@@ -9,8 +9,8 @@
 - **Total Python Modules**: `64`
 - **Total Classes**: `158`
 - **Total Top-Level Functions**: `198`
-- **Total Class Methods**: `893`
-- **Total Source Lines**: `26568`
+- **Total Class Methods**: `899`
+- **Total Source Lines**: `26742`
 
 ---
 
@@ -176,7 +176,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `687` lines (`31195` bytes)
+**Size**: `692` lines (`31456` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -712,7 +712,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `398` lines (`17586` bytes)
+**Size**: `410` lines (`18125` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -731,6 +731,7 @@
   - Method `.test_character_research_fleet_diplomacy_endpoints()`
   - Method `.test_crew_weapon_and_message_tree_endpoints()`
   - Method `.test_post_power()`
+  - Method `.test_post_travel_preview()`
   - Method `.test_post_orbit_and_scan()`
   - Method `.test_post_drone_and_upgrade_endpoints()`
   - Method `.test_contracts_and_relics_endpoints()`
@@ -911,7 +912,7 @@
 ### [`tests/test_transit_civ_events.py`](tests/test_transit_civ_events.py)
 > *Tests for in-system transit (TravelState), planetary civilization metadata, and cockpit GameEvents.*
 
-**Size**: `299` lines (`13718` bytes)
+**Size**: `355` lines (`16253` bytes)
 
 **Classes:**
 - `class TestTransitCivEvents` - *Verify TravelState, planetary faction/population/government, and GameEvent lifecycles.*
@@ -921,6 +922,8 @@
   - Method `.test_sublight_transit_progresses_and_completes_on_tick()`
   - Method `.test_quantum_in_system_transit_consumes_fuel_and_arrives_next_tick()`
   - Method `.test_start_travel_validation_guards()`
+  - Method `.test_travel_preview_reports_eta_fuel_and_risk()`
+  - Method `.test_transit_hazard_applies_damage_delay_and_event()`
   - Method `.test_start_travel_rejects_same_body_and_active_transit()`
   - Method `.test_event_emission_and_dismissal()`
   - Method `.test_cli_and_cockpit_surface_for_travel_and_events()`
@@ -1037,7 +1040,7 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `330` lines (`14679` bytes)
+**Size**: `334` lines (`14954` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
@@ -1222,7 +1225,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `5483` lines (`274865` bytes)
+**Size**: `5569` lines (`278884` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1260,6 +1263,9 @@
   - Method `.jump(target_system_id)` - *Execute a hyperspace jump to an adjacent star system.*
   - Method `.compute_body_distance_au(target_body, origin_body)` - *Compute 2D polar Euclidean distance in AU between two bodies (or current orbit/star origin).*
   - Method `.orbit(body_id)` - *Establish orbital trajectory around a celestial body in the current system.*
+  - Method `._transit_risk(system, mode, effects)` - *Sector hazard risk for one in-system transit, reduced by piloting and quantum drive.*
+  - Method `._travel_plan(body_id, mode)` - *Compute a transit plan without mutating state; shared by preview and execution.*
+  - Method `.preview_travel(body_id, mode)` - *Return ETA, fuel, risk and hazard names for a potential transit.*
   - Method `.start_travel(body_id, mode)` - *Initiate sublight or quantum in-system transit toward a celestial body.*
   - Method `.scan()` - *Perform sensor sweep of current body or local space.*
   - Method `.route_power(engines, shields, sensors, weapons)` - *Adjust reactor power distribution across ship subsystems.*
@@ -1749,7 +1755,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1147` lines (`47995` bytes)
+**Size**: `1158` lines (`48496` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

@@ -182,6 +182,18 @@ class TestServer(unittest.TestCase):
         self.assertTrue(json_data["ok"])
         self.assertEqual(json_data["state"]["ship"]["power"]["engines"], 35)
 
+    def test_post_travel_preview(self):
+        status, data = self._post("/api/travel/preview", {"body_id": "sol_body_3"})
+        self.assertEqual(status, 200)
+        parsed = json.loads(data.decode("utf-8"))
+        self.assertTrue(parsed["ok"])
+        sublight = parsed["previews"]["sublight"]
+        quantum = parsed["previews"]["quantum"]
+        self.assertIn("duration_ticks", sublight)
+        self.assertIn("risk", sublight)
+        self.assertIn("hazards", sublight)
+        self.assertGreaterEqual(quantum["fuel_cost"], 2)
+
     def test_post_orbit_and_scan(self):
         status, data = self._post("/api/orbit", {"target": "sol_body_1"})
         self.assertEqual(status, 200)

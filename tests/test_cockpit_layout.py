@@ -563,6 +563,11 @@ class TestSingleLineVitalsAndDistanceParity(unittest.TestCase):
     def test_orbit_button_uses_timed_transit(self):
         self.assertIn("TRANSIT & ORBIT (${estTicks}T)", self.js)
         self.assertNotIn("btnSublightTarget", self.js)
+        self.assertIn('id="transitPlan"', self.html)
+        self.assertIn("/api/travel/preview", self.js)
+        self.assertIn("refreshTransitPreview", self.js)
+        self.assertIn("COURSE PLOT", self.js)
+        self.assertIn("transit-plan-risk", self.js)
 
     def test_radar_backdrop_is_cached(self):
         self.assertIn("ensureRadarBackdrop", self.js)

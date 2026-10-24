@@ -655,3 +655,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Set the ticker base to 0.5s and the minimum interval to 0.05s, so 1x is 2 ticks/s and 10x is 20 ticks/s. Autosave is time-based every 15 seconds instead of every 10 ticks.
   4. Cache the static radar backdrop (map gradient, nebula, dust, starfield) in an offscreen canvas, skip drawing while the page is hidden, and remove backdrop blur from the HUD panels that overlay the moving map.
 - **Consequences**: The web UI no longer teleports into orbit and exposes one clear transit choice; the chrono is twice as fast at every preset with a meaningful quantum fuel trade-off; radar draw time drops to ~0.08ms with 60 FPS in the real browser. The suite grows to 499 tests.
+
+### ADR-054: In-System Transit Hazards, Course Plotting and Pre-Flight Risk Preview
+- **Date**: 2026-10-25
+- **Status**: Accepted
+- **Context**: Following the timed transit unification in ADR-053, navigation lacked situational awareness prior to launching: players could not preview travel duration or fuel requirements before clicking, environmental hazards from sector modifiers were uncalculated during travel, and the radar lacked visual vector cues connecting destination bodies.
+- **Decision**:
+  1. Add `SimulationEngine.preview_travel()` and `_transit_risk()` computing duration, fuel expenditure, hazard names and bounded risk percentage (3% to 45%) mitigated by piloting skill, evasion stats and quantum transit.
+  2. Integrate transit hazards into `SimulationEngine.start_travel()`: hazard impacts inflict deflector and hull abrasion, cause arrival delays (+1 tick), and spawn persistent `GameEvent` notifications and flight log entries.
+  3. Implement `POST /api/travel/preview` in `server.py` exposing sublight and quantum calculations.
+  4. Render an interactive `#transitPlan` card in the target dossier with color-coded risk indicators, ETA and fuel metrics, and hazard descriptors, alongside a dashed `COURSE PLOT` transit vector on the orbital radar canvas.
+  5. Tighten dossier vertical dimensions and resource tag typography (>=12px) for DPR-correct, unclipped rendering across 720p, laptop and 4K viewports with zero console findings.
+- **Consequences**: Navigation delivers tactical depth, transparent travel economics, and emergent sector hazard tension; real-browser automated audits verify zero console, horizontal overflow or sub-12px text defects; the test suite expands to 502 automated tests.

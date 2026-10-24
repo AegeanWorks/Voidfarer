@@ -76,18 +76,22 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
         page.wait_for_timeout(500)
     elif scenario == "target":
         page.evaluate(
-            """() => {
+            """async () => {
                 const cockpit = window.cockpit;
                 const bodies = (cockpit.state.current_system && cockpit.state.current_system.bodies) || [];
-                const body = bodies.find(item => item.body_type !== "star") || bodies[0];
+                const orbitingId = cockpit.state.ship && cockpit.state.ship.orbiting_body_id;
+                const body = bodies.find(item => item.id !== orbitingId && item.body_type !== "star") || bodies[0];
                 if (body) {
                     cockpit.selectedTarget = body;
                     cockpit.selectedType = "body";
                     cockpit.updateTargetCard();
+                    if (cockpit.refreshTransitPreview) {
+                        await cockpit.refreshTransitPreview(body.id);
+                    }
                 }
             }"""
         )
-        page.wait_for_timeout(500)
+        page.wait_for_timeout(700)
     elif scenario == "event":
         page.evaluate(
             """() => {

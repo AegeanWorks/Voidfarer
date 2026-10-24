@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from voidfarer.cli import main as cli_main
@@ -117,6 +118,61 @@ class TestTransitCivEvents(unittest.TestCase):
         )
         ok_no_fuel, _ = self.engine.start_travel("sol_body_4", mode="quantum")
         self.assertFalse(ok_no_fuel)
+
+    def test_travel_preview_reports_eta_fuel_and_risk(self) -> None:
+        self.engine.orbit("sol_body_1")
+        ok_s, sub = self.engine.preview_travel("sol_body_3", mode="sublight")
+        self.assertTrue(ok_s)
+        self.assertIsInstance(sub, dict)
+        self.assertEqual(sub["fuel_cost"], 0)
+        self.assertGreaterEqual(sub["duration_ticks"], 1)
+        self.assertGreaterEqual(sub["risk"], 0.01)
+        self.assertIn("hazards", sub)
+        self.assertTrue(sub["can_start"])
+
+        ok_q, quantum = self.engine.preview_travel("sol_body_3", mode="quantum")
+        self.assertTrue(ok_q)
+        self.assertGreaterEqual(quantum["fuel_cost"], 2)
+        self.assertEqual(quantum["duration_ticks"], 1)
+        self.assertLessEqual(quantum["risk"], sub["risk"] + 0.001)
+
+        ok_same, same = self.engine.preview_travel("sol_body_1", mode="sublight")
+        self.assertTrue(ok_same)
+        self.assertFalse(same["can_start"])
+        self.assertIn("Already in orbit", same["blocked_reason"])
+
+    def test_transit_hazard_applies_damage_delay_and_event(self) -> None:
+        self.engine.orbit("sol_body_1")
+        effects = {
+            "fuel_mult": 1.0,
+            "scan_mult": 1.0,
+            "encounter_mult": 1.0,
+            "sensor_mult": 1.0,
+            "heat_mult": 1.0,
+            "cooling_bonus": 0.0,
+            "trade_margin": 0.0,
+            "relic_find": 0.0,
+            "evasion": 0.0,
+            "hull_hazard": 1.0,
+        }
+        with patch.object(self.engine, "_map_effects", return_value=effects), \
+                patch.object(self.engine.rng, "random", return_value=0.0):
+            ok_plan, plan = self.engine.preview_travel("sol_body_3", mode="sublight")
+            before_hull = self.engine.state.ship.hull
+            before_shield = self.engine.state.ship.shield
+            ok, message = self.engine.start_travel("sol_body_3", mode="sublight")
+            travel = self.engine.state.ship.travel
+            hull_after = self.engine.state.ship.hull
+            shield_after = self.engine.state.ship.shield
+
+        self.assertTrue(ok_plan)
+        self.assertTrue(ok, message)
+        self.assertIn("TRANSIT HAZARD", message)
+        self.assertIsNotNone(travel)
+        self.assertEqual(travel.duration_ticks, plan["duration_ticks"] + 1)
+        self.assertLessEqual(hull_after, before_hull)
+        self.assertLessEqual(shield_after, before_shield)
+        self.assertTrue(any(event.kind == "hazard" for event in self.engine.state.events))
 
     def test_start_travel_rejects_same_body_and_active_transit(self) -> None:
         self.engine.orbit("sol_body_1")

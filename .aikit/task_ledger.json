@@ -1,58 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "transit-speed-performance-v1",
+    "task_id": "transit-hazards-course-preview-v1",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1792869657.3329268,
-    "owner": "unidentified",
-    "started_by": "unidentified",
+    "updated_at": 1792877457.3933058,
+    "owner": "antigravity",
+    "started_by": "antigravity",
     "continuations": [],
-    "completed_at": 1792869657.519736
+    "completed_at": 1792877477.0708122
   },
   "checkpoints": [
-    {
-      "task_id": "browser-ui-review-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verified: real Playwright Edge captures at desktop/laptop/short/ultrawide/4K; all 16 tabs, menu/settings/character/perks and target/event/combat report zero console/HTTP/hscroll/tiny; the panel-center cover was removed and the starfield map is visible; the free vision reviewer approved the map and Stellaris cockpit; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792844291.43159,
-      "timestamp_str": "2026-10-24 15:18:11",
-      "handoff": {
-        "state": "real-browser driver, transparent center, nebula/starfield, Stellaris notifications/combat, outliner glyphs",
-        "next": "commit and refresh the cockpit UI evidence, then run check --strict",
-        "open": "none in the UI, only delivery bookkeeping",
-        "evidence": "ui-review screenshots, ADR-047, real-browser reports"
-      }
-    },
-    {
-      "task_id": "browser-ui-review-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'browser-ui-review-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792844291.5930533,
-      "timestamp_str": "2026-10-24 15:18:11"
-    },
-    {
-      "task_id": "galaxy-map-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: fit, sharpen and label the galaxy map while removing the center backdrop blur",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792851814.3827057,
-      "timestamp_str": "2026-10-24 17:23:34",
-      "impact_assessment": {
-        "why": "Galaxy mode rendered as a blurred empty field because panel-center inherited a 16px backdrop blur, the galaxy used a fixed scale, hit testing used a different scale, and atmosphere overlays washed out the nodes",
-        "benefits": "All 15 systems, hyperlane links and labels fit at every Windows viewport; orbital mode is crisp; drawing and click hit testing share one transform; galaxy mode has repeatable Playwright evidence",
-        "risks": "contract: none; dependency: Playwright remains dev-only; concurrency: the browser driver starts and stops its own server per run; state: static UI and tooling only, no simulation changes",
-        "mitigation": "Real-browser captures at desktop/laptop/short/ultrawide/4K, galaxy node pixel checks, free-vision approval, 496 tests, 4/4 gates and ADR-048"
-      }
-    },
     {
       "task_id": "galaxy-map-v1",
       "phase": "phase 4",
@@ -288,6 +247,49 @@
       "timestamp": 1792869657.5197375,
       "timestamp_str": "2026-10-24 22:20:57",
       "agent": "unidentified"
+    },
+    {
+      "task_id": "transit-hazards-course-preview-v1",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: integrate transit hazards, course plotting, and pre-flight risk preview",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792877445.6783917,
+      "timestamp_str": "2026-10-25 00:30:45",
+      "agent": "antigravity",
+      "impact_assessment": {
+        "why": "Players lacked situational awareness before launching: travel duration and fuel were only partially estimated on buttons, sector environmental hazards were uncalculated during travel, and the radar did not visualize transit vectors.",
+        "benefits": "Strategic pre-flight transit planning with sublight/quantum comparison, color-coded risk %, hazard descriptors, dynamic radar course vectors, and sector hazard events.",
+        "risks": "contract: REST /api/travel/preview added; dependency: none; concurrency: engine simulation lock shared; state: GameState events updated on hazard strike",
+        "mitigation": "Automated unittests for preview and hazards, real-browser Playwright captures across viewports, typography tightening for 720p, 502 tests and 4/4 gates."
+      }
+    },
+    {
+      "task_id": "transit-hazards-course-preview-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verified: transit hazard simulation inflicts damage, delay and events on hazard strikes; /api/travel/preview returns sublight and quantum breakdowns; target dossier displays real-time transit plan; dashed COURSE PLOT renders on radar; target card compacted for 720p with action buttons unclipped; browser captures report 0 errors, 0 hscroll, 0 tiny text across desktop/laptop/short; vision approved; 502 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792877457.3933058,
+      "timestamp_str": "2026-10-25 00:30:57",
+      "agent": "antigravity",
+      "handoff": {
+        "state": "in-system hazards, course plot vector, target transit plan card, ADR-054",
+        "next": "commit and deliver task",
+        "evidence": "ui-review screenshots, report.json, ADR-054"
+      }
+    },
+    {
+      "task_id": "transit-hazards-course-preview-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'transit-hazards-course-preview-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792877477.070814,
+      "timestamp_str": "2026-10-25 00:31:17",
+      "agent": "antigravity"
     }
   ]
 }

@@ -6619,6 +6619,7 @@ input[type="text"], input[type="number"], select, textarea { min-height: 30px; b
 .target-info-grid span { color: var(--console-muted); }
 .target-info-grid strong { color: var(--console-ivory); font-family: var(--font-mono); }
 .target-resources { color: var(--console-text); font-size: 12px; }
+.target-resources span { border: 1px solid rgba(127, 183, 201, 0.25); border-radius: 0; padding: 2px 6px; font-family: var(--font-mono); font-size: 12px; color: var(--console-cyan); }
 .target-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
 .btn-action, .btn-service, .btn-combat { min-height: 32px; padding: 7px 9px; border-radius: 0; font-size: 12px; }
 
@@ -6760,7 +6761,14 @@ input[type="text"], input[type="number"], select, textarea { min-height: 30px; b
     .skill-quick-chip { min-height: 50px; }
     .hud-command-strip .flight-log-stream { height: 78px; max-height: 78px; }
     .hud-footer { padding: 4px 10px; }
-    .nav-target-card { max-height: calc(100vh - 370px); }
+    .nav-target-card { top: 136px; max-height: calc(100vh - 290px); padding: 7px 9px; }
+    .target-desc { font-size: 12px; line-height: 1.25; margin-bottom: 2px; }
+    .target-info-grid > * { padding: 1px 3px; }
+    .target-resources { margin-bottom: 4px; gap: 3px; }
+    .transit-plan { margin: 2px 0; padding: 3px 5px; gap: 1px; }
+    .transit-plan-hazard { margin: 0 0 1px 60px; }
+    .target-actions { gap: 4px; }
+    .btn-action { min-height: 28px; padding: 4px 6px; }
 }
 @media (min-width: 2300px) {
     .skills-quick-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -7760,4 +7768,44 @@ body.cockpit-theme .panel-center {
 .main-menu-card {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+}
+
+/* Transit plan preview in the target dossier. */
+.transit-plan {
+    margin: 6px 0;
+    padding: 7px 8px;
+    border: 1px solid rgba(201, 163, 90, 0.22);
+    border-radius: 0;
+    background: #07101d;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.transit-plan-title {
+    color: var(--console-gold);
+    font-family: var(--console-ui);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+}
+.transit-plan-row {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+    gap: 6px;
+    align-items: center;
+    color: var(--console-text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+.transit-plan-mode { color: var(--console-gold-bright); }
+.transit-plan-risk { text-align: right; }
+.risk-low { color: var(--console-green); }
+.risk-mid { color: var(--console-gold-bright); }
+.risk-high { color: var(--console-red); }
+.transit-plan-hazard {
+    margin: 0 0 2px 64px;
+    color: var(--console-muted);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

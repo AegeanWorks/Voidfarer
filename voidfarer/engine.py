@@ -1435,83 +1435,169 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship)
             return True, f"Now in orbit around {matched.name} ({distance_au:.1f} AU)."
 
+    def _transit_risk(self, system: StarSystem | None, mode: str,
+                      effects: dict[str, float] | None = None) -> tuple[float, list[str]]:
+        """Sector hazard risk for one in-system transit, reduced by piloting and quantum drive."""
+        map_effects = effects if effects is not None else self._map_effects(system)
+        hazard = max(0.0, float(map_effects.get("hull_hazard", 0.0)))
+        encounter = max(0.0, float(map_effects.get("encounter_mult", 1.0)) - 1.0)
+        evasion = float(map_effects.get("evasion", 0.0)) + self._skill("piloting") * 0.5
+        risk = 0.03 + hazard * 0.10 + encounter * 0.08
+        risk *= max(0.25, 1.0 - evasion)
+        if mode == "quantum":
+            risk *= 0.35
+        risk = max(0.01, min(0.45, risk))
+        hazards = sorted({
+            modifier.name for modifier in (system.modifiers if system else ())
+            if modifier.category == "hazard"
+        })
+        return round(risk, 3), hazards
+
+    def _travel_plan(self, body_id: str, mode: str) -> tuple[dict[str, Any] | None, str]:
+        """Compute a transit plan without mutating state; shared by preview and execution."""
+        norm_mode = str(mode).strip().lower()
+        if norm_mode not in ("sublight", "quantum"):
+            return None, f"Invalid transit mode '{mode}'. Choose 'sublight' or 'quantum'."
+
+        cur_sys = self.current_system
+        matched = next((b for b in cur_sys.bodies if b.id == body_id), None)
+        if not matched:
+            return None, f"Celestial body '{body_id}' not found in {cur_sys.name}."
+
+        origin = self.orbiting_body
+        origin_id = origin.id if origin else None
+        distance_au = self.compute_body_distance_au(matched, origin)
+        map_effects = self._map_effects(cur_sys)
+        risk, hazards = self._transit_risk(cur_sys, norm_mode, map_effects)
+
+        fuel_cost = 0
+        if norm_mode == "quantum":
+            equipment = self._combined_equipment()
+            passives = calculate_passive_multipliers(self.state.ship)
+            research = self._research_bonuses()
+            fuel_mult = (
+                float(map_effects["fuel_mult"])
+                * equipment["fuel_efficiency"]
+                * passives.get("fuel_efficiency", 1.0)
+                * research.get("fuel_efficiency", 1.0)
+                * (1.0 - min(0.25, self._skill("piloting")))
+            )
+            fuel_cost = max(2, int(math.ceil(distance_au * 1.0 * fuel_mult)))
+            duration_ticks = 1
+        else:
+            engine_factor = max(0.4, self._effective_power("engines") / 25.0) * (1.0 + self._skill("piloting"))
+            sublight_speed_au = max(0.35, 1.15 * engine_factor)
+            duration_ticks = max(1, int(math.ceil(distance_au / sublight_speed_au)))
+
+        blocked_reason = ""
+        if origin is not None and origin.id == matched.id:
+            blocked_reason = f"Already in orbit around {matched.name}."
+        elif self.state.ship.travel is not None:
+            active = self.state.ship.travel
+            destination_name = next(
+                (b.name for b in cur_sys.bodies if b.id == active.destination_body_id),
+                active.destination_body_id,
+            )
+            blocked_reason = (
+                f"Already in transit to {destination_name}; "
+                f"arrival is scheduled for tick {active.arrival_tick}."
+            )
+        elif norm_mode == "quantum" and self.state.ship.fuel < fuel_cost:
+            blocked_reason = f"Insufficient quantum fuel: need {fuel_cost}, have {self.state.ship.fuel}."
+        return {
+            "mode": norm_mode,
+            "body_id": matched.id,
+            "body_name": matched.name,
+            "origin_body_id": origin_id,
+            "distance_au": round(distance_au, 2),
+            "duration_ticks": duration_ticks,
+            "fuel_cost": fuel_cost,
+            "risk": risk,
+            "hazards": hazards,
+            "can_start": not blocked_reason,
+            "blocked_reason": blocked_reason,
+        }, ""
+
+    def preview_travel(self, body_id: str, mode: str = "sublight") -> tuple[bool, dict[str, Any] | str]:
+        """Return ETA, fuel, risk and hazard names for a potential transit."""
+        with self.lock:
+            plan, message = self._travel_plan(body_id, mode)
+            if plan is None:
+                return False, message
+            return True, plan
+
     def start_travel(self, body_id: str, mode: str = "sublight") -> tuple[bool, str]:
         """Initiate sublight or quantum in-system transit toward a celestial body."""
         with self.lock:
-            norm_mode = str(mode).strip().lower()
-            if norm_mode not in ("sublight", "quantum"):
-                return False, f"Invalid transit mode '{mode}'. Choose 'sublight' or 'quantum'."
+            plan, message = self._travel_plan(body_id, mode)
+            if plan is None:
+                return False, message
+            if not plan["can_start"]:
+                return False, str(plan["blocked_reason"])
 
             cur_sys = self.current_system
-            matched = None
-            for b in cur_sys.bodies:
-                if b.id == body_id:
-                    matched = b
-                    break
+            matched = next(b for b in cur_sys.bodies if b.id == body_id)
+            distance_au = float(plan["distance_au"])
+            duration_ticks = int(plan["duration_ticks"])
+            fuel_cost = int(plan["fuel_cost"])
+            hazard_hit = self.rng.random() < float(plan["risk"])
 
-            if not matched:
-                return False, f"Celestial body '{body_id}' not found in {cur_sys.name}."
-
-            origin = self.orbiting_body
-            origin_id = origin.id if origin else None
-            distance_au = self.compute_body_distance_au(matched, origin)
-
-            if origin is not None and origin.id == matched.id:
-                return False, f"Already in orbit around {matched.name}."
-
-            active_travel = self.state.ship.travel
-            if active_travel is not None:
-                dest_name = next(
-                    (b.name for b in cur_sys.bodies if b.id == active_travel.destination_body_id),
-                    active_travel.destination_body_id,
-                )
-                return False, f"Already in transit to {dest_name}; arrival is scheduled for tick {active_travel.arrival_tick}."
-
-            new_fuel = self.state.ship.fuel
-            if norm_mode == "quantum":
-                travel_map = self._map_effects(cur_sys)
-                equipment = self._combined_equipment()
-                passives = calculate_passive_multipliers(self.state.ship)
-                research = self._research_bonuses()
-                fuel_mult = (
-                    float(travel_map["fuel_mult"])
-                    * equipment["fuel_efficiency"]
-                    * passives.get("fuel_efficiency", 1.0)
-                    * research.get("fuel_efficiency", 1.0)
-                    * (1.0 - min(0.25, self._skill("piloting")))
-                )
-                fuel_cost = max(2, int(math.ceil(distance_au * 1.0 * fuel_mult)))
-                if self.state.ship.fuel < fuel_cost:
-                    return False, f"Insufficient quantum fuel for micro-jump: need {fuel_cost}, have {self.state.ship.fuel}."
-                new_fuel -= fuel_cost
-                duration_ticks = 1
-            else:
-                engine_factor = max(0.4, self._effective_power("engines") / 25.0) * (1.0 + self._skill("piloting"))
-                sublight_speed_au = max(0.35, 1.15 * engine_factor)
-                duration_ticks = max(1, int(math.ceil(distance_au / sublight_speed_au)))
+            shield_loss = 0
+            hull_loss = 0
+            hazard_delay = 0
+            hazard_name = ""
+            if hazard_hit:
+                hazard_delay = 1
+                damage = max(4, min(18, int(4 + distance_au * 0.5)))
+                shield_loss = min(self.state.ship.shield, damage)
+                hull_loss = min(max(0, self.state.ship.hull - 1), damage - shield_loss)
+                hazard_name = " // ".join(plan["hazards"]) or "Micrometeoroid Swarm"
 
             cur_tick = self.state.time.tick
+            total_ticks = duration_ticks + hazard_delay
             travel = TravelState(
-                origin_body_id=origin_id,
+                origin_body_id=plan["origin_body_id"],
                 destination_body_id=matched.id,
-                mode=norm_mode,
+                mode=plan["mode"],
                 started_tick=cur_tick,
-                arrival_tick=cur_tick + duration_ticks,
+                arrival_tick=cur_tick + total_ticks,
                 distance_au=distance_au,
-                duration_ticks=duration_ticks,
+                duration_ticks=total_ticks,
             )
 
-            log_entry = f"Engaged {norm_mode} drive toward {matched.name} ({distance_au:.1f} AU, ETA {duration_ticks} tick(s))."
+            log_entry = (
+                f"Engaged {plan['mode']} drive toward {matched.name} "
+                f"({distance_au:.1f} AU, ETA {total_ticks} tick(s), fuel: {fuel_cost})."
+            )
+            new_events = list(self.state.events)
+            if hazard_hit:
+                log_entry += (
+                    f" TRANSIT HAZARD: {hazard_name}; shields -{shield_loss}, "
+                    f"hull -{hull_loss}, ETA +{hazard_delay} tick."
+                )
+                new_events.append(GameEvent(
+                    id=f"evt_{cur_tick}_{len(new_events) + 1}",
+                    kind="hazard",
+                    title=f"Transit Hazard: {hazard_name}",
+                    message=(
+                        f"{hazard_name} struck during transit to {matched.name}. "
+                        f"Shields -{shield_loss}, hull -{hull_loss}, arrival delayed by {hazard_delay} tick."
+                    ),
+                    tick=cur_tick,
+                    dismissed=False,
+                ))
             new_log = list(self.state.ship.flight_log[-19:]) + [log_entry]
 
             new_ship = self._clone_ship(
-                fuel=new_fuel,
+                fuel=self.state.ship.fuel - fuel_cost,
+                shield=self.state.ship.shield - shield_loss,
+                hull=self.state.ship.hull - hull_loss,
                 landed_body_id=None,
                 travel=travel,
                 flight_log=tuple(new_log[-20:]),
             )
             new_time = replace(self.state.time, is_paused=False) if self.state.time.is_paused else self.state.time
-            self.state = self._clone_state(ship=new_ship, time=new_time)
+            self.state = self._clone_state(ship=new_ship, time=new_time, events=tuple(new_events))
             return True, log_entry
 
     def scan(self) -> tuple[bool, str, dict[str, Any]]:

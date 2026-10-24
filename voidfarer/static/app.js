@@ -350,6 +350,11 @@ class CockpitApp {
         this.targetPopulation = document.getElementById("targetPopulation");
         this.targetGovernment = document.getElementById("targetGovernment");
         this.targetResources = document.getElementById("targetResources");
+        this.transitPlan = document.getElementById("transitPlan");
+        this.transitPreviewToken = 0;
+        this.transitPreviewBodyId = null;
+        this.transitPreviewAt = 0;
+        this.transitPreviewData = null;
         this.eventPopupContainer = document.getElementById("eventPopupContainer");
 
         // Power Matrix
@@ -3423,6 +3428,72 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         return Math.max(0.25, Math.hypot(tx - ox, ty - oy));
     }
 
+    applyTransitPreviewLabels(bodyId) {
+        const data = this.transitPreviewData;
+        if (!data || data.body_id !== bodyId) return;
+        const travel = this.state.ship?.travel;
+        const inOrbit = this.state.ship?.orbiting_body_id === bodyId;
+        if (travel || inOrbit) return;
+        if (data.sublight?.can_start) {
+            this.btnOrbitTarget.textContent = `TRANSIT & ORBIT (${data.sublight.duration_ticks}T)`;
+        }
+        if (data.quantum && this.btnQuantumTarget) {
+            this.btnQuantumTarget.textContent = `QUANTUM (1T // ${data.quantum.fuel_cost}F)`;
+            this.btnQuantumTarget.disabled = !data.quantum.can_start;
+        }
+    }
+
+    async refreshTransitPreview(bodyId) {
+        if (!this.transitPlan || !bodyId) return;
+        const now = Date.now();
+        if (this.transitPreviewBodyId === bodyId && now - this.transitPreviewAt < 1500) return;
+        this.transitPreviewBodyId = bodyId;
+        this.transitPreviewAt = now;
+        const token = ++this.transitPreviewToken;
+        try {
+            const res = await fetch("/api/travel/preview", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ body_id: bodyId })
+            });
+            const json = await res.json();
+            if (token !== this.transitPreviewToken || this.selectedTarget?.id !== bodyId) return;
+            const sublight = json.previews?.sublight;
+            const quantum = json.previews?.quantum;
+            if (!json.ok || !sublight?.ok || !quantum?.ok) {
+                this.transitPlan.style.display = "none";
+                return;
+            }
+            const riskClass = risk => risk >= 0.20 ? "risk-high" : risk >= 0.10 ? "risk-mid" : "risk-low";
+            const riskPct = risk => Math.max(1, Math.round(risk * 100));
+            this.transitPlan.innerHTML = `
+                <div class="transit-plan-title">TRANSIT PLAN</div>
+                <div class="transit-plan-row">
+                    <span class="transit-plan-mode">SUBLIGHT</span>
+                    <span class="transit-plan-eta">${sublight.duration_ticks}T // FREE</span>
+                    <span class="transit-plan-risk ${riskClass(sublight.risk)}">RISK ${riskPct(sublight.risk)}%</span>
+                </div>
+                <div class="transit-plan-hazard">${this.escapeHtml(sublight.hazards.join(" // ") || "CLEAR CORRIDOR")}</div>
+                <div class="transit-plan-row">
+                    <span class="transit-plan-mode">QUANTUM</span>
+                    <span class="transit-plan-eta">${quantum.duration_ticks}T // ${quantum.fuel_cost}F</span>
+                    <span class="transit-plan-risk ${riskClass(quantum.risk)}">RISK ${riskPct(quantum.risk)}%</span>
+                </div>
+                <div class="transit-plan-hazard">${this.escapeHtml(quantum.hazards.join(" // ") || "CLEAR CORRIDOR")}</div>
+            `;
+            const inOrbitNow = this.state.ship?.orbiting_body_id === bodyId;
+            if (inOrbitNow) {
+                this.transitPlan.style.display = "none";
+                return;
+            }
+            this.transitPlan.style.display = "block";
+            this.transitPreviewData = { body_id: bodyId, sublight, quantum };
+            this.applyTransitPreviewLabels(bodyId);
+        } catch (e) {
+            this.transitPlan.style.display = "none";
+        }
+    }
+
     updateTargetCard() {
         if (!this.state) return;
         const travel = this.state.ship?.travel || this.state.travel || null;
@@ -3431,6 +3502,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.selectedTarget) {
             // Hide target card when nothing selected
             if (targetCard) targetCard.style.display = "none";
+            this.transitPreviewToken += 1;
+            this.transitPreviewData = null;
+            this.transitPreviewBodyId = null;
+            if (this.transitPlan) {
+                this.transitPlan.style.display = "none";
+                this.transitPlan.innerHTML = "";
+            }
             return;
         }
         
@@ -3483,6 +3561,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     : hasTravel ? "TRANSIT LOCKED" : "QUANTUM TRANSIT (1T)";
                 this.btnQuantumTarget.title = "One-tick micro-jump; costs quantum fuel.";
             }
+
+            this.applyTransitPreviewLabels(b.id);
+            this.refreshTransitPreview(b.id);
 
             this.targetGravity.textContent = `${(b.gravity ?? 1).toFixed(2)} g`;
             this.targetAtmosphere.textContent = b.atmosphere || "none";
@@ -3545,6 +3626,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 }
             }
         } else if (this.selectedType === "system") {
+            this.transitPreviewToken += 1;
+            this.transitPreviewData = null;
+            this.transitPreviewBodyId = null;
+            if (this.transitPlan) {
+                this.transitPlan.style.display = "none";
+                this.transitPlan.innerHTML = "";
+            }
             const fresh = this.galaxySystems[this.selectedTarget.id];
             if (!fresh) {
                 this.selectedTarget = null;
@@ -3884,6 +3972,33 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.fillText(b.name, bx + bodyRadius + 6, by + 3);
             }
         });
+
+        const activeCourseTravel = ship.travel || this.state.travel || null;
+        const originBody = bodies.find(b => b.id === ship.orbiting_body_id);
+        const targetBody = this.selectedTarget && this.selectedType === "body"
+            ? bodies.find(b => b.id === this.selectedTarget.id)
+            : null;
+        if (!activeCourseTravel && originBody && targetBody && targetBody.id !== originBody.id) {
+            const fromAngle = originBody.current_angle || 0;
+            const toAngle = targetBody.current_angle || 0;
+            const fromX = cx + Math.cos(fromAngle) * originBody.orbit_radius * auScale;
+            const fromY = cy + Math.sin(fromAngle) * originBody.orbit_radius * auScale;
+            const toX = cx + Math.cos(toAngle) * targetBody.orbit_radius * auScale;
+            const toY = cy + Math.sin(toAngle) * targetBody.orbit_radius * auScale;
+            ctx.save();
+            ctx.setLineDash([6, 6]);
+            ctx.strokeStyle = "rgba(111, 195, 215, 0.5)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = "10px 'Segoe UI'";
+            ctx.fillStyle = "rgba(236, 228, 212, 0.68)";
+            ctx.fillText("COURSE PLOT", (fromX + toX) / 2 + 6, (fromY + toY) / 2 - 6);
+            ctx.restore();
+        }
 
         this.drawTravelAnimation(ctx, cx, cy, auScale);
     }

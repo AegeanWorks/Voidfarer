@@ -138,5 +138,19 @@
     "final_snapshot_digest": "244f5806db152c274e88e75e5bd995d553e50817126af58bf87e2f3490013b5f",
     "final_snapshot_entries": 761,
     "surface_digest": "376ffd49a5a4a66520e7588ced5814a1556a30835ca59d60fd4fbd47f2f23025"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "c1efb0954a257fe032c1fbc00c3e320ac5b5aafb",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1792878400.0,
+    "finished_at": 1792878500.0,
+    "strikes": 0,
+    "reviewer": "Gemini 3.8 Flash (G-015 vision review)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "fcdaef4fecf923f83d4490224715438c5c3360b043e66904d7cb3434baf56d13",
+    "final_snapshot_entries": 766,
+    "surface_digest": "6d38f81a474270881869cdd9a888fcd559777fa6b8bcd9c150d5b2bf59374c16"
   }
 ]

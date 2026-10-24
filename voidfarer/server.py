@@ -940,6 +940,17 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/travel/preview":
+            body_id = str(body.get("body_id", ""))
+            previews = {}
+            ok_all = True
+            for mode in ("sublight", "quantum"):
+                ok, data = self.engine.preview_travel(body_id, mode=mode)
+                previews[mode] = {"ok": ok, **(data if isinstance(data, dict) else {"message": str(data)})}
+                ok_all = ok_all and ok
+            self._send_json({"ok": ok_all, "previews": previews})
+            return
+
         if path == "/api/travel":
             body_id = str(body.get("body_id", ""))
             mode = str(body.get("mode", "sublight"))
