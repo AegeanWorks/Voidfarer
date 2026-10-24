@@ -124,5 +124,19 @@
     "final_snapshot_digest": "e864f7420306fc48b300b38b4129540cf5141cbd34d5a445fbdb8ffa4ac98eea",
     "final_snapshot_entries": 764,
     "surface_digest": "9b24518323a46a5f3860e3a876271761c7e1fc023b857f6dedb287ed80c99dfa"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "39fced3f11447daff7c268355f360eebde3c0103",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1792869708.542793,
+    "finished_at": 1792869725.1392992,
+    "strikes": 0,
+    "reviewer": "NVIDIA Nemotron 3.5 Super VL (free; G-015)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "244f5806db152c274e88e75e5bd995d553e50817126af58bf87e2f3490013b5f",
+    "final_snapshot_entries": 761,
+    "surface_digest": "376ffd49a5a4a66520e7588ced5814a1556a30835ca59d60fd4fbd47f2f23025"
   }
 ]
