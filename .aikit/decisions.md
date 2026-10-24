@@ -644,3 +644,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Bound the ship panel to its terminal column with a `ship-top-row` grid: a 240px schematic and compact stats card, followed by a full-width module catalog ledger with name/slot, effects/cost and install/remove actions.
   4. Verify the merged Skills tab, the ship panel and all radar controls in the real browser. The vision reviewer approved Skills and the rebuilt ship dossier; Playwright confirmed every radar control changes state and the central map still receives clicks.
 - **Consequences**: The radar controls are now usable and visibly stateful; there is one player skill/perk/relic surface with no duplicate entry points; and the ship panel no longer overflows its terminal. Browser audits are zero at desktop, laptop and 720p, and the suite remains 496 tests.
+
+### ADR-053: Unified Transit, Faster Chrono and Cached Radar
+- **Date**: 2026-10-24
+- **Status**: Accepted
+- **Context**: The target card exposed both ENTER ORBIT (an instant `/api/orbit` teleport) and SUBLIGHT TRANSIT (a timed `/api/travel`), so the former bypassed travel and the latter duplicated it. The chrono advanced only one tick per second at 1x, while autosave ran every 10 ticks and could hitch high-speed play. The radar redrew 1,100 stars, nebula gradients and dust every frame, and HUD backdrop filters composited the moving map.
+- **Decision**:
+  1. Repurpose the orbit action as `TRANSIT & ORBIT`, remove the separate `SUBLIGHT TRANSIT` button, and delete the instant-orbit client path. `start_travel` now rejects same-body trips and second transit orders while a trip is active; arrival automatically establishes orbit.
+  2. Keep quantum transit as the premium one-tick option, raise its minimum fuel cost to 2 and its distance rate to 1.0 fuel/AU; sublight remains free but slower.
+  3. Set the ticker base to 0.5s and the minimum interval to 0.05s, so 1x is 2 ticks/s and 10x is 20 ticks/s. Autosave is time-based every 15 seconds instead of every 10 ticks.
+  4. Cache the static radar backdrop (map gradient, nebula, dust, starfield) in an offscreen canvas, skip drawing while the page is hidden, and remove backdrop blur from the HUD panels that overlay the moving map.
+- **Consequences**: The web UI no longer teleports into orbit and exposes one clear transit choice; the chrono is twice as fast at every preset with a meaningful quantum fuel trade-off; radar draw time drops to ~0.08ms with 60 FPS in the real browser. The suite grows to 499 tests.

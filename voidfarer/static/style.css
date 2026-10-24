@@ -7746,3 +7746,18 @@ body.cockpit-theme .panel-center {
 @media (max-width: 1599px) {
     .ship-top-row { grid-template-columns: 1fr; }
 }
+
+/* Static HUD surfaces should not pay for full-screen backdrop blur. */
+.hud-topbar,
+.panel-left,
+.hud-command-strip,
+.hud-strip-panel,
+.deck-panel,
+.nav-target-card,
+.map-controls-panel,
+.log-panel,
+.game-window,
+.main-menu-card {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}

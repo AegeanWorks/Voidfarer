@@ -3,6 +3,8 @@
  * Master Web Client: Canvas Radar, Procedural Web Audio Synth, Fleet/Arsenal Controller, and REST Link.
  */
 
+const TICKS_PER_SECOND = 2.0;
+
 const SKILL_META = {
     piloting: { name: "Piloting", icon: "✈", desc: "Improves sublight maneuverability, warp efficiency, and evasion." },
     engineering: { name: "Engineering", icon: "⚙", desc: "Boosts repair speed, shield recharge, and module efficiency." },
@@ -270,6 +272,8 @@ class CockpitApp {
         this.radarLabels = true;
         this.travelAnimationEnabled = true;
         this.travelAnimation = null;
+        this.radarBackdrop = null;
+        this.radarBackdropKey = null;
         this.savesList = [];
         this.activeSaveSlot = "default";
         this.gameStarted = false;
@@ -331,7 +335,6 @@ class CockpitApp {
         this.targetDist = document.getElementById("targetDist");
         this.targetDesc = document.getElementById("targetDesc");
         this.btnOrbitTarget = document.getElementById("btnOrbitTarget");
-        this.btnSublightTarget = document.getElementById("btnSublightTarget");
         this.btnQuantumTarget = document.getElementById("btnQuantumTarget");
         this.btnLandTarget = document.getElementById("btnLandTarget");
         this.btnSalvageTarget = document.getElementById("btnSalvageTarget");
@@ -622,8 +625,7 @@ class CockpitApp {
         });
 
         // Target actions
-        this.btnOrbitTarget.addEventListener("click", () => this.handleOrbitAction());
-        this.btnSublightTarget?.addEventListener("click", () => this.handleTravelAction("sublight"));
+        this.btnOrbitTarget.addEventListener("click", () => this.handleTravelAction("sublight"));
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
         this.btnJumpTarget.addEventListener("click", () => this.handleJumpAction());
 
@@ -3270,33 +3272,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
-    async handleOrbitAction() {
-        if (!this.selectedTarget || this.selectedType !== "body") return;
-        this.sound.init();
-        this.sound.playBeep(920);
-        const fromBodyId = this.state?.ship?.orbiting_body_id;
-        const toBodyId = this.selectedTarget.id;
-        try {
-            const res = await fetch("/api/orbit", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ target: this.selectedTarget.id })
-            });
-            const json = await res.json();
-            if (json.ok) {
-                this.appendLog(json.message, "system");
-                this.state = json.state;
-                this.startTravelAnimation(fromBodyId, toBodyId);
-                this.renderHUD();
-                this.updateTargetCard();
-            } else {
-                this.appendLog(`[ERROR] ${json.message}`, "hazard");
-            }
-        } catch (e) {
-            this.appendLog(`[ERROR] Orbit execution failed: ${e.message}`, "hazard");
-        }
-    }
-
     async handleJumpAction() {
         if (!this.selectedTarget || this.selectedType !== "system") return;
         this.sound.init();
@@ -3473,7 +3448,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const orbBody = this.state.orbiting_body || (this.state.current_system?.bodies || []).find(x => x.id === this.state.ship?.orbiting_body_id) || null;
             const distAu = this.calculateBodyDistanceAu(orbBody, b);
             const engPwr = this.state.ship?.power?.engines ?? 25;
-            const sublightSpeed = Math.max(0.35, 1.15 * Math.max(0.4, engPwr / 25.0));
+            const piloting = Number(this.state.character?.skills?.piloting ?? 1);
+            const pilotingBonus = Math.max(0, piloting - 1) * 0.04;
+            const engineFactor = Math.max(0.4, engPwr / 25.0) * (1.0 + pilotingBonus);
+            const sublightSpeed = Math.max(0.35, 1.15 * engineFactor);
             const estTicks = Math.max(1, Math.ceil(distAu / sublightSpeed));
 
             this.targetType.textContent = `TARGET: ${b.body_type.toUpperCase()}`;
@@ -3486,19 +3464,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.btnJumpTarget.style.display = "none";
             const inOrbitHere = (this.state.ship.orbiting_body_id === b.id && !travel);
             const inTransitHere = Boolean(travel && travel.destination_body_id === b.id);
-            this.btnOrbitTarget.disabled = inOrbitHere;
-            this.btnOrbitTarget.textContent = inOrbitHere ? "ALREADY IN ORBIT" : `ENTER ORBIT (${distAu.toFixed(2)} AU)`;
-            if (this.btnSublightTarget) {
-                this.btnSublightTarget.style.display = "inline-block";
-                this.btnSublightTarget.disabled = inOrbitHere || inTransitHere;
-                this.btnSublightTarget.textContent = inTransitHere && travel.mode === "sublight"
-                    ? `TRANSIT ACTIVE (${Math.max(1, (travel.arrival_tick || 0) - (this.state.time?.tick || 0))}T)`
-                    : `SUBLIGHT TRANSIT (${estTicks}T)`;
-            }
+            const hasTravel = Boolean(travel);
+            const remainingTicks = travel ? Math.max(1, (travel.arrival_tick || 0) - (this.state.time?.tick || 0)) : 0;
+            this.btnOrbitTarget.disabled = inOrbitHere || hasTravel;
+            this.btnOrbitTarget.textContent = inOrbitHere
+                ? "IN ORBIT"
+                : inTransitHere
+                    ? `TRANSIT ACTIVE (${remainingTicks}T)`
+                    : hasTravel
+                        ? "TRANSIT LOCKED"
+                        : `TRANSIT & ORBIT (${estTicks}T)`;
+            this.btnOrbitTarget.title = "Timed sublight transit; orbit is established on arrival.";
             if (this.btnQuantumTarget) {
                 this.btnQuantumTarget.style.display = "inline-block";
-                this.btnQuantumTarget.disabled = inOrbitHere || inTransitHere;
-                this.btnQuantumTarget.textContent = inTransitHere && travel.mode === "quantum" ? "QUANTUM ACTIVE" : "QUANTUM TRANSIT (1T)";
+                this.btnQuantumTarget.disabled = inOrbitHere || hasTravel;
+                this.btnQuantumTarget.textContent = inTransitHere && travel.mode === "quantum"
+                    ? "QUANTUM ACTIVE"
+                    : hasTravel ? "TRANSIT LOCKED" : "QUANTUM TRANSIT (1T)";
+                this.btnQuantumTarget.title = "One-tick micro-jump; costs quantum fuel.";
             }
 
             this.targetGravity.textContent = `${(b.gravity ?? 1).toFixed(2)} g`;
@@ -3589,7 +3572,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.btnSalvageTarget) this.btnSalvageTarget.style.display = "none";
             if (this.btnScoopFuel) this.btnScoopFuel.style.display = "none";
             if (this.salvageInfo) this.salvageInfo.style.display = "none";
-            if (this.btnSublightTarget) this.btnSublightTarget.style.display = "none";
             if (this.btnQuantumTarget) this.btnQuantumTarget.style.display = "none";
             this.btnOrbitTarget.style.display = "none";
             this.btnJumpTarget.style.display = "inline-block";
@@ -3635,7 +3617,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     startRenderLoop() {
         if (this.rafId !== null) return;
         const render = () => {
-            this.drawRadar();
+            if (!document.hidden) this.drawRadar();
             this.rafId = requestAnimationFrame(render);
         };
         this.rafId = requestAnimationFrame(render);
@@ -3661,12 +3643,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.startRenderLoop();
     }
 
-    drawRadar() {
-        const ctx = this.ctx;
-        const w = this.viewW;
-        const h = this.viewH;
-        ctx.setTransform(this.dpr || 1, 0, 0, this.dpr || 1, 0, 0);
-        ctx.clearRect(0, 0, w, h);
+    ensureRadarBackdrop(w, h) {
+        const dpr = this.dpr || 1;
+        const starCount = Math.max(600, Math.round((this.starDensity || 220) * 5));
+        const key = `${Math.round(w)}x${Math.round(h)}@${dpr}:${starCount}`;
+        if (this.radarBackdrop && this.radarBackdropKey === key) return;
+        const backdrop = document.createElement("canvas");
+        backdrop.width = Math.max(1, Math.round(w * dpr));
+        backdrop.height = Math.max(1, Math.round(h * dpr));
+        const ctx = backdrop.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         const mapBase = ctx.createRadialGradient(w * 0.5, h * 0.45, 0,
             w * 0.5, h * 0.45, Math.max(w, h) * 0.75);
@@ -3675,7 +3661,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         mapBase.addColorStop(1, "rgba(4, 9, 19, 1)");
         ctx.fillStyle = mapBase;
         ctx.fillRect(0, 0, w, h);
-        const starCount = Math.max(600, Math.round((this.starDensity || 220) * 5));
         if (!this.radarStars || this.radarStars.length !== starCount) {
             this.radarStars = [];
             let seed = 1337;
@@ -3745,6 +3730,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.fillRect(x, y, star.size, star.size);
             }
         });
+        this.radarBackdrop = backdrop;
+        this.radarBackdropKey = key;
+    }
+
+    drawRadar() {
+        const ctx = this.ctx;
+        const w = this.viewW;
+        const h = this.viewH;
+        ctx.setTransform(this.dpr || 1, 0, 0, this.dpr || 1, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        this.ensureRadarBackdrop(w, h);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = "source-over";
+        ctx.drawImage(this.radarBackdrop, 0, 0, w, h);
 
         const cx = w / 2 + this.panX;
         const cy = h / 2 + this.panY;
@@ -4691,7 +4690,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             lastSeenTick: this.state.time?.tick || 0,
             visualProgress: 0,
             completionStart: null,
-            duration: activeTravel ? (totalTicks * 1000) / speed : 1300,
+            duration: activeTravel ? (totalTicks * 1000) / (speed * TICKS_PER_SECOND) : 1300,
         };
     }
 
@@ -4727,7 +4726,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const speed = Math.max(0.25, this.state?.time?.speed || 1.0);
             const subTick = this.state?.time?.is_paused
                 ? 0
-                : Math.min(0.98, ((performance.now() - anim.lastTickSync) / 1000) * speed);
+                : Math.min(0.98, ((performance.now() - anim.lastTickSync) / 1000) * speed * TICKS_PER_SECOND);
             const targetProgress = Math.min(0.97, Math.max(0, (elapsedTicks + subTick) / Math.max(1, anim.totalTicks)));
             anim.visualProgress = Math.max(
                 anim.visualProgress || 0,

@@ -396,9 +396,9 @@ Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a three-column bottom strip: reactor, skills, separate radar settings above the compact log; circular zoom icons and themed cursors.
 - **Main Menu & Saves (`ESC`)**: Categorized settings console plus create, load, list and delete saves.
 - **Planet Inspector**: Gravity, atmosphere, temperature, habitability, orbit distance, moons, resources, and colony tiers.
-- **Transit, Landing & Fleet**: Tick-synchronized sublight/quantum transit, surface survey rewards, and drone/mercenary commands.
+- **Transit, Landing & Fleet**: Timed transit-and-orbit, fuel-priced quantum micro-jumps, surface surveys and drone fleets.
 - **Living Galaxy**: Procedural worlds, AI traders, dynamic markets, faction perks, and reputation.
-- **Mission Panels**: Quests, contracts, diplomacy, depots, messages, COMMS, factions, perks, relics, and combat.
+- **Mission Panels**: Quests, contracts, diplomacy, depots, messages, COMMS, factions and combat.
 - **Space-Opera Campaign Tab**: Five acts with a live objective checklist, locked choices that show their requirements, transmissions, and one of three endings with epilogue.
 - **The Hollow Between Panel**: Void drive readiness, lane dive buttons, traversal progress/stability, emergency emerge, and a hue-shifted radar overlay.
 - **REPL Server Lifecycle**: `serve` runs the HTTP server and ticker; `serve stop` saves and shuts down.
@@ -436,6 +436,6 @@ See ADR-041, ADR-042 and ADR-047.
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules (`math`, `random`, `dataclasses`, `http.server`, `json`, `pathlib`).
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 496-test suite runs in about 7 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 499-test suite runs in about 7 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: Anti-arbitrage dock guards, faction tariffs, cargo-volume refit gates, quantum fuel efficiency and cockpit parity.

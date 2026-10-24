@@ -94,7 +94,7 @@ class TestTransitCivEvents(unittest.TestCase):
 
         ok, msg = self.engine.start_travel(target_id, mode="quantum")
         self.assertTrue(ok, msg)
-        self.assertLess(self.engine.state.ship.fuel, fuel_before)
+        self.assertGreaterEqual(fuel_before - self.engine.state.ship.fuel, 2)
         travel = self.engine.state.ship.travel
         self.assertIsNotNone(travel)
         self.assertEqual(travel.mode, "quantum")
@@ -117,6 +117,18 @@ class TestTransitCivEvents(unittest.TestCase):
         )
         ok_no_fuel, _ = self.engine.start_travel("sol_body_4", mode="quantum")
         self.assertFalse(ok_no_fuel)
+
+    def test_start_travel_rejects_same_body_and_active_transit(self) -> None:
+        self.engine.orbit("sol_body_1")
+        ok_same, msg_same = self.engine.start_travel("sol_body_1", mode="sublight")
+        self.assertFalse(ok_same)
+        self.assertIn("Already in orbit", msg_same)
+
+        ok_start, msg_start = self.engine.start_travel("sol_body_3", mode="sublight")
+        self.assertTrue(ok_start, msg_start)
+        ok_second, msg_second = self.engine.start_travel("sol_body_4", mode="quantum")
+        self.assertFalse(ok_second)
+        self.assertIn("Already in transit", msg_second)
 
     def test_event_emission_and_dismissal(self) -> None:
         evt = self.engine.emit_event("alert", "Test Alert", "Hull integrity warning.")
@@ -146,10 +158,13 @@ class TestTransitCivEvents(unittest.TestCase):
         self.assertIn("targetFaction", html)
         self.assertIn("targetPopulation", html)
         self.assertIn("targetGovernment", html)
-        self.assertIn("btnSublightTarget", html)
+        self.assertIn("btnOrbitTarget", html)
         self.assertIn("btnQuantumTarget", html)
+        self.assertNotIn("btnSublightTarget", html)
         self.assertIn("eventPopupContainer", html)
         self.assertIn("/api/travel", js)
+        self.assertNotIn("handleOrbitAction", js)
+        self.assertNotIn('fetch("/api/orbit"', js)
         self.assertIn("/api/events/dismiss", js)
 
     def test_scientifically_accurate_planetary_physics_and_habitability(self) -> None:

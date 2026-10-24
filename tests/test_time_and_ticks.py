@@ -10,7 +10,7 @@ from pathlib import Path
 
 from voidfarer.engine import SimulationEngine
 from voidfarer.models import FleetDrone, GameState, TimeState
-from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
+from voidfarer.server import BASE_TICK_SECONDS, MIN_TICK_SECONDS, ThreadedHTTPServer, VoidFarerHandler, tick_interval
 from voidfarer.storage import StorageManager
 
 
@@ -38,6 +38,13 @@ class TestTimeStateModel(unittest.TestCase):
         d = t1.to_dict()
         t2 = TimeState.from_dict(d)
         self.assertEqual(t1, t2)
+
+    def test_tick_interval_scales_with_chrono_speed(self):
+        self.assertEqual(BASE_TICK_SECONDS, 0.5)
+        self.assertEqual(tick_interval(1.0), 0.5)
+        self.assertEqual(tick_interval(2.0), 0.25)
+        self.assertEqual(tick_interval(10.0), 0.05)
+        self.assertGreaterEqual(tick_interval(0.1), MIN_TICK_SECONDS)
 
     def test_gamestate_backward_compatibility(self):
         engine = SimulationEngine(seed=42)

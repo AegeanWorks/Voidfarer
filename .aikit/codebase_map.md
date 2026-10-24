@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `64`
 - **Total Classes**: `158`
-- **Total Top-Level Functions**: `197`
-- **Total Class Methods**: `890`
-- **Total Source Lines**: `26523`
+- **Total Top-Level Functions**: `198`
+- **Total Class Methods**: `893`
+- **Total Source Lines**: `26568`
 
 ---
 
@@ -176,7 +176,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `682` lines (`30997` bytes)
+**Size**: `687` lines (`31195` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -251,7 +251,8 @@
   - Method `.setUpClass()`
   - Method `.test_topbar_and_vitals_wrap_on_narrow_viewports()`
   - Method `.test_vital_cards_match_chrono_box_height()`
-  - Method `.test_orbit_button_adheres_to_distance_calculation()`
+  - Method `.test_orbit_button_uses_timed_transit()`
+  - Method `.test_radar_backdrop_is_cached()`
 - `class TestArsenalParityAndBulkDepotUI`
   - Method `.setUpClass()`
   - Method `.test_arsenal_contains_shipyard_and_weapons_containers()`
@@ -873,12 +874,13 @@
 ### [`tests/test_time_and_ticks.py`](tests/test_time_and_ticks.py)
 > *Comprehensive automated test suite for Time, Ticks, and Temporal Controls in VoidFarer.*
 
-**Size**: `318` lines (`12750` bytes)
+**Size**: `325` lines (`13134` bytes)
 
 **Classes:**
 - `class TestTimeStateModel` - *Verify TimeState dataclass serialization, defaults, and legacy migration.*
   - Method `.test_default_values()`
   - Method `.test_to_dict_and_from_dict()`
+  - Method `.test_tick_interval_scales_with_chrono_speed()`
   - Method `.test_gamestate_backward_compatibility()`
 - `class TestSimulationEngineTimeAndTicks` - *Verify time progression, orbital dynamics, shield regen, and drone harvests.*
   - Method `.setUp()`
@@ -909,7 +911,7 @@
 ### [`tests/test_transit_civ_events.py`](tests/test_transit_civ_events.py)
 > *Tests for in-system transit (TravelState), planetary civilization metadata, and cockpit GameEvents.*
 
-**Size**: `284` lines (`12956` bytes)
+**Size**: `299` lines (`13718` bytes)
 
 **Classes:**
 - `class TestTransitCivEvents` - *Verify TravelState, planetary faction/population/government, and GameEvent lifecycles.*
@@ -919,6 +921,7 @@
   - Method `.test_sublight_transit_progresses_and_completes_on_tick()`
   - Method `.test_quantum_in_system_transit_consumes_fuel_and_arrives_next_tick()`
   - Method `.test_start_travel_validation_guards()`
+  - Method `.test_start_travel_rejects_same_body_and_active_transit()`
   - Method `.test_event_emission_and_dismissal()`
   - Method `.test_cli_and_cockpit_surface_for_travel_and_events()`
   - Method `.test_scientifically_accurate_planetary_physics_and_habitability()`
@@ -1219,7 +1222,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `5472` lines (`274300` bytes)
+**Size**: `5483` lines (`274865` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1746,7 +1749,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1140` lines (`47706` bytes)
+**Size**: `1147` lines (`47995` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -1768,6 +1771,7 @@
 - `def _int_field(body, key, default, minimum)`
 - `def _float_field(body, key, default, minimum)`
 - `def _bool_field(body, key, default)`
+- `def tick_interval(speed)` - *Wall-clock seconds between simulation ticks for a chrono speed multiplier.*
 - `def start_background_server(engine, storage, port, host)` - *Launch the cockpit server and simulation ticker without blocking the REPL.*
 - `def run_server(engine, storage, port, host, open_browser, enable_ticker)` - *Start local cockpit HTTP server daemon with background temporal ticker.*
 

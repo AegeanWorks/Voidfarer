@@ -72,6 +72,16 @@ def _bool_field(body: dict[str, Any], key: str, default: bool) -> bool:
 
 
 
+
+BASE_TICK_SECONDS = 0.5
+MIN_TICK_SECONDS = 0.05
+AUTOSAVE_SECONDS = 15.0
+
+
+def tick_interval(speed: float) -> float:
+    """Wall-clock seconds between simulation ticks for a chrono speed multiplier."""
+    return max(MIN_TICK_SECONDS, BASE_TICK_SECONDS / max(0.1, float(speed or 0.0)))
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Multi-threaded HTTP server handling concurrent HUD telemetry requests."""
     daemon_threads = True
@@ -1023,20 +1033,19 @@ def start_background_server(
     stop_event = threading.Event()
 
     def _ticker_loop() -> None:
-        save_counter = 0
+        last_save = time.monotonic()
         while not stop_event.is_set():
             time_obj = engine.state.time
             if not time_obj.is_paused and time_obj.speed > 0:
-                if stop_event.wait(max(0.1, 1.0 / time_obj.speed)):
+                if stop_event.wait(tick_interval(time_obj.speed)):
                     break
                 engine.tick(1)
-                save_counter += 1
-                if save_counter >= 10:
+                if time.monotonic() - last_save >= AUTOSAVE_SECONDS:
                     try:
                         storage.save(engine.state)
                     except OSError as exc:
                         sys.stderr.write(f"[WARN] Autosave failed: {exc}\n")
-                    save_counter = 0
+                    last_save = time.monotonic()
             else:
                 if stop_event.wait(0.2):
                     break
@@ -1082,21 +1091,19 @@ def run_server(
     ticker_stop = threading.Event()
 
     def _ticker_loop() -> None:
-        save_counter = 0
+        last_save = time.monotonic()
         while not ticker_stop.is_set():
             time_obj = engine.state.time
             if not time_obj.is_paused and time_obj.speed > 0:
-                interval = max(0.1, 1.0 / time_obj.speed)
-                if ticker_stop.wait(interval):
+                if ticker_stop.wait(tick_interval(time_obj.speed)):
                     break
                 engine.tick(1)
-                save_counter += 1
-                if save_counter >= 10:
+                if time.monotonic() - last_save >= AUTOSAVE_SECONDS:
                     try:
                         storage.save(engine.state)
                     except OSError as exc:
                         print(f"[WARN] Autosave failed: {exc}")
-                    save_counter = 0
+                    last_save = time.monotonic()
             else:
                 if ticker_stop.wait(0.2):
                     break

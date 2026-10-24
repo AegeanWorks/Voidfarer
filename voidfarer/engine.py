@@ -1456,6 +1456,17 @@ class SimulationEngine:
             origin_id = origin.id if origin else None
             distance_au = self.compute_body_distance_au(matched, origin)
 
+            if origin is not None and origin.id == matched.id:
+                return False, f"Already in orbit around {matched.name}."
+
+            active_travel = self.state.ship.travel
+            if active_travel is not None:
+                dest_name = next(
+                    (b.name for b in cur_sys.bodies if b.id == active_travel.destination_body_id),
+                    active_travel.destination_body_id,
+                )
+                return False, f"Already in transit to {dest_name}; arrival is scheduled for tick {active_travel.arrival_tick}."
+
             new_fuel = self.state.ship.fuel
             if norm_mode == "quantum":
                 travel_map = self._map_effects(cur_sys)
@@ -1469,7 +1480,7 @@ class SimulationEngine:
                     * research.get("fuel_efficiency", 1.0)
                     * (1.0 - min(0.25, self._skill("piloting")))
                 )
-                fuel_cost = max(1, int(math.ceil(distance_au * 0.8 * fuel_mult)))
+                fuel_cost = max(2, int(math.ceil(distance_au * 1.0 * fuel_mult)))
                 if self.state.ship.fuel < fuel_cost:
                     return False, f"Insufficient quantum fuel for micro-jump: need {fuel_cost}, have {self.state.ship.fuel}."
                 new_fuel -= fuel_cost

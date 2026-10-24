@@ -560,8 +560,13 @@ class TestSingleLineVitalsAndDistanceParity(unittest.TestCase):
             "hud-time-deck must match vital card 44px height and border-box sizing",
         )
 
-    def test_orbit_button_adheres_to_distance_calculation(self):
-        self.assertIn("ENTER ORBIT (${distAu.toFixed(2)} AU)", self.js)
+    def test_orbit_button_uses_timed_transit(self):
+        self.assertIn("TRANSIT & ORBIT (${estTicks}T)", self.js)
+        self.assertNotIn("btnSublightTarget", self.js)
+
+    def test_radar_backdrop_is_cached(self):
+        self.assertIn("ensureRadarBackdrop", self.js)
+        self.assertIn("drawImage(this.radarBackdrop", self.js)
 
 class TestArsenalParityAndBulkDepotUI(unittest.TestCase):
     @classmethod

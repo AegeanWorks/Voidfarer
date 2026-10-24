@@ -1,58 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "cockpit-skills-radar-ship-v1",
+    "task_id": "transit-speed-performance-v1",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1792865423.2212696,
+    "updated_at": 1792869657.3329268,
     "owner": "unidentified",
     "started_by": "unidentified",
     "continuations": [],
-    "completed_at": 1792865423.4133396
+    "completed_at": 1792869657.519736
   },
   "checkpoints": [
-    {
-      "task_id": "stellaris-ui-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verified: Stellaris administration skin applied; vision reviewer APPROVED final cockpit, resource strip, map, market, ship, contracts and menu; all 16 terminal tabs and overlays report zero measured findings; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792835045.7039156,
-      "timestamp_str": "2026-10-24 12:44:05",
-      "handoff": {
-        "state": "deep navy/gold resource strip, Imperial Outliner, selected-object dossier, segmented ribbon and textured map",
-        "next": "commit, then refresh the cockpit UI evidence and run check --strict",
-        "open": "none in the UI, only delivery bookkeeping",
-        "evidence": "ui-review screenshots and ADR-046"
-      }
-    },
-    {
-      "task_id": "stellaris-ui-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'stellaris-ui-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792835045.8811786,
-      "timestamp_str": "2026-10-24 12:44:05"
-    },
-    {
-      "task_id": "browser-ui-review-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: replace iframe-only visual review with a real Playwright Edge driver, expose overlay states, and reveal the radar map",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792844078.7328167,
-      "timestamp_str": "2026-10-24 15:14:38",
-      "impact_assessment": {
-        "why": "The user asked for a real browser and the iframe method hid the true game: polling wiped event popups, the synthetic viewport produced wrapper screenshots, and the Stellaris deck-panel gradient covered the full-viewport radar",
-        "benefits": "True Edge screenshots at exact Windows viewports, reproducible target/event/combat states, visible starfield/nebula map, integrated Stellaris overlays, and a documented vision fallback for exhausted APIs",
-        "risks": "dependency: Playwright is dev-only and optional; concurrency: the browser driver starts its own server and stops it per run; contract: no runtime or layout-rule change; state: static UI, tooling, docs and metadata only",
-        "mitigation": "Real-browser captures at five Windows sizes, zero console/HTTP/tiny/hscroll findings, target/event/combat evidence, 496 tests, 4/4 gates and ADR-047"
-      }
-    },
     {
       "task_id": "browser-ui-review-v1",
       "phase": "phase 4",
@@ -284,6 +243,50 @@
       "status": "completed",
       "timestamp": 1792865423.4133413,
       "timestamp_str": "2026-10-24 21:10:23",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "transit-speed-performance-v1",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: merge orbit and sublight into one timed transit, speed up the chrono, and cache the radar backdrop",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792869612.932522,
+      "timestamp_str": "2026-10-24 22:20:12",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "ENTER ORBIT teleported via /api/orbit while SUBLIGHT TRANSIT duplicated it; the chrono advanced only 1 tick/s at 1x, autosave ran every 10 ticks, and the radar redrew 1,100 stars plus nebula gradients every frame",
+        "benefits": "One timed transit-and-orbit action, a meaningful quantum fuel trade-off, 2 ticks/s at 1x and 20 ticks/s at 10x, 15-second autosave cadence, and ~0.08ms cached radar draws at 60 FPS",
+        "risks": "contract: server and static surfaces change; dependency: none; concurrency: the ticker and autosave loop share the engine lock and now autosave by wall clock; state: engine travel guards, quantum fuel, server tick interval, radar cache and client animation",
+        "mitigation": "Failing-first transit and tick-interval tests, real-browser timed-travel smoke, zero /api/orbit calls from the UI, 499 tests, 4/4 gates, FPS/draw benchmarks and ADR-053"
+      }
+    },
+    {
+      "task_id": "transit-speed-performance-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verified: orbit and sublight are merged into one timed TRANSIT & ORBIT action with no /api/orbit UI call; travel guards and arrival auto-orbit are covered; quantum minimum is 2 fuel at 1.0/AU; ticker runs 2 ticks/s at 1x and 20 at 10x with 15s autosave; radar draw is ~0.08ms at 60 FPS; browser smoke shows stay-at-origin then arrival at 10x; vision APPROVED the two-action target card; 499 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792869657.3329268,
+      "timestamp_str": "2026-10-24 22:20:57",
+      "agent": "unidentified",
+      "handoff": {
+        "state": "timed transit, faster chrono, cached radar",
+        "next": "commit and refresh the cockpit evidence, then run check --strict",
+        "open": "none in the game mechanics",
+        "evidence": "ui-review target-transit crop, browser smoke, ADR-053"
+      }
+    },
+    {
+      "task_id": "transit-speed-performance-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'transit-speed-performance-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792869657.5197375,
+      "timestamp_str": "2026-10-24 22:20:57",
       "agent": "unidentified"
     }
   ]
