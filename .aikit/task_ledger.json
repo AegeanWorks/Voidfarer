@@ -1,55 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "left-row-ledger-v1",
+    "task_id": "cockpit-skills-radar-ship-v1",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1792860026.6624393,
-    "completed_at": 1792860026.9009778
+    "updated_at": 1792865423.2212696,
+    "owner": "unidentified",
+    "started_by": "unidentified",
+    "continuations": [],
+    "completed_at": 1792865423.4133396
   },
   "checkpoints": [
-    {
-      "task_id": "cockpit-overlays-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verified: settings, character and perks overlays report zero measured findings; perks now shows three populated branches and the vision reviewer APPROVED all three; 496 tests and 4/4 gates pass; checklists: passed; uncommitted",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792821120.5235963,
-      "timestamp_str": "2026-10-24 08:52:00",
-      "handoff": {
-        "state": "overlays match command-console chrome, audit supports settings/character scenarios and delayed tab opening",
-        "next": "commit and run a new reviewed cockpit UI task to refresh surface evidence",
-        "open": "strict delivery blocked only by the uncommitted tree and stale UI evidence",
-        "evidence": "ui-review/overlays screenshots and ADR-045"
-      }
-    },
-    {
-      "task_id": "cockpit-overlays-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'cockpit-overlays-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792821120.7004445,
-      "timestamp_str": "2026-10-24 08:52:00"
-    },
-    {
-      "task_id": "stellaris-ui-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: convert the Windows command console into a Stellaris-inspired administration skin",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792835017.3386753,
-      "timestamp_str": "2026-10-24 12:43:37",
-      "impact_assessment": {
-        "why": "The user requested a proper Stellaris-style UI; the prior command console was readable but still read as a generic sci-fi terminal to the vision reviewer",
-        "benefits": "Deep void navy, imperial gold hairlines, cold ivory data, a flat icon resource strip, a recessed Imperial Outliner, a selected-object dossier, a segmented command ribbon, and a textured map, all while preserving every gameplay layout and hotkey rule",
-        "risks": "contract: none; dependency: none; concurrency: none; state: static HTML, CSS and app.js font/canvas text only, no simulation or layout-rule changes",
-        "mitigation": "Five-viewport cockpit audit, every terminal tab audit, overlay audit, vision review until approved, 496-test suite, 4/4 gates and ADR-046"
-      }
-    },
     {
       "task_id": "stellaris-ui-v1",
       "phase": "phase 4",
@@ -279,6 +241,50 @@
       "status": "completed",
       "timestamp": 1792860026.9009798,
       "timestamp_str": "2026-10-24 19:40:26"
+    },
+    {
+      "task_id": "cockpit-skills-radar-ship-v1",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: make radar controls clickable and stateful, merge pilot perks into Skills, and bound the ship panel",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792865404.2984045,
+      "timestamp_str": "2026-10-24 21:10:04",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "Radar settings were visually present but unclickable, the Skills tab mixed training with duplicate top/left perks entry points, and the ship schematic expanded to over 2200px outside its 454px terminal column",
+        "benefits": "A working radar control strip with synced GRID/LABELS state, one player Skills/perks/relics dossier, and a bounded ship dossier with schematic, compact stats and module ledger",
+        "risks": "contract: none; dependency: none; concurrency: none; state: static HTML/CSS/JS plus layout tests and browser tooling, no simulation changes",
+        "mitigation": "Playwright click/state tests for every radar control, zero browser audit findings at desktop/laptop/720p, vision approval for Skills and ship, 496 tests, 4/4 gates and ADR-052"
+      }
+    },
+    {
+      "task_id": "cockpit-skills-radar-ship-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verified: all radar controls are clickable and stateful with map click-through intact; Skills now holds ranks, pilot perks and relics with no duplicate top/left perks entry; the ship panel is bounded to 450px with a 240px schematic, compact stats and full-width module ledger; browser audits are zero at desktop/laptop/720p; vision APPROVED Skills and ship; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792865423.2212696,
+      "timestamp_str": "2026-10-24 21:10:23",
+      "agent": "unidentified",
+      "handoff": {
+        "state": "radar sync, inline pilot perks, bounded ship dossier",
+        "next": "commit and refresh cockpit evidence",
+        "open": "none in the UI, only delivery bookkeeping",
+        "evidence": "ui-review skills/ship crops, ADR-052"
+      }
+    },
+    {
+      "task_id": "cockpit-skills-radar-ship-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'cockpit-skills-radar-ship-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792865423.4133413,
+      "timestamp_str": "2026-10-24 21:10:23",
+      "agent": "unidentified"
     }
   ]
 }

@@ -41,7 +41,6 @@ TAB_IDS = {
     "arsenal": "tabBtnArsenal",
     "fleet": "tabBtnFleet",
     "contracts": "tabBtnContracts",
-    "mastery": "tabBtnMastery",
     "empire": "tabBtnEmpire",
     "quests": "tabBtnQuests",
     "ai": "tabBtnAI",
@@ -196,7 +195,8 @@ def _metrics(page: Any) -> Dict[str, Any]:
 
 
 def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
-                  scenario: str, tab: str, out: Path, timeout: int) -> Dict[str, Any]:
+                  scenario: str, tab: str, out: Path, timeout: int,
+                  scroll: str = "top") -> Dict[str, Any]:
     """Open one real browser viewport, drive it and capture a true screenshot."""
     context = browser.new_context(
         viewport={"width": viewport[0], "height": viewport[1]},
@@ -217,10 +217,15 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
     page.on("requestfailed", lambda request: errors.append(
         f"requestfailed: {request.url} // {request.failure}"))
     label = f"{name}-{tab}" if tab else name
+    if scroll == "bottom":
+        label += "-bottom"
     target = out / f"{label}.png"
     try:
         page.goto(url, wait_until="domcontentloaded", timeout=timeout)
         _open_cockpit(page, scenario, tab, timeout)
+        if scroll == "bottom":
+            page.evaluate("() => { const el = document.querySelector('.terminal-content-stack'); if (el) el.scrollTop = el.scrollHeight; }")
+            page.wait_for_timeout(300)
         page.screenshot(path=str(target), full_page=False, animations="disabled")
         metrics = _metrics(page)
     finally:
@@ -229,6 +234,7 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
         "name": label,
         "scenario": scenario,
         "tab": tab or None,
+        "scroll": scroll,
         "viewport": list(viewport),
         "screenshot": target.name,
         "errors": errors,
@@ -244,6 +250,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--scenario", default="cockpit", choices=SCENARIOS)
     parser.add_argument("--tab", default="", choices=("",) + TABS)
     parser.add_argument("--timeout", type=int, default=30000, help="milliseconds per page step")
+    parser.add_argument("--scroll", default="top", choices=("top", "bottom"),
+                        help="scroll the terminal content to the top or bottom")
     parser.add_argument("--headed", action="store_true", help="show the browser window")
     parser.add_argument("--channel", default="msedge", help="Playwright browser channel")
     args = parser.parse_args(argv)
@@ -286,7 +294,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             try:
                 for name in names:
                     report = _run_viewport(browser, url, name, VIEWPORTS[name], args.scenario,
-                                           args.tab, out, args.timeout)
+                                           args.tab, out, args.timeout, args.scroll)
                     reports.append(report)
                     print(f"{report['name']}: errors {len(report['errors'])} "
                           f"hscroll {int(report['horizontal'])} tiny {report['tinyText']} -> "

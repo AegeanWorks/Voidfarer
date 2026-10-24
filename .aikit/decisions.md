@@ -633,3 +633,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Wrap active crew buttons into the action column, move morale into the value column, and add a RECRUIT action to available crew roles using the existing `/api/crew/recruit` endpoint.
   4. Standardize row chrome: no cards, left accent by record type, one-pixel separators, 56px target height, hover tint, and consistent icon/label/badge tab rail rows.
 - **Consequences**: The left terminal now scans as one system: crew roles and crew members, contracts, active fleet assets, mercenary offers, escort wings and commissions all align to the same columns. Browser audits are zero at desktop, laptop and 720p, the free vision reviewer approved the unified rows, and the suite remains 496 tests.
+
+### ADR-052: Radar Input, Unified Skills Dossier and Bounded Ship Panel
+- **Date**: 2026-10-24
+- **Status**: Accepted
+- **Context**: The radar settings appeared dead because the command strip is `pointer-events:none`, the map-controls panel was not re-enabled for input, and the full-viewport canvas intercepted clicks. The Skills tab still framed itself as training while a top PERKS button and a left PILOT PERKS tab both opened a duplicate perks overlay. The ship visual expanded to over 2200px because the visual and module grid were laid out outside the 454px terminal column.
+- **Decision**:
+  1. Raise the top bar, left panel, command strip and footer above the radar (`z-index: 5`), re-enable the map controls and strip panels for pointer input, and sync GRID/LABELS active state and settings checkboxes on load and on every change. All radar controls were then exercised in Playwright, including zoom, reset, map modes, scan and map click-through.
+  2. Remove the top PERKS button and left PILOT PERKS tab. Inline pilot perks, talent points and the Precursor Relics vault into the Skills tab; keep six quick-train actions in the bottom strip; make Skills a read-only rank/perk/relic dossier. Delete the duplicate overlay/mastery wiring and update the layout tests and browser tab lists.
+  3. Bound the ship panel to its terminal column with a `ship-top-row` grid: a 240px schematic and compact stats card, followed by a full-width module catalog ledger with name/slot, effects/cost and install/remove actions.
+  4. Verify the merged Skills tab, the ship panel and all radar controls in the real browser. The vision reviewer approved Skills and the rebuilt ship dossier; Playwright confirmed every radar control changes state and the central map still receives clicks.
+- **Consequences**: The radar controls are now usable and visibly stateful; there is one player skill/perk/relic surface with no duplicate entry points; and the ship panel no longer overflows its terminal. Browser audits are zero at desktop, laptop and 720p, and the suite remains 496 tests.

@@ -7581,3 +7581,168 @@ body.cockpit-theme .panel-center {
 
 .crew-row .crew-morale-bar { height: 18px; }
 .crew-row .crew-morale-text { line-height: 1; }
+
+/* HUD panels must sit above the full-viewport radar for pointer input. */
+.hud-topbar,
+.cadet-academy-banner,
+.panel-left,
+.hud-command-strip,
+.hud-footer {
+    position: relative;
+    z-index: 5;
+}
+.nav-target-card { z-index: 6; }
+.event-popup-container { z-index: 8; }
+.combat-alert-card,
+.anomaly-alert-card { z-index: 9; }
+.map-controls-panel,
+.hud-strip-right > *,
+.hud-strip-panel { pointer-events: auto; }
+
+/* Skills dossier: ranks, pilot perks and relics in one place. */
+.skills-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 8px;
+}
+.skills-talent-points { color: var(--console-muted); font-family: var(--console-ui); font-size: 12px; letter-spacing: 0.05em; }
+.skills-talent-points strong { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 13px; }
+.skills-panel .perks-branches {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    grid-template-columns: none;
+}
+.skills-panel .perk-branch {
+    min-height: 0;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.skills-panel .perk-branch h4 {
+    margin: 0 0 2px;
+    color: var(--console-gold);
+    font-family: var(--console-ui);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+}
+.skills-panel .perk-node {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 3px 8px;
+    margin: 0;
+    padding: 8px;
+    border-radius: 0;
+}
+.skills-panel .perk-node > strong { grid-column: 1; grid-row: 1; color: var(--console-ivory); font-size: 13px; }
+.skills-panel .perk-node > div { grid-column: 1 / -1; grid-row: 2; color: var(--console-muted); font-size: 12px; line-height: 1.4; }
+.skills-panel .perk-node > button { grid-column: 2; grid-row: 1; min-height: 28px; padding: 3px 8px; font-size: 12px; }
+.skills-panel .perk-node.unlocked { border-color: rgba(143, 191, 159, 0.45); }
+.skills-panel .perk-node.unlocked > div { color: var(--console-green); }
+.skills-perks-section,
+.skills-relics-section { margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(201, 163, 90, 0.16); }
+.skills-relics-section .relics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.skills-quick-hint { color: var(--console-muted); font-family: var(--console-ui); font-size: 12px; letter-spacing: 0.03em; }
+
+/* Ship dossier: fixed schematic, compact stats, ledger refit rows. */
+.ship-panel { align-items: flex-start; }
+.ship-panel > .panel-header { flex: 1 1 100%; }
+.ship-visual {
+    flex: 1 1 56%;
+    height: 240px;
+    min-height: 240px;
+    max-height: 240px;
+    align-self: flex-start;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ship-silhouette { width: 100%; max-height: 100%; }
+.ship-stats-panel { flex: 1 1 38%; align-self: flex-start; padding: 10px; }
+.ship-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ship-stat-item { padding: 8px; }
+.ship-stat-label { font-size: 12px; }
+.ship-stat-value { font-size: 16px; }
+.ship-catalog-header {
+    flex: 1 1 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 2px 4px;
+    border-bottom: 1px solid rgba(201, 163, 90, 0.2);
+    color: var(--console-gold);
+    font-family: var(--console-ui);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+}
+.ship-catalog-header small { color: var(--console-muted); font-size: 12px; letter-spacing: 0.05em; }
+.ship-modules-grid {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+}
+.ship-module-row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) 110px 96px;
+    align-items: center;
+    gap: 2px 8px;
+    min-height: 56px;
+    padding: 8px 10px;
+    border: 0;
+    border-left: 2px solid rgba(111, 195, 215, 0.35);
+    border-bottom: 1px solid rgba(201, 163, 90, 0.12);
+    border-radius: 0;
+    background: transparent;
+}
+.ship-module-row.installed { border-left-color: var(--console-green); }
+.ship-module-row:hover { background: rgba(201, 163, 90, 0.06); }
+.ship-module-row:last-child { border-bottom: 0; }
+.ship-module-glyph { grid-column: 1; align-self: center; color: var(--console-cyan); font-size: 16px; text-align: center; }
+.ship-module-info { grid-column: 2; min-width: 0; }
+.ship-module-info strong { display: block; color: var(--console-ivory); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ship-module-info small { display: block; color: var(--console-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ship-module-effects { grid-column: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 3px 6px; }
+.ship-module-stat { font-size: 12px; }
+.ship-module-cost { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 12px; }
+.ship-module-row > button { grid-column: 4; width: 100%; min-height: 28px; padding: 3px 6px; font-size: 12px; }
+@media (max-width: 1599px) {
+    .ship-visual { flex: 1 1 100%; height: 200px; min-height: 200px; max-height: 200px; }
+    .ship-stats-panel { flex: 1 1 100%; }
+    .ship-module-row { grid-template-columns: 24px minmax(0, 1fr) 90px 86px; gap: 2px 6px; padding: 7px 8px; }
+}
+
+/* Bound the ship dossier to the terminal column. */
+.ship-panel {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: visible;
+}
+.ship-top-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    align-items: start;
+}
+.ship-panel > .panel-header,
+.ship-catalog-header,
+.ship-modules-grid { width: 100%; min-width: 0; }
+.ship-visual,
+.ship-stats-panel { width: 100%; min-width: 0; flex: none; }
+@media (max-width: 1599px) {
+    .ship-top-row { grid-template-columns: 1fr; }
+}

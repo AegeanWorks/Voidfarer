@@ -44,7 +44,7 @@ VIEWPORTS: Dict[str, Tuple[int, int]] = {
     "short": (1280, 720),
 }
 TABS = ("player", "skills", "crew", "ship", "market", "arsenal", "fleet", "contracts",
-        "mastery", "empire", "quests", "ai", "depot", "messages", "story", "factions", "codex")
+        "empire", "quests", "ai", "depot", "messages", "story", "factions", "codex")
 CHROME_X = 24
 CHROME_Y = 92
 BROWSER_CANDIDATES = (

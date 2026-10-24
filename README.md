@@ -400,15 +400,15 @@ Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Living Galaxy**: Procedural worlds, AI traders, dynamic markets, faction perks, and reputation.
 - **Mission Panels**: Quests, contracts, diplomacy, depots, messages, COMMS, factions, perks, relics, and combat.
 - **Space-Opera Campaign Tab**: Five acts with a live objective checklist, locked choices that show their requirements, transmissions, and one of three endings with epilogue.
-- **The Hollow Between Panel**: Void drive readiness and blockers, lane dive buttons, traversal progress and stability meters, emergency emerge, and a hue-shifted radar overlay.
+- **The Hollow Between Panel**: Void drive readiness, lane dive buttons, traversal progress/stability, emergency emerge, and a hue-shifted radar overlay.
 - **REPL Server Lifecycle**: `serve` runs the HTTP server and ticker; `serve stop` saves and shuts down.
 - **Reactor Power Matrix (`G-006`, `G-013`)**: Bottom-left strip with sliders, `Q/W/E/R` hotkeys, thermal telemetry, four modes and VENT.
 - **Sector Map Modifiers**: Generated conditions shown as radar chips and applied to fuel, scans, encounters, trade and reactor heat.
-- **Player, Skills & Crew Tabs**: PLAYER is a dossier; six icon/hotkey skills live in the bottom strip (`SHIFT+1..6`), while SKILLS holds training and perks. Crew holds bonuses and drills.
-- **Ship Configuration Tab**: Chassis silhouette with five structural slot markers, trade-off catalogue cards, live capacity recomputation, and drydock install/salvage-remove controls through `/api/ship/module`.
+- **Player, Skills & Crew Tabs**: PLAYER is a dossier; six quick-train skills live in the bottom strip (`SHIFT+1..6`), while SKILLS holds ranks, pilot perks and relics. Crew holds bonuses and drills.
+- **Ship Configuration Tab**: Fixed-height silhouette, compact stats, and a full-width module ledger; refits require a docked drydock or station.
 - **Commander Creation & Death Flow**: Name, age, background, and starting-skill allocation wired into new games; a death overlay summarizes the run and offers a fresh commander or save load.
-- **Stellaris-Style Windows HUD**: deep-navy administrative panels, gold rules, 1280x720-4K/ultrawide, density/HUD scale, DPR radar, keyboard/mouse and reduced motion.
-- **Derelict Boarding & Fuel Scooping**: once-per-body salvage that feeds titanium mining contracts; star/gas/ice scoops trade reactor heat for fuel from finite, recharging volatile reservoirs; paid crew training drills.
+- **Stellaris-Style Windows HUD**: deep-navy panels, gold rules, 1280x720-4K/ultrawide, density/HUD scale, DPR radar, keyboard/mouse and reduced motion.
+- **Derelict Boarding & Fuel Scooping**: once-per-body salvage feeds titanium contracts; star/gas/ice scoops trade reactor heat for fuel from finite, recharging reservoirs; paid crew drills.
 - **Captain's Log & Discovery Codex**: career statistics grid, discovery milestones, claim rewards, category filters, and persistent flight log.
 
 ### 20. Captain's Log & Discovery Codex

@@ -279,6 +279,7 @@ class CockpitApp {
         this.bindEvents();
         this.initTooltips();
         this.applyViewportProfile();
+        this.syncRadarControlState();
         this.startAnimationLoop();
         this.fetchGalaxy();
         this.fetchSaves();
@@ -421,7 +422,6 @@ class CockpitApp {
         this.tabBtnShip = document.getElementById("tabBtnShip");
         this.tabBtnFleet = document.getElementById("tabBtnFleet");
         this.tabBtnContracts = document.getElementById("tabBtnContracts");
-        this.tabBtnMastery = document.getElementById("tabBtnMastery");
         this.tabBtnPlayer = document.getElementById("tabBtnPlayer");
         this.tabBtnSkills = document.getElementById("tabBtnSkills");
         this.tabBtnCrew = document.getElementById("tabBtnCrew");
@@ -451,7 +451,6 @@ class CockpitApp {
         this.tabContentShip = document.getElementById("tabContentShip");
         this.tabContentFleet = document.getElementById("tabContentFleet");
         this.tabContentContracts = document.getElementById("tabContentContracts");
-        this.tabContentMastery = document.getElementById("tabContentMastery");
         this.tabContentPlayer = document.getElementById("tabContentPlayer");
         this.tabContentSkills = document.getElementById("tabContentSkills");
         this.tabContentCrew = document.getElementById("tabContentCrew");
@@ -507,8 +506,6 @@ class CockpitApp {
 
         // Contracts & Mastery Containers
         this.contractsList = document.getElementById("contractsList");
-        this.availableTalentPoints = document.getElementById("availableTalentPoints");
-        this.talentsGrid = document.getElementById("talentsGrid");
         this.relicsGrid = document.getElementById("relicsGrid");
 
         // Market
@@ -533,7 +530,6 @@ class CockpitApp {
         this.characterPerks = document.getElementById("characterPerks");
         this.skillsGrid = document.getElementById("skillsGrid");
         this.skillsPointsAvailable = document.getElementById("skillsPointsAvailable");
-        this.skillsPerksList = document.getElementById("skillsPerksList");
         this.hudSkillsPanel = document.getElementById("hudSkillsPanel");
         this.hudSkillsGrid = document.getElementById("hudSkillsGrid");
         this.hudSkillsPoints = document.getElementById("hudSkillsPoints");
@@ -674,7 +670,6 @@ class CockpitApp {
         this.tabBtnFleet.addEventListener("click", () => this.switchRightTab("fleet"));
 
         this.tabBtnContracts.addEventListener("click", () => this.switchRightTab("contracts"));
-        this.tabBtnMastery.addEventListener("click", () => this.switchRightTab("mastery"));
         this.tabBtnPlayer.addEventListener("click", () => this.switchRightTab("player"));
         this.tabBtnSkills.addEventListener("click", () => this.switchRightTab("skills"));
         this.tabBtnCrew.addEventListener("click", () => this.switchRightTab("crew"));
@@ -693,18 +688,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.btnToggleGrid.addEventListener("click", () => {
             this.radarGrid = !this.radarGrid;
             this.saveSettings();
-            this.btnToggleGrid.classList.toggle("active", this.radarGrid);
+            this.syncRadarControlState();
+            this.drawRadar();
         });
         this.btnToggleLabels.addEventListener("click", () => {
             this.radarLabels = !this.radarLabels;
             this.saveSettings();
-            this.btnToggleLabels.classList.toggle("active", this.radarLabels);
+            this.syncRadarControlState();
+            this.drawRadar();
         });
 
         // Main menu, settings, perks, and frontier actions
         document.getElementById("btnMainMenu")?.addEventListener("click", () => this.toggleMainMenu());
-        document.getElementById("btnOpenPerks")?.addEventListener("click", () => this.openPerksWindow());
-        document.getElementById("btnClosePerks")?.addEventListener("click", () => this.closePerksWindow());
         document.getElementById("btnCloseSettings")?.addEventListener("click", () => this.closeSettings());
         document.getElementById("btnMenuResume")?.addEventListener("click", () => {
             this.menuAction("/api/load", "Game loaded.");
@@ -966,13 +961,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     document.activeElement.blur();
                 }
                 const settingsOverlay = document.getElementById("settingsOverlay");
-                const perksOverlay = document.getElementById("perksOverlay");
                 if (settingsOverlay && settingsOverlay.style.display !== "none") {
                     this.closeSettings();
-                    return;
-                }
-                if (perksOverlay && perksOverlay.style.display !== "none") {
-                    this.closePerksWindow();
                     return;
                 }
                 this.toggleMainMenu();
@@ -982,10 +972,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             const menu = document.getElementById("mainMenuOverlay");
             const settings = document.getElementById("settingsOverlay");
-            const perks = document.getElementById("perksOverlay");
             const overlayOpen = (menu && !menu.classList.contains("hidden"))
-                || (settings && settings.style.display !== "none")
-                || (perks && perks.style.display !== "none");
+                || (settings && settings.style.display !== "none");
             if (overlayOpen) return;
             const hotkey = String(e.key || "").toLowerCase();
             if (hotkey === "p") {
@@ -1028,6 +1016,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             || ["INPUT", "TEXTAREA", "SELECT"].includes(tag);
     }
 
+    syncRadarControlState() {
+        if (this.btnToggleGrid) {
+            this.btnToggleGrid.classList.toggle("active", this.radarGrid);
+            this.btnToggleGrid.setAttribute("aria-pressed", String(this.radarGrid));
+        }
+        if (this.btnToggleLabels) {
+            this.btnToggleLabels.classList.toggle("active", this.radarLabels);
+            this.btnToggleLabels.setAttribute("aria-pressed", String(this.radarLabels));
+        }
+        const grid = document.getElementById("settingGrid");
+        if (grid) grid.checked = this.radarGrid;
+        const labels = document.getElementById("settingLabels");
+        if (labels) labels.checked = this.radarLabels;
+    }
+
     applyViewportProfile() {
         const width = window.innerWidth || 1280;
         const height = window.innerHeight || 720;
@@ -1060,11 +1063,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     switchRightTab(tabName) {
         this.drawerUserToggled = true;
         this.sound.playBeep(750, 0.05);
-        if (tabName === "mastery") {
-            this.openPerksWindow();
-            return;
-        }
-
         const tabButtons = {
             market: this.tabBtnMarket, arsenal: this.tabBtnArsenal, ship: this.tabBtnShip, fleet: this.tabBtnFleet,
             contracts: this.tabBtnContracts, story: this.tabBtnStory, factions: this.tabBtnFactions,
@@ -1553,8 +1551,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.renderFleet();
         } else if (this.activeRightTab === "contracts") {
             this.renderContracts();
-        } else if (this.activeRightTab === "mastery") {
-            this.renderMastery();
         } else if (this.activeRightTab === "story") {
             this.renderStory();
             this.renderVoid();
@@ -2238,34 +2234,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             <div class="skill-card">
                 <div class="skill-header">
                     <span class="skill-name"><span class="skill-icon">${meta.icon}</span> ${this.escapeHtml(meta.name)}</span>
-                    <span class="skill-level">${level}/${maxRank}</span>
+                    <span class="skill-level">RANK ${level}/${maxRank}</span>
                 </div>
                 <div class="skill-bar">
                     <div class="skill-bar-fill" style="width: ${(level / maxRank) * 100}%"></div>
                 </div>
                 <div class="skill-desc">${this.escapeHtml(meta.desc)}</div>
-                <div class="skill-train-row">
-                    <span class="skill-train-cost">Cost: 1 SP</span>
-                    <button class="btn-train-skill" data-train-skill="${this.escapeHtml(id)}" ${skillPoints <= 0 || level >= maxRank ? "disabled" : ""}>TRAIN</button>
-                </div>
             </div>
         `;
         }).join("");
 
-        this.skillsGrid.querySelectorAll("[data-train-skill]").forEach(btn =>
-            btn.addEventListener("click", () => this.postAction("/api/character/train", { skill: btn.getAttribute("data-train-skill") }, "character"))
-        );
-
         if (this.skillsPointsAvailable) {
             this.skillsPointsAvailable.textContent = skillPoints;
         }
-
-        const traits = ch.traits || [];
-        if (this.skillsPerksList) {
-            this.skillsPerksList.innerHTML = traits.length
-                ? traits.map(t => `<span class="skill-perk-badge active">${this.escapeHtml(String(t).replace(/_/g, " "))}</span>`).join("")
-                : `<span class="skill-perk-badge">NO TRAITS RECORDED</span>`;
-        }
+        this.renderSkillsPerks();
+        this.renderRelics();
     }
 
     renderSkillsQuickPanel() {
@@ -2378,13 +2361,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     .map(([key, value]) => `<span class="ship-module-stat">${this.escapeHtml(this.formatEffectLabel(key, value))}</span>`)
                     .join("");
                 return `
-                    <div class="ship-module-card ${isInstalled ? "installed" : ""}" data-module="${this.escapeHtml(mod.id)}">
-                        <div class="ship-module-card-header">
-                            <span class="ship-module-card-name">${this.escapeHtml(mod.name)}</span>
-                            <span class="ship-module-card-status ${isInstalled ? "installed" : "available"}">${isInstalled ? "INSTALLED" : (slotBusy ? "SLOT OCCUPIED" : `${mod.cost} CR`)}</span>
+                    <div class="ship-module-row ${isInstalled ? "installed" : ""}" data-module="${this.escapeHtml(mod.id)}">
+                        <span class="ship-module-glyph">${isInstalled ? "◆" : "◇"}</span>
+                        <div class="ship-module-info">
+                            <strong>${this.escapeHtml(mod.name)}</strong>
+                            <small>${this.escapeHtml(labels[mod.slot] || mod.slot)} // ${this.escapeHtml(mod.description)}</small>
                         </div>
-                        <div class="ship-module-card-desc">${this.escapeHtml(mod.description)}</div>
-                        <div class="ship-module-card-stats">${effects}</div>
+                        <div class="ship-module-effects">
+                            ${effects}
+                            <span class="ship-module-cost">${isInstalled ? "INSTALLED" : (slotBusy ? "SLOT BUSY" : `${mod.cost} CR`)}</span>
+                        </div>
                         <button class="btn-hud ${isInstalled ? "btn-amber" : "btn-cyan"}" data-action="${isInstalled ? "uninstall" : "install"}" ${disabled ? "disabled" : ""}>${isInstalled ? "REMOVE" : "INSTALL"}</button>
                     </div>
                 `;
@@ -2884,69 +2870,68 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         });
     }
 
-    renderMastery() {
+    renderTalentBranches(container, pointsEl) {
         if (!this.state) return;
-        const mastery = this.state.ship.mastery || { level: 1, xp: 0, next_level_xp: 500, talent_points: 0, specializations: [] };
-        this.availableTalentPoints.textContent = mastery.talent_points;
+        if (!container) return;
+        const mastery = this.state.ship.mastery || { talent_points: 0, specializations: [] };
+        const specs = mastery.specializations || [];
+        if (pointsEl) pointsEl.textContent = String(mastery.talent_points || 0);
 
-        // Render Talents Grid
-        this.talentsGrid.innerHTML = "";
-        const talents = this.state.catalog_talents || {
+        const talentCatalog = this.state.catalog_talents || {
             "void_cartographer": { id: "void_cartographer", name: "Void Cartographer", category: "exploration", description: "+30% sensor scan research credits and +20% Precursor Relic resonance detection." },
             "dreadnought_tactics": { id: "dreadnought_tactics", name: "Dreadnought Tactician", category: "combat", description: "+25% tactical laser damage and +25 MW shield overcharge absorption." },
             "swarm_commander": { id: "swarm_commander", name: "Swarm Fleet Overlord", category: "fleet", description: "+50% autonomous fleet drone harvest yields across all deployed systems." },
             "quantum_smuggler": { id: "quantum_smuggler", name: "Quantum Smuggler", category: "trade", description: "-25% hyperlane jump fuel burn and +20% commodity market profit margins." }
         };
-
-        const specs = mastery.specializations || [];
-
-        Object.values(talents).forEach(t => {
-            const isUnlocked = specs.includes(t.id);
-            const card = document.createElement("div");
-            card.className = `talent-card ${isUnlocked ? 'unlocked' : ''}`;
-
-            card.innerHTML = `
-                <div class="talent-top">
-                    <div class="talent-header-row">
-                        <strong class="talent-name">${this.escapeHtml(t.name)}</strong>
-                        <span class="contract-cat-badge cat-${this.escapeHtml(t.category)}">${this.escapeHtml(t.category)}</span>
-                    </div>
-                    <p class="talent-desc">${this.escapeHtml(t.description)}</p>
-                </div>
-                <button class="btn-talent-unlock" ${isUnlocked || mastery.talent_points <= 0 ? 'disabled' : ''} data-id="${this.escapeHtml(t.id)}">
-                    ${isUnlocked ? 'ACQUIRED' : (mastery.talent_points > 0 ? 'UNLOCK PERK (1 PT)' : 'LOCKED (1 PT)')}
-                </button>
-            `;
-
-            if (!isUnlocked && mastery.talent_points > 0) {
-                card.querySelector(".btn-talent-unlock").addEventListener("click", () => this.handleUnlockTalent(t.id));
-            }
-
-            this.talentsGrid.appendChild(card);
+        const talents = Object.values(talentCatalog);
+        const branches = {};
+        talents.forEach(t => {
+            const branch = t.branch || (t.category || "OTHER").toUpperCase();
+            (branches[branch] = branches[branch] || []).push(t);
         });
+        container.innerHTML = Object.entries(branches).map(([branch, nodes]) => `
+            <div class="perk-branch">
+                <h4>${this.escapeHtml(branch)}</h4>
+                ${nodes.sort((a, b) => (a.tier || 1) - (b.tier || 1)).map(t => {
+                    const unlocked = specs.includes(t.id);
+                    const requires = t.requires || [];
+                    const requiresMet = requires.every(r => specs.includes(r));
+                    const canUnlock = !unlocked && requiresMet && (mastery.talent_points || 0) > 0;
+                    return `<div class="perk-node ${unlocked ? "unlocked" : "locked"}">
+                        <strong>${this.escapeHtml(t.name)}</strong>
+                        <div>${this.escapeHtml(t.description)}</div>
+                        ${unlocked ? "<div>UNLOCKED</div>" : `<button class="btn-hud" data-talent="${this.escapeHtml(t.id)}" ${canUnlock ? "" : "disabled"}>${requiresMet ? "UNLOCK" : "REQUIRES " + requires.join(", ").toUpperCase()}</button>`}
+                    </div>`;
+                }).join("")}
+            </div>
+        `).join("");
+        container.querySelectorAll("[data-talent]").forEach(btn => {
+            btn.addEventListener("click", () => this.handleUnlockPerk(btn.getAttribute("data-talent")));
+        });
+    }
 
-        // Render Precursor Relics Grid
-        this.relicsGrid.innerHTML = "";
+    renderSkillsPerks() {
+        this.renderTalentBranches(document.getElementById("skillsPerksBranches"),
+            document.getElementById("skillsTalentPoints"));
+    }
+
+    renderRelics() {
+        if (!this.state) return;
+        if (!this.relicsGrid) return;
         const relics = this.state.ship.relics || [];
-
-        if (relics.length === 0) {
-            this.relicsGrid.innerHTML = `<p style="padding:10px;font-size:0.72rem;color:var(--text-muted);text-align:center;">No ancient Precursor Relics recovered yet. Recover them via planet sensor sweeps, anomalies, and contracts.</p>`;
+        if (!relics.length) {
+            this.relicsGrid.innerHTML = `<p class="panel-intro-text">No ancient Precursor Relics recovered yet. Recover them via planet sensor sweeps, anomalies and contracts.</p>`;
             return;
         }
-
-        relics.forEach(r => {
-            const card = document.createElement("div");
-            card.className = "relic-card";
-
-            card.innerHTML = `
+        this.relicsGrid.innerHTML = relics.map(r => `
+            <div class="relic-card">
                 <div class="relic-header-row">
                     <strong class="relic-name">${this.escapeHtml(r.name)}</strong>
                     <span class="relic-rarity-pill rarity-${this.escapeHtml(r.rarity)}">${this.escapeHtml(r.rarity)}</span>
                 </div>
                 <p class="relic-desc">${this.escapeHtml(r.description)}</p>
-            `;
-            this.relicsGrid.appendChild(card);
-        });
+            </div>
+        `).join("");
     }
 
     appendLog(text, type = "system") {
@@ -3012,28 +2997,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         } catch (e) {
             this.appendLog(`[ERROR] Contract claim failed: ${e.message}`, "hazard");
-        }
-    }
-
-    async handleUnlockTalent(talentId) {
-        this.sound.init();
-        try {
-            const res = await fetch("/api/mastery/unlock", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ talent_id: talentId })
-            });
-            const json = await res.json();
-            if (json.ok) {
-                this.sound.playLevelUp();
-                this.appendLog(json.message, "reward");
-                this.state = json.state;
-                this.renderHUD();
-            } else {
-                this.appendLog(`[MASTERY] ${json.message}`, "hazard");
-            }
-        } catch (e) {
-            this.appendLog(`[ERROR] Talent unlock failed: ${e.message}`, "hazard");
         }
     }
 
@@ -4222,6 +4185,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.enabled = document.getElementById("settingSound")?.checked !== false;
         this.radarGrid = document.getElementById("settingGrid")?.checked !== false;
         this.radarLabels = document.getElementById("settingLabels")?.checked !== false;
+        this.syncRadarControlState();
+        this.drawRadar();
         this.travelAnimationEnabled = document.getElementById("settingAnimation")?.checked !== false;
         this.starDensity = Number(document.getElementById("settingStarDensity")?.value || 220);
         this.uiDensity = document.getElementById("settingDensity")?.value || "auto";
@@ -4455,60 +4420,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
-    openPerksWindow() {
-        this.renderPerksWindow();
-        const overlay = document.getElementById("perksOverlay");
-        if (overlay) overlay.style.display = "flex";
-        this.sound.playBeep(820, 0.05);
-    }
-
-    closePerksWindow() {
-        const overlay = document.getElementById("perksOverlay");
-        if (overlay) overlay.style.display = "none";
-    }
-
-    renderPerksWindow() {
-        if (!this.state) return;
-        const container = document.getElementById("perksBranches");
-        const pointsEl = document.getElementById("perksWindowPoints");
-        if (!container) return;
-        const mastery = this.state.ship.mastery || { talent_points: 0, specializations: [] };
-        const specs = mastery.specializations || [];
-        if (pointsEl) pointsEl.textContent = `${mastery.talent_points || 0} POINTS`;
-
-        const talentCatalog = this.state.catalog_talents || {
-            "void_cartographer": { id: "void_cartographer", name: "Void Cartographer", category: "exploration", description: "+30% sensor scan research credits and +20% Precursor Relic resonance detection." },
-            "dreadnought_tactics": { id: "dreadnought_tactics", name: "Dreadnought Tactician", category: "combat", description: "+25% tactical laser damage and +25 MW shield overcharge absorption." },
-            "swarm_commander": { id: "swarm_commander", name: "Swarm Fleet Overlord", category: "fleet", description: "+50% autonomous fleet drone harvest yields across all deployed systems." },
-            "quantum_smuggler": { id: "quantum_smuggler", name: "Quantum Smuggler", category: "trade", description: "-25% hyperlane jump fuel burn and +20% commodity market profit margins." }
-        };
-        const talents = Object.values(talentCatalog);
-        const branches = {};
-        talents.forEach(t => {
-            const branch = t.branch || (t.category || "OTHER").toUpperCase();
-            (branches[branch] = branches[branch] || []).push(t);
-        });
-        container.innerHTML = Object.entries(branches).map(([branch, nodes]) => `
-            <div class="perk-branch">
-                <h4>${this.escapeHtml(branch)}</h4>
-                ${nodes.sort((a, b) => (a.tier || 1) - (b.tier || 1)).map(t => {
-                    const unlocked = specs.includes(t.id);
-                    const requires = t.requires || [];
-                    const requiresMet = requires.every(r => specs.includes(r));
-                    const canUnlock = !unlocked && requiresMet && (mastery.talent_points || 0) > 0;
-                    return `<div class="perk-node ${unlocked ? "unlocked" : "locked"}">
-                        <strong>${this.escapeHtml(t.name)}</strong>
-                        <div>${this.escapeHtml(t.description)}</div>
-                        ${unlocked ? "<div>UNLOCKED</div>" : `<button class="btn-hud" data-talent="${this.escapeHtml(t.id)}" ${canUnlock ? "" : "disabled"}>${requiresMet ? "UNLOCK" : "REQUIRES " + requires.join(", ").toUpperCase()}</button>`}
-                    </div>`;
-                }).join("")}
-            </div>
-        `).join("");
-        container.querySelectorAll("[data-talent]").forEach(btn => {
-            btn.addEventListener("click", () => this.handleUnlockPerk(btn.getAttribute("data-talent")));
-        });
-    }
-
     async handleUnlockPerk(talentId) {
         try {
             const res = await fetch("/api/mastery/unlock", {
@@ -4519,7 +4430,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (json.ok) {
                 this.state = json.state;
                 this.renderHUD();
-                this.renderPerksWindow();
+                this.renderSkills();
                 this.sound.playChime();
                 this.appendLog(json.message, "reward");
             } else {

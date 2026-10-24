@@ -32,7 +32,6 @@ TAB_BUTTON_IDS = (
     "tabBtnArsenal",
     "tabBtnFleet",
     "tabBtnContracts",
-    "tabBtnMastery",
     "tabBtnStory",
     "tabBtnFactions",
 )
@@ -42,7 +41,6 @@ TAB_CONTENT_IDS = (
     "tabContentArsenal",
     "tabContentFleet",
     "tabContentContracts",
-    "tabContentMastery",
     "tabContentStory",
     "tabContentFactions",
 )
@@ -307,7 +305,7 @@ class TestCockpitRuntimeContracts(unittest.TestCase):
         self.assertIn("this.dragMoved", self.js)
 
     def test_preload_renderers_guard_against_missing_state(self):
-        for method in ("renderMarketTable", "renderArsenal", "renderFleet", "renderContracts", "renderMastery", "renderFactions", "drawGalaxyView", "updateTargetCard"):
+        for method in ("renderMarketTable", "renderArsenal", "renderFleet", "renderContracts", "renderTalentBranches", "renderRelics", "renderFactions", "drawGalaxyView", "updateTargetCard"):
             self.assertRegex(
                 self.js,
                 rf"{method}\([^)]*\) \{{\s*if \(!this\.state\) return;",
@@ -345,15 +343,21 @@ class TestFrontierCockpitUI(unittest.TestCase):
         cls.css = STYLE_CSS.read_text(encoding="utf-8")
 
     def test_main_menu_and_windows_exist(self):
-        for marker in ("mainMenuOverlay", "settingsOverlay", "perksOverlay", "btnMenuSave", "btnMenuLoad", "btnMenuDelete", "btnMenuNew"):
+        for marker in ("mainMenuOverlay", "settingsOverlay", "btnMenuSave", "btnMenuLoad", "btnMenuDelete", "btnMenuNew"):
             self.assertIn(f'id="{marker}"', self.html)
+        for marker in ("skillsPerksBranches", "skillsTalentPoints", "relicsGrid"):
+            self.assertIn(f'id="{marker}"', self.html)
+        self.assertNotIn('id="perksOverlay"', self.html,
+                         "pilot perks must be inline in the Skills tab, not a duplicate overlay")
+        self.assertNotIn('id="btnOpenPerks"', self.html,
+                         "pilot perks must not have a top-bar shortcut duplicating the Skills tab")
 
     def test_frontier_tabs_and_radar_overlay_exist(self):
         for marker in ("tabBtnQuests", "tabBtnAI", "tabBtnDepot", "tabBtnMessages", "viewOrbitBtn", "viewGalaxyBtn", "btnToggleGrid", "btnToggleLabels", "btnLandTarget", "targetGravity", "quickScanBtn"):
             self.assertIn(f'id="{marker}"', self.html)
 
     def test_frontier_renderers_are_wired(self):
-        for method in ("renderQuests", "renderAICaptains", "renderDepots", "renderMessages", "openPerksWindow", "renderPerksWindow", "startTravelAnimation", "menuAction", "handleLandAction"):
+        for method in ("renderQuests", "renderAICaptains", "renderDepots", "renderMessages", "renderSkillsPerks", "renderTalentBranches", "renderRelics", "handleUnlockPerk", "startTravelAnimation", "menuAction", "handleLandAction"):
             self.assertIn(method, self.js)
 
     def test_esc_key_toggles_main_menu(self):

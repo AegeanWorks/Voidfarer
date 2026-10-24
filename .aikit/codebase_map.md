@@ -10,7 +10,7 @@
 - **Total Classes**: `158`
 - **Total Top-Level Functions**: `197`
 - **Total Class Methods**: `890`
-- **Total Source Lines**: `26511`
+- **Total Source Lines**: `26523`
 
 ---
 
@@ -176,7 +176,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `678` lines (`30545` bytes)
+**Size**: `682` lines (`30997` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1015,7 +1015,7 @@
 ### [`tools/ui_audit.py`](tools/ui_audit.py)
 > *Capture VoidFarer cockpit screenshots and a measurable UI audit with headless Edge or Chrome.*
 
-**Size**: `861` lines (`33216` bytes)
+**Size**: `861` lines (`33205` bytes)
 
 **Functions:**
 - `def find_browser()` - *Locate an installed Edge or Chrome executable without a third-party dependency.*
@@ -1034,12 +1034,12 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `322` lines (`14209` bytes)
+**Size**: `330` lines (`14679` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
 - `def _metrics(page)` - *Return viewport, scroll, element and tiny-text counts from the live page.*
-- `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout)` - *Open one real browser viewport, drive it and capture a true screenshot.*
+- `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll)` - *Open one real browser viewport, drive it and capture a true screenshot.*
 - `def main(argv)` - *Run the browser review driver and write screenshots plus a small JSON report.*
 
 ---
