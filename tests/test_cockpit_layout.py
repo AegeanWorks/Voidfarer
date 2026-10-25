@@ -455,13 +455,19 @@ class TestSleekHUDDeclutter(unittest.TestCase):
         self.assertIn("btnToggleLog", self.js)
         self.assertIn("clearLogBtn", self.js)
 
-    def test_skills_strip_has_icons_hotkeys_and_training_wiring(self):
+    def test_ability_strip_has_icons_hotkeys_and_use_wiring(self):
         self.assertIn('id="hudSkillsPanel"', self.html)
         self.assertIn('id="hudSkillsGrid"', self.html)
         self.assertIn("renderSkillsQuickPanel", self.js)
-        self.assertIn("trainSkillQuick", self.js)
+        self.assertIn("useAbilityQuick", self.js)
+        self.assertIn("ABILITY_ORDER", self.js)
+        self.assertIn("ABILITY_META", self.js)
         self.assertIn("SKILL_HOTKEYS", self.js)
-        self.assertIn("SKILL_META", self.js)
+        self.assertIn("data-train-skill", self.js)
+        self.assertIn("TRAIN 1 SP", self.js)
+        self.assertNotIn("Spend points with SHIFT+1..6", self.html)
+        self.assertIn("SHIFT+1..6 USE ABILITY", self.html)
+        self.assertNotIn('id="hudSkillsPoints"', self.html)
         self.assertNotIn('id="characterSkills"', self.html,
                          "the PLAYER tab must no longer own a skills summary")
 

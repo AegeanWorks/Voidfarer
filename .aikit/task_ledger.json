@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "grand-strategy-v1",
+    "task_id": "ability-bar-balance-v1",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1792935553.904484,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1792954222.3826716,
     "owner": "kilo:1",
-    "started_by": "claude-code:f36d48df",
-    "continuations": [
-      {
-        "agent": "kilo:1",
-        "from": "claude-code:f36d48df",
-        "at": 1792927195.3782234
-      }
-    ],
-    "completed_at": 1792935628.391651
+    "started_by": "kilo:1",
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "left-panel-qol-ledger-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/5] Commerce: order lot bar x1/x5/x10/MAX (persisted), clamped BUY n/SELL n labels, Shift+click max via REST max flag, @avg cost and green/red sell margin, non-wrapping numeric columns; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792880698.596777,
-      "timestamp_str": "2026-10-25 01:24:58",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "left-panel-qol-ledger-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/5 pending docs] Settings: master volume (master gain node), auto-pause on hostile intercept/new event, auto-claim contracts, default order lot, remember tab, CONTROLS reference, RESET DEFAULTS around SETTINGS_DEFAULTS; Edge smoke 13/13; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792880996.5792615,
-      "timestamp_str": "2026-10-25 01:29:56",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "left-panel-qol-ledger-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/5] Docs and parity: CLI buy max/sell all, README (22,496 chars), ADR-055; 524 tests; 4/4 gates; Edge smoke 13/13; uncommitted pending user commit request; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792881165.0253487,
-      "timestamp_str": "2026-10-25 01:32:45",
-      "agent": "claude-code:f36d48df"
-    },
     {
       "task_id": "left-panel-qol-ledger-v1",
       "phase": "completed",
@@ -246,6 +206,45 @@
       "status": "completed",
       "timestamp": 1792935628.391652,
       "timestamp_str": "2026-10-25 16:40:28",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "ability-bar-balance-v1",
+      "phase": "planning",
+      "phase_num": 2,
+      "description": "[1/5] Plan: (1) replace the bottom-strip TRAINING chips with the commander's activatable abilities (icons, SHIFT+1..6 hotkeys, cooldown/ready state, click-to-use, charm target resolution); (2) make abilities progress (unlock charm/trade at skill 7, overclock becomes a timed reactor surge) and rebalance yields; (3) rebalance outpost yields/upgrades and early combat threat; (4) ADR-058 and README; (5) 100% tests, 4/4 gates, real-browser UI review by vision model",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792948323.2125654,
+      "timestamp_str": "2026-10-25 20:12:03",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The bottom-strip SKILLS panel trains passive ranks with SHIFT+1..6, but the design calls for the commander's activatable powers (Reactor Overclock, Emergency Repair, ...) with hotkeys; two of six abilities are unreachable, overclock is a duplicate of the reactor-mode button, and measured economy data shows outposts pay back in 1-1.5 months while early combat kills in 3 shots without hull damage.",
+        "benefits": "The cockpit's most-used strip becomes a tactical ability bar; all six powers are reachable through play; overclock is a unique burst; outposts become a longer-term investment than active play; early fights carry real risk; ability and outpost values are documented with measured numbers.",
+        "risks": "contract: new ReactorState surge fields and ability-unlock thresholds must stay save-compatible; outpost and enemy stat changes shift documented balance; UI contract surface (static/server) changes; dependency: none beyond the standard library; concurrency: engine lock unchanged, no new threads; state: ReactorState gains defaulted fields, character abilities gain entries only",
+        "mitigation": "Backward-compatible defaults on every new field, or-from_dict tests for old saves, ability unlock additive to existing tuples, measured before/after simulation table in ADR-058, failing-first tests for each balance assertion, bounded UI diff inside the cockpit surface, full suite and 4/4 gates before any delivery"
+      }
+    },
+    {
+      "task_id": "ability-bar-balance-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Ability bar + balance verified: 576 tests, 4/4 gates, real-browser captures at 1920/1366/1280; vision review found clipped labels and hidden hint, both fixed and re-approved (4 READY, 2 LOCKED, SHIFT hint visible); ADR-058 and README updated; checklists: passed; delivery pending user authorization",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792950541.617316,
+      "timestamp_str": "2026-10-25 20:49:01",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "ability-bar-balance-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Ability bar + balance + review hardening verified: 582 tests, 4/4 gates, ADR-058 corrected; reviewers found and I fixed rank-7 unlock reconciliation on creation/load, 0-hull defeat with no bounty, no double outpost level scaling, whole-credit yields, skill TRAIN buttons, charm target validation, cooldown-safe failures and ability-bar context states; vision review approved 7 real-browser captures at 1920/1366/1280; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792954222.3826716,
+      "timestamp_str": "2026-10-25 21:50:22",
       "agent": "kilo:1"
     }
   ]

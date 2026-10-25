@@ -39,6 +39,59 @@ class TestProgressionThreatScaling(unittest.TestCase):
         self.assertIsNotNone(ENEMY_ARCHETYPES[high.archetype_id])
 
 
+class TestEarlyCombatRisk(unittest.TestCase):
+    def test_a_marauder_costs_hull_to_a_fresh_corvette(self):
+        arch = ENEMY_ARCHETYPES["syndicate_marauder"]
+        combat = CombatEncounter(
+            id="balance_marauder",
+            enemy_name=arch.name,
+            enemy_class=arch.enemy_class,
+            enemy_hull=arch.base_hull,
+            enemy_max_hull=arch.base_hull,
+            enemy_damage=arch.base_damage,
+            bounty_credits=arch.bounty_credits,
+            salvage_commodity=arch.salvage_commodity,
+            enemy_shield=arch.base_shield,
+            enemy_max_shield=arch.base_shield,
+            faction_id=arch.faction_id,
+            special_ability=arch.special_ability,
+        )
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(hull=100, shield=100),
+            active_combat=combat,
+        )
+        start_hull = engine.state.ship.hull
+        for _ in range(20):
+            if engine.state.active_combat is None:
+                break
+            engine.combat_action("fire_lasers")
+        self.assertIsNone(engine.state.active_combat)
+        self.assertLess(engine.state.ship.hull, start_hull,
+                        "a marauder fight must cost hull without abilities")
+        self.assertGreater(engine.state.ship.hull, 0,
+                           "the baseline marauder must remain survivable")
+
+    def test_zero_hull_ends_combat_as_a_defeat_without_bounty(self):
+        combat = CombatEncounter(
+            id="balance_lethal", enemy_name="Lethal Test Frame", enemy_class="Dreadnought",
+            enemy_hull=999, enemy_max_hull=999, enemy_damage=500, bounty_credits=2500,
+            salvage_commodity="titanium", enemy_shield=0, enemy_max_shield=0,
+            faction_id="void_corsairs", special_ability="none",
+        )
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(hull=100, shield=0, credits=0),
+            active_combat=combat,
+        )
+        ok, msg = engine.combat_action("fire_lasers")
+        self.assertTrue(ok)
+        self.assertIn("DEFEAT", msg)
+        self.assertIsNone(engine.state.active_combat)
+        self.assertEqual(engine.state.ship.hull, 0)
+        self.assertEqual(engine.state.ship.credits, 0)
+
+
 class TestEvasiveBurnDiscipline(unittest.TestCase):
     def _engine(self, fuel=20, streak=5, combo=3):
         engine = SimulationEngine(seed=42)

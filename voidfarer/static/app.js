@@ -14,6 +14,17 @@ const SKILL_META = {
     trade: { name: "Trade", icon: "💱", desc: "Increases cargo capacity, buy/sell margins, and depot efficiency." }
 };
 const SKILL_HOTKEYS = ["⇧1", "⇧2", "⇧3", "⇧4", "⇧5", "⇧6"];
+// Activatable commander powers, in hotkey order (SHIFT+1..6).
+const ABILITY_ORDER = ["overclock", "emergency_repair", "battle_focus", "charm_offensive", "science_burst", "trade_instinct"];
+const ABILITY_META = {
+    overclock: { icon: "⚡", name: "Reactor Overclock", label: "Overclock" },
+    emergency_repair: { icon: "🛠", name: "Emergency Repair", label: "Repair" },
+    battle_focus: { icon: "🎯", name: "Battle Focus", label: "Battle Focus" },
+    charm_offensive: { icon: "⚖", name: "Diplomatic Offensive", label: "Diplomacy" },
+    science_burst: { icon: "🔬", name: "Science Burst", label: "Science" },
+    trade_instinct: { icon: "💱", name: "Trade Instinct", label: "Trade" },
+};
+const ABILITY_UNLOCK_RANK = { charm_offensive: 7, trade_instinct: 7 };
 // Left terminal rail order, top to bottom; [ and ] cycle through it.
 const TERMINAL_TABS = [
     "player", "skills", "crew", "ship", "market", "arsenal", "fleet", "contracts",
@@ -591,7 +602,7 @@ class CockpitApp {
         this.skillsPointsAvailable = document.getElementById("skillsPointsAvailable");
         this.hudSkillsPanel = document.getElementById("hudSkillsPanel");
         this.hudSkillsGrid = document.getElementById("hudSkillsGrid");
-        this.hudSkillsPoints = document.getElementById("hudSkillsPoints");
+        this.hudSkillsReady = document.getElementById("hudSkillsReady");
         this.btnOpenSkillsTab = document.getElementById("btnOpenSkillsTab");
         this.btnToggleSkills = document.getElementById("btnToggleSkills");
         this.crewAssignments = document.getElementById("crewAssignments");
@@ -1060,8 +1071,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.toggleLogPanel();
             } else if (e.shiftKey && /^Digit[1-6]$/.test(e.code)) {
                 e.preventDefault();
-                const skillId = Object.keys(SKILL_META)[Number(e.code.slice(-1)) - 1];
-                this.trainSkillQuick(skillId);
+                this.useAbilityQuick(ABILITY_ORDER[Number(e.code.slice(-1)) - 1]);
             } else if (!e.shiftKey && ["KeyQ", "KeyW", "KeyE", "KeyR"].includes(e.code)) {
                 e.preventDefault();
                 this.nudgeReactorPower({ KeyQ: "engines", KeyW: "shields", KeyE: "sensors", KeyR: "weapons" }[e.code]);
@@ -1278,7 +1288,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     toggleSkillsPanel() {
         if (!this.hudSkillsPanel) return;
-        this.hudSkillsPanel.classList.toggle("skills-collapsed");
+        const collapsed = this.hudSkillsPanel.classList.toggle("skills-collapsed");
+        if (this.btnToggleSkills) this.btnToggleSkills.setAttribute("aria-expanded", String(!collapsed));
     }
 
     toggleLogPanel() {
@@ -2355,17 +2366,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const abilities = Object.entries(this.state.character_abilities || {});
         const unlocked = new Set(ch.abilities || []);
         const cooldowns = ch.ability_cooldowns || {};
+        const shipState = this.state.ship || {};
+        const charmTarget = this.abilityTargetFaction("charm_offensive");
         this.characterAbilities.innerHTML = abilities.map(([id, info]) => {
             const isUnlocked = unlocked.has(id);
             const cd = cooldowns[id] || 0;
+            const contextBlocked = (id === "battle_focus" && !this.state.active_combat)
+                || (id === "emergency_repair" && Number(shipState.hull || 0) >= Number(shipState.max_hull || 1))
+                || (id === "charm_offensive" && !charmTarget);
             return `<div class="ability-row ${isUnlocked ? "" : "locked"}">
                 <span><strong>${this.escapeHtml(info.name)}</strong><br><small>${this.escapeHtml(info.description)}</small></span>
-                <span class="cooldown">${isUnlocked ? (cd > 0 ? `CD ${cd}` : "READY") : "LOCKED"}</span>
-                <button class="btn-hud btn-amber" data-use-ability="${this.escapeHtml(id)}" ${!isUnlocked || cd > 0 ? "disabled" : ""}>USE</button>
+                <span class="cooldown">${isUnlocked ? (cd > 0 ? `CD ${cd}` : contextBlocked ? "IDLE" : "READY") : "LOCKED"}</span>
+                <button class="btn-hud btn-amber" data-use-ability="${this.escapeHtml(id)}" data-ability-faction="${this.escapeHtml(charmTarget || "")}" ${!isUnlocked || cd > 0 || contextBlocked ? "disabled" : ""}>USE</button>
             </div>`;
         }).join("");
         this.characterAbilities.querySelectorAll("[data-use-ability]").forEach(btn =>
-            btn.addEventListener("click", () => this.postAction("/api/character/ability", { ability_id: btn.getAttribute("data-use-ability") }, "character"))
+            btn.addEventListener("click", () => this.useAbilityQuick(
+                btn.getAttribute("data-use-ability"),
+                btn.getAttribute("data-ability-faction") || null
+            ))
         );
 
         this.characterPerks.innerHTML = `
@@ -2387,6 +2406,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         this.skillsGrid.innerHTML = Object.entries(skills).map(([id, level]) => {
             const meta = SKILL_META[id] || { name: id, icon: "✦", desc: "" };
+            const canTrain = skillPoints > 0 && level < maxRank;
             return `
             <div class="skill-card">
                 <div class="skill-header">
@@ -2397,9 +2417,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <div class="skill-bar-fill" style="width: ${(level / maxRank) * 100}%"></div>
                 </div>
                 <div class="skill-desc">${this.escapeHtml(meta.desc)}</div>
+                <button class="btn-hud btn-amber skill-train-btn" data-train-skill="${this.escapeHtml(id)}" ${canTrain ? "" : "disabled"}>TRAIN 1 SP</button>
             </div>
         `;
         }).join("");
+        this.skillsGrid.querySelectorAll("[data-train-skill]").forEach(btn =>
+            btn.addEventListener("click", () => this.trainSkill(btn.getAttribute("data-train-skill")))
+        );
 
         if (this.skillsPointsAvailable) {
             this.skillsPointsAvailable.textContent = skillPoints;
@@ -2408,44 +2432,93 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.renderRelics();
     }
 
+    async trainSkill(skillId) {
+        if (!skillId || !this.state) return;
+        this.sound.init();
+        await this.postAction("/api/character/train", { skill: skillId }, null);
+        this.renderSkills();
+    }
+
     renderSkillsQuickPanel() {
         if (!this.state || !this.hudSkillsGrid) return;
-        const ch = this.state.character || {};
-        const skillPoints = ch.skill_points || 0;
-        const skills = ch.skills || { piloting: 0, engineering: 0, science: 0, combat: 0, diplomacy: 0, trade: 0 };
-        const maxRank = 10;
-
-        if (this.hudSkillsPoints) this.hudSkillsPoints.textContent = String(skillPoints);
-        this.hudSkillsGrid.innerHTML = Object.entries(skills).map(([id, level], index) => {
-            const meta = SKILL_META[id] || { name: id, icon: "✦" };
-            const canTrain = skillPoints > 0 && level < maxRank;
+        const abilities = this.state.character_abilities || {};
+        const ship = this.state.ship || {};
+        const charmTarget = this.abilityTargetFaction("charm_offensive");
+        const inCombat = Boolean(this.state.active_combat);
+        const available = id => {
+            const info = abilities[id] || {};
+            if (!info.unlocked || Number(info.cooldown || 0) > 0) return false;
+            if (id === "battle_focus" && !inCombat) return false;
+            if (id === "emergency_repair" && Number(ship.hull || 0) >= Number(ship.max_hull || 1)) return false;
+            if (id === "charm_offensive" && !charmTarget) return false;
+            return true;
+        };
+        const ready = ABILITY_ORDER.filter(available).length;
+        if (this.hudSkillsReady) this.hudSkillsReady.textContent = String(ready);
+        const signature = ABILITY_ORDER.map(id => `${id}:${(abilities[id] || {}).unlocked ? 1 : 0}:${(abilities[id] || {}).cooldown || 0}`).join("|")
+            + `|${inCombat}|${ship.hull}|${ship.max_hull}|${charmTarget || ""}`;
+        if (signature === this.abilitySignature && this.hudSkillsGrid.childElementCount) return;
+        this.abilitySignature = signature;
+        this.hudSkillsGrid.innerHTML = ABILITY_ORDER.map((id, index) => {
+            const info = abilities[id] || {};
+            const meta = ABILITY_META[id] || { name: id, icon: "✦" };
+            const unlocked = Boolean(info.unlocked);
+            const cooldown = Math.max(0, Number(info.cooldown || 0));
+            const total = Math.max(1, Number(info.cooldown_total || 0));
+            const readyNow = available(id);
+            const contextLabel = id === "battle_focus" ? "NO COMBAT"
+                : id === "emergency_repair" ? "FULL HULL"
+                : id === "charm_offensive" ? "NO TARGET" : "";
+            const percent = !unlocked ? 0 : readyNow ? 100 : cooldown > 0 ? Math.max(0, 100 - (cooldown / total) * 100) : 0;
+            const stateLabel = !unlocked ? "LOCKED" : readyNow ? "READY" : cooldown > 0 ? `CD ${Math.ceil(cooldown)}` : contextLabel;
+            const requirement = info.skill ? `${info.skill} rank ${ABILITY_UNLOCK_RANK[id] || 7}` : "skill training";
+            const title = unlocked ? `${meta.name} // ${stateLabel} // ${SKILL_HOTKEYS[index]}` : `${meta.name} // locked: raise ${requirement}`;
             return `
-                <button class="skill-quick-chip ${canTrain ? "" : "is-locked"}"
-                        data-quick-skill="${this.escapeHtml(id)}"
-                        title="${this.escapeHtml(meta.name)} rank ${level}/${maxRank} // ${SKILL_HOTKEYS[index] || ""} to train"
-                        ${canTrain ? "" : "disabled"}>
-                    <span class="skill-quick-hotkey">${SKILL_HOTKEYS[index] || "—"}</span>
+                <button class="skill-quick-chip ${readyNow ? "is-ready" : unlocked ? "is-cooldown" : "is-locked"}"
+                        data-quick-ability="${this.escapeHtml(id)}"
+                        title="${this.escapeHtml(title)}"
+                        ${readyNow ? "" : "disabled"}>
+                    <span class="skill-quick-hotkey">${SKILL_HOTKEYS[index] || "-"}</span>
                     <span class="skill-quick-icon">${meta.icon}</span>
-                    <span class="skill-quick-name">${this.escapeHtml(meta.name)}</span>
-                    <span class="skill-quick-rank">${level}/${maxRank}</span>
-                    <span class="skill-quick-bar"><i style="width:${(level / maxRank) * 100}%"></i></span>
+                    <span class="skill-quick-name">${this.escapeHtml(meta.label || meta.name)}</span>
+                    <span class="skill-quick-rank">${stateLabel}</span>
+                    <span class="skill-quick-bar"><i style="width:${percent}%"></i></span>
                 </button>
             `;
         }).join("");
 
-        this.hudSkillsGrid.querySelectorAll("[data-quick-skill]").forEach(btn =>
-            btn.addEventListener("click", () => this.trainSkillQuick(btn.getAttribute("data-quick-skill")))
+        this.hudSkillsGrid.querySelectorAll("[data-quick-ability]").forEach(btn =>
+            btn.addEventListener("click", () => this.useAbilityQuick(btn.getAttribute("data-quick-ability")))
         );
     }
 
-    async trainSkillQuick(skillId) {
-        if (!skillId || !this.state) return;
-        const ch = this.state.character || {};
-        const level = Number((ch.skills || {})[skillId] || 0);
-        if ((ch.skill_points || 0) <= 0 || level >= 10) return;
-        this.sound.init();
-        await this.postAction("/api/character/train", { skill: skillId }, null);
-        this.renderSkillsQuickPanel();
+    async useAbilityQuick(abilityId, factionOverride = null) {
+        if (!abilityId || !this.state || this.abilityPending) return;
+        const info = (this.state.character_abilities || {})[abilityId];
+        if (!info || !info.unlocked || Number(info.cooldown || 0) > 0) return;
+        const factionId = factionOverride || this.abilityTargetFaction(abilityId);
+        if (abilityId === "charm_offensive" && !factionId) return;
+        this.abilityPending = true;
+        try {
+            this.sound.init();
+            await this.postAction("/api/character/ability", {
+                ability_id: abilityId,
+                faction_id: factionId,
+            }, null);
+        } finally {
+            this.abilityPending = false;
+            this.abilitySignature = "";
+            this.renderSkillsQuickPanel();
+        }
+    }
+
+    // Quick-bar diplomacy targets the sovereign faction of the current system, never a fallback.
+    abilityTargetFaction(abilityId) {
+        if (abilityId !== "charm_offensive") return null;
+        const name = (this.state.current_system || {}).faction || "";
+        const factions = this.state.factions || {};
+        const match = Object.entries(factions).find(([, f]) => f.name === name);
+        return match ? match[0] : null;
     }
 
     renderShip() {

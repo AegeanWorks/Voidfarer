@@ -23,8 +23,8 @@ MAX_STARTING_SKILL_TOTAL = len(SKILL_CATALOG) * STARTING_SKILL_BASE + STARTING_S
 ABILITY_CATALOG: dict[str, dict[str, Any]] = {
     "overclock": {
         "name": "Reactor Overclock",
-        "description": "Push the core into overdrive for immediate subsystem output.",
-        "cooldown": 8,
+        "description": "Push the core into a timed surge: +25% subsystem output for 8 ticks at a heat cost.",
+        "cooldown": 20,
         "skill": "engineering",
     },
     "emergency_repair": {
@@ -59,6 +59,12 @@ ABILITY_CATALOG: dict[str, dict[str, Any]] = {
     },
 }
 
+# Later powers unlock by investing in the matching skill; the first four are innate.
+ABILITY_UNLOCKS: dict[str, dict[str, Any]] = {
+    "charm_offensive": {"skill": "diplomacy", "rank": 7},
+    "trade_instinct": {"skill": "trade", "rank": 7},
+}
+
 
 def skill_level(character: PlayerCharacter, skill: str) -> int:
     return int(character.skills.get(skill, 1))
@@ -67,6 +73,19 @@ def skill_level(character: PlayerCharacter, skill: str) -> int:
 def skill_bonus(character: PlayerCharacter, skill: str) -> float:
     """Percent bonus per skill level above baseline."""
     return max(0.0, (skill_level(character, skill) - 1) * 0.04)
+
+
+def reconcile_abilities(character: PlayerCharacter) -> tuple[PlayerCharacter, list[str]]:
+    """Append every ability whose skill requirement this character already meets."""
+    abilities = tuple(character.abilities)
+    extra = [
+        ability_id for ability_id, requirement in ABILITY_UNLOCKS.items()
+        if int(character.skills.get(requirement["skill"], 1)) >= requirement["rank"]
+        and ability_id not in abilities
+    ]
+    if not extra:
+        return character, []
+    return replace(character, abilities=abilities + tuple(extra)), extra
 
 
 def train_skill(character: PlayerCharacter, skill: str) -> tuple[bool, PlayerCharacter, str]:
@@ -80,7 +99,12 @@ def train_skill(character: PlayerCharacter, skill: str) -> tuple[bool, PlayerCha
     skills = dict(character.skills)
     skills[skill] = current + 1
     updated = replace(character, skills=skills, skill_points=character.skill_points - 1)
-    return True, updated, f"Trained {SKILL_CATALOG[skill]['name']} to rank {current + 1}."
+    updated, unlocked = reconcile_abilities(updated)
+    msg = f"Trained {SKILL_CATALOG[skill]['name']} to rank {current + 1}."
+    if unlocked:
+        names = ", ".join(ABILITY_CATALOG[aid]["name"] for aid in unlocked)
+        msg += f" Unlocked {names}."
+    return True, updated, msg
 
 
 def award_character_xp(character: PlayerCharacter, amount: int) -> tuple[PlayerCharacter, bool, str]:

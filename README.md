@@ -4,7 +4,7 @@
 
 > **Autonomous Deep-Space Fleet, Procedural Galaxy & Windows Cockpit Simulator.**
 
-VoidFarer is a zero-dependency, local-first space flight, fleet and exploration simulation. Explore procedural systems, route reactor power, board derelicts, scoop fuel, command drones, fit upgrades, fight adaptive AI and trade, from an ANSI REPL or a Windows HTML5 Canvas cockpit.
+VoidFarer is a zero-dependency, local-first space flight, fleet and exploration simulation. Explore procedural systems, route reactor power, board derelicts, scoop fuel, command drones, fit upgrades, fight adaptive AI and trade, from an ANSI REPL or a Windows cockpit.
 
 ---
 
@@ -382,8 +382,10 @@ python -m voidfarer.cli crew train <crew_id>
 python -m voidfarer.cli crew shore
 python -m voidfarer.cli weapons install railgun
 ```
-The commander ages, earns XP, and trains six skills with active cooldown abilities. Research
-unlocks reactor, scan, combat, outpost, repair, and fuel tech. Outposts produce resources each tick.
+The commander ages, earns XP, and trains six skills; SHIFT+1..6 fires
+Reactor Overclock, Emergency Repair, Battle Focus, Science Burst and the rank-7 unlocks. Research
+unlocks reactor, scan, combat, outpost, repair, and fuel tech. Outposts repay build cost over
+3.9-9.2 months.
 Wars run along hyperlane fronts: strength, overextension and attrition decide captures, capitals fall last, treaties and truces end them. Escort warships coordinate volleys,
 screen damage, and adopt battle stances. Multi-jump routing handles black holes. Message trees branch
 into lasting outcomes. Crew feature roles, morale, wages, and SVG portraits; morale reacts to
@@ -399,7 +401,7 @@ python -m voidfarer.cli serve --port 8080
 ```
 Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Top Status Bar & Chronometer (`G-007`, `G-011`)**: Vitals plus the chrono deck, sized for 1280x720 through 4K.
-- **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a three-column bottom strip: reactor, skills, separate radar settings above the compact log; circular zoom icons and themed cursors.
+- **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a three-column bottom strip: reactor, abilities, separate radar settings above the compact log; circular zoom icons and themed cursors.
 - **Menu, Settings & Saves (`ESC`)**: volume, auto-pause on intercepts/events, auto-claim, order lot, key list, reset; saves.
 - **Left Terminal & Commerce**: `[`/`]` cycle tabs, `\` hides the drawer, the last tab reopens; two-line ledger rows; x1/x5/x10/MAX order lots (Shift+click = max), average cost and sell margins.
 - **Planet Inspector**: Gravity, atmosphere, temperature, habitability, orbit distance, moons, resources, and colony tiers.
@@ -412,7 +414,7 @@ Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **REPL Server Lifecycle**: `serve` runs the HTTP server and ticker; `serve stop` saves and shuts down.
 - **Reactor Power Matrix (`G-006`, `G-013`)**: four sliders that route on release, presets, `Q/W/E/R`, heat, four modes, VENT.
 - **Sector Map Modifiers**: Generated conditions shown as radar chips and applied to fuel, scans, encounters, trade and reactor heat.
-- **Player, Skills & Crew Tabs**: PLAYER is a dossier; six quick-train skills live in the bottom strip (`SHIFT+1..6`), while SKILLS holds ranks, pilot perks and relics. Crew holds bonuses and drills.
+- **Player, Skills & Crew Tabs**: PLAYER is a dossier; the bottom strip is the six-power ability bar (`SHIFT+1..6`), while SKILLS holds training, talents and relics. Crew holds bonuses and drills.
 - **Ship Configuration Tab**: Fixed-height silhouette, compact stats, and a full-width module ledger; refits require a docked drydock or station.
 - **Commander Creation & Death Flow**: name, age, background and starting skills for new games; a death overlay summarizes the run and offers a new commander or a save.
 - **Stellaris-Style Windows HUD**: gold-on-navy, 720p-4K, density/HUD scale, DPR radar.

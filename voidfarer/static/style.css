@@ -4657,6 +4657,11 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
     cursor: default;
 }
 
+.skill-quick-chip.is-cooldown:disabled { opacity: 0.82; }
+.skill-quick-chip.is-ready .skill-quick-rank { color: var(--neon-cyan); }
+.skill-quick-chip.is-cooldown .skill-quick-rank { color: var(--neon-amber); }
+.skill-train-btn { margin-top: 6px; align-self: flex-start; font-size: 11px; padding: 3px 8px; }
+
 .skill-quick-hotkey {
     font-family: var(--font-mono);
     font-size: 0.5rem;
@@ -5531,7 +5536,6 @@ body.cockpit-theme .hud-command-strip .power-total { font-size: 12px; }
 
 body.cockpit-theme .hud-command-strip .power-action-row .btn-hud { font-size: 12px; min-height: 28px; }
 body.cockpit-theme .skills-quick-points,
-body.cockpit-theme #hudSkillsPoints { font-size: 12px; }
 
 body.cockpit-theme .save-slot-empty { font-size: 12px; }
 body.cockpit-theme .menu-btn.primary { background: #c9a35a; border-color: #e2c078; color: #171208; }
@@ -7968,7 +7972,6 @@ body.cockpit-theme .panel-center {
 .skills-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 6px; }
 .skill-quick-chip { min-height: 30px; padding: 3px 7px; gap: 1px 6px; }
 .skill-quick-bar { height: 2px; }
-.skills-quick-panel .skills-quick-hint { display: none; }
 .hud-command-strip .power-total { white-space: nowrap; }
 .hud-command-strip .reactor-mode-row { flex-wrap: nowrap; }
 .hud-command-strip .reactor-mode-btn { flex: 1 1 auto; }
@@ -7988,7 +7991,6 @@ body.cockpit-theme .panel-center {
     .hud-strip-right .panel-title { white-space: nowrap; }
     .skills-quick-grid { grid-template-columns: minmax(0, 1fr); gap: 2px; }
     .skill-quick-chip { min-height: 24px; padding: 2px 6px; }
-    .skill-quick-hotkey { display: none; }
     .hud-strip-panel .panel-tag,
     .hud-strip-right .panel-tag,
     .hud-command-strip .title-long,

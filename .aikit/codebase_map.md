@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `68`
-- **Total Classes**: `177`
-- **Total Top-Level Functions**: `213`
-- **Total Class Methods**: `998`
-- **Total Source Lines**: `28014`
+- **Total Classes**: `178`
+- **Total Top-Level Functions**: `214`
+- **Total Class Methods**: `1010`
+- **Total Source Lines**: `28260`
 
 ---
 
@@ -179,7 +179,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `899` lines (`40662` bytes)
+**Size**: `905` lines (`40991` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -241,7 +241,7 @@
   - Method `.test_quick_scan_is_bound_exactly_once()`
   - Method `.test_left_terminal_is_collapsible_drawer()`
   - Method `.test_bottom_strip_log_is_compact_and_keeps_its_controls()`
-  - Method `.test_skills_strip_has_icons_hotkeys_and_training_wiring()`
+  - Method `.test_ability_strip_has_icons_hotkeys_and_use_wiring()`
   - Method `.test_reactor_mode_and_vent_buttons_are_wired()`
   - Method `.test_cockpit_uses_themed_cursor_assets()`
   - Method `.test_command_strip_hotkeys_are_wired()`
@@ -321,13 +321,16 @@
 ### [`tests/test_combat_void_depth.py`](tests/test_combat_void_depth.py)
 > *Regression tests for progression-scaled combat and Hollow resonance risk/reward.*
 
-**Size**: `200` lines (`8546` bytes)
+**Size**: `253` lines (`10889` bytes)
 
 **Classes:**
 - `class TestProgressionThreatScaling`
   - Method `.test_threat_multiplier_starts_flat_and_grows()`
   - Method `.test_generated_enemy_scales_with_threat_level()`
   - Method `.test_dreadnought_boss_is_gated_behind_mastery()`
+- `class TestEarlyCombatRisk`
+  - Method `.test_a_marauder_costs_hull_to_a_fresh_corvette()`
+  - Method `.test_zero_hull_ends_combat_as_a_defeat_without_bounty()`
 - `class TestEvasiveBurnDiscipline`
   - Method `._engine(fuel, streak, combo)`
   - Method `.test_successful_evasive_burn_costs_fuel_and_resets_streak()`
@@ -382,7 +385,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `251` lines (`11514` bytes)
+**Size**: `365` lines (`17213` bytes)
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -390,10 +393,20 @@
   - Method `.test_character_state_round_trip_and_age()`
   - Method `.test_train_skill_requires_points_and_valid_skill()`
   - Method `.test_emergency_repair_ability_heals_and_sets_cooldown()`
+  - Method `.test_high_skill_unlocks_the_late_abilities()`
+  - Method `.test_overclock_is_a_timed_reactor_surge()`
   - Method `.test_research_project_completes_on_tick()`
   - Method `.test_unknown_research_project_rejected()`
   - Method `.test_outpost_builds_and_produces_on_tick()`
   - Method `.test_outpost_requires_orbit()`
+  - Method `.test_outposts_pay_back_over_multiple_months()`
+  - Method `.test_outpost_upgrade_costs_less_than_building_and_adds_quarter_output()`
+  - Method `.test_old_outposts_use_the_current_catalog_yields()`
+  - Method `.test_commander_creation_reconciles_rank_seven_unlocks()`
+  - Method `.test_loading_an_old_save_reconciles_rank_seven_unlocks()`
+  - Method `.test_failed_ability_checks_do_not_burn_the_cooldown()`
+  - Method `.test_snapshot_exposes_ability_cooldown_totals()`
+  - Method `.test_old_reactor_saves_default_the_surge_fields()`
 - `class FactionDiplomacyWarTest`
   - Method `.setUp()`
   - Method `.test_leaders_generated_deterministically()`
@@ -1195,7 +1208,7 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `334` lines (`14954` bytes)
+**Size**: `344` lines (`15288` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
@@ -1239,11 +1252,12 @@
 ### [`voidfarer/character.py`](voidfarer/character.py)
 > *Commander character progression, skills, and activatable abilities.*
 
-**Size**: `130` lines (`5086` bytes)
+**Size**: `154` lines (`6112` bytes)
 
 **Functions:**
 - `def skill_level(character, skill)`
 - `def skill_bonus(character, skill)` - *Percent bonus per skill level above baseline.*
+- `def reconcile_abilities(character)` - *Append every ability whose skill requirement this character already meets.*
 - `def train_skill(character, skill)`
 - `def award_character_xp(character, amount)`
 - `def advance_age(character, elapsed_days_before, elapsed_days_after)`
@@ -1369,7 +1383,7 @@
 ### [`voidfarer/enemies.py`](voidfarer/enemies.py)
 > *Hostile Enemy Archetypes, Tactical Combat AI, and Procedural Intercept Generation.*
 
-**Size**: `279` lines (`10978` bytes)
+**Size**: `279` lines (`10979` bytes)
 
 **Classes:**
 - `class EnemyArchetype` - *Blueprint for procedural hostile intercepts across galactic territories.*
@@ -1384,7 +1398,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `5803` lines (`290366` bytes)
+**Size**: `5831` lines (`291900` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1695,7 +1709,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `1821` lines (`67380` bytes)
+**Size**: `1827` lines (`67670` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -1866,7 +1880,7 @@
 ### [`voidfarer/outposts.py`](voidfarer/outposts.py)
 > *Outpost construction and production catalogs.*
 
-**Size**: `151` lines (`5277` bytes)
+**Size**: `153` lines (`5396` bytes)
 
 **Classes:**
 - `class OutpostType`
@@ -1876,7 +1890,7 @@
 - `def get_outpost_type(outpost_type)`
 - `def can_build_on(body, outpost_type)`
 - `def build_outpost(outpost_type, system_id, body, current_tick, existing_count)`
-- `def outpost_tick_production(outpost, yield_multiplier)`
+- `def outpost_tick_production(outpost, yield_multiplier)` - *Effective per-tick yield: catalog base, level growth, then modules and map multipliers.*
 - `def upgrade_outpost(outpost, cost_scale)`
 
 ---
@@ -1884,7 +1898,7 @@
 ### [`voidfarer/reactor.py`](voidfarer/reactor.py)
 > *Reactor core simulation: operating modes, thermal load, cooling, and derating.*
 
-**Size**: `156` lines (`6161` bytes)
+**Size**: `159` lines (`6429` bytes)
 
 **Functions:**
 - `def get_reactor_mode(mode)`

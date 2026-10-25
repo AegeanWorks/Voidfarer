@@ -117,7 +117,7 @@
                             <dt>[ ]</dt><dd>Previous / next terminal tab</dd>
                             <dt>\</dt><dd>Hide / show the terminal drawer</dd>
                             <dt>Q W E R</dt><dd>Route power to engines / shields / sensors / weapons</dd>
-                            <dt>⇧1 … ⇧6</dt><dd>Quick-train a skill</dd>
+                            <dt>⇧1 … ⇧6</dt><dd>Use commander ability 1-6</dd>
                             <dt>P K L</dt><dd>Toggle reactor / skills / flight log panels</dd>
                             <dt>⇧ CLICK</dt><dd>Market BUY / SELL at max quantity</dd>
                             <dt>ESC</dt><dd>Menu; closes settings</dd>
@@ -592,7 +592,7 @@
                                 <span>SKILL POINTS</span>
                                 <strong id="skillsPointsAvailable">0</strong>
                             </div>
-                            <p class="skills-desc">Aptitude earned through play. Spend points with SHIFT+1..6 in the command strip; this dossier tracks your current ranks and pilot perks.</p>
+                            <p class="skills-desc">Aptitude earned through play. Spend points with the TRAIN buttons below; the bottom strip holds your six active abilities (SHIFT+1..6).</p>
                         </div>
                         <div class="skills-grid" id="skillsGrid"></div>
                         <div class="skills-perks-section">
@@ -971,17 +971,17 @@
                     </div>
                 </div>
 
-                <!-- Skills quick strip -->
+                <!-- Ability quick strip -->
                 <div class="sub-panel skills-quick-panel hud-strip-panel" id="hudSkillsPanel">
                     <div class="panel-header">
-                        <div class="panel-tag"><span class="badge-dot dot-purple"></span><span class="strip-icon">✦</span> TRAINING</div>
-                        <h2 class="panel-title">SKILLS</h2>
-                        <button class="hotkey-chip" id="btnToggleSkills" title="Toggle skills strip (K)">K</button>
-                        <span class="skills-quick-points"><strong id="hudSkillsPoints">0</strong> SP</span>
-                        <button class="text-btn" id="btnOpenSkillsTab" title="Open commander skills and pilot perks">DOSSIER</button>
+                        <div class="panel-tag"><span class="badge-dot dot-purple"></span><span class="strip-icon">✦</span> POWERS</div>
+                        <h2 class="panel-title">ABILITIES</h2>
+                        <button class="hotkey-chip" id="btnToggleSkills" title="Toggle abilities strip (K)" aria-controls="hudSkillsGrid" aria-expanded="true">K</button>
+                        <span class="skills-quick-points"><strong id="hudSkillsReady">0</strong> READY</span>
+                        <button class="text-btn" id="btnOpenSkillsTab" title="Open commander skills, ranks and perks">DOSSIER</button>
                     </div>
                     <div class="skills-quick-grid" id="hudSkillsGrid"></div>
-                    <p class="skills-quick-hint">SHIFT+1..6 QUICK TRAIN // 1 SP EACH // DOSSIER FOR RANKS & PERKS</p>
+                    <p class="skills-quick-hint">SHIFT+1..6 USE ABILITY // K TO HIDE // DOSSIER TO TRAIN SKILLS</p>
                 </div>
 
                 <!-- Right column: radar settings above, flight log below (separate panels) -->

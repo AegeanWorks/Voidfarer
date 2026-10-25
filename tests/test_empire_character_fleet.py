@@ -9,13 +9,15 @@ from pathlib import Path
 
 from voidfarer.character import advance_age, train_skill
 from voidfarer.cli import main
+from voidfarer.crew import DAYS_PER_MONTH
 from voidfarer.engine import SimulationEngine
 from voidfarer.faction_state import generate_faction_leaders, resolve_wars
 from voidfarer.fleet import apply_fleet_casualties, build_fleet_ship, fleet_damage
 from voidfarer.galaxy import GalaxyGenerator
-from voidfarer.models import FleetShip, GameState, Outpost, PlayerCharacter, ResearchState, WarState
+from voidfarer.models import FleetShip, GameState, Outpost, PlayerCharacter, ReactorState, ResearchState, WarState
 from voidfarer.navigation import route_plan, shortest_route
-from voidfarer.outposts import OUTPOST_TYPES, can_build_on
+from voidfarer.outposts import OUTPOST_TYPES, can_build_on, outpost_tick_production
+from voidfarer.reactor import reactor_output_efficiency
 
 
 class CharacterResearchOutpostTest(unittest.TestCase):
@@ -50,6 +52,34 @@ class CharacterResearchOutpostTest(unittest.TestCase):
         self.assertGreater(self.engine.state.ship.hull, 40)
         self.assertGreater(self.engine.state.character.ability_cooldowns["emergency_repair"], 0)
 
+    def test_high_skill_unlocks_the_late_abilities(self):
+        character = self.engine.state.character
+        character = replace(
+            character,
+            skills={**character.skills, "diplomacy": 6, "trade": 6},
+            skill_points=4,
+        )
+        self.engine.state = self.engine._clone_state(character=character)
+        self.assertNotIn("charm_offensive", self.engine.state.character.abilities)
+        ok, msg = self.engine.train_character_skill("diplomacy")
+        self.assertTrue(ok)
+        self.assertIn("charm_offensive", self.engine.state.character.abilities)
+        self.assertIn("Unlocked", msg)
+        ok, _ = self.engine.train_character_skill("trade")
+        self.assertTrue(ok)
+        self.assertIn("trade_instinct", self.engine.state.character.abilities)
+
+    def test_overclock_is_a_timed_reactor_surge(self):
+        base = reactor_output_efficiency(self.engine.state.ship.reactor)
+        ok, _ = self.engine.use_character_ability("overclock")
+        self.assertTrue(ok)
+        reactor = self.engine.state.ship.reactor
+        self.assertEqual(reactor.surge_ticks, 8)
+        self.assertGreater(reactor_output_efficiency(reactor), base)
+        self.engine.tick(8)
+        self.assertEqual(self.engine.state.ship.reactor.surge_ticks, 0)
+        self.assertEqual(self.engine.state.ship.reactor.surge_bonus, 0.0)
+
     def test_research_project_completes_on_tick(self):
         research = ResearchState(points=50, progress=119, active_project_id="advanced_cooling")
         self.engine.state = self.engine._clone_state(research=research)
@@ -81,6 +111,90 @@ class CharacterResearchOutpostTest(unittest.TestCase):
         ok, msg = self.engine.build_outpost("sol_ring_world", "solar")
         self.assertFalse(ok)
         self.assertIn("orbit", msg.lower())
+
+    def test_outposts_pay_back_over_multiple_months(self):
+        ticks_per_month = int(DAYS_PER_MONTH / 0.25)
+        for outpost in OUTPOST_TYPES:
+            for value in outpost.production.values():
+                self.assertEqual(value, int(value), f"{outpost.id} yields must not truncate per tick")
+            monthly = outpost.production.get("credits", 0.0) * ticks_per_month
+            self.assertLess(monthly, outpost.cost, f"{outpost.id} must not repay its cost in a month")
+        mining = next(outpost for outpost in OUTPOST_TYPES if outpost.id == "mining")
+        monthly = mining.production["credits"] * ticks_per_month
+        self.assertGreaterEqual(monthly, 300)
+        self.assertLessEqual(monthly, 400)
+
+    def test_outpost_upgrade_costs_less_than_building_and_adds_quarter_output(self):
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(credits=5000)
+        )
+        self.engine.orbit("sol_body_2")
+        ok, _ = self.engine.build_outpost("sol_body_2", "mining")
+        self.assertTrue(ok)
+        outpost = self.engine.state.outposts[0]
+        before = outpost_tick_production(outpost)["credits"]
+        ok, _ = self.engine.upgrade_outpost(outpost.id)
+        self.assertTrue(ok)
+        upgraded = self.engine.state.outposts[0]
+        self.assertEqual(upgraded.level, 2)
+        self.assertEqual(outpost_tick_production(upgraded)["credits"], round(before * 1.25, 2))
+
+    def test_old_outposts_use_the_current_catalog_yields(self):
+        legacy = Outpost(
+            id="legacy", name="Legacy Mine", system_id="sol", body_id="sol_body_2",
+            outpost_type="mining", level=1, production={"credits": 10.0, "titanium": 2.0},
+        )
+        self.assertEqual(outpost_tick_production(legacy)["credits"], 3.0)
+
+    def test_commander_creation_reconciles_rank_seven_unlocks(self):
+        ok, msg = self.engine.reset(seed=42, profile={
+            "name": "Ace", "age": 30, "background": "Navigator",
+            "skills": {"diplomacy": 7, "trade": 7},
+        })
+        self.assertTrue(ok, msg)
+        self.assertIn("charm_offensive", self.engine.state.character.abilities)
+        self.assertIn("trade_instinct", self.engine.state.character.abilities)
+
+    def test_loading_an_old_save_reconciles_rank_seven_unlocks(self):
+        engine = SimulationEngine(seed=42)
+        character = replace(
+            engine.state.character,
+            skills={**engine.state.character.skills, "diplomacy": 7},
+            abilities=(),
+            skill_points=0,
+        )
+        state = replace(engine.state, character=character)
+        ok, msg = engine.load_state(state)
+        self.assertTrue(ok, msg)
+        self.assertIn("charm_offensive", engine.state.character.abilities)
+
+    def test_failed_ability_checks_do_not_burn_the_cooldown(self):
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(hull=self.engine.state.ship.max_hull)
+        )
+        ok, _ = self.engine.use_character_ability("emergency_repair")
+        self.assertFalse(ok)
+        self.assertEqual(self.engine.state.character.ability_cooldowns.get("emergency_repair", 0), 0)
+        character = replace(
+            self.engine.state.character,
+            abilities=tuple(self.engine.state.character.abilities) + ("charm_offensive",),
+        )
+        self.engine.state = self.engine._clone_state(character=character)
+        ok, _ = self.engine.use_character_ability("charm_offensive", "no_such_faction")
+        self.assertFalse(ok)
+        self.assertEqual(self.engine.state.character.ability_cooldowns.get("charm_offensive", 0), 0)
+
+    def test_snapshot_exposes_ability_cooldown_totals(self):
+        snapshot = self.engine.get_status_snapshot()
+        self.assertEqual(snapshot["character_abilities"]["overclock"]["cooldown_total"], 20)
+
+    def test_old_reactor_saves_default_the_surge_fields(self):
+        data = SimulationEngine(seed=42).state.ship.reactor.to_dict()
+        data.pop("surge_ticks")
+        data.pop("surge_bonus")
+        restored = ReactorState.from_dict(data)
+        self.assertEqual(restored.surge_ticks, 0)
+        self.assertEqual(restored.surge_bonus, 0.0)
 
 
 class FactionDiplomacyWarTest(unittest.TestCase):

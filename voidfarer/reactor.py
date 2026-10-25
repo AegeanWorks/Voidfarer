@@ -70,7 +70,8 @@ def reactor_output_efficiency(reactor: ReactorState, output_bonus: float = 0.0) 
     """Effective output multiplier applied to every powered subsystem."""
     mode = get_reactor_mode(reactor.mode)
     frame_bonus = max(-0.60, float(output_bonus))
-    return max(0.05, float(mode["output_mult"]) * (1.0 + frame_bonus) * reactor_derating(reactor))
+    surge = float(reactor.surge_bonus) if reactor.surge_ticks > 0 else 0.0
+    return max(0.05, float(mode["output_mult"]) * (1.0 + frame_bonus) * (1.0 + max(0.0, surge)) * reactor_derating(reactor))
 
 
 def reactor_cooling_rate(reactor: ReactorState, equipment_bonuses: dict[str, float], map_cooling_bonus: float = 0.0) -> float:
@@ -126,6 +127,8 @@ def simulate_reactor_tick(
         integrity=round(integrity, 2),
         max_heat=max_heat,
         max_integrity=max(reactor.max_integrity, 100.0 + float(equipment_bonuses.get("reactor_integrity", 0.0))),
+        surge_ticks=max(0, int(reactor.surge_ticks) - num_ticks),
+        surge_bonus=float(reactor.surge_bonus) if int(reactor.surge_ticks) - num_ticks > 0 else 0.0,
     )
     report = {
         "heat_delta": round(new_heat - reactor.heat, 2),

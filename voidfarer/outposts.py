@@ -36,7 +36,7 @@ OUTPOST_TYPES: tuple[OutpostType, ...] = (
         name="Mining Outpost",
         description="Extracts ore and produces credits each tick.",
         cost=1800,
-        production={"credits": 10.0, "titanium": 2.0},
+        production={"credits": 3.0, "titanium": 1.0},
         module="extractor",
         allowed_bodies=("asteroid_belt", "lava_world", "barren", "desert_world", "ice_world"),
     ),
@@ -45,7 +45,7 @@ OUTPOST_TYPES: tuple[OutpostType, ...] = (
         name="Research Station",
         description="Generates research points from local phenomena.",
         cost=2200,
-        production={"credits": 4.0, "research": 4.0},
+        production={"credits": 2.0, "research": 2.0},
         module="laboratory",
         allowed_bodies=("research_outpost", "ice_world", "gas_giant", "ringed_giant", "black_hole", "ring_world"),
     ),
@@ -54,7 +54,7 @@ OUTPOST_TYPES: tuple[OutpostType, ...] = (
         name="Solar Collector Array",
         description="Solar panels feeding a local power grid and credit market.",
         cost=1400,
-        production={"credits": 12.0, "fuel_cells": 2.0},
+        production={"credits": 3.0, "fuel_cells": 1.0},
         module="solar_array",
         allowed_bodies=("terrestrial", "oceanic", "desert_world", "savanna", "ring_world"),
     ),
@@ -63,7 +63,7 @@ OUTPOST_TYPES: tuple[OutpostType, ...] = (
         name="Frontier Shipyard",
         description="Supports escort construction and hull servicing.",
         cost=3200,
-        production={"credits": 8.0},
+        production={"credits": 3.0},
         module="drydock",
         allowed_bodies=("orbital_station", "ring_world"),
     ),
@@ -72,7 +72,7 @@ OUTPOST_TYPES: tuple[OutpostType, ...] = (
         name="Civilian Colony",
         description="Grows population and tax revenue over time.",
         cost=2600,
-        production={"credits": 14.0, "hydroponics": 3.0},
+        production={"credits": 4.0, "hydroponics": 1.0},
         module="habitat",
         allowed_bodies=("terrestrial", "oceanic", "savanna", "tundra", "ring_world"),
     ),
@@ -126,16 +126,19 @@ def build_outpost(
 
 
 def outpost_tick_production(outpost: Outpost, yield_multiplier: float = 1.0) -> dict[str, float]:
-    level_mult = 1.0 + (outpost.level - 1) * 0.35
+    """Effective per-tick yield: catalog base, level growth, then modules and map multipliers."""
+    template = OUTPOST_MAP.get(outpost.outpost_type)
+    base = template.production if template else outpost.production
+    level_mult = 1.25 ** max(0, outpost.level - 1)
     modules = sum(outpost.modules.values())
     module_mult = 1.0 + max(0, modules - 1) * 0.10
     return {
         key: round(value * level_mult * module_mult * max(0.1, yield_multiplier), 2)
-        for key, value in outpost.production.items()
+        for key, value in base.items()
     }
 
 
-def upgrade_outpost(outpost: Outpost, cost_scale: int = 900) -> tuple[bool, Outpost, int, str]:
+def upgrade_outpost(outpost: Outpost, cost_scale: int = 450) -> tuple[bool, Outpost, int, str]:
     if outpost.level >= 5:
         return False, outpost, 0, "Outpost is already at maximum level."
     cost = cost_scale * outpost.level
@@ -146,6 +149,5 @@ def upgrade_outpost(outpost: Outpost, cost_scale: int = 900) -> tuple[bool, Outp
         level=outpost.level + 1,
         integrity=100.0,
         population=int(outpost.population * 1.25),
-        production={k: round(v * 1.18, 2) for k, v in outpost.production.items()},
     )
     return True, upgraded, cost, f"Upgraded {outpost.name} to level {upgraded.level} for {cost} cr."

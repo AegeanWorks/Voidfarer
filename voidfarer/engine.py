@@ -45,6 +45,7 @@ from voidfarer.character import (
     ability_ready,
     advance_age,
     award_character_xp,
+    reconcile_abilities,
     skill_bonus,
     start_ability_cooldown,
     tick_ability_cooldowns,
@@ -778,6 +779,7 @@ class SimulationEngine:
             except (TypeError, ValueError):
                 continue
         updated_character = replace(character, name=name, age=age, background=background, skills=skills)
+        updated_character, _ = reconcile_abilities(updated_character)
         updated_ship = self._clone_ship(commander_name=name)
         self.state = self._clone_state(character=updated_character, ship=updated_ship)
 
@@ -786,6 +788,7 @@ class SimulationEngine:
         with self.lock:
             self.seed = int(state.galaxy_seed)
             self.rng = random.Random(self.seed)
+            state = replace(state, character=reconcile_abilities(state.character)[0])
             self.state = state
             st = state.ship.story
             if not st.chapters:
@@ -2124,7 +2127,6 @@ class SimulationEngine:
                 return False, f"Unknown ability '{ability_id}'."
             if not ability_ready(self.state.character, ability_id):
                 return False, f"Ability '{ability['name']}' is on cooldown or not unlocked."
-            character = start_ability_cooldown(self.state.character, ability_id)
             ship = self.state.ship
             new_hull = ship.hull
             new_shield = ship.shield
@@ -2135,11 +2137,18 @@ class SimulationEngine:
             msg = ""
 
             if ability_id == "overclock":
-                reactor = replace(ship.reactor, heat=max(0.0, ship.reactor.heat + 8.0), mode="overdrive")
-                msg = "Reactor Overclock engaged: core forced into overdrive (+8 heat)."
+                reactor = replace(
+                    ship.reactor,
+                    heat=min(ship.reactor.max_heat, ship.reactor.heat + 12.0),
+                    surge_ticks=8,
+                    surge_bonus=0.25,
+                )
+                msg = "Reactor Overclock engaged: +25% output for 8 ticks (+12 heat)."
                 new_ship = self._clone_ship(reactor=reactor)
             elif ability_id == "emergency_repair":
-                gain = 15 + int(self.state.character.skills.get("engineering", 1)) * 5
+                if ship.hull >= ship.max_hull:
+                    return False, "Emergency Repair requires hull damage to weld."
+                gain = 10 + int(self.state.character.skills.get("engineering", 1)) * 3
                 new_hull = min(ship.max_hull, ship.hull + gain)
                 msg = f"Emergency Repair restored {new_hull - ship.hull} hull."
                 new_ship = self._clone_ship(hull=new_hull)
@@ -2152,17 +2161,21 @@ class SimulationEngine:
             elif ability_id == "charm_offensive":
                 if not target_faction_id:
                     return False, "Diplomatic Offensive requires a target faction id."
-                gain = 4 + int(self.state.character.skills.get("diplomacy", 1)) * 2
+                if target_faction_id not in CANONICAL_FACTIONS:
+                    return False, f"Unknown target faction '{target_faction_id}'."
+                if target_faction_id in self.state.eliminated_factions:
+                    return False, f"{target_faction_id} has no government left to negotiate with."
+                gain = 3 + int(self.state.character.skills.get("diplomacy", 1))
                 new_standings[target_faction_id] = max(-100, min(100, new_standings.get(target_faction_id, 0) + gain))
                 msg = f"Diplomatic Offensive improved {target_faction_id} standing by {gain}."
                 new_ship = self._clone_ship(faction_standings=new_standings)
             elif ability_id == "science_burst":
-                gain = 18 + int(self.state.character.skills.get("science", 1)) * 6
+                gain = 6 + int(self.state.character.skills.get("science", 1)) * 2
                 new_research = replace(self.state.research, points=self.state.research.points + gain)
                 msg = f"Science Burst generated {gain} research points."
                 new_ship = self._clone_ship()
             elif ability_id == "trade_instinct":
-                gain = 60 + int(self.state.character.skills.get("trade", 1)) * 30
+                gain = 20 + int(self.state.character.skills.get("trade", 1)) * 6
                 new_credits = ship.credits + gain
                 msg = f"Trade Instinct yielded {gain} cr."
                 new_ship = self._clone_ship(credits=new_credits)
@@ -2171,7 +2184,7 @@ class SimulationEngine:
 
             self.state = self._clone_state(
                 ship=new_ship,
-                character=character,
+                character=start_ability_cooldown(self.state.character, ability_id),
                 research=new_research,
             )
             return True, msg
@@ -2245,6 +2258,7 @@ class SimulationEngine:
                         **info,
                         "unlocked": aid in character.abilities,
                         "cooldown": int(character.ability_cooldowns.get(aid, 0)),
+                        "cooldown_total": int(info["cooldown"]),
                     }
                     for aid, info in ABILITY_CATALOG.items()
                 },
@@ -3776,6 +3790,17 @@ class SimulationEngine:
                 if new_hull < 50:
                     new_streak = max(1, self.state.ship.streak - 1)
 
+            if new_hull <= 0:
+                defeat_log = f"DEFEAT: {combat.enemy_name} destroyed your {self.state.ship.ship_class}."
+                new_ship = self._clone_ship(
+                    hull=0,
+                    shield=0,
+                    tactical_combo=0,
+                    flight_log=tuple((list(self.state.ship.flight_log[-19:]) + [defeat_log])[-20:]),
+                )
+                self.state = self._clone_state(ship=new_ship, active_combat=None)
+                return True, defeat_log
+
             # AI selects the next maneuver from live hull, shield, combo, and profile state.
             next_intent, next_telegraph = choose_enemy_intent(
                 profile=combat.ai_profile,
@@ -4499,6 +4524,8 @@ class SimulationEngine:
                     "max_integrity": round(self.state.ship.reactor.max_integrity, 1),
                     "mode": self.state.ship.reactor.mode,
                     "mode_name": get_reactor_mode(self.state.ship.reactor.mode)["name"],
+                    "surge_ticks": int(self.state.ship.reactor.surge_ticks),
+                    "surge_bonus": round(float(self.state.ship.reactor.surge_bonus), 3),
                     "efficiency": round(reactor_output_efficiency(self.state.ship.reactor, float(equipment_snapshot.get("reactor_output", 0.0))), 3),
                     "cooling": round(reactor_cooling_rate(self.state.ship.reactor, equipment_snapshot, float(self._map_effects(cur_sys)["cooling_bonus"])), 2),
                     "modes": {mid: dict(profile) for mid, profile in REACTOR_MODES.items()},
@@ -4515,6 +4542,7 @@ class SimulationEngine:
                         **info,
                         "unlocked": aid in self.state.character.abilities,
                         "cooldown": int(self.state.character.ability_cooldowns.get(aid, 0)),
+                        "cooldown_total": int(info["cooldown"]),
                     }
                     for aid, info in ABILITY_CATALOG.items()
                 },

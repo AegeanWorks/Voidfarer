@@ -1089,6 +1089,8 @@ class ReactorState:
     max_integrity: float = 100.0
     mode: str = "balanced"
     last_vent_tick: int = -999
+    surge_ticks: int = 0
+    surge_bonus: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1098,6 +1100,8 @@ class ReactorState:
             "max_integrity": self.max_integrity,
             "mode": self.mode,
             "last_vent_tick": self.last_vent_tick,
+            "surge_ticks": self.surge_ticks,
+            "surge_bonus": round(self.surge_bonus, 3),
             "heat_pct": round(min(100.0, max(0.0, self.heat / self.max_heat * 100.0)), 1) if self.max_heat else 0.0,
             "integrity_pct": round(min(100.0, max(0.0, self.integrity / self.max_integrity * 100.0)), 1) if self.max_integrity else 0.0,
         }
@@ -1113,6 +1117,8 @@ class ReactorState:
             max_integrity=max_integrity,
             mode=str(data.get("mode", "balanced")),
             last_vent_tick=int(data.get("last_vent_tick", -999)),
+            surge_ticks=max(0, int(data.get("surge_ticks", 0))),
+            surge_bonus=max(0.0, float(data.get("surge_bonus", 0.0))),
         )
 
 
