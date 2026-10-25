@@ -3,8 +3,8 @@
   "active_task": {
     "task_id": "grand-strategy-v1",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1792935553.904484,
     "owner": "kilo:1",
     "started_by": "claude-code:f36d48df",
@@ -14,20 +14,10 @@
         "from": "claude-code:f36d48df",
         "at": 1792927195.3782234
       }
-    ]
+    ],
+    "completed_at": 1792935628.391651
   },
   "checkpoints": [
-    {
-      "task_id": "left-panel-qol-ledger-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/5] Trade ledger: ShipState.cargo_cost (empty default), sell P/L in message, max_trade_quantity/trade_max, REST max flag, REPL buy max/sell all, snapshot max_buy + cargo_avg_cost; 12 failing-first tests; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792880590.169539,
-      "timestamp_str": "2026-10-25 01:23:10",
-      "agent": "claude-code:f36d48df"
-    },
     {
       "task_id": "left-panel-qol-ledger-v1",
       "phase": "phase 4",
@@ -246,6 +236,16 @@
       "status": "in_progress",
       "timestamp": 1792935553.904484,
       "timestamp_str": "2026-10-25 16:39:13",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "grand-strategy-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'grand-strategy-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792935628.391652,
+      "timestamp_str": "2026-10-25 16:40:28",
       "agent": "kilo:1"
     }
   ]
