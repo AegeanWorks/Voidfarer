@@ -1,34 +1,22 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ability-bar-balance-v1",
+    "task_id": "ability-hardening-v1",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1792954222.3826716,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1792958099.8881035,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": [],
-    "completed_at": 1792954364.6519353
+    "impact_assessment": {
+      "why": "A post-push audit found shield_absorb and evasive_burn bypassed the new defeat check, a dead ship could tick/repair back to life, reactor surge never expired during paused combat, CLI constructor skipped rank-7 reconciliation, and the death overlay could reopen over creation while hotkeys still fired behind it.",
+      "benefits": "0 hull is now terminal everywhere, death cannot be undone by time or Repair, overclock is bounded during paused fights, legacy saves unlock through every entry path, and failures are visible and announced instead of silently logged.",
+      "risks": "contract: no new save fields; time pause is a normal state value; dependency: none; concurrency: engine lock unchanged; state: death pauses time and clears combat",
+      "mitigation": "Regression tests for lethal defensive actions, terminal tick, constructor unlock, per-turn surge decay and cockpit copy; full suite and 4/4 gates; real-browser vision audit before delivery"
+    }
   },
   "checkpoints": [
-    {
-      "task_id": "cockpit-perf-layout-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Plan: (1) engine/server: cached static catalogs split from the per-poll snapshot (/api/state?static=0, /api/catalogs); (2) client: catalogs fetched once, lite polling merged, speed-adaptive poll cadence, skip terminal rebuilds that are unchanged or under the pointer, drop duplicate renderVoid; (3) layout: G-005/G-013 strip beside a full-height terminal below 1600px, compact strip (skills chips, 2x2 reactor sliders incl. sensors/weapons), top-bar streak/mastery overlap, tiny XP text; (4) README, ADR-056, before/after numbers",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792881610.087687,
-      "timestamp_str": "2026-10-25 01:40:10",
-      "agent": "claude-code:f36d48df",
-      "impact_assessment": {
-        "why": "Every 1s poll ships 133 KB of which ~40 KB are code-constant catalogs, so faster polling (needed: 10x speed runs 20 ticks/s against a 1 Hz HUD) would multiply waste; each poll rebuilds the open tab and can swallow clicks; below 1600px the strip spans full width at ~320px and crushes the left terminal to ~150px while clipping the sensors/weapons sliders.",
-        "benefits": "Smaller polls, smoother HUD at high speed, no lost clicks, a usable full-height terminal at 1280x720 and 1366x768.",
-        "risks": "contract: /api/state default payload unchanged, static=0 and /api/catalogs are additive; dependency: none; concurrency: catalogs are immutable module constants, snapshot stays under the engine lock; state: none persisted",
-        "mitigation": "Failing-first engine/server tests, layout tests, before/after profiler numbers, Playwright Edge captures at 720p/laptop/desktop/4K, 4/4 gates, ADR-056"
-      }
-    },
     {
       "task_id": "cockpit-perf-layout-v1",
       "phase": "phase 4",
@@ -247,6 +235,23 @@
       "timestamp": 1792954364.6519368,
       "timestamp_str": "2026-10-25 21:52:44",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "ability-hardening-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Audit hardening: terminal defeat on all combat paths, tick/ability guards at 0 hull, paused clock, per-turn surge decay, constructor unlock reconciliation, death acknowledgement and overlay hotkey blocking, visible aria-live failures, focus/pointer-safe rebuilds; 586 tests, 4/4 gates, vision audit approved death/ability/skills captures; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792958099.8881035,
+      "timestamp_str": "2026-10-25 22:54:59",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "A post-push audit found shield_absorb and evasive_burn bypassed the new defeat check, a dead ship could tick/repair back to life, reactor surge never expired during paused combat, CLI constructor skipped rank-7 reconciliation, and the death overlay could reopen over creation while hotkeys still fired behind it.",
+        "benefits": "0 hull is now terminal everywhere, death cannot be undone by time or Repair, overclock is bounded during paused fights, legacy saves unlock through every entry path, and failures are visible and announced instead of silently logged.",
+        "risks": "contract: no new save fields; time pause is a normal state value; dependency: none; concurrency: engine lock unchanged; state: death pauses time and clears combat",
+        "mitigation": "Regression tests for lethal defensive actions, terminal tick, constructor unlock, per-turn surge decay and cockpit copy; full suite and 4/4 gates; real-browser vision audit before delivery"
+      }
     }
   ]
 }

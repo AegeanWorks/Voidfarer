@@ -9,8 +9,8 @@
 - **Total Python Modules**: `68`
 - **Total Classes**: `178`
 - **Total Top-Level Functions**: `214`
-- **Total Class Methods**: `1010`
-- **Total Source Lines**: `28260`
+- **Total Class Methods**: `1015`
+- **Total Source Lines**: `28367`
 
 ---
 
@@ -179,7 +179,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `905` lines (`40991` bytes)
+**Size**: `908` lines (`41160` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -321,7 +321,7 @@
 ### [`tests/test_combat_void_depth.py`](tests/test_combat_void_depth.py)
 > *Regression tests for progression-scaled combat and Hollow resonance risk/reward.*
 
-**Size**: `253` lines (`10889` bytes)
+**Size**: `286` lines (`12577` bytes)
 
 **Classes:**
 - `class TestProgressionThreatScaling`
@@ -330,6 +330,8 @@
   - Method `.test_dreadnought_boss_is_gated_behind_mastery()`
 - `class TestEarlyCombatRisk`
   - Method `.test_a_marauder_costs_hull_to_a_fresh_corvette()`
+  - Method `.test_defensive_actions_also_end_in_defeat()`
+  - Method `.test_a_destroyed_ship_cannot_tick_back_to_life()`
   - Method `.test_zero_hull_ends_combat_as_a_defeat_without_bounty()`
 - `class TestEvasiveBurnDiscipline`
   - Method `._engine(fuel, streak, combo)`
@@ -385,7 +387,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `365` lines (`17213` bytes)
+**Size**: `389` lines (`18439` bytes)
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -403,6 +405,8 @@
   - Method `.test_outpost_upgrade_costs_less_than_building_and_adds_quarter_output()`
   - Method `.test_old_outposts_use_the_current_catalog_yields()`
   - Method `.test_commander_creation_reconciles_rank_seven_unlocks()`
+  - Method `.test_constructor_reconciles_rank_seven_unlocks()`
+  - Method `.test_overclock_surge_decays_once_per_combat_turn()`
   - Method `.test_loading_an_old_save_reconciles_rank_seven_unlocks()`
   - Method `.test_failed_ability_checks_do_not_burn_the_cooldown()`
   - Method `.test_snapshot_exposes_ability_cooldown_totals()`
@@ -1398,7 +1402,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `5831` lines (`291900` bytes)
+**Size**: `5878` lines (`294177` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1491,6 +1495,7 @@
   - Method `.deploy_drone(drone_id, target_system_id)` - *Redeploy an autonomous fleet asset to a different star system.*
   - Method `.collect_drone_yield(drone_id)` - *Collect accumulated cargo and research credits from fleet drones.*
   - Method `.set_battle_stance(stance)` - *Set fleet battle doctrine: balanced, aggressive, or defensive.*
+  - Method `._combat_defeat(combat, note, fleet_ships, crew, streak, fuel)` - *End a fight at 0 hull, pausing time so a destroyed ship cannot recover by ticking.*
   - Method `.combat_action(action)` - *Execute a tactical combat maneuver against an active hostile intercept.*
   - Method `.resolve_anomaly(choice_id)` - *Resolve current deep-space anomaly encounter with power-check validation.*
   - Method `.repair_hull(amount)` - *Repair ship hull integrity at orbital station.*

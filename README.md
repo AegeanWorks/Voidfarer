@@ -4,7 +4,7 @@
 
 > **Autonomous Deep-Space Fleet, Procedural Galaxy & Windows Cockpit Simulator.**
 
-VoidFarer is a zero-dependency, local-first space flight, fleet and exploration simulation. Explore procedural systems, route reactor power, board derelicts, scoop fuel, command drones, fit upgrades, fight adaptive AI and trade, from an ANSI REPL or a Windows cockpit.
+VoidFarer is a zero-dependency, local space flight and exploration simulation. Explore systems, route reactor power, board derelicts, scoop fuel, command drones, fit upgrades, fight AI and trade, from an ANSI REPL or Windows cockpit.
 
 ---
 
@@ -382,11 +382,11 @@ python -m voidfarer.cli crew train <crew_id>
 python -m voidfarer.cli crew shore
 python -m voidfarer.cli weapons install railgun
 ```
-The commander ages, earns XP, and trains six skills; SHIFT+1..6 fires
+The commander ages, earns XP, and trains six skills; SHIFT+1..6 activates
 Reactor Overclock, Emergency Repair, Battle Focus, Science Burst and the rank-7 unlocks. Research
 unlocks reactor, scan, combat, outpost, repair, and fuel tech. Outposts repay build cost over
 3.9-9.2 months.
-Wars run along hyperlane fronts: strength, overextension and attrition decide captures, capitals fall last, treaties and truces end them. Escort warships coordinate volleys,
+Wars run along hyperlane fronts: strength, overextension and attrition decide captures, capitals fall last, treaties and truces end them. 0 hull ends the run in defeat, with no bounty. Escort warships coordinate volleys,
 screen damage, and adopt battle stances. Multi-jump routing handles black holes. Message trees branch
 into lasting outcomes. Crew feature roles, morale, wages, and SVG portraits; morale reacts to
 battles, hull breaches, void storms, hostile arrivals, and campaign beats, unpaid crews below

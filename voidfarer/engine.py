@@ -310,6 +310,7 @@ class SimulationEngine:
                 st = generate_initial_story()
             else:
                 st = migrate_story_state(st)
+            state = replace(state, character=reconcile_abilities(state.character)[0])
             self.state = state
             new_ship = self._clone_ship(tutorial=tut, story=st) if (tut != ship.tutorial or st != ship.story) else ship
             econ = state.economy
@@ -2127,6 +2128,8 @@ class SimulationEngine:
                 return False, f"Unknown ability '{ability_id}'."
             if not ability_ready(self.state.character, ability_id):
                 return False, f"Ability '{ability['name']}' is on cooldown or not unlocked."
+            if self.state.ship.hull <= 0:
+                return False, "The ship is destroyed; no ability can be engaged."
             ship = self.state.ship
             new_hull = ship.hull
             new_shield = ship.shield
@@ -3396,12 +3399,47 @@ class SimulationEngine:
             self.state = self._clone_state(ship=self._clone_ship(battle_stance=normalized))
             return True, f"Fleet battle stance set to {normalized.upper()}."
 
+    def _combat_defeat(self, combat: CombatEncounter, note: str = "",
+                       fleet_ships: tuple | None = None, crew: tuple | None = None,
+                       streak: int | None = None, fuel: int | None = None) -> tuple[bool, str]:
+        """End a fight at 0 hull, pausing time so a destroyed ship cannot recover by ticking."""
+        ship = self.state.ship
+        log_line = f"DEFEAT: {combat.enemy_name} destroyed your {ship.ship_class}."
+        if note:
+            log_line = f"{note} {log_line}"
+        new_log = tuple((list(ship.flight_log[-19:]) + [log_line])[-20:])
+        self.state = self._clone_state(
+            ship=self._clone_ship(
+                hull=0,
+                shield=0,
+                tactical_combo=0,
+                streak=streak if streak is not None else ship.streak,
+                crew=crew if crew is not None else ship.crew,
+                fleet_ships=fleet_ships if fleet_ships is not None else ship.fleet_ships,
+                fuel=fuel if fuel is not None else ship.fuel,
+                flight_log=new_log,
+            ),
+            active_combat=None,
+            time=replace(self.state.time, is_paused=True),
+        )
+        return True, log_line
+
     def combat_action(self, action: str) -> tuple[bool, str]:
         """Execute a tactical combat maneuver against an active hostile intercept."""
         with self.lock:
             combat = self.state.active_combat
             if not combat:
                 return False, "No hostile ship in combat proximity."
+            ship = self.state.ship
+            if ship.reactor.surge_ticks > 0:
+                remaining = ship.reactor.surge_ticks - 1
+                self.state = self._clone_state(
+                    ship=self._clone_ship(reactor=replace(
+                        ship.reactor,
+                        surge_ticks=max(0, remaining),
+                        surge_bonus=ship.reactor.surge_bonus if remaining > 0 else 0.0,
+                    ))
+                )
 
             new_hull = self.state.ship.hull
             new_shield = self.state.ship.shield
@@ -3514,6 +3552,8 @@ class SimulationEngine:
                     new_hull = max(0, new_hull - (mitigated - new_shield))
                     new_shield = 0
                 msg = f"Shield capacitors overcharged (+{boost} MW). Enemy barrage deflected, taking only {mitigated} damage."
+                if new_hull <= 0:
+                    return self._combat_defeat(combat, note=msg)
                 next_intent, next_telegraph = choose_enemy_intent(
                     profile=combat.ai_profile,
                     special_ability=combat.special_ability,
@@ -3573,6 +3613,8 @@ class SimulationEngine:
                         new_shield = 0
                     msg = f"Evasive burn failed! Suffered {dmg} damage during high-G maneuver."
                     new_combat = combat
+                if new_hull <= 0:
+                    return self._combat_defeat(combat, note=msg, fuel=new_fuel)
                 new_log = list(self.state.ship.flight_log[-19:]) + [msg]
                 new_ship = self._clone_ship(
                     hull=new_hull,
@@ -3791,15 +3833,10 @@ class SimulationEngine:
                     new_streak = max(1, self.state.ship.streak - 1)
 
             if new_hull <= 0:
-                defeat_log = f"DEFEAT: {combat.enemy_name} destroyed your {self.state.ship.ship_class}."
-                new_ship = self._clone_ship(
-                    hull=0,
-                    shield=0,
-                    tactical_combo=0,
-                    flight_log=tuple((list(self.state.ship.flight_log[-19:]) + [defeat_log])[-20:]),
+                return self._combat_defeat(
+                    combat, note=breach_log, fleet_ships=fleet_ships,
+                    crew=breach_crew, streak=new_streak,
                 )
-                self.state = self._clone_state(ship=new_ship, active_combat=None)
-                return True, defeat_log
 
             # AI selects the next maneuver from live hull, shield, combo, and profile state.
             next_intent, next_telegraph = choose_enemy_intent(
@@ -5315,6 +5352,16 @@ class SimulationEngine:
                     "tick": self.state.time.tick,
                     "time_scale": self.state.time.time_scale,
                     "is_paused": self.state.time.is_paused,
+                }
+            if self.state.ship.hull <= 0:
+                return {
+                    "ticks_advanced": 0,
+                    "stardate": round(self.state.time.stardate, 2),
+                    "date": self.state.time.current_date,
+                    "tick": self.state.time.tick,
+                    "time_scale": self.state.time.time_scale,
+                    "is_paused": self.state.time.is_paused,
+                    "destroyed": True,
                 }
 
             cur_time = self.state.time

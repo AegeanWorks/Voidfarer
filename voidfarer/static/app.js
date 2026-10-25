@@ -341,6 +341,8 @@ class CockpitApp {
         this.gameStarted = false;
         this.loadSettings();
         this.terminalPointerDown = false;
+        this.skillsPointerDown = false;
+        this.deathAcknowledged = false;
 
         this.initDOMElements();
         this.bindEvents();
@@ -804,8 +806,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             button.addEventListener("click", () => this.setTradeLot(button.getAttribute("data-lot")));
         });
         this.panelLeft?.addEventListener("pointerdown", () => { this.terminalPointerDown = true; });
-        window.addEventListener("pointerup", () => { this.terminalPointerDown = false; });
-        window.addEventListener("pointercancel", () => { this.terminalPointerDown = false; });
+        this.hudSkillsGrid?.addEventListener("pointerdown", () => { this.skillsPointerDown = true; });
+        window.addEventListener("pointerup", () => { this.terminalPointerDown = false; this.skillsPointerDown = false; });
+        window.addEventListener("pointercancel", () => { this.terminalPointerDown = false; this.skillsPointerDown = false; });
         [
             "settingSound", "settingVolume", "settingGrid", "settingLabels", "settingAnimation", "settingStarDensity",
             "settingDensity", "settingUiScale", "settingRememberTab", "settingAutoPause", "settingAutoClaim", "settingTradeLot",
@@ -1056,8 +1059,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             const menu = document.getElementById("mainMenuOverlay");
             const settings = document.getElementById("settingsOverlay");
+            const death = document.getElementById("deathOverlay");
+            const creation = document.getElementById("characterCreationOverlay");
             const overlayOpen = (menu && !menu.classList.contains("hidden"))
-                || (settings && settings.style.display !== "none");
+                || (settings && settings.style.display !== "none")
+                || (death && death.style.display === "flex")
+                || (creation && creation.style.display !== "none");
             if (overlayOpen) return;
             const hotkey = String(e.key || "").toLowerCase();
             if (hotkey === "p") {
@@ -1076,6 +1083,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 e.preventDefault();
                 this.nudgeReactorPower({ KeyQ: "engines", KeyW: "shields", KeyE: "sensors", KeyR: "weapons" }[e.code]);
             } else if (e.code === "Space") {
+                if (String((document.activeElement || {}).tagName || "").toUpperCase() === "BUTTON") return;
                 e.preventDefault();
                 this.handleToggleTimePause();
             } else if (e.key === "1") {
@@ -1113,8 +1121,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     // A rebuild between pointerdown and pointerup swaps the pressed button and drops the click;
     // a rebuild under a focused select or input closes it. Polls skip the tab until it is idle.
     terminalBusy() {
-        if (this.terminalPointerDown) return true;
+        if (this.terminalPointerDown || this.skillsPointerDown) return true;
         const active = document.activeElement;
+        if (active && this.hudSkillsGrid && this.hudSkillsGrid.contains(active)) return true;
         return Boolean(active && this.panelLeft && this.panelLeft.contains(active) && this.isTypingTarget(active));
     }
 
@@ -1719,8 +1728,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     checkDeath() {
         if (!this.state || !this.state.ship || !this.deathOverlay) return;
         const ship = this.state.ship;
-        if (ship.hull > 0 || this.deathOverlay.style.display === "flex") return;
+        if (this.deathAcknowledged || ship.hull > 0 || this.deathOverlay.style.display === "flex") return;
         this.showDeathOverlay();
+        if (this.state.time && !this.state.time.is_paused) {
+            apiFetch("/api/time/pause", { method: "POST" }).catch(() => {});
+        }
     }
 
     showDeathOverlay() {
@@ -1748,6 +1760,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             "EXPEDITION ENDED"
         ];
         
+        this.deathAcknowledged = true;
         const msg = deathMessages[Math.floor(Math.random() * deathMessages.length)];
         const title = deathTitles[Math.floor(Math.random() * deathTitles.length)];
         
@@ -1761,7 +1774,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             </div>
             <div class="death-stat">
                 <span class="death-stat-label">Credits Earned</span>
-                <span class="death-stat-value">${(ch.credits_earned || 0).toLocaleString()}</span>
+                <span class="death-stat-value">${(stats.credits_earned || 0).toLocaleString()}</span>
             </div>
             <div class="death-stat">
                 <span class="death-stat-label">Enemies Destroyed</span>
@@ -1787,6 +1800,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         // Death overlay buttons
         this.btnDeathNewGame.onclick = () => {
             this.hideDeathOverlay();
+            this.gameStarted = false;
             this.openCharacterCreation();
         };
         this.btnDeathLoadSave.onclick = () => {
@@ -2337,6 +2351,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     renderPlayer() {
         if (!this.state || !this.characterProfile) return;
+        if (this.characterAbilities?.contains(document.activeElement)) return;
         const ch = this.state.character || {};
         const skillPoints = ch.skill_points || 0;
         const xp = ch.xp || 0;
@@ -2372,7 +2387,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const isUnlocked = unlocked.has(id);
             const cd = cooldowns[id] || 0;
             const contextBlocked = (id === "battle_focus" && !this.state.active_combat)
-                || (id === "emergency_repair" && Number(shipState.hull || 0) >= Number(shipState.max_hull || 1))
+                || (id === "emergency_repair" && (Number(shipState.hull || 0) <= 0 || Number(shipState.hull || 0) >= Number(shipState.max_hull || 1)))
                 || (id === "charm_offensive" && !charmTarget);
             return `<div class="ability-row ${isUnlocked ? "" : "locked"}">
                 <span><strong>${this.escapeHtml(info.name)}</strong><br><small>${this.escapeHtml(info.description)}</small></span>
@@ -2401,6 +2416,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.state || !this.skillsGrid) return;
         const ch = this.state.character || {};
         const skillPoints = ch.skill_points || 0;
+        if (this.skillsGrid.contains(document.activeElement)) {
+            if (this.skillsPointsAvailable) this.skillsPointsAvailable.textContent = skillPoints;
+            return;
+        }
         const skills = ch.skills || { piloting: 0, engineering: 0, science: 0, combat: 0, diplomacy: 0, trade: 0 };
         const maxRank = 10;
 
@@ -2449,6 +2468,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const info = abilities[id] || {};
             if (!info.unlocked || Number(info.cooldown || 0) > 0) return false;
             if (id === "battle_focus" && !inCombat) return false;
+            if (id === "emergency_repair" && Number(ship.hull || 0) <= 0) return false;
             if (id === "emergency_repair" && Number(ship.hull || 0) >= Number(ship.max_hull || 1)) return false;
             if (id === "charm_offensive" && !charmTarget) return false;
             return true;
@@ -2457,6 +2477,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.hudSkillsReady) this.hudSkillsReady.textContent = String(ready);
         const signature = ABILITY_ORDER.map(id => `${id}:${(abilities[id] || {}).unlocked ? 1 : 0}:${(abilities[id] || {}).cooldown || 0}`).join("|")
             + `|${inCombat}|${ship.hull}|${ship.max_hull}|${charmTarget || ""}`;
+        if (this.skillsPointerDown || this.hudSkillsGrid.contains(document.activeElement)) return;
         if (signature === this.abilitySignature && this.hudSkillsGrid.childElementCount) return;
         this.abilitySignature = signature;
         this.hudSkillsGrid.innerHTML = ABILITY_ORDER.map((id, index) => {
@@ -2495,9 +2516,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async useAbilityQuick(abilityId, factionOverride = null) {
         if (!abilityId || !this.state || this.abilityPending) return;
         const info = (this.state.character_abilities || {})[abilityId];
-        if (!info || !info.unlocked || Number(info.cooldown || 0) > 0) return;
+        const label = (ABILITY_META[abilityId] || {}).name || abilityId;
+        if (!info || !info.unlocked) return this.reportProblem(`${label} is locked; train the matching skill.`);
+        if (Number(info.cooldown || 0) > 0) return this.reportProblem(`${label} is on cooldown (${Math.ceil(Number(info.cooldown))} ticks).`);
+        if (Number((this.state.ship || {}).hull || 0) <= 0) return this.reportProblem("The ship is destroyed; no ability can be engaged.");
+        if (abilityId === "emergency_repair" && Number(this.state.ship.hull) >= Number(this.state.ship.max_hull)) {
+            return this.reportProblem("Emergency Repair needs hull damage to weld.");
+        }
+        if (abilityId === "battle_focus" && !this.state.active_combat) {
+            return this.reportProblem("Battle Focus requires an active combat engagement.");
+        }
         const factionId = factionOverride || this.abilityTargetFaction(abilityId);
-        if (abilityId === "charm_offensive" && !factionId) return;
+        if (abilityId === "charm_offensive" && !factionId) {
+            return this.reportProblem("Diplomatic Offensive needs a sovereign faction in the current system.");
+        }
         this.abilityPending = true;
         try {
             this.sound.init();
@@ -5593,12 +5625,23 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 }
                 this.sound.playBeep(980, 0.05);
             } else {
-                this.appendLog(`[ERROR] ${json.message}`, "hazard");
+                this.reportProblem(json.message);
             }
             return json;
         } catch (e) {
-            this.appendLog(`[ERROR] ${e.message}`, "hazard");
+            this.reportProblem(e.message);
             return { ok: false, message: e.message };
+        }
+    }
+
+    reportProblem(message) {
+        this.appendLog(`[ERROR] ${message}`, "hazard");
+        if (this.logPanel) {
+            this.logPanel.classList.remove("log-collapsed");
+            if (this.btnToggleLog) {
+                this.btnToggleLog.textContent = "HIDE";
+                this.btnToggleLog.setAttribute("aria-expanded", "true");
+            }
         }
     }
 }

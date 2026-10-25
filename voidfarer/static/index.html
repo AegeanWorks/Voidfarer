@@ -118,7 +118,7 @@
                             <dt>\</dt><dd>Hide / show the terminal drawer</dd>
                             <dt>Q W E R</dt><dd>Route power to engines / shields / sensors / weapons</dd>
                             <dt>⇧1 … ⇧6</dt><dd>Use commander ability 1-6</dd>
-                            <dt>P K L</dt><dd>Toggle reactor / skills / flight log panels</dd>
+                            <dt>P K L</dt><dd>Toggle reactor / abilities / flight log panels</dd>
                             <dt>⇧ CLICK</dt><dd>Market BUY / SELL at max quantity</dd>
                             <dt>ESC</dt><dd>Menu; closes settings</dd>
                         </dl>
@@ -976,7 +976,7 @@
                     <div class="panel-header">
                         <div class="panel-tag"><span class="badge-dot dot-purple"></span><span class="strip-icon">✦</span> POWERS</div>
                         <h2 class="panel-title">ABILITIES</h2>
-                        <button class="hotkey-chip" id="btnToggleSkills" title="Toggle abilities strip (K)" aria-controls="hudSkillsGrid" aria-expanded="true">K</button>
+                        <button class="hotkey-chip" id="btnToggleSkills" title="Toggle abilities strip (K)" aria-label="Toggle abilities strip" aria-controls="hudSkillsPanel" aria-expanded="true">K</button>
                         <span class="skills-quick-points"><strong id="hudSkillsReady">0</strong> READY</span>
                         <button class="text-btn" id="btnOpenSkillsTab" title="Open commander skills, ranks and perks">DOSSIER</button>
                     </div>
@@ -1021,7 +1021,7 @@
                                 <button class="text-btn" id="clearLogBtn">CLEAR</button>
                             </div>
                         </div>
-                        <div class="flight-log-stream" id="flightLogStream">
+                        <div class="flight-log-stream" id="flightLogStream" role="status" aria-live="polite">
                             <div class="log-line log-system">[SYS] Sub-space uplink online. Telemetry sync active.</div>
                         </div>
                     </div>

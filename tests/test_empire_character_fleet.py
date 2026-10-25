@@ -14,7 +14,7 @@ from voidfarer.engine import SimulationEngine
 from voidfarer.faction_state import generate_faction_leaders, resolve_wars
 from voidfarer.fleet import apply_fleet_casualties, build_fleet_ship, fleet_damage
 from voidfarer.galaxy import GalaxyGenerator
-from voidfarer.models import FleetShip, GameState, Outpost, PlayerCharacter, ReactorState, ResearchState, WarState
+from voidfarer.models import CombatEncounter, FleetShip, GameState, Outpost, PlayerCharacter, ReactorState, ResearchState, WarState
 from voidfarer.navigation import route_plan, shortest_route
 from voidfarer.outposts import OUTPOST_TYPES, can_build_on, outpost_tick_production
 from voidfarer.reactor import reactor_output_efficiency
@@ -154,6 +154,30 @@ class CharacterResearchOutpostTest(unittest.TestCase):
         self.assertTrue(ok, msg)
         self.assertIn("charm_offensive", self.engine.state.character.abilities)
         self.assertIn("trade_instinct", self.engine.state.character.abilities)
+
+    def test_constructor_reconciles_rank_seven_unlocks(self):
+        engine = SimulationEngine(seed=42)
+        character = replace(
+            engine.state.character,
+            skills={**engine.state.character.skills, "trade": 7},
+            abilities=(),
+        )
+        restored = SimulationEngine(seed=42, state=replace(engine.state, character=character))
+        self.assertIn("trade_instinct", restored.state.character.abilities)
+
+    def test_overclock_surge_decays_once_per_combat_turn(self):
+        combat = CombatEncounter(
+            id="surge_drill", enemy_name="Drill Frame", enemy_class="Corvette",
+            enemy_hull=999, enemy_max_hull=999, enemy_damage=1, bounty_credits=0,
+            salvage_commodity="titanium", enemy_shield=0, enemy_max_shield=0,
+            faction_id="void_corsairs", special_ability="none",
+        )
+        self.engine.state = self.engine._clone_state(active_combat=combat)
+        ok, _ = self.engine.use_character_ability("overclock")
+        self.assertTrue(ok)
+        self.assertEqual(self.engine.state.ship.reactor.surge_ticks, 8)
+        self.engine.combat_action("scan")
+        self.assertEqual(self.engine.state.ship.reactor.surge_ticks, 7)
 
     def test_loading_an_old_save_reconciles_rank_seven_unlocks(self):
         engine = SimulationEngine(seed=42)

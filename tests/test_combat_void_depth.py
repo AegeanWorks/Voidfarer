@@ -72,6 +72,39 @@ class TestEarlyCombatRisk(unittest.TestCase):
         self.assertGreater(engine.state.ship.hull, 0,
                            "the baseline marauder must remain survivable")
 
+    def test_defensive_actions_also_end_in_defeat(self):
+        for action in ("shield_absorb", "evasive_burn"):
+            combat = CombatEncounter(
+                id=f"lethal_{action}", enemy_name="Lethal Frame", enemy_class="Dreadnought",
+                enemy_hull=999, enemy_max_hull=999, enemy_damage=500, bounty_credits=750,
+                salvage_commodity="titanium", enemy_shield=0, enemy_max_shield=0,
+                faction_id="void_corsairs", special_ability="none",
+            )
+            engine = SimulationEngine(seed=4)
+            engine.state = engine._clone_state(
+                ship=engine._clone_ship(hull=5, shield=0, fuel=20, credits=100),
+                active_combat=combat,
+            )
+            engine.rng.random = lambda: 0.99
+            ok, msg = engine.combat_action(action)
+            self.assertTrue(ok)
+            self.assertIn("DEFEAT", msg)
+            self.assertIsNone(engine.state.active_combat, action)
+            self.assertEqual(engine.state.ship.hull, 0)
+            self.assertEqual(engine.state.ship.credits, 100)
+            self.assertEqual(engine.state.ship.fuel, 17 if action == "evasive_burn" else 20)
+            self.assertTrue(engine.state.time.is_paused)
+
+    def test_a_destroyed_ship_cannot_tick_back_to_life(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(ship=engine._clone_ship(hull=0))
+        report = engine.tick(5)
+        self.assertTrue(report.get("destroyed"))
+        self.assertEqual(engine.state.ship.hull, 0)
+        ok, msg = engine.use_character_ability("emergency_repair")
+        self.assertFalse(ok)
+        self.assertIn("destroyed", msg.lower())
+
     def test_zero_hull_ends_combat_as_a_defeat_without_bounty(self):
         combat = CombatEncounter(
             id="balance_lethal", enemy_name="Lethal Test Frame", enemy_class="Dreadnought",
