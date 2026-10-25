@@ -5,7 +5,7 @@
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1792934514.8205342,
+    "updated_at": 1792935553.904484,
     "owner": "kilo:1",
     "started_by": "claude-code:f36d48df",
     "continuations": [
@@ -17,17 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "left-panel-qol-ledger-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/5] Left terminal: single visible tab on load, [ ] cycle and \\ hide hotkeys, remembered tab, one-line outliner label, 3-column two-line records for contracts/drones/mercenaries/escorts; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792880372.778852,
-      "timestamp_str": "2026-10-25 01:19:32",
-      "agent": "claude-code:f36d48df"
-    },
     {
       "task_id": "left-panel-qol-ledger-v1",
       "phase": "phase 4",
@@ -246,6 +235,17 @@
       "status": "in_progress",
       "timestamp": 1792934514.8205342,
       "timestamp_str": "2026-10-25 16:21:54",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "grand-strategy-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Cockpit evidence: real-browser captures at 1280x720, 1366x768, 1920x1080, 4K; vision review found clipped edge labels and a tight legend, both fixed and re-approved; README tree updated; 4/4 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792935553.904484,
+      "timestamp_str": "2026-10-25 16:39:13",
       "agent": "kilo:1"
     }
   ]

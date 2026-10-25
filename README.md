@@ -52,6 +52,7 @@ voidfarer/
 │   └── NARRATIVE_AND_TUTORIAL_LITERATURE_REVIEW.md <- cognitive load & narrative review
 ├── .gitignore                <- transient state & python caches excluded
 ├── LICENSE                   <- GNU AGPL-3.0 license
+├── COMMERCIAL.md             <- commercial licensing and support terms
 ├── pyproject.toml            <- build and package configuration
 ├── play.bat                  <- 1-click interactive Windows launcher (default: Windows Cockpit)
 ├── voidfarer.bat             <- 1-click Windows CLI passthrough launcher

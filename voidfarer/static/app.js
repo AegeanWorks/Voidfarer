@@ -4219,7 +4219,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.radarLabels) {
                 ctx.font = "12px 'Segoe UI'";
                 ctx.fillStyle = "#ece4d4";
-                ctx.fillText(b.name, bx + bodyRadius + 6, by + 3);
+                const nameWidth = ctx.measureText(b.name).width;
+                let nameX = bx + bodyRadius + 6;
+                if (nameX + nameWidth > this.viewW - 6) nameX = bx - bodyRadius - 6 - nameWidth;
+                ctx.fillText(b.name, Math.max(6, nameX), by + 3);
             }
         });
 
@@ -4566,7 +4569,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             f,
             text: `${f.name.split(" ")[0]} ${(f.at_war_with || []).length ? "⚔" : ""}${f.systems}`,
         }));
-        const width = items.reduce((sum, item) => sum + 18 + ctx.measureText(item.text).width + 12, 12);
+        const width = items.reduce((sum, item) => sum + 22 + ctx.measureText(item.text).width + 18, 12);
         const x = r.x + 10;
         const y = r.y + r.h - 28;
         ctx.fillStyle = "rgba(5, 11, 22, 0.82)";
@@ -4577,7 +4580,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.fillRect(cursor, y + 6, 10, 10);
             ctx.fillStyle = (f.at_war_with || []).length ? "#e07a66" : "#ece4d4";
             ctx.fillText(text, cursor + 14, y + 15);
-            cursor += 18 + ctx.measureText(text).width + 12;
+            cursor += 22 + ctx.measureText(text).width + 18;
         });
         ctx.restore();
     }
