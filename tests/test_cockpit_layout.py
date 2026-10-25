@@ -690,3 +690,210 @@ class TestCrewSimulationCockpit(unittest.TestCase):
         for selector in (".crew-cashflow-row", ".crew-shore-row", ".crew-morale-bar", ".crew-morale-fill"):
             self.assertIn(selector, self.css, f"missing CSS rule for {selector}")
 
+
+
+class TestLeftTerminalLedger(unittest.TestCase):
+    """Left terminal: one visible tab on load, keyboard tab cycling, and two-line ledger records."""
+
+    @classmethod
+    def setUpClass(cls):
+        parser = _TreeBuilder()
+        parser.feed(INDEX_HTML.read_text(encoding="utf-8"))
+        parser.close()
+        cls.dom = parser.root
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def _tab_contents(self, node):
+        if node.has_class("tab-content"):
+            yield node
+        for child in node.children:
+            yield from self._tab_contents(child)
+
+    def test_only_the_player_tab_is_visible_before_scripts_run(self):
+        visible = [node.attrs.get("id") for node in self._tab_contents(self.dom)
+                   if "display: none" not in (node.attrs.get("style") or "")]
+        self.assertEqual(visible, ["tabContentPlayer"])
+
+    def test_bracket_keys_cycle_terminal_tabs(self):
+        self.assertIn("cycleTerminalTab", self.js)
+        self.assertIn('"BracketLeft"', self.js)
+        self.assertIn('"BracketRight"', self.js)
+
+    def test_ledger_records_use_three_column_two_line_grid(self):
+        match = re.search(r"--ledger-record-cols:\s*([^;]+);", self.css)
+        self.assertIsNotNone(match, "missing --ledger-record-cols token")
+        tracks = re.findall(r"\w+\([^)]*\)|\S+", match.group(1))
+        self.assertEqual(len(tracks), 3, "ledger records use icon | body | value/action")
+        for selector in (".contract-card", ".drone-card", ".fleet-ship-card", ".fleet-procurement-row"):
+            self.assertIn(selector, self.css)
+
+    def test_outliner_label_stays_on_one_line(self):
+        rules = re.findall(r"\.panel-left \.deck-tabs-header::before\s*\{([^}]*)\}", self.css)
+        self.assertTrue(any("white-space: nowrap" in body for body in rules))
+
+
+class TestMarketBulkTrading(unittest.TestCase):
+    """Commerce tab: lot selector, max orders and cost-basis feedback."""
+
+    @classmethod
+    def setUpClass(cls):
+        parser = _TreeBuilder()
+        parser.feed(INDEX_HTML.read_text(encoding="utf-8"))
+        parser.close()
+        cls.dom = parser.root
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_lot_selector_sits_in_the_market_tab(self):
+        market = self.dom.find_by_id("tabContentMarket")
+        bar = market.find_by_id("marketLotBar")
+        self.assertIsNotNone(bar, "#marketLotBar missing from the market tab")
+        lots = [child.attrs.get("data-lot") for child in bar.children if child.tag == "button"]
+        self.assertEqual(lots, ["1", "5", "10", "max"])
+
+    def test_max_orders_and_cost_basis_reach_the_api(self):
+        self.assertIn("max: true", self.js)
+        self.assertIn("cargo_avg_cost", self.js)
+        self.assertIn("max_buy", self.js)
+
+
+class TestSettingsConsoleQoL(unittest.TestCase):
+    """Settings console: volume, gameplay automation, interface memory, controls and reset."""
+
+    SETTING_IDS = ("settingVolume", "settingAutoPause", "settingAutoClaim", "settingTradeLot", "settingRememberTab")
+
+    @classmethod
+    def setUpClass(cls):
+        parser = _TreeBuilder()
+        parser.feed(INDEX_HTML.read_text(encoding="utf-8"))
+        parser.close()
+        cls.dom = parser.root
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_new_settings_live_in_the_settings_overlay_and_are_wired(self):
+        overlay = self.dom.find_by_id("settingsOverlay")
+        for element_id in self.SETTING_IDS + ("btnResetSettings", "settingsControls"):
+            self.assertIsNotNone(overlay.find_by_id(element_id), f"#{element_id} missing from settings")
+        for element_id in self.SETTING_IDS + ("btnResetSettings",):
+            self.assertIn(f'"{element_id}"', self.js, f"#{element_id} is not wired in app.js")
+
+    def test_every_sound_goes_through_the_master_gain(self):
+        self.assertNotIn("gain.connect(this.ctx.destination)", self.js)
+        self.assertIn("setVolume", self.js)
+
+
+class TestCockpitPolling(unittest.TestCase):
+    """Client polling contract: cached catalogs, lite payloads, adaptive cadence, guarded rebuilds."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_every_api_call_goes_through_the_catalog_aware_wrapper(self):
+        raw = re.findall(r"await fetch\(([^)]*)\)", self.js)
+        self.assertEqual(raw, ['"/api/catalogs"'], "only loadCatalogs may bypass apiFetch")
+        self.assertIn('"X-VoidFarer-Catalogs"', self.js)
+
+    def test_poll_cadence_follows_the_chrono(self):
+        self.assertIn("schedulePoll", self.js)
+        self.assertIn("pollInterval", self.js)
+        self.assertNotRegex(self.js, r"setInterval\([^)]*refreshState")
+
+    def test_open_tab_is_not_rebuilt_under_a_pressed_pointer(self):
+        self.assertIn("terminalBusy()", self.js)
+        self.assertIn('"pointerdown"', self.js)
+
+
+class TestCommandStripFit(unittest.TestCase):
+    """G-005/G-013 at every width, and power routing that works without a hidden APPLY button."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def _last(self, selector, prop):
+        values = re.findall(re.escape(selector) + r"\s*\{[^}]*?" + prop + r":\s*([^;]+);", self.css)
+        self.assertTrue(values, f"no {prop} for {selector}")
+        return values[-1].strip()
+
+    def test_strip_stays_beside_a_full_height_terminal(self):
+        self.assertEqual(self._last(".hud-command-strip", "grid-column"), "2 / -1")
+        self.assertEqual(self._last(".panel-left", "grid-row"), "1 / span 2")
+
+    def test_strip_panels_are_not_capped_at_210px(self):
+        self.assertEqual(self._last(".hud-strip-panel", "max-height"), "none")
+
+    def test_power_sliders_and_presets_commit_without_the_apply_button(self):
+        self.assertIn('addEventListener("change", () => this.commitPowerRoute())', self.js)
+        self.assertGreaterEqual(self.js.count("this.commitPowerRoute();"), 3, "each preset commits")
+
+
+class TestStrategicGalaxyMap(unittest.TestCase):
+    """Galaxy map: faction territory, war fronts and legend, fitted to the visible map area."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_map_views_share_one_visible_area_centre(self):
+        self.assertIn("mapCenter()", self.js)
+        self.assertNotIn("this.viewW / 2 + this.panX", self.js)
+
+    def test_territory_is_cached_and_drawn_from_politics(self):
+        self.assertIn("galactic_politics", self.js)
+        self.assertIn("this.territoryKey !== key", self.js, "territory must be cached, not rebuilt every frame")
+        self.assertIn("drawPoliticsLegend", self.js)
+        self.assertIn("war.fronts", self.js)
+
+
+class TestCelestialModels(unittest.TestCase):
+    """Procedural celestial models: their own module, loaded before the cockpit, sprites cached."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.celestial = (STATIC_DIR / "celestial.js").read_text(encoding="utf-8")
+
+    def test_renderer_loads_before_the_cockpit(self):
+        self.assertLess(self.html.index('src="celestial.js"'), self.html.index('src="app.js"'))
+        self.assertIn("new window.CelestialRenderer()", self.js)
+
+    def test_every_generated_body_type_has_a_model(self):
+        body_types = (
+            "terrestrial", "oceanic", "super_earth", "savanna", "tundra", "desert_world", "barren", "ice_world",
+            "lava_world", "toxic", "ringed_giant", "ice_giant", "ring_world", "dyson_sphere", "orbital_station",
+            "research_outpost", "quantum_relay", "solar_collector", "black_hole", "wormhole", "asteroid_belt",
+        )
+        for body_type in body_types:
+            self.assertIn(body_type, self.celestial, f"no model for {body_type}")
+
+    def test_surface_sprites_are_cached(self):
+        self.assertIn("this.sprites.get(key)", self.celestial)
+        self.assertIn("bodyDisplayRadius(b)", self.js, "drawing and hit tests share one body size")
+
+
+class TestStrategyPanels(unittest.TestCase):
+    """Strategy actions in the cockpit: war pledges, outpost founding and the monthly treasury."""
+
+    @classmethod
+    def setUpClass(cls):
+        parser = _TreeBuilder()
+        parser.feed(INDEX_HTML.read_text(encoding="utf-8"))
+        parser.close()
+        cls.dom = parser.root
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_wars_panel_sits_in_the_factions_tab_and_pledges(self):
+        self.assertIsNotNone(self.dom.find_by_id("tabContentFactions").find_by_id("warsList"))
+        self.assertIn('"/api/war/support"', self.js)
+
+    def test_outposts_are_founded_from_the_empire_tab(self):
+        self.assertIsNotNone(self.dom.find_by_id("tabContentEmpire").find_by_id("outpostBuild"))
+        self.assertIn('"/api/outpost/build"', self.js)
+        self.assertNotIn("use the outpost build API/CLI", self.js)
+
+    def test_treasury_is_reported_per_month(self):
+        self.assertIn("net_per_month", self.js)
+        self.assertNotIn("net_per_tick", self.js)

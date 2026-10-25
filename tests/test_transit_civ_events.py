@@ -126,7 +126,7 @@ class TestTransitCivEvents(unittest.TestCase):
         self.assertIsInstance(sub, dict)
         self.assertEqual(sub["fuel_cost"], 0)
         self.assertGreaterEqual(sub["duration_ticks"], 1)
-        self.assertGreaterEqual(sub["risk"], 0.01)
+        self.assertGreaterEqual(sub["risk"], 0.03)
         self.assertIn("hazards", sub)
         self.assertTrue(sub["can_start"])
 
@@ -134,6 +134,7 @@ class TestTransitCivEvents(unittest.TestCase):
         self.assertTrue(ok_q)
         self.assertGreaterEqual(quantum["fuel_cost"], 2)
         self.assertEqual(quantum["duration_ticks"], 1)
+        self.assertGreaterEqual(quantum["risk"], 0.03)
         self.assertLessEqual(quantum["risk"], sub["risk"] + 0.001)
 
         ok_same, same = self.engine.preview_travel("sol_body_1", mode="sublight")

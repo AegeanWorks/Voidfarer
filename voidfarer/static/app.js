@@ -14,11 +14,44 @@ const SKILL_META = {
     trade: { name: "Trade", icon: "💱", desc: "Increases cargo capacity, buy/sell margins, and depot efficiency." }
 };
 const SKILL_HOTKEYS = ["⇧1", "⇧2", "⇧3", "⇧4", "⇧5", "⇧6"];
+// Left terminal rail order, top to bottom; [ and ] cycle through it.
+const TERMINAL_TABS = [
+    "player", "skills", "crew", "ship", "market", "arsenal", "fleet", "contracts",
+    "empire", "quests", "ai", "depot", "messages", "story", "factions", "codex",
+];
+const TRADE_LOTS = ["1", "5", "10", "max"];
+// Code-constant catalogs from /api/catalogs, fetched once. Once present, every API call sends
+// the cache header so state payloads leave them out, and CockpitApp.state merges them back.
+let catalogCache = null;
+const CATALOG_CACHE_HEADER = "X-VoidFarer-Catalogs";
+
+function apiFetch(url, options = {}) {
+    if (!catalogCache) return fetch(url, options);
+    return fetch(url, { ...options, headers: { ...(options.headers || {}), [CATALOG_CACHE_HEADER]: "1" } });
+}
+
+async function loadCatalogs() {
+    try {
+        const res = await fetch("/api/catalogs");
+        const json = await res.json();
+        if (json.ok && json.data) catalogCache = json.data;
+    } catch (e) {
+        console.error("Error loading catalogs:", e);
+    }
+}
+// Stored under localStorage "voidfarer_settings"; RESET DEFAULTS restores exactly these.
+const SETTINGS_DEFAULTS = {
+    sound: true, volume: 0.8, radarGrid: true, radarLabels: true, travelAnimation: true,
+    starDensity: 220, uiDensity: "auto", uiScale: 1, rememberTab: true, lastTab: "player",
+    tradeLot: "1", autoPause: true, autoClaim: false,
+};
 
 class SoundController {
     constructor() {
         this.ctx = null;
+        this.master = null;
         this.enabled = true;
+        this.volume = 0.8;
     }
 
     init() {
@@ -26,6 +59,10 @@ class SoundController {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             if (AudioContext) {
                 this.ctx = new AudioContext();
+                // Every voice connects here, so one gain is the master volume.
+                this.master = this.ctx.createGain();
+                this.master.gain.value = this.volume;
+                this.master.connect(this.ctx.destination);
             }
         }
         if (this.ctx && this.ctx.state === "suspended") {
@@ -38,6 +75,11 @@ class SoundController {
         return this.enabled;
     }
 
+    setVolume(volume) {
+        this.volume = Math.min(1, Math.max(0, Number(volume)));
+        if (this.master) this.master.gain.value = this.volume;
+    }
+
     playBeep(freq = 880, duration = 0.08, type = "sine") {
         if (!this.enabled || !this.ctx) return;
         try {
@@ -48,7 +90,7 @@ class SoundController {
             gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
             osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            gain.connect(this.master);
             osc.start();
             osc.stop(this.ctx.currentTime + duration);
         } catch (e) {}
@@ -66,7 +108,7 @@ class SoundController {
             gain.gain.setValueAtTime(0.15, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
             osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            gain.connect(this.master);
             osc.start(now);
             osc.stop(now + 0.4);
         } catch (e) {}
@@ -84,7 +126,7 @@ class SoundController {
             gain.gain.setValueAtTime(0.2, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
             osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            gain.connect(this.master);
             osc.start(now);
             osc.stop(now + 0.7);
         } catch (e) {}
@@ -102,7 +144,7 @@ class SoundController {
                 gain.gain.setValueAtTime(0.12, now + idx * 0.06);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.25);
                 osc.connect(gain);
-                gain.connect(this.ctx.destination);
+                gain.connect(this.master);
                 osc.start(now + idx * 0.06);
                 osc.stop(now + idx * 0.06 + 0.28);
             });
@@ -121,7 +163,7 @@ class SoundController {
             gain.gain.setValueAtTime(0.12, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
             osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            gain.connect(this.master);
             osc.start(now);
             osc.stop(now + 0.38);
         } catch (e) {}
@@ -139,7 +181,7 @@ class SoundController {
                 gain.gain.setValueAtTime(0.12, now + idx * 0.05);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.08);
                 osc.connect(gain);
-                gain.connect(this.ctx.destination);
+                gain.connect(this.master);
                 osc.start(now + idx * 0.05);
                 osc.stop(now + idx * 0.05 + 0.09);
             });
@@ -158,7 +200,7 @@ class SoundController {
             gain.gain.setValueAtTime(0.2, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
             osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            gain.connect(this.master);
             osc.start(now);
             osc.stop(now + 0.22);
         } catch (e) {}
@@ -176,7 +218,7 @@ class SoundController {
                 gain.gain.setValueAtTime(0.18, now + idx * 0.08);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
                 osc.connect(gain);
-                gain.connect(this.ctx.destination);
+                gain.connect(this.master);
                 osc.start(now + idx * 0.08);
                 osc.stop(now + idx * 0.08 + 0.38);
             });
@@ -195,7 +237,7 @@ class SoundController {
                 gain.gain.setValueAtTime(0.2, now + idx * 0.09);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.4);
                 osc.connect(gain);
-                gain.connect(this.ctx.destination);
+                gain.connect(this.master);
                 osc.start(now + idx * 0.09);
                 osc.stop(now + idx * 0.09 + 0.42);
             });
@@ -214,7 +256,7 @@ class SoundController {
             gain.gain.setValueAtTime(0.35, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
             osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            gain.connect(this.master);
             osc.start(now);
             osc.stop(now + 0.4);
         } catch (e) {}
@@ -233,7 +275,7 @@ class SoundController {
             gain.gain.setValueAtTime(0.16, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
             osc.connect(gain);
-            gain.connect(this.ctx.destination);
+            gain.connect(this.master);
             osc.start(now);
             osc.stop(now + 0.52);
         } catch (e) {}
@@ -241,8 +283,17 @@ class SoundController {
 }
 
 class CockpitApp {
+    get state() {
+        return this._state;
+    }
+
+    set state(value) {
+        this._state = value && catalogCache ? Object.assign(value, catalogCache) : value;
+    }
+
     constructor() {
         this.sound = new SoundController();
+        this.celestial = window.CelestialRenderer ? new window.CelestialRenderer() : null;
         this.state = null;
         this.galaxySystems = {};
         this.viewMode = "ORBITS"; // "ORBITS" or "GALAXY"
@@ -278,10 +329,12 @@ class CockpitApp {
         this.activeSaveSlot = "default";
         this.gameStarted = false;
         this.loadSettings();
+        this.terminalPointerDown = false;
 
         this.initDOMElements();
         this.bindEvents();
         this.initTooltips();
+        this.openInitialTerminalTab();
         this.applyViewportProfile();
         this.syncRadarControlState();
         this.startAnimationLoop();
@@ -289,10 +342,8 @@ class CockpitApp {
         this.fetchSaves();
         this.openMainMenu(); // Show main menu on startup
 
-        // Polling interval for live sync (1000ms for responsive tick progression)
-        setInterval(() => {
-            if (!document.hidden && this.gameStarted && this.state) this.refreshState(true);
-        }, 1000);
+        // Live sync: catalogs first so polls stay lite, then a cadence that follows the chrono.
+        loadCatalogs().finally(() => this.schedulePoll());
     }
 
     initDOMElements() {
@@ -640,20 +691,25 @@ class CockpitApp {
             this.powerDirty = true;
             this.updatePowerAllocationDisplay();
         }));
+        // Releasing a slider routes power; APPLY ROUTE stays as an explicit retry.
+        sliders.forEach(s => s.addEventListener("change", () => this.commitPowerRoute()));
         this.applyPowerBtn.addEventListener("click", () => this.handleApplyPower());
 
         // Presets
         document.getElementById("presetBalanced").addEventListener("click", () => {
             this.setPowerSliders(25, 25, 25, 25);
             this.sound.playBeep(850);
+            this.commitPowerRoute();
         });
         document.getElementById("presetSprint").addEventListener("click", () => {
             this.setPowerSliders(45, 20, 20, 15);
             this.sound.playBeep(950);
+            this.commitPowerRoute();
         });
         document.getElementById("presetScience").addEventListener("click", () => {
             this.setPowerSliders(20, 20, 45, 15);
             this.sound.playBeep(1050);
+            this.commitPowerRoute();
         });
 
         // Reactor doctrine modes and emergency vent
@@ -733,9 +789,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.btnLandTarget?.addEventListener("click", () => this.handleLandAction());
         this.btnSalvageTarget?.addEventListener("click", () => this.handleSalvage());
         this.btnScoopFuel?.addEventListener("click", () => this.handleScoop());
-        ["settingSound", "settingGrid", "settingLabels", "settingAnimation", "settingStarDensity", "settingDensity", "settingUiScale"].forEach(id => {
+        document.querySelectorAll("#marketLotBar .market-lot-btn").forEach(button => {
+            button.addEventListener("click", () => this.setTradeLot(button.getAttribute("data-lot")));
+        });
+        this.panelLeft?.addEventListener("pointerdown", () => { this.terminalPointerDown = true; });
+        window.addEventListener("pointerup", () => { this.terminalPointerDown = false; });
+        window.addEventListener("pointercancel", () => { this.terminalPointerDown = false; });
+        [
+            "settingSound", "settingVolume", "settingGrid", "settingLabels", "settingAnimation", "settingStarDensity",
+            "settingDensity", "settingUiScale", "settingRememberTab", "settingAutoPause", "settingAutoClaim", "settingTradeLot",
+        ].forEach(id => {
             document.getElementById(id)?.addEventListener("input", () => this.applySettingsFromUI());
         });
+        document.getElementById("btnResetSettings")?.addEventListener("click", () => this.resetSettings());
         document.querySelectorAll(".settings-nav-item").forEach(link => {
             link.addEventListener("click", () => {
                 document.querySelectorAll(".settings-nav-item").forEach(item => item.classList.remove("active"));
@@ -1012,8 +1078,34 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.handleSetTimeSpeed(10.0);
             } else if (hotkey === "t") {
                 this.handleTimeStep(1);
+            } else if (e.code === "BracketLeft" || e.code === "BracketRight") {
+                e.preventDefault();
+                this.cycleTerminalTab(e.code === "BracketRight" ? 1 : -1);
+            } else if (e.code === "Backslash") {
+                e.preventDefault();
+                this.switchRightTab(this.activeRightTab || this.lastTerminalTab || "player");
             }
         });
+    }
+
+    openInitialTerminalTab() {
+        const remembered = this.rememberTerminalTab && TERMINAL_TABS.includes(this.lastTerminalTab);
+        this.switchRightTab(remembered ? this.lastTerminalTab : "player", { quiet: true });
+    }
+
+    cycleTerminalTab(step) {
+        const current = this.activeRightTab || this.lastTerminalTab || "player";
+        const index = Math.max(0, TERMINAL_TABS.indexOf(current));
+        const next = TERMINAL_TABS[(index + step + TERMINAL_TABS.length) % TERMINAL_TABS.length];
+        this.switchRightTab(next);
+    }
+
+    // A rebuild between pointerdown and pointerup swaps the pressed button and drops the click;
+    // a rebuild under a focused select or input closes it. Polls skip the tab until it is idle.
+    terminalBusy() {
+        if (this.terminalPointerDown) return true;
+        const active = document.activeElement;
+        return Boolean(active && this.panelLeft && this.panelLeft.contains(active) && this.isTypingTarget(active));
     }
 
     isTypingTarget(element) {
@@ -1067,9 +1159,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         });
     }
 
-    switchRightTab(tabName) {
-        this.drawerUserToggled = true;
-        this.sound.playBeep(750, 0.05);
+    switchRightTab(tabName, options = {}) {
+        if (!options.quiet) {
+            this.drawerUserToggled = true;
+            this.sound.playBeep(750, 0.05);
+        }
         const tabButtons = {
             market: this.tabBtnMarket, arsenal: this.tabBtnArsenal, ship: this.tabBtnShip, fleet: this.tabBtnFleet,
             contracts: this.tabBtnContracts, story: this.tabBtnStory, factions: this.tabBtnFactions,
@@ -1098,6 +1192,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         this.activeRightTab = tabName;
+        if (this.lastTerminalTab !== tabName) {
+            this.lastTerminalTab = tabName;
+            if (this.rememberTerminalTab && !options.quiet) this.saveSettings();
+        }
         if (this.panelLeft) {
             this.panelLeft.classList.remove("drawer-collapsed");
         }
@@ -1221,11 +1319,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.playBeep(720, 0.04);
     }
 
+    pollInterval() {
+        const time = this.state && this.state.time;
+        if (!time || time.is_paused) return 1000;
+        const speed = Number(time.speed) || 1;
+        // 1x runs 2 ticks/s; poll at least that often, and 4 Hz from 5x up.
+        return speed >= 5 ? 250 : speed >= 2 ? 333 : 500;
+    }
+
+    schedulePoll() {
+        clearTimeout(this.pollTimer);
+        this.pollTimer = setTimeout(async () => {
+            if (!document.hidden && this.gameStarted && this.state) await this.refreshState(true);
+            this.schedulePoll();
+        }, this.pollInterval());
+    }
+
     async refreshState(silent = false) {
         if (this.refreshInFlight || document.hidden || !this.gameStarted) return;
         this.refreshInFlight = true;
         try {
-            const res = await fetch("/api/state");
+            const res = await apiFetch("/api/state");
             const json = await res.json();
             if (json.ok && json.data) {
                 this.state = json.data;
@@ -1243,7 +1357,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     async fetchGalaxy() {
         try {
-            const res = await fetch("/api/galaxy");
+            const res = await apiFetch("/api/galaxy");
             const json = await res.json();
             if (json.ok && json.systems) {
                 this.galaxySystems = json.systems;
@@ -1264,7 +1378,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         
         // Check for death
         this.checkDeath();
-        
+        this.runAlertAutomation();
+
         const ship = this.state.ship;
         const curSys = this.state.current_system;
         const orbBody = this.state.orbiting_body;
@@ -1288,7 +1403,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const totalCargo = manifest.length
             ? manifest.reduce((sum, item) => sum + (item.total_volume || 0), 0)
             : Object.values(ship.cargo).reduce((a, b) => a + b, 0);
-        this.cargoSummary.textContent = `HOLD: ${totalCargo}/${ship.cargo_capacity}`;
+        const flow = this.state.cash_flow;
+        const monthly = flow ? ` · ${flow.net_per_month >= 0 ? "+" : ""}${Math.round(flow.net_per_month)}/MO` : "";
+        this.cargoSummary.textContent = `HOLD: ${totalCargo}/${ship.cargo_capacity}${monthly}`;
+        this.cargoSummary.title = flow
+            ? `Monthly treasury: payroll -${flow.upkeep_per_month} cr, passive +${flow.passive_per_month} cr`
+            : "";
         this.cargoDetailed.textContent = `${totalCargo} / ${ship.cargo_capacity} VOLUME`;
         this.cargoMeterFill.style.width = `${Math.min(100, Math.round((totalCargo / ship.cargo_capacity) * 100))}%`;
 
@@ -1329,11 +1449,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         // Streak render
         const streak = ship.streak || 1;
         const streakMult = 1.0 + Math.min(1.5, (streak - 1) * 0.15);
-        this.streakVal.textContent = `🔥 ${streak} JUMP${streak > 1 ? 'S' : ''} (x${streakMult.toFixed(2)})`;
+        // The equal-width card shows the count; the payout multiplier leads the subline.
+        this.streakVal.textContent = `🔥 ${streak}`;
+        this.streakVal.title = `${streak} jump${streak > 1 ? "s" : ""} streak, x${streakMult.toFixed(2)} payouts`;
         this.vitalStreakCard.classList.toggle("high-streak", streak >= 3);
-        this.streakSubtext.textContent = streak > 1 
-            ? `+${Math.round((streakMult - 1.0) * 100)}% ALL REWARDS // FLEE RESETS`
-            : "LOSS AVERSION: FLEE RESETS";
+        this.streakSubtext.textContent = streak > 1
+            ? `x${streakMult.toFixed(2)} REWARDS // FLEE RESETS`
+            : "x1.00 // FLEE RESETS";
 
         // Mastery render
         const mastery = ship.mastery || { level: 1, xp: 0, next_level_xp: 500, talent_points: 0 };
@@ -1528,7 +1650,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         // Render Active Tab Content
-        if (this.activeRightTab === "market") {
+        if (this.terminalBusy()) {
+            // Leave the open tab as it is; the next poll renders it.
+        } else if (this.activeRightTab === "market") {
             if (orbBody && orbBody.station_dockable) {
                 this.noMarketMsg.style.display = "none";
                 this.marketTitle.textContent = `${orbBody.name.toUpperCase()} EXCHANGE`;
@@ -1560,7 +1684,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.renderContracts();
         } else if (this.activeRightTab === "story") {
             this.renderStory();
-            this.renderVoid();
         } else if (this.activeRightTab === "factions") {
             this.renderFactions();
         } else if (this.activeRightTab === "quests") {
@@ -1889,7 +2012,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!systemId) return;
         this.sound.init();
         try {
-            const res = await fetch("/api/void/dive", {
+            const res = await apiFetch("/api/void/dive", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ target_system_id: systemId })
@@ -1913,7 +2036,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleVoidEmerge() {
         this.sound.init();
         try {
-            const res = await fetch("/api/void/emerge", {
+            const res = await apiFetch("/api/void/emerge", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({})
@@ -1937,7 +2060,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.init();
         this.sound.playTransmission();
         try {
-            const res = await fetch("/api/story/choice", {
+            const res = await apiFetch("/api/story/choice", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ choice_id: choiceId })
@@ -1966,7 +2089,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             return;
         }
         try {
-            const res = await fetch("/api/tutorial/skip", { method: "POST" });
+            const res = await apiFetch("/api/tutorial/skip", { method: "POST" });
             const json = await res.json();
             if (json.ok) {
                 this.appendLog(json.message, "system");
@@ -1983,7 +2106,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.playBeep(850);
         this.cadetGraduationDismissed = false;
         try {
-            const res = await fetch("/api/tutorial/reset", { method: "POST" });
+            const res = await apiFetch("/api/tutorial/reset", { method: "POST" });
             const json = await res.json();
             if (json.ok) {
                 this.appendLog(json.message, "system");
@@ -2000,37 +2123,64 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     renderMarketTable() {
         if (!this.state) return;
+        this.syncMarketLotBar();
         this.marketTableBody.innerHTML = "";
         const quotes = this.state.market_quotes || [];
         const cargo = this.state.ship.cargo || {};
+        const avgCost = this.state.cargo_avg_cost || {};
+        const lot = this.tradeLot;
 
         quotes.forEach(q => {
             const tr = document.createElement("tr");
             const holdCount = cargo[q.commodity_id] || 0;
+            const avg = avgCost[q.commodity_id];
+            const maxBuy = Number(q.max_buy ?? 0);
+            // A fixed lot is clamped to what the hold and credits allow, so the button never lies.
+            const buyQty = lot === "max" ? maxBuy : Math.min(Number(lot), maxBuy);
+            const sellQty = lot === "max" ? holdCount : Math.min(Number(lot), holdCount);
+            const margin = avg ? (q.sell_price >= avg ? "td-profit" : "td-loss") : "";
+            const commId = this.escapeHtml(q.commodity_id);
 
             tr.innerHTML = `
-                <td><strong class="commodity-name">${this.escapeHtml(q.name)}</strong><br><small class="commodity-category">${this.escapeHtml(q.category)}</small></td>
-                <td class="td-buy">${q.buy_price} cr</td>
-                <td class="td-sell">${q.sell_price} cr</td>
-                <td class="td-hold">${holdCount}</td>
+                <td><strong class="commodity-name">${this.escapeHtml(q.name)}</strong><small class="commodity-category">${this.escapeHtml(q.category)}</small></td>
+                <td class="td-buy">${q.buy_price}</td>
+                <td class="td-sell ${margin}">${q.sell_price}</td>
+                <td class="td-hold">${holdCount}${avg ? `<small class="td-avg" title="Average paid per unit held">@${avg}</small>` : ""}</td>
                 <td>
                     <div class="trade-btn-group">
-                        <button class="btn-trade" data-comm="${this.escapeHtml(q.commodity_id)}" data-action="buy">BUY +1</button>
-                        <button class="btn-trade btn-sell-trade" data-comm="${this.escapeHtml(q.commodity_id)}" data-action="sell" ${holdCount <= 0 ? 'disabled' : ''}>SELL 1</button>
+                        <button class="btn-trade" data-comm="${commId}" data-action="buy" data-qty="${buyQty}" ${buyQty <= 0 ? "disabled" : ""}
+                            title="${buyQty > 0 ? `Buy ${buyQty}. Shift+click buys the max (${maxBuy}).` : "No credits or hold space for another unit."}">BUY ${buyQty || ""}</button>
+                        <button class="btn-trade btn-sell-trade" data-comm="${commId}" data-action="sell" data-qty="${sellQty}" ${holdCount <= 0 ? "disabled" : ""}
+                            title="Sell ${sellQty}. Shift+click sells all ${holdCount}.">${lot === "max" && holdCount > 0 ? "SELL ALL" : `SELL ${sellQty || ""}`}</button>
                     </div>
                 </td>
             `;
 
             tr.querySelectorAll(".btn-trade").forEach(b => {
                 b.addEventListener("click", (e) => {
-                    const cid = e.target.getAttribute("data-comm");
-                    const act = e.target.getAttribute("data-action");
-                    this.handleTrade(cid, 1, act === "buy");
+                    const button = e.currentTarget;
+                    const isBuy = button.getAttribute("data-action") === "buy";
+                    const useMax = e.shiftKey || lot === "max";
+                    this.handleTrade(button.getAttribute("data-comm"), Number(button.getAttribute("data-qty")), isBuy, useMax);
                 });
             });
 
             this.marketTableBody.appendChild(tr);
         });
+    }
+
+    syncMarketLotBar() {
+        document.querySelectorAll("#marketLotBar .market-lot-btn").forEach(button => {
+            const active = button.getAttribute("data-lot") === this.tradeLot;
+            button.classList.toggle("active", active);
+            button.setAttribute("aria-pressed", String(active));
+        });
+    }
+
+    setTradeLot(lot) {
+        this.tradeLot = TRADE_LOTS.includes(lot) ? lot : "1";
+        this.saveSettings();
+        this.renderMarketTable();
     }
 
     renderArsenal() {
@@ -2197,7 +2347,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 <div class="character-xp-row">
                     <span class="character-level">LEVEL ${ch.level || 1}</span>
                     <div class="character-xp-bar"><div class="character-xp-fill" style="width: ${xpPct}%"></div></div>
-                    <span class="character-xp-text" style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--neon-amber);">${xp}/${nextXp} XP</span>
+                    <span class="character-xp-text" style="font-family: var(--font-mono); font-size: 12px; color: var(--neon-amber);">${xp}/${nextXp} XP</span>
                 </div>
             </div>
         `;
@@ -2441,12 +2591,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         };
 
         if (this.crewCashFlow && cashFlow) {
-            const net = cashFlow.net_per_tick;
+            const net = cashFlow.net_per_month;
             const netColor = net >= 0 ? "var(--neon-green, #00f088)" : "var(--neon-red, #c96b5a)";
             this.crewCashFlow.innerHTML = `
-                <span class="cashflow-label">CASH FLOW / TICK</span>
-                <span class="cashflow-value">UPKEEP <strong>-${cashFlow.upkeep_per_tick}</strong> CR</span>
-                <span class="cashflow-value">PASSIVE <strong>+${cashFlow.passive_per_tick}</strong> CR</span>
+                <span class="cashflow-label">CASH FLOW / MONTH</span>
+                <span class="cashflow-value">PAYROLL <strong>-${cashFlow.upkeep_per_month}</strong> CR</span>
+                <span class="cashflow-value">PASSIVE <strong>+${cashFlow.passive_per_month}</strong> CR</span>
                 <span class="cashflow-value">NET <strong style="color:${netColor}">${net >= 0 ? "+" : ""}${net}</strong> CR</span>
             `;
         }
@@ -2523,7 +2673,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleShoreLeave() {
         this.sound.init();
         try {
-            const res = await fetch("/api/crew/shore", {
+            const res = await apiFetch("/api/crew/shore", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({})
@@ -2580,7 +2730,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const outposts = this.state.outposts || [];
         this.outpostSummary.textContent = outposts.length
             ? `${outposts.length} outpost(s) producing each tick.`
-            : "No outposts founded. Orbit a body and use the outpost build API/CLI.";
+            : "No outposts founded yet. Orbit a world and found one below.";
+        this.renderOutpostBuild();
         this.outpostList.innerHTML = outposts.map(o => `
             <div class="outpost-row"><span>${this.escapeHtml(o.name)} — LVL ${o.level} — POP ${Number(o.population).toLocaleString()}</span>
             <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button></div>
@@ -2840,6 +2991,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         contracts.forEach(c => {
             const card = document.createElement("div");
             card.className = `contract-card ${c.completed ? 'completed' : ''}`;
+            card.title = c.description || "";
 
             const pct = Math.min(100, Math.round((c.current_count / c.target_count) * 100));
             const relicBadge = c.reward_relic_tier ? `<span class="reward-pill relic">+Relic [${c.reward_relic_tier.toUpperCase()}]</span>` : '';
@@ -2966,7 +3118,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         try {
-            const res = await fetch("/api/combat", {
+            const res = await apiFetch("/api/combat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: action })
@@ -2985,10 +3137,49 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    // Settings-driven automation, evaluated on every state render.
+    runAlertAutomation() {
+        const combatKey = this.state.active_combat ? String(this.state.active_combat.enemy_name || "hostile") : "";
+        const events = this.state.undismissed_events || [];
+        const firstLook = this.alertBaseline === undefined;
+        const newCombat = !firstLook && combatKey && combatKey !== this.alertBaseline.combat;
+        const newEvent = !firstLook && events.length > this.alertBaseline.events;
+        this.alertBaseline = { combat: combatKey, events: events.length };
+        const time = this.state.time;
+        if (this.autoPauseOnAlert && (newCombat || newEvent) && time && !time.is_paused && !this.autoPauseInFlight) {
+            this.autoPauseInFlight = true;
+            this.postTimeControl("/api/time/pause", newCombat ? "hostile intercept" : "new event")
+                .finally(() => { this.autoPauseInFlight = false; });
+        }
+        if (this.autoClaimContracts) {
+            this.claimingContracts = this.claimingContracts || new Set();
+            (this.state.ship.active_contracts || [])
+                .filter(c => c.completed && !this.claimingContracts.has(c.id))
+                .forEach(c => {
+                    this.claimingContracts.add(c.id);
+                    this.handleClaimContract(c.id).finally(() => this.claimingContracts.delete(c.id));
+                });
+        }
+    }
+
+    async postTimeControl(endpoint, reason) {
+        try {
+            const res = await apiFetch(endpoint, { method: "POST" });
+            const json = await res.json();
+            if (json.ok && json.state) {
+                this.state = json.state;
+                this.renderHUD();
+                this.appendLog(`[TIME] Auto-paused: ${reason}. SPACE resumes.`, "hazard");
+            }
+        } catch (e) {
+            this.appendLog(`[ERROR] Auto-pause failed: ${e.message}`, "hazard");
+        }
+    }
+
     async handleClaimContract(contractId) {
         this.sound.init();
         try {
-            const res = await fetch("/api/contract/claim", {
+            const res = await apiFetch("/api/contract/claim", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ contract_id: contractId })
@@ -3010,7 +3201,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleBuyUpgrade(upgradeId) {
         this.sound.init();
         try {
-            const res = await fetch("/api/upgrade", {
+            const res = await apiFetch("/api/upgrade", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ upgrade_id: upgradeId })
@@ -3032,7 +3223,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleCommissionChassis(chassisId) {
         this.sound.init();
         try {
-            const res = await fetch("/api/shipyard/chassis", {
+            const res = await apiFetch("/api/shipyard/chassis", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ chassis_id: chassisId })
@@ -3054,7 +3245,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleInstallWeapon(weaponId) {
         this.sound.init();
         try {
-            const res = await fetch("/api/weapons/install", {
+            const res = await apiFetch("/api/weapons/install", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ weapon_id: weaponId })
@@ -3076,7 +3267,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleSetPrimaryWeapon(weaponId) {
         this.sound.init();
         try {
-            const res = await fetch("/api/weapons/set", {
+            const res = await apiFetch("/api/weapons/set", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ weapon_id: weaponId })
@@ -3098,7 +3289,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleReactorMode(mode) {
         this.sound.init();
         try {
-            const res = await fetch("/api/reactor/mode", {
+            const res = await apiFetch("/api/reactor/mode", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ mode })
@@ -3119,7 +3310,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleReactorVent() {
         this.sound.init();
         try {
-            const res = await fetch("/api/reactor/vent", {
+            const res = await apiFetch("/api/reactor/vent", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({})
@@ -3143,7 +3334,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleCommissionDrone(droneType) {
         this.sound.init();
         try {
-            const res = await fetch("/api/drone/buy", {
+            const res = await apiFetch("/api/drone/buy", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ drone_type: droneType })
@@ -3165,7 +3356,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleHarvestFleet() {
         this.sound.init();
         try {
-            const res = await fetch("/api/drone/collect", { method: "POST" });
+            const res = await apiFetch("/api/drone/collect", { method: "POST" });
             const json = await res.json();
             if (json.ok) {
                 this.sound.playChime();
@@ -3187,7 +3378,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const isPaused = this.state.time.is_paused;
         const endpoint = isPaused ? "/api/time/resume" : "/api/time/pause";
         try {
-            const res = await fetch(endpoint, { method: "POST" });
+            const res = await apiFetch(endpoint, { method: "POST" });
             const json = await res.json();
             if (json.ok && json.state) {
                 this.state = json.state;
@@ -3205,7 +3396,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.init();
         this.sound.playBeep(980, 0.05);
         try {
-            const res = await fetch("/api/time/speed", {
+            const res = await apiFetch("/api/time/speed", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ speed })
@@ -3227,7 +3418,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.init();
         this.sound.playBeep(1150, 0.04);
         try {
-            const res = await fetch("/api/time/step", {
+            const res = await apiFetch("/api/time/step", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ticks })
@@ -3257,7 +3448,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.init();
         this.sound.playScan();
         try {
-            const res = await fetch("/api/scan", { method: "POST" });
+            const res = await apiFetch("/api/scan", { method: "POST" });
             const json = await res.json();
             if (json.ok) {
                 const discovery = json.discovery || {};
@@ -3282,7 +3473,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.init();
         this.sound.playJump();
         try {
-            const res = await fetch("/api/jump", {
+            const res = await apiFetch("/api/jump", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ target: this.selectedTarget.id })
@@ -3301,6 +3492,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    commitPowerRoute() {
+        const total = [this.sliderEng, this.sliderShd, this.sliderSen, this.sliderWep]
+            .reduce((sum, slider) => sum + parseInt(slider.value, 10), 0);
+        // Over 100% stays local and red until the pilot rebalances.
+        if (total <= 100) this.handleApplyPower();
+    }
+
     async handleApplyPower() {
         this.sound.init();
         this.sound.playBeep(1200);
@@ -3310,7 +3508,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const wep = parseInt(this.sliderWep.value, 10);
 
         try {
-            const res = await fetch("/api/power", {
+            const res = await apiFetch("/api/power", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ engines: eng, shields: shd, sensors: sen, weapons: wep })
@@ -3329,13 +3527,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
-    async handleTrade(commId, qty, isBuy) {
+    async handleTrade(commId, qty, isBuy, useMax = false) {
         this.sound.init();
+        const order = useMax
+            ? { commodity_id: commId, is_buy: isBuy, max: true }
+            : { commodity_id: commId, quantity: qty, is_buy: isBuy };
         try {
-            const res = await fetch("/api/trade", {
+            const res = await apiFetch("/api/trade", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ commodity_id: commId, quantity: qty, is_buy: isBuy })
+                body: JSON.stringify(order)
             });
             const json = await res.json();
             if (json.ok) {
@@ -3354,7 +3555,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleResolveAnomaly(choiceId) {
         this.sound.init();
         try {
-            const res = await fetch("/api/anomaly", {
+            const res = await apiFetch("/api/anomaly", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ choice_id: choiceId })
@@ -3377,7 +3578,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.init();
         this.sound.playBeep(800);
         try {
-            const res = await fetch("/api/repair", {
+            const res = await apiFetch("/api/repair", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount: 25 })
@@ -3400,7 +3601,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.sound.init();
         this.sound.playBeep(850);
         try {
-            const res = await fetch("/api/refuel", {
+            const res = await apiFetch("/api/refuel", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ amount: 20 })
@@ -3451,7 +3652,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.transitPreviewAt = now;
         const token = ++this.transitPreviewToken;
         try {
-            const res = await fetch("/api/travel/preview", {
+            const res = await apiFetch("/api/travel/preview", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ body_id: bodyId })
@@ -3642,17 +3843,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const s = this.selectedTarget;
             const curSys = this.state.current_system;
             const isConn = curSys.connections.includes(s.id);
+            const owner = ((this.state.galactic_politics || {}).systems || {})[s.id];
+            const factionName = (owner && owner.owner) || s.faction;
             this.targetType.textContent = `TARGET: STAR SYSTEM [${s.spectral_type}-TYPE]`;
             this.targetName.textContent = s.name;
             const dist = Math.hypot(s.x - curSys.x, s.y - curSys.y);
             this.targetDist.textContent = `${dist.toFixed(1)} LY`;
-            this.targetDesc.textContent = `Faction: ${s.faction} // Security: ${(s.security * 100).toFixed(0)}% // Linked: ${isConn ? 'YES' : 'NO'}`;
+            this.targetDesc.textContent = `Faction: ${factionName} // Security: ${(s.security * 100).toFixed(0)}% // Linked: ${isConn ? 'YES' : 'NO'}`;
             this.targetGravity.textContent = `${s.spectral_type}-class`;
             this.targetAtmosphere.textContent = `${(s.security * 100).toFixed(0)}% sec`;
             this.targetTemp.textContent = `${s.connections.length} links`;
             if (this.targetHabitability) this.targetHabitability.textContent = "--";
-            this.targetMoons.textContent = s.faction;
-            if (this.targetFaction) this.targetFaction.textContent = s.faction || "Unclaimed";
+            this.targetMoons.textContent = factionName;
+            if (this.targetFaction) this.targetFaction.textContent = factionName || "Unclaimed";
             if (this.targetPopulation) this.targetPopulation.textContent = "--";
             if (this.targetGovernment) this.targetGovernment.textContent = "--";
             this.targetResources.innerHTML = "";
@@ -3685,6 +3888,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.dpr = dpr;
         this.viewW = width;
         this.viewH = height;
+        this.updateMapRect();
+    }
+
+    // The canvas spans the whole viewport, but HUD panels cover its edges. Both map views
+    // centre and fit inside the visible radar area (.panel-center), measured on resize only.
+    updateMapRect() {
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const view = document.querySelector(".panel-center");
+        const r = view ? view.getBoundingClientRect() : canvasRect;
+        const x = Math.max(0, r.left - canvasRect.left);
+        const y = Math.max(0, r.top - canvasRect.top);
+        this.mapRect = {
+            x, y,
+            w: Math.max(200, Math.min(r.width || this.viewW, this.viewW - x)),
+            h: Math.max(160, Math.min(r.height || this.viewH, this.viewH - y)),
+        };
+    }
+
+    mapCenter() {
+        const r = this.mapRect || { x: 0, y: 0, w: this.viewW, h: this.viewH };
+        return { x: r.x + r.w / 2 + this.panX, y: r.y + r.h / 2 + this.panY };
     }
 
     pointerToCanvas(e) {
@@ -3718,6 +3942,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (typeof ResizeObserver !== "undefined") {
             this.resizeObserver = new ResizeObserver(() => this.requestRadarResize());
             this.resizeObserver.observe(document.getElementById("radarBackgroundLayer") || this.canvas);
+            const mapView = document.querySelector(".panel-center");
+            if (mapView) this.resizeObserver.observe(mapView);
         }
         window.addEventListener("visibilitychange", () => {
             if (document.hidden) {
@@ -3833,8 +4059,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         ctx.globalCompositeOperation = "source-over";
         ctx.drawImage(this.radarBackdrop, 0, 0, w, h);
 
-        const cx = w / 2 + this.panX;
-        const cy = h / 2 + this.panY;
+        const { x: cx, y: cy } = this.mapCenter();
 
         // Draw tactical radar grid rings
         ctx.save();
@@ -3881,6 +4106,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         bodies.forEach(b => {
+            if (b.body_type === "star" && this.celestial) {
+                this.celestial.drawStar(ctx, b, cx, cy, 13 * Math.max(0.8, this.zoom) * Math.min(1.6, this.radarScale()), now);
+                return;
+            }
             if (b.body_type === "star") {
                 const pulse = 18 + Math.sin(now * 2) * 2.5;
                 const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, pulse * 1.5);
@@ -3920,17 +4149,29 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const bx = cx + Math.cos(angle) * orbitR;
             const by = cy + Math.sin(angle) * orbitR;
 
-            const bodyRadius = Math.max(4, Math.min(14, b.radius_km / 12000)) * this.zoom;
+            const bodyRadius = this.bodyDisplayRadius(b);
 
-            ctx.beginPath();
-            ctx.arc(bx, by, bodyRadius, 0, Math.PI * 2);
-            ctx.fillStyle = b.color;
-            ctx.shadowColor = b.color;
-            ctx.shadowBlur = 8;
-            ctx.fill();
-            ctx.shadowBlur = 0;
+            if (this.celestial) {
+                if (b.body_type === "asteroid_belt") {
+                    this.celestial.drawAsteroidBelt(ctx, b, cx, cy, orbitR, this.zoom, now);
+                    ctx.fillStyle = "rgba(200, 190, 175, 0.9)";
+                    ctx.beginPath();
+                    ctx.arc(bx, by, 3 * this.zoom, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    this.celestial.drawBody(ctx, b, bx, by, bodyRadius, Math.atan2(cy - by, cx - bx), now, this.dpr || 1);
+                    this.celestial.drawMoons(ctx, b, bx, by, bodyRadius, now);
+                }
+            } else {
+                ctx.beginPath();
+                ctx.arc(bx, by, bodyRadius, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+            }
 
-            if (b.body_type === "black_hole") {
+            if (this.celestial) {
+                // The renderer draws black holes, ring worlds and the rest as full models.
+            } else if (b.body_type === "black_hole") {
                 ctx.beginPath();
                 ctx.arc(bx, by, bodyRadius * 2.2, 0, Math.PI * 2);
                 ctx.strokeStyle = "rgba(201, 163, 90,0.55)";
@@ -3957,17 +4198,26 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
             const activeTravel = ship.travel || this.state.travel || null;
             if (ship.orbiting_body_id === b.id && !activeTravel && !this.travelAnimation) {
-                ctx.beginPath();
-                ctx.arc(bx + bodyRadius + 8, by - bodyRadius - 8, 3.5, 0, Math.PI * 2);
+                // Parked in orbit: the flagship circles its body, nose along the orbit.
+                const parkR = bodyRadius + 12 * Math.max(1, this.zoom);
+                const parkA = now * 0.5;
+                const sx = bx + Math.cos(parkA) * parkR;
+                const sy = by + Math.sin(parkA) * parkR;
+                if (this.celestial) {
+                    this.celestial.drawShip(ctx, sx, sy, parkA + Math.PI / 2, 6 * Math.max(1, this.zoom));
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
+                    ctx.fillStyle = "#8fbf9f";
+                    ctx.fill();
+                }
+                ctx.font = "12px 'Share Tech Mono'";
                 ctx.fillStyle = "#8fbf9f";
-                ctx.fill();
-                ctx.font = "9px 'Share Tech Mono'";
-                ctx.fillStyle = "#8fbf9f";
-                ctx.fillText("VF-FLAGSHIP", bx + bodyRadius + 14, by - bodyRadius - 4);
+                ctx.fillText("VF-FLAGSHIP", bx + bodyRadius + 14, by - bodyRadius - 10);
             }
 
             if (this.radarLabels) {
-                ctx.font = "10px 'Segoe UI'";
+                ctx.font = "12px 'Segoe UI'";
                 ctx.fillStyle = "#ece4d4";
                 ctx.fillText(b.name, bx + bodyRadius + 6, by + 3);
             }
@@ -4003,6 +4253,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.drawTravelAnimation(ctx, cx, cy, auScale);
     }
 
+    // Display size is logarithmic in real radius: an Earth ~14px, a gas giant ~22px at 1x,
+    // so every world is big enough to show its surface model. Drawing and hit tests share it.
+    bodyDisplayRadius(b) {
+        const sizeLog = Math.log2(Math.max(1, (b.radius_km || 1000) / 1000));
+        return Math.max(6, Math.min(22, 6 + sizeLog * 3)) * this.zoom * Math.min(1.4, this.radarScale());
+    }
+
     galaxyTransform(cx, cy) {
         const systems = Object.values(this.galaxySystems);
         const nodeScale = this.radarScale();
@@ -4015,14 +4272,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const maxX = Math.max(...xs);
         const minY = Math.min(...ys);
         const maxY = Math.max(...ys);
+        const view = this.mapRect || { w: this.viewW, h: this.viewH };
+        // Short map areas keep a legend row along the bottom edge; fit above it.
+        const usableH = view.h < 360 ? view.h - 34 : view.h;
         const scale = Math.min(
-            (this.viewW * 0.78) / Math.max(1, maxX - minX),
-            (this.viewH * 0.68) / Math.max(1, maxY - minY)
+            (view.w * 0.8) / Math.max(1, maxX - minX),
+            (usableH * 0.72) / Math.max(1, maxY - minY)
         ) * this.zoom;
         return {
             scale,
             cx: cx - ((minX + maxX) / 2) * scale,
-            cy: cy - ((minY + maxY) / 2) * scale,
+            cy: cy - (view.h - usableH) / 2 - ((minY + maxY) / 2) * scale,
             nodeScale,
         };
     }
@@ -4039,78 +4299,294 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const gx = transform.cx;
         const gy = transform.cy;
         const nodeScale = transform.nodeScale;
+        const politics = this.state.galactic_politics || { systems: {}, factions: [], wars: [] };
+        const owners = politics.systems || {};
+        const at = s => [gx + s.x * scale, gy + s.y * scale];
 
-        ctx.strokeStyle = "rgba(111, 195, 215, 0.38)";
-        ctx.lineWidth = Math.max(1, nodeScale * 0.8);
+        this.drawTerritory(ctx, transform, systems, owners);
+        // Crowded maps (720p, zoomed out) label only what matters; the rest show on hover.
+        const gaps = systems.map(a => Math.min(...systems.filter(b => b !== a)
+            .map(b => Math.hypot((a.x - b.x) * scale, (a.y - b.y) * scale))));
+        gaps.sort((m, n) => m - n);
+        const crowded = (gaps[Math.floor(gaps.length / 2)] || 999) < 90 * nodeScale;
+        const hoveredId = this.hoveredItem && this.hoveredItem.id;
+
+        // Hyperlanes: quiet inside a realm, brighter where they cross a border.
         const drawnPairs = new Set();
-
+        ctx.lineWidth = Math.max(1, nodeScale * 0.8);
         systems.forEach(s1 => {
-            const x1 = gx + s1.x * scale;
-            const y1 = gy + s1.y * scale;
+            const [x1, y1] = at(s1);
             s1.connections.forEach(connId => {
                 const pairKey = [s1.id, connId].sort().join("-");
-                if (!drawnPairs.has(pairKey)) {
-                    drawnPairs.add(pairKey);
-                    const s2 = this.galaxySystems[connId];
-                    if (s2) {
-                        const x2 = gx + s2.x * scale;
-                        const y2 = gy + s2.y * scale;
-                        ctx.beginPath();
-                        ctx.moveTo(x1, y1);
-                        ctx.lineTo(x2, y2);
-                        ctx.stroke();
-                    }
-                }
+                const s2 = this.galaxySystems[connId];
+                if (drawnPairs.has(pairKey) || !s2) return;
+                drawnPairs.add(pairKey);
+                const [x2, y2] = at(s2);
+                const crossing = (owners[s1.id] || {}).owner_id !== (owners[connId] || {}).owner_id;
+                ctx.strokeStyle = crossing ? "rgba(236, 228, 212, 0.42)" : "rgba(111, 195, 215, 0.28)";
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
             });
         });
 
+        // War fronts: contested lanes pulse red.
+        const pulse = 0.55 + 0.35 * Math.sin(Date.now() * 0.004);
+        ctx.save();
+        ctx.setLineDash([7 * nodeScale, 5 * nodeScale]);
+        ctx.lineWidth = Math.max(2, 2.4 * nodeScale);
+        ctx.strokeStyle = `rgba(214, 96, 77, ${pulse.toFixed(3)})`;
+        (politics.wars || []).forEach(war => (war.fronts || []).forEach(([a, b]) => {
+            const sa = this.galaxySystems[a];
+            const sb = this.galaxySystems[b];
+            if (!sa || !sb) return;
+            const [x1, y1] = at(sa);
+            const [x2, y2] = at(sb);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }));
+        ctx.restore();
+
         systems.forEach(s => {
-            const sx = gx + s.x * scale;
-            const sy = gy + s.y * scale;
+            const [sx, sy] = at(s);
+            const owner = owners[s.id] || {};
             const isCurrent = (s.id === curSys.id);
             const isSelected = (this.selectedTarget && this.selectedTarget.id === s.id);
-            const radius = (isCurrent ? 14 : 10) * nodeScale;
+            const radius = (isCurrent ? 9 : 7) * nodeScale;
 
+            this.drawStarGlyph(ctx, sx, sy, radius, s.color || "#6fc3d7");
+            // Owner ring: whose system this is, readable even where territories overlap.
             ctx.beginPath();
-            ctx.arc(sx, sy, radius, 0, Math.PI * 2);
-            ctx.fillStyle = s.color || "#6fc3d7";
-            ctx.shadowColor = s.color || "#6fc3d7";
-            ctx.shadowBlur = 12 * nodeScale;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
+            ctx.arc(sx, sy, radius + 4 * nodeScale, 0, Math.PI * 2);
+            ctx.strokeStyle = owner.color || "#7f8a99";
+            ctx.lineWidth = 2 * nodeScale;
+            ctx.stroke();
+            if (owner.front) {
+                ctx.font = `${Math.round(12 * nodeScale)}px 'Segoe UI Symbol', 'Segoe UI'`;
+                ctx.fillStyle = "#e07a66";
+                ctx.fillText("⚔", sx - radius - 16 * nodeScale, sy - radius - 2 * nodeScale);
+            }
             if (isCurrent) {
                 ctx.beginPath();
-                ctx.arc(sx, sy, 22 * nodeScale, 0, Math.PI * 2);
+                ctx.arc(sx, sy, radius + 10 * nodeScale, 0, Math.PI * 2);
                 ctx.strokeStyle = "#8fbf9f";
-                ctx.lineWidth = 2 * nodeScale;
+                ctx.lineWidth = 1.5 * nodeScale;
+                ctx.setLineDash([3 * nodeScale, 3 * nodeScale]);
                 ctx.stroke();
+                ctx.setLineDash([]);
             }
             if (isSelected) {
                 ctx.strokeStyle = "#6fc3d7";
                 ctx.lineWidth = 2 * nodeScale;
-                ctx.strokeRect(sx - 13 * nodeScale, sy - 13 * nodeScale,
-                    26 * nodeScale, 26 * nodeScale);
+                const box = radius + 8 * nodeScale;
+                ctx.strokeRect(sx - box, sy - box, box * 2, box * 2);
             }
 
-            const fontSize = 13 * nodeScale;
+            if (crowded && !isCurrent && !isSelected && !owner.front && s.id !== hoveredId) return;
+            const fontSize = Math.max(12, 13 * nodeScale);
             ctx.font = `${fontSize}px 'Segoe UI'`;
             const label = s.name;
             const labelWidth = ctx.measureText(label).width;
+            const lx = sx + radius + 9 * nodeScale;
             ctx.fillStyle = "rgba(4, 9, 19, 0.78)";
-            ctx.fillRect(sx + 14 * nodeScale, sy - 11 * nodeScale,
-                labelWidth + 8 * nodeScale, 18 * nodeScale);
+            ctx.fillRect(lx - 4 * nodeScale, sy - 11 * nodeScale, labelWidth + 8 * nodeScale, 18 * nodeScale);
+            ctx.fillStyle = owner.color || "#7f8a99";
+            ctx.fillRect(lx - 4 * nodeScale, sy - 11 * nodeScale, 2 * nodeScale, 18 * nodeScale);
             ctx.fillStyle = isCurrent ? "#8fbf9f" : "#ece4d4";
-            ctx.fillText(label, sx + 18 * nodeScale, sy + 4 * nodeScale);
+            ctx.fillText(label, lx, sy + 4 * nodeScale);
         });
+
+        this.drawPoliticsLegend(ctx, politics);
+    }
+
+    drawStarGlyph(ctx, x, y, radius, color) {
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.4);
+        glow.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+        glow.addColorStop(0.28, color);
+        glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 2.4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Stellaris-style realms: each canvas cell belongs to the nearest system within reach,
+    // filled faintly in its owner's colour, with a bright line where ownership changes.
+    // Rendered at quarter resolution into an offscreen canvas and redrawn only when the
+    // view or the map of owners changes.
+    drawTerritory(ctx, transform, systems, owners) {
+        const key = [
+            this.viewW, this.viewH, transform.scale.toFixed(4),
+            systems.map(s => `${s.id}:${(owners[s.id] || {}).owner_id || ""}`).join(","),
+        ].join("|");
+        const drift = Math.hypot(transform.cx - this.territoryCx, transform.cy - this.territoryCy);
+        if (this.territoryKey !== key || !(drift < this.viewW * 0.35)) {
+            this.territoryCanvas = this.renderTerritory(transform, systems, owners);
+            this.territoryKey = key;
+            this.territoryCx = transform.cx;
+            this.territoryCy = transform.cy;
+        }
+        if (this.territoryCanvas) {
+            ctx.save();
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(this.territoryCanvas, transform.cx - this.territoryCx,
+                transform.cy - this.territoryCy, this.viewW, this.viewH);
+            ctx.restore();
+        }
+    }
+
+    renderTerritory(transform, systems, owners) {
+        // ~480 cells across at any resolution keeps a rebuild (every pan/zoom frame) cheap.
+        const cell = Math.max(4, Math.round(this.viewW / 480));
+        const cw = Math.ceil(this.viewW / cell);
+        const ch = Math.ceil(this.viewH / cell);
+        const ownerIds = [];
+        const points = systems.map(s => {
+            const owner = owners[s.id] || {};
+            let idx = ownerIds.indexOf(owner.owner_id);
+            if (idx < 0) { ownerIds.push(owner.owner_id); idx = ownerIds.length - 1; }
+            const hex = /^#[0-9a-fA-F]{6}$/.test(owner.color || "") ? owner.color : "#7f8a99";
+            return {
+                x: (transform.cx + s.x * transform.scale) / cell,
+                y: (transform.cy + s.y * transform.scale) / cell,
+                owner: idx,
+                rgb: [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)),
+            };
+        });
+        if (!points.length) return null;
+        // A realm reaches a little past half the typical gap to the nearest neighbour.
+        const gaps = points.map(p => Math.min(...points.filter(q => q !== p).map(q => Math.hypot(p.x - q.x, p.y - q.y))));
+        gaps.sort((a, b) => a - b);
+        const reach = Math.max(6, (gaps[Math.floor(gaps.length / 2)] || 20) * 0.9);
+        const reach2 = reach * reach;
+
+        const owner = new Int16Array(cw * ch).fill(-1);
+        const nearest = new Int16Array(cw * ch).fill(-1);
+        const depth = new Float32Array(cw * ch);
+        for (let y = 0; y < ch; y++) {
+            for (let x = 0; x < cw; x++) {
+                let best = -1;
+                let bestD = reach2;
+                for (let i = 0; i < points.length; i++) {
+                    const dx = points[i].x - x;
+                    const dy = points[i].y - y;
+                    const d = dx * dx + dy * dy;
+                    if (d < bestD) { bestD = d; best = i; }
+                }
+                if (best >= 0) {
+                    const at = y * cw + x;
+                    nearest[at] = best;
+                    owner[at] = points[best].owner;
+                    depth[at] = 1 - Math.sqrt(bestD) / reach;
+                }
+            }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = cw;
+        canvas.height = ch;
+        const tctx = canvas.getContext("2d");
+        const image = tctx.createImageData(cw, ch);
+        const data = image.data;
+        for (let y = 0; y < ch; y++) {
+            for (let x = 0; x < cw; x++) {
+                const at = y * cw + x;
+                const o = owner[at];
+                if (o < 0) continue;
+                const rgb = points[nearest[at]].rgb;
+                const edge = (x > 0 && owner[at - 1] !== o) || (x < cw - 1 && owner[at + 1] !== o)
+                    || (y > 0 && owner[at - cw] !== o) || (y < ch - 1 && owner[at + cw] !== o);
+                const p = at * 4;
+                data[p] = rgb[0];
+                data[p + 1] = rgb[1];
+                data[p + 2] = rgb[2];
+                // Interior: a faint wash that thickens toward the border; border: a solid line.
+                data[p + 3] = edge ? 200 : Math.round(26 + 34 * (1 - depth[at]));
+            }
+        }
+        tctx.putImageData(image, 0, 0);
+        // Upscale once with a light blur so cell steps become smooth borders; frames then
+        // only blit this cached layer.
+        // The blurred layer is capped at 1920px wide: blurring a full 4K canvas costs more than
+        // the rest of the rebuild, and the per-frame blit stretches it invisibly.
+        const layerScale = Math.min(1, 1920 / this.viewW);
+        const smooth = document.createElement("canvas");
+        smooth.width = Math.round(this.viewW * layerScale);
+        smooth.height = Math.round(this.viewH * layerScale);
+        const sctx = smooth.getContext("2d");
+        sctx.imageSmoothingEnabled = true;
+        sctx.imageSmoothingQuality = "high";
+        sctx.filter = "blur(1.2px)";
+        sctx.drawImage(canvas, 0, 0, smooth.width, smooth.height);
+        return smooth;
+    }
+
+    drawPoliticsLegend(ctx, politics) {
+        const factions = politics.factions || [];
+        if (!factions.length) return;
+        const r = this.mapRect || { x: 0, y: 0, w: this.viewW, h: this.viewH };
+        if (r.h < 360) {
+            this.drawPoliticsLegendRow(ctx, factions, r);
+            return;
+        }
+        const rowH = 18;
+        const width = 230;
+        const height = 26 + factions.length * rowH;
+        const x = r.x + 12;
+        const y = r.y + r.h - height - 12;
+        ctx.save();
+        ctx.fillStyle = "rgba(5, 11, 22, 0.82)";
+        ctx.fillRect(x, y, width, height);
+        ctx.strokeStyle = "rgba(201, 163, 90, 0.35)";
+        ctx.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
+        ctx.font = "12px 'Segoe UI'";
+        ctx.fillStyle = "#c9a35a";
+        ctx.fillText("GALACTIC POWERS", x + 10, y + 17);
+        factions.forEach((f, i) => {
+            const ry = y + 26 + i * rowH;
+            ctx.fillStyle = f.color;
+            ctx.fillRect(x + 10, ry + 3, 10, 10);
+            ctx.fillStyle = "#ece4d4";
+            ctx.fillText(f.name, x + 28, ry + 12);
+            ctx.fillStyle = (f.at_war_with || []).length ? "#e07a66" : "#9fb2c6";
+            const tag = `${(f.at_war_with || []).length ? "⚔ " : ""}${f.systems}`;
+            ctx.fillText(tag, x + width - 10 - ctx.measureText(tag).width, ry + 12);
+        });
+        ctx.restore();
+    }
+
+    // Short map areas (720p, laptop): one row of swatch, first name word and system count.
+    drawPoliticsLegendRow(ctx, factions, r) {
+        ctx.save();
+        ctx.font = "12px 'Segoe UI'";
+        const items = factions.map(f => ({
+            f,
+            text: `${f.name.split(" ")[0]} ${(f.at_war_with || []).length ? "⚔" : ""}${f.systems}`,
+        }));
+        const width = items.reduce((sum, item) => sum + 18 + ctx.measureText(item.text).width + 12, 12);
+        const x = r.x + 10;
+        const y = r.y + r.h - 28;
+        ctx.fillStyle = "rgba(5, 11, 22, 0.82)";
+        ctx.fillRect(x, y, width, 22);
+        let cursor = x + 8;
+        items.forEach(({ f, text }) => {
+            ctx.fillStyle = f.color;
+            ctx.fillRect(cursor, y + 6, 10, 10);
+            ctx.fillStyle = (f.at_war_with || []).length ? "#e07a66" : "#ece4d4";
+            ctx.fillText(text, cursor + 14, y + 15);
+            cursor += 18 + ctx.measureText(text).width + 12;
+        });
+        ctx.restore();
     }
 
     handleCanvasMouseMove(e) {
         const point = this.pointerToCanvas(e);
         const mx = point.x;
         const my = point.y;
-        const cx = this.viewW / 2 + this.panX;
-        const cy = this.viewH / 2 + this.panY;
+        const { x: cx, y: cy } = this.mapCenter();
 
         let hit = null;
 
@@ -4123,7 +4599,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const bx = cx + Math.cos(angle) * orbitR;
                 const by = cy + Math.sin(angle) * orbitR;
                 const dist = Math.hypot(mx - bx, my - by);
-                if (dist < 18) {
+                if (dist < Math.max(18, this.bodyDisplayRadius(b) + 4)) {
                     hit = { item: b, type: "body" };
                     break;
                 }
@@ -4142,6 +4618,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         this.canvas.style.cursor = hit ? "pointer" : "crosshair";
+        this.hoveredItem = hit ? hit.item : null;
     }
 
     handleCanvasClick(e) {
@@ -4153,8 +4630,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const point = this.pointerToCanvas(e);
         const mx = point.x;
         const my = point.y;
-        const cx = this.viewW / 2 + this.panX;
-        const cy = this.viewH / 2 + this.panY;
+        const { x: cx, y: cy } = this.mapCenter();
         let hit = false;
 
         if (this.viewMode === "ORBITS" && this.state) {
@@ -4165,7 +4641,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const angle = b.current_angle || 0;
                 const bx = cx + Math.cos(angle) * orbitR;
                 const by = cy + Math.sin(angle) * orbitR;
-                if (Math.hypot(mx - bx, my - by) < 18) {
+                if (Math.hypot(mx - bx, my - by) < Math.max(18, this.bodyDisplayRadius(b) + 4)) {
                     this.selectedTarget = b;
                     this.selectedType = "body";
                     this.sound.playBeep(1000);
@@ -4198,8 +4674,87 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.updateTargetCard();
         }
     }
+    // Outposts the orbited world can host, each with its cost and yield.
+    renderOutpostBuild() {
+        const host = document.getElementById("outpostBuild");
+        if (!host) return;
+        const body = this.state.orbiting_body;
+        if (!body) {
+            host.innerHTML = `<p class="panel-intro-text">Orbit a world to survey outpost sites.</p>`;
+            return;
+        }
+        if (this.state.outpost_body_occupied) {
+            host.innerHTML = `<p class="panel-intro-text">${this.escapeHtml(body.name)} already hosts an outpost. Upgrade it from the list above.</p>`;
+            return;
+        }
+        const allowed = new Set(this.state.outpost_options || []);
+        const options = (this.state.outpost_catalog || []).filter(t => allowed.has(t.id));
+        if (!options.length) {
+            host.innerHTML = `<p class="panel-intro-text">${this.escapeHtml(body.name)} cannot host an outpost.</p>`;
+            return;
+        }
+        const credits = this.state.ship.credits;
+        host.innerHTML = `<h4 class="commission-title">FOUND AN OUTPOST AT ${this.escapeHtml(body.name.toUpperCase())}</h4>` + options.map(t => {
+            const yields = Object.entries(t.production || {}).map(([k, v]) => `+${v} ${k}`).join(" · ");
+            return `
+                <button class="btn-hud fleet-procurement-row" data-outpost-build="${this.escapeHtml(t.id)}" ${credits < t.cost ? "disabled" : ""}
+                    title="${this.escapeHtml(t.description)}">
+                    <span class="procurement-info"><strong>${this.escapeHtml(t.name)}</strong><small>${this.escapeHtml(yields)} per tick</small></span>
+                    <span class="procurement-value">${t.cost} CR</span>
+                    <span class="procurement-action">BUILD</span>
+                </button>`;
+        }).join("");
+        host.querySelectorAll("[data-outpost-build]").forEach(btn => btn.addEventListener("click", () =>
+            this.postAction("/api/outpost/build", { body_id: body.id, outpost_type: btn.getAttribute("data-outpost-build") }, "empire")
+        ));
+    }
+
+    // Active wars as tug-of-war bars: attacker on the left, defender on the right.
+    renderWars() {
+        const host = document.getElementById("warsList");
+        if (!host) return;
+        const wars = (this.state.galactic_politics || {}).wars || [];
+        if (!wars.length) {
+            host.innerHTML = `<p class="panel-intro-text">The galaxy is at peace. For now.</p>`;
+            return;
+        }
+        const colors = {};
+        ((this.state.galactic_politics || {}).factions || []).forEach(f => { colors[f.id] = this.safeColor(f.color); });
+        const affordable = this.state.ship.credits >= 500;
+        host.innerHTML = wars.map(w => {
+            const lead = Math.max(-1, Math.min(1, w.war_score / 24));
+            const attackerShare = Math.round(50 + lead * 50);
+            const captured = (w.captured_systems || []).length;
+            const pledge = id => (w.support || {})[id] || 0;
+            return `
+                <div class="war-card">
+                    <div class="war-sides">
+                        <strong style="color:${colors[w.attacker_id] || "#ece4d4"}">${this.escapeHtml(w.attacker)}</strong>
+                        <span class="war-vs">VS</span>
+                        <strong style="color:${colors[w.defender_id] || "#ece4d4"}">${this.escapeHtml(w.defender)}</strong>
+                    </div>
+                    <div class="war-bar" title="War score ${w.war_score.toFixed(1)}: a side captures a front system at 12">
+                        <span style="width:${attackerShare}%;background:${colors[w.attacker_id] || "#c9a35a"}"></span>
+                        <span style="width:${100 - attackerShare}%;background:${colors[w.defender_id] || "#7fb7c9"}"></span>
+                    </div>
+                    <div class="war-meta">${(w.fronts || []).length} front lane(s) · ${captured} system(s) taken · since tick ${w.started_tick}</div>
+                    <div class="war-actions">
+                        <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.attacker_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.attacker.split(" ")[0].toUpperCase())} Â· 500</button>
+                        <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.defender_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.defender.split(" ")[0].toUpperCase())} Â· 500</button>
+                    </div>
+                    ${pledge(w.attacker_id) || pledge(w.defender_id) ? `<div class="war-meta">Your pledges: ${pledge(w.attacker_id)} / ${pledge(w.defender_id)} cr</div>` : ""}
+                </div>`;
+        }).join("");
+        host.querySelectorAll("[data-war]").forEach(btn => btn.addEventListener("click", () =>
+            this.postAction("/api/war/support", {
+                war_id: btn.getAttribute("data-war"), faction_id: btn.getAttribute("data-side"), credits: 500,
+            }, "factions")
+        ));
+    }
+
     renderFactions() {
         if (!this.state) return;
+        this.renderWars();
         if (!this.state.factions || !this.factionsGrid) return;
 
         this.factionsGrid.innerHTML = "";
@@ -4259,44 +4814,56 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     loadSettings() {
+        let saved = {};
         try {
-            const saved = JSON.parse(localStorage.getItem("voidfarer_settings") || "{}");
-            this.radarGrid = saved.radarGrid !== false;
-            this.radarLabels = saved.radarLabels !== false;
-            this.travelAnimationEnabled = saved.travelAnimation !== false;
-            this.starDensity = Number(saved.starDensity || 220);
-            this.uiDensity = saved.uiDensity || "auto";
-            this.uiScale = Number(saved.uiScale || 1);
-            if (saved.sound === false) {
-                this.sound.enabled = false;
-                const audioIcon = document.getElementById("audioIcon");
-                if (audioIcon) audioIcon.textContent = "MUTED";
-            }
-        } catch (e) {
-            this.radarGrid = true;
-            this.radarLabels = true;
-            this.travelAnimationEnabled = true;
-            this.starDensity = 220;
-            this.uiDensity = "auto";
-            this.uiScale = 1;
+            saved = JSON.parse(localStorage.getItem("voidfarer_settings") || "{}") || {};
+        } catch (e) {}
+        this.applySettingsProfile({ ...SETTINGS_DEFAULTS, ...saved });
+        if (!this.sound.enabled) {
+            const audioIcon = document.getElementById("audioIcon");
+            if (audioIcon) audioIcon.textContent = "MUTED";
         }
+    }
+
+    applySettingsProfile(profile) {
+        const volume = Number(profile.volume);
+        this.sound.enabled = profile.sound !== false;
+        this.sound.setVolume(Number.isFinite(volume) ? volume : SETTINGS_DEFAULTS.volume);
+        this.radarGrid = profile.radarGrid !== false;
+        this.radarLabels = profile.radarLabels !== false;
+        this.travelAnimationEnabled = profile.travelAnimation !== false;
+        this.starDensity = Number(profile.starDensity) || SETTINGS_DEFAULTS.starDensity;
+        this.uiDensity = profile.uiDensity || SETTINGS_DEFAULTS.uiDensity;
+        this.uiScale = Number(profile.uiScale) || SETTINGS_DEFAULTS.uiScale;
+        this.rememberTerminalTab = profile.rememberTab !== false;
+        this.lastTerminalTab = TERMINAL_TABS.includes(profile.lastTab) ? profile.lastTab : "player";
+        this.tradeLot = TRADE_LOTS.includes(String(profile.tradeLot)) ? String(profile.tradeLot) : "1";
+        this.autoPauseOnAlert = profile.autoPause !== false;
+        this.autoClaimContracts = profile.autoClaim === true;
     }
 
     saveSettings() {
         const payload = {
             sound: this.sound.enabled,
+            volume: this.sound.volume,
             radarGrid: this.radarGrid,
             radarLabels: this.radarLabels,
             travelAnimation: this.travelAnimationEnabled,
             starDensity: this.starDensity,
             uiDensity: this.uiDensity,
             uiScale: this.uiScale,
+            rememberTab: this.rememberTerminalTab,
+            lastTab: this.lastTerminalTab,
+            tradeLot: this.tradeLot,
+            autoPause: this.autoPauseOnAlert,
+            autoClaim: this.autoClaimContracts,
         };
         try { localStorage.setItem("voidfarer_settings", JSON.stringify(payload)); } catch (e) {}
     }
 
     applySettingsFromUI() {
         this.sound.enabled = document.getElementById("settingSound")?.checked !== false;
+        this.sound.setVolume(Number(document.getElementById("settingVolume")?.value ?? 80) / 100);
         this.radarGrid = document.getElementById("settingGrid")?.checked !== false;
         this.radarLabels = document.getElementById("settingLabels")?.checked !== false;
         this.syncRadarControlState();
@@ -4305,27 +4872,58 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.starDensity = Number(document.getElementById("settingStarDensity")?.value || 220);
         this.uiDensity = document.getElementById("settingDensity")?.value || "auto";
         this.uiScale = Number(document.getElementById("settingUiScale")?.value || 100) / 100;
+        this.rememberTerminalTab = document.getElementById("settingRememberTab")?.checked !== false;
+        this.autoPauseOnAlert = document.getElementById("settingAutoPause")?.checked !== false;
+        this.autoClaimContracts = document.getElementById("settingAutoClaim")?.checked === true;
+        const lot = document.getElementById("settingTradeLot")?.value;
+        this.tradeLot = TRADE_LOTS.includes(lot) ? lot : "1";
+        const volumeValue = document.getElementById("settingVolumeValue");
+        if (volumeValue) volumeValue.textContent = `${Math.round(this.sound.volume * 100)}%`;
         const audioIcon = document.getElementById("audioIcon");
         if (audioIcon) audioIcon.textContent = this.sound.enabled ? "SFX" : "MUTED";
         this.applyViewportProfile();
+        this.renderMarketTable();
         this.saveSettings();
     }
 
+    resetSettings() {
+        this.applySettingsProfile({ ...SETTINGS_DEFAULTS });
+        this.populateSettingsForm();
+        this.applySettingsFromUI();
+        this.appendLog("[SYS] Settings restored to defaults.", "system");
+    }
+
+    populateSettingsForm() {
+        const toggles = {
+            settingSound: this.sound.enabled,
+            settingGrid: this.radarGrid,
+            settingLabels: this.radarLabels,
+            settingAnimation: this.travelAnimationEnabled,
+            settingRememberTab: this.rememberTerminalTab,
+            settingAutoPause: this.autoPauseOnAlert,
+            settingAutoClaim: this.autoClaimContracts,
+        };
+        Object.entries(toggles).forEach(([id, checked]) => {
+            const input = document.getElementById(id);
+            if (input) input.checked = checked;
+        });
+        const fields = {
+            settingVolume: Math.round(this.sound.volume * 100),
+            settingStarDensity: this.starDensity,
+            settingDensity: this.uiDensity,
+            settingUiScale: Math.round((this.uiScale || 1) * 100),
+            settingTradeLot: this.tradeLot,
+        };
+        Object.entries(fields).forEach(([id, value]) => {
+            const input = document.getElementById(id);
+            if (input) input.value = value;
+        });
+        const volumeValue = document.getElementById("settingVolumeValue");
+        if (volumeValue) volumeValue.textContent = `${fields.settingVolume}%`;
+    }
+
     openSettings() {
-        const sound = document.getElementById("settingSound");
-        const grid = document.getElementById("settingGrid");
-        const labels = document.getElementById("settingLabels");
-        const animation = document.getElementById("settingAnimation");
-        const density = document.getElementById("settingStarDensity");
-        const uiDensity = document.getElementById("settingDensity");
-        const uiScale = document.getElementById("settingUiScale");
-        if (sound) sound.checked = this.sound.enabled;
-        if (grid) grid.checked = this.radarGrid;
-        if (labels) labels.checked = this.radarLabels;
-        if (animation) animation.checked = this.travelAnimationEnabled;
-        if (density) density.value = this.starDensity;
-        if (uiDensity) uiDensity.value = this.uiDensity;
-        if (uiScale) uiScale.value = Math.round((this.uiScale || 1) * 100);
+        this.populateSettingsForm();
         this.applyViewportProfile();
         const overlay = document.getElementById("settingsOverlay");
         if (overlay) overlay.style.display = "flex";
@@ -4446,7 +5044,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     async fetchSaves() {
         try {
-            const res = await fetch("/api/saves");
+            const res = await apiFetch("/api/saves");
             const json = await res.json();
             if (json.ok && Array.isArray(json.saves)) {
                 this.savesList = json.saves;
@@ -4504,7 +5102,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const slot = slotOverride || this.getSelectedSaveSlot();
         if (status) status.textContent = "TRANSMITTING...";
         try {
-            const res = await fetch(endpoint, {
+            const res = await apiFetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ slot }),
@@ -4536,7 +5134,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     async handleUnlockPerk(talentId) {
         try {
-            const res = await fetch("/api/mastery/unlock", {
+            const res = await apiFetch("/api/mastery/unlock", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ talent_id: talentId }),
             });
@@ -4877,14 +5475,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         ctx.stroke();
         ctx.setLineDash([]);
 
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "#7fb7c9";
-        ctx.shadowColor = "#7fb7c9";
-        ctx.shadowBlur = 18;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.font = "9px 'Share Tech Mono'";
+        if (this.celestial) {
+            this.celestial.drawShip(ctx, x, y, Math.atan2(ty - oy, tx - ox), 9 * Math.max(1, this.zoom), "#7fb7c9");
+        } else {
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = "#7fb7c9";
+            ctx.fill();
+        }
+        ctx.font = "12px 'Share Tech Mono'";
         ctx.fillStyle = "#7fb7c9";
         if (activeTravel) {
             const remTicks = Math.max(1, (activeTravel.arrival_tick || anim.arrivalTick) - (this.state?.time?.tick || 0));
@@ -4902,7 +5501,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     async postAction(endpoint, payload, refreshTab = null) {
         try {
-            const res = await fetch(endpoint, {
+            const res = await apiFetch(endpoint, {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });

@@ -166,9 +166,9 @@ def cmd_status(engine: SimulationEngine) -> int:
 
     # Cash flow telemetry
     flow = engine.cash_flow()
-    net = flow["net_per_tick"]
+    net = flow["net_per_month"]
     flow_color = GREEN if net >= 0 else RED
-    flow_summary = f"Upkeep -{flow['upkeep_per_tick']} | Passive +{flow['passive_per_tick']} | Net {net:+.1f} cr/tick"
+    flow_summary = f"Payroll -{flow['upkeep_per_month']} | Passive +{flow['passive_per_month']} | Net {net:+.1f} cr/month"
     print(f"╠════ CASH FLOW TELEMETRY ════════════════════════════════════════════╣{RESET}")
     print(f"║ {flow_color}{flow_summary[:67]:<67}{RESET} ║")
 
@@ -912,6 +912,38 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
     print((GREEN if ok else RED) + msg + RESET)
     storage.save(engine.state)
     return 0 if ok else 1
+
+
+def cmd_war(engine: SimulationEngine, storage: StorageManager, action: str, args: list[str]) -> int:
+    """List active wars and their fronts, or pledge credits to one side."""
+    if action == "support":
+        if len(args) != 3:
+            print(f"{RED}Usage:{RESET} war support <war_id> <faction_id> <credits>")
+            return 2
+        try:
+            credits = int(args[2])
+        except ValueError:
+            print(f"{RED}Error:{RESET} Credits must be an integer.")
+            return 2
+        ok, msg = engine.support_war(args[0], args[1], credits)
+        print((GREEN if ok else RED) + msg + RESET)
+        storage.save(engine.state)
+        return 0 if ok else 1
+    politics = engine.galactic_politics()
+    print(f"\n{BOLD}{CYAN}GALACTIC POWERS{RESET}")
+    for f in politics["factions"]:
+        foes = ", ".join(f["at_war_with"]) or "at peace"
+        print(f"  {f['name']:<26} {f['systems']:>2} systems  strength {f['strength']:>7.1f}  {DIM}{foes}{RESET}")
+    if not politics["wars"]:
+        print(f"\n  {DIM}No active wars.{RESET}")
+        return 0
+    print(f"\n{BOLD}{RED}ACTIVE WARS{RESET}")
+    for w in politics["wars"]:
+        lead = w["attacker"] if w["war_score"] >= 0 else w["defender"]
+        print(f"  {w['id']}: {w['attacker']} vs {w['defender']}  score {w['war_score']:+.1f} ({lead} advancing)")
+        print(f"    fronts: {len(w['fronts'])} lanes  captured: {', '.join(w['captured_systems']) or 'none'}")
+    print(f"\n{DIM}Pledge credits: war support <war_id> <faction_id> <credits>{RESET}")
+    return 0
 
 
 def cmd_factions(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -1697,7 +1729,7 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
     report = engine.get_crew_report()
     if sub in ("list", "status", "roster"):
         print(f"\n{BOLD}{CYAN}=== CREW ROSTER ==={RESET}")
-        print(f"Active {report['active']}/{report['capacity']} | Upkeep {report['upkeep']} cr/tick")
+        print(f"Active {report['active']}/{report['capacity']} | Upkeep {report['upkeep']} cr/month")
         for member in report["crew"]:
             morale_note = f"{RED}⚠ NEAR DESERTION{RESET}" if member["morale"] < 20 else (f"{YELLOW}LOW{RESET}" if member["morale"] < 35 else f"{GREEN}OK{RESET}")
             print(
@@ -1958,20 +1990,26 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
                     print(f"{RED}Error:{RESET} Power values must be integers summing to 100.")
         elif cmd == "buy":
             if len(parts) < 3:
-                print(f"{RED}Usage:{RESET} buy <commodity_id> <quantity>")
+                print(f"{RED}Usage:{RESET} buy <commodity_id> <quantity|max|all>")
             else:
                 try:
-                    ok, msg = engine.trade(parts[1], int(parts[2]), is_buy=True)
+                    if parts[2].lower() in ("max", "all"):
+                        ok, msg = engine.trade_max(parts[1], is_buy=True)
+                    else:
+                        ok, msg = engine.trade(parts[1], int(parts[2]), is_buy=True)
                     print((GREEN if ok else RED) + msg + RESET)
                     storage.save(engine.state)
                 except ValueError:
                     print(f"{RED}Error:{RESET} Quantity must be an integer.")
         elif cmd == "sell":
             if len(parts) < 3:
-                print(f"{RED}Usage:{RESET} sell <commodity_id> <quantity>")
+                print(f"{RED}Usage:{RESET} sell <commodity_id> <quantity|max|all>")
             else:
                 try:
-                    ok, msg = engine.trade(parts[1], int(parts[2]), is_buy=False)
+                    if parts[2].lower() in ("max", "all"):
+                        ok, msg = engine.trade_max(parts[1], is_buy=False)
+                    else:
+                        ok, msg = engine.trade(parts[1], int(parts[2]), is_buy=False)
                     print((GREEN if ok else RED) + msg + RESET)
                     storage.save(engine.state)
                 except ValueError:
@@ -2003,6 +2041,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             storage.save(engine.state)
         elif cmd in ("factions", "faction"):
             cmd_factions(engine, storage, parts)
+        elif cmd in ("war", "wars"):
+            cmd_war(engine, storage, parts[1].lower() if len(parts) > 1 else "list", parts[2:])
         elif cmd in ("corps", "corporations", "corp"):
             cmd_corporations(engine, storage, parts)
         elif cmd in ("time", "chrono", "tick", "wait"):
@@ -2033,6 +2073,7 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             print("  shipyard [chassis|sell]        - Orbital shipyard, chassis showroom, and drydocks")
             print("  chart / map                    - Hyperlane network & orbital bodies")
             print("  factions                       - Galactic factions, sovereign standings & perks")
+            print("  war [list|support]             - Active wars, territory fronts & credit pledges")
             print("  corps / corporations           - Megacorporations, specialties & trade bonuses")
             print("  jump <system_id>               - Hyperspace jump to adjacent star")
             print("  orbit <body_id>                - Enter orbit around planet or station")
@@ -2045,8 +2086,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             print("  relics                         - Ancient Precursor Relic vault & passive fleet buffs")
             print("  streak                         - Expedition jump streak & multiplier status")
             print("  market                         - Check commodity trade prices")
-            print("  buy <comm> <qty>               - Buy commodities from local exchange")
-            print("  sell <comm> <qty>              - Sell commodities to local exchange")
+            print("  buy <comm> <qty|max>           - Buy commodities (max: all you can afford and hold)")
+            print("  sell <comm> <qty|all>          - Sell commodities (all: the whole hold of it)")
             print("  fleet [harvest|buy|deploy]     - Autonomous fleet assets and drone yields")
             print("  upgrades [buy <id>]            - Station hardware upgrades and module shop")
             print("  combat <fire|drone|target|flee>- Tactical maneuvers during hostile intercepts")
@@ -2093,6 +2134,22 @@ def cmd_events(engine: SimulationEngine, storage: StorageManager, parts: Sequenc
     for evt in undismissed:
         print(f"  [{evt.id}] ({evt.kind.upper()} @ Tick #{evt.tick}) {BOLD}{evt.title}{RESET}: {evt.message}")
     return 0
+
+
+def _trade_quantity(value: str) -> int | str:
+    """argparse type for trade orders: a positive count, or `max`/`all` for the largest possible order."""
+    if value.lower() in ("max", "all"):
+        return "max"
+    try:
+        return int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"expected a whole number, 'max' or 'all', got '{value}'") from None
+
+
+def _run_trade(engine: SimulationEngine, commodity_id: str, quantity: int | str, is_buy: bool) -> tuple[bool, str]:
+    if quantity == "max":
+        return engine.trade_max(commodity_id, is_buy=is_buy)
+    return engine.trade(commodity_id, int(quantity), is_buy=is_buy)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -2214,11 +2271,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     buy_p = subparsers.add_parser("buy", help="Buy commodities")
     buy_p.add_argument("commodity_id", help="Commodity identifier")
-    buy_p.add_argument("quantity", type=int, help="Quantity to purchase")
+    buy_p.add_argument("quantity", type=_trade_quantity, help="Quantity to purchase, or max")
 
     sell_p = subparsers.add_parser("sell", help="Sell commodities")
     sell_p.add_argument("commodity_id", help="Commodity identifier")
-    sell_p.add_argument("quantity", type=int, help="Quantity to sell")
+    sell_p.add_argument("quantity", type=_trade_quantity, help="Quantity to sell, or all")
 
     anom_p = subparsers.add_parser("anomaly", help="Resolve active anomaly encounter")
     anom_p.add_argument("choice_id", help="Selected choice ID")
@@ -2237,6 +2294,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     serve_p.add_argument("--open", action="store_true", help="Automatically launch web browser")
 
     subparsers.add_parser("factions", help="Inspect galactic sovereign factions and reputation")
+    war_p = subparsers.add_parser("war", help="Galactic wars, fronts and war pledges")
+    war_p.add_argument("action", nargs="?", default="list", choices=["list", "support"])
+    war_p.add_argument("args", nargs="*", help="support: <war_id> <faction_id> <credits>")
     subparsers.add_parser("corps", help="Inspect interstellar megacorporations and trade perks")
     subparsers.add_parser("corporations", help="Alias for 'corps'")
 
@@ -2384,6 +2444,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_time(engine, storage, parts)
     elif args.command == "factions":
         return cmd_factions(engine, storage, ["factions"])
+    elif args.command == "war":
+        return cmd_war(engine, storage, args.action, args.args)
     elif args.command == "corps":
         return cmd_corporations(engine, storage, ["corps"])
     elif args.command == "corporations":
@@ -2546,12 +2608,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         storage.save(engine.state)
         return 0 if ok else 1
     elif args.command == "buy":
-        ok, msg = engine.trade(args.commodity_id, args.quantity, is_buy=True)
+        ok, msg = _run_trade(engine, args.commodity_id, args.quantity, is_buy=True)
         print((GREEN if ok else RED) + msg + RESET)
         storage.save(engine.state)
         return 0 if ok else 1
     elif args.command == "sell":
-        ok, msg = engine.trade(args.commodity_id, args.quantity, is_buy=False)
+        ok, msg = _run_trade(engine, args.commodity_id, args.quantity, is_buy=False)
         print((GREEN if ok else RED) + msg + RESET)
         storage.save(engine.state)
         return 0 if ok else 1

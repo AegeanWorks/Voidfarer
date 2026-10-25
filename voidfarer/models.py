@@ -1316,12 +1316,17 @@ class WarState:
     started_tick: int
     war_score: float = 0.0
     active: bool = True
+    captured_systems: tuple[str, ...] = ()
+    ended_tick: int | None = None
+    # Credits the player pledged to each side, by faction id.
+    support: dict[str, int] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        return {**asdict(self), "captured_systems": list(self.captured_systems)}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> WarState:
+        ended = data.get("ended_tick")
         return cls(
             id=str(data["id"]),
             attacker_id=str(data["attacker_id"]),
@@ -1329,6 +1334,9 @@ class WarState:
             started_tick=int(data.get("started_tick", 0)),
             war_score=float(data.get("war_score", 0.0)),
             active=bool(data.get("active", True)),
+            captured_systems=tuple(str(sid) for sid in data.get("captured_systems", ())),
+            ended_tick=int(ended) if ended is not None else None,
+            support={str(k): int(v) for k, v in data.get("support", {}).items()},
         )
 
 
@@ -1409,6 +1417,8 @@ class ShipState:
     landed_body_id: str | None = None
     travel: TravelState | None = None
     void_traversal: VoidTraversalState | None = None
+    # Credits paid for the units still in the hold, per commodity (trade P/L basis).
+    cargo_cost: dict[str, int] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1423,6 +1433,7 @@ class ShipState:
             "max_fuel": self.max_fuel,
             "credits": self.credits,
             "cargo": dict(self.cargo),
+            "cargo_cost": dict(self.cargo_cost),
             "cargo_capacity": self.cargo_capacity,
             "current_system_id": self.current_system_id,
             "orbiting_body_id": self.orbiting_body_id,
@@ -1490,6 +1501,7 @@ class ShipState:
             credits=int(data.get("credits", 1500)),
             cargo=dict(data.get("cargo", {})),
             cargo_capacity=int(data.get("cargo_capacity", 30)),
+            cargo_cost={str(k): int(v) for k, v in data.get("cargo_cost", {}).items()},
             current_system_id=str(data.get("current_system_id", "sol")),
             orbiting_body_id=data.get("orbiting_body_id"),
             power=ShipPower.from_dict(data.get("power", {})),

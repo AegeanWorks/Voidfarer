@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, replace
+from functools import lru_cache
 import math
 import random
 import threading
@@ -24,6 +25,7 @@ from voidfarer.factions import (
 )
 from voidfarer.crew import (
     CREW_ROLES,
+    DAYS_PER_MONTH,
     apply_morale_event,
     calculate_crew_bonuses,
     crew_catalog,
@@ -32,6 +34,7 @@ from voidfarer.crew import (
     recruit_crew_member,
     shore_leave_restore,
     tick_crew,
+    wages_due,
 )
 from voidfarer.character import (
     ABILITY_CATALOG,
@@ -67,6 +70,7 @@ from voidfarer.economy import (
     tick_global_economy,
 )
 from voidfarer.faction_state import (
+    faction_strength,
     generate_faction_leaders,
     leader_for,
     simulate_faction_behaviors,
@@ -152,6 +156,7 @@ from voidfarer.models import (
     CelestialBody,
     CodexState,
     CombatEncounter,
+    Commodity,
     Depot,
     EconomicEvent,
     FactionLeader,
@@ -227,6 +232,59 @@ from voidfarer.upgrades import (
     get_sell_value,
     get_upgrade,
 )
+
+
+# Snapshot keys whose values are code constants: identical for every save, tick and seed.
+STATIC_SNAPSHOT_KEYS = (
+    "catalog_chassis",
+    "catalog_drones",
+    "catalog_relics",
+    "catalog_talents",
+    "catalog_upgrades",
+    "catalog_weapons",
+    "character_skill_catalog",
+    "crew_roles",
+    "enemy_archetypes",
+    "mercenary_catalog",
+    "outpost_catalog",
+    "story_chapters",
+    "story_chapters_map",
+    "weapons",
+)
+
+
+@lru_cache(maxsize=1)
+def static_catalogs() -> dict[str, Any]:
+    """Build the code-constant catalogs once per process; callers must treat them as read-only."""
+    return {
+        "catalog_chassis": [c.to_dict() for c in CATALOG_CHASSIS],
+        "catalog_drones": CATALOG_DRONE_TEMPLATES,
+        "catalog_relics": [r.to_dict() for r in CATALOG_RELICS],
+        "catalog_talents": PILOT_TALENTS,
+        "catalog_upgrades": [u.to_dict() for u in CATALOG_UPGRADES],
+        "catalog_weapons": weapon_catalog(),
+        "character_skill_catalog": {sid: dict(info) for sid, info in SKILL_CATALOG.items()},
+        "crew_roles": crew_catalog(),
+        "enemy_archetypes": {aid: asdict(a) for aid, a in ENEMY_ARCHETYPES.items()},
+        "mercenary_catalog": MERCENARY_CATALOG,
+        "outpost_catalog": [t.to_dict() for t in OUTPOST_TYPES],
+        "story_chapters": [c.to_dict() for c in CAMPAIGN_CHAPTERS],
+        "story_chapters_map": {c.id: c.to_dict() for c in CAMPAIGN_CHAPTERS},
+        "weapons": weapon_catalog(),
+    }
+
+
+def _cargo_cost_after(previous_cargo: dict[str, int], previous_cost: dict[str, int],
+                      cargo: dict[str, int]) -> dict[str, int]:
+    """Carry the paid basis of held cargo through any mutation outside a market trade."""
+    costs: dict[str, int] = {}
+    for item_id, quantity in cargo.items():
+        held = max(0, int(previous_cargo.get(item_id, 0)))
+        paid = max(0, int(previous_cost.get(item_id, 0)))
+        if quantity <= 0 or held <= 0 or paid <= 0:
+            continue
+        costs[item_id] = paid * int(quantity) // held if quantity <= held else paid
+    return {item_id: cost for item_id, cost in costs.items() if cost > 0}
 
 
 class SimulationEngine:
@@ -356,6 +414,10 @@ class SimulationEngine:
     def _clone_ship(self, **kwargs: Any) -> ShipState:
         """Create a new ShipState preserving all unspecified telemetry and inventory attributes."""
         cur = self.state.ship
+        cargo = kwargs.get("cargo", cur.cargo)
+        cargo_cost = kwargs.get("cargo_cost")
+        if cargo_cost is None:
+            cargo_cost = _cargo_cost_after(cur.cargo, cur.cargo_cost, cargo)
         return ShipState(
             commander_name=kwargs.get("commander_name", cur.commander_name),
             callsign=kwargs.get("callsign", cur.callsign),
@@ -367,7 +429,7 @@ class SimulationEngine:
             fuel=kwargs.get("fuel", cur.fuel),
             max_fuel=kwargs.get("max_fuel", cur.max_fuel),
             credits=kwargs.get("credits", cur.credits),
-            cargo=kwargs.get("cargo", cur.cargo),
+            cargo=cargo,
             cargo_capacity=kwargs.get("cargo_capacity", cur.cargo_capacity),
             current_system_id=kwargs.get("current_system_id", cur.current_system_id),
             orbiting_body_id=kwargs.get("orbiting_body_id", cur.orbiting_body_id),
@@ -398,6 +460,7 @@ class SimulationEngine:
             landed_body_id=kwargs["landed_body_id"] if "landed_body_id" in kwargs else cur.landed_body_id,
             travel=kwargs["travel"] if "travel" in kwargs else cur.travel,
             void_traversal=kwargs["void_traversal"] if "void_traversal" in kwargs else cur.void_traversal,
+            cargo_cost=cargo_cost,
         )
 
     def _clone_state(self, **kwargs: Any) -> GameState:
@@ -1446,7 +1509,7 @@ class SimulationEngine:
         risk *= max(0.25, 1.0 - evasion)
         if mode == "quantum":
             risk *= 0.35
-        risk = max(0.01, min(0.45, risk))
+        risk = max(0.03, min(0.45, risk))
         hazards = sorted({
             modifier.name for modifier in (system.modifiers if system else ())
             if modifier.category == "hazard"
@@ -2425,7 +2488,7 @@ class SimulationEngine:
             }
 
     def cash_flow(self) -> dict[str, Any]:
-        """Per-tick credit flow telemetry: crew upkeep against passive income estimates."""
+        """Monthly credit flow: crew payroll against passive income (drones, outposts)."""
         with self.lock:
             upkeep = crew_upkeep(self.state.ship.crew)
             passive = 0.0
@@ -2444,10 +2507,12 @@ class SimulationEngine:
             for outpost in self.state.outposts:
                 production = outpost_tick_production(outpost, research_yield_mult)
                 passive += float(production.get("credits", 0.0))
+            # Passive sources pay per tick; a month is DAYS_PER_MONTH days of 0.25-day ticks.
+            passive_month = passive * DAYS_PER_MONTH / 0.25
             return {
-                "upkeep_per_tick": upkeep,
-                "passive_per_tick": round(passive, 1),
-                "net_per_tick": round(passive - upkeep, 1),
+                "upkeep_per_month": upkeep,
+                "passive_per_month": round(passive_month, 1),
+                "net_per_month": round(passive_month - upkeep, 1),
             }
 
     def install_weapon(self, weapon_id: str) -> tuple[bool, str]:
@@ -2599,6 +2664,82 @@ class SimulationEngine:
                 "messages": [m.to_dict() for m in self.state.messages],
             }
 
+    def _bulk_buy_cost(
+        self, body: CelestialBody, comm: Commodity, quantity: int, standing: int, unit_price: int
+    ) -> tuple[int, dict[str, int] | None]:
+        """Price a buy order by walking the local stockpile, so bulk orders move the price they pay."""
+        market = self.state.economy.markets.get(self.current_system.id)
+        if market is None:
+            return unit_price * quantity, None
+        commodity_id = comm.id
+        stocks = dict(market.stockpiles)
+        remaining = quantity
+        total_cost = 0
+        while remaining > 0:
+            slice_qty = min(remaining, max(1, stocks.get(commodity_id, 50) // 8))
+            slice_quote = calculate_dynamic_market_quote(
+                self.current_system, body, comm,
+                GlobalEconomyState(
+                    markets={self.current_system.id: SystemMarketState(
+                        system_id=self.current_system.id,
+                        stockpiles=stocks,
+                        production_rates=market.production_rates,
+                        consumption_rates=market.consumption_rates,
+                    )},
+                    active_events=self.state.economy.active_events,
+                    last_updated_tick=self.state.economy.last_updated_tick,
+                ),
+                faction_standing=standing,
+            )
+            total_cost += slice_quote.buy_price * slice_qty
+            stocks[commodity_id] = max(MIN_STOCK, stocks.get(commodity_id, 50) - slice_qty)
+            remaining -= slice_qty
+        return total_cost, stocks
+
+    def max_trade_quantity(self, commodity_id: str, is_buy: bool) -> int:
+        """Largest order that would succeed now: affordable and in-hold for buys, all held units for sells."""
+        with self.lock:
+            if not is_buy:
+                return int(self.state.ship.cargo.get(commodity_id, 0))
+            body = self.orbiting_body
+            comm = COMMODITY_MAP.get(commodity_id)
+            if not body or not body.station_dockable or not comm:
+                return 0
+            ship = self.state.ship
+            free_volume = ship.cargo_capacity - calculate_cargo_volume(ship.cargo)
+            standing = ship.faction_standings.get(get_faction_id_from_name(self.current_system.faction), 0)
+            unit_price = calculate_dynamic_market_quote(
+                self.current_system, body, comm, self.state.economy, faction_standing=standing
+            ).buy_price
+            high = min(free_volume // max(1, comm.volume), ship.credits // max(1, unit_price))
+            low = 0
+            # Slice pricing only rises with quantity, so the affordable set is a prefix.
+            while low < high:
+                mid = (low + high + 1) // 2
+                if self._bulk_buy_cost(body, comm, mid, standing, unit_price)[0] <= ship.credits:
+                    low = mid
+                else:
+                    high = mid - 1
+            return max(0, low)
+
+    def trade_max(self, commodity_id: str, is_buy: bool) -> tuple[bool, str]:
+        """Buy as many units as credits and hold allow, or sell every unit held."""
+        with self.lock:
+            quantity = self.max_trade_quantity(commodity_id, is_buy)
+            if quantity <= 0:
+                if not is_buy:
+                    return False, f"No {commodity_id} in the hold to sell."
+                body = self.orbiting_body
+                if not body or not body.station_dockable or commodity_id not in COMMODITY_MAP:
+                    # Let the regular order explain the docking or catalogue refusal.
+                    return self.trade(commodity_id, 1, is_buy)
+                ship = self.state.ship
+                comm = COMMODITY_MAP[commodity_id]
+                if ship.cargo_capacity - calculate_cargo_volume(ship.cargo) < comm.volume:
+                    return False, "Cargo hold capacity exceeded: no free volume for another unit."
+                return False, f"Insufficient credits: {ship.credits} cr available is below one unit's price."
+            return self.trade(commodity_id, quantity, is_buy)
+
     def trade(self, commodity_id: str, quantity: int, is_buy: bool) -> tuple[bool, str]:
         """Execute buy or sell commodity order at orbiting market."""
         with self.lock:
@@ -2622,6 +2763,7 @@ class SimulationEngine:
             vol_per_unit = comm.volume
 
             cargo = dict(self.state.ship.cargo)
+            cargo_cost = dict(self.state.ship.cargo_cost)
             stats = dict(self.state.stats)
 
             passives = calculate_passive_multipliers(self.state.ship)
@@ -2634,36 +2776,7 @@ class SimulationEngine:
 
             if is_buy:
                 unit_price = quote.buy_price
-                simulated_stocks = None
-                market = self.state.economy.markets.get(self.current_system.id)
-                if market is not None:
-                    # Volume-aware execution: walk the local stockpile in slices so
-                    # bulk orders move the price they pay (simulation, not a flat quote).
-                    stocks = dict(market.stockpiles)
-                    remaining = quantity
-                    total_cost = 0
-                    while remaining > 0:
-                        slice_qty = min(remaining, max(1, stocks.get(commodity_id, 50) // 8))
-                        slice_quote = calculate_dynamic_market_quote(
-                            self.current_system, body, comm,
-                            GlobalEconomyState(
-                                markets={self.current_system.id: SystemMarketState(
-                                    system_id=self.current_system.id,
-                                    stockpiles=stocks,
-                                    production_rates=market.production_rates,
-                                    consumption_rates=market.consumption_rates,
-                                )},
-                                active_events=self.state.economy.active_events,
-                                last_updated_tick=self.state.economy.last_updated_tick,
-                            ),
-                            faction_standing=standing,
-                        )
-                        total_cost += slice_quote.buy_price * slice_qty
-                        stocks[commodity_id] = max(MIN_STOCK, stocks.get(commodity_id, 50) - slice_qty)
-                        remaining -= slice_qty
-                    simulated_stocks = stocks
-                else:
-                    total_cost = unit_price * quantity
+                total_cost, simulated_stocks = self._bulk_buy_cost(body, comm, quantity, standing, unit_price)
                 if self.state.ship.credits < total_cost:
                     return False, f"Insufficient credits: {total_cost} cr required, {self.state.ship.credits} cr available."
 
@@ -2676,6 +2789,9 @@ class SimulationEngine:
                 bought_qty, bought_cost = self._local_dock_purchases.get(dock_tag, (0, 0))
                 self._local_dock_purchases[dock_tag] = (bought_qty + quantity, bought_cost + total_cost)
                 new_credits = self.state.ship.credits - total_cost
+                # A hold emptied outside the market (jettison, delivery) leaves no basis to carry.
+                prior_cost = cargo_cost.get(commodity_id, 0) if cargo.get(commodity_id, 0) > 0 else 0
+                cargo_cost[commodity_id] = prior_cost + total_cost
                 cargo[commodity_id] = cargo.get(commodity_id, 0) + quantity
                 tariff_note = ""
                 if standing_factor > 1.0:
@@ -2766,6 +2882,10 @@ class SimulationEngine:
                     unit_sell_price = bonus_sell
                     revenue = unit_sell_price * quantity
                 new_credits = self.state.ship.credits + revenue
+                held_cost = cargo_cost.pop(commodity_id, 0)
+                released_cost = held_cost * quantity // owned
+                if owned > quantity and held_cost - released_cost > 0:
+                    cargo_cost[commodity_id] = held_cost - released_cost
                 cargo[commodity_id] = owned - quantity
                 if cargo[commodity_id] == 0:
                     del cargo[commodity_id]
@@ -2776,6 +2896,8 @@ class SimulationEngine:
                     if impact_pct >= 1:
                         impact_note = f" (base avg {avg_base_sell:.0f}/unit, market impact -{impact_pct}%)"
                 msg = f"Sold {quantity}x {quote.name} for {revenue} cr (trade margin: x{margin_mult:.2f}){corp_note}{impact_note}."
+                if released_cost > 0:
+                    msg += f" P/L {revenue - released_cost:+d} cr."
 
             stats["trades"] += 1
             log_entry = f"Market transaction: {msg}"
@@ -2796,6 +2918,7 @@ class SimulationEngine:
             new_ship = self._clone_ship(
                 credits=new_credits + tut_cr,
                 cargo=cargo,
+                cargo_cost=cargo_cost,
                 mastery=new_mastery,
                 relics=tuple(list(self.state.ship.relics) + tut_relics),
                 active_contracts=updated_contracts,
@@ -4264,8 +4387,12 @@ class SimulationEngine:
             self.state.ship.ship_class,
         )
 
-    def get_status_snapshot(self) -> dict[str, Any]:
-        """Produce a comprehensive JSON serializable telemetry snapshot for the HUD."""
+    def get_status_snapshot(self, include_static: bool = True) -> dict[str, Any]:
+        """Produce a JSON serializable telemetry snapshot for the HUD.
+
+        `include_static=False` leaves out the code-constant catalogs (see `static_catalogs`),
+        for clients that fetched them once from `/api/catalogs`.
+        """
         with self.lock:
             cur_sys = self.current_system
             orb_body = self.orbiting_body
@@ -4292,9 +4419,16 @@ class SimulationEngine:
                         "sell_price": q.sell_price,
                         "supply": q.supply,
                         "demand": q.demand,
+                        "max_buy": self.max_trade_quantity(q.commodity_id, is_buy=True),
                     }
                     for q in quotes
                 ]
+            ship_cargo = self.state.ship.cargo
+            cargo_avg_cost = {
+                cid: cost // ship_cargo[cid]
+                for cid, cost in self.state.ship.cargo_cost.items()
+                if ship_cargo.get(cid, 0) > 0
+            }
 
             equipment_snapshot = self._combined_equipment()
             salvage_site = (
@@ -4327,10 +4461,16 @@ class SimulationEngine:
                         ),
                     }
             survey_scanned = sum(1 for b in cur_sys.bodies if b.scan_completed)
-            return {
+            snapshot = {
                 "ship": self.state.ship.to_dict(),
                 "current_system": cur_sys.to_dict(),
                 "orbiting_body": orb_body.to_dict() if orb_body else None,
+                "outpost_options": (
+                    [t.id for t in OUTPOST_TYPES if can_build_on(orb_body, t)] if orb_body else []
+                ),
+                "outpost_body_occupied": bool(
+                    orb_body and any(o.body_id == orb_body.id for o in self.state.outposts)
+                ),
                 "salvage_site": salvage_site.to_dict() if salvage_site else None,
                 "scoop": scoop,
                 "survey": {
@@ -4378,7 +4518,6 @@ class SimulationEngine:
                     }
                     for aid, info in ABILITY_CATALOG.items()
                 },
-                "character_skill_catalog": {sid: dict(info) for sid, info in SKILL_CATALOG.items()},
                 "research": {
                     **self.state.research.to_dict(),
                     "bonuses": self._research_bonuses(),
@@ -4387,14 +4526,12 @@ class SimulationEngine:
                     "catalog": [p.to_dict() for p in RESEARCH_PROJECTS],
                 },
                 "outposts": [o.to_dict() for o in self.state.outposts],
-                "outpost_catalog": [t.to_dict() for t in OUTPOST_TYPES],
                 "faction_leaders": [leader.to_dict() for leader in self.state.faction_leaders],
                 "wars": [war.to_dict() for war in self.state.wars],
+                "galactic_politics": self.galactic_politics(),
                 "eliminated_factions": list(self.state.eliminated_factions),
                 "crew": [c.to_dict() for c in self.state.ship.crew],
-                "crew_roles": crew_catalog(),
                 "crew_bonuses": calculate_crew_bonuses(self.state.ship.crew),
-                "weapons": weapon_catalog(),
                 "primary_weapon": self.state.ship.primary_weapon,
                 "fleet_manager": {
                     "ships": [s.to_dict() for s in self.state.ship.fleet_ships],
@@ -4415,12 +4552,7 @@ class SimulationEngine:
                     "bonuses": calculate_ship_mod_bonuses(self.state.ship.ship_mods),
                 },
                 "market_quotes": market_quotes,
-                "catalog_upgrades": [u.to_dict() for u in CATALOG_UPGRADES],
-                "catalog_drones": CATALOG_DRONE_TEMPLATES,
-                "catalog_talents": PILOT_TALENTS,
-                "catalog_relics": [r.to_dict() for r in CATALOG_RELICS],
-                "story_chapters": [c.to_dict() for c in CAMPAIGN_CHAPTERS],
-                "story_chapters_map": {c.id: c.to_dict() for c in CAMPAIGN_CHAPTERS},
+                "cargo_avg_cost": cargo_avg_cost,
                 "factions": {
                     fid: {
                         **f.to_dict(),
@@ -4437,13 +4569,10 @@ class SimulationEngine:
                     }
                     for cid, c in CANONICAL_CORPORATIONS.items()
                 },
-                "enemy_archetypes": {aid: asdict(a) for aid, a in ENEMY_ARCHETYPES.items()},
                 "economy": self.state.economy.to_dict(),
                 "inventory_manifest": get_inventory_manifest(self.state.ship.cargo),
                 "trade_routes": get_galactic_trade_routes(self.state.systems, self.state.economy),
-                "catalog_chassis": [c.to_dict() for c in CATALOG_CHASSIS],
                 "available_chassis": [c.to_dict() for c in get_available_chassis(self.current_chassis_id)],
-                "catalog_weapons": weapon_catalog(),
                 "ai_captains": [c.to_dict() for c in self.state.ai_captains],
                 "depots": [
                     {**d.to_dict(), "used_volume": calculate_cargo_volume(d.cargo)}
@@ -4458,7 +4587,6 @@ class SimulationEngine:
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),
-                "mercenary_catalog": MERCENARY_CATALOG,
                 "fleet_stats": [
                     {
                         **d.to_dict(),
@@ -4468,6 +4596,103 @@ class SimulationEngine:
                     for d in self.state.ship.fleet_drones
                 ],
             }
+            if include_static:
+                snapshot.update(static_catalogs())
+            return snapshot
+
+    # Smallest pledge that moves a war, and the most one pledge can move it.
+    WAR_SUPPORT_MIN_CREDITS = 100
+    WAR_SUPPORT_MAX_SHIFT = 6.0
+
+    def support_war(self, war_id: str, faction_id: str, credits: int) -> tuple[bool, str]:
+        """Pledge credits to one side of an active war: shifts its score and your standings."""
+        with self.lock:
+            war = next((w for w in self.state.wars if w.id == war_id), None)
+            if war is None or not war.active:
+                return False, f"No active war '{war_id}'."
+            if faction_id not in (war.attacker_id, war.defender_id):
+                return False, f"{faction_id} is not a party to {war_id}."
+            if credits < self.WAR_SUPPORT_MIN_CREDITS:
+                return False, f"War pledges start at {self.WAR_SUPPORT_MIN_CREDITS} cr."
+            ship = self.state.ship
+            if ship.credits < credits:
+                return False, f"Insufficient credits: {credits} cr pledged, {ship.credits} cr available."
+            shift = min(self.WAR_SUPPORT_MAX_SHIFT, credits / 400.0)
+            score = war.war_score + (shift if faction_id == war.attacker_id else -shift)
+            enemy_id = war.defender_id if faction_id == war.attacker_id else war.attacker_id
+            gain = min(10, max(1, credits // 300))
+            standings = dict(ship.faction_standings)
+            standings[faction_id] = min(100, standings.get(faction_id, 0) + gain)
+            standings[enemy_id] = max(-100, standings.get(enemy_id, 0) - max(1, gain // 2))
+            support = dict(war.support)
+            support[faction_id] = support.get(faction_id, 0) + credits
+            new_war = replace(war, war_score=round(score, 2), support=support)
+            side = CANONICAL_FACTIONS[faction_id].name if faction_id in CANONICAL_FACTIONS else faction_id
+            msg = f"War pledge: {credits} cr to {side} (front shifts {shift:.1f}; standing +{gain})."
+            self.state = self._clone_state(
+                wars=tuple(new_war if w.id == war_id else w for w in self.state.wars),
+                ship=self._clone_ship(
+                    credits=ship.credits - credits,
+                    faction_standings=standings,
+                    flight_log=tuple(list(ship.flight_log[-19:]) + [msg]),
+                ),
+            )
+            return True, msg
+
+    def galactic_politics(self) -> dict[str, Any]:
+        """Territory, borders and war fronts for the strategic map and the factions panel."""
+        with self.lock:
+            systems = self.state.systems
+            colors = {f.name: f.primary_color for f in CANONICAL_FACTIONS.values()}
+            ids = {f.name: fid for fid, f in CANONICAL_FACTIONS.items()}
+            active = [w for w in self.state.wars if w.active]
+            enemies: dict[str, set[str]] = {}
+            for w in active:
+                enemies.setdefault(w.attacker_id, set()).add(w.defender_id)
+                enemies.setdefault(w.defender_id, set()).add(w.attacker_id)
+
+            def owner_id(sid: str) -> str:
+                return ids.get(systems[sid].faction, systems[sid].faction)
+
+            system_view = {}
+            for sid, system in systems.items():
+                fid = owner_id(sid)
+                neighbours = [n for n in system.connections if n in systems]
+                system_view[sid] = {
+                    "owner_id": fid,
+                    "owner": system.faction,
+                    "color": colors.get(system.faction, "#7f8a99"),
+                    "border": any(systems[n].faction != system.faction for n in neighbours),
+                    "front": any(owner_id(n) in enemies.get(fid, set()) for n in neighbours),
+                }
+            factions = [
+                {
+                    "id": fid,
+                    "name": f.name,
+                    "color": f.primary_color,
+                    "systems": sum(1 for s in systems.values() if s.faction == f.name),
+                    "strength": round(faction_strength(fid, systems), 1),
+                    "at_war_with": sorted(enemies.get(fid, set())),
+                }
+                for fid, f in CANONICAL_FACTIONS.items()
+                if fid not in self.state.eliminated_factions
+            ]
+            factions.sort(key=lambda f: -f["strength"])
+            war_view = []
+            for w in active:
+                pair = {w.attacker_id, w.defender_id}
+                fronts = sorted({
+                    tuple(sorted((a, b)))
+                    for a in systems for b in systems[a].connections
+                    if b in systems and {owner_id(a), owner_id(b)} == pair
+                })
+                war_view.append({
+                    **w.to_dict(),
+                    "attacker": CANONICAL_FACTIONS[w.attacker_id].name if w.attacker_id in CANONICAL_FACTIONS else w.attacker_id,
+                    "defender": CANONICAL_FACTIONS[w.defender_id].name if w.defender_id in CANONICAL_FACTIONS else w.defender_id,
+                    "fronts": [list(f) for f in fronts],
+                })
+            return {"systems": system_view, "factions": factions, "wars": war_view}
 
     def get_quests(self) -> list[dict[str, Any]]:
         """Return a unified quest panel view of the story chapter and active contracts."""
@@ -5191,7 +5416,11 @@ class SimulationEngine:
                 ))
 
             research_gain += int(equipment.get("research_per_tick", 0.0) * num_ticks)
-            new_crew, wage_cost, crew_logs = tick_crew(cur_ship.crew, num_ticks, cur_ship.credits + outpost_credits, rng=self.rng)
+            new_crew, wage_cost, crew_logs = tick_crew(
+                cur_ship.crew, num_ticks, cur_ship.credits + outpost_credits, rng=self.rng,
+                wage_due=wages_due(cur_ship.crew, cur_time.elapsed_days, new_days),
+            )
+            month_rollover = int(new_days // DAYS_PER_MONTH) > int(cur_time.elapsed_days // DAYS_PER_MONTH)
 
             points = research_state.points + max(0, research_gain)
             progress = research_state.progress + max(0, research_gain)
@@ -5425,6 +5654,11 @@ class SimulationEngine:
             if new_flight_log_research:
                 new_flight_log.append(new_flight_log_research)
             new_flight_log.extend(faction_logs[-3:])
+            if month_rollover:
+                crew_logs.append(
+                    f"MONTH END: crew payroll runs {crew_upkeep(new_crew)} cr/month; "
+                    f"treasury {max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta)} cr."
+                )
             new_flight_log.extend(crew_logs[-2:])
             new_ship = self._clone_ship(
                 hull=new_hull,

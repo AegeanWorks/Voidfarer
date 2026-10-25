@@ -196,3 +196,28 @@ class TestCLIRelicsWithRecoveredRelics(_IsolatedCliTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCLIMaxTrades(_IsolatedCliTestCase):
+    """`buy <id> max` and `sell <id> all` match the REST max flag and the REPL."""
+
+    def test_sell_all_and_buy_max(self):
+        engine = SimulationEngine(seed=42)
+        engine.orbit("sol_body_1")
+        engine.state = engine._clone_state(ship=engine._clone_ship(cargo={"fuel_cells": 4}))
+        save_dir = Path(self._tmp.name) / ".voidfarer"
+        StorageManager(save_dir).save(engine.state)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["sell", "fuel_cells", "all"]), 0)
+            self.assertEqual(main(["buy", "fuel_cells", "max"]), 0)
+        self.assertIn("Sold 4x", mock_out.getvalue())
+        ship = StorageManager(save_dir).load().ship
+        self.assertGreater(ship.cargo.get("fuel_cells", 0), 0)
+        self.assertIn("fuel_cells", ship.cargo_cost)
+
+    def test_non_numeric_quantity_is_rejected(self):
+        with patch("sys.stderr", new_callable=io.StringIO):
+            with self.assertRaises(SystemExit) as raised:
+                main(["buy", "fuel_cells", "lots"])
+        self.assertEqual(raised.exception.code, 2)

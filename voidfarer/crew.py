@@ -111,8 +111,20 @@ def calculate_crew_bonuses(crew: Sequence[CrewMember]) -> dict[str, float]:
     return bonuses
 
 
+# Crew wages are a monthly rate; the engine accrues them day by day on the calendar.
+DAYS_PER_MONTH = 30.0
+
+
 def crew_upkeep(crew: Sequence[CrewMember]) -> int:
+    """Monthly wage bill of the active crew."""
     return sum(member.wage for member in crew if member.status == "active")
+
+
+def wages_due(crew: Sequence[CrewMember], days_before: float, days_after: float) -> int:
+    """Whole credits of monthly wages accrued between two calendar points (cumulative, so
+    fractions carry over between ticks instead of being lost or double-charged)."""
+    upkeep = crew_upkeep(crew)
+    return int(upkeep * days_after // DAYS_PER_MONTH) - int(upkeep * days_before // DAYS_PER_MONTH)
 
 
 # Morale thresholds for the living crew simulation
@@ -126,8 +138,12 @@ def tick_crew(
     num_ticks: int,
     credits_available: int,
     rng: random.Random | None = None,
+    wage_due: int | None = None,
 ) -> tuple[tuple[CrewMember, ...], int, list[str]]:
     """Advance wages and morale; unpaid crews sink toward desertion.
+
+    `wage_due` is the accrued wage for this step (see `wages_due`); without it the whole
+    wage bill is charged per tick, the legacy rate kept for direct callers.
 
     Only active members drift. Wages are paid from available credits; shortfalls
     drain morale, and members below the resignation threshold may desert while
@@ -139,7 +155,7 @@ def tick_crew(
         rng = random.Random()
 
     logs: list[str] = []
-    upkeep = crew_upkeep(crew) * num_ticks
+    upkeep = crew_upkeep(crew) * num_ticks if wage_due is None else max(0, wage_due)
     paid = min(upkeep, max(0, credits_available))
     unpaid = upkeep - paid
     updated: list[CrewMember] = []

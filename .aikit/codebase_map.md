@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `64`
-- **Total Classes**: `158`
-- **Total Top-Level Functions**: `198`
-- **Total Class Methods**: `899`
-- **Total Source Lines**: `26742`
+- **Total Python Modules**: `68`
+- **Total Classes**: `177`
+- **Total Top-Level Functions**: `213`
+- **Total Class Methods**: `998`
+- **Total Source Lines**: `28014`
 
 ---
 
@@ -141,7 +141,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `198` lines (`8509` bytes)
+**Size**: `223` lines (`9667` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -170,13 +170,16 @@
 - `class TestCLIRelicsWithRecoveredRelics` - *A save that already has relics must render the vault and modifiers (regression).*
   - Method `.test_relics_command_with_recovered_relics()`
   - Method `.test_cli_frontier_commands()`
+- `class TestCLIMaxTrades` - *`buy <id> max` and `sell <id> all` match the REST max flag and the REPL.*
+  - Method `.test_sell_all_and_buy_max()`
+  - Method `.test_non_numeric_quantity_is_rejected()`
 
 ---
 
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `692` lines (`31456` bytes)
+**Size**: `899` lines (`40662` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -272,6 +275,46 @@
   - Method `.test_crew_section_source_order()`
   - Method `.test_app_wires_shore_leave_and_morale_bars()`
   - Method `.test_crew_simulation_styles_exist()`
+- `class TestLeftTerminalLedger` - *Left terminal: one visible tab on load, keyboard tab cycling, and two-line ledger records.*
+  - Method `.setUpClass()`
+  - Method `._tab_contents(node)`
+  - Method `.test_only_the_player_tab_is_visible_before_scripts_run()`
+  - Method `.test_bracket_keys_cycle_terminal_tabs()`
+  - Method `.test_ledger_records_use_three_column_two_line_grid()`
+  - Method `.test_outliner_label_stays_on_one_line()`
+- `class TestMarketBulkTrading` - *Commerce tab: lot selector, max orders and cost-basis feedback.*
+  - Method `.setUpClass()`
+  - Method `.test_lot_selector_sits_in_the_market_tab()`
+  - Method `.test_max_orders_and_cost_basis_reach_the_api()`
+- `class TestSettingsConsoleQoL` - *Settings console: volume, gameplay automation, interface memory, controls and reset.*
+  - Method `.setUpClass()`
+  - Method `.test_new_settings_live_in_the_settings_overlay_and_are_wired()`
+  - Method `.test_every_sound_goes_through_the_master_gain()`
+- `class TestCockpitPolling` - *Client polling contract: cached catalogs, lite payloads, adaptive cadence, guarded rebuilds.*
+  - Method `.setUpClass()`
+  - Method `.test_every_api_call_goes_through_the_catalog_aware_wrapper()`
+  - Method `.test_poll_cadence_follows_the_chrono()`
+  - Method `.test_open_tab_is_not_rebuilt_under_a_pressed_pointer()`
+- `class TestCommandStripFit` - *G-005/G-013 at every width, and power routing that works without a hidden APPLY button.*
+  - Method `.setUpClass()`
+  - Method `._last(selector, prop)`
+  - Method `.test_strip_stays_beside_a_full_height_terminal()`
+  - Method `.test_strip_panels_are_not_capped_at_210px()`
+  - Method `.test_power_sliders_and_presets_commit_without_the_apply_button()`
+- `class TestStrategicGalaxyMap` - *Galaxy map: faction territory, war fronts and legend, fitted to the visible map area.*
+  - Method `.setUpClass()`
+  - Method `.test_map_views_share_one_visible_area_centre()`
+  - Method `.test_territory_is_cached_and_drawn_from_politics()`
+- `class TestCelestialModels` - *Procedural celestial models: their own module, loaded before the cockpit, sprites cached.*
+  - Method `.setUpClass()`
+  - Method `.test_renderer_loads_before_the_cockpit()`
+  - Method `.test_every_generated_body_type_has_a_model()`
+  - Method `.test_surface_sprites_are_cached()`
+- `class TestStrategyPanels` - *Strategy actions in the cockpit: war pledges, outpost founding and the monthly treasury.*
+  - Method `.setUpClass()`
+  - Method `.test_wars_panel_sits_in_the_factions_tab_and_pledges()`
+  - Method `.test_outposts_are_founded_from_the_empire_tab()`
+  - Method `.test_treasury_is_reported_per_month()`
 
 ---
 
@@ -339,7 +382,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `221` lines (`10258` bytes)
+**Size**: `251` lines (`11514` bytes)
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -364,6 +407,7 @@
   - Method `.test_route_planning()`
   - Method `.test_black_holes_and_ring_worlds_exist()`
 - `class NewSystemsSerializationAndCLITest`
+  - Method `.test_snapshot_outpost_options_match_what_the_server_accepts()`
   - Method `.test_game_state_round_trip_preserves_new_fields()`
   - Method `.test_new_cli_commands_run()`
   - Method `.test_cockpit_fleet_character_empire_and_void_fade_wiring()`
@@ -549,6 +593,48 @@
 
 ---
 
+### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
+> *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
+
+**Size**: `250` lines (`11935` bytes)
+
+**Classes:**
+- `class FixedRng` - *Noise-free rng: uniform returns a fixed value, choice takes the first item.*
+  - Method `.__init__(value)`
+  - Method `.uniform(low, high)`
+  - Method `.choice(seq)`
+- `class TestWarFronts`
+  - Method `.setUp()`
+  - Method `._war(**kwargs)`
+  - Method `.test_frontier_is_loser_territory_adjacent_to_the_winner()`
+  - Method `.test_capture_takes_a_front_system_and_spends_the_score()`
+  - Method `.test_no_front_means_no_capture()`
+  - Method `._assign(owners)`
+  - Method `.test_more_core_territory_means_more_war_effort()`
+  - Method `.test_overextension_caps_war_effort()`
+  - Method `.test_a_hegemon_faces_containment()`
+  - Method `.test_last_stand_bonus_does_not_empower_the_besieged_attacker()`
+  - Method `.test_capital_needs_double_score()`
+  - Method `.test_the_capital_holds_while_the_defender_still_owns_other_worlds()`
+  - Method `.test_a_defending_faction_is_not_dogpiled()`
+  - Method `.test_exhaustion_ends_the_war_with_a_treaty()`
+  - Method `.test_old_war_records_load_with_defaults()`
+- `class TestWarSupport`
+  - Method `.test_support_spends_credits_shifts_score_and_standing()`
+  - Method `.test_support_is_refused_when_it_cannot_apply()`
+  - Method `.test_snapshot_exposes_territory_and_fronts()`
+- `class TestWarSupportParity`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.test_rest_support()`
+  - Method `.test_cli_war_list_and_support()`
+
+**Functions:**
+- `def _owner_ids(systems, name)`
+- `def _engine_at_war(credits)`
+
+---
+
 ### [`tests/test_galaxy.py`](tests/test_galaxy.py)
 > *Unit tests for procedural galaxy generation, hyperlane mesh, and market quotes.*
 
@@ -640,6 +726,20 @@
   - Method `.test_pilot_mastery_serialization()`
   - Method `.test_game_state_roundtrip()`
   - Method `.test_tutorial_and_story_models_serialization()`
+
+---
+
+### [`tests/test_monthly_economy.py`](tests/test_monthly_economy.py)
+> *Monthly economy: crew wages are a monthly rate accrued on the calendar, not a per-tick charge.*
+
+**Size**: `43` lines (`1833` bytes)
+
+**Classes:**
+- `class TestMonthlyWages`
+  - Method `.test_tick_crew_charges_exactly_the_wage_due()`
+  - Method `.test_a_new_commander_pays_one_month_of_wages_per_month()`
+  - Method `.test_cash_flow_reports_monthly_rates()`
+  - Method `.test_month_end_report_is_logged_once_per_month()`
 
 ---
 
@@ -756,7 +856,7 @@
 ### [`tests/test_sim_mechanics.py`](tests/test_sim_mechanics.py)
 > *Unit and integration tests for the living crew, volume-aware market, and cash-flow mechanics.*
 
-**Size**: `399` lines (`16518` bytes)
+**Size**: `399` lines (`16523` bytes)
 
 **Classes:**
 - `class TestCrewMoraleCore`
@@ -806,6 +906,29 @@
 
 **Functions:**
 - `def _member(member_id, morale, status, wage)`
+
+---
+
+### [`tests/test_snapshot_catalogs.py`](tests/test_snapshot_catalogs.py)
+> *Static catalogs: built once, served by /api/catalogs, and left out of polls that cache them.*
+
+**Size**: `87` lines (`3717` bytes)
+
+**Classes:**
+- `class TestStaticCatalogs`
+  - Method `.test_catalogs_cover_exactly_the_static_keys()`
+  - Method `.test_catalogs_are_built_once()`
+  - Method `.test_full_snapshot_still_carries_every_catalog()`
+  - Method `.test_lite_snapshot_omits_catalogs_and_keeps_live_state()`
+- `class TestCatalogEndpoints`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._request(method, path, body, cached)`
+  - Method `.test_catalog_endpoint_serves_every_static_key()`
+  - Method `.test_catalog_endpoint_ignores_the_cache_header()`
+  - Method `.test_state_poll_is_full_by_default_and_lite_when_cached()`
+  - Method `.test_action_responses_honour_the_cache_header()`
 
 ---
 
@@ -909,10 +1032,42 @@
 
 ---
 
+### [`tests/test_trade_ledger.py`](tests/test_trade_ledger.py)
+> *Trade ledger: per-commodity cost basis, realised profit and max-quantity orders.*
+
+**Size**: `160` lines (`7106` bytes)
+
+**Classes:**
+- `class TestTradeCostBasis`
+  - Method `.test_buy_records_what_was_paid()`
+  - Method `.test_sell_reports_profit_and_releases_cost_proportionally()`
+  - Method `.test_stale_cost_is_reset_when_the_hold_was_emptied_elsewhere()`
+  - Method `.test_jettison_releases_the_cost_basis_proportionally()`
+  - Method `.test_old_saves_load_with_an_empty_cost_basis()`
+  - Method `.test_cost_basis_round_trips()`
+- `class TestMaxOrders`
+  - Method `.test_max_buy_is_bounded_by_hold_volume()`
+  - Method `.test_max_buy_is_bounded_by_credits()`
+  - Method `.test_max_sell_sells_everything_held()`
+  - Method `.test_max_with_nothing_possible_explains_why()`
+  - Method `.test_max_buy_names_the_hold_when_a_unit_does_not_fit()`
+  - Method `.test_snapshot_exposes_max_buy_and_average_cost()`
+- `class TestMaxOrderParity`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `.test_rest_trade_accepts_max_flag()`
+  - Method `.test_repl_sell_all()`
+
+**Functions:**
+- `def _docked_engine(credits, cargo)`
+
+---
+
 ### [`tests/test_transit_civ_events.py`](tests/test_transit_civ_events.py)
 > *Tests for in-system transit (TravelState), planetary civilization metadata, and cockpit GameEvents.*
 
-**Size**: `355` lines (`16253` bytes)
+**Size**: `356` lines (`16308` bytes)
 
 **Classes:**
 - `class TestTransitCivEvents` - *Verify TravelState, planetary faction/population/government, and GameEvent lifecycles.*
@@ -1101,7 +1256,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2585` lines (`132149` bytes)
+**Size**: `2647` lines (`135386` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1124,6 +1279,7 @@
 - `def cmd_allies(engine, storage, parts)`
 - `def cmd_upgrades(engine, storage, parts)` - *Inspect and purchase hardware modules from station arsenal.*
 - `def cmd_combat(engine, storage, parts)` - *Execute tactical combat maneuvers during hostile intercepts.*
+- `def cmd_war(engine, storage, action, args)` - *List active wars and their fronts, or pledge credits to one side.*
 - `def cmd_factions(engine, storage, parts)` - *Inspect galactic sovereign factions, standings, active territory, and diplomatic perks.*
 - `def cmd_corporations(engine, storage, parts)` - *Inspect interstellar megacorporations, commercial specialties, and corporate standing.*
 - `def cmd_contracts(engine, storage, parts)` - *Inspect dynamic sector bounties, claim completed contracts, and trigger fresh assignments.*
@@ -1148,6 +1304,8 @@
 - `def cmd_weapons(engine, storage, parts)`
 - `def cmd_repl(engine, storage)` - *Launch interactive terminal command session.*
 - `def cmd_events(engine, storage, parts)` - *List or dismiss cockpit popup events.*
+- `def _trade_quantity(value)` - *argparse type for trade orders: a positive count, or `max`/`all` for the largest possible order.*
+- `def _run_trade(engine, commodity_id, quantity, is_buy)`
 - `def main(argv)` - *Main CLI entrypoint.*
 
 ---
@@ -1175,7 +1333,7 @@
 ### [`voidfarer/crew.py`](voidfarer/crew.py)
 > *Crew roles, recruiting, portraits, and crew-derived ship bonuses.*
 
-**Size**: `219` lines (`7858` bytes)
+**Size**: `235` lines (`8652` bytes)
 
 **Classes:**
 - `class CrewRole`
@@ -1185,8 +1343,9 @@
 - `def get_crew_role(role_id)`
 - `def recruit_crew_member(role_id, seed, current_count)`
 - `def calculate_crew_bonuses(crew)`
-- `def crew_upkeep(crew)`
-- `def tick_crew(crew, num_ticks, credits_available, rng)` - *Advance wages and morale; unpaid crews sink toward desertion.*
+- `def crew_upkeep(crew)` - *Monthly wage bill of the active crew.*
+- `def wages_due(crew, days_before, days_after)` - *Whole credits of monthly wages accrued between two calendar points (cumulative, so*
+- `def tick_crew(crew, num_ticks, credits_available, rng, wage_due)` - *Advance wages and morale; unpaid crews sink toward desertion.*
 - `def apply_morale_event(crew, delta, reason)` - *Shift every active member's morale by an event delta, clamped to 0..100.*
 - `def shore_leave_restore(crew)` - *Compute a fleet-wide shore leave outcome: restored crew and morale points.*
 - `def crew_catalog()`
@@ -1225,7 +1384,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `5569` lines (`278884` bytes)
+**Size**: `5803` lines (`290366` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1298,12 +1457,15 @@
   - Method `.recruit_crew(role_id)`
   - Method `.dismiss_crew(crew_id)`
   - Method `.get_crew_report()`
-  - Method `.cash_flow()` - *Per-tick credit flow telemetry: crew upkeep against passive income estimates.*
+  - Method `.cash_flow()` - *Monthly credit flow: crew payroll against passive income (drones, outposts).*
   - Method `.install_weapon(weapon_id)`
   - Method `.set_primary_weapon(weapon_id)`
   - Method `.get_weapon_report()`
   - Method `.resolve_message_choice(message_id, choice_id)`
   - Method `.get_message_tree_report()`
+  - Method `._bulk_buy_cost(body, comm, quantity, standing, unit_price)` - *Price a buy order by walking the local stockpile, so bulk orders move the price they pay.*
+  - Method `.max_trade_quantity(commodity_id, is_buy)` - *Largest order that would succeed now: affordable and in-hold for buys, all held units for sells.*
+  - Method `.trade_max(commodity_id, is_buy)` - *Buy as many units as credits and hold allow, or sell every unit held.*
   - Method `.trade(commodity_id, quantity, is_buy)` - *Execute buy or sell commodity order at orbiting market.*
   - Method `.buy_upgrade(upgrade_id)` - *Purchase and install a hardware upgrade module at an orbital station.*
   - Method `.sell_upgrade(slot)` - *Uninstall and sell an equipped hardware module back to shipyard for credits.*
@@ -1328,7 +1490,9 @@
   - Method `.skip_tutorial()` - *Skip Cadet Flight Academy and unlock unrestricted operational status.*
   - Method `.reset_tutorial()` - *Reset Cadet Flight Academy to step 1 for revision or retraining.*
   - Property `.current_chassis_id` - *Id of the chassis matching the ship's commissioned class (falls back to the class name).*
-  - Method `.get_status_snapshot()` - *Produce a comprehensive JSON serializable telemetry snapshot for the HUD.*
+  - Method `.get_status_snapshot(include_static)` - *Produce a JSON serializable telemetry snapshot for the HUD.*
+  - Method `.support_war(war_id, faction_id, credits)` - *Pledge credits to one side of an active war: shifts its score and your standings.*
+  - Method `.galactic_politics()` - *Territory, borders and war fronts for the strategic map and the factions panel.*
   - Method `.get_quests()` - *Return a unified quest panel view of the story chapter and active contracts.*
   - Method `._find_ai_captain(captain_id)`
   - Method `._replace_ai_captain(captain)`
@@ -1357,6 +1521,10 @@
   - Method `.set_time_speed(speed)` - *Set simulation speed multiplier (0.0x to 10.0x).*
   - Method `.step_time(num_ticks)` - *Advance simulation by a discrete number of ticks.*
 
+**Functions:**
+- `def static_catalogs()` - *Build the code-constant catalogs once per process; callers must treat them as read-only.*
+- `def _cargo_cost_after(previous_cargo, previous_cost, cargo)` - *Carry the paid basis of held cargo through any mutation outside a market trade.*
+
 ---
 
 ### [`voidfarer/exploration.py`](voidfarer/exploration.py)
@@ -1382,13 +1550,19 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `164` lines (`7241` bytes)
+**Size**: `278` lines (`12798` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
 - `def _faction_systems(faction_id, systems)`
 - `def faction_strength(faction_id, systems)`
-- `def resolve_wars(wars, systems, rng, current_tick, eliminated)` - *Advance wars, transfer territory, and eliminate factions that lose all systems.*
+- `def _faction_name(faction_id)`
+- `def war_effort(faction_id, systems)` - *Strength a faction can actually project at the front.*
+- `def war_momentum(attacker_id, defender_id, systems)` - *Per-step score drift before noise: effort ratio, defender edge and hegemon containment.*
+- `def _capture_target(front, loser_id, loser_name, score, systems, rng)` - *Front worlds fall first; a capital only falls to double the capture score.*
+- `def frontier_systems(winner_name, loser_name, systems)` - *Loser-held systems with a hyperlane into winner territory, sorted for determinism.*
+- `def _end_war(war, score, current_tick, logs)`
+- `def resolve_wars(wars, systems, rng, current_tick, eliminated)` - *Advance wars one step: strength drives momentum, captures follow hyperlane fronts.*
 - `def simulate_faction_behaviors(leaders, wars, systems, rng, current_tick, eliminated, num_ticks)` - *Apply leader archetypes: declare wars, then resolve active fronts.*
 - `def leader_for(leaders, faction_id)`
 
@@ -1521,7 +1695,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `1809` lines (`66570` bytes)
+**Size**: `1821` lines (`67380` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -1755,13 +1929,14 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1158` lines (`48496` bytes)
+**Size**: `1189` lines (`50119` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
 - `class VoidFarerHandler` - *Handles REST API actions and serves static cockpit assets.*
   - Method `.log_message(format, *args)` - *Suppress standard access logs for clean terminal output.*
   - Method `._send_json(data, status)`
+  - Method `._without_catalogs(data)` - *Drop static catalogs from the snapshot a response carries under `state` or `data`.*
   - Method `._send_error_json(message, status)`
   - Method `._read_body_json()`
   - Method `.do_OPTIONS()`

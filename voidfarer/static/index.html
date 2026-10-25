@@ -69,6 +69,7 @@
                     <a class="settings-nav-item active" href="#settingsDisplay">DISPLAY</a>
                     <a class="settings-nav-item" href="#settingsAudio">AUDIO</a>
                     <a class="settings-nav-item" href="#settingsGameplay">GAMEPLAY</a>
+                    <a class="settings-nav-item" href="#settingsControls">CONTROLS</a>
                     <a class="settings-nav-item" href="#settingsSystem">SYSTEM</a>
                 </nav>
                 <div class="settings-content">
@@ -86,20 +87,51 @@
                             </select>
                         </label>
                         <label class="setting-row"><span>HUD scale</span><input type="range" id="settingUiScale" min="85" max="120" step="5" value="100"></label>
+                        <label class="setting-row"><span>Reopen the last terminal tab on launch</span><input type="checkbox" id="settingRememberTab" checked></label>
                     </section>
                     <section class="settings-group" id="settingsAudio">
                         <h3 class="settings-group-title">AUDIO <span>// bridge signals</span></h3>
                         <label class="setting-row"><span>Sound effects</span><input type="checkbox" id="settingSound" checked></label>
+                        <label class="setting-row"><span>Master volume <output id="settingVolumeValue">80%</output></span><input type="range" id="settingVolume" min="0" max="100" step="5" value="80"></label>
                     </section>
                     <section class="settings-group" id="settingsGameplay">
                         <h3 class="settings-group-title">GAMEPLAY <span>// simulation</span></h3>
                         <label class="setting-row"><span>Travel animation</span><input type="checkbox" id="settingAnimation" checked></label>
+                        <label class="setting-row"><span>Pause time on hostile intercept or new event</span><input type="checkbox" id="settingAutoPause" checked></label>
+                        <label class="setting-row"><span>Claim finished contracts automatically</span><input type="checkbox" id="settingAutoClaim"></label>
+                        <label class="setting-row"><span>Default market order lot</span>
+                            <select id="settingTradeLot">
+                                <option value="1">×1</option>
+                                <option value="5">×5</option>
+                                <option value="10">×10</option>
+                                <option value="max">MAX</option>
+                            </select>
+                        </label>
+                    </section>
+                    <section class="settings-group" id="settingsControls">
+                        <h3 class="settings-group-title">CONTROLS <span>// keyboard reference</span></h3>
+                        <dl class="controls-list">
+                            <dt>SPACE</dt><dd>Pause / resume time</dd>
+                            <dt>1 2 3 4</dt><dd>Time speed 1x / 2x / 5x / 10x</dd>
+                            <dt>T</dt><dd>Advance one tick</dd>
+                            <dt>[ ]</dt><dd>Previous / next terminal tab</dd>
+                            <dt>\</dt><dd>Hide / show the terminal drawer</dd>
+                            <dt>Q W E R</dt><dd>Route power to engines / shields / sensors / weapons</dd>
+                            <dt>⇧1 … ⇧6</dt><dd>Quick-train a skill</dd>
+                            <dt>P K L</dt><dd>Toggle reactor / skills / flight log panels</dd>
+                            <dt>⇧ CLICK</dt><dd>Market BUY / SELL at max quantity</dd>
+                            <dt>ESC</dt><dd>Menu; closes settings</dd>
+                        </dl>
                     </section>
                     <section class="settings-group" id="settingsSystem">
                         <h3 class="settings-group-title">SYSTEM <span>// local profile</span></h3>
                         <div class="setting-row viewport-readout-row">
                             <span>Viewport</span>
                             <strong id="viewportReadout">--</strong>
+                        </div>
+                        <div class="setting-row">
+                            <span>Restore every setting to its default</span>
+                            <button class="btn-hud" id="btnResetSettings" type="button">RESET DEFAULTS</button>
                         </div>
                     </section>
                     <div class="settings-footer"><span></span> CONFIGURATION SYNCED // LOCAL PROFILE</div>
@@ -247,9 +279,9 @@
                     <div class="vital-label">
                         <span class="vital-icon" aria-hidden="true">▲</span>
                         <span>STREAK</span>
-                        <strong class="flame-text" id="streakVal">🔥 1 JUMP (x1.00)</strong>
+                        <strong class="flame-text" id="streakVal">🔥 1</strong>
                     </div>
-                    <div class="vital-subtext" id="streakSubtext">LOSS AVERSION: FLEE RESETS</div>
+                    <div class="vital-subtext" id="streakSubtext">x1.00 // FLEE RESETS</div>
                 </div>
 
                 <div class="vital-card mastery-card" id="vitalMasteryCard" data-tooltip="Pilot mastery // Experience unlocks levels, perks and stronger contracts.">
@@ -332,13 +364,13 @@
                     <button class="deck-tab-btn" id="tabBtnDepot">DEPOT</button>
                     <button class="deck-tab-btn" id="tabBtnMessages">MESSAGES <span class="tab-badge" id="messagesBadge" style="display: none;">0</span></button>
                     <button class="deck-tab-btn" id="tabBtnStory">COMMS LOG <span class="tab-badge" id="storyBadge" style="display: none;">!</span></button>
-                    <button class="deck-tab-btn" id="tabBtnFactions">FACTIONS & CORPS</button>
+                    <button class="deck-tab-btn" id="tabBtnFactions" title="Factions &amp; megacorporations">FACTIONS</button>
                     <button class="deck-tab-btn" id="tabBtnCodex">CAPTAIN'S LOG <span class="tab-badge" id="codexBadge" style="display: none;">0</span></button>
                 </nav>
 
                 <div class="terminal-content-stack">
                     <!-- Tab 1: Station Market / Exchange -->
-                    <div class="market-panel tab-content" id="tabContentMarket">
+                    <div class="market-panel tab-content" id="tabContentMarket" style="display: none;">
                         <div class="panel-header">
                             <div class="panel-tag"><span class="badge-dot dot-cyan"></span> EXCHANGE</div>
                             <h2 class="panel-title" id="marketTitle">LOCAL EXCHANGE</h2>
@@ -374,14 +406,24 @@
                             </div>
                         </div>
 
+                        <!-- Order lot: every BUY/SELL in the table uses it; Shift+click is always MAX -->
+                        <div class="market-lot-bar" id="marketLotBar" role="group" aria-label="Order lot size">
+                            <span class="market-lot-label">ORDER LOT</span>
+                            <button class="market-lot-btn" data-lot="1">×1</button>
+                            <button class="market-lot-btn" data-lot="5">×5</button>
+                            <button class="market-lot-btn" data-lot="10">×10</button>
+                            <button class="market-lot-btn" data-lot="max">MAX</button>
+                            <span class="market-lot-hint">⇧ CLICK = MAX</span>
+                        </div>
+
                         <!-- Commodity Exchange List -->
                         <div class="commodity-table-container">
                             <table class="market-table">
                                 <thead>
                                     <tr>
                                         <th>COMMODITY</th>
-                                        <th>BUY</th>
-                                        <th>SELL</th>
+                                        <th>BUY CR</th>
+                                        <th>SELL CR</th>
                                         <th>HOLD</th>
                                         <th>TRADE</th>
                                     </tr>
@@ -611,6 +653,7 @@
                             <h3 class="subpanel-title">OUTPOSTS</h3>
                             <div id="outpostSummary"></div>
                             <div class="outpost-list" id="outpostList"></div>
+                            <div class="outpost-build" id="outpostBuild"></div>
                         </div>
                         <div class="empire-section">
                             <h3 class="subpanel-title">FACTION LEADERS & WARS</h3>
@@ -732,6 +775,11 @@
                             <h2 class="panel-title">GALACTIC FACTIONS & CORPORATIONS</h2>
                         </div>
                         <div class="factions-section">
+                            <h3 class="subpanel-title">GALACTIC WARS</h3>
+                            <p class="panel-intro-text">Wars move along hyperlane fronts. Pledge credits to tip a front; the side you back warms to you, its enemy cools.</p>
+                            <div class="wars-list" id="warsList"></div>
+                        </div>
+                        <div class="factions-section">
                             <h3 class="subpanel-title">SOVEREIGN FACTIONS</h3>
                             <div class="factions-grid" id="factionsGrid">
                                 <!-- Populated dynamically by app.js -->
@@ -849,7 +897,7 @@
                 <div class="sub-panel reactor-panel hud-strip-panel" id="panelReactor">
                     <div class="panel-header">
                         <div class="panel-tag"><span class="badge-dot dot-amber"></span><span class="strip-icon">⚡</span> POWER-ROUTING</div>
-                        <h2 class="panel-title">REACTOR DISTRIBUTION</h2>
+                        <h2 class="panel-title">REACTOR<span class="title-long"> DISTRIBUTION</span></h2>
                         <span class="hotkey-chip" title="Toggle reactor distribution (P)">P</span>
                         <span class="power-total" id="powerTotal">100% ALLOCATED</span>
                         <div class="reactor-header-actions">
@@ -941,7 +989,7 @@
                     <div class="sub-panel map-controls-panel" id="mapControlsPanel">
                         <div class="panel-header">
                             <div class="panel-tag"><span class="badge-dot"></span><span class="strip-icon">🗺</span> MAP CONTROLS</div>
-                            <h2 class="panel-title">RADAR SETTINGS</h2>
+                            <h2 class="panel-title">RADAR<span class="title-long"> SETTINGS</span></h2>
                         </div>
                         <div class="map-controls-content">
                             <div class="view-toggle-group">
@@ -966,7 +1014,7 @@
                     <div class="sub-panel log-panel hud-strip-panel" id="logPanel">
                         <div class="panel-header">
                             <div class="panel-tag"><span class="badge-dot dot-green"></span><span class="strip-icon">📡</span> TELEMETRY</div>
-                            <h2 class="panel-title">TACTICAL FLIGHT LOG</h2>
+                            <h2 class="panel-title"><span class="title-long">TACTICAL </span>FLIGHT LOG</h2>
                             <span class="hotkey-chip" title="Toggle telemetry log (L)">L</span>
                             <div class="log-header-actions">
                                 <button class="text-btn" id="btnToggleLog" aria-controls="flightLogStream" aria-expanded="true" title="Hide or show the telemetry stream (L)">HIDE</button>
@@ -999,6 +1047,7 @@
     <div class="hud-tooltip" id="hudTooltip" role="tooltip" aria-hidden="true"></div>
 
     <!-- Scripts -->
+    <script src="celestial.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 
 > **Autonomous Deep-Space Fleet, Procedural Galaxy & Windows Cockpit Simulator.**
 
-VoidFarer is a zero-dependency, local-first space flight, fleet management, and exploration simulation engine. Navigate procedural star systems, establish orbits, route reactor power, board derelicts, scoop fuel, drill crew, commission autonomous drones, purchase hardware upgrades, fight adaptive hostile AI, trade commodities, and pilot your flagship via an ANSI REPL or a Windows desktop HTML5 Canvas cockpit.
+VoidFarer is a zero-dependency, local-first space flight, fleet and exploration simulation. Explore procedural systems, route reactor power, board derelicts, scoop fuel, command drones, fit upgrades, fight adaptive AI and trade, from an ANSI REPL or a Windows HTML5 Canvas cockpit.
 
 ---
 
@@ -90,6 +90,7 @@ voidfarer/
 │       ├── index.html        <- semantic HUD structure & radar canvas
 │       ├── style.css         <- sci-fi glassmorphism design system
 │       ├── app.js            <- radar math, Web Audio synth & REST link
+│       ├── celestial.js      <- procedural planet, station & ship models
 │       ├── cursor-default.svg <- themed default cockpit cursor
 │       ├── cursor-pointer.svg <- themed pointer cursor for controls
 │       └── cursor-crosshair.svg <- themed radar crosshair cursor
@@ -98,7 +99,7 @@ voidfarer/
 │   ├── ui_audit.py           <- layout metrics
 │   ├── ui_browser.py         <- real browser review
 │   └── ui_inventory.py       <- cockpit inventory proof
-└── tests/                    <- unit & integration test suite (30 suites)
+└── tests/                    <- unit & integration test suite (34 suites)
 ```
 
 ---
@@ -117,7 +118,7 @@ Displays commander dossier, vital telemetry (hull, shields, fuel), reactor power
 ```bash
 python -m voidfarer.cli chart
 ```
-Prints the sector hyperlane network, visited flags, security ratings, and every body in the local system. Each system hosts 5-6 planets, moons, ice/lava worlds, ringed giants, and research outposts, with a guaranteed dockable station.
+Prints hyperlanes, visited flags, security and every local body; each system has 5-6 worlds and a dockable station.
 
 ### 3. Navigation & Spaceflight
 ```bash
@@ -144,7 +145,7 @@ python -m voidfarer.cli salvage
 # Recover fuel from a star, gas giant, or ice body (adds reactor heat)
 python -m voidfarer.cli scoop
 ```
-Scans need 5 MW of sensor power; a failed zero-power attempt no longer consumes the body. Full-system surveys pay a bonus and advance `systems_surveyed`; titanium salvage advances mining contracts; each scoopable body has a finite 3-8 tap reserve that recharges one tap every 6 ticks.
+Scans need 5 MW of sensor power. Full surveys pay a bonus; titanium salvage advances mining contracts; scoopable bodies hold 3-8 taps, one recharging every 6 ticks.
 
 ### 4. Hardware Upgrades & Station Arsenal
 ```bash
@@ -224,9 +225,9 @@ python -m voidfarer.cli streak
 # Inspect local exchange prices
 python -m voidfarer.cli market
 
-# Purchase and sell commodities
-python -m voidfarer.cli buy fuel_cells 5
-python -m voidfarer.cli sell titanium 3
+# Buy and sell (max: largest affordable buy; all: whole hold); sales show P/L
+python -m voidfarer.cli buy fuel_cells max
+python -m voidfarer.cli sell titanium all
 
 # Repair hull damage and refuel
 python -m voidfarer.cli repair --amount 25
@@ -259,7 +260,7 @@ python -m voidfarer.cli story
 # Resolve an episodic narrative dilemma
 python -m voidfarer.cli story choose choice_vance_telemetry
 ```
-The five-act campaign tracks persistent story flags: later choices can require earlier decisions (Act V's title needs the Act IV Oath; selling the echoes needs the Act I Syndicate leak), locked choices show their reasons, and the finale resolves First VoidFarer, Sentinel, or Shadow Broker. Legacy saves migrate on load.
+The five-act campaign keeps persistent flags: later choices can need earlier decisions, locked choices show why, and the finale resolves First VoidFarer, Sentinel or Shadow Broker.
 
 ### 13b. The Hollow Between (Void Lane Traversal)
 ```bash
@@ -275,7 +276,7 @@ python -m voidfarer.cli void dive golconda
 # Emergency surfacing back through the entry horizon (costs hull and shields)
 python -m voidfarer.cli void emerge
 ```
-Black-hole anchors mesh into a seeded void-lane graph. Diving needs a horizon orbit, route fuel, and 25% shields; storms drain stability, shields and hull. Each storm adds resonance (+1, doubled below 30% stability) worth 120 cr and 15 XP on arrival; `void emerge` banks half, collapse loses all. `gateways_open` calms storms 25%, and the Void Compass and Crown of Echoes raise starting stability.
+Black holes anchor a seeded void-lane graph. Diving needs a horizon orbit, fuel and 25% shields; storms drain stability and add resonance (120 cr, 15 XP each on arrival); `void emerge` banks half, collapse loses all.
 
 ### 14. Geopolitical Factions & Megacorporations
 ```bash
@@ -284,6 +285,10 @@ python -m voidfarer.cli factions
 
 # View galactic megacorporations, commercial specialties, and trade perks
 python -m voidfarer.cli corporations
+
+# Galactic wars: powers, fronts and captures; pledge credits to one side
+python -m voidfarer.cli war list
+python -m voidfarer.cli war support w_1 vanguard_syndicate 800
 ```
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
@@ -378,12 +383,12 @@ python -m voidfarer.cli weapons install railgun
 ```
 The commander ages, earns XP, and trains six skills with active cooldown abilities. Research
 unlocks reactor, scan, combat, outpost, repair, and fuel tech. Outposts produce resources each tick.
-Faction leaders wage wars, capture systems, and face elimination. Escort warships coordinate volleys,
+Wars run along hyperlane fronts: strength, overextension and attrition decide captures, capitals fall last, treaties and truces end them. Escort warships coordinate volleys,
 screen damage, and adopt battle stances. Multi-jump routing handles black holes. Message trees branch
 into lasting outcomes. Crew feature roles, morale, wages, and SVG portraits; morale reacts to
 battles, hull breaches, void storms, hostile arrivals, and campaign beats, unpaid crews below
 morale 20 risk resignation, and docked stations offer paid shore leave. Bulk orders walk the
-local stockpile price, and the status deck, CLI, and crew tab show per-tick cash flow. The
+local stockpile price; wages accrue as a monthly payroll shown as net cr/month. The
 setting begins 01.01.3042 in the Quantum Age with Dyson spheres, wormholes, and ring worlds.
 
 ### 19. Stellaris-Style Windows Cockpit
@@ -394,20 +399,22 @@ python -m voidfarer.cli serve --port 8080
 Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Top Status Bar & Chronometer (`G-007`, `G-011`)**: Vitals plus the chrono deck, sized for 1280x720 through 4K.
 - **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a three-column bottom strip: reactor, skills, separate radar settings above the compact log; circular zoom icons and themed cursors.
-- **Main Menu & Saves (`ESC`)**: Categorized settings console plus create, load, list and delete saves.
+- **Menu, Settings & Saves (`ESC`)**: volume, auto-pause on intercepts/events, auto-claim, order lot, key list, reset; saves.
+- **Left Terminal & Commerce**: `[`/`]` cycle tabs, `\` hides the drawer, the last tab reopens; two-line ledger rows; x1/x5/x10/MAX order lots (Shift+click = max), average cost and sell margins.
 - **Planet Inspector**: Gravity, atmosphere, temperature, habitability, orbit distance, moons, resources, and colony tiers.
 - **Transit, Landing & Fleet**: Timed transit-and-orbit, fuel-priced quantum micro-jumps, surface surveys and drone fleets.
 - **Living Galaxy**: Procedural worlds, AI traders, dynamic markets, faction perks, and reputation.
+- **Strategic Map**: faction territories, borders, war fronts, a powers legend; modelled worlds and ships.
 - **Mission Panels**: Quests, contracts, diplomacy, depots, messages, COMMS, factions and combat.
 - **Space-Opera Campaign Tab**: Five acts with a live objective checklist, locked choices that show their requirements, transmissions, and one of three endings with epilogue.
 - **The Hollow Between Panel**: Void drive readiness, lane dive buttons, traversal progress/stability, emergency emerge, and a hue-shifted radar overlay.
 - **REPL Server Lifecycle**: `serve` runs the HTTP server and ticker; `serve stop` saves and shuts down.
-- **Reactor Power Matrix (`G-006`, `G-013`)**: Bottom-left strip with sliders, `Q/W/E/R` hotkeys, thermal telemetry, four modes and VENT.
+- **Reactor Power Matrix (`G-006`, `G-013`)**: four sliders that route on release, presets, `Q/W/E/R`, heat, four modes, VENT.
 - **Sector Map Modifiers**: Generated conditions shown as radar chips and applied to fuel, scans, encounters, trade and reactor heat.
 - **Player, Skills & Crew Tabs**: PLAYER is a dossier; six quick-train skills live in the bottom strip (`SHIFT+1..6`), while SKILLS holds ranks, pilot perks and relics. Crew holds bonuses and drills.
 - **Ship Configuration Tab**: Fixed-height silhouette, compact stats, and a full-width module ledger; refits require a docked drydock or station.
-- **Commander Creation & Death Flow**: Name, age, background, and starting-skill allocation wired into new games; a death overlay summarizes the run and offers a fresh commander or save load.
-- **Stellaris-Style Windows HUD**: deep-navy panels, gold rules, 1280x720-4K/ultrawide, density/HUD scale, DPR radar, keyboard/mouse and reduced motion.
+- **Commander Creation & Death Flow**: name, age, background and starting skills for new games; a death overlay summarizes the run and offers a new commander or a save.
+- **Stellaris-Style Windows HUD**: gold-on-navy, 720p-4K, density/HUD scale, DPR radar.
 - **Derelict Boarding & Fuel Scooping**: once-per-body salvage feeds titanium contracts; star/gas/ice scoops trade reactor heat for fuel from finite, recharging reservoirs; paid crew drills.
 - **Captain's Log & Discovery Codex**: career statistics grid, discovery milestones, claim rewards, category filters, and persistent flight log.
 

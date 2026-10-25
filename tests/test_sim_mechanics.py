@@ -329,15 +329,15 @@ class TestCashFlowTelemetry(unittest.TestCase):
 
     def test_cash_flow_fields_and_math(self):
         flow = self.engine.cash_flow()
-        self.assertEqual(flow["upkeep_per_tick"], 65)
-        self.assertGreaterEqual(flow["passive_per_tick"], 0.0)
-        self.assertAlmostEqual(flow["net_per_tick"], round(flow["passive_per_tick"] - 65, 1))
+        self.assertEqual(flow["upkeep_per_month"], 65)
+        self.assertGreaterEqual(flow["passive_per_month"], 0.0)
+        self.assertAlmostEqual(flow["net_per_month"], round(flow["passive_per_month"] - 65, 1))
 
     def test_scout_drone_counts_as_passive_income(self):
         ok, msg = self.engine.buy_drone("scout")
         self.assertTrue(ok, msg)
         flow = self.engine.cash_flow()
-        self.assertGreater(flow["passive_per_tick"], 0.0)
+        self.assertGreater(flow["passive_per_month"], 0.0)
 
     def test_snapshot_and_crew_report_expose_cash_flow(self):
         snapshot = self.engine.get_status_snapshot()

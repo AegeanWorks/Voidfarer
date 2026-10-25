@@ -16,7 +16,7 @@ from socketserver import ThreadingMixIn
 from typing import Any
 
 from voidfarer.economy import get_galactic_trade_routes
-from voidfarer.engine import SimulationEngine
+from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
 from voidfarer.frontier import MERCENARY_CATALOG
 from voidfarer.inventory import get_inventory_manifest
 from voidfarer.mapmods import MAP_MODIFIER_CATALOG, aggregate_map_modifiers, system_modifier_summary
@@ -30,6 +30,8 @@ from voidfarer.upgrades import (
 )
 
 MAX_BODY_BYTES = 1024 * 1024
+# A client that sends this header has /api/catalogs cached; its state payloads omit them.
+CATALOG_CACHE_HEADER = "X-VoidFarer-Catalogs"
 
 
 def _int_field(body: dict[str, Any], key: str, default: int, minimum: int | None = None) -> int:
@@ -99,6 +101,8 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         return
 
     def _send_json(self, data: Any, status: int = 200) -> None:
+        if self.headers.get(CATALOG_CACHE_HEADER) and isinstance(data, dict):
+            data = self._without_catalogs(data)
         payload = json.dumps(data).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -106,6 +110,16 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(payload)
+
+    @staticmethod
+    def _without_catalogs(data: dict[str, Any]) -> dict[str, Any]:
+        """Drop static catalogs from the snapshot a response carries under `state` or `data`."""
+        trimmed = dict(data)
+        for key in ("state", "data"):
+            snapshot = trimmed.get(key)
+            if isinstance(snapshot, dict) and "ship" in snapshot:
+                trimmed[key] = {k: v for k, v in snapshot.items() if k not in STATIC_SNAPSHOT_KEYS}
+        return trimmed
 
     def _send_error_json(self, message: str, status: int = 400) -> None:
         self._send_json({"ok": False, "error": message}, status=status)
@@ -137,15 +151,20 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.NO_CONTENT)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", f"Content-Type, {CATALOG_CACHE_HEADER}")
         self.end_headers()
 
     def do_GET(self) -> None:
         path = self.path.split("?")[0]
 
         if path == "/api/state":
-            snapshot = self.engine.get_status_snapshot()
+            include_static = not self.headers.get(CATALOG_CACHE_HEADER)
+            snapshot = self.engine.get_status_snapshot(include_static=include_static)
             self._send_json({"ok": True, "data": snapshot})
+            return
+
+        if path == "/api/catalogs":
+            self._send_json({"ok": True, "data": static_catalogs()})
             return
 
         if path == "/api/galaxy":
@@ -751,9 +770,21 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/trade":
             comm_id = str(body.get("commodity_id", ""))
-            qty = _int_field(body, "quantity", 0, minimum=0)
             is_buy = _bool_field(body, "is_buy", True)
-            ok, msg = self.engine.trade(comm_id, qty, is_buy)
+            if _bool_field(body, "max", False):
+                ok, msg = self.engine.trade_max(comm_id, is_buy)
+            else:
+                qty = _int_field(body, "quantity", 0, minimum=0)
+                ok, msg = self.engine.trade(comm_id, qty, is_buy)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/war/support":
+            war_id = str(body.get("war_id", ""))
+            faction_id = str(body.get("faction_id", ""))
+            credits = _int_field(body, "credits", 0, minimum=0)
+            ok, msg = self.engine.support_war(war_id, faction_id, credits)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

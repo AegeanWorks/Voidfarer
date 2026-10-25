@@ -7809,3 +7809,242 @@ body.cockpit-theme .panel-center {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* Left terminal records: icon | name over detail | value over action.
+   Three columns leave the record body room inside the ~450px drawer; this layer
+   supersedes the four-column ledger grid for contract, drone, escort and
+   procurement rows (crew rows keep --ledger-cols). */
+:root { --ledger-record-cols: 24px minmax(0, 1fr) 124px; }
+
+.panel-left .deck-tabs-header::before {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.04em;
+}
+.panel-left .deck-tabs-header::after {
+    content: "[ ]  CYCLE TABS\A\005C    HIDE DRAWER";
+    white-space: pre;
+    margin-top: auto;
+    padding: 8px 4px 2px;
+    border-top: 1px solid rgba(201, 163, 90, 0.16);
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.panel-left .deck-tab-btn { letter-spacing: 0.02em; }
+
+.contract-card,
+.drone-card,
+.fleet-ship-card,
+.fleet-procurement-row {
+    grid-template-columns: var(--ledger-record-cols);
+    grid-template-rows: auto auto;
+    gap: 3px 10px;
+    min-height: 52px;
+}
+.contract-card::before,
+.drone-card::before,
+.fleet-ship-card::before,
+.fleet-procurement-row::before { grid-column: 1; grid-row: 1 / -1; }
+
+.contract-card > .contract-header { grid-column: 2; grid-row: 1; flex-direction: row; align-items: center; justify-content: flex-start; }
+.contract-card .contract-title { flex: 1 1 auto; text-align: left; }
+.contract-card > .contract-desc { display: none; }
+.contract-card > .contract-progress-box {
+    grid-column: 2;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+}
+.contract-card .contract-progress-label { display: block; white-space: nowrap; }
+.contract-card > .contract-footer { grid-column: 3; grid-row: 1 / -1; align-self: center; }
+.contract-card .contract-rewards { display: flex; flex-wrap: wrap; justify-content: flex-end; text-align: right; }
+.contract-card .contract-status { color: var(--console-muted); }
+.contract-card.completed .contract-status,
+.contract-card.completed .contract-progress-label { color: var(--console-green); }
+
+.drone-card { grid-template-rows: auto auto auto; }
+.drone-card .drone-name { grid-column: 2; grid-row: 1; }
+.drone-card .drone-sub { grid-column: 2; grid-row: 2; }
+.drone-card .drone-stats { display: block; grid-column: 2; grid-row: 3; }
+.drone-card .drone-yield-badge { grid-column: 3; grid-row: 1; align-self: center; text-align: right; }
+.drone-card .drone-actions { grid-column: 3; grid-row: 2 / -1; flex-direction: column; }
+
+.fleet-ship-card > .fleet-value { grid-column: 3; grid-row: 1; }
+.fleet-ship-card > .ship-actions { grid-column: 3; grid-row: 2; flex-direction: row; }
+.fleet-ship-card .ship-actions .btn-hud { flex: 1 1 0; min-width: 0; }
+
+.fleet-procurement-row > .procurement-info,
+.depot-card.fleet-procurement-row > .procurement-info { grid-column: 2; grid-row: 1 / -1; color: var(--console-text); }
+.procurement-info strong,
+.procurement-info h4 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fleet-procurement-row > .procurement-value { grid-column: 3; grid-row: 1; align-self: end; }
+.fleet-procurement-row > .procurement-action,
+.fleet-procurement-row > .depot-actions { grid-column: 3; grid-row: 2; align-self: start; }
+.procurement-action {
+    justify-content: center;
+    min-height: 26px;
+    border: 1px solid rgba(201, 163, 90, 0.35);
+    color: var(--console-gold);
+}
+.fleet-procurement-row:disabled { opacity: 0.55; cursor: not-allowed; }
+.contract-cat-badge { border: 1px solid rgba(201, 163, 90, 0.4); text-transform: uppercase; }
+.contract-cat-badge.cat-mining { color: #d8c49a; background: rgba(169, 139, 189, 0.12); border-color: rgba(169, 139, 189, 0.4); }
+
+/* Commerce: order lot bar, numeric columns that never wrap, cost-basis cues. */
+.market-lot-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    border: 1px solid rgba(201, 163, 90, 0.18);
+    background: #07101d;
+}
+.market-lot-label { margin-right: 4px; color: var(--console-gold); font-family: var(--console-ui); font-size: 12px; letter-spacing: 0.1em; }
+.market-lot-btn {
+    min-width: 42px;
+    min-height: 26px;
+    padding: 2px 8px;
+    border: 1px solid rgba(201, 163, 90, 0.3);
+    border-radius: 0;
+    background: transparent;
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+.market-lot-btn:hover { border-color: var(--console-gold); color: var(--console-ivory); }
+.market-lot-btn.active { border-color: var(--console-gold); background: rgba(201, 163, 90, 0.14); color: var(--console-gold-bright); }
+.market-lot-hint { margin-left: auto; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+.market-table td:nth-child(2),
+.market-table td:nth-child(3),
+.market-table td:nth-child(4),
+.market-table th { white-space: nowrap; }
+.market-table .commodity-category { display: block; }
+.market-table .td-avg { display: block; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
+.market-table .td-profit { color: var(--console-green); }
+.market-table .td-loss { color: var(--console-red); }
+.market-table .btn-trade { min-width: 58px; white-space: nowrap; }
+
+/* Settings: keyboard reference and live volume readout. */
+.controls-list {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 7px 14px;
+    margin: 0;
+    padding: 6px 4px;
+}
+.controls-list dt { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+.controls-list dd { margin: 0; color: var(--console-text); font-size: 13px; }
+#settingVolumeValue { margin-left: 6px; color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 12px; }
+
+/* Command strip fit (G-005, G-013): the strip sits beside a full-height terminal at every
+   width, and every reactor, skill, radar and log control is visible without scrolling. */
+.panel-left { grid-row: 1 / span 2; }
+.hud-command-strip { grid-column: 2 / -1; }
+.hud-strip-panel { max-height: none; overflow: hidden; }
+
+.hud-command-strip .reactor-sim-strip {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding-bottom: 5px;
+}
+.hud-command-strip .reactor-thermal { min-width: 0; }
+.hud-command-strip .reactor-eff-line { gap: 8px; white-space: nowrap; }
+.hud-command-strip .reactor-mode-row { display: flex; gap: 3px; }
+.hud-command-strip .reactor-mode-btn,
+.hud-command-strip #btnVentReactor { min-height: 25px; padding: 2px 7px; }
+.hud-command-strip .power-matrix { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 14px; }
+.hud-command-strip .power-slider-row { gap: 0; min-width: 0; }
+.hud-command-strip .pwr-hint { display: none; }
+.hud-command-strip .pwr-slider { height: 20px; }
+.hud-command-strip .power-action-row { display: flex; gap: 4px; }
+.hud-command-strip .power-action-row .btn-hud { flex: 1 1 0; min-width: 0; min-height: 24px; padding: 2px 4px; }
+
+.skills-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 6px; }
+.skill-quick-chip { min-height: 30px; padding: 3px 7px; gap: 1px 6px; }
+.skill-quick-bar { height: 2px; }
+.skills-quick-panel .skills-quick-hint { display: none; }
+.hud-command-strip .power-total { white-space: nowrap; }
+.hud-command-strip .reactor-mode-row { flex-wrap: nowrap; }
+.hud-command-strip .reactor-mode-btn { flex: 1 1 auto; }
+
+.hud-strip-right .radar-zoom-stack { gap: 2px; }
+.hud-strip-right .radar-zoom-btn { width: 28px; height: 28px; }
+
+@media (max-width: 1599px) {
+    .cockpit-grid { grid-template-columns: minmax(480px, 0.9fr) minmax(0, 1.4fr); }
+    .panel-left { grid-row: 1 / span 2; }
+    .hud-command-strip {
+        grid-column: 2 / -1;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .hud-strip-panel > .panel-header { flex-wrap: nowrap; }
+    .hud-strip-panel .panel-title,
+    .hud-strip-right .panel-title { white-space: nowrap; }
+    .skills-quick-grid { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    .skill-quick-chip { min-height: 24px; padding: 2px 6px; }
+    .skill-quick-hotkey { display: none; }
+    .hud-strip-panel .panel-tag,
+    .hud-strip-right .panel-tag,
+    .hud-command-strip .title-long,
+    .hud-command-strip .reactor-eff-line,
+    .hud-command-strip #applyPowerBtn { display: none; }
+    .hud-command-strip .reactor-mode-btn,
+    .hud-command-strip #btnVentReactor { padding: 2px 4px; }
+    .hud-strip-right .view-toggle-group .tab-btn,
+    .hud-strip-right .map-settings-row .ctrl-btn,
+    .hud-strip-right .map-settings-row .btn-hud { white-space: nowrap; padding: 2px 6px; }
+
+    /* Reactor: VENT joins the heat row so the four doctrine modes fit one row. */
+    .hud-command-strip .reactor-sim-strip { grid-template-columns: repeat(3, max-content) minmax(max-content, 1fr); }
+    .hud-command-strip .reactor-mode-row { display: contents; }
+    .hud-command-strip .reactor-thermal { grid-column: 1 / 4; grid-row: 1; }
+    .hud-command-strip #btnVentReactor { grid-column: 4; grid-row: 1; justify-self: end; }
+    .hud-command-strip .reactor-mode-btn { grid-row: 2; }
+
+    /* Flight log: title and hotkey on one row, HIDE/CLEAR on the next. */
+    .hud-strip-right .log-panel > .panel-header { flex-wrap: wrap; row-gap: 3px; }
+    .hud-strip-right .log-panel .log-header-actions { flex: 1 0 100%; justify-content: flex-end; }
+
+    /* Commerce in the ~320px terminal: stacked trade buttons, no hint text. */
+    .market-lot-bar { flex-wrap: nowrap; gap: 3px; padding: 5px 6px; }
+    .market-lot-label { white-space: nowrap; }
+    .market-lot-btn { min-width: 34px; padding: 2px 5px; }
+    .market-lot-hint { display: none; }
+    .market-table th,
+    .market-table td { padding-left: 4px; padding-right: 4px; }
+    .market-table .trade-btn-group { display: flex; flex-direction: column; gap: 3px; }
+    .market-table .btn-trade { min-width: 0; width: 100%; padding: 3px 4px; }
+    .market-table { table-layout: fixed; width: 100%; }
+    .market-table th { white-space: normal; line-height: 1.15; }
+    .market-table th:nth-child(2), .market-table td:nth-child(2) { width: 42px; }
+    .market-table th:nth-child(3), .market-table td:nth-child(3) { width: 44px; }
+    .market-table th:nth-child(4), .market-table td:nth-child(4) { width: 46px; }
+    .market-table th:nth-child(5), .market-table td:nth-child(5) { width: 62px; }
+    .market-table .commodity-name { overflow-wrap: anywhere; }
+}
+
+/* Vital cards are equal width (G-009): a long value truncates instead of spilling into its neighbour. */
+.vital-card .vital-label { min-width: 0; }
+.vital-card .vital-label strong { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* Sector condition chips sit in the radar's free top-left corner, clear of the NAV-RADAR title. */
+.sector-mod-strip { justify-content: flex-start; padding-left: 14px; }
+
+/* Galactic wars: tug-of-war bars with pledge actions. */
+.wars-list { display: flex; flex-direction: column; gap: 8px; }
+.war-card { padding: 9px 11px; border: 1px solid rgba(201, 163, 90, 0.2); border-left: 3px solid #d6604d; background: #0a1424; }
+.war-sides { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.war-sides strong { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.war-vs { color: var(--console-muted); font-size: 12px; }
+.war-bar { display: flex; height: 8px; margin: 7px 0 5px; background: #050b16; }
+.war-bar span { display: block; height: 100%; transition: width 0.4s ease; }
+.war-meta { color: var(--console-muted); font-size: 12px; }
+.war-actions { display: flex; gap: 6px; margin-top: 7px; }
+.war-actions .btn-hud { flex: 1 1 0; min-width: 0; min-height: 28px; padding: 3px 6px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.outpost-build { display: flex; flex-direction: column; margin-top: 8px; }

@@ -15,6 +15,7 @@ from voidfarer.fleet import apply_fleet_casualties, build_fleet_ship, fleet_dama
 from voidfarer.galaxy import GalaxyGenerator
 from voidfarer.models import FleetShip, GameState, Outpost, PlayerCharacter, ResearchState, WarState
 from voidfarer.navigation import route_plan, shortest_route
+from voidfarer.outposts import OUTPOST_TYPES, can_build_on
 
 
 class CharacterResearchOutpostTest(unittest.TestCase):
@@ -178,6 +179,35 @@ class FleetAndNavigationTest(unittest.TestCase):
 
 
 class NewSystemsSerializationAndCLITest(unittest.TestCase):
+    def test_snapshot_outpost_options_match_what_the_server_accepts(self):
+        galaxy = GalaxyGenerator(seed=42).generate_galaxy()
+        system_id, world = next(
+            (sid, body)
+            for sid, system in galaxy.items()
+            for body in system.bodies
+            if body.body_type == "terrestrial" and body.station_dockable
+        )
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            systems=galaxy,
+            ship=engine._clone_ship(
+                current_system_id=system_id,
+                orbiting_body_id=world.id,
+                credits=9000,
+                cargo={},
+                cargo_cost={},
+            ),
+        )
+        snapshot = engine.get_status_snapshot()
+        self.assertEqual(
+            snapshot["outpost_options"], [t.id for t in OUTPOST_TYPES if can_build_on(world, t)]
+        )
+        self.assertNotIn("solar", snapshot["outpost_options"])
+        self.assertFalse(snapshot["outpost_body_occupied"])
+        ok, message = engine.build_outpost(world.id, "shipyard")
+        self.assertTrue(ok, message)
+        self.assertTrue(engine.get_status_snapshot()["outpost_body_occupied"])
+
     def test_game_state_round_trip_preserves_new_fields(self):
         engine = SimulationEngine(seed=42)
         restored = GameState.from_dict(engine.state.to_dict())

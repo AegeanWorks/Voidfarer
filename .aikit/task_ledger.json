@@ -1,295 +1,252 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "transit-hazards-course-preview-v1",
+    "task_id": "grand-strategy-v1",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1792877457.3933058,
-    "owner": "antigravity",
-    "started_by": "antigravity",
-    "continuations": [],
-    "completed_at": 1792877477.0708122
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1792934514.8205342,
+    "owner": "kilo:1",
+    "started_by": "claude-code:f36d48df",
+    "continuations": [
+      {
+        "agent": "kilo:1",
+        "from": "claude-code:f36d48df",
+        "at": 1792927195.3782234
+      }
+    ]
   },
   "checkpoints": [
     {
-      "task_id": "galaxy-map-v1",
+      "task_id": "left-panel-qol-ledger-v1",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verified: galaxy mode fits all 15 systems with hyperlanes and labels at desktop/laptop/short/ultrawide/4K; orbital mode is crisp after removing the panel-center backdrop blur; drawing and hit testing share galaxyTransform; the free vision reviewer approved both maps; zero console/hscroll/tiny findings; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "description": "[2/5] Left terminal: single visible tab on load, [ ] cycle and \\ hide hotkeys, remembered tab, one-line outliner label, 3-column two-line records for contracts/drones/mercenaries/escorts; 4/4 gates; checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792851852.212303,
-      "timestamp_str": "2026-10-24 17:24:12",
-      "handoff": {
-        "state": "galaxy-view class, fit transform, label backing, crisp radar",
-        "next": "commit and refresh the cockpit evidence",
-        "open": "none in the UI, only delivery bookkeeping",
-        "evidence": "ui-review galaxy/cockpit screenshots, ADR-048, Playwright galaxy scenario"
-      }
+      "timestamp": 1792880372.778852,
+      "timestamp_str": "2026-10-25 01:19:32",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "galaxy-map-v1",
+      "task_id": "left-panel-qol-ledger-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[3/5] Trade ledger: ShipState.cargo_cost (empty default), sell P/L in message, max_trade_quantity/trade_max, REST max flag, REPL buy max/sell all, snapshot max_buy + cargo_avg_cost; 12 failing-first tests; 4/4 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792880590.169539,
+      "timestamp_str": "2026-10-25 01:23:10",
+      "agent": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "left-panel-qol-ledger-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/5] Commerce: order lot bar x1/x5/x10/MAX (persisted), clamped BUY n/SELL n labels, Shift+click max via REST max flag, @avg cost and green/red sell margin, non-wrapping numeric columns; 4/4 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792880698.596777,
+      "timestamp_str": "2026-10-25 01:24:58",
+      "agent": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "left-panel-qol-ledger-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5 pending docs] Settings: master volume (master gain node), auto-pause on hostile intercept/new event, auto-claim contracts, default order lot, remember tab, CONTROLS reference, RESET DEFAULTS around SETTINGS_DEFAULTS; Edge smoke 13/13; 4/4 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792880996.5792615,
+      "timestamp_str": "2026-10-25 01:29:56",
+      "agent": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "left-panel-qol-ledger-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Docs and parity: CLI buy max/sell all, README (22,496 chars), ADR-055; 524 tests; 4/4 gates; Edge smoke 13/13; uncommitted pending user commit request; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792881165.0253487,
+      "timestamp_str": "2026-10-25 01:32:45",
+      "agent": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "left-panel-qol-ledger-v1",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'galaxy-map-v1' completed successfully.",
+      "description": "Task 'left-panel-qol-ledger-v1' completed successfully.",
       "status": "completed",
-      "timestamp": 1792851852.4650662,
-      "timestamp_str": "2026-10-24 17:24:12"
+      "timestamp": 1792881308.9604876,
+      "timestamp_str": "2026-10-25 01:35:08",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "settings-console-v1",
+      "task_id": "cockpit-perf-layout-v1",
       "phase": "phase 2",
       "phase_num": 2,
-      "description": "[1/2] Plan: turn the sparse settings modal into a Stellaris-style categorized system console",
+      "description": "[1/4] Plan: (1) engine/server: cached static catalogs split from the per-poll snapshot (/api/state?static=0, /api/catalogs); (2) client: catalogs fetched once, lite polling merged, speed-adaptive poll cadence, skip terminal rebuilds that are unchanged or under the pointer, drop duplicate renderVoid; (3) layout: G-005/G-013 strip beside a full-height terminal below 1600px, compact strip (skills chips, 2x2 reactor sliders incl. sensors/weapons), top-bar streak/mastery overlap, tiny XP text; (4) README, ADR-056, before/after numbers",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792852972.18301,
-      "timestamp_str": "2026-10-24 17:42:52",
+      "timestamp": 1792881610.087687,
+      "timestamp_str": "2026-10-25 01:40:10",
+      "agent": "claude-code:f36d48df",
       "impact_assessment": {
-        "why": "The vision reviewer identified settings as the weakest overlay: a single list that did not match the layered command-console language",
-        "benefits": "A DISPLAY/AUDIO/GAMEPLAY/SYSTEM category rail, grouped sections with gold rules, a wider window, active rail state and a local-profile footer while preserving every control and binding",
-        "risks": "contract: none; dependency: none; concurrency: none; state: static HTML/CSS and a small navigation handler only, no simulation changes",
-        "mitigation": "Real-browser captures at desktop/laptop/720p, zero console/hscroll/tiny findings, free-vision approval, 496 tests, 4/4 gates and ADR-049"
+        "why": "Every 1s poll ships 133 KB of which ~40 KB are code-constant catalogs, so faster polling (needed: 10x speed runs 20 ticks/s against a 1 Hz HUD) would multiply waste; each poll rebuilds the open tab and can swallow clicks; below 1600px the strip spans full width at ~320px and crushes the left terminal to ~150px while clipping the sensors/weapons sliders.",
+        "benefits": "Smaller polls, smoother HUD at high speed, no lost clicks, a usable full-height terminal at 1280x720 and 1366x768.",
+        "risks": "contract: /api/state default payload unchanged, static=0 and /api/catalogs are additive; dependency: none; concurrency: catalogs are immutable module constants, snapshot stays under the engine lock; state: none persisted",
+        "mitigation": "Failing-first engine/server tests, layout tests, before/after profiler numbers, Playwright Edge captures at 720p/laptop/desktop/4K, 4/4 gates, ADR-056"
       }
     },
     {
-      "task_id": "settings-console-v1",
+      "task_id": "cockpit-perf-layout-v1",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verified: settings is now a grouped DISPLAY/AUDIO/GAMEPLAY/SYSTEM console with an active rail and local-profile footer; real-browser captures at desktop/laptop/720p report zero console/hscroll/tiny findings; the free vision reviewer APPROVED; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "description": "[2/4] Static catalogs: STATIC_SNAPSHOT_KEYS + lru_cache static_catalogs(), get_status_snapshot(include_static), GET /api/catalogs, X-VoidFarer-Catalogs header trims state/data payloads on every endpoint; poll 133->86 KB, build+encode 2.08->1.80ms; 8 failing-first tests; 4/4 gates; checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792853018.3686564,
-      "timestamp_str": "2026-10-24 17:43:38",
-      "handoff": {
-        "state": "settings categories, grouped sections, wider window and nav handler",
-        "next": "commit and refresh the cockpit evidence",
-        "open": "none in the UI, only delivery bookkeeping",
-        "evidence": "ui-review settings screenshot, ADR-049"
-      }
+      "timestamp": 1792881756.8250065,
+      "timestamp_str": "2026-10-25 01:42:36",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "settings-console-v1",
+      "task_id": "cockpit-perf-layout-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[3/4] Client: module apiFetch + loadCatalogs (34 call sites), state setter merges cached catalogs, schedulePoll cadence 1000ms paused / 500ms 1x / 333ms 2x / 250ms 5x+, terminalBusy guard (pressed pointer or focused control) skips tab rebuilds, story tab renderVoid once; Edge perf smoke 8/8, QoL smoke 13/13; 4/4 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792881955.0005708,
+      "timestamp_str": "2026-10-25 01:45:55",
+      "agent": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "cockpit-perf-layout-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/4 pending docs] Layout: strip beside full-height terminal at all widths (G-005/G-013), panels uncapped (was max-height 210px clipping sensors/weapons/presets/APPLY everywhere), sliders+presets commit on release (mouse routing was inert), compact narrow strip (short titles, VENT on heat row, single-column skills, stacked market trade buttons, fixed market columns), streak value fits its card, sector chips top-left, XP label 12px; terminal 153->480px at 720p, 201->528px at 768p; Edge power smoke 5/5 at 1080p and 720p; 4/4 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792917552.9413483,
+      "timestamp_str": "2026-10-25 11:39:12",
+      "agent": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "cockpit-perf-layout-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/4] Docs: README reactor bullet + 32 suites (22,485 chars), ADR-056; 538 tests; 4/4 gates; uncommitted pending user commit request; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792917607.8654387,
+      "timestamp_str": "2026-10-25 11:40:07",
+      "agent": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "cockpit-perf-layout-v1",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'settings-console-v1' completed successfully.",
+      "description": "Task 'cockpit-perf-layout-v1' completed successfully.",
       "status": "completed",
-      "timestamp": 1792853018.5667963,
-      "timestamp_str": "2026-10-24 17:43:38"
+      "timestamp": 1792917787.4385147,
+      "timestamp_str": "2026-10-25 11:43:07",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "death-screen-v1",
+      "task_id": "grand-strategy-v1",
       "phase": "phase 2",
       "phase_num": 2,
-      "description": "[1/2] Plan: bring the defeat overlay into the Stellaris console language",
+      "description": "[1/5] Plan: (1) sim: power-driven wars over hyperlane fronts (captures only border systems, score resets per capture, exhaustion peace treaties), player war support with credits (REST/CLI/cockpit), galactic_politics snapshot; (2) galaxy map: Stellaris-style faction territory fills, borders, contested fronts, legend, fit to the visible map area; (3) procedural celestial models: cached planet sprites by type (shading, bands, craters, ice caps, atmosphere, rings), star coronas, station and flagship silhouettes; (4) UI: outpost build/upgrade in the Empire tab, resource bar income deltas, wars panel with SUPPORT; (5) README, ADR-057",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792854068.0341208,
-      "timestamp_str": "2026-10-24 18:01:08",
+      "timestamp": 1792917868.742541,
+      "timestamp_str": "2026-10-25 11:44:28",
+      "agent": "claude-code:f36d48df",
       "impact_assessment": {
-        "why": "The death screen was the last unreviewed surface and still used a pulsing neon card, rounded stat box, tiny labels and an emoji icon",
-        "benefits": "A sharp emergency console card, readable 12px/14px stat ledger, framed actions and a repeatable Playwright death scenario",
-        "risks": "contract: none; dependency: none; concurrency: the browser driver starts and stops its own server; state: static HTML/CSS and a browser scenario only, no gameplay changes",
-        "mitigation": "Real-browser captures at desktop/laptop/720p, zero console/hscroll/tiny findings, free-vision approval, 496 tests, 4/4 gates and ADR-050"
+        "why": "The user wants a Stellaris-like grand strategy feel with simulation mechanics; wars are coin flips that can snowball (score never resets after a capture), captures ignore geography, wars never end, the player cannot affect them, the galaxy map shows no territory, planets are flat dots, and outposts cannot be built from the UI.",
+        "benefits": "Readable, geography-driven galactic politics the player can influence; a map that shows who owns what; themed planet and ship visuals; expansion from the cockpit.",
+        "risks": "contract: WarState gains captured/ended_tick fields and snapshot gains galactic_politics (additive, defaults for old saves); new /api/war/support endpoint; dependency: none; concurrency: politics computed under the engine lock; state: war fields serialized with defaults",
+        "mitigation": "Failing-first sim/server/CLI tests with fixed seeds, old-save load test, sprite caching with draw-time profiling, Playwright Edge captures at 720p/1080p/4K, 4/4 gates, ADR-057"
       }
     },
     {
-      "task_id": "death-screen-v1",
+      "task_id": "grand-strategy-v1",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verified: defeat screen rebuilt as a sharp console card with a 2x3 stat ledger and framed actions; real-browser captures at desktop/laptop/720p report zero console/hscroll/tiny findings; the free vision reviewer APPROVED; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "description": "[2/5] Galactic politics sim: hyperlane fronts (frontier_systems), war_effort (territory + log population, overextension past 3 systems), war_momentum (containment of 40%+ hegemons, last stand), attrition 0.05 mean reversion, capture spends threshold, capitals need double score, treaties after 240 ticks or 3 captures, 600-tick truces, no dogpiling, declaration rate 0.025; fixed per-tick snowball capture bug; WarState captured_systems/ended_tick/support with defaults; support_war (REST /api/war/support, CLI war list|support); galactic_politics snapshot; 6-seed 3000-tick balance: 13-26 captures, 0 eliminations, largest 3-4/15 (was Sol 15/15); 15 new tests, 553 total; 4/4 gates; checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792854093.3577278,
-      "timestamp_str": "2026-10-24 18:01:33",
-      "handoff": {
-        "state": "death console styling, text glyph, browser death scenario",
-        "next": "commit and refresh the cockpit evidence",
-        "open": "none in the UI, only delivery bookkeeping",
-        "evidence": "ui-review death screenshot, ADR-050"
-      }
+      "timestamp": 1792918628.7355566,
+      "timestamp_str": "2026-10-25 11:57:08",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "death-screen-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'death-screen-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792854093.537761,
-      "timestamp_str": "2026-10-24 18:01:33"
-    },
-    {
-      "task_id": "left-row-ledger-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: unify every left-terminal record under one ledger grid",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792859993.9090428,
-      "timestamp_str": "2026-10-24 19:39:53",
-      "impact_assessment": {
-        "why": "Market already read as a ledger, while crew, contracts and fleet mixed cards, role rows, active rows and procurement offers; the vision reviewer asked for one shared row grammar",
-        "benefits": "A single icon/title/value/action grid across crew, contracts, drones, escorts, mercenaries and commissions, with the market table as the aligned reference",
-        "risks": "contract: none; dependency: none; concurrency: none; state: static HTML/CSS plus row markup and one existing crew-recruit endpoint; no simulation changes",
-        "mitigation": "Real-browser captures at desktop/laptop/720p, zero console/hscroll/clipped/tiny/target/contrast/overlap findings, free-vision approval, 496 tests, 4/4 gates and ADR-051"
-      }
-    },
-    {
-      "task_id": "left-row-ledger-v1",
+      "task_id": "grand-strategy-v1",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verified: crew roles/active crew, contracts, drones, escorts, mercenaries and commissions share one icon/title/value/action ledger; market numeric columns align; browser audits are zero at desktop/laptop/720p; the free vision reviewer APPROVED; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "description": "[3/5] Strategic galaxy map: mapRect/mapCenter fit both views to the visible radar area (no systems under the terminal), cached quarter-res Voronoi faction territory with blurred borders (rebuild 4.6ms 1080p / 7.9ms 4K, frame 0.1ms), border-crossing lanes highlighted, pulsing red war-front lanes and front markers, owner rings and owner-tinted labels, GALACTIC POWERS legend (row form on short maps), crowded-map label declutter with hover labels; 2 static tests; 4/4 gates; checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792860026.6624393,
-      "timestamp_str": "2026-10-24 19:40:26",
-      "handoff": {
-        "state": "shared ledger columns, row chrome, crew RECRUIT action",
-        "next": "commit and refresh the cockpit evidence",
-        "open": "none in the UI, only delivery bookkeeping",
-        "evidence": "ui-review left crops, ADR-051"
-      }
+      "timestamp": 1792918984.2703657,
+      "timestamp_str": "2026-10-25 12:03:04",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "left-row-ledger-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'left-row-ledger-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792860026.9009798,
-      "timestamp_str": "2026-10-24 19:40:26"
-    },
-    {
-      "task_id": "cockpit-skills-radar-ship-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: make radar controls clickable and stateful, merge pilot perks into Skills, and bound the ship panel",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792865404.2984045,
-      "timestamp_str": "2026-10-24 21:10:04",
-      "agent": "unidentified",
-      "impact_assessment": {
-        "why": "Radar settings were visually present but unclickable, the Skills tab mixed training with duplicate top/left perks entry points, and the ship schematic expanded to over 2200px outside its 454px terminal column",
-        "benefits": "A working radar control strip with synced GRID/LABELS state, one player Skills/perks/relics dossier, and a bounded ship dossier with schematic, compact stats and module ledger",
-        "risks": "contract: none; dependency: none; concurrency: none; state: static HTML/CSS/JS plus layout tests and browser tooling, no simulation changes",
-        "mitigation": "Playwright click/state tests for every radar control, zero browser audit findings at desktop/laptop/720p, vision approval for Skills and ship, 496 tests, 4/4 gates and ADR-052"
-      }
-    },
-    {
-      "task_id": "cockpit-skills-radar-ship-v1",
+      "task_id": "grand-strategy-v1",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verified: all radar controls are clickable and stateful with map click-through intact; Skills now holds ranks, pilot perks and relics with no duplicate top/left perks entry; the ship panel is bounded to 450px with a 240px schematic, compact stats and full-width module ledger; browser audits are zero at desktop/laptop/720p; vision APPROVED Skills and ship; 496 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "description": "[4/5] Celestial models: new static/celestial.js CelestialRenderer with seeded cached sprites for 21 body types (continents/oceans/caps/clouds, craters, lava veins, toxic bands, banded giants with tilted rings, ring world, Dyson lattice, 4 station models rotating, black hole accretion disk, wormhole spiral), star corona with rays, asteroid belts as rock bands, moons, star-facing terminator, flagship silhouette parked in orbit and in transit; logarithmic body display size shared with hit tests; radar canvas labels 12px; orbit frame median 0.2-0.3ms at 60fps; 3 static tests; 4/4 gates; checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792865423.2212696,
-      "timestamp_str": "2026-10-24 21:10:23",
-      "agent": "unidentified",
-      "handoff": {
-        "state": "radar sync, inline pilot perks, bounded ship dossier",
-        "next": "commit and refresh cockpit evidence",
-        "open": "none in the UI, only delivery bookkeeping",
-        "evidence": "ui-review skills/ship crops, ADR-052"
-      }
+      "timestamp": 1792919353.0459323,
+      "timestamp_str": "2026-10-25 12:09:13",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "cockpit-skills-radar-ship-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'cockpit-skills-radar-ship-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792865423.4133413,
-      "timestamp_str": "2026-10-24 21:10:23",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "transit-speed-performance-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: merge orbit and sublight into one timed transit, speed up the chrono, and cache the radar backdrop",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792869612.932522,
-      "timestamp_str": "2026-10-24 22:20:12",
-      "agent": "unidentified",
-      "impact_assessment": {
-        "why": "ENTER ORBIT teleported via /api/orbit while SUBLIGHT TRANSIT duplicated it; the chrono advanced only 1 tick/s at 1x, autosave ran every 10 ticks, and the radar redrew 1,100 stars plus nebula gradients every frame",
-        "benefits": "One timed transit-and-orbit action, a meaningful quantum fuel trade-off, 2 ticks/s at 1x and 20 ticks/s at 10x, 15-second autosave cadence, and ~0.08ms cached radar draws at 60 FPS",
-        "risks": "contract: server and static surfaces change; dependency: none; concurrency: the ticker and autosave loop share the engine lock and now autosave by wall clock; state: engine travel guards, quantum fuel, server tick interval, radar cache and client animation",
-        "mitigation": "Failing-first transit and tick-interval tests, real-browser timed-travel smoke, zero /api/orbit calls from the UI, 499 tests, 4/4 gates, FPS/draw benchmarks and ADR-053"
-      }
-    },
-    {
-      "task_id": "transit-speed-performance-v1",
+      "task_id": "grand-strategy-v1",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verified: orbit and sublight are merged into one timed TRANSIT & ORBIT action with no /api/orbit UI call; travel guards and arrival auto-orbit are covered; quantum minimum is 2 fuel at 1.0/AU; ticker runs 2 ticks/s at 1x and 20 at 10x with 15s autosave; radar draw is ~0.08ms at 60 FPS; browser smoke shows stay-at-origin then arrival at 10x; vision APPROVED the two-action target card; 499 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "description": "[5/5 pending docs] Strategy UI + monthly economy: GALACTIC WARS panel (tug-of-war bars, fronts, captures, BACK 500 pledges), outpost founding from the Empire tab for the orbited world, credits card shows net/MO; crew wages became a monthly rate accrued on the calendar (wages_due, DAYS_PER_MONTH=30) instead of a per-tick charge that bankrupted a new commander in 20 s at 1x; MONTH END report; cash_flow per-month keys (test_sim_mechanics expectations moved from per_tick to per_month keys, same values); Edge strategy smoke 6/6; 4/4 gates; checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792869657.3329268,
-      "timestamp_str": "2026-10-24 22:20:57",
-      "agent": "unidentified",
-      "handoff": {
-        "state": "timed transit, faster chrono, cached radar",
-        "next": "commit and refresh the cockpit evidence, then run check --strict",
-        "open": "none in the game mechanics",
-        "evidence": "ui-review target-transit crop, browser smoke, ADR-053"
-      }
+      "timestamp": 1792919674.6021585,
+      "timestamp_str": "2026-10-25 12:14:34",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "transit-speed-performance-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'transit-speed-performance-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792869657.5197375,
-      "timestamp_str": "2026-10-24 22:20:57",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "transit-hazards-course-preview-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: integrate transit hazards, course plotting, and pre-flight risk preview",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792877445.6783917,
-      "timestamp_str": "2026-10-25 00:30:45",
-      "agent": "antigravity",
-      "impact_assessment": {
-        "why": "Players lacked situational awareness before launching: travel duration and fuel were only partially estimated on buttons, sector environmental hazards were uncalculated during travel, and the radar did not visualize transit vectors.",
-        "benefits": "Strategic pre-flight transit planning with sublight/quantum comparison, color-coded risk %, hazard descriptors, dynamic radar course vectors, and sector hazard events.",
-        "risks": "contract: REST /api/travel/preview added; dependency: none; concurrency: engine simulation lock shared; state: GameState events updated on hazard strike",
-        "mitigation": "Automated unittests for preview and hazards, real-browser Playwright captures across viewports, typography tightening for 720p, 502 tests and 4/4 gates."
-      }
-    },
-    {
-      "task_id": "transit-hazards-course-preview-v1",
+      "task_id": "grand-strategy-v1",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verified: transit hazard simulation inflicts damage, delay and events on hazard strikes; /api/travel/preview returns sublight and quantum breakdowns; target dossier displays real-time transit plan; dashed COURSE PLOT renders on radar; target card compacted for 720p with action buttons unclipped; browser captures report 0 errors, 0 hscroll, 0 tiny text across desktop/laptop/short; vision approved; 502 tests and 4/4 gates pass; checklists: passed; uncommitted pending commit",
+      "description": "[5/5] Docs: README war CLI, war rules, monthly payroll, strategic map, celestial.js, 34 suites (22,341 chars), ADR-057 with outpost rebalance follow-up; 565 tests; 4/4 gates; uncommitted pending user commit request; checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1792877457.3933058,
-      "timestamp_str": "2026-10-25 00:30:57",
-      "agent": "antigravity",
-      "handoff": {
-        "state": "in-system hazards, course plot vector, target transit plan card, ADR-054",
-        "next": "commit and deliver task",
-        "evidence": "ui-review screenshots, report.json, ADR-054"
-      }
+      "timestamp": 1792919773.3660283,
+      "timestamp_str": "2026-10-25 12:16:13",
+      "agent": "claude-code:f36d48df"
     },
     {
-      "task_id": "transit-hazards-course-preview-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'transit-hazards-course-preview-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792877477.070814,
-      "timestamp_str": "2026-10-25 00:31:17",
-      "agent": "antigravity"
+      "task_id": "grand-strategy-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[resume] Grand-strategy layer verified: 565 tests, 4/4 gates; delivery authorized by user; next: feature commit, cockpit UI review, evidence commit, push",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792927195.3782234,
+      "timestamp_str": "2026-10-25 14:19:55",
+      "agent": "kilo:1",
+      "continued_from": "claude-code:f36d48df"
+    },
+    {
+      "task_id": "grand-strategy-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[5/5] Grand-strategy layer reviewed and hardened: cargo cost basis reconciles every hold mutation, defender-only last stand, capital falls last, transit risk floor 3%, monthly payroll log ordering, war in REPL, outpost options from can_build_on, pan-cached territory layer, sprite LRU, equal 3-column 1280 strip, fresh system owner dossier; 570 tests; 4/4 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792934514.8205342,
+      "timestamp_str": "2026-10-25 16:21:54",
+      "agent": "kilo:1"
     }
   ]
 }
