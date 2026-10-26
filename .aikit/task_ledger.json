@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "state-roundtrip-audit",
+    "task_id": "doc-encoding-final",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793007968.196351,
+    "updated_at": 1793011407.2534275,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": [],
-    "completed_at": 1793007995.1267478
+    "completed_at": 1793011420.0162897
   },
   "checkpoints": [
-    {
-      "task_id": "away-teams-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'away-teams-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792970336.75027,
-      "timestamp_str": "2026-10-26 02:18:56",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "deepfrontier-v1",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/6] Plan: galaxy/faction/pirate expansion; 25+ blocking decision events; mission board + counters; quantum trade orders with transit fees; landing surface operations; realistic population/war devastation + outliner height. Each milestone keeps tests green.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792970944.7086182,
-      "timestamp_str": "2026-10-26 02:29:04",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The user asked for substantially more simulation depth across encounters, decisions, missions, economics, landing, factions and war consequences. Existing anomalies are jump-only, trade is instant local only, landing is a single reward button, and war captures never hurt populations.",
-        "benefits": "More systems/factions and pirate zones widen the map; blocking decisions create real-time tension; a mission board and counters reward play; quantum trade adds logistics; surface operations make landing a choice; devastation makes war consequential and population believable.",
-        "risks": "contract: additive defaulted model fields and snapshot keys, new REST/CLI surfaces; dependency: stdlib only; concurrency: engine lock and tick guards, UI modal must not deadlock; state: deterministic seeds, old-save defaults, blocked ticks must pause cleanly",
-        "mitigation": "Pure data modules for events/events catalog and quantum routes, failing-first tests per mechanic, engine guard helper for pending decisions, backward-compatible from_dict tests, real-Edge 3-viewport review, full gates before completion"
-      }
-    },
-    {
-      "task_id": "deepfrontier-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[6/6] Frontier depth implemented and verified: 23 systems/9 factions, pirate tolls, 9 anomalies, 35 blocking decisions, expanded contracts with 120cr board refresh, quantum freight with fees/ETA, landing surface ops, realistic populations/war devastation, compact outliner. checklists: passed (4/4 gates). Tests: 619 passed. UI: real Edge 1920/1366/1280, zero errors/hscroll/tiny; focused vision approvals for quantum board, surface ops, pirate card, decision modal, compact outliner.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792997526.2335446,
-      "timestamp_str": "2026-10-26 09:52:06",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "619 tests pass and 4/4 gates pass",
-        "next": "commit when authorized",
-        "open": "UI cockpit contract needs a clean-baseline UI task",
-        "evidence": "ui-review/frontier-depth and ADR-060"
-      }
-    },
     {
       "task_id": "deepfrontier-v1",
       "phase": "completed",
@@ -295,6 +251,49 @@
       "status": "completed",
       "timestamp": 1793007995.1267493,
       "timestamp_str": "2026-10-26 12:46:35",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "doc-encoding-final",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Normalize legacy ADR mojibake, extend the encoding guard to decisions.md, and visually verify the low-morale crew label.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793011365.5224068,
+      "timestamp_str": "2026-10-26 13:42:45",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The last-ten audit found double-encoded old ADR punctuation and the crew morale label needed a real cockpit check.",
+        "benefits": "The generated decision register is marker-free and the source encoding test now covers it; the low-morale crew text is visually clean.",
+        "risks": "contract: documentation/test only; dependency: none; concurrency: none; state: no game behavior, save schema, or RNG change",
+        "mitigation": "Normalize punctuation to ASCII, assert decisions.md in the encoding test, review a 1366px Edge capture, run 4/4 gates"
+      }
+    },
+    {
+      "task_id": "doc-encoding-final",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Normalized legacy ADR punctuation, extended the mojibake guard to decisions.md, and visually verified the 10-morale crew row showing 10 !! NEAR DESERTION with no corrupted glyphs in a 1366px Edge capture. checklists: passed (4/4 gates). Tests: 625.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793011407.2534275,
+      "timestamp_str": "2026-10-26 13:43:27",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "625 tests and 4/4 gates",
+        "next": "complete task, commit ledger, strict check, push",
+        "evidence": "ui-review/encoding/crew-morale-laptop.png and ADR-066"
+      }
+    },
+    {
+      "task_id": "doc-encoding-final",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'doc-encoding-final' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793011420.0162945,
+      "timestamp_str": "2026-10-26 13:43:40",
       "agent": "kilo:1"
     }
   ]
