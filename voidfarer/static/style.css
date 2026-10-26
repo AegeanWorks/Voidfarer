@@ -8205,3 +8205,131 @@ body.cockpit-theme .panel-center {
 /* Crew morale gets a dedicated row; the role/XP/status line may wrap above it. */
 .crew-row .crew-info-block small { white-space: normal; overflow: visible; text-overflow: clip; }
 .crew-row .crew-morale-text { white-space: nowrap; }
+
+/* Contract titles in the dense ledger wrap cleanly without losing their identity. */
+.contract-card .contract-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.22;
+    display: block;
+}
+
+/* The ledger gives the contract name its full column at narrow widths by shrinking the
+   category chip to a colored code and stacking it above the title; the full word stays
+   in the tooltip and at 1600px+. */
+/* Bound the target dossier to the center radar cell so it never overlaps the
+   onboarding banner above or the command strip below, and move the radar label left. */
+body.cockpit-theme .nav-panel > .panel-header {
+    top: 8px;
+    left: 12px;
+    right: auto;
+}
+.sector-mod-strip { padding-top: 34px; }
+.nav-target-card {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    bottom: 4px;
+    width: min(440px, 55vw);
+    max-height: none;
+}
+.surface-op-main {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 1px 8px;
+}
+.surface-op-main strong { order: 1; }
+.surface-op-main .surface-op-reward { order: 2; margin-left: auto; white-space: nowrap; }
+.surface-op-main small:not(.surface-op-reward) { order: 3; flex: 1 0 100%; }
+.hud-command-strip .skill-quick-chip {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "hotkey name rank" "bar bar bar";
+    padding: 3px 5px;
+    gap: 1px 4px;
+}
+.hud-command-strip .skill-quick-icon { display: none; }
+.skill-quick-name, .skill-quick-rank { letter-spacing: -0.02em; }
+.contract-card .contract-cat-label-short { display: none; }
+@media (max-width: 1599px) {
+    :root { --ledger-record-cols: 20px minmax(0, 1fr) 110px; }
+    .cockpit-grid { grid-template-columns: minmax(456px, 0.85fr) minmax(0, 1.45fr); }
+    .panel-left { grid-template-columns: 142px minmax(0, 1fr); }
+    .panel-left .deck-tab-btn { padding-left: 6px; padding-right: 6px; }
+    body.cockpit-theme .nav-panel > .panel-header { top: 6px; left: 6px; padding: 3px 6px; gap: 6px; }
+    body.cockpit-theme .nav-panel > .panel-header .panel-title { font-size: 12px; letter-spacing: 0.04em; }
+    .nav-target-card { top: 4px; right: 4px; bottom: 4px; width: min(432px, 54vw); max-height: none; }
+    .contract-card .contract-cat-label-full { display: none; }
+    .contract-card .contract-cat-label-short { display: inline; }
+    .contract-card > .contract-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+    .hud-strip-panel > .panel-header { gap: 4px; }
+    .hud-strip-panel > .panel-header .panel-title {
+        flex: 0 0 auto;
+        font-size: 13px;
+        letter-spacing: 0.03em;
+        overflow: visible;
+    }
+    .hud-strip-panel .text-btn { padding: 2px 5px; }
+    .skills-quick-points { white-space: nowrap; font-size: 12px; }
+    #panelReactor .power-total {
+        margin-left: auto;
+        min-width: 0;
+        font-size: 12px;
+        letter-spacing: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .hud-command-strip .reactor-sim-strip {
+        grid-template-columns: 1.12fr 1.12fr 1.22fr 0.82fr;
+        gap: 3px 2px;
+    }
+    body.cockpit-theme .hud-command-strip .reactor-mode-btn {
+        min-width: 0;
+        padding: 2px 1px;
+        font-size: 12px;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+    }
+    .hud-command-strip .power-matrix { gap: 3px 8px; }
+    .hud-command-strip .power-header { gap: 3px; }
+    .hud-command-strip .pwr-icon { display: none; }
+}
+@media (max-height: 800px) and (min-width: 1280px) {
+    .cockpit-frame { gap: 4px; padding: 5px 8px; }
+    .cockpit-grid { gap: 5px; }
+    .cadet-academy-banner { padding: 4px 10px; min-height: 0; }
+    .hud-strip-panel { padding: 5px 7px; gap: 3px; }
+    .hud-strip-panel > .panel-header,
+    .hud-strip-right .map-controls-panel > .panel-header,
+    .hud-strip-right .log-panel > .panel-header { padding-bottom: 2px; flex-wrap: nowrap; }
+    .hud-strip-right .log-panel .log-header-actions { flex: 0 0 auto; margin-left: auto; }
+    .hud-command-strip .flight-log-stream { height: 48px; max-height: 48px; padding: 4px 7px; }
+    .hud-command-strip .reactor-sim-strip { gap: 2px; padding-bottom: 2px; }
+    .hud-command-strip .reactor-mode-btn,
+    .hud-command-strip #btnVentReactor { min-height: 22px; }
+    .hud-command-strip .pwr-slider { height: 15px; }
+    .hud-command-strip .power-action-row .btn-hud { min-height: 22px; }
+    .hud-command-strip .skill-quick-chip { min-height: 21px; padding: 1px 5px; }
+    .skills-quick-hint { margin: 1px 0 0; line-height: 1.15; letter-spacing: -0.02em; }
+    .nav-target-card { top: 2px; right: 2px; bottom: 2px; width: min(432px, 54vw); max-height: none; padding: 5px 8px; }
+    .surface-ops { margin-top: 2px; padding: 3px 6px; }
+    .surface-header { margin-bottom: 2px; }
+    .surface-op-list { gap: 2px; }
+    .surface-op-row { padding: 2px 5px; gap: 5px; }
+    .surface-op-main { line-height: 1.12; }
+    .surface-op-main small:not(.surface-op-reward) { letter-spacing: -0.01em; line-height: 1.12; }
+    .surface-op-side { gap: 2px; }
+    .surface-op-side .btn-hud { min-height: 22px; padding: 1px 7px; }
+}
+.contract-cat-badge.cat-pirates { color: #ffb3a5; background: rgba(201, 107, 90, 0.16); border-color: rgba(201, 107, 90, 0.45); }
+.contract-cat-badge.cat-surface { color: #b9e3c7; background: rgba(143, 191, 159, 0.14); border-color: rgba(143, 191, 159, 0.4); }
+.contract-cat-badge.cat-anomaly { color: #d8c49a; background: rgba(169, 139, 189, 0.12); border-color: rgba(169, 139, 189, 0.4); }
+.contract-cat-badge.cat-diplomacy { color: #b9dce8; background: rgba(127, 183, 201, 0.14); border-color: rgba(127, 183, 201, 0.4); }
+.contract-cat-badge.cat-fleet { color: #b9dce8; background: rgba(127, 183, 201, 0.14); border-color: rgba(127, 183, 201, 0.4); }

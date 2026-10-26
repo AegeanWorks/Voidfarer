@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `74`
-- **Total Classes**: `198`
-- **Total Top-Level Functions**: `255`
-- **Total Class Methods**: `1098`
-- **Total Source Lines**: `32280`
+- **Total Classes**: `199`
+- **Total Top-Level Functions**: `256`
+- **Total Class Methods**: `1102`
+- **Total Source Lines**: `32357`
 
 ---
 
@@ -218,7 +218,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `908` lines (`41160` bytes)
+**Size**: `938` lines (`42756` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -354,6 +354,11 @@
   - Method `.test_wars_panel_sits_in_the_factions_tab_and_pledges()`
   - Method `.test_outposts_are_founded_from_the_empire_tab()`
   - Method `.test_treasury_is_reported_per_month()`
+- `class TestPostPushPolishLayout` - *Contract header readability, compact reactor strip and deterministic surface scenario.*
+  - Method `.setUpClass()`
+  - Method `.test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths()`
+  - Method `.test_compact_reactor_strip_uses_four_proportional_tracks()`
+  - Method `.test_surface_ops_scrolls_target_card_and_browser_driver_prepares_surface()`
 
 ---
 
@@ -1295,12 +1300,13 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `344` lines (`15288` bytes)
+**Size**: `391` lines (`17418` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
 - `def _metrics(page)` - *Return viewport, scroll, element and tiny-text counts from the live page.*
 - `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll)` - *Open one real browser viewport, drive it and capture a true screenshot.*
+- `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
 - `def main(argv)` - *Run the browser review driver and write screenshots plus a small JSON report.*
 
 ---

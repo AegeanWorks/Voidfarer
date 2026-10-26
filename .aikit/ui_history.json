@@ -250,5 +250,19 @@
     "final_snapshot_digest": "05aa1712917a68e66f3eb54c6a4ff33d2a1d3697edf779cbe4afab69af45bfd5",
     "final_snapshot_entries": 909,
     "surface_digest": "1f06d209f4888f51af9dd82605fa4f2ac3a93f69697462f88b41f595177ef61a"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "efb8a0b79375f4952bb5c45a9554ac37a3cdb008",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793041907.6401515,
+    "finished_at": 1793041919.662455,
+    "strikes": 0,
+    "reviewer": "G-015 Vision Reviewer",
+    "allowed_removals": [],
+    "final_snapshot_digest": "05aa1712917a68e66f3eb54c6a4ff33d2a1d3697edf779cbe4afab69af45bfd5",
+    "final_snapshot_entries": 909,
+    "surface_digest": "e282998b8800e16c7bdfefc8da4668535cba604bf94d9a7dd3010fe4f8382ae1"
   }
 ]

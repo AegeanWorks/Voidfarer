@@ -906,3 +906,33 @@ class TestStrategyPanels(unittest.TestCase):
     def test_treasury_is_reported_per_month(self):
         self.assertIn("net_per_month", self.js)
         self.assertNotIn("net_per_tick", self.js)
+
+
+class TestPostPushPolishLayout(unittest.TestCase):
+    """Contract header readability, compact reactor strip and deterministic surface scenario."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.browser_tool = (STATIC_DIR.parent.parent / "tools" / "ui_browser.py").read_text(encoding="utf-8")
+
+    def test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths(self):
+        self.assertIn("contract-cat-label-full", self.js)
+        self.assertIn("contract-cat-label-short", self.js)
+        self.assertRegex(
+            self.css,
+            r"\.contract-card\s*>\s*\.contract-header\s*\{\s*flex-direction:\s*column",
+        )
+
+    def test_compact_reactor_strip_uses_four_proportional_tracks(self):
+        self.assertIn("grid-template-columns: 1.12fr 1.12fr 1.22fr 0.82fr;", self.css)
+        self.assertIn(".hud-command-strip .pwr-icon { display: none; }", self.css)
+
+    def test_surface_ops_scrolls_target_card_and_browser_driver_prepares_surface(self):
+        self.assertIn('this.surfaceOps.closest(".nav-target-card")', self.js)
+        self.assertIn(".surface-op-main .surface-op-reward { order: 2; margin-left: auto; white-space: nowrap; }", self.css)
+        self.assertIn(".hud-command-strip .skill-quick-icon { display: none; }", self.css)
+        self.assertIn('"surface"', self.browser_tool)
+        self.assertIn("def _prepare_surface(", self.browser_tool)
+        self.assertIn("engine.allow_decision_events = False", self.browser_tool)

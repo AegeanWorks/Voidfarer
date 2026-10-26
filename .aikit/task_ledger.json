@@ -1,103 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "cockpit-layout-audit",
+    "task_id": "postpush-polish-verify",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793014329.5525756,
-    "owner": "kilo:1",
-    "started_by": "kilo:1",
+    "updated_at": 1793042036.8370857,
+    "owner": "antigravity:1",
+    "started_by": "antigravity:1",
     "continuations": [],
-    "completed_at": 1793014350.087136
+    "completed_at": 1793042036.9899187
   },
   "checkpoints": [
-    {
-      "task_id": "frontier-review-push",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/4] Pre-push audit complete: fixed pirate/decision bypasses, gated encounter generation for deterministic tests, normalized surface cargo names, compacted the quantum board at 1366, verified natural-view graphics. checklists: passed (4/4 gates). Tests: 621. UI cockpit task finished and reviewed.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793000005.0621989,
-      "timestamp_str": "2026-10-26 10:33:25",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "621 tests and 4/4 gates",
-        "next": "commit UI evidence and close task, then push origin/master",
-        "evidence": "ui-review/frontier-depth and ADR-060/061"
-      }
-    },
-    {
-      "task_id": "frontier-review-push",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'frontier-review-push' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793000046.54602,
-      "timestamp_str": "2026-10-26 10:34:06",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "frontier-postpush-audit",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Audit pushed frontier changes, fix encounter/error-state/REPL/contract/devastation gaps, verify galaxy/faction/surface graphics, then commit and push.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793002770.4764476,
-      "timestamp_str": "2026-10-26 11:19:30",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The user asked to continue verifying the last push, fix whatever is needed, and check graphical fit with subagents.",
-        "benefits": "Prevents 409 responses from corrupting cockpit state, closes REPL bypasses, initializes frontier standings, fixes double-counted surface contracts and false field-rest risk, and keeps land/surface graphics coherent.",
-        "risks": "contract: additive state/error payloads and UI guards; dependency: none; concurrency: engine lock and REPL/HTTP guards; state: old saves and deterministic RNG must remain stable",
-        "mitigation": "Add regression assertions, gate blocked actions, run 4/4 checks, review natural Edge captures with the free vision subagent, then commit/push"
-      }
-    },
-    {
-      "task_id": "frontier-postpush-audit",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/3] Post-push audit complete: 409 responses now carry message/state, new cockpit handlers guard missing state, REPL and HTTP locks cover decisions and pirates, frontier factions/corps are initialized, surface contracts only advance on operations, field rest is risk-free, uninhabited bodies no longer gain devastation, and contract tooltips expose full titles. Graphical review covered galaxy, faction bottom, contracts, active freight order, and scrolled surface ops; normal panel scrolling explains the apparent clipped rows. checklists: passed (4/4 gates). Tests: 622. UI cockpit task finished with aria-live polish.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793003074.969729,
-      "timestamp_str": "2026-10-26 11:24:34",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "622 tests and 4/4 gates",
-        "next": "commit ledger and push origin/master",
-        "evidence": "ui-review/postpush and ADR-062"
-      }
-    },
-    {
-      "task_id": "frontier-postpush-audit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'frontier-postpush-audit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793003106.3052566,
-      "timestamp_str": "2026-10-26 11:25:06",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "anomaly-escape-audit",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Stress-test the live frontier loops, add guaranteed anomaly escape branches, enforce the invariant in tests, and re-run gates.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793004175.91049,
-      "timestamp_str": "2026-10-26 11:42:55",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "A long deterministic simulation showed three old anomaly profiles had only power-gated choices; low reactor power could leave no valid resolution.",
-        "benefits": "Every anomaly now has a no-power withdrawal, so the encounter can always clear without soft-locking flight.",
-        "risks": "contract: additive catalog choices only; dependency: none; concurrency: engine lock unchanged; state: legacy saves and RNG streams remain stable",
-        "mitigation": "Add one escape per anomaly, enforce a catalog test, run a 1,200-tick stress pass and full 4/4 gates"
-      }
-    },
     {
       "task_id": "anomaly-escape-audit",
       "phase": "phase 4",
@@ -294,6 +208,82 @@
       "timestamp": 1793014350.0871375,
       "timestamp_str": "2026-10-26 14:32:30",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "postpush-polish-verify",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Verify the two uncommitted post-push cockpit changes, make screenshot captures deterministic (no random decision modal), add a real surface-ops scenario, and fix the clipped contract-title header at 1280-1366.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793030656.6081486,
+      "timestamp_str": "2026-10-26 19:04:16",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The only work since origin/master is an uncommitted contract-title clamp and surface autoscroll; capture evidence shows the title still loses its identity in the 1366 ledger and the surface capture was obscured by a random decision modal, so neither change is verified.",
+        "benefits": "Deterministic, reproducible screenshots; contract titles stay readable without crowding; surface operations are reviewable; future audits stop reporting false visual passes.",
+        "risks": "contract: CSS/markup and a dev-only tool; dependency: none; concurrency: server ticker unchanged; state: no engine/save/RNG change, only tooling event suppression",
+        "mitigation": "Recapture at 1920/1366/1280, compare before/after, pin the header layout in test_cockpit_layout, run the full suite and 4/4 gates"
+      }
+    },
+    {
+      "task_id": "postpush-polish-verify",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Verify the two uncommitted post-push cockpit changes, make screenshot captures deterministic (no random decision modal), add a real surface-ops scenario, and fix the clipped contract-title header and compact strip/surface layout at 1280-1366.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793039960.7177024,
+      "timestamp_str": "2026-10-26 21:39:20",
+      "agent": "antigravity:1",
+      "impact_assessment": {
+        "why": "The only work since origin/master is an uncommitted contract-title clamp and surface autoscroll; capture evidence shows the title still loses its identity at 1280x720, the reactor strip clips SILENT/VENT at 1280-1366, and the surface dossier overlaps the command strip while clipping the fifth operation.",
+        "benefits": "Deterministic, reproducible screenshots; contract titles stay readable without ellipsis at 1920/1366/1280; reactor doctrine modes fit inside the compact strip; surface operations fit cleanly above the command strip.",
+        "risks": "contract: CSS/markup and a dev-only tool; dependency: none; concurrency: server ticker unchanged; state: no engine/save/RNG change, only tooling event suppression",
+        "mitigation": "Recapture at 1920/1366/1280, visually verify and run G-015 review, pin the header and strip layout in test_cockpit_layout, run the full suite and 4/4 gates"
+      },
+      "continued_from": "kilo:1"
+    },
+    {
+      "task_id": "postpush-polish-verify",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'postpush-polish-verify' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793042002.2590725,
+      "timestamp_str": "2026-10-26 22:13:22",
+      "agent": "antigravity:1"
+    },
+    {
+      "task_id": "postpush-polish-verify",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'postpush-polish-verify' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793042019.6818366,
+      "timestamp_str": "2026-10-26 22:13:39",
+      "agent": "antigravity:1"
+    },
+    {
+      "task_id": "postpush-polish-verify",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] 628 tests pass; 6 Playwright Edge screenshots approved by G-015 Vision Reviewer across 1920x1080, 1366x768, and 1280x720; ADR-068 and UI surface evidence recorded; 4/4 gates green; checklists: passed.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793042036.8370857,
+      "timestamp_str": "2026-10-26 22:13:56",
+      "agent": "antigravity:1"
+    },
+    {
+      "task_id": "postpush-polish-verify",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'postpush-polish-verify' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793042036.9899206,
+      "timestamp_str": "2026-10-26 22:13:56",
+      "agent": "antigravity:1"
     }
   ]
 }

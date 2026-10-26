@@ -2983,6 +2983,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
         const body = data.body || {};
         const operations = data.operations || [];
+        const wasHidden = this.surfaceOps.style.display === "none";
         const rows = operations.map(op => {
             const riskClass = op.risk >= 35 ? "risk-high" : (op.risk >= 18 ? "risk-mid" : "risk-low");
             const rewards = [];
@@ -3015,6 +3016,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.surfaceOps.querySelectorAll("[data-surface-op]").forEach(button => {
             button.addEventListener("click", () => this.handleSurfaceOp(button.getAttribute("data-surface-op")));
         });
+        if (wasHidden) {
+            const card = this.surfaceOps.closest(".nav-target-card");
+            if (card) card.scrollTop = Math.max(0, this.surfaceOps.offsetTop - 6);
+            else this.surfaceOps.scrollIntoView({ block: "nearest" });
+        }
     }
 
     async handleSurfaceOp(operationId) {
@@ -3465,10 +3471,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
             const pct = Math.min(100, Math.round((c.current_count / c.target_count) * 100));
             const relicBadge = c.reward_relic_tier ? `<span class="reward-pill relic">+Relic [${c.reward_relic_tier.toUpperCase()}]</span>` : '';
+            const category = String(c.category || "assignment");
+            const categoryCode = {
+                combat: "COM", exploration: "EXP", mining: "MIN", trade: "TRD",
+                pirates: "PIR", delivery: "DLV", surface: "SRF", anomaly: "ANO",
+                diplomacy: "DIP", fleet: "FLT",
+            }[category] || category.slice(0, 3).toUpperCase();
 
             card.innerHTML = `
                 <div class="contract-header">
-                    <span class="contract-cat-badge cat-${this.escapeHtml(c.category)}">${this.escapeHtml(c.category)}</span>
+                    <span class="contract-cat-badge cat-${this.escapeHtml(category)}" title="${this.escapeHtml(category.toUpperCase())}"><span class="contract-cat-label-full">${this.escapeHtml(category)}</span><span class="contract-cat-label-short" aria-hidden="true">${this.escapeHtml(categoryCode)}</span></span>
                     <strong class="contract-title">${this.escapeHtml(c.title)}</strong>
                 </div>
                 <p class="contract-desc">${this.escapeHtml(c.description)}</p>

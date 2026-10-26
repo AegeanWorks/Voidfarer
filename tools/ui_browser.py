@@ -31,7 +31,7 @@ from voidfarer.server import VoidFarerHandler, start_background_server  # noqa: 
 from voidfarer.storage import StorageManager  # noqa: E402
 from tools.ui_audit import TABS, VIEWPORTS  # noqa: E402
 
-SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "galaxy", "death", "ability")
+SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "galaxy", "death", "ability", "surface")
 TAB_IDS = {
     "player": "tabBtnPlayer",
     "skills": "tabBtnSkills",
@@ -92,6 +92,25 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
             }"""
         )
         page.wait_for_timeout(700)
+    elif scenario == "surface":
+        page.evaluate(
+            """async () => {
+                const cockpit = window.cockpit;
+                if (cockpit.refreshState) await cockpit.refreshState(true);
+                const report = cockpit.state && cockpit.state.surface_report;
+                const landedId = report && report.body ? report.body.id : null;
+                const bodies = (cockpit.state && cockpit.state.current_system && cockpit.state.current_system.bodies) || [];
+                const body = bodies.find(item => item.id === landedId);
+                if (body) {
+                    cockpit.selectedTarget = body;
+                    cockpit.selectedType = "body";
+                    cockpit.updateTargetCard();
+                    cockpit.renderSurfaceOps();
+                }
+                if (cockpit.renderEventPopups) cockpit.renderEventPopups();
+            }"""
+        )
+        page.wait_for_timeout(900)
     elif scenario == "event":
         page.evaluate(
             """() => {
@@ -230,7 +249,9 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
             if response.status >= 400 else None)
     page.on("requestfailed", lambda request: errors.append(
         f"requestfailed: {request.url} // {request.failure}"))
-    label = f"{name}-{tab}" if tab else name
+    label = name if scenario == "cockpit" else f"{name}-{scenario}"
+    if tab and scenario == "cockpit":
+        label += f"-{tab}"
     if scroll == "bottom":
         label += "-bottom"
     target = out / f"{label}.png"
@@ -254,6 +275,26 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
         "errors": errors,
         **metrics,
     }
+
+
+def _prepare_surface(engine: SimulationEngine) -> Optional[str]:
+    """Put the live engine on a landed body so the surface-ops panel has real data."""
+    landable = [body for body in engine.current_system.bodies if getattr(body, "landable", False)]
+    if not landable:
+        return None
+    target = landable[0]
+    ok, _ = engine.start_travel(target.id, mode="quantum")
+    if not ok:
+        return None
+    for _ in range(5):
+        if engine.state.ship.orbiting_body_id == target.id:
+            break
+        engine.tick(1)
+    ok, _ = engine.land_on_body(target.id)
+    for event in list(getattr(engine.state, "events", [])):
+        engine.dismiss_event(event.id)
+    engine.pause_time()
+    return target.id if ok else None
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -297,6 +338,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print("Fix: stop the process holding the port or retry.")
             return 1
         VoidFarerHandler.static_dir = STATIC_DIR
+        engine.allow_decision_events = False
+        engine.pause_time()
+        if args.scenario == "surface" and _prepare_surface(engine) is None:
+            print("Why: no landable body was available for the surface scenario.")
+            print("Fix: retry with a save that has a habitable body in the current system.")
+            return 1
         url = f"http://127.0.0.1:{handle.port}/"
         with sync_playwright() as playwright:
             try:
