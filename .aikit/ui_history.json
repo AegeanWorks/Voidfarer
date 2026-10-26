@@ -208,5 +208,19 @@
     "final_snapshot_digest": "9e2dc89a4d04e106ecc16d88984b8d420be0dfc832cf5351e108dc369628f837",
     "final_snapshot_entries": 905,
     "surface_digest": "6b332e4d773a73fdb64b1ec9d37c670476064282a6c1b988c50844cc942cb5e8"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "b98603166949270616b60e77b06edd980f5e6617",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793002841.489006,
+    "finished_at": 1793002968.9735532,
+    "strikes": 1,
+    "reviewer": "Nemotron 3.5 Super VL (free)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "6619ff1bdb9388c2fb00bf3ecf5092c10a94eb8907f0816dbd7685b04f0af66f",
+    "final_snapshot_entries": 908,
+    "surface_digest": "9c313fccddb4ff55d3554f462741aa782a39b7ecf2578111e0be231f0a0ed031"
   }
 ]
