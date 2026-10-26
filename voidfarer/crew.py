@@ -89,6 +89,8 @@ def calculate_crew_bonuses(crew: Sequence[CrewMember]) -> dict[str, float]:
         if member.status != "active":
             continue
         skill = max(1, member.skill)
+        if member.injury_ticks > 0:
+            skill = max(1.0, skill * 0.5)
         morale = max(0.25, member.morale / 100.0)
         if member.role == "pilot":
             bonuses["evasion"] += 0.015 * skill * morale
@@ -204,6 +206,49 @@ def apply_morale_event(
         updated.append(replace(member, morale=round(morale, 1)))
     sign = "+" if delta > 0 else ""
     return tuple(updated), f"CREW MORALE {sign}{delta:g} ({reason})."
+
+
+def crew_xp_to_next(member: CrewMember) -> int:
+    """Experience required for the next rank: veterans take longer to train."""
+    return max(1, int(max(1, member.skill)) * 40)
+
+
+def award_crew_xp(member: CrewMember, amount: int) -> tuple[CrewMember, bool]:
+    """Add expedition experience and promote a specialist when a rank threshold is crossed."""
+    from dataclasses import replace
+
+    xp = max(0, member.xp + max(0, int(amount)))
+    skill = max(1, member.skill)
+    promoted = False
+    while skill < 10 and xp >= crew_xp_to_next(replace(member, skill=skill)):
+        xp -= crew_xp_to_next(replace(member, skill=skill))
+        skill += 1
+        promoted = True
+    return replace(member, skill=skill, xp=xp), promoted
+
+
+def recover_crew_injuries(
+    crew: Sequence[CrewMember],
+    num_ticks: int,
+    medic_aboard: bool = False,
+) -> tuple[tuple[CrewMember, ...], list[str]]:
+    """Heal away-team injuries over time; an active medic doubles the recovery rate."""
+    from dataclasses import replace
+
+    if num_ticks <= 0:
+        return tuple(crew), []
+    rate = max(1, int(num_ticks)) * (2 if medic_aboard else 1)
+    updated: list[CrewMember] = []
+    logs: list[str] = []
+    for member in crew:
+        if member.status != "active" or member.injury_ticks <= 0:
+            updated.append(member)
+            continue
+        remaining = max(0, member.injury_ticks - rate)
+        updated.append(replace(member, injury_ticks=remaining))
+        if remaining == 0:
+            logs.append(f"MEDBAY: {member.name} recovered from expedition injuries.")
+    return tuple(updated), logs
 
 
 def shore_leave_restore(crew: Sequence[CrewMember]) -> tuple[tuple[CrewMember, ...], int, int]:

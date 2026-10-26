@@ -136,6 +136,31 @@ def _capture_target(front: list[str], loser_id: str, loser_name: str, score: flo
     return front[0] if abs(score) >= 2 * WAR_CAPTURE_THRESHOLD else None
 
 
+def _devastate_system(
+    system: StarSystem,
+    rng: random.Random,
+    severity: float = 1.0,
+) -> tuple[StarSystem, int]:
+    """A captured front loses civilians and gains persistent devastation."""
+    bodies = []
+    lost_total = 0
+    for body in system.bodies:
+        if body.population <= 0:
+            bodies.append(replace(body, devastation=min(100.0, (body.devastation or 0.0) + 2.0 * severity)))
+            continue
+        loss_rate = rng.uniform(0.018, 0.052) * max(0.4, severity)
+        lost = max(1, int(body.population * loss_rate))
+        lost_total += lost
+        bodies.append(
+            replace(
+                body,
+                population=max(0, body.population - lost),
+                devastation=min(100.0, (body.devastation or 0.0) + rng.uniform(14.0, 28.0) * severity),
+            )
+        )
+    return replace(system, bodies=tuple(bodies)), lost_total
+
+
 def frontier_systems(winner_name: str, loser_name: str, systems: dict[str, StarSystem]) -> list[str]:
     """Loser-held systems with a hyperlane into winner territory, sorted for determinism."""
     return sorted(
@@ -188,9 +213,16 @@ def resolve_wars(
             target = _capture_target(front, loser_id, loser_name, score, updated_systems, rng)
             if target is not None:
                 updated_systems[target] = replace(updated_systems[target], faction=winner_name)
+                severity = 2.0 if abs(score) >= 2 * WAR_CAPTURE_THRESHOLD else 1.0
+                updated_systems[target], civilians_lost = _devastate_system(
+                    updated_systems[target], rng, severity
+                )
                 captured = captured + (target,)
                 score -= sign * WAR_CAPTURE_THRESHOLD
-                logs.append(f"WAR: {winner_name} captured {updated_systems[target].name} from {loser_name}.")
+                logs.append(
+                    f"WAR: {winner_name} captured {updated_systems[target].name} from {loser_name}; "
+                    f"{civilians_lost:,} civilians displaced and the world left devastated."
+                )
             elif not front:
                 # No shared border: the offensive stalls until a front opens.
                 score = sign * WAR_CAPTURE_THRESHOLD / 2

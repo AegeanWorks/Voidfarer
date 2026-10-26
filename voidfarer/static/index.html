@@ -406,6 +406,8 @@
                             </div>
                         </div>
 
+                        <div class="quantum-freight" id="quantumFreight"></div>
+
                         <!-- Order lot: every BUY/SELL in the table uses it; Shift+click is always MAX -->
                         <div class="market-lot-bar" id="marketLotBar" role="group" aria-label="Order lot size">
                             <span class="market-lot-label">ORDER LOT</span>
@@ -437,6 +439,7 @@
                             <h4>NO ORBITAL EXCHANGE</h4>
                             <p>Ship is currently orbiting an unpopulated body or in deep space. Orbit a space station or colony to trade.</p>
                         </div>
+
                     </div>
 
                     <!-- Tab 2: Station Arsenal & Modular Upgrades -->
@@ -521,6 +524,7 @@
                             <h2 class="panel-title">SECTOR BOUNTIES & CONTRACTS</h2>
                         </div>
                         <p class="panel-intro-text">Continuous operational assignments. Completing tasks yields credits, pilot XP, and Precursor Relics while immediately deploying next-tier assignments.</p>
+                        <button class="btn-hud btn-amber contracts-refresh-btn" id="btnRefreshContracts">REFRESH MISSION BOARD (120 CR)</button>
                         <div class="contracts-list" id="contractsList">
                             <!-- Populated dynamically -->
                         </div>
@@ -615,12 +619,21 @@
                             <div class="panel-tag"><span class="badge-dot dot-green"></span> CREW</div>
                             <h2 class="panel-title">CREW ROSTER & ASSIGNMENTS</h2>
                         </div>
-                        <div class="crew-cashflow-row" id="crewCashFlow"></div>
-                        <div class="crew-assignments" id="crewAssignments"></div>
-                        <div class="crew-roster" id="crewRoster"></div>
-                        <div class="crew-shore-row" id="crewShoreRow">
-                            <button class="btn-hud btn-amber" id="btnShoreLeave">◍ GRANT SHORE LEAVE (DOCKED STATIONS)</button>
-                            <small class="crew-shore-note" id="crewShoreNote">Restores fleet morale for credits while docked.</small>
+                        <div class="crew-view-tabs" role="tablist" aria-label="Crew console views">
+                            <button class="crew-view-btn is-active" id="crewRosterTab" data-crew-view="roster" role="tab" aria-selected="true">ROSTER</button>
+                            <button class="crew-view-btn" id="crewAwayTab" data-crew-view="away" role="tab" aria-selected="false">AWAY TEAMS <span class="crew-view-count" id="crewAwayCount"></span></button>
+                        </div>
+                        <div class="crew-view" id="crewRosterView">
+                            <div class="crew-cashflow-row" id="crewCashFlow"></div>
+                            <div class="crew-assignments" id="crewAssignments"></div>
+                            <div class="crew-roster" id="crewRoster"></div>
+                            <div class="crew-shore-row" id="crewShoreRow">
+                                <button class="btn-hud btn-amber" id="btnShoreLeave">◍ GRANT SHORE LEAVE (DOCKED STATIONS)</button>
+                                <small class="crew-shore-note" id="crewShoreNote">Restores fleet morale for credits while docked.</small>
+                            </div>
+                        </div>
+                        <div class="crew-view" id="crewAwayView" style="display: none;">
+                            <div class="away-section" id="awaySection"></div>
                         </div>
                     </div>
 
@@ -852,6 +865,24 @@
                     <div class="anomaly-choices" id="anomalyChoices"></div>
                 </div>
 
+                <!-- Pirate Toll Card (blocks flight until resolved) -->
+                <div class="anomaly-alert-card pirate-alert-card" id="pirateCard" style="display: none;">
+                    <div class="anomaly-header">
+                        <span class="alert-icon">☠</span>
+                        <div class="alert-text">
+                            <span class="alert-tag">PIRATE INTERCEPT</span>
+                            <h3 class="alert-title" id="pirateTitle">Corsair Toll</h3>
+                        </div>
+                    </div>
+                    <p class="anomaly-desc" id="pirateDesc">A raider demands a toll for safe passage.</p>
+                    <div class="pirate-toll-line" id="pirateTollLine"></div>
+                    <div class="anomaly-choices pirate-choices">
+                        <button class="anomaly-choice-btn" id="btnPiratePay">PAY TOLL</button>
+                        <button class="anomaly-choice-btn" id="btnPirateFight">FIGHT</button>
+                        <button class="anomaly-choice-btn" id="btnPirateEvade">EVADE (-FUEL)</button>
+                    </div>
+                </div>
+
                 <div class="sub-panel nav-panel" id="panelNav">
                     <div class="panel-header">
                         <div class="panel-tag"><span class="badge-dot"></span> NAV-RADAR</div>
@@ -875,6 +906,7 @@
                             <span>MOONS <strong id="targetMoons">--</strong></span>
                             <span>FACTION <strong id="targetFaction">--</strong></span>
                             <span>POPULATION <strong id="targetPopulation">--</strong></span>
+                            <span>DEVASTATION <strong id="targetDevastation">--</strong></span>
                             <span>GOVERNMENT <strong id="targetGovernment">--</strong></span>
                         </div>
                         <div class="target-resources" id="targetResources"></div>
@@ -888,6 +920,7 @@
                             <button class="btn-action btn-amber" id="btnScoopFuel" style="display:none;" disabled>SCOOP FUEL</button>
                             <button class="btn-action btn-purple" id="btnJumpTarget" style="display:none;" disabled>HYPERSPACE JUMP</button>
                         </div>
+                        <div class="surface-ops" id="surfaceOps" style="display:none;"></div>
                     </div>
                 </div>
             </section>
@@ -1037,6 +1070,9 @@
                 <span class="stat-item">TRADES: <strong id="statTrades">0</strong></span>
                 <span class="stat-item">COMBAT VICTORIES: <strong id="statVictories">0</strong></span>
                 <span class="stat-item">ANOMALIES RESOLVED: <strong id="statAnomalies">0</strong></span>
+                <span class="stat-item">PIRATES: <strong id="statPirates">0</strong></span>
+                <span class="stat-item">DECISIONS: <strong id="statDecisions">0</strong></span>
+                <span class="stat-item">LANDINGS: <strong id="statLandings">0</strong></span>
             </div>
             <div class="footer-status">
                 <span class="signal-indicator"></span> SUB-SPACE QUANTUM LINK: NOMINAL
@@ -1045,6 +1081,17 @@
     </div>
 
     <div class="hud-tooltip" id="hudTooltip" role="tooltip" aria-hidden="true"></div>
+
+    <!-- Blocking decision modal: time and flight do not advance until a choice is made. -->
+    <div class="decision-overlay" id="decisionOverlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="decisionTitle">
+        <div class="decision-modal">
+            <div class="decision-eyebrow" id="decisionSeverity">DECISION REQUIRED</div>
+            <h2 class="decision-title" id="decisionTitle">Decision</h2>
+            <p class="decision-desc" id="decisionDesc"></p>
+            <div class="decision-choices" id="decisionChoices"></div>
+            <p class="decision-lock">SIMULATION LOCKED // RESOLVE TO CONTINUE</p>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="celestial.js"></script>

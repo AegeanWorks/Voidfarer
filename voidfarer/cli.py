@@ -1001,6 +1001,12 @@ def cmd_contracts(engine: SimulationEngine, storage: StorageManager, parts: list
         return 0
 
     sub = parts[1].lower()
+    if sub in ("refresh", "reroll"):
+        ok, msg = engine.refresh_contracts()
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
     if sub in ("claim", "complete"):
         if len(parts) < 3:
             ready = [c for c in engine.state.ship.active_contracts if c.completed]
@@ -1018,7 +1024,7 @@ def cmd_contracts(engine: SimulationEngine, storage: StorageManager, parts: list
             storage.save(engine.state)
         return 0 if ok else 1
 
-    print(f"{RED}Unknown contracts command '{sub}'. Options: list, claim <id>.{RESET}")
+    print(f"{RED}Unknown contracts command '{sub}'. Options: list, claim <id>, refresh.{RESET}")
     return 1
 
 
@@ -1731,12 +1737,15 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
         print(f"\n{BOLD}{CYAN}=== CREW ROSTER ==={RESET}")
         print(f"Active {report['active']}/{report['capacity']} | Upkeep {report['upkeep']} cr/month")
         for member in report["crew"]:
-            morale_note = f"{RED}⚠ NEAR DESERTION{RESET}" if member["morale"] < 20 else (f"{YELLOW}LOW{RESET}" if member["morale"] < 35 else f"{GREEN}OK{RESET}")
+            morale_note = f"{RED}âš  NEAR DESERTION{RESET}" if member["morale"] < 20 else (f"{YELLOW}LOW{RESET}" if member["morale"] < 35 else f"{GREEN}OK{RESET}")
+            injury_note = f" {RED}INJURED {member.get('injury_ticks', 0)}t{RESET}" if member.get("injury_ticks", 0) else ""
+            xp_note = f"{CYAN}XP {member.get('xp', 0)}/{max(1, member['skill'] * 40)}{RESET}"
             print(
                 f"{member['id']:<18} {BOLD}{member['name']:<18}{RESET} {member['role']:<12} "
-                f"SKILL {member['skill']} MORALE {member['morale']:.0f} [{morale_note}] WAGE {member['wage']} PORTRAIT {member['portrait']}"
+                f"SKILL {member['skill']} {xp_note} MORALE {member['morale']:.0f} [{morale_note}] WAGE {member['wage']} PORTRAIT {member['portrait']}{injury_note}"
             )
         print(f"\n{DIM}Recruit: crew recruit <{'|'.join(r.id for r in CREW_ROLES)}> | Drill: crew train <id> | Dismiss: crew dismiss <id> | Shore leave: crew shore{RESET}")
+        print(f"{DIM}Away teams: away | away launch <mission_type> [crew_ids...] | away recall <mission_id>{RESET}")
         return 0
     if sub in ("recruit", "hire"):
         if len(parts) < 3:
@@ -1772,6 +1781,206 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
             storage.save(engine.state)
         return 0 if ok else 1
     print(f"{RED}Unknown crew command '{sub}'. Options: list, recruit, train, shore, dismiss.{RESET}")
+    return 1
+
+
+def cmd_away(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    sub = parts[1].lower() if len(parts) > 1 else "list"
+    report = engine.get_away_report()
+    body = report.get("body")
+    if sub in ("list", "status", "teams"):
+        print(f"\n{BOLD}{CYAN}=== AWAY TEAMS & EXPEDITIONS ==={RESET}")
+        if not body:
+            print(f"{YELLOW}No orbital body. Orbit a world or station to deploy an away team.{RESET}")
+        else:
+            hazards = ", ".join(body["hazards"]) if body["hazards"] else "none"
+            print(f"Orbit: {BOLD}{body['name']}{RESET} [{body['body_type']}] | Hazards: {hazards}")
+        if report["active"]:
+            print(f"\n{BOLD}ACTIVE EXPEDITIONS ({len(report['active'])}/{report['max_active']}){RESET}")
+            for mission in report["active"]:
+                team = ", ".join(member["name"] for member in mission["team"])
+                print(
+                    f"  {mission['icon']} {BOLD}{mission['name']:<20}{RESET} {mission['body_name']:<28} "
+                    f"RISK {mission['risk']}% | {mission['progress']:.0f}% | {mission['remaining_ticks']}t left | {team}"
+                )
+        else:
+            print(f"\n{DIM}No away teams deployed.{RESET}")
+        if body:
+            print(f"\n{BOLD}AVAILABLE EXPEDITIONS{RESET}")
+            for mission in report["available"]:
+                team = ", ".join(member["name"] for member in mission["team"]) or "none"
+                state = f"{GREEN}READY{RESET}" if mission["available"] else f"{YELLOW}BLOCKED{RESET}"
+                risk_label = "N/A" if mission["risk"] is None else f"{mission['risk']}%"
+                print(
+                    f"  {mission['icon']} {BOLD}{mission['id']:<18}{RESET} {mission['name']:<20} "
+                    f"RISK {risk_label} | {mission['duration_ticks']}t | team {len(mission['team'])}/{mission['team_size']} "
+                    f"| {', '.join(mission['rewards'])} | {state}"
+                )
+                reason_note = f" - {mission['reason']}" if mission["reason"] else ""
+                print(f"     {DIM}Best-fit team: {team}{reason_note}{RESET}")
+        injuries = [member for member in report["crew"] if member["injury_ticks"] > 0]
+        if injuries:
+            print(f"\n{RED}INJURED CREW:{RESET} " + ", ".join(
+                f"{member['name']} ({member['injury_ticks']}t)" for member in injuries
+            ))
+        print(f"\n{DIM}Deploy: away launch <mission_type> [crew_ids...] | Recall: away recall <mission_id>{RESET}")
+        return 0
+    if sub in ("launch", "deploy"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} away launch <mission_type> [crew_ids...]")
+            return 1
+        crew_ids = parts[3:] or None
+        ok, msg = engine.launch_away_mission(parts[2], crew_ids)
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub in ("recall", "abort"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} away recall <mission_id>")
+            return 1
+        ok, msg = engine.recall_away_mission(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown away command '{sub}'. Options: list, launch, recall.{RESET}")
+    return 1
+
+
+def cmd_pirate(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    action = parts[1].lower() if len(parts) > 1 else "status"
+    pirate = engine.state.active_pirate
+    if action in ("status", "list"):
+        if pirate is None:
+            print(f"\n{DIM}No pirate encounter active. Raid risk rises in pirate havens, low-security systems and hostile space.{RESET}")
+            return 0
+        print(f"\n{RED}{BOLD}=== PIRATE INTERCEPT ==={RESET}")
+        print(f"{BOLD}{pirate.band_name}{RESET} // {pirate.ship_class} // threat {pirate.threat} // {pirate.system_name}")
+        print(pirate.description)
+        print(f"Toll demanded: {YELLOW}{pirate.toll_credits} cr{RESET} | Your credits: {engine.state.ship.credits}")
+        print(f"{DIM}Resolve: pirate pay | pirate fight | pirate evade{RESET}")
+        return 0
+    if action not in ("pay", "fight", "evade", "flee"):
+        print(f"{RED}Unknown pirate action '{action}'. Use pay, fight, or evade.{RESET}")
+        return 1
+    ok, msg = engine.resolve_pirate_encounter(action)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
+
+
+def cmd_decision(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    action = parts[1].lower() if len(parts) > 1 else "status"
+    pending = engine.state.pending_decision
+    if action in ("status", "list", "show"):
+        if pending is None:
+            print(f"\n{DIM}No decision pending. Time and flight are clear.{RESET}")
+            return 0
+        print(f"\n{YELLOW}{BOLD}=== DECISION REQUIRED ==={RESET}")
+        print(f"{BOLD}{pending.title}{RESET} [{pending.severity.upper()}]")
+        print(pending.description)
+        for choice in pending.choices:
+            print(f"  {CYAN}{choice.id:<16}{RESET} {choice.label} - {choice.description}")
+        print(f"{DIM}Resolve: decision choose <choice_id>{RESET}")
+        return 0
+    if action in ("choose", "resolve"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} decision choose <choice_id>")
+            return 1
+        ok, msg = engine.resolve_decision(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown decision action '{action}'. Use status or choose.{RESET}")
+    return 1
+
+
+def cmd_quantum(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    action = parts[1].lower() if len(parts) > 1 else "routes"
+    report = engine.get_quantum_trade_report()
+    if action in ("routes", "list", "freight"):
+        if not report.get("docked"):
+            print(f"\n{YELLOW}{report.get('message', 'Dock at a station first.')}{RESET}")
+            return 1
+        print(f"\n{BOLD}{CYAN}=== QUANTUM FREIGHT LANES ==={RESET}")
+        print(f"Docked: {BOLD}{report.get('body', '')}{RESET} | active orders {len(report['orders'])}/{report['max_orders']}")
+        if not report["routes"]:
+            print(f"{DIM}No cargo in the hold with a profitable quantum lane.{RESET}")
+        for route in report["routes"]:
+            net_color = GREEN if route["net"] > 0 else RED
+            print(
+                f"  {BOLD}{route['commodity_name']:<18}{RESET} x{route['quantity']:<4} -> {route['destination_system_name']:<20} "
+                f"{route['destination_name']:<18} {route['jumps']}j {route['duration_ticks']}t "
+                f"FEE {route['fee']} cr PAYOUT {route['payout']} cr NET {net_color}{route['net']:+d} cr{RESET}"
+            )
+        print(f"{DIM}Ship: quantum ship <commodity_id> <quantity> <destination_system_id>{RESET}")
+        return 0
+    if action in ("orders", "status"):
+        orders = report["orders"]
+        if not orders:
+            print(f"\n{DIM}No quantum freight orders in transit.{RESET}")
+            return 0
+        print(f"\n{BOLD}QUANTUM FREIGHT IN TRANSIT ({len(orders)}/{report['max_orders']}){RESET}")
+        for order in orders:
+            remaining = max(0, int(order["arrival_tick"]) - engine.state.time.tick)
+            print(
+                f"  {order['id']:<22} {order['quantity']}x {order['commodity_id']:<16} -> {order['destination_name']:<18} "
+                f"ETA {remaining}t | fee {order['fee_paid']} cr"
+            )
+        return 0
+    if action in ("ship", "send", "place"):
+        if len(parts) < 5:
+            print(f"{RED}Usage:{RESET} quantum ship <commodity_id> <quantity> <destination_system_id>")
+            return 1
+        try:
+            quantity = int(parts[3])
+        except ValueError:
+            print(f"{RED}Quantity must be an integer.{RESET}")
+            return 1
+        ok, msg = engine.place_quantum_order(parts[2], quantity, parts[4])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown quantum action '{action}'. Use routes, orders or ship.{RESET}")
+    return 1
+
+
+def cmd_surface(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    action = parts[1].lower() if len(parts) > 1 else "list"
+    report = engine.get_surface_report()
+    if action in ("list", "status", "ops"):
+        if not report.get("landed"):
+            print(f"\n{YELLOW}No surface team deployed. Orbit a landable body and run `land <body_id>`.{RESET}")
+            return 1
+        body = report["body"]
+        print(f"\n{BOLD}{CYAN}=== SURFACE OPERATIONS: {body['name']} ==={RESET}")
+        print(f"{body['body_type']} | gravity {body['gravity']} | hazards {', '.join(body['hazards']) or 'none'} | worked {report['used_count']}/{report['total_count']}")
+        for op in report["operations"]:
+            if op["used"]:
+                state = f"{DIM}WORKED{RESET}"
+            else:
+                state = f"{GREEN}READY{RESET}"
+            print(
+                f"  {BOLD}{op['id']:<18}{RESET} {op['name']:<20} RISK {op['risk']}% | "
+                f"{op['credits']} cr | {op['research']} res | {op['credit_cost']} cr cost | {state}"
+            )
+            print(f"     {DIM}{op['description']}{RESET}")
+        print(f"{DIM}Run: surface op <operation_id>{RESET}")
+        return 0
+    if action in ("op", "run"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} surface op <operation_id>")
+            return 1
+        ok, msg = engine.perform_surface_operation(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown surface action '{action}'. Use list or op.{RESET}")
     return 1
 
 
@@ -1814,6 +2023,7 @@ def cmd_weapons(engine: SimulationEngine, storage: StorageManager, parts: list[s
 
 def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
     """Launch interactive terminal command session."""
+    engine.allow_decision_events = True
     # Print status upon entry
     cmd_status(engine)
     print(f"\n{GREEN}Sub-space quantum link active. Type 'help' for command matrix, 'serve' for Web HUD.{RESET}\n")
@@ -1857,6 +2067,16 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
                 cmd_chart(engine)
         elif cmd in ("crew", "roster"):
             cmd_crew(engine, storage, parts)
+        elif cmd in ("away", "expedition", "teams"):
+            cmd_away(engine, storage, parts)
+        elif cmd in ("pirate", "corsair"):
+            cmd_pirate(engine, storage, parts)
+        elif cmd in ("decision", "decide"):
+            cmd_decision(engine, storage, parts)
+        elif cmd in ("quantum", "freight"):
+            cmd_quantum(engine, storage, parts)
+        elif cmd in ("surface", "landing"):
+            cmd_surface(engine, storage, parts)
         elif cmd in ("weapons", "weapon"):
             cmd_weapons(engine, storage, parts)
         elif cmd in ("reactor", "core", "thermal"):
@@ -2224,7 +2444,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     combat_p.add_argument("target", nargs="?", help="Subsystem target for 'combat target' (weapons or shields)")
 
     contracts_p = subparsers.add_parser("contracts", help="Inspect and claim dynamic sector bounty contracts")
-    contracts_p.add_argument("action", nargs="?", default="list", choices=["list", "claim"])
+    contracts_p.add_argument("action", nargs="?", default="list", choices=["list", "claim", "refresh"])
     contracts_p.add_argument("contract_id", nargs="?", help="Contract ID to claim")
 
     mastery_p = subparsers.add_parser("mastery", help="Pilot rank progression and talent specializations")
@@ -2304,6 +2524,25 @@ def main(argv: Sequence[str] | None = None) -> int:
     crew_p.add_argument("action", nargs="?", default="list", choices=["list", "recruit", "train", "shore", "dismiss"])
     crew_p.add_argument("value", nargs="?", help="Role or crew id")
 
+    away_p = subparsers.add_parser("away", help="Deploy, inspect, or recall away-team expeditions")
+    away_p.add_argument("action", nargs="?", default="list", choices=["list", "launch", "recall"])
+    away_p.add_argument("values", nargs="*", help="Mission type, crew ids, or mission id")
+
+    pirate_p = subparsers.add_parser("pirate", help="Inspect or resolve a pirate toll encounter")
+    pirate_p.add_argument("action", nargs="?", default="status", choices=["status", "pay", "fight", "evade"])
+
+    decision_p = subparsers.add_parser("decision", help="Inspect or resolve the pending real-time decision")
+    decision_p.add_argument("action", nargs="?", default="status", choices=["status", "choose"])
+    decision_p.add_argument("choice_id", nargs="?", help="Choice id to resolve")
+
+    quantum_p = subparsers.add_parser("quantum", help="Quantum freight routes, orders, and shipping")
+    quantum_p.add_argument("action", nargs="?", default="routes", choices=["routes", "orders", "ship"])
+    quantum_p.add_argument("values", nargs="*", help="commodity, quantity, destination_system_id")
+
+    surface_p = subparsers.add_parser("surface", help="Inspect or run landing-party surface operations")
+    surface_p.add_argument("action", nargs="?", default="list", choices=["list", "op"])
+    surface_p.add_argument("operation_id", nargs="?", help="Surface operation id")
+
     subparsers.add_parser("salvage", help="Board the derelict at the current body")
     subparsers.add_parser("scoop", help="Scoop fuel from a star, gas giant, or ice body")
 
@@ -2365,6 +2604,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     custom_dir = Path(args.save_path) if getattr(args, "save_path", None) else None
     engine, storage = _get_engine(custom_dir)
 
+    pending = engine.state.pending_decision
+    if pending is not None and args.command not in ("decision", "status", "save", "serve", "time", "quit"):
+        print(f"{RED}Decision required:{RESET} {pending.title}. Run `decision` and choose an option first.")
+        return 1
+
+    pirate = engine.state.active_pirate
+    if pirate is not None and args.command not in ("pirate", "decision", "status", "save", "serve", "time", "quit"):
+        print(
+            f"{RED}Pirate intercept unresolved:{RESET} {pirate.band_name} demands {pirate.toll_credits} cr. "
+            "Run `pirate pay`, `pirate fight`, or `pirate evade` first."
+        )
+        return 1
+
     if args.command == "status":
         return cmd_status(engine)
     elif args.command == "crew":
@@ -2372,6 +2624,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.value:
             parts.append(args.value)
         return cmd_crew(engine, storage, parts)
+    elif args.command == "away":
+        return cmd_away(engine, storage, ["away", args.action] + list(args.values))
+    elif args.command == "pirate":
+        return cmd_pirate(engine, storage, ["pirate", args.action])
+    elif args.command == "decision":
+        return cmd_decision(engine, storage, ["decision", args.action] + ([args.choice_id] if args.choice_id else []))
+    elif args.command == "quantum":
+        return cmd_quantum(engine, storage, ["quantum", args.action] + list(args.values))
+    elif args.command == "surface":
+        return cmd_surface(engine, storage, ["surface", args.action] + ([args.operation_id] if args.operation_id else []))
     elif args.command == "weapons":
         parts = ["weapons", args.action]
         if args.weapon_id:

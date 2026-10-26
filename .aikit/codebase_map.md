@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `68`
-- **Total Classes**: `178`
-- **Total Top-Level Functions**: `214`
-- **Total Class Methods**: `1015`
-- **Total Source Lines**: `28367`
+- **Total Python Modules**: `74`
+- **Total Classes**: `198`
+- **Total Top-Level Functions**: `255`
+- **Total Class Methods**: `1094`
+- **Total Source Lines**: `32152`
 
 ---
 
@@ -84,6 +84,45 @@
   - Method `.test_calendar_date_advances_and_rolls_over_months()`
   - Method `.test_time_payload_exposes_date()`
   - Method `.test_engine_tick_updates_calendar_date()`
+
+---
+
+### [`tests/test_away_missions.py`](tests/test_away_missions.py)
+> *Away-team expeditions: catalog, deterministic outcomes, injuries, XP, parity and saves.*
+
+**Size**: `307` lines (`12956` bytes)
+
+**Classes:**
+- `class AwayCatalogTest`
+  - Method `.test_catalog_has_multiple_distinct_missions()`
+  - Method `.test_auto_team_prefers_matching_specialty_and_excludes_assigned()`
+  - Method `.test_risk_falls_with_specialist_skill_and_rises_with_hazards()`
+  - Method `.test_resolution_is_deterministic_and_reports_outcome()`
+  - Method `._body()`
+- `class AwayEngineTest`
+  - Method `.setUp()`
+  - Method `._launch_any()`
+  - Method `.test_report_lists_body_missions_and_crew()`
+  - Method `.test_launch_assigns_an_uninjured_team_and_persists()`
+  - Method `.test_launch_rejects_injured_team_and_combat()`
+  - Method `.test_tick_resolves_success_and_awards_cargo_or_credits()`
+  - Method `.test_tick_failure_injures_crew_and_blocks_their_bonus()`
+  - Method `.test_recall_returns_crew_without_reward()`
+  - Method `.test_injuries_recover_and_medic_speeds_it()`
+  - Method `.test_crew_xp_promotes_skill_and_keeps_remainder()`
+  - Method `.test_old_saves_default_new_fields()`
+  - Method `.test_mission_round_trip()`
+- `class AwayParityTest`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_rest_report_and_launch()`
+  - Method `.test_cli_lists_away_teams()`
+
+**Functions:**
+- `def _crew(member_id, role, skill, specialty, injury)`
 
 ---
 
@@ -387,7 +426,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `389` lines (`18439` bytes)
+**Size**: `390` lines (`18511` bytes)
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -565,6 +604,46 @@
   - Method `.test_ship_state_faction_standings_migration()`
   - Method `.test_tactical_combat_shield_and_actions()`
   - Method `.test_combat_victory_faction_standing_shift()`
+
+---
+
+### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
+> *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
+
+**Size**: `317` lines (`15417` bytes)
+
+**Classes:**
+- `class FrontierContentTest`
+  - Method `.test_galaxy_has_more_systems_factions_and_anomalies()`
+  - Method `.test_populations_are_realistic_and_devastation_kills_growth()`
+  - Method `.test_war_capture_devastates_and_displaces_population()`
+  - Method `.test_contract_board_has_new_categories()`
+- `class PirateEncounterTest`
+  - Method `.test_risk_rises_in_havens()`
+  - Method `.test_pay_fight_and_evade_paths()`
+- `class DecisionEventTest`
+  - Method `.test_at_least_twenty_five_conditional_events()`
+  - Method `.test_pending_decision_blocks_time_until_resolved()`
+  - Method `.test_low_hull_event_is_eligible()`
+- `class QuantumFreightTest`
+  - Method `.test_freight_costs_fee_arrives_later_and_progresses_delivery_contract()`
+  - Method `.test_quantum_report_lists_lanes()`
+- `class SurfaceOperationTest`
+  - Method `.test_landing_opens_choices_and_marks_site_branch_worked()`
+- `class FrontierUiContractTest`
+  - Method `.test_cockpit_has_new_mechanics_surfaces()`
+- `class FrontierApiTest`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._request(method, path, payload)`
+  - Method `.test_get_quantum_and_surface_report()`
+  - Method `.test_refresh_contracts_endpoint()`
+  - Method `.test_pending_decision_blocks_and_resolves_over_rest()`
+  - Method `.test_pirate_resolve_endpoint()`
+- `class PirateLockTest`
+  - Method `.test_active_pirate_blocks_tick_flight_and_trade_until_resolved()`
+  - Method `.test_surface_cargo_reports_display_names()`
 
 ---
 
@@ -1125,7 +1204,7 @@
 ### [`tests/test_ui_inventory.py`](tests/test_ui_inventory.py)
 > *The cockpit inventory proof covers controls, handlers, routes, hotkeys and theme tokens.*
 
-**Size**: `34` lines (`1276` bytes)
+**Size**: `35` lines (`1400` bytes)
 
 **Classes:**
 - `class InventoryTest`
@@ -1253,6 +1332,29 @@
 
 ---
 
+### [`voidfarer/away.py`](voidfarer/away.py)
+> *Away-team expeditions: body missions, deterministic outcomes, and crew risk.*
+
+**Size**: `306` lines (`10283` bytes)
+
+**Classes:**
+- `class AwayMissionType` - *One expedition profile that can be launched from orbit.*
+  - Method `.to_dict()`
+  - Method `.available_on(body)`
+
+**Functions:**
+- `def get_away_mission_type(mission_type)`
+- `def site_key(mission_type, body_id)` - *Stable key for a worked site, so a body cannot be farmed by the same expedition.*
+- `def available_missions(body)` - *Every expedition profile that can be launched from orbit around this body.*
+- `def _fit(member, required_skill)`
+- `def crew_fit(member, required_skill)` - *Effective aptitude of one crew member for a mission's required discipline.*
+- `def auto_team(mission_type, crew, assigned_ids)` - *Pick the best available specialists for a mission, deterministically.*
+- `def mission_risk(mission_type, body, team)` - *Risk percentage after body hazards, gravity and specialist aptitude.*
+- `def _mission_rng(mission, galaxy_seed)`
+- `def resolve_away_mission(mission, mission_type, body, team, galaxy_seed)` - *Resolve one due expedition deterministically. Returns an outcome packet.*
+
+---
+
 ### [`voidfarer/character.py`](voidfarer/character.py)
 > *Commander character progression, skills, and activatable abilities.*
 
@@ -1274,7 +1376,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2647` lines (`135386` bytes)
+**Size**: `2909` lines (`149270` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1319,6 +1421,11 @@
 - `def cmd_diplomacy(engine, storage, parts)`
 - `def cmd_route(engine, target)`
 - `def cmd_crew(engine, storage, parts)`
+- `def cmd_away(engine, storage, parts)`
+- `def cmd_pirate(engine, storage, parts)`
+- `def cmd_decision(engine, storage, parts)`
+- `def cmd_quantum(engine, storage, parts)`
+- `def cmd_surface(engine, storage, parts)`
 - `def cmd_weapons(engine, storage, parts)`
 - `def cmd_repl(engine, storage)` - *Launch interactive terminal command session.*
 - `def cmd_events(engine, storage, parts)` - *List or dismiss cockpit popup events.*
@@ -1331,7 +1438,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `556` lines (`18952` bytes)
+**Size**: `606` lines (`20869` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -1351,7 +1458,7 @@
 ### [`voidfarer/crew.py`](voidfarer/crew.py)
 > *Crew roles, recruiting, portraits, and crew-derived ship bonuses.*
 
-**Size**: `235` lines (`8652` bytes)
+**Size**: `280` lines (`10336` bytes)
 
 **Classes:**
 - `class CrewRole`
@@ -1365,8 +1472,39 @@
 - `def wages_due(crew, days_before, days_after)` - *Whole credits of monthly wages accrued between two calendar points (cumulative, so*
 - `def tick_crew(crew, num_ticks, credits_available, rng, wage_due)` - *Advance wages and morale; unpaid crews sink toward desertion.*
 - `def apply_morale_event(crew, delta, reason)` - *Shift every active member's morale by an event delta, clamped to 0..100.*
+- `def crew_xp_to_next(member)` - *Experience required for the next rank: veterans take longer to train.*
+- `def award_crew_xp(member, amount)` - *Add expedition experience and promote a specialist when a rank threshold is crossed.*
+- `def recover_crew_injuries(crew, num_ticks, medic_aboard)` - *Heal away-team injuries over time; an active medic doubles the recovery rate.*
 - `def shore_leave_restore(crew)` - *Compute a fleet-wide shore leave outcome: restored crew and morale points.*
 - `def crew_catalog()`
+
+---
+
+### [`voidfarer/decisions.py`](voidfarer/decisions.py)
+> *Conditional real-time decision events that pause the simulation until resolved.*
+
+**Size**: `372` lines (`25433` bytes)
+
+**Classes:**
+- `class DecisionDefinition`
+
+**Functions:**
+- `def _system(state)`
+- `def _body(state)`
+- `def _credits(state)`
+- `def _avg_morale(state)`
+- `def _has_contraband(state)`
+- `def _any_injury(state)`
+- `def _war_active(state)`
+- `def _at_inhabited(state)`
+- `def _at_station(state)`
+- `def _low_hull(state)`
+- `def _low_fuel(state)`
+- `def _high_heat(state)`
+- `def _bad_area(state)`
+- `def _choice(choice_id, label, description, effects)`
+- `def eligible_decisions(state, trigger)` - *Definitions whose trigger and state condition are satisfied and not yet seen.*
+- `def make_decision_event(definition, tick, trigger)`
 
 ---
 
@@ -1402,10 +1540,11 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `5878` lines (`294177` bytes)
+**Size**: `7011` lines (`349959` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
+  - Method `._stable_unit(*parts)` - *Deterministic [0,1) roll that does not disturb the live RNG stream.*
   - Method `.__init__(seed, state)`
   - Method `._bootstrap_frontier()` - *Backfill frontier systems for legacy saves without changing the save schema.*
   - Method `._clone_ship(**kwargs)` - *Create a new ShipState preserving all unspecified telemetry and inventory attributes.*
@@ -1422,7 +1561,7 @@
   - Method `._apply_relic_stat_bonuses(hull, max_hull, shield, max_shield, relics)` - *Raise current and maximum hull/shield for newly acquired permanent relics.*
   - Method `._progress_tutorial(action_type)` - *Advance the Cadet Flight Academy if current step requirement is satisfied.*
   - Method `._award_pilot_xp(amount, current_mastery)` - *Award experience points and compute level promotions and talent points.*
-  - Method `._progress_contracts(category, amount)` - *Advance matching active contracts toward completion objectives.*
+  - Method `._progress_contracts(category, amount, contracts)` - *Advance matching active contracts toward completion objectives.*
   - Method `.reset(seed, profile)` - *Reset the simulation to a fresh galaxy with an isolated deterministic RNG stream.*
   - Method `._validate_commander_profile(profile)` - *Reject commander profiles whose starting skills exceed the creation budget.*
   - Method `._apply_commander_profile(profile)` - *Apply the commander name, age, background and starting skills chosen at creation.*
@@ -1475,6 +1614,11 @@
   - Method `.recruit_crew(role_id)`
   - Method `.dismiss_crew(crew_id)`
   - Method `.get_crew_report()`
+  - Method `._away_assigned_ids(ship)`
+  - Method `._away_reward_preview(mission_type)`
+  - Method `.get_away_report()` - *Body expeditions available from orbit, active teams, and crew readiness.*
+  - Method `.launch_away_mission(mission_type, crew_ids)` - *Deploy an away team from orbit. Spent crew stop contributing ship bonuses.*
+  - Method `.recall_away_mission(mission_id)` - *Abort one expedition and return its team to the ship with no reward.*
   - Method `.cash_flow()` - *Monthly credit flow: crew payroll against passive income (drones, outposts).*
   - Method `.install_weapon(weapon_id)`
   - Method `.set_primary_weapon(weapon_id)`
@@ -1485,6 +1629,11 @@
   - Method `.max_trade_quantity(commodity_id, is_buy)` - *Largest order that would succeed now: affordable and in-hold for buys, all held units for sells.*
   - Method `.trade_max(commodity_id, is_buy)` - *Buy as many units as credits and hold allow, or sell every unit held.*
   - Method `.trade(commodity_id, quantity, is_buy)` - *Execute buy or sell commodity order at orbiting market.*
+  - Method `._destination_market_body(system)`
+  - Method `._quantum_fee(commodity, quantity, jumps)`
+  - Method `.get_quantum_trade_report()` - *Arbitrage routes for cargo already in the hold, with fees and transit times.*
+  - Method `.place_quantum_order(commodity_id, quantity, destination_system_id)` - *Ship owned cargo through the quantum lane; cargo leaves now and pays on arrival.*
+  - Method `._resolve_quantum_orders(orders, tick, systems, economy)`
   - Method `.buy_upgrade(upgrade_id)` - *Purchase and install a hardware upgrade module at an orbital station.*
   - Method `.sell_upgrade(slot)` - *Uninstall and sell an equipped hardware module back to shipyard for credits.*
   - Method `.buy_ship_chassis(chassis_id)` - *Purchase and commission a new spacecraft hull chassis at an orbital shipyard.*
@@ -1498,9 +1647,11 @@
   - Method `._combat_defeat(combat, note, fleet_ships, crew, streak, fuel)` - *End a fight at 0 hull, pausing time so a destroyed ship cannot recover by ticking.*
   - Method `.combat_action(action)` - *Execute a tactical combat maneuver against an active hostile intercept.*
   - Method `.resolve_anomaly(choice_id)` - *Resolve current deep-space anomaly encounter with power-check validation.*
+  - Method `.resolve_pirate_encounter(action)` - *Resolve a pirate toll: pay, fight, or burn clear. Flight resumes afterward.*
   - Method `.repair_hull(amount)` - *Repair ship hull integrity at orbital station.*
   - Method `.refuel(amount)` - *Refuel quantum drive at orbital station.*
   - Method `.step_orbits(delta_time)` - *Advance celestial bodies along orbital mechanics paths and cycle fleet drones.*
+  - Method `.refresh_contracts()` - *Reroll the mission board across every category for a broker fee.*
   - Method `.claim_contract(contract_id)` - *Claim rewards for a fulfilled contract and immediately draw a new assignment.*
   - Method `.unlock_talent(talent_id)` - *Unlock a Pilot Specialization Perk using available talent points.*
   - Method `._story_unmet_requirements(requirements, *, chapter)` - *List human-readable unmet gating conditions for a chapter or choice.*
@@ -1524,6 +1675,8 @@
   - Method `.withdraw_cargo(item_id, quantity)`
   - Method `.sell_from_depot(item_id, quantity)`
   - Method `.land_on_body(body_id)` - *Land on a habitable body and collect surface discovery rewards.*
+  - Method `.get_surface_report()` - *Landing-party operations available on the currently landed body.*
+  - Method `.perform_surface_operation(operation_id)` - *Run one surface operation, then mark the site branch as worked.*
   - Method `.salvage_derelict()` - *Board the current body's derelict hulk for cargo, credits, and hazard risk.*
   - Method `.scoop_fuel()` - *Recover fuel from a star, gas giant, or ice body currently in orbit.*
   - Method `.train_crew_member(crew_id)` - *Run a paid training drill that raises one crew member's skill rank.*
@@ -1532,6 +1685,10 @@
   - Method `.dismiss_fleet_unit(drone_id)`
   - Method `.refit_fleet_unit(drone_id)`
   - Method `.form_alliance(captain_id)`
+  - Method `._decision_lock_reason()`
+  - Method `._action_lock_reason()` - *Reason flight or exploration actions are frozen (decision or pirate toll).*
+  - Method `.maybe_trigger_decision(trigger)` - *Evaluate conditional events and open at most one blocking decision.*
+  - Method `.resolve_decision(choice_id)` - *Apply a decision choice; time and flight remain locked until this succeeds.*
   - Method `.tick(num_ticks)` - *Advance the simulation universe by num_ticks.*
   - Method `.emit_event(kind, title, message)` - *Create and append a cockpit popup GameEvent.*
   - Method `.dismiss_event(event_id)` - *Mark a cockpit popup GameEvent as dismissed.*
@@ -1569,7 +1726,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `278` lines (`12798` bytes)
+**Size**: `310` lines (`14066` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -1579,6 +1736,7 @@
 - `def war_effort(faction_id, systems)` - *Strength a faction can actually project at the front.*
 - `def war_momentum(attacker_id, defender_id, systems)` - *Per-step score drift before noise: effort ratio, defender edge and hegemon containment.*
 - `def _capture_target(front, loser_id, loser_name, score, systems, rng)` - *Front worlds fall first; a capital only falls to double the capture score.*
+- `def _devastate_system(system, rng, severity)` - *A captured front loses civilians and gains persistent devastation.*
 - `def frontier_systems(winner_name, loser_name, systems)` - *Loser-held systems with a hyperlane into winner territory, sorted for determinism.*
 - `def _end_war(war, score, current_tick, logs)`
 - `def resolve_wars(wars, systems, rng, current_tick, eliminated)` - *Advance wars one step: strength drives momentum, captures follow hyperlane fronts.*
@@ -1590,7 +1748,7 @@
 ### [`voidfarer/factions.py`](voidfarer/factions.py)
 > *Galactic Factions, Megacorporations, Standings, and Geopolitical Mechanics.*
 
-**Size**: `250` lines (`9842` bytes)
+**Size**: `308` lines (`12587` bytes)
 
 **Classes:**
 - `class Faction` - *Sovereign faction or interstellar coalition.*
@@ -1642,7 +1800,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `907` lines (`40437` bytes)
+**Size**: `1185` lines (`53073` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -1714,7 +1872,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `1827` lines (`67670` bytes)
+**Size**: `2054` lines (`75816` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -1811,6 +1969,15 @@
   - Method `.progress(current_tick)`
   - Method `.to_dict()`
   - Method `.from_dict(data)`
+- `class DecisionChoice` - *One selectable response to a pending decision event.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+- `class DecisionEvent` - *A blocking decision that must be resolved before time or flight advances.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+- `class PirateEncounter` - *A pirate toll encounter that must be resolved before flight continues.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
 - `class GameEvent` - *Realtime popup event delivered to the cockpit.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
@@ -1836,6 +2003,12 @@
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class CrewMember` - *Recruitable crew specialist with a role, morale, wage, and portrait.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+- `class TradeOrder` - *A quantum freight order: cargo leaves now and is sold at the destination on arrival.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+- `class AwayMission` - *An away-team expedition assigned to a celestial body for a finite duration.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class ShipState` - *Complete telemetry, resource inventory, and status of the player's flagship.*
@@ -1900,6 +2073,20 @@
 
 ---
 
+### [`voidfarer/pirates.py`](voidfarer/pirates.py)
+> *Pirate bands, toll encounters, and deterministic raid generation.*
+
+**Size**: `98` lines (`3097` bytes)
+
+**Classes:**
+- `class PirateRisk`
+
+**Functions:**
+- `def pirate_risk(system, faction_standing, has_escort, evasion)` - *Risk of a pirate toll encounter in a system, before the engine RNG roll.*
+- `def generate_pirate_encounter(system, seed, threat_level, standing)` - *Build a deterministic pirate toll encounter for one jump or orbit.*
+
+---
+
 ### [`voidfarer/reactor.py`](voidfarer/reactor.py)
 > *Reactor core simulation: operating modes, thermal load, cooling, and derating.*
 
@@ -1935,7 +2122,7 @@
 ### [`voidfarer/retention.py`](voidfarer/retention.py)
 > *Psychological retention mechanics, Precursor relics, dynamic contracts, and pilot mastery.*
 
-**Size**: `388` lines (`13747` bytes)
+**Size**: `437` lines (`15358` bytes)
 
 **Functions:**
 - `def generate_contract(rng, category)` - *Procedurally instantiate a fresh BountyContract following Zeigarnik task loops.*
@@ -1948,7 +2135,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1189` lines (`50119` bytes)
+**Size**: `1271` lines (`54014` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -2030,6 +2217,23 @@
 - `def resolve_story_ending(story)` - *Deterministically resolve which ending variant the campaign resolves to.*
 - `def ending_transmission(ending_id, timestamp_system)` - *Build the final campaign transmission for a resolved ending.*
 - `def migrate_story_state(story)` - *Extend a legacy campaign save into the current chapter list, preserving all resolved state.*
+
+---
+
+### [`voidfarer/surface.py`](voidfarer/surface.py)
+> *Surface operations: choose what your landing party does after touchdown.*
+
+**Size**: `167` lines (`5220` bytes)
+
+**Classes:**
+- `class SurfaceOperation`
+  - Method `.to_dict()`
+
+**Functions:**
+- `def _stable_unit(*parts)`
+- `def surface_risk(operation, body)`
+- `def surface_report(ship, body)`
+- `def resolve_surface_operation(operation, body, ship, galaxy_seed, tick)`
 
 ---
 

@@ -135,6 +135,36 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "scoops", 1, 150, 50,
     ),
     CodexEntry(
+        "field_team", "exploration", "Field Team",
+        "Complete five away-team expeditions.",
+        "Deploy an away team from the CREW tab while in orbit.",
+        "away_missions", 5, 500, 160,
+    ),
+    CodexEntry(
+        "corsair_bane", "combat", "Corsair Bane",
+        "Defeat five pirate bands in direct engagement.",
+        "Resolve pirate intercepts with the FIGHT option.",
+        "pirates_fought", 5, 900, 240,
+    ),
+    CodexEntry(
+        "freight_baron", "commerce", "Freight Baron",
+        "Deliver ten quantum freight orders.",
+        "Open the QUANTUM FREIGHT board while docked.",
+        "deliveries", 10, 1200, 300,
+    ),
+    CodexEntry(
+        "surface_pioneer", "exploration", "Surface Pioneer",
+        "Complete three surface operations.",
+        "Land on a landable body and choose a surface action.",
+        "surface_ops", 3, 600, 180,
+    ),
+    CodexEntry(
+        "decision_maker", "command", "Decision Maker",
+        "Resolve ten command decisions.",
+        "Answer the blocking decisions that appear during flight.",
+        "decisions_resolved", 10, 750, 200,
+    ),
+    CodexEntry(
         "helium_harvester", "exploration", "Helium Harvester",
         "Scoop fuel ten times.",
         "Scoop fuel whenever the tanks run low.",
@@ -337,6 +367,11 @@ METRIC_LABELS: dict[str, str] = {
     "landings": "Surface landings",
     "salvage": "Derelicts boarded",
     "scoops": "Fuel scoops",
+    "away_missions": "Away missions completed",
+    "decisions_resolved": "Decisions resolved",
+    "pirates_fought": "Pirates fought",
+    "deliveries": "Quantum freight deliveries",
+    "surface_ops": "Surface operations",
     "trades": "Commodity trades",
     "credits_earned": "Credits earned",
     "combat_victories": "Combat victories",
@@ -371,6 +406,11 @@ STATS_ORDER: tuple[str, ...] = (
     "landings",
     "salvage",
     "scoops",
+    "away_missions",
+    "decisions_resolved",
+    "pirates_fought",
+    "deliveries",
+    "surface_ops",
     "trades",
     "credits_earned",
     "combat_victories",
@@ -431,6 +471,16 @@ def metric_value(state: GameState, metric: str) -> int:
         return int(state.stats.get("salvage", 0))
     if metric == "scoops":
         return int(state.stats.get("scoops", 0))
+    if metric == "away_missions":
+        return int(state.stats.get("away_missions", 0))
+    if metric == "decisions_resolved":
+        return int(state.stats.get("decisions_resolved", 0))
+    if metric == "pirates_fought":
+        return int(state.stats.get("pirates_fought", 0))
+    if metric == "deliveries":
+        return int(state.stats.get("deliveries", 0))
+    if metric == "surface_ops":
+        return int(state.stats.get("surface_ops", 0))
     if metric == "trades":
         return int(state.stats.get("trades", 0))
     if metric == "credits_earned":

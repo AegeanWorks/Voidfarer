@@ -1,116 +1,22 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ability-hardening-v1",
-    "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1792958099.8881035,
+    "task_id": "frontier-review-push",
+    "last_phase": "phase 2",
+    "active_phase": 2,
+    "status": "in_progress",
+    "updated_at": 1792999642.8122344,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": [],
     "impact_assessment": {
-      "why": "A post-push audit found shield_absorb and evasive_burn bypassed the new defeat check, a dead ship could tick/repair back to life, reactor surge never expired during paused combat, CLI constructor skipped rank-7 reconciliation, and the death overlay could reopen over creation while hotkeys still fired behind it.",
-      "benefits": "0 hull is now terminal everywhere, death cannot be undone by time or Repair, overclock is bounded during paused fights, legacy saves unlock through every entry path, and failures are visible and announced instead of silently logged.",
-      "risks": "contract: no new save fields; time pause is a normal state value; dependency: none; concurrency: engine lock unchanged; state: death pauses time and clears combat",
-      "mitigation": "Regression tests for lethal defensive actions, terminal tick, constructor unlock, per-turn surge decay and cockpit copy; full suite and 4/4 gates; real-browser vision audit before delivery"
-    },
-    "completed_at": 1792958496.5314648
+      "why": "The user asked for an extensive pre-push audit of the frontier changes, including graphical fit, and explicitly authorized push.",
+      "benefits": "Prevents pirate/decision bypasses, keeps item names consistent, makes the freight board readable at 1366, and records UI evidence before delivery.",
+      "risks": "contract: additive state guards and server conflict responses; dependency: none; concurrency: engine lock and overlay guards; state: deterministic tests must keep legacy RNG streams",
+      "mitigation": "Gate pirate generation behind the gameplay-events flag, add engine/server/CLI/keyboard locks, add regression tests, run 4/4 gates, capture natural Edge views, then commit/push"
+    }
   },
   "checkpoints": [
-    {
-      "task_id": "cockpit-perf-layout-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/4] Client: module apiFetch + loadCatalogs (34 call sites), state setter merges cached catalogs, schedulePoll cadence 1000ms paused / 500ms 1x / 333ms 2x / 250ms 5x+, terminalBusy guard (pressed pointer or focused control) skips tab rebuilds, story tab renderVoid once; Edge perf smoke 8/8, QoL smoke 13/13; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792881955.0005708,
-      "timestamp_str": "2026-10-25 01:45:55",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "cockpit-perf-layout-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/4 pending docs] Layout: strip beside full-height terminal at all widths (G-005/G-013), panels uncapped (was max-height 210px clipping sensors/weapons/presets/APPLY everywhere), sliders+presets commit on release (mouse routing was inert), compact narrow strip (short titles, VENT on heat row, single-column skills, stacked market trade buttons, fixed market columns), streak value fits its card, sector chips top-left, XP label 12px; terminal 153->480px at 720p, 201->528px at 768p; Edge power smoke 5/5 at 1080p and 720p; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792917552.9413483,
-      "timestamp_str": "2026-10-25 11:39:12",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "cockpit-perf-layout-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/4] Docs: README reactor bullet + 32 suites (22,485 chars), ADR-056; 538 tests; 4/4 gates; uncommitted pending user commit request; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792917607.8654387,
-      "timestamp_str": "2026-10-25 11:40:07",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "cockpit-perf-layout-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'cockpit-perf-layout-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792917787.4385147,
-      "timestamp_str": "2026-10-25 11:43:07",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "grand-strategy-v1",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/5] Plan: (1) sim: power-driven wars over hyperlane fronts (captures only border systems, score resets per capture, exhaustion peace treaties), player war support with credits (REST/CLI/cockpit), galactic_politics snapshot; (2) galaxy map: Stellaris-style faction territory fills, borders, contested fronts, legend, fit to the visible map area; (3) procedural celestial models: cached planet sprites by type (shading, bands, craters, ice caps, atmosphere, rings), star coronas, station and flagship silhouettes; (4) UI: outpost build/upgrade in the Empire tab, resource bar income deltas, wars panel with SUPPORT; (5) README, ADR-057",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792917868.742541,
-      "timestamp_str": "2026-10-25 11:44:28",
-      "agent": "claude-code:f36d48df",
-      "impact_assessment": {
-        "why": "The user wants a Stellaris-like grand strategy feel with simulation mechanics; wars are coin flips that can snowball (score never resets after a capture), captures ignore geography, wars never end, the player cannot affect them, the galaxy map shows no territory, planets are flat dots, and outposts cannot be built from the UI.",
-        "benefits": "Readable, geography-driven galactic politics the player can influence; a map that shows who owns what; themed planet and ship visuals; expansion from the cockpit.",
-        "risks": "contract: WarState gains captured/ended_tick fields and snapshot gains galactic_politics (additive, defaults for old saves); new /api/war/support endpoint; dependency: none; concurrency: politics computed under the engine lock; state: war fields serialized with defaults",
-        "mitigation": "Failing-first sim/server/CLI tests with fixed seeds, old-save load test, sprite caching with draw-time profiling, Playwright Edge captures at 720p/1080p/4K, 4/4 gates, ADR-057"
-      }
-    },
-    {
-      "task_id": "grand-strategy-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/5] Galactic politics sim: hyperlane fronts (frontier_systems), war_effort (territory + log population, overextension past 3 systems), war_momentum (containment of 40%+ hegemons, last stand), attrition 0.05 mean reversion, capture spends threshold, capitals need double score, treaties after 240 ticks or 3 captures, 600-tick truces, no dogpiling, declaration rate 0.025; fixed per-tick snowball capture bug; WarState captured_systems/ended_tick/support with defaults; support_war (REST /api/war/support, CLI war list|support); galactic_politics snapshot; 6-seed 3000-tick balance: 13-26 captures, 0 eliminations, largest 3-4/15 (was Sol 15/15); 15 new tests, 553 total; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792918628.7355566,
-      "timestamp_str": "2026-10-25 11:57:08",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "grand-strategy-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/5] Strategic galaxy map: mapRect/mapCenter fit both views to the visible radar area (no systems under the terminal), cached quarter-res Voronoi faction territory with blurred borders (rebuild 4.6ms 1080p / 7.9ms 4K, frame 0.1ms), border-crossing lanes highlighted, pulsing red war-front lanes and front markers, owner rings and owner-tinted labels, GALACTIC POWERS legend (row form on short maps), crowded-map label declutter with hover labels; 2 static tests; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792918984.2703657,
-      "timestamp_str": "2026-10-25 12:03:04",
-      "agent": "claude-code:f36d48df"
-    },
-    {
-      "task_id": "grand-strategy-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[4/5] Celestial models: new static/celestial.js CelestialRenderer with seeded cached sprites for 21 body types (continents/oceans/caps/clouds, craters, lava veins, toxic bands, banded giants with tilted rings, ring world, Dyson lattice, 4 station models rotating, black hole accretion disk, wormhole spiral), star corona with rays, asteroid belts as rock bands, moons, star-facing terminator, flagship silhouette parked in orbit and in transit; logarithmic body display size shared with hit tests; radar canvas labels 12px; orbit frame median 0.2-0.3ms at 60fps; 3 static tests; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792919353.0459323,
-      "timestamp_str": "2026-10-25 12:09:13",
-      "agent": "claude-code:f36d48df"
-    },
     {
       "task_id": "grand-strategy-v1",
       "phase": "phase 4",
@@ -252,6 +158,127 @@
       "timestamp": 1792958496.531466,
       "timestamp_str": "2026-10-25 23:01:36",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "away-teams-v1",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/6] Plan: (1) away-team mission catalog, deterministic outcome resolver, CrewMember xp/injury fields, AwayMission state with save-compatible defaults; (2) tick-driven completion, rewards, injuries, recovery, crew XP ranks, codex metric; (3) REST /api/away + launch/recall, CLI away, snapshot parity; (4) cockpit CREW-tab expedition section; (5) real-Edge vision review; (6) ADR/README/map + gates",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792967796.491212,
+      "timestamp_str": "2026-10-26 01:36:36",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "Crew are currently passive bonus sources with no decisions, injuries or progression, and planetary exploration ends after one land/salvage interaction. The game needs a repeatable risk/reward loop that turns crew composition and orbital position into choices without adding a new tab.",
+        "benefits": "Away teams give crew a purpose beyond passive stats, make injuries and medics matter, add a finite-time expedition loop with real failure costs, and feed existing research, contracts, factions, cargo, XP and codex systems.",
+        "risks": "contract: new defaulted CrewMember.xp/injury_ticks and ShipState.away_missions fields, additive snapshot/REST; dependency: stdlib only; concurrency: engine lock unchanged, tick resolves missions inside it; state: deterministic per save seed, active missions persist and are recalled safely",
+        "mitigation": "Pure deterministic resolver in a new module, backward-compatible from_dict tests, failing-first tests for launch/tick/injury/recall/parity, bounded UI diff, full suite and 4/4 gates, real-Edge captures reviewed by a vision subagent"
+      }
+    },
+    {
+      "task_id": "away-teams-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[6/6] Away-team expeditions implemented and verified: deterministic body missions, crew XP/injury model fields, site depletion, tick rewards/contracts/standing/codex, REST+CLI parity, and CREW ROSTER/AWAY TEAMS cockpit sub-views. checklists: passed (pre-flight freshness/call-sites/deps/platform and post-flight tests/hygiene/guidelines/secrets; 4/4 gates).",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792970325.4837577,
+      "timestamp_str": "2026-10-26 02:18:45",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "602 tests pass, real-Edge 1920/1366/1280 captures show 0 errors, 0 h-scroll, 0 sub-12px text",
+        "next": "commit when authorized",
+        "open": "UI contract record needs a clean baseline, delivery NOT READY until then",
+        "evidence": "ui-review/away-teams-final and away-teams-v3-away captures, ADR-059."
+      }
+    },
+    {
+      "task_id": "away-teams-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'away-teams-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792970336.75027,
+      "timestamp_str": "2026-10-26 02:18:56",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "deepfrontier-v1",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/6] Plan: galaxy/faction/pirate expansion; 25+ blocking decision events; mission board + counters; quantum trade orders with transit fees; landing surface operations; realistic population/war devastation + outliner height. Each milestone keeps tests green.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792970944.7086182,
+      "timestamp_str": "2026-10-26 02:29:04",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The user asked for substantially more simulation depth across encounters, decisions, missions, economics, landing, factions and war consequences. Existing anomalies are jump-only, trade is instant local only, landing is a single reward button, and war captures never hurt populations.",
+        "benefits": "More systems/factions and pirate zones widen the map; blocking decisions create real-time tension; a mission board and counters reward play; quantum trade adds logistics; surface operations make landing a choice; devastation makes war consequential and population believable.",
+        "risks": "contract: additive defaulted model fields and snapshot keys, new REST/CLI surfaces; dependency: stdlib only; concurrency: engine lock and tick guards, UI modal must not deadlock; state: deterministic seeds, old-save defaults, blocked ticks must pause cleanly",
+        "mitigation": "Pure data modules for events/events catalog and quantum routes, failing-first tests per mechanic, engine guard helper for pending decisions, backward-compatible from_dict tests, real-Edge 3-viewport review, full gates before completion"
+      }
+    },
+    {
+      "task_id": "deepfrontier-v1",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[6/6] Frontier depth implemented and verified: 23 systems/9 factions, pirate tolls, 9 anomalies, 35 blocking decisions, expanded contracts with 120cr board refresh, quantum freight with fees/ETA, landing surface ops, realistic populations/war devastation, compact outliner. checklists: passed (4/4 gates). Tests: 619 passed. UI: real Edge 1920/1366/1280, zero errors/hscroll/tiny; focused vision approvals for quantum board, surface ops, pirate card, decision modal, compact outliner.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792997526.2335446,
+      "timestamp_str": "2026-10-26 09:52:06",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "619 tests pass and 4/4 gates pass",
+        "next": "commit when authorized",
+        "open": "UI cockpit contract needs a clean-baseline UI task",
+        "evidence": "ui-review/frontier-depth and ADR-060"
+      }
+    },
+    {
+      "task_id": "deepfrontier-v1",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'deepfrontier-v1' completed successfully.",
+      "status": "completed",
+      "timestamp": 1792997533.3520532,
+      "timestamp_str": "2026-10-26 09:52:13",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "frontier-review-push",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[4/4] Verified changes since origin/master, fixed encounter bypasses, gated pirate generation, blocked tick/flight/trade/away/surface actions while a pirate toll is active, added 409/CLI/keyboard guards, normalized surface cargo names, kept the quantum board above the commodity table and compact at 1366, refreshed map/docs. checklists: passed (4/4 gates). Tests: 621 passed.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792999593.0768063,
+      "timestamp_str": "2026-10-26 10:26:33",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "621 tests and 4/4 gates",
+        "next": "stage explicit files, commit feat(frontier), open/finish cockpit UI task, commit chore(ui), push origin/master",
+        "evidence": "ui-review/frontier-depth and ADR-060/061"
+      }
+    },
+    {
+      "task_id": "frontier-review-push",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Review origin/master..worktree, fix encounter bypasses and UI placement, verify graphically, then commit and push.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1792999642.8122344,
+      "timestamp_str": "2026-10-26 10:27:22",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The user asked for an extensive pre-push audit of the frontier changes, including graphical fit, and explicitly authorized push.",
+        "benefits": "Prevents pirate/decision bypasses, keeps item names consistent, makes the freight board readable at 1366, and records UI evidence before delivery.",
+        "risks": "contract: additive state guards and server conflict responses; dependency: none; concurrency: engine lock and overlay guards; state: deterministic tests must keep legacy RNG streams",
+        "mitigation": "Gate pirate generation behind the gameplay-events flag, add engine/server/CLI/keyboard locks, add regression tests, run 4/4 gates, capture natural Edge views, then commit/push"
+      }
     }
   ]
 }

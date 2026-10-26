@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, replace
 from functools import lru_cache
+import hashlib
 import math
 import random
 import threading
@@ -27,11 +28,14 @@ from voidfarer.crew import (
     CREW_ROLES,
     DAYS_PER_MONTH,
     apply_morale_event,
+    award_crew_xp,
     calculate_crew_bonuses,
     crew_catalog,
     crew_upkeep,
+    crew_xp_to_next,
     get_crew_role,
     recruit_crew_member,
+    recover_crew_injuries,
     shore_leave_restore,
     tick_crew,
     wages_due,
@@ -52,6 +56,19 @@ from voidfarer.character import (
     train_skill,
 )
 from voidfarer.codex import build_codex_report, get_codex_entry
+from voidfarer.decisions import eligible_decisions, make_decision_event
+from voidfarer.pirates import generate_pirate_encounter, pirate_risk
+from voidfarer.away import (
+    AWAY_MISSION_MAP,
+    AWAY_MISSION_TYPES,
+    auto_team,
+    available_missions,
+    crew_fit,
+    get_away_mission_type,
+    mission_risk,
+    resolve_away_mission,
+    site_key,
+)
 from voidfarer.exploration import (
     SCOOP_RECHARGE_TICKS,
     crew_training_cost,
@@ -118,6 +135,7 @@ from voidfarer.inventory import (
 from voidfarer.galaxy import (
     CANONICAL_COMMODITIES,
     COMMODITY_MAP,
+    LEGACY_SYSTEM_IDS,
     VOID_GATE_SYSTEM_IDS,
     GalaxyGenerator,
     black_hole_body,
@@ -153,6 +171,7 @@ from voidfarer.shipmods import (
 )
 from voidfarer.models import (
     AICaptain,
+    AwayMission,
     BountyContract,
     CelestialBody,
     CodexState,
@@ -186,6 +205,7 @@ from voidfarer.models import (
     StoryTransmission,
     SystemMarketState,
     TimeState,
+    TradeOrder,
     TravelState,
     TutorialState,
     TutorialStep,
@@ -201,11 +221,17 @@ from voidfarer.frontier import (
 )
 from voidfarer.retention import (
     CATALOG_RELICS,
+    CONTRACT_CATEGORIES,
     PILOT_TALENTS,
     calculate_passive_multipliers,
     generate_contract,
     generate_initial_contracts,
     roll_relic_drop,
+)
+from voidfarer.surface import (
+    SURFACE_OPERATION_MAP,
+    resolve_surface_operation,
+    surface_report,
 )
 from voidfarer.story import (
     CAMPAIGN_CHAPTERS,
@@ -295,10 +321,18 @@ class SimulationEngine:
     SURVEY_COMPLETION_CREDITS = 300
     SURVEY_COMPLETION_XP = 120
 
+    @staticmethod
+    def _stable_unit(*parts: object) -> float:
+        """Deterministic [0,1) roll that does not disturb the live RNG stream."""
+        payload = "|".join(str(part) for part in parts).encode("utf-8")
+        digest = hashlib.blake2b(payload, digest_size=8).digest()
+        return int.from_bytes(digest, "big") / float(2**64)
+
     def __init__(self, seed: int = 42, state: GameState | None = None) -> None:
         self.lock = threading.RLock()
         self.seed = seed
         self.rng = random.Random(seed)
+        self.allow_decision_events = False
 
         if state is not None:
             ship = state.ship
@@ -462,6 +496,10 @@ class SimulationEngine:
             landed_body_id=kwargs["landed_body_id"] if "landed_body_id" in kwargs else cur.landed_body_id,
             travel=kwargs["travel"] if "travel" in kwargs else cur.travel,
             void_traversal=kwargs["void_traversal"] if "void_traversal" in kwargs else cur.void_traversal,
+            away_missions=kwargs.get("away_missions", cur.away_missions),
+            away_completed=kwargs.get("away_completed", cur.away_completed),
+            trade_orders=kwargs.get("trade_orders", cur.trade_orders),
+            surface_used=kwargs.get("surface_used", cur.surface_used),
             cargo_cost=cargo_cost,
         )
 
@@ -476,6 +514,9 @@ class SimulationEngine:
             visited_systems=kwargs.get("visited_systems", cur.visited_systems),
             active_anomaly=kwargs["active_anomaly"] if "active_anomaly" in kwargs else cur.active_anomaly,
             active_combat=kwargs["active_combat"] if "active_combat" in kwargs else cur.active_combat,
+            active_pirate=kwargs["active_pirate"] if "active_pirate" in kwargs else cur.active_pirate,
+            pending_decision=kwargs["pending_decision"] if "pending_decision" in kwargs else cur.pending_decision,
+            decision_history=kwargs.get("decision_history", cur.decision_history),
             time=kwargs.get("time", cur.time),
             stats=kwargs.get("stats", cur.stats),
             economy=kwargs.get("economy", cur.economy),
@@ -520,7 +561,8 @@ class SimulationEngine:
 
     def _crew_bonuses(self, ship: ShipState | None = None) -> dict[str, float]:
         target = ship if ship is not None else self.state.ship
-        return calculate_crew_bonuses(target.crew)
+        assigned = {cid for mission in target.away_missions for cid in mission.crew_ids}
+        return calculate_crew_bonuses(tuple(member for member in target.crew if member.id not in assigned))
 
     def _map_effects(self, system: StarSystem | None = None) -> dict[str, float]:
         """Aggregate the active map modifiers of a system (defaults to the current one)."""
@@ -700,11 +742,16 @@ class SimulationEngine:
             specializations=current_mastery.specializations,
         ), logs
 
-    def _progress_contracts(self, category: str, amount: int = 1) -> tuple[tuple[BountyContract, ...], list[str]]:
+    def _progress_contracts(
+        self,
+        category: str,
+        amount: int = 1,
+        contracts: Sequence[BountyContract] | None = None,
+    ) -> tuple[tuple[BountyContract, ...], list[str]]:
         """Advance matching active contracts toward completion objectives."""
         updated: list[BountyContract] = []
         logs: list[str] = []
-        for c in self.state.ship.active_contracts:
+        for c in contracts if contracts is not None else self.state.ship.active_contracts:
             if c.category == category and not c.completed:
                 new_cnt = min(c.target_count, c.current_count + amount)
                 is_done = new_cnt >= c.target_count
@@ -807,6 +854,11 @@ class SimulationEngine:
         generator = GalaxyGenerator(seed=seed)
         systems = generator.generate_galaxy()
         initial_contracts = generate_initial_contracts(self.rng)
+        extra_contract_rng = random.Random(seed ^ 0x9E3779B9)
+        initial_contracts = initial_contracts + (
+            generate_contract(extra_contract_rng, "trade"),
+            generate_contract(extra_contract_rng, "delivery"),
+        )
 
         ship = ShipState(
             commander_name="Astraea",
@@ -864,7 +916,18 @@ class SimulationEngine:
             },
         )
 
-        economy = generate_initial_economy(systems, self.rng)
+        legacy_ids = set(LEGACY_SYSTEM_IDS)
+        legacy_systems = {sid: sys for sid, sys in systems.items() if sid in legacy_ids}
+        frontier_systems = {sid: sys for sid, sys in systems.items() if sid not in legacy_ids}
+        economy = generate_initial_economy(legacy_systems, self.rng)
+        if frontier_systems:
+            frontier_econ = generate_initial_economy(
+                frontier_systems, random.Random(seed ^ 0x5F3759DF)
+            )
+            economy = replace(
+                economy,
+                markets={**economy.markets, **frontier_econ.markets},
+            )
         return GameState(
             version=1,
             galaxy_seed=seed,
@@ -873,6 +936,9 @@ class SimulationEngine:
             visited_systems=("sol",),
             active_anomaly=None,
             active_combat=None,
+            active_pirate=None,
+            pending_decision=None,
+            decision_history=(),
             stats={
                 "jumps": 0,
                 "scans": 0,
@@ -881,6 +947,19 @@ class SimulationEngine:
                 "combat_victories": 0,
                 "credits_earned": 0,
                 "contracts_completed": 0,
+                "away_missions": 0,
+                "away_successes": 0,
+                "away_failures": 0,
+                "away_injuries": 0,
+                "pirate_encounters": 0,
+                "pirates_paid": 0,
+                "pirates_evaded": 0,
+                "pirates_fought": 0,
+                "landings": 0,
+                "surface_ops": 0,
+                "decisions_resolved": 0,
+                "quantum_orders": 0,
+                "deliveries": 0,
             },
             economy=economy,
             ai_captains=generate_ai_captains(systems, seed),
@@ -1182,6 +1261,10 @@ class SimulationEngine:
             if self.state.active_combat is not None:
                 return False, "Hyperspace drive locked by hostile enemy tractor field! Must resolve combat or flee."
 
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+
             if self.state.active_anomaly is not None:
                 return False, "Hyperspace drive locked: unresolved spatial anomaly in proximity!"
 
@@ -1286,6 +1369,26 @@ class SimulationEngine:
                 anomaly = GalaxyGenerator.get_random_anomaly(self.rng.randint(1, 99999))
                 new_log.append(f"WARNING: Deep-space anomaly detected! [{anomaly.title}]")
 
+            active_pirate = None
+            if not combat and not anomaly and self.allow_decision_events:
+                raid_risk = pirate_risk(target_sys, standing, has_escort, encounter_evasion)
+                pirate_roll = self._stable_unit(
+                    self.state.galaxy_seed, "pirate", target_system_id, self.state.time.tick
+                )
+                if pirate_roll < raid_risk.chance:
+                    active_pirate = generate_pirate_encounter(
+                        target_sys,
+                        seed=int(self._stable_unit(
+                            self.state.galaxy_seed, "pirate_seed", target_system_id, self.state.time.tick
+                        ) * 99999) + 1,
+                        threat_level=max(1, self.state.ship.mastery.level),
+                        standing=standing,
+                    )
+                    new_log.append(
+                        f"PIRATE ENCOUNTER: {active_pirate.band_name} demands "
+                        f"{active_pirate.toll_credits} cr for safe passage ({raid_risk.reason})."
+                    )
+
             # Tutorial progression on hyperspace jump
             new_tut, tut_cr, tut_xp, tut_relics, tut_logs = self._progress_tutorial("jump")
             new_log.extend(tut_logs)
@@ -1352,6 +1455,8 @@ class SimulationEngine:
 
             stats = dict(self.state.stats)
             stats["jumps"] += 1
+            if active_pirate is not None:
+                stats["pirate_encounters"] = int(stats.get("pirate_encounters", 0)) + 1
 
             # Advance cosmic time by 2 ticks (12 hours transit) during interstellar hyperspace jump
             cur_time = self.state.time
@@ -1439,6 +1544,7 @@ class SimulationEngine:
                 visited_systems=tuple(sorted(visited)),
                 active_anomaly=anomaly,
                 active_combat=combat,
+                active_pirate=active_pirate,
                 stats=stats,
                 time=transit_time,
                 economy=new_econ,
@@ -1446,6 +1552,8 @@ class SimulationEngine:
             )
 
             msg = f"Jump successful: arrived in {target_sys.name}."
+            if self.allow_decision_events:
+                self.maybe_trigger_decision("jump")
             if combat:
                 msg += f" WARNING: Intercepted by {combat.enemy_name}!"
             return True, msg
@@ -1470,6 +1578,9 @@ class SimulationEngine:
         """Establish orbital trajectory around a celestial body in the current system."""
         with self.lock:
             cur_sys = self.current_system
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
             matched = None
             for b in cur_sys.bodies:
                 if b.id == body_id:
@@ -1500,6 +1611,8 @@ class SimulationEngine:
             )
 
             self.state = self._clone_state(ship=new_ship)
+            if self.allow_decision_events:
+                self.maybe_trigger_decision("orbit")
             return True, f"Now in orbit around {matched.name} ({distance_au:.1f} AU)."
 
     def _transit_risk(self, system: StarSystem | None, mode: str,
@@ -1596,6 +1709,9 @@ class SimulationEngine:
     def start_travel(self, body_id: str, mode: str = "sublight") -> tuple[bool, str]:
         """Initiate sublight or quantum in-system transit toward a celestial body."""
         with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
             plan, message = self._travel_plan(body_id, mode)
             if plan is None:
                 return False, message
@@ -1670,6 +1786,9 @@ class SimulationEngine:
     def scan(self) -> tuple[bool, str, dict[str, Any]]:
         """Perform sensor sweep of current body or local space."""
         with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock, {}
             body = self.orbiting_body
             if not body:
                 return False, "Cannot scan: ship must establish orbit around a celestial body first.", {}
@@ -1800,6 +1919,24 @@ class SimulationEngine:
                 stats["systems_surveyed"] = int(stats.get("systems_surveyed", 0)) + 1
 
             self.state = self._clone_state(ship=new_ship, systems=systems, stats=stats)
+            anomaly_roll = self._stable_unit(
+                self.state.galaxy_seed, "anomaly", body.id, self.state.time.tick, stats["scans"]
+            )
+            if anomaly_roll < 0.10:
+                anomaly = GalaxyGenerator.get_random_anomaly(
+                    int(self._stable_unit(
+                        self.state.galaxy_seed, "anomaly_seed", body.id, self.state.time.tick, stats["scans"]
+                    ) * 99999) + 1
+                )
+                warning = f"ANOMALY CONTACT: Sensor sweep disturbed {anomaly.title}."
+                new_log = list(self.state.ship.flight_log[-19:]) + [warning]
+                self.state = self._clone_state(
+                    ship=self._clone_ship(flight_log=tuple(new_log[-20:])),
+                    active_anomaly=anomaly,
+                )
+
+            if self.allow_decision_events:
+                self.maybe_trigger_decision("scan")
 
             discovery_info = {
                 "body_name": body.name,
@@ -2312,17 +2449,25 @@ class SimulationEngine:
             if act in ("improve", "negotiate"):
                 gain = int(3 + diplomacy_bonus * 20 + min(5, max(0, amount)))
                 standings[faction_id] = min(100, current + gain)
-                self.state = self._clone_state(ship=self._clone_ship(faction_standings=standings))
-                return True, f"Diplomatic talks with {CANONICAL_FACTIONS[faction_id].name}: standing {current:+d} -> {standings[faction_id]:+d}."
+                new_contracts, contract_logs = self._progress_contracts("diplomacy", 1)
+                self.state = self._clone_state(
+                    ship=self._clone_ship(faction_standings=standings, active_contracts=new_contracts),
+                )
+                return True, f"Diplomatic talks with {CANONICAL_FACTIONS[faction_id].name}: standing {current:+d} -> {standings[faction_id]:+d}." + (" " + " ".join(contract_logs) if contract_logs else "")
             if act in ("gift", "aid"):
                 cost = max(100, int(amount) if amount else 300)
                 if self.state.ship.credits < cost:
                     return False, f"Insufficient credits for aid package ({cost} cr)."
                 gain = 5 + int(diplomacy_bonus * 20) + cost // 200
                 standings[faction_id] = min(100, current + gain)
-                new_ship = self._clone_ship(credits=self.state.ship.credits - cost, faction_standings=standings)
+                new_contracts, contract_logs = self._progress_contracts("diplomacy", 1)
+                new_ship = self._clone_ship(
+                    credits=self.state.ship.credits - cost,
+                    faction_standings=standings,
+                    active_contracts=new_contracts,
+                )
                 self.state = self._clone_state(ship=new_ship)
-                return True, f"Aid package delivered to {CANONICAL_FACTIONS[faction_id].name} ({cost} cr, +{gain} standing)."
+                return True, f"Aid package delivered to {CANONICAL_FACTIONS[faction_id].name} ({cost} cr, +{gain} standing)." + (" " + " ".join(contract_logs) if contract_logs else "")
             if act == "alliance":
                 if current < 70:
                     return False, f"Alliance requires standing >= 70 (current {current:+d})."
@@ -2491,10 +2636,11 @@ class SimulationEngine:
     def get_crew_report(self) -> dict[str, Any]:
         with self.lock:
             crew = self.state.ship.crew
+            assigned = {cid for mission in self.state.ship.away_missions for cid in mission.crew_ids}
             return {
                 "crew": [c.to_dict() for c in crew],
                 "roles": crew_catalog(),
-                "bonuses": calculate_crew_bonuses(crew),
+                "bonuses": calculate_crew_bonuses(tuple(c for c in crew if c.id not in assigned)),
                 "upkeep": crew_upkeep(crew),
                 "capacity": 8,
                 "active": len([c for c in crew if c.status == "active"]),
@@ -2502,7 +2648,234 @@ class SimulationEngine:
                 "morale_warnings": [
                     f"{c.name} is near desertion" for c in crew if c.status == "active" and c.morale < 20.0
                 ],
+                "injuries": [
+                    f"{c.name} injured ({c.injury_ticks} ticks)" for c in crew if c.injury_ticks > 0
+                ],
+                "away": len(self.state.ship.away_missions),
             }
+
+    AWAY_MAX_ACTIVE = 2
+
+    def _away_assigned_ids(self, ship: ShipState | None = None) -> set[str]:
+        target = ship if ship is not None else self.state.ship
+        return {cid for mission in target.away_missions for cid in mission.crew_ids}
+
+    def _away_reward_preview(self, mission_type: Any) -> list[str]:
+        rewards = [f"+{mission_type.credits} cr", f"{mission_type.research} research"]
+        rewards.extend(f"{quantity} x {get_item_info(item_id).name}" for item_id, quantity in mission_type.cargo)
+        if mission_type.morale:
+            rewards.append(f"morale +{mission_type.morale}")
+        if mission_type.standing:
+            rewards.append(f"standing +{mission_type.standing}")
+        return rewards
+
+    def get_away_report(self) -> dict[str, Any]:
+        """Body expeditions available from orbit, active teams, and crew readiness."""
+        with self.lock:
+            ship = self.state.ship
+            body = self.orbiting_body
+            assigned = self._away_assigned_ids(ship)
+            tick = self.state.time.tick
+            active: list[dict[str, Any]] = []
+            for mission in ship.away_missions:
+                mission_type = get_away_mission_type(mission.mission_type)
+                team = [member for member in ship.crew if member.id in mission.crew_ids]
+                total = max(1, mission.duration_ticks)
+                remaining = max(0, mission.started_tick + mission.duration_ticks - tick)
+                active.append({
+                    **mission.to_dict(),
+                    "name": mission_type.name if mission_type else mission.mission_type,
+                    "icon": mission_type.icon if mission_type else "◇",
+                    "team": [
+                        {
+                            "id": member.id,
+                            "name": member.name,
+                            "role": member.role,
+                            "skill": member.skill,
+                            "specialty": member.specialty,
+                        }
+                        for member in team
+                    ],
+                    "remaining_ticks": remaining,
+                    "progress": round(100.0 * (total - remaining) / total, 1),
+                    "duration_ticks": total,
+                })
+
+            crew_rows = [
+                {
+                    **member.to_dict(),
+                    "xp_to_next": crew_xp_to_next(member),
+                    "assigned_mission_id": next(
+                        (mission.id for mission in ship.away_missions if member.id in mission.crew_ids),
+                        None,
+                    ),
+                }
+                for member in ship.crew
+            ]
+
+            missions: list[dict[str, Any]] = []
+            if body is not None:
+                for mission_type in available_missions(body):
+                    team = auto_team(mission_type, ship.crew, assigned)
+                    missing = max(0, mission_type.team_size - len(team))
+                    risk = mission_risk(mission_type, body, team) if team else None
+                    worked = site_key(mission_type.id, body.id) in ship.away_completed
+                    reason = ""
+                    if worked:
+                        reason = "Site already worked; move to a fresh body."
+                    elif len(active) >= self.AWAY_MAX_ACTIVE:
+                        reason = "Both expedition slots are deployed."
+                    elif missing:
+                        reason = f"Need {missing} more healthy crew member(s)."
+                    missions.append({
+                        **mission_type.to_dict(),
+                        "risk": risk,
+                        "team": [
+                            {
+                                "id": member.id,
+                                "name": member.name,
+                                "role": member.role,
+                                "skill": member.skill,
+                                "specialty": member.specialty,
+                                "fit": round(crew_fit(member, mission_type.required_skill), 1),
+                            }
+                            for member in team
+                        ],
+                        "missing_crew": missing,
+                        "worked": worked,
+                        "available": missing == 0 and len(active) < self.AWAY_MAX_ACTIVE and not worked,
+                        "reason": reason,
+                        "rewards": self._away_reward_preview(mission_type),
+                    })
+
+            body_summary = None
+            if body is not None:
+                body_summary = {
+                    "id": body.id,
+                    "name": body.name,
+                    "body_type": body.body_type,
+                    "hazards": list(body.hazards),
+                    "population": body.population,
+                    "gravity": body.gravity,
+                }
+            return {
+                "body": body_summary,
+                "available": missions,
+                "active": active,
+                "crew": crew_rows,
+                "max_active": self.AWAY_MAX_ACTIVE,
+                "assigned_crew_ids": sorted(assigned),
+            }
+
+    def launch_away_mission(
+        self,
+        mission_type: str,
+        crew_ids: Sequence[str] | None = None,
+    ) -> tuple[bool, str]:
+        """Deploy an away team from orbit. Spent crew stop contributing ship bonuses."""
+        with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+            ship = self.state.ship
+            body = self.orbiting_body
+            if body is None:
+                return False, "Establish orbit around a body before deploying an away team."
+            if self.state.active_combat:
+                return False, "Cannot deploy an away team while under hostile fire."
+            if ship.travel is not None:
+                return False, "Cannot deploy an away team during in-system transit."
+            if ship.void_traversal is not None:
+                return False, "Cannot deploy an away team inside the Hollow Between."
+            if len(ship.away_missions) >= self.AWAY_MAX_ACTIVE:
+                return False, f"Both expedition slots are deployed (maximum {self.AWAY_MAX_ACTIVE})."
+            mission_type_def = get_away_mission_type(str(mission_type))
+            if mission_type_def is None:
+                return False, f"Unknown expedition type '{mission_type}'."
+            if not mission_type_def.available_on(body):
+                return False, f"{mission_type_def.name} is not available at {body.name}."
+            if site_key(mission_type_def.id, body.id) in ship.away_completed:
+                return False, f"{mission_type_def.name} site at {body.name} is already worked; move to a fresh body."
+
+            assigned = self._away_assigned_ids(ship)
+            if crew_ids is not None:
+                requested = list(dict.fromkeys(str(cid) for cid in crew_ids))
+                by_id = {member.id: member for member in ship.crew}
+                team_members = []
+                for cid in requested:
+                    member = by_id.get(cid)
+                    if member is None:
+                        return False, f"Unknown crew member '{cid}'."
+                    if member.id in assigned:
+                        return False, f"{member.name} is already deployed on an expedition."
+                    if member.status != "active":
+                        return False, f"{member.name} is not on active duty."
+                    if member.injury_ticks > 0:
+                        return False, f"{member.name} is injured and cannot deploy."
+                    team_members.append(member)
+                team = tuple(team_members)
+                if len(team) != mission_type_def.team_size:
+                    return False, f"{mission_type_def.name} needs exactly {mission_type_def.team_size} crew member(s)."
+            else:
+                team = auto_team(mission_type_def, ship.crew, assigned)
+                if len(team) < mission_type_def.team_size:
+                    injured = len([member for member in ship.crew if member.injury_ticks > 0])
+                    injury_note = f" ({injured} injured)" if injured else ""
+                    return False, (
+                        f"{mission_type_def.name} needs {mission_type_def.team_size} healthy crew member(s); "
+                        f"only {len(team)} available{injury_note}."
+                    )
+
+            tick = self.state.time.tick
+            mission_seq = len(ship.away_missions) + 1
+            mission_id = f"away_{tick}_{mission_seq}"
+            existing = {mission.id for mission in ship.away_missions}
+            while mission_id in existing:
+                mission_seq += 1
+                mission_id = f"away_{tick}_{mission_seq}"
+            risk = mission_risk(mission_type_def, body, team)
+            mission = AwayMission(
+                id=mission_id,
+                mission_type=mission_type_def.id,
+                system_id=ship.current_system_id,
+                body_id=body.id,
+                body_name=body.name,
+                crew_ids=tuple(member.id for member in team),
+                started_tick=tick,
+                duration_ticks=mission_type_def.duration_ticks,
+                risk=risk,
+            )
+            names = ", ".join(member.name for member in team)
+            log = f"AWAY TEAM DEPLOYED: {mission_type_def.name} at {body.name} ({names}); risk {risk}%."
+            self.state = self._clone_state(
+                ship=self._clone_ship(
+                    away_missions=ship.away_missions + (mission,),
+                    flight_log=tuple(list(ship.flight_log[-19:]) + [log]),
+                )
+            )
+            return True, (
+                f"{mission_type_def.name} deployed to {body.name}: {names}. "
+                f"Risk {risk}%, ETA {mission_type_def.duration_ticks} ticks."
+            )
+
+    def recall_away_mission(self, mission_id: str) -> tuple[bool, str]:
+        """Abort one expedition and return its team to the ship with no reward."""
+        with self.lock:
+            ship = self.state.ship
+            mission = next((m for m in ship.away_missions if m.id == str(mission_id)), None)
+            if mission is None:
+                return False, f"No active expedition '{mission_id}'."
+            mission_type = get_away_mission_type(mission.mission_type)
+            name = mission_type.name if mission_type else mission.mission_type
+            remaining = tuple(m for m in ship.away_missions if m.id != mission.id)
+            log = f"AWAY TEAM RECALLED: {name} at {mission.body_name}; no salvage recovered."
+            self.state = self._clone_state(
+                ship=self._clone_ship(
+                    away_missions=remaining,
+                    flight_log=tuple(list(ship.flight_log[-19:]) + [log]),
+                )
+            )
+            return True, log
 
     def cash_flow(self) -> dict[str, Any]:
         """Monthly credit flow: crew payroll against passive income (drones, outposts)."""
@@ -2760,6 +3133,9 @@ class SimulationEngine:
     def trade(self, commodity_id: str, quantity: int, is_buy: bool) -> tuple[bool, str]:
         """Execute buy or sell commodity order at orbiting market."""
         with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
             body = self.orbiting_body
             if not body or not body.station_dockable:
                 return False, "Docking authorization required: ship must orbit a station or habitable colony to trade."
@@ -2976,8 +3352,221 @@ class SimulationEngine:
                 economy=new_economy,
                 local_dock_purchases=dict(self._local_dock_purchases),
             )
+            if self.allow_decision_events:
+                self.maybe_trigger_decision("trade")
 
             return True, msg
+
+    QUANTUM_MAX_ORDERS = 4
+
+    def _destination_market_body(self, system: StarSystem) -> CelestialBody | None:
+        for body in system.bodies:
+            if body.station_dockable and body.market_archetype not in ("none", ""):
+                return body
+        return next((body for body in system.bodies if body.station_dockable), None)
+
+    def _quantum_fee(self, commodity: Any, quantity: int, jumps: int) -> int:
+        return max(35, int(25 + jumps * 40 + commodity.volume * quantity * 4))
+
+    def get_quantum_trade_report(self) -> dict[str, Any]:
+        """Arbitrage routes for cargo already in the hold, with fees and transit times."""
+        with self.lock:
+            body = self.orbiting_body
+            if body is None or not body.station_dockable:
+                return {
+                    "docked": False,
+                    "message": "Dock at a station or colony to open quantum freight lanes.",
+                    "routes": [],
+                    "orders": [order.to_dict() for order in self.state.ship.trade_orders],
+                    "max_orders": self.QUANTUM_MAX_ORDERS,
+                }
+            origin = self.current_system
+            routes: list[dict[str, Any]] = []
+            for commodity in CANONICAL_COMMODITIES:
+                quantity = int(self.state.ship.cargo.get(commodity.id, 0))
+                if quantity <= 0:
+                    continue
+                for system in self.state.systems.values():
+                    if system.id == origin.id:
+                        continue
+                    dest_body = self._destination_market_body(system)
+                    if dest_body is None:
+                        continue
+                    plan = route_plan(self.state.systems, origin.id, system.id)
+                    if not plan["reachable"]:
+                        continue
+                    faction_id = get_faction_id_from_name(system.faction)
+                    quote = calculate_dynamic_market_quote(
+                        system,
+                        dest_body,
+                        commodity,
+                        self.state.economy,
+                        faction_standing=self.state.ship.faction_standings.get(faction_id, 0),
+                    )
+                    fee = self._quantum_fee(commodity, quantity, int(plan["jumps"]))
+                    payout = int(quote.sell_price * quantity * 0.97)
+                    routes.append({
+                        "commodity_id": commodity.id,
+                        "commodity_name": commodity.name,
+                        "quantity": quantity,
+                        "destination_system_id": system.id,
+                        "destination_system_name": system.name,
+                        "destination_body_id": dest_body.id,
+                        "destination_name": dest_body.name,
+                        "jumps": int(plan["jumps"]),
+                        "duration_ticks": max(2, int(plan["jumps"]) * 3),
+                        "unit_price": quote.sell_price,
+                        "fee": fee,
+                        "payout": payout,
+                        "net": payout - fee,
+                    })
+            routes.sort(key=lambda route: (-route["net"], route["destination_system_name"], route["commodity_id"]))
+            return {
+                "docked": True,
+                "body": body.name,
+                "routes": routes[:6],
+                "orders": [order.to_dict() for order in self.state.ship.trade_orders],
+                "max_orders": self.QUANTUM_MAX_ORDERS,
+            }
+
+    def place_quantum_order(
+        self,
+        commodity_id: str,
+        quantity: int,
+        destination_system_id: str,
+    ) -> tuple[bool, str]:
+        """Ship owned cargo through the quantum lane; cargo leaves now and pays on arrival."""
+        with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+            body = self.orbiting_body
+            if body is None or not body.station_dockable:
+                return False, "Quantum freight requires a docked station or colony."
+            commodity = COMMODITY_MAP.get(str(commodity_id))
+            if commodity is None:
+                return False, f"Unknown commodity '{commodity_id}'."
+            try:
+                quantity = int(quantity)
+            except (TypeError, ValueError):
+                return False, "Quantity must be a positive integer."
+            if quantity <= 0:
+                return False, "Quantity must be a positive integer."
+            held = int(self.state.ship.cargo.get(commodity.id, 0))
+            if held < quantity:
+                return False, f"Insufficient cargo: hold has {held} {commodity.name}, order needs {quantity}."
+            if len(self.state.ship.trade_orders) >= self.QUANTUM_MAX_ORDERS:
+                return False, f"All {self.QUANTUM_MAX_ORDERS} quantum freight slots are in use."
+            destination = self.state.systems.get(str(destination_system_id))
+            if destination is None:
+                return False, f"Unknown destination system '{destination_system_id}'."
+            if destination.id == self.current_system.id:
+                return False, "Choose a destination outside the current system."
+            dest_body = self._destination_market_body(destination)
+            if dest_body is None:
+                return False, f"{destination.name} has no quantum freight terminal."
+            plan = route_plan(self.state.systems, self.current_system.id, destination.id)
+            if not plan["reachable"]:
+                return False, f"No hyperlane route to {destination.name}."
+            fee = self._quantum_fee(commodity, quantity, int(plan["jumps"]))
+            if self.state.ship.credits < fee:
+                return False, f"Quantum freight fee is {fee} cr; treasury has {self.state.ship.credits} cr."
+            faction_id = get_faction_id_from_name(destination.faction)
+            quote = calculate_dynamic_market_quote(
+                destination,
+                dest_body,
+                commodity,
+                self.state.economy,
+                faction_standing=self.state.ship.faction_standings.get(faction_id, 0),
+            )
+            cargo = dict(self.state.ship.cargo)
+            remaining = held - quantity
+            if remaining:
+                cargo[commodity.id] = remaining
+            else:
+                cargo.pop(commodity.id, None)
+            cargo_cost = dict(self.state.ship.cargo_cost)
+            paid = int(cargo_cost.get(commodity.id, 0))
+            if paid and held:
+                cargo_cost[commodity.id] = max(0, paid * remaining // held)
+                if cargo_cost[commodity.id] <= 0:
+                    cargo_cost.pop(commodity.id, None)
+            tick = self.state.time.tick
+            order = TradeOrder(
+                id=f"freight_{tick}_{len(self.state.ship.trade_orders) + 1}",
+                commodity_id=commodity.id,
+                quantity=quantity,
+                origin_system_id=self.current_system.id,
+                destination_system_id=destination.id,
+                destination_body_id=dest_body.id,
+                destination_name=dest_body.name,
+                fee_paid=fee,
+                created_tick=tick,
+                arrival_tick=tick + max(2, int(plan["jumps"]) * 3),
+                unit_price_at_launch=quote.sell_price,
+            )
+            log = (
+                f"QUANTUM FREIGHT: {quantity} {commodity.name} departed for {destination.name} "
+                f"({dest_body.name}) via {plan['jumps']} jump(s); fee {fee} cr, ETA {order.arrival_tick - tick} ticks."
+            )
+            stats = dict(self.state.stats)
+            stats["quantum_orders"] = int(stats.get("quantum_orders", 0)) + 1
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - fee,
+                cargo=cargo,
+                cargo_cost=cargo_cost,
+                trade_orders=self.state.ship.trade_orders + (order,),
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+            )
+            self.state = self._clone_state(ship=new_ship, stats=stats)
+            return True, log
+
+    def _resolve_quantum_orders(
+        self,
+        orders: Sequence[TradeOrder],
+        tick: int,
+        systems: dict[str, StarSystem],
+        economy: GlobalEconomyState,
+    ) -> tuple[tuple[TradeOrder, ...], int, list[str], int, GlobalEconomyState]:
+        remaining: list[TradeOrder] = []
+        credits = 0
+        logs: list[str] = []
+        delivered = 0
+        markets = dict(economy.markets)
+        for order in orders:
+            if tick < order.arrival_tick:
+                remaining.append(order)
+                continue
+            system = systems.get(order.destination_system_id)
+            body = next(
+                (candidate for candidate in (system.bodies if system else ()) if candidate.id == order.destination_body_id),
+                None,
+            )
+            commodity = COMMODITY_MAP.get(order.commodity_id)
+            if system is None or body is None or commodity is None:
+                logs.append(f"QUANTUM FREIGHT LOST: {order.quantity}x {order.commodity_id} never arrived at {order.destination_name}.")
+                continue
+            faction_id = get_faction_id_from_name(system.faction)
+            quote = calculate_dynamic_market_quote(
+                system,
+                body,
+                commodity,
+                economy,
+                faction_standing=self.state.ship.faction_standings.get(faction_id, 0),
+            )
+            revenue = int(quote.sell_price * order.quantity * 0.97)
+            credits += revenue
+            market = markets.get(system.id)
+            if market is not None:
+                stocks = dict(market.stockpiles)
+                stocks[order.commodity_id] = min(MAX_STOCK, stocks.get(order.commodity_id, 0) + order.quantity)
+                markets[system.id] = replace(market, stockpiles=stocks)
+            delivered += 1
+            logs.append(
+                f"QUANTUM FREIGHT DELIVERED: {order.quantity}x {commodity.name} sold at {system.name} "
+                f"for {revenue} cr (fee {order.fee_paid} cr)."
+            )
+        return tuple(remaining), credits, logs, delivered, replace(economy, markets=markets)
 
     def buy_upgrade(self, upgrade_id: str) -> tuple[bool, str]:
         """Purchase and install a hardware upgrade module at an orbital station."""
@@ -3948,12 +4537,15 @@ class SimulationEngine:
             if overflow_items:
                 log_entry += f" Hold full: jettisoned {', '.join(overflow_items)}."
             new_log = list(self.state.ship.flight_log[-19:]) + [log_entry]
+            new_contracts, contract_logs = self._progress_contracts("anomaly", 1)
+            new_log.extend(contract_logs)
 
             new_ship = self._clone_ship(
                 hull=new_hull,
                 fuel=new_fuel,
                 credits=new_credits,
                 cargo=cargo,
+                active_contracts=new_contracts,
                 flight_log=tuple(new_log),
             )
 
@@ -3969,6 +4561,82 @@ class SimulationEngine:
             )
 
             return True, choice.outcome_text
+
+    def resolve_pirate_encounter(self, action: str) -> tuple[bool, str]:
+        """Resolve a pirate toll: pay, fight, or burn clear. Flight resumes afterward."""
+        with self.lock:
+            pirate = self.state.active_pirate
+            if pirate is None:
+                return False, "No pirate encounter is active."
+            action = str(action).strip().lower()
+            stats = dict(self.state.stats)
+            if action in ("pay", "toll"):
+                if self.state.ship.credits < pirate.toll_credits:
+                    return False, (
+                        f"Insufficient credits: {pirate.toll_credits} cr demanded, "
+                        f"{self.state.ship.credits} available."
+                    )
+                log = (
+                    f"PIRATE TOLL PAID: {pirate.band_name} accepts {pirate.toll_credits} cr; "
+                    f"the raider peels away."
+                )
+                new_contracts, contract_logs = self._progress_contracts("pirates", 1)
+                new_ship = self._clone_ship(
+                    credits=self.state.ship.credits - pirate.toll_credits,
+                    active_contracts=new_contracts,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log] + contract_logs),
+                )
+                stats["pirates_paid"] = int(stats.get("pirates_paid", 0)) + 1
+                self.state = self._clone_state(ship=new_ship, active_pirate=None, stats=stats)
+                return True, log
+
+            if action in ("fight", "engage"):
+                system = self.state.systems.get(pirate.system_id) or self.current_system
+                combat = generate_system_enemy(
+                    system_id=system.id,
+                    security=system.security,
+                    faction="Void Corsairs",
+                    seed=pirate.seed or self.rng.randint(1000, 99999),
+                    threat_level=pirate.threat,
+                )
+                log = f"PIRATE ENGAGEMENT: Weapons free against {pirate.band_name} ({pirate.ship_class})."
+                new_contracts, contract_logs = self._progress_contracts("pirates", 1)
+                new_ship = self._clone_ship(
+                    active_contracts=new_contracts,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log] + contract_logs),
+                )
+                stats["pirates_fought"] = int(stats.get("pirates_fought", 0)) + 1
+                self.state = self._clone_state(
+                    ship=new_ship,
+                    active_pirate=None,
+                    active_combat=combat,
+                    stats=stats,
+                )
+                return True, log
+
+            if action in ("evade", "flee", "burn"):
+                fuel_cost = 6 + pirate.threat
+                hull_damage = 0
+                if self.rng.random() < 0.40:
+                    hull_damage = 5 + pirate.threat * 3
+                log = (
+                    f"PIRATE EVASION: Burned clear of {pirate.band_name} "
+                    f"(fuel -{min(self.state.ship.fuel, fuel_cost)}"
+                    + (f", hull -{hull_damage}" if hull_damage else "")
+                    + ")."
+                )
+                new_contracts, contract_logs = self._progress_contracts("pirates", 1)
+                new_ship = self._clone_ship(
+                    fuel=max(0, self.state.ship.fuel - fuel_cost),
+                    hull=max(0, self.state.ship.hull - hull_damage),
+                    active_contracts=new_contracts,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log] + contract_logs),
+                )
+                stats["pirates_evaded"] = int(stats.get("pirates_evaded", 0)) + 1
+                self.state = self._clone_state(ship=new_ship, active_pirate=None, stats=stats)
+                return True, log
+
+            return False, f"Unknown pirate action '{action}'. Use pay, fight, or evade."
 
     def repair_hull(self, amount: int = 25) -> tuple[bool, str]:
         """Repair ship hull integrity at orbital station."""
@@ -4055,6 +4723,34 @@ class SimulationEngine:
                 )
 
             self.state = self._clone_state(systems=updated_systems)
+
+    CONTRACT_REFRESH_COST = 120
+
+    def refresh_contracts(self) -> tuple[bool, str]:
+        """Reroll the mission board across every category for a broker fee."""
+        with self.lock:
+            if self.state.ship.credits < self.CONTRACT_REFRESH_COST:
+                return False, (
+                    f"Mission board refresh costs {self.CONTRACT_REFRESH_COST} cr; "
+                    f"treasury has {self.state.ship.credits} cr."
+                )
+            categories = list(CONTRACT_CATEGORIES)
+            self.rng.shuffle(categories)
+            new_contracts = tuple(
+                generate_contract(self.rng, category=category)
+                for category in categories[:5]
+            )
+            log = (
+                f"MISSION BOARD REFRESHED: five new contracts drawn for "
+                f"{self.CONTRACT_REFRESH_COST} cr."
+            )
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - self.CONTRACT_REFRESH_COST,
+                active_contracts=new_contracts,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, log
 
     def claim_contract(self, contract_id: str) -> tuple[bool, str, dict[str, Any]]:
         """Claim rewards for a fulfilled contract and immediately draw a new assignment."""
@@ -4544,6 +5240,9 @@ class SimulationEngine:
                 "visited_systems": list(self.state.visited_systems),
                 "active_anomaly": self.state.active_anomaly.to_dict() if self.state.active_anomaly else None,
                 "active_combat": self.state.active_combat.to_dict() if self.state.active_combat else None,
+                "active_pirate": self.state.active_pirate.to_dict() if self.state.active_pirate else None,
+                "pending_decision": self.state.pending_decision.to_dict() if self.state.pending_decision else None,
+                "decision_history": list(self.state.decision_history),
                 "time": self.state.time.to_dict(),
                 "stats": dict(self.state.stats),
                 "codex": build_codex_report(self.state),
@@ -4596,7 +5295,9 @@ class SimulationEngine:
                 "galactic_politics": self.galactic_politics(),
                 "eliminated_factions": list(self.state.eliminated_factions),
                 "crew": [c.to_dict() for c in self.state.ship.crew],
-                "crew_bonuses": calculate_crew_bonuses(self.state.ship.crew),
+                "crew_bonuses": self._crew_bonuses(),
+                "away_report": self.get_away_report(),
+                "surface_report": self.get_surface_report(),
                 "primary_weapon": self.state.ship.primary_weapon,
                 "fleet_manager": {
                     "ships": [s.to_dict() for s in self.state.ship.fleet_ships],
@@ -5050,6 +5751,9 @@ class SimulationEngine:
     def land_on_body(self, body_id: str) -> tuple[bool, str]:
         """Land on a habitable body and collect surface discovery rewards."""
         with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
             body = next((b for b in self.current_system.bodies if b.id == body_id), None)
             if not body:
                 return False, f"Unknown body '{body_id}' in {self.current_system.name}."
@@ -5064,17 +5768,104 @@ class SimulationEngine:
             stats["landings"] = stats.get("landings", 0) + 1
             stats["credits_earned"] = stats.get("credits_earned", 0) + reward
             log_entry = f"SURFACE LANDING: Touched down on {body.name}. Survey reward +{reward} cr."
+            new_contracts, contract_logs = self._progress_contracts("surface", 1)
             new_ship = self._clone_ship(
                 credits=self.state.ship.credits + reward,
                 landed_body_id=body_id,
-                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log_entry]),
+                active_contracts=new_contracts,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log_entry] + contract_logs),
             )
             self.state = self._clone_state(ship=new_ship, stats=stats)
+            if self.allow_decision_events:
+                self.maybe_trigger_decision("land")
             return True, log_entry
+
+    def get_surface_report(self) -> dict[str, Any]:
+        """Landing-party operations available on the currently landed body."""
+        with self.lock:
+            landed_id = self.state.ship.landed_body_id
+            body = next(
+                (candidate for candidate in self.current_system.bodies if candidate.id == landed_id),
+                None,
+            )
+            return surface_report(self.state.ship, body)
+
+    def perform_surface_operation(self, operation_id: str) -> tuple[bool, str]:
+        """Run one surface operation, then mark the site branch as worked."""
+        with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+            body = next(
+                (candidate for candidate in self.current_system.bodies if candidate.id == self.state.ship.landed_body_id),
+                None,
+            )
+            if body is None:
+                return False, "Land on a body before starting surface operations."
+            operation = SURFACE_OPERATION_MAP.get(str(operation_id))
+            if operation is None:
+                return False, f"Unknown surface operation '{operation_id}'."
+            key = f"{body.id}:{operation.id}"
+            if key in self.state.ship.surface_used:
+                return False, f"{operation.name} has already been completed on {body.name}."
+            if self.state.ship.credits < operation.credit_cost:
+                return False, f"{operation.name} requires {operation.credit_cost} cr; treasury has {self.state.ship.credits} cr."
+            outcome = resolve_surface_operation(
+                operation, body, self.state.ship, self.state.galaxy_seed, self.state.time.tick
+            )
+            cargo = dict(self.state.ship.cargo)
+            granted_items: list[str] = []
+            for item_id, quantity in outcome["cargo"]:
+                granted, overflow = self._grant_cargo(cargo, item_id, quantity)
+                if granted:
+                    granted_items.append(f"+{granted} {get_item_info(item_id).name}")
+            crew = self.state.ship.crew
+            heal = int(outcome["heal_injuries"])
+            if heal:
+                crew = tuple(replace(member, injury_ticks=max(0, member.injury_ticks - heal)) for member in crew)
+            morale = int(outcome["morale"])
+            if morale:
+                crew, _ = apply_morale_event(crew, float(morale), f"surface {operation.name}")
+            research = self.state.research
+            research_delta = int(outcome["research"])
+            if research_delta:
+                research = ResearchState(
+                    points=research.points + research_delta,
+                    progress=research.progress + research_delta,
+                    active_project_id=research.active_project_id,
+                    completed=research.completed,
+                )
+            new_credits = max(
+                0,
+                self.state.ship.credits + int(outcome["credits"]) - operation.credit_cost,
+            )
+            new_hull = max(0, min(self.state.ship.max_hull, self.state.ship.hull + int(outcome["hull_delta"])))
+            stats = dict(self.state.stats)
+            stats["surface_ops"] = int(stats.get("surface_ops", 0)) + 1
+            stats["credits_earned"] = int(stats.get("credits_earned", 0)) + int(outcome["credits"])
+            new_contracts, contract_logs = self._progress_contracts("surface", 1)
+            detail = " ".join(granted_items + contract_logs)
+            log = str(outcome["log"]) + (f" {detail}" if detail else "")
+            new_ship = self._clone_ship(
+                credits=new_credits,
+                hull=new_hull,
+                cargo=cargo,
+                crew=crew,
+                active_contracts=new_contracts,
+                surface_used=self.state.ship.surface_used + (key,),
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+            )
+            self.state = self._clone_state(ship=new_ship, research=research, stats=stats)
+            if self.allow_decision_events:
+                self.maybe_trigger_decision("land")
+            return True, log
 
     def salvage_derelict(self) -> tuple[bool, str, dict[str, Any]]:
         """Board the current body's derelict hulk for cargo, credits, and hazard risk."""
         with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock, {}
             body = self.orbiting_body
             if not body:
                 return False, "Cannot salvage: establish orbit around a body first.", {}
@@ -5142,7 +5933,8 @@ class SimulationEngine:
             stats["credits_earned"] = stats.get("credits_earned", 0) + credits
             systems = self._replace_system_body(body.id, salvage_claimed=True)
             self.state = self._clone_state(ship=new_ship, systems=systems, stats=stats)
-
+            if self.allow_decision_events:
+                self.maybe_trigger_decision("orbit")
             report = {
                 "site": site.to_dict(),
                 "success": success,
@@ -5157,6 +5949,9 @@ class SimulationEngine:
     def scoop_fuel(self) -> tuple[bool, str]:
         """Recover fuel from a star, gas giant, or ice body currently in orbit."""
         with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
             body = self.orbiting_body
             if not body:
                 return False, "Cannot scoop fuel: establish orbit around a scoopable body first."
@@ -5341,9 +6136,168 @@ class SimulationEngine:
     def form_alliance(self, captain_id: str) -> tuple[bool, str]:
         return self.interact_ai(captain_id, "ally")
 
+    def _decision_lock_reason(self) -> str:
+        pending = self.state.pending_decision
+        if pending is not None:
+            return f"Decision required: {pending.title}. Choose an option before continuing."
+        return ""
+
+    def _action_lock_reason(self) -> str:
+        """Reason flight or exploration actions are frozen (decision or pirate toll)."""
+        reason = self._decision_lock_reason()
+        if reason:
+            return reason
+        pirate = self.state.active_pirate
+        if pirate is not None:
+            return (
+                f"Pirate intercept unresolved: {pirate.band_name} demands "
+                f"{pirate.toll_credits} cr. Pay, fight, or evade before continuing."
+            )
+        return ""
+
+    def maybe_trigger_decision(self, trigger: str = "tick") -> dict[str, Any] | None:
+        """Evaluate conditional events and open at most one blocking decision."""
+        with self.lock:
+            if self.state.pending_decision is not None:
+                return None
+            if self.state.active_combat or self.state.active_anomaly or self.state.active_pirate:
+                return None
+            eligible = eligible_decisions(self.state, trigger)
+            if not eligible:
+                return None
+            chosen = eligible[0]
+            roll = self._stable_unit(
+                self.state.galaxy_seed, "decision", trigger, self.state.time.tick, chosen.id
+            )
+            threshold = max(chosen.chance, 0.45 if chosen.priority >= 85 else 0.18)
+            if roll > threshold:
+                return None
+            event = make_decision_event(chosen, self.state.time.tick, trigger)
+            log = f"DECISION REQUIRED: {event.title}."
+            self.state = self._clone_state(
+                ship=self._clone_ship(flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log])),
+                pending_decision=event,
+            )
+            return event.to_dict()
+
+    def resolve_decision(self, choice_id: str) -> tuple[bool, str]:
+        """Apply a decision choice; time and flight remain locked until this succeeds."""
+        with self.lock:
+            pending = self.state.pending_decision
+            if pending is None:
+                return False, "No decision is pending."
+            choice = next((c for c in pending.choices if c.id == str(choice_id)), None)
+            if choice is None:
+                return False, f"Unknown decision choice '{choice_id}'."
+            ship = self.state.ship
+            effects = choice.effects
+            cargo = dict(ship.cargo)
+            for item_id, quantity in dict(effects.get("cargo", {})).items():
+                quantity = int(quantity)
+                if quantity >= 0:
+                    self._grant_cargo(cargo, item_id, quantity)
+                else:
+                    remaining = max(0, int(cargo.get(item_id, 0)) + quantity)
+                    if remaining:
+                        cargo[item_id] = remaining
+                    else:
+                        cargo.pop(item_id, None)
+            for item_id, quantity in dict(effects.get("remove_cargo", {})).items():
+                remaining = max(0, int(cargo.get(item_id, 0)) - abs(int(quantity)))
+                if remaining:
+                    cargo[item_id] = remaining
+                else:
+                    cargo.pop(item_id, None)
+
+            crew = ship.crew
+            heal = int(effects.get("heal_injuries", 0))
+            if heal:
+                crew = tuple(
+                    replace(member, injury_ticks=max(0, member.injury_ticks - heal))
+                    for member in crew
+                )
+            morale = int(effects.get("morale", 0))
+            if morale:
+                crew, morale_log = apply_morale_event(crew, float(morale), f"decision {pending.title}")
+            else:
+                morale_log = ""
+
+            standings = dict(ship.faction_standings)
+            for faction_id, delta in dict(effects.get("standing", {})).items():
+                standings[faction_id] = max(-100, min(100, standings.get(faction_id, 0) + int(delta)))
+
+            reactor = ship.reactor
+            heat_delta = float(effects.get("heat", 0))
+            if heat_delta:
+                reactor = replace(
+                    reactor,
+                    heat=max(0.0, min(reactor_heat_capacity(reactor, self._combined_equipment(ship)), reactor.heat + heat_delta)),
+                )
+
+            research = self.state.research
+            research_delta = int(effects.get("research", 0))
+            if research_delta:
+                research = ResearchState(
+                    points=research.points + research_delta,
+                    progress=research.progress + research_delta,
+                    active_project_id=research.active_project_id,
+                    completed=research.completed,
+                )
+
+            credits = max(0, ship.credits + int(effects.get("credits", 0)))
+            fuel = max(0, min(ship.max_fuel, ship.fuel + int(effects.get("fuel", 0))))
+            hull = max(0, min(ship.max_hull, ship.hull + int(effects.get("hull", 0))))
+            log = str(effects.get("log") or f"DECISION [{pending.title}]: {choice.label}.")
+            new_ship = self._clone_ship(
+                credits=credits,
+                fuel=fuel,
+                hull=hull,
+                cargo=cargo,
+                crew=crew,
+                reactor=reactor,
+                faction_standings=standings,
+                flight_log=tuple(list(ship.flight_log[-19:]) + [log]),
+            )
+            stats = dict(self.state.stats)
+            stats["decisions_resolved"] = int(stats.get("decisions_resolved", 0)) + 1
+            history = tuple(list(self.state.decision_history) + [pending.definition_id])
+            self.state = self._clone_state(
+                ship=new_ship,
+                pending_decision=None,
+                decision_history=history,
+                research=research,
+                stats=stats,
+            )
+            if morale_log:
+                return True, f"{log} {morale_log}"
+            return True, log
+
     def tick(self, num_ticks: int = 1) -> dict[str, Any]:
         """Advance the simulation universe by num_ticks."""
         with self.lock:
+            pending = self.state.pending_decision
+            if pending is not None:
+                return {
+                    "ticks_advanced": 0,
+                    "stardate": round(self.state.time.stardate, 2),
+                    "date": self.state.time.current_date,
+                    "tick": self.state.time.tick,
+                    "time_scale": self.state.time.time_scale,
+                    "is_paused": self.state.time.is_paused,
+                    "blocked_by_decision": True,
+                    "decision": pending.to_dict(),
+                }
+            if self.state.active_pirate is not None:
+                return {
+                    "ticks_advanced": 0,
+                    "stardate": round(self.state.time.stardate, 2),
+                    "date": self.state.time.current_date,
+                    "tick": self.state.time.tick,
+                    "time_scale": self.state.time.time_scale,
+                    "is_paused": self.state.time.is_paused,
+                    "blocked_by_encounter": True,
+                    "encounter": self.state.active_pirate.to_dict(),
+                }
             if num_ticks <= 0:
                 return {
                     "ticks_advanced": 0,
@@ -5394,6 +6348,7 @@ class SimulationEngine:
                             body,
                             current_angle=(body.current_angle + d_angle) % (2.0 * math.pi),
                             population=updated_pop,
+                            devastation=max(0.0, (body.devastation or 0.0) - 0.35 * num_ticks),
                             volatile_tapped=tapped,
                             volatile_recharge_tick=recharge_tick,
                         )
@@ -5495,6 +6450,12 @@ class SimulationEngine:
                 cur_ship.crew, num_ticks, cur_ship.credits + outpost_credits, rng=self.rng,
                 wage_due=wages_due(cur_ship.crew, cur_time.elapsed_days, new_days),
             )
+            medic_aboard = any(
+                member.role == "medic" and member.status == "active" and member.injury_ticks == 0
+                for member in new_crew
+            )
+            new_crew, medbay_logs = recover_crew_injuries(new_crew, num_ticks, medic_aboard=medic_aboard)
+            crew_logs.extend(medbay_logs)
             month_rollover = int(new_days // DAYS_PER_MONTH) > int(cur_time.elapsed_days // DAYS_PER_MONTH)
 
             points = research_state.points + max(0, research_gain)
@@ -5726,6 +6687,166 @@ class SimulationEngine:
                         resonance=resonance,
                     )
 
+            # 10. Away-team expeditions resolve on the tick, then return their crews
+            resolved_away_ids: set[str] = set()
+            away_logs: list[str] = []
+            away_credits = 0
+            away_research = 0
+            new_cargo = dict(cur_ship.cargo)
+            new_standings = dict(cur_ship.faction_standings)
+            new_contracts = cur_ship.active_contracts
+            new_away_completed = set(cur_ship.away_completed)
+            away_stats = dict(new_stats_tick)
+            away_crew_by_id = {member.id: member for member in new_crew}
+            for mission in cur_ship.away_missions:
+                if new_tick < mission.started_tick + mission.duration_ticks:
+                    continue
+                mission_type = get_away_mission_type(mission.mission_type)
+                mission_system = updated_systems.get(mission.system_id)
+                mission_body = (
+                    next((body for body in mission_system.bodies if body.id == mission.body_id), None)
+                    if mission_system is not None else None
+                )
+                if mission_type is None or mission_body is None:
+                    resolved_away_ids.add(mission.id)
+                    away_logs.append(
+                        f"AWAY TEAM LOST: the expedition at {mission.body_name or mission.body_id} could not be recovered."
+                    )
+                    continue
+                team = tuple(
+                    away_crew_by_id[cid] for cid in mission.crew_ids if cid in away_crew_by_id
+                )
+                if not team:
+                    resolved_away_ids.add(mission.id)
+                    away_logs.append(
+                        f"AWAY TEAM LOST: no surviving crew returned from {mission.body_name or mission.body_id}."
+                    )
+                    away_stats["away_missions"] = int(away_stats.get("away_missions", 0)) + 1
+                    away_stats["away_failures"] = int(away_stats.get("away_failures", 0)) + 1
+                    continue
+                outcome = resolve_away_mission(
+                    mission, mission_type, mission_body, team, self.state.galaxy_seed
+                )
+                resolved_away_ids.add(mission.id)
+                away_logs.append(outcome["log"])
+
+                for crew_id, amount in outcome["xp"].items():
+                    member = away_crew_by_id.get(crew_id)
+                    if member is None:
+                        continue
+                    updated_member, promoted = award_crew_xp(member, amount)
+                    away_crew_by_id[crew_id] = updated_member
+                    if promoted:
+                        away_logs.append(
+                            f"CREW PROMOTION: {updated_member.name} reached skill {updated_member.skill} in the field."
+                        )
+                for crew_id, injury_ticks in outcome["injuries"].items():
+                    member = away_crew_by_id.get(crew_id)
+                    if member is None:
+                        continue
+                    away_crew_by_id[crew_id] = replace(
+                        member, injury_ticks=max(member.injury_ticks, int(injury_ticks))
+                    )
+                if outcome["morale"]:
+                    updated_crew, morale_log = apply_morale_event(
+                        tuple(away_crew_by_id.values()),
+                        float(outcome["morale"]),
+                        f"expedition {mission_type.name}",
+                    )
+                    away_crew_by_id = {member.id: member for member in updated_crew}
+                    if morale_log:
+                        away_logs.append(morale_log)
+                for item_id, quantity in outcome["cargo"]:
+                    granted, overflow = self._grant_cargo(new_cargo, item_id, quantity)
+                    item_name = get_item_info(item_id).name
+                    if granted:
+                        away_logs.append(f"AWAY SALVAGE: +{granted} {item_name} recovered.")
+                    if overflow:
+                        away_logs.append(f"HOLD FULL: {overflow} {item_name} left at the site.")
+                away_credits += int(outcome["credits"])
+                away_research += int(outcome["research"])
+                if outcome["success"]:
+                    new_away_completed.add(site_key(mission.mission_type, mission.body_id))
+                if outcome["standing"] and mission_system is not None:
+                    faction_id = get_faction_id_from_name(mission_system.faction)
+                    if faction_id:
+                        new_standings[faction_id] = min(
+                            100, new_standings.get(faction_id, 0) + int(outcome["standing"])
+                        )
+                if outcome["contract_progress"]:
+                    new_contracts, contract_logs = self._progress_contracts(
+                        outcome["contract_category"],
+                        int(outcome["contract_progress"]),
+                        new_contracts,
+                    )
+                    away_logs.extend(contract_logs)
+                new_mastery, xp_logs = self._award_pilot_xp(
+                    30 if outcome["critical"] else (20 if outcome["success"] else 8),
+                    new_mastery,
+                )
+                away_logs.extend(xp_logs)
+
+                away_stats["away_missions"] = int(away_stats.get("away_missions", 0)) + 1
+                if outcome["success"]:
+                    away_stats["away_successes"] = int(away_stats.get("away_successes", 0)) + 1
+                else:
+                    away_stats["away_failures"] = int(away_stats.get("away_failures", 0)) + 1
+                    away_stats["away_injuries"] = int(away_stats.get("away_injuries", 0)) + len(outcome["injuries"])
+                away_stats["credits_earned"] = int(away_stats.get("credits_earned", 0)) + int(outcome["credits"])
+
+                evt_id = f"evt_{new_tick}_{len(new_events) + 1}"
+                new_events.append(
+                    GameEvent(
+                        id=evt_id,
+                        kind="away",
+                        title=f"Away Team: {mission_type.name}",
+                        message=outcome["log"],
+                        tick=new_tick,
+                        dismissed=False,
+                    )
+                )
+
+            if resolved_away_ids:
+                new_away_missions = tuple(
+                    mission for mission in cur_ship.away_missions if mission.id not in resolved_away_ids
+                )
+                new_crew = tuple(away_crew_by_id.get(member.id, member) for member in new_crew)
+                if away_research:
+                    new_research = ResearchState(
+                        points=new_research.points + away_research,
+                        progress=new_research.progress + away_research,
+                        active_project_id=new_research.active_project_id,
+                        completed=new_research.completed,
+                    )
+                new_stats_tick = away_stats
+            else:
+                new_away_missions = cur_ship.away_missions
+
+            new_trade_orders = cur_ship.trade_orders
+            delivery_credits = 0
+            delivery_logs: list[str] = []
+            if new_trade_orders:
+                new_trade_orders, delivery_credits, delivery_logs, delivered, new_econ = self._resolve_quantum_orders(
+                    new_trade_orders, new_tick, updated_systems, new_econ
+                )
+                if delivered:
+                    new_contracts, contract_logs = self._progress_contracts(
+                        "delivery", delivered, new_contracts
+                    )
+                    delivery_logs.extend(contract_logs)
+                    new_stats_tick["deliveries"] = int(new_stats_tick.get("deliveries", 0)) + delivered
+                    new_stats_tick["credits_earned"] = int(new_stats_tick.get("credits_earned", 0)) + delivery_credits
+                    new_events.append(
+                        GameEvent(
+                            id=f"evt_{new_tick}_{len(new_events) + 1}",
+                            kind="trade",
+                            title="Quantum Freight Delivered",
+                            message=" ".join(delivery_logs[-3:]),
+                            tick=new_tick,
+                            dismissed=False,
+                        )
+                    )
+
             if new_flight_log_research:
                 new_flight_log.append(new_flight_log_research)
             new_flight_log.extend(faction_logs[-3:])
@@ -5735,10 +6856,13 @@ class SimulationEngine:
                     f"treasury {max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta)} cr."
                 )
             new_flight_log.extend(crew_logs[-2:])
+            new_flight_log.extend(away_logs[-6:])
+            new_flight_log.extend(delivery_logs[-4:])
             new_ship = self._clone_ship(
                 hull=new_hull,
                 shield=new_shield,
-                credits=max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta),
+                credits=max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta + away_credits + delivery_credits),
+                cargo=new_cargo,
                 crew=new_crew,
                 reactor=new_reactor,
                 current_system_id=new_current_system_id,
@@ -5746,9 +6870,14 @@ class SimulationEngine:
                 landed_body_id=new_landed_body_id,
                 travel=new_travel,
                 void_traversal=new_void,
+                away_missions=new_away_missions,
+                away_completed=tuple(sorted(new_away_completed)),
+                trade_orders=new_trade_orders,
                 mastery=new_mastery,
                 fleet_drones=new_drones,
                 fleet_ships=new_fleet_ships,
+                faction_standings=new_standings,
+                active_contracts=new_contracts,
                 flight_log=tuple(new_flight_log[-20:]),
             )
 
@@ -5770,7 +6899,8 @@ class SimulationEngine:
                 eliminated_factions=new_eliminated,
             )
 
-            return {
+            decision = self.maybe_trigger_decision("tick") if self.allow_decision_events else None
+            payload = {
                 "ticks_advanced": num_ticks,
                 "stardate": round(new_stardate, 2),
                 "date": new_time.current_date,
@@ -5786,6 +6916,9 @@ class SimulationEngine:
                 "time_scale": new_time.time_scale,
                 "is_paused": new_time.is_paused,
             }
+            if decision:
+                payload["decision"] = decision
+            return payload
 
     def emit_event(self, kind: str, title: str, message: str) -> GameEvent:
         """Create and append a cockpit popup GameEvent."""

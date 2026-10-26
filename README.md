@@ -1,6 +1,6 @@
 # VoidFarer
 
-[![Built with AIKit](https://img.shields.io/badge/built%20with-AIKit-6f42c1)](https://github.com/Aegean-E/AIKit)
+[![Built with AIKit](https://img.shields.io/badge/built%20with-AIKit-6f42c1)](https://github.com/AegeanWorks/AIKit)
 
 > **Autonomous Deep-Space Fleet, Procedural Galaxy & Windows Cockpit Simulator.**
 
@@ -75,6 +75,10 @@ voidfarer/
 │   ├── navigation.py         <- multi-jump routing, void lanes & black-hole hazards
 │   ├── messaging.py          <- branching quantum message trees
 │   ├── crew.py               <- crew roles, recruiting & portraits
+│   ├── away.py               <- away-team expeditions, injuries & crew XP
+│   ├── decisions.py          <- blocking conditional events
+│   ├── pirates.py            <- pirate bands & toll encounters
+│   ├── surface.py            <- landing-party operations
 │   ├── weapons.py            <- weapon types & combat modifiers
 │   ├── retention.py          <- relics, dynamic contracts & pilot mastery
 │   ├── story.py              <- cadet academy, cipher campaign flags & endings
@@ -100,7 +104,7 @@ voidfarer/
 │   ├── ui_audit.py           <- layout metrics
 │   ├── ui_browser.py         <- real browser review
 │   └── ui_inventory.py       <- cockpit inventory proof
-└── tests/                    <- unit & integration test suite (34 suites)
+└── tests/                    <- unit & integration test suite (36 suites)
 ```
 
 ---
@@ -146,7 +150,7 @@ python -m voidfarer.cli salvage
 # Recover fuel from a star, gas giant, or ice body (adds reactor heat)
 python -m voidfarer.cli scoop
 ```
-Scans need 5 MW of sensor power. Full surveys pay a bonus; titanium salvage advances mining contracts; scoopable bodies hold 3-8 taps, one recharging every 6 ticks.
+Scans need 5 MW. Full surveys pay a bonus; salvage advances mining contracts; scoopable bodies hold 3-8 recharging taps.
 
 ### 4. Hardware Upgrades & Station Arsenal
 ```bash
@@ -380,19 +384,23 @@ python -m voidfarer.cli messages choose <message_id> <choice_id>
 python -m voidfarer.cli crew recruit scientist
 python -m voidfarer.cli crew train <crew_id>
 python -m voidfarer.cli crew shore
+python -m voidfarer.cli away
+python -m voidfarer.cli away launch salvage_sweep
+python -m voidfarer.cli away recall <mission_id>
 python -m voidfarer.cli weapons install railgun
 ```
-The commander ages, earns XP, and trains six skills; SHIFT+1..6 activates
-Reactor Overclock, Emergency Repair, Battle Focus, Science Burst and the rank-7 unlocks. Research
-unlocks reactor, scan, combat, outpost, repair, and fuel tech. Outposts repay build cost over
-3.9-9.2 months.
-Wars run along hyperlane fronts: strength, overextension and attrition decide captures, capitals fall last, treaties and truces end them. 0 hull ends the run in defeat, with no bounty. Escort warships coordinate volleys,
-screen damage, and adopt battle stances. Multi-jump routing handles black holes. Message trees branch
-into lasting outcomes. Crew feature roles, morale, wages, and SVG portraits; morale reacts to
-battles, hull breaches, void storms, hostile arrivals, and campaign beats, unpaid crews below
-morale 20 risk resignation, and docked stations offer paid shore leave. Bulk orders walk the
-local stockpile price; wages accrue as a monthly payroll shown as net cr/month. The
-setting begins 01.01.3042 in the Quantum Age with Dyson spheres, wormholes, and ring worlds.
+The commander ages, earns XP and trains six skills; SHIFT+1..6 fires Overclock, Repair, Battle Focus, Science Burst and rank-7 unlocks. Research unlocks reactor, scan, combat, outpost, repair and fuel tech; outposts repay in 3.9-9.2 months. Wars capture hyperlane fronts; escorts coordinate volleys, screen damage and stances; multi-jump routing handles black holes; message trees branch. Crew roles, morale, wages and portraits react to battles, breaches, storms and campaign beats; unpaid crews below morale 20 risk resignation, and docks sell shore leave. Away teams deploy from orbit for 5-10 ticks: surveys, salvage, xenobiology, relief and distress runs pay credits, research, cargo, standing and crew XP; failures injure specialists, halving their bonus until medbay or time heals them. Bulk orders walk stockpile prices; wages show as net cr/month.
+
+### 18b. Frontier Depth: Pirates, Decisions, Freight & Surface Ops
+```bash
+python -m voidfarer.cli pirate
+python -m voidfarer.cli decision
+python -m voidfarer.cli quantum routes
+python -m voidfarer.cli quantum ship titanium 2 kepler
+python -m voidfarer.cli surface
+python -m voidfarer.cli contracts refresh
+```
+23 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time. Quantum freight ships cargo for a fee, paying on arrival. Landed teams survey, core-sample, explore ruins, salvage, or rest. War captures displace civilians and leave scars.
 
 ### 19. Stellaris-Style Windows Cockpit
 Launch the Stellaris-inspired Windows command console:
@@ -401,25 +409,25 @@ python -m voidfarer.cli serve --port 8080
 ```
 Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Top Status Bar & Chronometer (`G-007`, `G-011`)**: Vitals plus the chrono deck, sized for 1280x720 through 4K.
-- **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a three-column bottom strip: reactor, abilities, separate radar settings above the compact log; circular zoom icons and themed cursors.
+- **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a three-column bottom strip (reactor, abilities, radar settings above the log).
 - **Menu, Settings & Saves (`ESC`)**: volume, auto-pause on intercepts/events, auto-claim, order lot, key list, reset; saves.
-- **Left Terminal & Commerce**: `[`/`]` cycle tabs, `\` hides the drawer, the last tab reopens; two-line ledger rows; x1/x5/x10/MAX order lots (Shift+click = max), average cost and sell margins.
-- **Planet Inspector**: Gravity, atmosphere, temperature, habitability, orbit distance, moons, resources, and colony tiers.
-- **Transit, Landing & Fleet**: Timed transit-and-orbit, fuel-priced quantum micro-jumps, surface surveys and drone fleets.
-- **Living Galaxy**: Procedural worlds, AI traders, dynamic markets, faction perks, and reputation.
-- **Strategic Map**: faction territories, borders, war fronts, a powers legend; modelled worlds and ships.
+- **Left Terminal & Commerce**: `[`/`]` cycle tabs, `\` hides the drawer; order lots, cost and margins.
+- **Planet Inspector**: Gravity, atmosphere, habitability, orbit, moons, resources, colony tiers.
+- **Transit, Landing & Fleet**: Timed transit, quantum jumps, surveys and drones.
+- **Living Galaxy**: Procedural worlds, AI traders, dynamic markets and reputation.
+- **Strategic Map**: faction territories, borders, war fronts and powers legend.
 - **Mission Panels**: Quests, contracts, diplomacy, depots, messages, COMMS, factions and combat.
-- **Space-Opera Campaign Tab**: Five acts with a live objective checklist, locked choices that show their requirements, transmissions, and one of three endings with epilogue.
-- **The Hollow Between Panel**: Void drive readiness, lane dive buttons, traversal progress/stability, emergency emerge, and a hue-shifted radar overlay.
+- **Space-Opera Campaign**: five acts, live objectives, three endings.
+- **Hollow Between**: readiness, lane dives, stability, emergency emerge.
 - **REPL Server Lifecycle**: `serve` runs the HTTP server and ticker; `serve stop` saves and shuts down.
-- **Reactor Power Matrix (`G-006`, `G-013`)**: four sliders that route on release, presets, `Q/W/E/R`, heat, four modes, VENT.
-- **Sector Map Modifiers**: Generated conditions shown as radar chips and applied to fuel, scans, encounters, trade and reactor heat.
-- **Player, Skills & Crew Tabs**: PLAYER is a dossier; the bottom strip is the six-power ability bar (`SHIFT+1..6`), while SKILLS holds training, talents and relics. Crew holds bonuses and drills.
+- **Reactor Matrix**: four sliders, presets, `Q/W/E/R`, heat, modes and VENT.
+- **Sector Map Modifiers**: radar chips alter fuel, scans, encounters, trade and reactor heat.
+- **Player, Skills & Crew Tabs**: PLAYER is a dossier; the bottom strip is the six-power ability bar (`SHIFT+1..6`), while SKILLS holds training, talents and relics. Crew splits into ROSTER (morale, XP, drills) and AWAY TEAMS (body expeditions, risk pills, deployment and recall).
 - **Ship Configuration Tab**: Fixed-height silhouette, compact stats, and a full-width module ledger; refits require a docked drydock or station.
-- **Commander Creation & Death Flow**: name, age, background and starting skills for new games; a death overlay summarizes the run and offers a new commander or a save.
-- **Stellaris-Style Windows HUD**: gold-on-navy, 720p-4K, density/HUD scale, DPR radar.
-- **Derelict Boarding & Fuel Scooping**: once-per-body salvage feeds titanium contracts; star/gas/ice scoops trade reactor heat for fuel from finite, recharging reservoirs; paid crew drills.
-- **Captain's Log & Discovery Codex**: career statistics grid, discovery milestones, claim rewards, category filters, and persistent flight log.
+- **Commander Creation & Death**: creation and death overlay with run summary.
+- **Stellaris-Style HUD**: gold-on-navy, 720p-4K, density/HUD scale, DPR radar.
+- **Derelict Boarding & Fuel Scooping**: salvage and finite fuel taps.
+- **Captain's Log & Discovery Codex**: career stats, milestones, rewards, filters and log.
 
 ### 20. Captain's Log & Discovery Codex
 ```bash
@@ -438,7 +446,7 @@ New System Surveyor and Sector Cartographer milestones track full-system sweeps,
 `.aikit/ui.json` bounds cockpit work to `voidfarer/static/**` and `voidfarer/server.py`.
 `ui_required` is true: tests are the fast proof, `tools/ui_inventory.py` is the snapshot,
 `tools/ui_audit.py` measures layout, and `tools/ui_browser.py` drives real Edge screenshots.
-See ADR-041, ADR-042 and ADR-047.
+See ADR-041 and ADR-047.
 
 ---
 
@@ -446,6 +454,6 @@ See ADR-041, ADR-042 and ADR-047.
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules (`math`, `random`, `dataclasses`, `http.server`, `json`, `pathlib`).
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 499-test suite runs in about 7 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 621-test suite runs in about 18 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
-5. **Realistic Mechanics & Economic Integrity**: Anti-arbitrage dock guards, faction tariffs, cargo-volume refit gates, quantum fuel efficiency and cockpit parity.
+5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.

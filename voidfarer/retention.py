@@ -173,8 +173,7 @@ RELICS_BY_RARITY: dict[str, list[PrecursorRelic]] = {
     "legendary": [r for r in CATALOG_RELICS if r.rarity == "legendary"],
 }
 
-CONTRACT_TEMPLATES = (
-    {
+CONTRACT_TEMPLATES = (    {
         "category": "combat",
         "title": "Pirate Outlaw Intercept",
         "desc_template": "Neutralize {target} hostile outlaw raiders or corsairs in low-sec corridors.",
@@ -210,6 +209,56 @@ CONTRACT_TEMPLATES = (
         "base_xp": 130,
         "relic_tier": None,
     },
+    {
+        "category": "pirates",
+        "title": "Corsair Toll Reversal",
+        "desc_template": "Resolve {target} pirate interceptions without losing the ship.",
+        "target_range": (1, 3),
+        "base_credits": 900,
+        "base_xp": 220,
+        "relic_tier": "rare",
+    },
+    {
+        "category": "delivery",
+        "title": "Quantum Freight Manifest",
+        "desc_template": "Deliver {target} quantum freight orders to their destination ports.",
+        "target_range": (1, 3),
+        "base_credits": 700,
+        "base_xp": 170,
+        "relic_tier": None,
+    },
+    {
+        "category": "surface",
+        "title": "Surface Survey Charter",
+        "desc_template": "Complete {target} surface operations on landable worlds.",
+        "target_range": (1, 3),
+        "base_credits": 620,
+        "base_xp": 160,
+        "relic_tier": "common",
+    },
+    {
+        "category": "anomaly",
+        "title": "Anomalous Signal Recovery",
+        "desc_template": "Resolve {target} spatial anomaly encounters.",
+        "target_range": (1, 2),
+        "base_credits": 850,
+        "base_xp": 210,
+        "relic_tier": "rare",
+    },
+    {
+        "category": "diplomacy",
+        "title": "Diplomatic Goodwill Circuit",
+        "desc_template": "Complete {target} diplomatic goodwill missions for local powers.",
+        "target_range": (1, 2),
+        "base_credits": 560,
+        "base_xp": 140,
+        "relic_tier": None,
+    },
+)
+
+CONTRACT_CATEGORIES: tuple[str, ...] = (
+    "exploration", "combat", "mining", "trade", "delivery",
+    "pirates", "surface", "anomaly", "diplomacy",
 )
 
 

@@ -13,14 +13,15 @@ class InventoryTest(unittest.TestCase):
     def test_the_inventory_names_the_core_controls_and_handlers(self):
         entries = inventory(STATIC)
         for expected in ("element button#btnMainMenu", "element canvas#radarCanvas",
-                         "binding btnMainMenu click", "handler handleCombat",
-                         "handler createCharacter"):
+                         "element div#awaySection", "binding btnMainMenu click", "handler handleCombat",
+                         "handler createCharacter", "handler renderAway"):
             self.assertIn(expected, entries)
         self.assertGreaterEqual(len(entries), 650)
 
     def test_the_inventory_names_the_ui_routes_and_theme_surface(self):
         entries = inventory(STATIC)
-        for expected in ("api /api/state", "route /api/state", "hotkey key:escape",
+        for expected in ("api /api/state", "api /api/away/launch", "route /api/state",
+                         "route /api/away/launch", "hotkey key:escape",
                          "hotkey code:KeyQ", "token --neon-cyan",
                          "asset cursor-default.svg"):
             self.assertIn(expected, entries)

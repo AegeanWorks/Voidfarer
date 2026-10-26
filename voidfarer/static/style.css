@@ -8050,3 +8050,128 @@ body.cockpit-theme .panel-center {
 .war-actions { display: flex; gap: 6px; margin-top: 7px; }
 .war-actions .btn-hud { flex: 1 1 0; min-width: 0; min-height: 28px; padding: 3px 6px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .outpost-build { display: flex; flex-direction: column; margin-top: 8px; }
+
+
+/* Away teams: expedition board in the crew console. Rows use a two-column icon/content
+   grid so the description and rewards keep a workable measure at 320px terminal widths. */
+.away-section { margin-bottom: 10px; padding: 8px 9px; border: 1px solid rgba(201, 163, 90, 0.22); border-left: 2px solid rgba(201, 163, 90, 0.75); background: rgba(4, 9, 19, 0.45); }
+.away-header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.away-header h4 { margin: 0; font-family: var(--font-display); font-size: 13px; letter-spacing: 0.06em; color: var(--console-gold); white-space: nowrap; }
+.away-deployed { font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); white-space: nowrap; }
+.away-body-line { margin: 1px 0 6px; font-family: var(--font-mono); font-size: 12px; color: rgba(127, 183, 201, 0.9); overflow-wrap: anywhere; }
+.away-empty { margin: 4px 0; font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); }
+.away-active-card { margin: 6px 0; padding: 7px 8px; border: 1px solid rgba(127, 183, 201, 0.2); background: rgba(127, 183, 201, 0.05); }
+.away-active-head { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 12.5px; color: var(--console-ivory); }
+.away-active-head strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.away-head-meta { margin-left: auto; color: var(--console-gold-bright); white-space: nowrap; }
+.away-recall-btn { margin-left: 4px; min-height: 26px; padding: 2px 7px; font-size: 12px; }
+.away-progress { height: 7px; margin: 6px 0 4px; border: 1px solid rgba(127, 183, 201, 0.22); background: #050b16; }
+.away-progress > span { display: block; height: 100%; background: linear-gradient(90deg, #6fc3d7, #c9a35a); }
+.away-team-line { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); overflow-wrap: anywhere; }
+.away-team-line span { color: rgba(201, 163, 90, 0.85); }
+.away-mission-list { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+.away-mission { display: grid; grid-template-columns: 16px minmax(0, 1fr); align-items: start; gap: 7px; padding: 7px 8px; border: 1px solid rgba(127, 183, 201, 0.16); border-left: 2px solid rgba(143, 191, 159, 0.45); background: rgba(127, 183, 201, 0.03); }
+.away-mission.is-blocked { opacity: 0.6; border-left-color: rgba(201, 107, 90, 0.55); }
+.away-icon { font-size: 14px; line-height: 1.25; color: var(--console-gold-bright); text-align: center; }
+.away-mission-info { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.away-mission-title { display: flex; align-items: center; gap: 6px; }
+.away-mission-title strong { min-width: 0; font-family: var(--font-mono); font-size: 13px; color: var(--console-ivory); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.away-risk { margin-left: auto; flex: 0 0 auto; font-family: var(--font-mono); font-size: 12px; padding: 0 5px; border: 1px solid currentColor; }
+.away-risk.risk-low { color: #8fbf9f; }
+.away-risk.risk-mid { color: #c9a35a; }
+.away-risk.risk-high { color: #d6604d; }
+.away-risk.risk-none { color: var(--console-muted); }
+.away-mission-info small { font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); line-height: 1.3; }
+.away-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.away-reward-line { color: rgba(143, 191, 159, 0.95) !important; overflow-wrap: anywhere; }
+.away-reason { color: rgba(201, 107, 90, 0.95) !important; }
+.away-mission-foot { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.away-foot-hint { flex: 1 1 auto; min-width: 0; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: rgba(127, 183, 201, 0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.away-mission-foot .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 10px; font-size: 12px; }
+.crew-injury { color: #d6604d; }
+.crew-away { color: #6fc3d7; }
+
+/* Crew sub-views: roster and the expedition board each get the full console height. */
+.crew-view-tabs { display: flex; gap: 4px; margin: 0 0 8px; border-bottom: 1px solid rgba(201, 163, 90, 0.18); }
+.crew-view-btn { flex: 1 1 0; min-width: 0; min-height: 30px; padding: 5px 8px; border: 1px solid transparent; border-bottom: 0; background: rgba(127, 183, 201, 0.03); color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; cursor: pointer; }
+.crew-view-btn:hover { color: var(--console-ivory); background: rgba(201, 163, 90, 0.08); }
+.crew-view-btn.is-active { color: var(--console-gold-bright); border-color: rgba(201, 163, 90, 0.3); background: rgba(201, 163, 90, 0.09); }
+.crew-view-count { display: none; min-width: 16px; margin-left: 3px; padding: 0 4px; border-radius: 8px; background: rgba(214, 96, 77, 0.85); color: #fff; font-size: 12px; }
+.crew-view-count.is-live { display: inline-block; }
+.crew-row .crew-info-block small { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+
+/* Crew tab title must stay whole when the terminal narrows; it wraps instead of ellipsizing. */
+#tabContentCrew .panel-title { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+
+/* Pirate toll card: brassy red intercept state, shares the anomaly alert shell. */
+.pirate-alert-card { border-color: rgba(214, 96, 77, 0.55); box-shadow: 0 0 24px rgba(214, 96, 77, 0.16); }
+.pirate-alert-card .alert-icon { color: #d6604d; }
+.pirate-toll-line { margin: 2px 0 8px; padding: 5px 7px; border: 1px solid rgba(214, 96, 77, 0.28); background: rgba(214, 96, 77, 0.06); color: #f0c9a0; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.03em; }
+.pirate-choices { display: flex; flex-direction: column; gap: 5px; }
+.pirate-choices .anomaly-choice-btn { text-align: left; }
+
+/* Blocking decision modal: high-contrast command interrupt over the cockpit. */
+.decision-overlay { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(2, 5, 12, 0.78); backdrop-filter: blur(5px); }
+.decision-modal { width: min(620px, 92vw); max-height: 82vh; overflow-y: auto; padding: 20px 22px 16px; border: 1px solid rgba(201, 163, 90, 0.55); border-top: 3px solid var(--console-gold); background: linear-gradient(180deg, rgba(15, 23, 38, 0.98), rgba(5, 9, 18, 0.98)); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), inset 0 0 40px rgba(201, 163, 90, 0.04); }
+.decision-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--console-gold-bright); }
+.decision-title { margin: 6px 0 8px; font-family: var(--font-display); font-size: 22px; letter-spacing: 0.03em; color: var(--console-ivory); }
+.decision-desc { margin: 0 0 14px; font-family: var(--font-ui); font-size: 13px; line-height: 1.5; color: var(--console-text); }
+.decision-choices { display: flex; flex-direction: column; gap: 8px; }
+.decision-choice-btn { display: flex; flex-direction: column; gap: 3px; width: 100%; padding: 10px 12px; text-align: left; border: 1px solid rgba(201, 163, 90, 0.3); background: rgba(201, 163, 90, 0.05); color: var(--console-ivory); cursor: pointer; }
+.decision-choice-btn:hover, .decision-choice-btn:focus-visible { border-color: var(--console-gold-bright); background: rgba(201, 163, 90, 0.14); outline: none; }
+.decision-choice-btn strong { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.03em; }
+.decision-choice-btn small { font-family: var(--font-ui); font-size: 12px; color: var(--console-muted); }
+.decision-lock { margin: 14px 0 0; padding-top: 9px; border-top: 1px solid rgba(201, 163, 90, 0.18); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; color: var(--console-gold); }
+
+/* Quantum freight: logistics lane board inside the market panel. */
+.quantum-freight { margin-top: 10px; padding: 8px 9px; border: 1px solid rgba(127, 183, 201, 0.2); border-left: 2px solid rgba(127, 183, 201, 0.6); background: rgba(127, 183, 201, 0.035); }
+.quantum-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+.quantum-header .subpanel-title { margin: 0; font-size: 12px; }
+.quantum-header > span { font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); }
+.quantum-orders { display: flex; flex-direction: column; gap: 3px; margin-bottom: 7px; }
+.quantum-order-row { display: flex; gap: 6px; align-items: baseline; font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); }
+.q-order-id { color: rgba(127, 183, 201, 0.8); }
+.q-order-eta { margin-left: auto; color: var(--console-gold-bright); white-space: nowrap; }
+.quantum-routes { display: flex; flex-direction: column; gap: 5px; }
+.quantum-route-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: 7px; padding: 6px 7px; border: 1px solid rgba(127, 183, 201, 0.14); background: rgba(5, 11, 22, 0.5); }
+.q-route-main { min-width: 0; display: flex; flex-direction: column; }
+.q-route-main strong { font-family: var(--font-mono); font-size: 12.5px; color: var(--console-ivory); overflow-wrap: anywhere; }
+.q-route-main small, .q-route-meta small { font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); overflow-wrap: anywhere; }
+.q-route-meta { display: flex; flex-direction: column; align-items: flex-end; font-family: var(--font-mono); font-size: 12px; color: rgba(127, 183, 201, 0.9); }
+.q-route-net { display: flex; flex-direction: column; align-items: flex-end; font-family: var(--font-mono); font-size: 12px; }
+.q-route-net strong { font-size: 12.5px; }
+.q-net-positive strong { color: #8fbf9f; }
+.q-net-negative strong { color: #d6604d; }
+.quantum-route-row .btn-hud { min-height: 26px; padding: 2px 7px; font-size: 12px; }
+.quantum-note { margin: 7px 0 0; font-family: var(--font-ui); font-size: 12px; color: var(--console-muted); }
+
+/* Landing surface operations: choose a landing-party action instead of one button. */
+.surface-ops { margin-top: 8px; padding: 8px 9px; border: 1px solid rgba(143, 191, 159, 0.25); border-left: 2px solid rgba(143, 191, 159, 0.7); background: rgba(5, 11, 22, 0.6); }
+.surface-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+.surface-header h4 { margin: 0; font-family: var(--font-display); font-size: 12px; letter-spacing: 0.05em; color: #8fbf9f; overflow-wrap: anywhere; }
+.surface-header > span { font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); white-space: nowrap; }
+.surface-op-list { display: flex; flex-direction: column; gap: 5px; }
+.surface-op-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; padding: 6px 7px; border: 1px solid rgba(127, 183, 201, 0.14); background: rgba(127, 183, 201, 0.03); }
+.surface-op-row.is-worked { opacity: 0.55; }
+.surface-op-main { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.surface-op-main strong { font-family: var(--font-mono); font-size: 12.5px; color: var(--console-ivory); }
+.surface-op-main small { font-family: var(--font-ui); font-size: 12px; line-height: 1.3; color: var(--console-muted); }
+.surface-op-reward { color: rgba(143, 191, 159, 0.95) !important; overflow-wrap: anywhere; }
+.surface-op-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.surface-op-side .btn-hud { min-height: 26px; padding: 2px 8px; font-size: 12px; }
+
+/* Devastation warning and a compact outliner that ends at its last row. */
+#targetDevastation.is-devastated { color: #d6604d; }
+.panel-left .deck-tabs-header { height: auto; max-height: 100%; align-self: start; }
+.panel-left .deck-tabs-header::after { margin-top: 0; }
+
+.contracts-refresh-btn { margin: 0 0 8px; min-height: 28px; font-size: 12px; }
+
+/* Compact outliner rows at short viewports so every tab reaches the last row without clipping. */
+@media (max-height: 800px) {
+  .panel-left .deck-tabs-header { padding-top: 28px; padding-bottom: 4px; gap: 0; }
+  .panel-left .deck-tab-btn { min-height: 24px; padding: 3px 8px; font-size: 12px; }
+  .panel-left .deck-tab-btn:nth-child(4n) { margin-bottom: 2px; }
+  .panel-left .deck-tabs-header::before { top: 6px; padding-bottom: 4px; }
+  .panel-left .deck-tabs-header::after { padding: 4px 4px 0; line-height: 1.35; }
+}

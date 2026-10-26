@@ -401,6 +401,7 @@ class CockpitApp {
         this.btnOrbitTarget = document.getElementById("btnOrbitTarget");
         this.btnQuantumTarget = document.getElementById("btnQuantumTarget");
         this.btnLandTarget = document.getElementById("btnLandTarget");
+        this.surfaceOps = document.getElementById("surfaceOps");
         this.btnSalvageTarget = document.getElementById("btnSalvageTarget");
         this.btnScoopFuel = document.getElementById("btnScoopFuel");
         this.salvageInfo = document.getElementById("salvageInfo");
@@ -412,6 +413,7 @@ class CockpitApp {
         this.targetMoons = document.getElementById("targetMoons");
         this.targetFaction = document.getElementById("targetFaction");
         this.targetPopulation = document.getElementById("targetPopulation");
+        this.targetDevastation = document.getElementById("targetDevastation");
         this.targetGovernment = document.getElementById("targetGovernment");
         this.targetResources = document.getElementById("targetResources");
         this.transitPlan = document.getElementById("transitPlan");
@@ -467,6 +469,18 @@ class CockpitApp {
         this.anomalyTitle = document.getElementById("anomalyTitle");
         this.anomalyDesc = document.getElementById("anomalyDesc");
         this.anomalyChoices = document.getElementById("anomalyChoices");
+        this.pirateCard = document.getElementById("pirateCard");
+        this.pirateTitle = document.getElementById("pirateTitle");
+        this.pirateDesc = document.getElementById("pirateDesc");
+        this.pirateTollLine = document.getElementById("pirateTollLine");
+        this.btnPiratePay = document.getElementById("btnPiratePay");
+        this.btnPirateFight = document.getElementById("btnPirateFight");
+        this.btnPirateEvade = document.getElementById("btnPirateEvade");
+        this.decisionOverlay = document.getElementById("decisionOverlay");
+        this.decisionSeverity = document.getElementById("decisionSeverity");
+        this.decisionTitle = document.getElementById("decisionTitle");
+        this.decisionDesc = document.getElementById("decisionDesc");
+        this.decisionChoices = document.getElementById("decisionChoices");
 
         // Vitals: Streak & Mastery
         this.vitalStreakCard = document.getElementById("vitalStreakCard");
@@ -578,12 +592,16 @@ class CockpitApp {
 
         // Contracts & Mastery Containers
         this.contractsList = document.getElementById("contractsList");
+        this.btnRefreshContracts = document.getElementById("btnRefreshContracts");
         this.relicsGrid = document.getElementById("relicsGrid");
 
         // Market
         this.marketTitle = document.getElementById("marketTitle");
         this.marketArch = document.getElementById("marketArch");
         this.marketTableBody = document.getElementById("marketTableBody");
+        this.quantumFreight = document.getElementById("quantumFreight");
+        this.quantumData = null;
+        this.quantumBodyId = null;
         this.noMarketMsg = document.getElementById("noMarketMsg");
         this.cargoDetailed = document.getElementById("cargoDetailed");
         this.cargoMeterFill = document.getElementById("cargoMeterFill");
@@ -609,6 +627,12 @@ class CockpitApp {
         this.btnToggleSkills = document.getElementById("btnToggleSkills");
         this.crewAssignments = document.getElementById("crewAssignments");
         this.crewCashFlow = document.getElementById("crewCashFlow");
+        this.awaySection = document.getElementById("awaySection");
+        this.crewRosterView = document.getElementById("crewRosterView");
+        this.crewAwayView = document.getElementById("crewAwayView");
+        this.crewAwayCount = document.getElementById("crewAwayCount");
+        this.crewViewButtons = Array.from(document.querySelectorAll("[data-crew-view]"));
+        this.crewView = "roster";
         this.btnShoreLeave = document.getElementById("btnShoreLeave");
         this.crewShoreNote = document.getElementById("crewShoreNote");
         this.shipVisual = document.getElementById("shipVisual");
@@ -639,6 +663,9 @@ class CockpitApp {
         this.statTrades = document.getElementById("statTrades");
         this.statVictories = document.getElementById("statVictories");
         this.statAnomalies = document.getElementById("statAnomalies");
+        this.statPirates = document.getElementById("statPirates");
+        this.statDecisions = document.getElementById("statDecisions");
+        this.statLandings = document.getElementById("statLandings");
     }
 
     bindEvents() {
@@ -746,9 +773,15 @@ class CockpitApp {
         this.tabBtnFleet.addEventListener("click", () => this.switchRightTab("fleet"));
 
         this.tabBtnContracts.addEventListener("click", () => this.switchRightTab("contracts"));
+        if (this.btnRefreshContracts) {
+            this.btnRefreshContracts.addEventListener("click", () => this.postAction("/api/contracts/refresh", {}, "contracts"));
+        }
         this.tabBtnPlayer.addEventListener("click", () => this.switchRightTab("player"));
         this.tabBtnSkills.addEventListener("click", () => this.switchRightTab("skills"));
         this.tabBtnCrew.addEventListener("click", () => this.switchRightTab("crew"));
+        this.crewViewButtons.forEach(button => {
+            button.addEventListener("click", () => this.setCrewView(button.getAttribute("data-crew-view")));
+        });
         if (this.tabBtnEmpire) this.tabBtnEmpire.addEventListener("click", () => this.switchRightTab("empire"));
         if (this.tabBtnCodex) this.tabBtnCodex.addEventListener("click", () => this.switchRightTab("codex"));
         this.tabBtnStory.addEventListener("click", () => this.switchRightTab("story"));
@@ -948,6 +981,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.btnCombatAbsorb.addEventListener("click", () => this.handleCombat("shield_absorb"));
         this.btnCombatEvade.addEventListener("click", () => this.handleCombat("evasive_burn"));
         this.btnCombatFlee.addEventListener("click", () => this.handleCombat("flee"));
+        if (this.btnPiratePay) this.btnPiratePay.addEventListener("click", () => this.handlePirateAction("pay"));
+        if (this.btnPirateFight) this.btnPirateFight.addEventListener("click", () => this.handlePirateAction("fight"));
+        if (this.btnPirateEvade) this.btnPirateEvade.addEventListener("click", () => this.handlePirateAction("evade"));
 
         // Harvest Fleet
         this.btnHarvestFleet.addEventListener("click", () => this.handleHarvestFleet());
@@ -1061,10 +1097,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const settings = document.getElementById("settingsOverlay");
             const death = document.getElementById("deathOverlay");
             const creation = document.getElementById("characterCreationOverlay");
+            const decision = document.getElementById("decisionOverlay");
+            const pirateCard = document.getElementById("pirateCard");
             const overlayOpen = (menu && !menu.classList.contains("hidden"))
                 || (settings && settings.style.display !== "none")
                 || (death && death.style.display === "flex")
-                || (creation && creation.style.display !== "none");
+                || (creation && creation.style.display !== "none")
+                || (decision && decision.style.display !== "none")
+                || (pirateCard && pirateCard.style.display !== "none");
             if (overlayOpen) return;
             const hotkey = String(e.key || "").toLowerCase();
             if (hotkey === "p") {
@@ -1228,6 +1268,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         });
 
         if (tabName === "market") this.renderMarketTable();
+        if (tabName === "market") this.loadQuantumFreight();
         if (tabName === "arsenal") this.renderArsenal();
         if (tabName === "ship") this.renderShip();
         if (tabName === "player") this.renderPlayer();
@@ -1552,6 +1593,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.statTrades.textContent = this.state.stats.trades || 0;
         this.statVictories.textContent = this.state.stats.combat_victories || 0;
         this.statAnomalies.textContent = this.state.stats.anomalies_resolved || 0;
+        if (this.statPirates) this.statPirates.textContent = this.state.stats.pirate_encounters || 0;
+        if (this.statDecisions) this.statDecisions.textContent = this.state.stats.decisions_resolved || 0;
+        if (this.statLandings) this.statLandings.textContent = this.state.stats.landings || 0;
 
         // Render Combat Intercept Alert
         if (this.state.active_combat) {
@@ -1620,6 +1664,40 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.anomalyCard.style.display = "none";
         }
 
+        if (this.state.active_pirate && !this.state.active_combat) {
+            const pirate = this.state.active_pirate;
+            this.sound.playAlarm();
+            this.pirateCard.style.display = "flex";
+            this.pirateTitle.textContent = `${pirate.band_name} // ${pirate.ship_class}`;
+            this.pirateDesc.textContent = pirate.description;
+            this.pirateTollLine.textContent = `DEMAND: ${pirate.toll_credits} CREDITS // THREAT ${pirate.threat} // ${pirate.system_name}`;
+            this.btnPiratePay.textContent = `PAY ${pirate.toll_credits} CR`;
+            this.btnPiratePay.disabled = (ship.credits || 0) < pirate.toll_credits;
+            this.btnPirateEvade.textContent = `EVADE (-${6 + pirate.threat} FUEL)`;
+        } else {
+            this.pirateCard.style.display = "none";
+        }
+
+        const pendingDecision = this.state.pending_decision;
+        if (pendingDecision && this.decisionOverlay) {
+            this.decisionOverlay.style.display = "flex";
+            this.decisionSeverity.textContent = `DECISION REQUIRED // ${String(pendingDecision.severity || "major").toUpperCase()}`;
+            this.decisionTitle.textContent = pendingDecision.title;
+            this.decisionDesc.textContent = pendingDecision.description;
+            this.decisionChoices.innerHTML = "";
+            (pendingDecision.choices || []).forEach(choice => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "decision-choice-btn";
+                const desc = choice.description ? `<small>${this.escapeHtml(choice.description)}</small>` : "";
+                button.innerHTML = `<strong>${this.escapeHtml(choice.label)}</strong>${desc}`;
+                button.addEventListener("click", () => this.handleDecisionChoice(choice.id));
+                this.decisionChoices.appendChild(button);
+            });
+        } else if (this.decisionOverlay) {
+            this.decisionOverlay.style.display = "none";
+        }
+
         // Cadet Academy Ribbon render
         const tut = ship.tutorial;
         if (tut && !tut.completed && !tut.skipped && tut.steps && tut.steps.length > 0) {
@@ -1678,11 +1756,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.marketTitle.textContent = `${orbBody.name.toUpperCase()} EXCHANGE`;
                 this.marketArch.textContent = orbBody.market_archetype.toUpperCase();
                 this.renderMarketTable();
+                if (this.quantumBodyId !== orbBody.id) {
+                    this.quantumBodyId = orbBody.id;
+                    this.loadQuantumFreight();
+                } else {
+                    this.renderQuantumFreight();
+                }
             } else {
                 this.noMarketMsg.style.display = "flex";
                 this.marketTableBody.innerHTML = "";
                 this.marketTitle.textContent = orbBody ? orbBody.name : "DEEP SPACE";
                 this.marketArch.textContent = "UNPOPULATED";
+                if (this.quantumFreight) this.quantumFreight.style.display = "none";
             }
         } else if (this.activeRightTab === "arsenal") {
             this.renderArsenal();
@@ -1719,6 +1804,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.renderSkillsQuickPanel();
         this.renderEventPopups();
         this.updateTargetCard();
+        this.renderSurfaceOps();
 
         // Void transit state: radar overlay + live panel refresh
         document.body.classList.toggle("void-transit", !!(ship && ship.void_traversal));
@@ -2206,6 +2292,102 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.tradeLot = TRADE_LOTS.includes(lot) ? lot : "1";
         this.saveSettings();
         this.renderMarketTable();
+    }
+
+    async loadQuantumFreight() {
+        if (!this.quantumFreight) return;
+        try {
+            const res = await apiFetch("/api/trade/quantum");
+            const json = await res.json();
+            if (json.ok) {
+                this.quantumData = json.quantum;
+                this.renderQuantumFreight();
+            }
+        } catch (e) {
+            this.appendLog(`[ERROR] Quantum freight lanes unavailable: ${e.message}`, "hazard");
+        }
+    }
+
+    renderQuantumFreight() {
+        if (!this.quantumFreight) return;
+        const data = this.quantumData;
+        const ship = this.state?.ship || {};
+        const orders = ship.trade_orders || data?.orders || [];
+        this.quantumFreight.style.display = "";
+        const orderRows = orders.length ? orders.map(order => {
+            const eta = Math.max(0, Number(order.arrival_tick || 0) - Number(this.state.time?.tick || 0));
+            return `<div class="quantum-order-row">
+                <span class="q-order-id">${this.escapeHtml(order.id)}</span>
+                <span>${order.quantity}x ${this.escapeHtml(order.commodity_id)} -> ${this.escapeHtml(order.destination_name)}</span>
+                <span class="q-order-eta">ETA ${eta}T</span>
+            </div>`;
+        }).join("") : `<p class="panel-intro-text">No freight in transit.</p>`;
+
+        const allRoutes = data?.routes || [];
+        const routes = allRoutes.slice(0, window.innerWidth < 1500 ? 4 : 6);
+        const routeRows = routes.length ? routes.map(route => {
+            const netClass = route.net >= 0 ? "q-net-positive" : "q-net-negative";
+            return `<div class="quantum-route-row">
+                <div class="q-route-main">
+                    <strong>${this.escapeHtml(route.commodity_name)} x${route.quantity}</strong>
+                    <small>${this.escapeHtml(route.destination_system_name)} // ${this.escapeHtml(route.destination_name)}</small>
+                </div>
+                <div class="q-route-meta">
+                    <span>${route.jumps}J · ${route.duration_ticks}T</span>
+                    <small>FEE ${route.fee} CR</small>
+                </div>
+                <div class="q-route-net ${netClass}">
+                    <strong>${route.net >= 0 ? "+" : ""}${route.net} CR</strong>
+                    <small>NET</small>
+                </div>
+                <button class="btn-hud" data-q-comm="${this.escapeHtml(route.commodity_id)}"
+                    data-q-dest="${this.escapeHtml(route.destination_system_id)}"
+                    data-q-qty="${route.quantity}" ${data?.docked ? "" : "disabled"}>SHIP</button>
+            </div>`;
+        }).join("") : `<p class="panel-intro-text">No profitable lanes from the current hold.</p>`;
+
+        this.quantumFreight.innerHTML = `
+            <div class="quantum-header">
+                <h3 class="subpanel-title">QUANTUM FREIGHT</h3>
+                <span>${orders.length}/${data?.max_orders || 4} IN TRANSIT</span>
+            </div>
+            <div class="quantum-orders">${orderRows}</div>
+            <div class="quantum-routes">${routeRows}</div>
+            <p class="quantum-note">Cargo leaves immediately; the destination pays on arrival. Fees are charged now.</p>
+        `;
+        this.quantumFreight.querySelectorAll("[data-q-comm]").forEach(button => {
+            button.addEventListener("click", () => this.handleQuantumOrder(
+                button.getAttribute("data-q-comm"),
+                Number(button.getAttribute("data-q-qty")),
+                button.getAttribute("data-q-dest")
+            ));
+        });
+    }
+
+    async handleQuantumOrder(commodityId, quantity, destinationSystemId) {
+        try {
+            const res = await apiFetch("/api/trade/quantum/place", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    commodity_id: commodityId,
+                    quantity,
+                    destination_system_id: destinationSystemId,
+                })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound.playChime();
+                this.appendLog(json.message, "reward");
+            } else {
+                this.appendLog(`[FREIGHT BLOCKED] ${json.message}`, "hazard");
+            }
+            this.state = json.state;
+            this.renderHUD();
+            this.loadQuantumFreight();
+        } catch (e) {
+            this.appendLog(`[ERROR] Quantum freight failed: ${e.message}`, "hazard");
+        }
     }
 
     renderArsenal() {
@@ -2743,21 +2925,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.crewRoster.innerHTML = crew.length ? crew.map(m => {
                 const morale = Math.round(m.morale);
                 const moraleClass = morale < 20 ? "crew-morale-critical" : (morale < 35 ? "crew-morale-low" : "");
-                const moraleNote = morale < 20 ? " ⚠ NEAR DESERTION" : (morale < 35 ? " LOW" : "");
+                const moraleNote = morale < 20 ? " âš  NEAR DESERTION" : (morale < 35 ? " LOW" : "");
+                const injury = Number(m.injury_ticks || 0);
+                const xpToNext = Math.max(1, Number(m.skill || 1) * 40);
+                const away = (this.state.away_report?.active || []).find(mission => (mission.crew_ids || []).includes(m.id));
+                const statusNote = injury > 0
+                    ? ` | <span class="crew-injury">INJURED ${injury}T</span>`
+                    : (away ? ` | <span class="crew-away">AWAY: ${this.escapeHtml(away.name)}</span>` : "");
                 return `
                 <div class="crew-row">
                     <div class="crew-portrait">${this.portraitAvatar(m.portrait, m.name)}</div>
                     <div class="crew-info-block">
                         <strong>${this.escapeHtml(m.name)}</strong>
-                        <small>${this.escapeHtml(m.role)} | skill ${m.skill} | wage ${m.wage}</small>
+                        <small>${this.escapeHtml(m.role)} · SKILL ${m.skill} · XP ${m.xp || 0}/${xpToNext}${statusNote}</small>
                     </div>
                     <div class="crew-morale-bar" title="Morale ${morale}${moraleNote}">
                         <div class="crew-morale-fill ${moraleClass}" style="width:${morale}%"></div>
                         <span class="crew-morale-text">${morale}${moraleNote}</span>
                     </div>
                     <div class="crew-actions">
-                        <button class="btn-hud btn-amber" data-train-crew="${this.escapeHtml(m.id)}" ${m.skill >= 10 ? "disabled" : ""}>DRILL</button>
-                        <button class="btn-hud" data-dismiss-crew="${this.escapeHtml(m.id)}">DISMISS</button>
+                        <button class="btn-hud btn-amber" data-train-crew="${this.escapeHtml(m.id)}" ${m.skill >= 10 || injury > 0 ? "disabled" : ""}>DRILL</button>
+                        <button class="btn-hud" data-dismiss-crew="${this.escapeHtml(m.id)}" ${away ? "disabled" : ""}>DISMISS</button>
                     </div>
                 </div>
                 `;
@@ -2770,9 +2958,175 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             );
         }
 
+        this.renderAway();
+
         if (this.btnShoreLeave) {
             this.btnShoreLeave.addEventListener("click", () => this.handleShoreLeave());
         }
+    }
+
+    renderSurfaceOps() {
+        if (!this.surfaceOps) return;
+        const data = this.state?.surface_report;
+        if (!data || !data.landed) {
+            this.surfaceOps.style.display = "none";
+            return;
+        }
+        const body = data.body || {};
+        const operations = data.operations || [];
+        const rows = operations.map(op => {
+            const riskClass = op.risk >= 35 ? "risk-high" : (op.risk >= 18 ? "risk-mid" : "risk-low");
+            const rewards = [];
+            if (op.credits) rewards.push(`+${op.credits} CR`);
+            if (op.research) rewards.push(`+${op.research} RES`);
+            if (op.credit_cost) rewards.push(`-${op.credit_cost} CR`);
+            if (op.heal_injuries) rewards.push(`HEAL ${op.heal_injuries}`);
+            if (op.morale) rewards.push(`MORALE ${op.morale > 0 ? "+" : ""}${op.morale}`);
+            (op.cargo || []).forEach(item => rewards.push(`+${item.quantity} ${item.name || item.id}`));
+            return `<div class="surface-op-row ${op.used ? "is-worked" : ""}">
+                <div class="surface-op-main">
+                    <strong>${this.escapeHtml(op.name)}</strong>
+                    <small>${this.escapeHtml(op.description)}</small>
+                    <small class="surface-op-reward">${rewards.map(item => this.escapeHtml(item)).join(" · ")}</small>
+                </div>
+                <div class="surface-op-side">
+                    <span class="away-risk ${riskClass}">${op.risk}%</span>
+                    <button class="btn-hud" data-surface-op="${this.escapeHtml(op.id)}" ${op.used ? "disabled" : ""}>${op.used ? "WORKED" : "RUN"}</button>
+                </div>
+            </div>`;
+        }).join("");
+        this.surfaceOps.style.display = "block";
+        this.surfaceOps.innerHTML = `
+            <div class="surface-header">
+                <h4>SURFACE OPERATIONS // ${this.escapeHtml(body.name || "")}</h4>
+                <span>${data.used_count}/${data.total_count} WORKED</span>
+            </div>
+            <div class="surface-op-list">${rows || '<p class="panel-intro-text">No operations available.</p>'}</div>
+        `;
+        this.surfaceOps.querySelectorAll("[data-surface-op]").forEach(button => {
+            button.addEventListener("click", () => this.handleSurfaceOp(button.getAttribute("data-surface-op")));
+        });
+    }
+
+    async handleSurfaceOp(operationId) {
+        try {
+            const res = await apiFetch("/api/surface/op", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ operation_id: operationId })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound.playChime();
+                this.appendLog(json.message, "reward");
+            } else {
+                this.appendLog(`[SURFACE BLOCKED] ${json.message}`, "hazard");
+            }
+            this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Surface operation failed: ${e.message}`, "hazard");
+        }
+    }
+
+    renderAway() {
+        if (!this.awaySection) return;
+        const report = this.state?.away_report || {};
+        const body = report.body;
+        const active = report.active || [];
+        const missions = report.available || [];
+        const maxActive = report.max_active || 2;
+        if (this.crewAwayCount) {
+            this.crewAwayCount.textContent = active.length ? String(active.length) : "";
+            this.crewAwayCount.classList.toggle("is-live", active.length > 0);
+        }
+        const bodyLabel = body
+            ? `${this.escapeHtml(body.name)} // ${this.escapeHtml(body.body_type || "body")}`
+            : "NO ORBIT";
+
+        const activeRows = active.length ? active.map(mission => {
+            const team = (mission.team || []).map(member => `${this.escapeHtml(member.name)} (${member.skill})`).join(", ");
+            const progress = Math.max(0, Math.min(100, Number(mission.progress || 0)));
+            return `
+                <div class="away-active-card">
+                    <div class="away-active-head">
+                        <span class="away-icon">${this.escapeHtml(mission.icon || "◇")}</span>
+                        <strong>${this.escapeHtml(mission.name)}</strong>
+                        <span class="away-head-meta">ETA ${mission.remaining_ticks}T</span>
+                        <button class="btn-hud away-recall-btn" data-away-recall="${this.escapeHtml(mission.id)}">RECALL</button>
+                    </div>
+                    <div class="away-progress"><span style="width:${progress}%"></span></div>
+                    <small class="away-team-line">${team} <span>// risk ${mission.risk}%</span></small>
+                </div>
+            `;
+        }).join("") : `<p class="away-empty">No away teams deployed.</p>`;
+
+        const missionRows = missions.length ? missions.map(mission => {
+            const riskValue = mission.risk === null || mission.risk === undefined ? null : Number(mission.risk);
+            const riskClass = riskValue === null ? "risk-none" : (riskValue >= 35 ? "risk-high" : (riskValue >= 18 ? "risk-mid" : "risk-low"));
+            const riskLabel = riskValue === null ? "N/A" : `${riskValue}%`;
+            const team = (mission.team || []).map(member => `${this.escapeHtml(member.name)} ${member.skill}`).join(", ") || "NO HEALTHY CREW";
+            const rewards = (mission.rewards || []).map(item => this.escapeHtml(String(item))).join(" · ");
+            const blocked = !mission.available;
+            const reason = mission.reason ? `<small class="away-reason">${this.escapeHtml(mission.reason)}</small>` : "";
+            return `
+                <div class="away-mission ${blocked ? "is-blocked" : ""}">
+                    <span class="away-icon">${this.escapeHtml(mission.icon || "◇")}</span>
+                    <div class="away-mission-info">
+                        <div class="away-mission-title">
+                            <strong>${this.escapeHtml(mission.name)}</strong>
+                            <span class="away-risk ${riskClass}">${riskLabel}</span>
+                        </div>
+                        <small class="away-desc">${this.escapeHtml(mission.description)}</small>
+                        <small class="away-team-line">${team} <span>// ${mission.duration_ticks}T // ${mission.team_size} CREW</span></small>
+                        <small class="away-reward-line">${rewards}</small>
+                        ${reason}
+                        <div class="away-mission-foot">
+                            <span class="away-foot-hint">${blocked ? "STANDING BY" : "BEST-FIT TEAM READY"}</span>
+                            <button class="btn-hud" data-away-launch="${this.escapeHtml(mission.id)}" ${blocked ? "disabled" : ""}>DEPLOY</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join("") : `<p class="away-empty">No expedition profiles fit this body.</p>`;
+
+        this.awaySection.innerHTML = `
+            <div class="away-header">
+                <h4>AWAY TEAMS</h4>
+                <span class="away-deployed">${active.length}/${maxActive} DEPLOYED</span>
+            </div>
+            <div class="away-body-line">${bodyLabel}</div>
+            ${body ? "" : `<p class="away-empty">Establish orbit around a world or station to deploy a team.</p>`}
+            ${activeRows}
+            <div class="away-mission-list">${body ? missionRows : ""}</div>
+        `;
+        this.awaySection.querySelectorAll("[data-away-launch]").forEach(btn =>
+            btn.addEventListener("click", () => this.handleAwayLaunch(btn.getAttribute("data-away-launch")))
+        );
+        this.awaySection.querySelectorAll("[data-away-recall]").forEach(btn =>
+            btn.addEventListener("click", () => this.handleAwayRecall(btn.getAttribute("data-away-recall")))
+        );
+    }
+
+    handleAwayLaunch(missionType) {
+        return this.postAction("/api/away/launch", { mission_type: missionType }, "crew");
+    }
+
+    handleAwayRecall(missionId) {
+        return this.postAction("/api/away/recall", { mission_id: missionId }, "crew");
+    }
+
+    setCrewView(view) {
+        const next = view === "away" ? "away" : "roster";
+        this.crewView = next;
+        if (this.crewRosterView) this.crewRosterView.style.display = next === "roster" ? "" : "none";
+        if (this.crewAwayView) this.crewAwayView.style.display = next === "away" ? "" : "none";
+        this.crewViewButtons.forEach(button => {
+            const selected = button.getAttribute("data-crew-view") === next;
+            button.classList.toggle("is-active", selected);
+            button.setAttribute("aria-selected", selected ? "true" : "false");
+        });
+        if (next === "away") this.renderAway();
     }
 
     async handleShoreLeave() {
@@ -3679,6 +4033,50 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    async handlePirateAction(action) {
+        this.sound.init();
+        try {
+            const res = await apiFetch("/api/pirate/resolve", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound.playChime();
+                this.appendLog(json.message, action === "fight" ? "hazard" : "reward");
+            } else {
+                this.appendLog(`[BLOCKED] ${json.message}`, "hazard");
+            }
+            this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Pirate action failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleDecisionChoice(choiceId) {
+        this.sound.init();
+        try {
+            const res = await apiFetch("/api/decision/resolve", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ choice_id: choiceId })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound.playChime();
+                this.appendLog(`[DECISION] ${json.message}`, "reward");
+            } else {
+                this.appendLog(`[DECISION FAILED] ${json.message}`, "hazard");
+            }
+            this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Decision action failed: ${e.message}`, "hazard");
+        }
+    }
+
     async handleRepair() {
         this.sound.init();
         this.sound.playBeep(800);
@@ -3893,6 +4291,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 }
             }
             if (this.targetGovernment) this.targetGovernment.textContent = b.government || "None";
+            if (this.targetDevastation) {
+                const devastation = Number(b.devastation || 0);
+                this.targetDevastation.textContent = devastation > 0 ? `${devastation.toFixed(1)}%` : "None";
+                this.targetDevastation.classList.toggle("is-devastated", devastation >= 25);
+            }
             this.targetResources.innerHTML = (b.resources || []).map(r => `<span>${this.escapeHtml(r)}</span>`).join("");
             if (this.btnLandTarget) {
                 this.btnLandTarget.style.display = b.landable ? "inline-block" : "none";
@@ -3962,6 +4365,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.targetMoons.textContent = factionName;
             if (this.targetFaction) this.targetFaction.textContent = factionName || "Unclaimed";
             if (this.targetPopulation) this.targetPopulation.textContent = "--";
+            if (this.targetDevastation) this.targetDevastation.textContent = "--";
             if (this.targetGovernment) this.targetGovernment.textContent = "--";
             this.targetResources.innerHTML = "";
             if (this.btnLandTarget) this.btnLandTarget.style.display = "none";

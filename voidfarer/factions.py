@@ -114,6 +114,42 @@ CANONICAL_FACTIONS: dict[str, Faction] = {
         primary_color="#ef4444",
         perk_summary="Bounties on enemy ships; safe passage through anarchic outer-rim corridors.",
     ),
+    "kepler_concord": Faction(
+        id="kepler_concord",
+        name="Kepler Concord",
+        description="A treaty network of observatories, gene banks, and deep-space research habitats.",
+        ideology="Open Science, Ecological Stewardship & Shared Discovery",
+        headquarters_system="kepler",
+        primary_color="#22d3ee",
+        perk_summary="Cheaper research projects and bonus xenobiology discoveries on surveyed worlds.",
+    ),
+    "helios_compact": Faction(
+        id="helios_compact",
+        name="Helios Compact",
+        description="Solar engineers and orbital foundry guilds who power the frontier's industrial spine.",
+        ideology="Energy Sovereignty, Foundry Guilds & Frontier Development",
+        headquarters_system="helios",
+        primary_color="#fbbf24",
+        perk_summary="Discounted fuel cells and reactor refits at Compact dockyards.",
+    ),
+    "ashen_choir": Faction(
+        id="ashen_choir",
+        name="Ashen Choir",
+        description="A contemplative order that tends derelict shrines and listens to the void for omens.",
+        ideology="Ancestral Memory, Relic Reverence & Silent Pilgrimage",
+        headquarters_system="ashen",
+        primary_color="#a78bfa",
+        perk_summary="Better relic odds and reduced anomaly hull damage within Choir space.",
+    ),
+    "iron_meridian": Faction(
+        id="iron_meridian",
+        name="Iron Meridian",
+        description="Mercantile militarists running fortified trade corridors and privateer courts.",
+        ideology="Contract Law, Armed Commerce & Corridor Sovereignty",
+        headquarters_system="meridian",
+        primary_color="#fb7185",
+        perk_summary="Escort discounts and higher mission payouts on Meridian contract boards.",
+    ),
 }
 
 CANONICAL_CORPORATIONS: dict[str, Corporation] = {
@@ -161,6 +197,24 @@ CANONICAL_CORPORATIONS: dict[str, Corporation] = {
         specialty_commodity="fuel_cells",
         corporate_perk="30% discount on hyperdrive fuel cell purchases across all affiliated ports.",
         bonus_trade_margin=0.15,
+    ),
+    "helios_forge": Corporation(
+        id="helios_forge",
+        name="Helios Forge Combine",
+        description="Orbital smelters and solar-collector yards supplying frontier shipbuilders.",
+        headquarters_system="helios",
+        specialty_commodity="titanium",
+        corporate_perk="Discounted hull modules and reactor cooling parts at Compact yards.",
+        bonus_trade_margin=0.17,
+    ),
+    "choir_reliquary": Corporation(
+        id="choir_reliquary",
+        name="Choir Reliquary Trust",
+        description="Curators and licensed antiquarians who authenticate and broker precursor relics.",
+        headquarters_system="ashen",
+        specialty_commodity="xenoliths",
+        corporate_perk="Higher relic sale prices and safer anomaly recovery contracts.",
+        bonus_trade_margin=0.20,
     ),
 }
 
@@ -212,6 +266,10 @@ FACTION_NAME_TO_ID: dict[str, str] = {
     "void corsairs": "outlaw_corsairs",
     "outer rim anarchy": "outlaw_corsairs",
     "outlaw haven": "outlaw_corsairs",
+    "kepler concord": "kepler_concord",
+    "helios compact": "helios_compact",
+    "ashen choir": "ashen_choir",
+    "iron meridian": "iron_meridian",
 }
 
 

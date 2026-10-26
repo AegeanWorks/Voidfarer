@@ -236,6 +236,18 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, "crew": self.engine.get_crew_report(), "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/away":
+            self._send_json({"ok": True, "away": self.engine.get_away_report(), "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/trade/quantum":
+            self._send_json({"ok": True, "quantum": self.engine.get_quantum_trade_report()})
+            return
+
+        if path == "/api/surface":
+            self._send_json({"ok": True, "surface": self.engine.get_surface_report(), "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/weapons":
             self._send_json({"ok": True, "weapons": self.engine.get_weapon_report(), "state": self.engine.get_status_snapshot()})
             return
@@ -393,6 +405,26 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         body = self._read_body_json()
 
+        pending = self.engine.state.pending_decision
+        if pending is not None and path not in ("/api/decision/resolve", "/api/time", "/api/save"):
+            self._send_error_json(
+                f"Decision required: {pending.title}. Resolve it before continuing.",
+                status=HTTPStatus.CONFLICT,
+            )
+            return
+
+        if (
+            self.engine.state.active_pirate is not None
+            and path not in ("/api/pirate/resolve", "/api/time", "/api/save")
+        ):
+            pirate = self.engine.state.active_pirate
+            self._send_error_json(
+                f"Pirate intercept unresolved: {pirate.band_name} demands {pirate.toll_credits} cr. "
+                "Pay, fight, or evade before continuing.",
+                status=HTTPStatus.CONFLICT,
+            )
+            return
+
         if path == "/api/save":
             slot = resolve_slot_name(body.get("slot"))
             self.storage.save(self.engine.state, slot=slot)
@@ -503,6 +535,39 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/crew/shore":
             ok, msg = self.engine.shore_leave()
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/away/launch":
+            mission_type = str(body.get("mission_type", ""))
+            raw_crew = body.get("crew_ids")
+            crew_ids = [str(cid) for cid in raw_crew] if isinstance(raw_crew, list) and raw_crew else None
+            ok, msg = self.engine.launch_away_mission(mission_type, crew_ids)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/away/recall":
+            ok, msg = self.engine.recall_away_mission(str(body.get("mission_id", "")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/pirate/resolve":
+            ok, msg = self.engine.resolve_pirate_encounter(str(body.get("action", "")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/contracts/refresh":
+            ok, msg = self.engine.refresh_contracts()
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/decision/resolve":
+            ok, msg = self.engine.resolve_decision(str(body.get("choice_id", "")))
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
@@ -776,6 +841,21 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             else:
                 qty = _int_field(body, "quantity", 0, minimum=0)
                 ok, msg = self.engine.trade(comm_id, qty, is_buy)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/trade/quantum/place":
+            commodity_id = str(body.get("commodity_id", ""))
+            quantity = _int_field(body, "quantity", 0, minimum=1)
+            destination = str(body.get("destination_system_id", ""))
+            ok, msg = self.engine.place_quantum_order(commodity_id, quantity, destination)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/surface/op":
+            ok, msg = self.engine.perform_surface_operation(str(body.get("operation_id", "")))
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
@@ -1064,6 +1144,7 @@ def start_background_server(
         return None
     static_dir = Path(__file__).parent / "static"
     VoidFarerHandler.engine = engine
+    engine.allow_decision_events = True
     VoidFarerHandler.storage = storage
     VoidFarerHandler.static_dir = static_dir
 
@@ -1113,6 +1194,7 @@ def run_server(
         print("Fix: choose a port such as 8080 or 8000.")
         return 1
     VoidFarerHandler.engine = engine
+    engine.allow_decision_events = True
     VoidFarerHandler.storage = storage
     VoidFarerHandler.static_dir = static_dir
 

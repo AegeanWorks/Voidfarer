@@ -60,6 +60,7 @@ class CelestialBody:
     landable: bool = False
     faction: str = "Unclaimed"
     population: int = 0
+    devastation: float = 0.0
     government: str = "None"
     habitability: float = 0.0
     salvage_claimed: bool = False
@@ -93,6 +94,7 @@ class CelestialBody:
             landable=bool(data.get("landable", str(data.get("body_type", "")) in {"terrestrial", "oceanic", "savanna", "tundra"})),
             faction=str(data.get("faction", "Unclaimed")),
             population=int(data.get("population", 0)),
+            devastation=max(0.0, min(100.0, float(data.get("devastation", 0.0)))),
             government=str(data.get("government", "None")),
             habitability=float(data.get("habitability", 0.0)),
             salvage_claimed=bool(data.get("salvage_claimed", False)),
@@ -1054,6 +1056,104 @@ class VoidTraversalState:
 
 
 @dataclass(frozen=True)
+class DecisionChoice:
+    """One selectable response to a pending decision event."""
+
+    id: str
+    label: str
+    description: str = ""
+    effects: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "label": self.label,
+            "description": self.description,
+            "effects": dict(self.effects),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> DecisionChoice:
+        return cls(
+            id=str(data["id"]),
+            label=str(data.get("label", "Choose")),
+            description=str(data.get("description", "")),
+            effects=dict(data.get("effects", {})),
+        )
+
+
+@dataclass(frozen=True)
+class DecisionEvent:
+    """A blocking decision that must be resolved before time or flight advances."""
+
+    id: str
+    definition_id: str
+    title: str
+    description: str
+    severity: str
+    trigger: str
+    choices: tuple[DecisionChoice, ...]
+    tick: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "definition_id": self.definition_id,
+            "title": self.title,
+            "description": self.description,
+            "severity": self.severity,
+            "trigger": self.trigger,
+            "choices": [choice.to_dict() for choice in self.choices],
+            "tick": self.tick,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> DecisionEvent:
+        return cls(
+            id=str(data["id"]),
+            definition_id=str(data.get("definition_id", "unknown")),
+            title=str(data.get("title", "Decision Required")),
+            description=str(data.get("description", "")),
+            severity=str(data.get("severity", "major")),
+            trigger=str(data.get("trigger", "tick")),
+            choices=tuple(DecisionChoice.from_dict(c) for c in data.get("choices", ())),
+            tick=int(data.get("tick", 0)),
+        )
+
+
+@dataclass(frozen=True)
+class PirateEncounter:
+    """A pirate toll encounter that must be resolved before flight continues."""
+
+    id: str
+    band_name: str
+    ship_class: str
+    system_id: str
+    system_name: str
+    toll_credits: int
+    threat: int
+    description: str
+    seed: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> PirateEncounter:
+        return cls(
+            id=str(data["id"]),
+            band_name=str(data.get("band_name", "Pirate Raider")),
+            ship_class=str(data.get("ship_class", "Raider")),
+            system_id=str(data.get("system_id", "sol")),
+            system_name=str(data.get("system_name", "Unknown")),
+            toll_credits=max(0, int(data.get("toll_credits", 100))),
+            threat=max(1, int(data.get("threat", 1))),
+            description=str(data.get("description", "")),
+            seed=int(data.get("seed", 0)),
+        )
+
+
+@dataclass(frozen=True)
 class GameEvent:
     """Realtime popup event delivered to the cockpit."""
 
@@ -1359,6 +1459,8 @@ class CrewMember:
     portrait: str = "crew_01"
     specialty: str = ""
     status: str = "active"
+    xp: int = 0
+    injury_ticks: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1375,6 +1477,86 @@ class CrewMember:
             portrait=str(data.get("portrait", "crew_01")),
             specialty=str(data.get("specialty", "")),
             status=str(data.get("status", "active")),
+            xp=max(0, int(data.get("xp", 0))),
+            injury_ticks=max(0, int(data.get("injury_ticks", 0))),
+        )
+
+
+@dataclass(frozen=True)
+class TradeOrder:
+    """A quantum freight order: cargo leaves now and is sold at the destination on arrival."""
+
+    id: str
+    commodity_id: str
+    quantity: int
+    origin_system_id: str
+    destination_system_id: str
+    destination_body_id: str
+    destination_name: str
+    fee_paid: int
+    created_tick: int
+    arrival_tick: int
+    unit_price_at_launch: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TradeOrder:
+        return cls(
+            id=str(data["id"]),
+            commodity_id=str(data.get("commodity_id", "titanium")),
+            quantity=max(1, int(data.get("quantity", 1))),
+            origin_system_id=str(data.get("origin_system_id", "sol")),
+            destination_system_id=str(data.get("destination_system_id", "sol")),
+            destination_body_id=str(data.get("destination_body_id", "")),
+            destination_name=str(data.get("destination_name", "")),
+            fee_paid=max(0, int(data.get("fee_paid", 0))),
+            created_tick=max(0, int(data.get("created_tick", 0))),
+            arrival_tick=max(0, int(data.get("arrival_tick", 0))),
+            unit_price_at_launch=max(0, int(data.get("unit_price_at_launch", 0))),
+        )
+
+
+@dataclass(frozen=True)
+class AwayMission:
+    """An away-team expedition assigned to a celestial body for a finite duration."""
+
+    id: str
+    mission_type: str
+    system_id: str
+    body_id: str
+    body_name: str
+    crew_ids: tuple[str, ...]
+    started_tick: int
+    duration_ticks: int
+    risk: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "mission_type": self.mission_type,
+            "system_id": self.system_id,
+            "body_id": self.body_id,
+            "body_name": self.body_name,
+            "crew_ids": list(self.crew_ids),
+            "started_tick": self.started_tick,
+            "duration_ticks": self.duration_ticks,
+            "risk": self.risk,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> AwayMission:
+        return cls(
+            id=str(data["id"]),
+            mission_type=str(data.get("mission_type", "geological_survey")),
+            system_id=str(data.get("system_id", "sol")),
+            body_id=str(data.get("body_id", "")),
+            body_name=str(data.get("body_name", "")),
+            crew_ids=tuple(str(cid) for cid in data.get("crew_ids", ())),
+            started_tick=max(0, int(data.get("started_tick", 0))),
+            duration_ticks=max(1, int(data.get("duration_ticks", 1))),
+            risk=max(0, min(100, int(data.get("risk", 10)))),
         )
 
 
@@ -1423,6 +1605,11 @@ class ShipState:
     landed_body_id: str | None = None
     travel: TravelState | None = None
     void_traversal: VoidTraversalState | None = None
+    away_missions: tuple[AwayMission, ...] = ()
+    # Worked expedition sites, keyed "body_id:mission_type"; a successful team depletes the site.
+    away_completed: tuple[str, ...] = ()
+    trade_orders: tuple[TradeOrder, ...] = ()
+    surface_used: tuple[str, ...] = ()
     # Credits paid for the units still in the hold, per commodity (trade P/L basis).
     cargo_cost: dict[str, int] = field(default_factory=dict)
 
@@ -1470,6 +1657,10 @@ class ShipState:
             "landed_body_id": self.landed_body_id,
             "travel": self.travel.to_dict() if self.travel else None,
             "void_traversal": self.void_traversal.to_dict() if self.void_traversal else None,
+            "away_missions": [m.to_dict() for m in self.away_missions],
+            "away_completed": list(self.away_completed),
+            "trade_orders": [order.to_dict() for order in self.trade_orders],
+            "surface_used": list(self.surface_used),
         }
 
     @classmethod
@@ -1537,6 +1728,10 @@ class ShipState:
             landed_body_id=data.get("landed_body_id"),
             travel=TravelState.from_dict(data["travel"]) if data.get("travel") else None,
             void_traversal=VoidTraversalState.from_dict(data["void_traversal"]) if data.get("void_traversal") else None,
+            away_missions=tuple(AwayMission.from_dict(m) for m in data.get("away_missions", ())),
+            away_completed=tuple(str(key) for key in data.get("away_completed", ())),
+            trade_orders=tuple(TradeOrder.from_dict(order) for order in data.get("trade_orders", ())),
+            surface_used=tuple(str(key) for key in data.get("surface_used", ())),
         )
 
 
@@ -1714,6 +1909,9 @@ class GameState:
     visited_systems: tuple[str, ...]
     active_anomaly: AnomalyEncounter | None = None
     active_combat: CombatEncounter | None = None
+    active_pirate: PirateEncounter | None = None
+    pending_decision: DecisionEvent | None = None
+    decision_history: tuple[str, ...] = ()
     time: TimeState = field(default_factory=TimeState)
     stats: dict[str, int] = field(default_factory=lambda: {
         "jumps": 0,
@@ -1722,6 +1920,19 @@ class GameState:
         "anomalies_resolved": 0,
         "combat_victories": 0,
         "credits_earned": 0,
+        "away_missions": 0,
+        "away_successes": 0,
+        "away_failures": 0,
+        "away_injuries": 0,
+        "pirate_encounters": 0,
+        "pirates_paid": 0,
+        "pirates_evaded": 0,
+        "pirates_fought": 0,
+        "decisions_resolved": 0,
+        "landings": 0,
+        "surface_ops": 0,
+        "quantum_orders": 0,
+        "deliveries": 0,
     })
     economy: GlobalEconomyState = field(default_factory=GlobalEconomyState)
     ai_captains: tuple[AICaptain, ...] = ()
@@ -1746,6 +1957,9 @@ class GameState:
             "visited_systems": list(self.visited_systems),
             "active_anomaly": self.active_anomaly.to_dict() if self.active_anomaly else None,
             "active_combat": self.active_combat.to_dict() if self.active_combat else None,
+            "active_pirate": self.active_pirate.to_dict() if self.active_pirate else None,
+            "pending_decision": self.pending_decision.to_dict() if self.pending_decision else None,
+            "decision_history": list(self.decision_history),
             "time": self.time.to_dict(),
             "stats": dict(self.stats),
             "economy": self.economy.to_dict(),
@@ -1782,6 +1996,16 @@ class GameState:
             if data.get("active_combat")
             else None
         )
+        active_pirate = (
+            PirateEncounter.from_dict(data["active_pirate"])
+            if data.get("active_pirate")
+            else None
+        )
+        pending_decision = (
+            DecisionEvent.from_dict(data["pending_decision"])
+            if data.get("pending_decision")
+            else None
+        )
         dock_purchases: dict[tuple[str, str, str], tuple[int, int]] = {}
         for raw_tag, raw_lot in (data.get("local_dock_purchases") or {}).items():
             parts = str(raw_tag).split("|")
@@ -1801,6 +2025,9 @@ class GameState:
             visited_systems=tuple(data.get("visited_systems", ())),
             active_anomaly=active_anomaly,
             active_combat=active_combat,
+            active_pirate=active_pirate,
+            pending_decision=pending_decision,
+            decision_history=tuple(str(item) for item in data.get("decision_history", ())),
             time=TimeState.from_dict(data.get("time", {})),
             stats=dict(data.get("stats", {
                 "jumps": 0,

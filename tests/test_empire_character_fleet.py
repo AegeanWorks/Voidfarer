@@ -11,6 +11,7 @@ from voidfarer.character import advance_age, train_skill
 from voidfarer.cli import main
 from voidfarer.crew import DAYS_PER_MONTH
 from voidfarer.engine import SimulationEngine
+from voidfarer.factions import CANONICAL_FACTIONS
 from voidfarer.faction_state import generate_faction_leaders, resolve_wars
 from voidfarer.fleet import apply_fleet_casualties, build_fleet_ship, fleet_damage
 from voidfarer.galaxy import GalaxyGenerator
@@ -229,7 +230,7 @@ class FactionDiplomacyWarTest(unittest.TestCase):
         first = generate_faction_leaders(42)
         second = generate_faction_leaders(42)
         self.assertEqual([l.to_dict() for l in first], [l.to_dict() for l in second])
-        self.assertEqual(len(first), 5)
+        self.assertEqual(len(first), len(CANONICAL_FACTIONS))
         self.assertTrue(all(l.behavior for l in first))
 
     def test_diplomacy_improve_and_declare_war(self):

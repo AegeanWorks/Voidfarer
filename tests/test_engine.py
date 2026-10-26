@@ -192,7 +192,7 @@ class TestEngine(unittest.TestCase):
         self.assertEqual(self.engine.state.ship.mastery.xp, xp_before + 150)
         self.assertIn("new_contract", info)
         self.assertIsNotNone(info["relic"])
-        self.assertEqual(len(self.engine.state.ship.active_contracts), 3)
+        self.assertEqual(len(self.engine.state.ship.active_contracts), 5)
 
     def test_pilot_mastery_and_talents(self):
         # Promote pilot by granting talent point

@@ -45,10 +45,27 @@ SYSTEM_ARCHETYPES = [
     ("wolf_359", "Wolf 359", 30.0, -50.0, "RedGiant", "#ff4400", 0.25, "Free Spacers Syndicate", "vortex_fuel"),
     ("golconda", "Golconda Rift", 66.0, 8.0, "O", "#9bb0ff", 0.10, "Void Corsairs", None),
     ("cyclops", "Cyclops Binary", -70.0, 30.0, "Binary", "#ffcc66", 0.45, "Sol Coalition", "hyperion_dynamics"),
+    ("kepler", "Kepler Concord", 12.0, 66.0, "G", "#7bf1a8", 0.72, "Kepler Concord", "astraea_pharma"),
+    ("helios", "Helios Compact", 20.0, -58.0, "F", "#ffb020", 0.58, "Helios Compact", "vortex_fuel"),
+    ("ashen", "Ashen Choir", -62.0, 58.0, "M", "#9b7bd4", 0.28, "Ashen Choir", None),
+    ("meridian", "Iron Meridian", 62.0, 22.0, "K", "#fb7185", 0.66, "Iron Meridian", "hyperion_dynamics"),
+    ("vela", "Vela Anchorage", -80.0, -42.0, "B", "#a5b4fc", 0.52, "Helios Compact", "omnicorp_mining"),
+    ("lyra", "Lyra Breadbasket", 76.0, -12.0, "A", "#e0f2fe", 0.61, "Free Spacers Syndicate", "astraea_pharma"),
+    ("draco", "Draco Reach", -30.0, -68.0, "K", "#f97316", 0.22, "Iron Meridian", "omnicorp_mining"),
+    ("phoenix", "Phoenix Verge", 40.0, 62.0, "G", "#fde68a", 0.44, "Helios Compact", "helios_forge"),
 ]
 
 # Systems whose generator appends a black-hole event horizon (void traversal gates)
 VOID_GATE_SYSTEM_IDS = ("cygnus_x1", "golconda")
+
+# The pre-expansion core worlds. Their market generation keeps the original RNG stream
+# stable for existing saves and deterministic balance tests; new frontier systems use
+# their own derived RNG so expanding the map does not perturb legacy gameplay outcomes.
+LEGACY_SYSTEM_IDS: tuple[str, ...] = (
+    "sol", "alpha_centauri", "sirius", "procyon", "vega", "arcturus", "betelgeuse",
+    "cygnus_x1", "pulsar_psr", "rift_station", "orion_belt", "trappist", "wolf_359",
+    "golconda", "cyclops",
+)
 
 
 def black_hole_body(sys_id: str, sys_name: str) -> CelestialBody:
@@ -196,6 +213,252 @@ ANOMALIES_CATALOG = [
                 "required_power": "none",
                 "min_power_threshold": 0,
                 "outcome_text": "You log the beacon and maintain your patrol corridor.",
+                "hull_delta": 0,
+                "credits_delta": 0,
+                "fuel_delta": 0,
+                "cargo_reward": {},
+            },
+        ],
+    },
+    {
+        "id": "quantum_ghost_ship",
+        "title": "Quantum Ghost Ship",
+        "description": "A frigate phases in and out of sensor lock, its transponder broadcasting a distress code from a century ago.",
+        "severity": "critical",
+        "choices": [
+            {
+                "choice_id": "board_ghost",
+                "text": "Board through the phase shadow with cutting teams (Needs Weapons >= 35%)",
+                "required_power": "weapons",
+                "min_power_threshold": 35,
+                "outcome_text": "The boarding team recovers a sealed vault of quantum substrates before the hull phases out.",
+                "hull_delta": -12,
+                "credits_delta": 900,
+                "fuel_delta": -3,
+                "cargo_reward": {"microchips": 2, "xenoliths": 1},
+            },
+            {
+                "choice_id": "ghost_scan",
+                "text": "Match the phase frequency and record its memory core (Needs Sensors >= 45%)",
+                "required_power": "sensors",
+                "min_power_threshold": 45,
+                "outcome_text": "The memory core yields a navigational cipher and a modest archival bounty.",
+                "hull_delta": 0,
+                "credits_delta": 650,
+                "fuel_delta": -1,
+                "cargo_reward": {},
+            },
+            {
+                "choice_id": "ghost_withdraw",
+                "text": "Withdraw before the phase instability collapses",
+                "required_power": "none",
+                "min_power_threshold": 0,
+                "outcome_text": "You clear the ghost's radius and log the encounter.",
+                "hull_delta": 0,
+                "credits_delta": 0,
+                "fuel_delta": 0,
+                "cargo_reward": {},
+            },
+        ],
+    },
+    {
+        "id": "helium_storm",
+        "title": "Helium Storm Front",
+        "description": "A stellar flare drives a charged helium wall across the shipping lane, shredding unshielded hulls.",
+        "severity": "major",
+        "choices": [
+            {
+                "choice_id": "storm_surf",
+                "text": "Surf the storm front to skim free fuel (Needs Engines >= 50%)",
+                "required_power": "engines",
+                "min_power_threshold": 50,
+                "outcome_text": "The ship rides the pressure wave and scoops a rich charge of helium-3.",
+                "hull_delta": -8,
+                "credits_delta": 200,
+                "fuel_delta": 20,
+                "cargo_reward": {"fuel_cells": 2},
+            },
+            {
+                "choice_id": "storm_shield",
+                "text": "Brace behind the shield envelope and ride it out (Needs Shields >= 40%)",
+                "required_power": "shields",
+                "min_power_threshold": 40,
+                "outcome_text": "The shields hold. A grateful convoy pays for your relay telemetry.",
+                "hull_delta": 0,
+                "credits_delta": 450,
+                "fuel_delta": -2,
+                "cargo_reward": {},
+            },
+            {
+                "choice_id": "storm_wait",
+                "text": "Cut engines and wait for the front to pass",
+                "required_power": "none",
+                "min_power_threshold": 0,
+                "outcome_text": "You wait out the storm at minimal power.",
+                "hull_delta": 0,
+                "credits_delta": 0,
+                "fuel_delta": -1,
+                "cargo_reward": {},
+            },
+        ],
+    },
+    {
+        "id": "precursor_library",
+        "title": "Precursor Data Library",
+        "description": "A derelict archive station unfolds like a metal flower, its index still warm after millennia.",
+        "severity": "major",
+        "choices": [
+            {
+                "choice_id": "library_decrypt",
+                "text": "Decrypt the index with a narrow-band sensor interrogator (Needs Sensors >= 55%)",
+                "required_power": "sensors",
+                "min_power_threshold": 55,
+                "outcome_text": "The index opens. You copy a fragment of precursor mathematics and its substrate lattice.",
+                "hull_delta": 0,
+                "credits_delta": 1200,
+                "fuel_delta": -3,
+                "cargo_reward": {"microchips": 3, "xenoliths": 1},
+            },
+            {
+                "choice_id": "library_salvage",
+                "text": "Cut open the archive shell and strip its alloy ribs (Needs Weapons >= 30%)",
+                "required_power": "weapons",
+                "min_power_threshold": 30,
+                "outcome_text": "The shell yields high-grade alloy but the archive collapses behind you.",
+                "hull_delta": -6,
+                "credits_delta": 300,
+                "fuel_delta": -2,
+                "cargo_reward": {"titanium": 4},
+            },
+            {
+                "choice_id": "library_leave",
+                "text": "Mark the archive for the Choir and leave it intact",
+                "required_power": "none",
+                "min_power_threshold": 0,
+                "outcome_text": "You record the coordinates and leave the archive undisturbed.",
+                "hull_delta": 0,
+                "credits_delta": 0,
+                "fuel_delta": 0,
+                "cargo_reward": {},
+            },
+        ],
+    },
+    {
+        "id": "pirate_beacon",
+        "title": "Pirate Lure Beacon",
+        "description": "A false distress beacon pings from a hollow asteroid; ion trails betray waiting raiders.",
+        "severity": "minor",
+        "choices": [
+            {
+                "choice_id": "beacon_jam",
+                "text": "Jam the beacon and sell its cipher to local patrol (Needs Sensors >= 30%)",
+                "required_power": "sensors",
+                "min_power_threshold": 30,
+                "outcome_text": "The patrol pays for the cipher and the ambush goes cold.",
+                "hull_delta": 0,
+                "credits_delta": 350,
+                "fuel_delta": -1,
+                "cargo_reward": {},
+            },
+            {
+                "choice_id": "beacon_ambush",
+                "text": "Spring the ambush and break the raiders (Needs Weapons >= 45%)",
+                "required_power": "weapons",
+                "min_power_threshold": 45,
+                "outcome_text": "You scatter the ambush and strip the abandoned raider skiff.",
+                "hull_delta": -10,
+                "credits_delta": 700,
+                "fuel_delta": -4,
+                "cargo_reward": {"titanium": 1},
+            },
+            {
+                "choice_id": "beacon_avoid",
+                "text": "Burn clear of the asteroid field",
+                "required_power": "engines",
+                "min_power_threshold": 25,
+                "outcome_text": "You clear the field before the raiders can close.",
+                "hull_delta": 0,
+                "credits_delta": 0,
+                "fuel_delta": -3,
+                "cargo_reward": {},
+            },
+        ],
+    },
+    {
+        "id": "crystal_bloom",
+        "title": "Crystal Bloom",
+        "description": "A lattice of translucent crystals blooms from a dead moon, singing on the hull microphones.",
+        "severity": "minor",
+        "choices": [
+            {
+                "choice_id": "bloom_harvest",
+                "text": "Crack the outer lattice and harvest the resonating cores (Needs Weapons >= 25%)",
+                "required_power": "weapons",
+                "min_power_threshold": 25,
+                "outcome_text": "The cores ring in the cargo bay, worth a small fortune to the Choir.",
+                "hull_delta": -4,
+                "credits_delta": 400,
+                "fuel_delta": -2,
+                "cargo_reward": {"xenoliths": 1},
+            },
+            {
+                "choice_id": "bloom_study",
+                "text": "Record the resonance pattern from a safe standoff (Needs Sensors >= 35%)",
+                "required_power": "sensors",
+                "min_power_threshold": 35,
+                "outcome_text": "The resonance data is purchased by a Kepler observatory.",
+                "hull_delta": 0,
+                "credits_delta": 500,
+                "fuel_delta": -1,
+                "cargo_reward": {},
+            },
+            {
+                "choice_id": "bloom_leave",
+                "text": "Leave the bloom undisturbed",
+                "required_power": "none",
+                "min_power_threshold": 0,
+                "outcome_text": "The bloom fades behind your wake.",
+                "hull_delta": 0,
+                "credits_delta": 0,
+                "fuel_delta": 0,
+                "cargo_reward": {},
+            },
+        ],
+    },
+    {
+        "id": "meridian_convoy",
+        "title": "Meridian Convoy Under Fire",
+        "description": "A Meridian trade convoy is pinned by corsair skiffs, its escorts burning hard.",
+        "severity": "major",
+        "choices": [
+            {
+                "choice_id": "convoy_intercept",
+                "text": "Intercept the corsairs and break their attack run (Needs Weapons >= 40%)",
+                "required_power": "weapons",
+                "min_power_threshold": 40,
+                "outcome_text": "The corsairs scatter. Meridian factors pay a contract bounty and load medical cargo.",
+                "hull_delta": -6,
+                "credits_delta": 850,
+                "fuel_delta": -3,
+                "cargo_reward": {"medicines": 2},
+            },
+            {
+                "choice_id": "convoy_escort",
+                "text": "Push between the convoy and the raiders (Needs Shields >= 45%)",
+                "required_power": "shields",
+                "min_power_threshold": 45,
+                "outcome_text": "Your shields absorb the first volley and the convoy slips clear.",
+                "hull_delta": -10,
+                "credits_delta": 600,
+                "fuel_delta": -2,
+                "cargo_reward": {},
+            },
+            {
+                "choice_id": "convoy_ignore",
+                "text": "Hold course and let the Meridian escorts handle it",
+                "required_power": "none",
+                "min_power_threshold": 0,
+                "outcome_text": "You pass the burning convoy without slowing.",
                 "hull_delta": 0,
                 "credits_delta": 0,
                 "fuel_delta": 0,
@@ -417,10 +680,14 @@ def step_population_dynamics(body: CelestialBody, num_ticks: int = 1) -> int:
         growth_rate = (hab / 100.0) * 0.00025
 
     factor = (1.0 + growth_rate) ** num_ticks
+    devastation = max(0.0, min(100.0, float(body.devastation or 0.0)))
+    if devastation > 0:
+        death_rate = (devastation / 100.0) ** 1.5 * 0.0022
+        factor *= max(0.90, 1.0 - death_rate * num_ticks)
     growth = int(round(body.population * (factor - 1.0)))
-    if growth == 0 and growth_rate > 0:
+    if growth == 0 and growth_rate > 0 and devastation <= 0:
         growth = 1
-    return body.population + growth
+    return max(0, body.population + growth)
 
 
 class GalaxyGenerator:
@@ -568,6 +835,10 @@ class GalaxyGenerator:
             "Nebula Collective": "Technocratic Council",
             "Void Corsairs": "Pirate Warlordship",
             "Precursor Watch": "Monastic Curate",
+            "Kepler Concord": "Research Concordat",
+            "Helios Compact": "Foundry Assembly",
+            "Ashen Choir": "Relic Curate",
+            "Iron Meridian": "Chartered Directorate",
         }
         default_gov = gov_map.get(faction, "Colonial Republic")
 
@@ -602,10 +873,17 @@ class GalaxyGenerator:
 
             is_inhabited = is_station or body_type in habitable_types
             if body_type in habitable_types:
-                body_pop = 120_000_000 + (i + 1) * 45_000_000
+                core_boost = 2.8 if sys_id in ("sol", "alpha_centauri", "kepler", "helios", "meridian") else 1.0
+                body_pop = int(
+                    (140_000_000 + (i + 1) * 55_000_000)
+                    * core_boost
+                    * (0.75 + (i % 3) * 0.18)
+                )
+                if sys_id == "sol" and i == 1:
+                    body_pop = 8_200_000_000
                 body_gov = default_gov
             elif is_station:
-                body_pop = 250_000 + (i + 1) * 85_000
+                body_pop = 450_000 + (i + 1) * 140_000
                 body_gov = "Science Directorate" if body_type == "research_outpost" else default_gov
             else:
                 body_pop = 0
