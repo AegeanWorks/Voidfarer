@@ -1,27 +1,22 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "doc-encoding-final",
-    "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793011407.2534275,
+    "task_id": "cockpit-layout-audit",
+    "last_phase": "phase 2",
+    "active_phase": 2,
+    "status": "in_progress",
+    "updated_at": 1793014183.41012,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": [],
-    "completed_at": 1793011420.0162897
+    "impact_assessment": {
+      "why": "The user asked for continued verification with images; natural captures showed morale/XP clipping and squeezed freight metadata.",
+      "benefits": "Crew identity, XP, morale and actions are readable at all supported widths; freight routes keep FEE/NET/SHIP legible without horizontal pressure.",
+      "risks": "contract: CSS/DOM order only; dependency: none; concurrency: none; state: no engine/save/RNG change",
+      "mitigation": "Natural captures at 1366/1280, free vision review, layout tests, full suite and 4/4 gates"
+    }
   },
   "checkpoints": [
-    {
-      "task_id": "deepfrontier-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'deepfrontier-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792997533.3520532,
-      "timestamp_str": "2026-10-26 09:52:13",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "frontier-review-push",
       "phase": "phase 4",
@@ -295,6 +290,23 @@
       "timestamp": 1793011420.0162945,
       "timestamp_str": "2026-10-26 13:43:40",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "cockpit-layout-audit",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Fix crew row wrapping and quantum route layout found in natural 1366/1280 captures, reorder roster ahead of shore/roles, and record image-review evidence.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793014183.41012,
+      "timestamp_str": "2026-10-26 14:29:43",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The user asked for continued verification with images; natural captures showed morale/XP clipping and squeezed freight metadata.",
+        "benefits": "Crew identity, XP, morale and actions are readable at all supported widths; freight routes keep FEE/NET/SHIP legible without horizontal pressure.",
+        "risks": "contract: CSS/DOM order only; dependency: none; concurrency: none; state: no engine/save/RNG change",
+        "mitigation": "Natural captures at 1366/1280, free vision review, layout tests, full suite and 4/4 gates"
+      }
     }
   ]
 }
