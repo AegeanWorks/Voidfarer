@@ -13,6 +13,7 @@ from voidfarer.engine import SimulationEngine
 from voidfarer.faction_state import _devastate_system
 from voidfarer.factions import CANONICAL_FACTIONS
 from voidfarer.galaxy import ANOMALIES_CATALOG, GalaxyGenerator, step_population_dynamics
+from voidfarer.models import AwayMission, GameState, TradeOrder
 from voidfarer.pirates import generate_pirate_encounter, pirate_risk
 from voidfarer.retention import generate_contract
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
@@ -63,6 +64,38 @@ class FrontierContentTest(unittest.TestCase):
                 and int(choice.get("min_power_threshold", 0)) <= 0
             ]
             self.assertTrue(escape, anomaly["id"])
+
+    def test_new_state_fields_survive_save_round_trip(self):
+        engine = SimulationEngine(seed=42)
+        event = make_decision_event(DECISION_DEFINITIONS[0], 4, "tick")
+        pirate = generate_pirate_encounter(engine.current_system, seed=7, threat_level=2)
+        order = TradeOrder(
+            id="freight_4_1", commodity_id="titanium", quantity=2,
+            origin_system_id="sol", destination_system_id="alpha_centauri",
+            destination_body_id="alpha_centauri_body_1", destination_name="Alpha Centauri A",
+            fee_paid=120, created_tick=4, arrival_tick=12, unit_price_at_launch=500,
+        )
+        mission = AwayMission(
+            id="away_4_1", mission_type="salvage_sweep", system_id="sol",
+            body_id="sol_dyson_sphere", body_name="Dyson Sphere Helios",
+            crew_ids=("crew_1",), started_tick=4, duration_ticks=8, risk=20,
+        )
+        state = engine._clone_state(
+            ship=engine._clone_ship(
+                away_missions=(mission,), away_completed=("sol:salvage_sweep",),
+                trade_orders=(order,), surface_used=("sol_dyson_sphere:surface_survey",),
+            ),
+            pending_decision=event, active_pirate=pirate,
+            decision_history=("colony_distress",),
+        )
+        restored = GameState.from_dict(state.to_dict())
+        self.assertEqual(restored.pending_decision.id, event.id)
+        self.assertEqual(restored.active_pirate.id, pirate.id)
+        self.assertEqual(restored.decision_history, ("colony_distress",))
+        self.assertEqual(restored.ship.away_missions[0].id, mission.id)
+        self.assertEqual(restored.ship.away_completed, ("sol:salvage_sweep",))
+        self.assertEqual(restored.ship.trade_orders[0].arrival_tick, 12)
+        self.assertEqual(restored.ship.surface_used, ("sol_dyson_sphere:surface_survey",))
 
     def test_initial_standings_include_frontier_powers(self):
         engine = SimulationEngine(seed=42)

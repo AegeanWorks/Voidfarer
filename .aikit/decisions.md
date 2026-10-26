@@ -789,3 +789,10 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Add a source-encoding regression test that scans all Python modules and the three cockpit static files for common mojibake markers. Generated ADR history is deliberately excluded.
   3. Reconfirm the feature and hardening commits: 623 tests pass, 4/4 gates pass, the 1,200-tick live-encounter stress pass remains clean, all 23 systems stay connected, all 9 factions are present in the roster, all 9 anomalies have a power-free exit, and cockpit panels match the gold/navy theme at 1920/1366/1280.
 - **Consequences**: Player-visible text no longer contains encoding damage, and future source edits that reintroduce it fail the suite. The last ten commits are audited as feature, UI evidence, map/ledger, hardening, accessibility, anomaly-escape and bookkeeping changes with no remaining invariant failures. Suite: 624 tests (36 suites).
+
+### ADR-065: Frontier State Serialization Round-Trip Coverage
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: The last-ten audit verified the individual mechanics and UI, but the combined persistence path for the new blocking decision, pirate encounter, away mission, quantum freight and surface-operation fields was not covered by one regression test.
+- **Decision**: Add a single save/load round-trip test that constructs an engine state with a pending decision, active pirate toll, decision history, away mission and completed site, in-transit trade order, and worked surface branch, then reconstructs the `GameState` and asserts every field survives.
+- **Consequences**: The new state surface is verified as JSON-safe and backward-compatible with the existing `from_dict` paths. Suite: 625 tests (36 suites).
