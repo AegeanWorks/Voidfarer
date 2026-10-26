@@ -1,18 +1,18 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "voidfarer"
-version = "0.1.0"
+version = "0.2.0"
 description = "A deep-space fleet, procedural galaxy, and holographic cockpit simulation engine"
 readme = "README.md"
-license = { text = "AGPL-3.0-or-later" }
+license = "LicenseRef-AGL-1.1"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "AI Assistant" }]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Operating System :: Microsoft :: Windows",
     "Topic :: Games/Entertainment :: Simulation",
 ]

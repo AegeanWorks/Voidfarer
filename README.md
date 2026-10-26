@@ -39,72 +39,76 @@ voidfarer.bat   # CLI passthrough launcher (e.g. `voidfarer.bat status`, `voidfa
 
 ```text
 voidfarer/
-├── .aikit/                   <- project memory: record, ledger, decisions
-│   ├── codebase_map.md       <- AST-generated symbol map
-│   ├── decisions.md          <- monotonic ADR register
-│   ├── guidelines.md         <- project-specific guidelines
-│   ├── project.json          <- stack and gate configuration
-│   ├── ui.json               <- committed cockpit UI surface contract
-│   ├── ui_history.json       <- append-only UI task evidence
-│   └── task_ledger.json      <- power-loss safe task state
-├── docs/                     <- comprehensive system design & research
+├── .aikit/               <- project memory: record, ledger, decisions
+│   ├── codebase_map.md   <- AST-generated symbol map
+│   ├── decisions.md      <- monotonic ADR register
+│   ├── guidelines.md     <- project-specific guidelines
+│   ├── project.json      <- stack and gate configuration
+│   ├── ui.json           <- committed cockpit UI surface contract
+│   ├── ui_history.json   <- append-only UI task evidence
+│   └── task_ledger.json  <- power-loss safe task state
+├── docs/                 <- comprehensive system design & research
+│   ├── COCKPIT.md        <- Windows cockpit panels, controls and launch options
 │   ├── ATTENTION_MECHANICS_LITERATURE_REVIEW.md <- behavioral psychology review
 │   └── NARRATIVE_AND_TUTORIAL_LITERATURE_REVIEW.md <- cognitive load & narrative review
-├── .gitignore                <- transient state & python caches excluded
-├── LICENSE                   <- GNU AGPL-3.0 license
-├── COMMERCIAL.md             <- commercial licensing and support terms
-├── pyproject.toml            <- build and package configuration
-├── play.bat                  <- 1-click interactive Windows launcher (default: Windows Cockpit)
-├── voidfarer.bat             <- 1-click Windows CLI passthrough launcher
-├── README.md                 <- living documentation
-├── voidfarer/                <- core simulation package
-│   ├── __init__.py           <- package metadata
-│   ├── models.py             <- frozen dataclass DTOs and schema validators
-│   ├── factions.py           <- sovereign factions, megacorps & standing tiers
-│   ├── enemies.py            <- tactical enemy archetypes, abilities & generator
-│   ├── galaxy.py             <- procedural star system & hyperlane generator
-│   ├── engine.py             <- deterministic state machine & coordinator
-│   ├── reactor.py            <- reactor modes, heat, cooling & derating
-│   ├── mapmods.py            <- procedural sector map modifiers
-│   ├── shipmods.py           <- structural ship modification catalog
-│   ├── character.py          <- commander age, skills & abilities
-│   ├── research.py           <- research projects & technology bonuses
-│   ├── outposts.py           <- outpost catalogs & tick production
-│   ├── faction_state.py      <- faction leaders, behaviors, wars & elimination
-│   ├── fleet.py              <- escort warships, formations & battle support
-│   ├── navigation.py         <- multi-jump routing, void lanes & black-hole hazards
-│   ├── messaging.py          <- branching quantum message trees
-│   ├── crew.py               <- crew roles, recruiting & portraits
-│   ├── away.py               <- away-team expeditions, injuries & crew XP
-│   ├── decisions.py          <- blocking conditional events
-│   ├── pirates.py            <- pirate bands & toll encounters
-│   ├── surface.py            <- landing-party operations
-│   ├── weapons.py            <- weapon types & combat modifiers
-│   ├── retention.py          <- relics, dynamic contracts & pilot mastery
-│   ├── story.py              <- cadet academy, cipher campaign flags & endings
-│   ├── upgrades.py           <- hardware upgrades catalog & drone templates
-│   ├── economy.py            <- dynamic galactic economy, stockpiles & trade routes
-│   ├── frontier.py           <- AI captains, depots, mercenaries & quantum messages
-│   ├── exploration.py        <- derelict salvage, fuel scooping & crew drills
-│   ├── codex.py              <- discovery codex, career statistics & milestones
-│   ├── inventory.py          <- item catalog, consumables & cargo manifest
-│   ├── storage.py            <- crash-safe atomic persistence & shadow backup
-│   ├── server.py             <- zero-dependency HTTP REST & cockpit server
-│   ├── cli.py                <- ANSI terminal interface & interactive REPL
-│   └── static/               <- Stellaris-style command console UI
-│       ├── index.html        <- semantic HUD structure & radar canvas
-│       ├── style.css         <- sci-fi glassmorphism design system
-│       ├── app.js            <- radar math, Web Audio synth & REST link
-│       ├── celestial.js      <- procedural planet, station & ship models
+├── .gitignore            <- transient state & python caches excluded
+├── LICENSE               <- Aegean Game License 1.1 (AGL-1.1): DRM-free personal play
+├── LICENSES/             <- REUSE license texts
+├── REUSE.toml            <- Machine-readable SPDX metadata
+├── ASSETS.md             <- Asset/data manifest: what the license covers
+├── COMMERCIAL.md         <- commercial licensing and support terms
+├── pyproject.toml        <- build and package configuration
+├── play.bat              <- 1-click interactive Windows launcher (default: Windows Cockpit)
+├── voidfarer.bat         <- 1-click Windows CLI passthrough launcher
+├── README.md             <- living documentation
+├── voidfarer/            <- core simulation package
+│   ├── __init__.py       <- package metadata
+│   ├── models.py         <- frozen dataclass DTOs and schema validators
+│   ├── factions.py       <- sovereign factions, megacorps & standing tiers
+│   ├── enemies.py        <- tactical enemy archetypes, abilities & generator
+│   ├── galaxy.py         <- procedural star system & hyperlane generator
+│   ├── engine.py         <- deterministic state machine & coordinator
+│   ├── reactor.py        <- reactor modes, heat, cooling & derating
+│   ├── mapmods.py        <- procedural sector map modifiers
+│   ├── shipmods.py       <- structural ship modification catalog
+│   ├── character.py      <- commander age, skills & abilities
+│   ├── research.py       <- research projects & technology bonuses
+│   ├── outposts.py       <- outpost catalogs & tick production
+│   ├── faction_state.py  <- faction leaders, behaviors, wars & elimination
+│   ├── fleet.py          <- escort warships, formations & battle support
+│   ├── navigation.py     <- multi-jump routing, void lanes & black-hole hazards
+│   ├── messaging.py      <- branching quantum message trees
+│   ├── crew.py           <- crew roles, recruiting & portraits
+│   ├── away.py           <- away-team expeditions, injuries & crew XP
+│   ├── decisions.py      <- blocking conditional events
+│   ├── pirates.py        <- pirate bands & toll encounters
+│   ├── surface.py        <- landing-party operations
+│   ├── weapons.py        <- weapon types & combat modifiers
+│   ├── retention.py      <- relics, dynamic contracts & pilot mastery
+│   ├── story.py          <- cadet academy, cipher campaign flags & endings
+│   ├── upgrades.py       <- hardware upgrades catalog & drone templates
+│   ├── economy.py        <- dynamic galactic economy, stockpiles & trade routes
+│   ├── frontier.py       <- AI captains, depots, mercenaries & quantum messages
+│   ├── exploration.py    <- derelict salvage, fuel scooping & crew drills
+│   ├── codex.py          <- discovery codex, career statistics & milestones
+│   ├── inventory.py      <- item catalog, consumables & cargo manifest
+│   ├── storage.py        <- crash-safe atomic persistence & shadow backup
+│   ├── server.py         <- zero-dependency HTTP REST & cockpit server
+│   ├── cli.py            <- ANSI terminal interface & interactive REPL
+│   └── static/           <- Stellaris-style command console UI
+│       ├── index.html    <- semantic HUD structure & radar canvas
+│       ├── style.css     <- sci-fi glassmorphism design system
+│       ├── app.js        <- radar math, Web Audio synth & REST link
+│       ├── celestial.js  <- procedural planet, station & ship models
 │       ├── cursor-default.svg <- themed default cockpit cursor
 │       ├── cursor-pointer.svg <- themed pointer cursor for controls
 │       └── cursor-crosshair.svg <- themed radar crosshair cursor
-├── tools/                    <- developer proofs
-│   ├── __init__.py           <- package marker
-│   ├── ui_audit.py           <- layout metrics
-│   ├── ui_browser.py         <- real browser review
-│   └── ui_inventory.py       <- cockpit inventory proof
-└── tests/                    <- unit & integration test suite (36 suites)
+├── tools/                <- developer proofs
+│   ├── __init__.py       <- package marker
+│   ├── ui_audit.py       <- layout metrics
+│   ├── ui_browser.py     <- real browser review
+│   └── ui_inventory.py   <- cockpit inventory proof
+└── tests/                <- unit & integration test suite (36 suites)
 ```
 
 ---
@@ -403,31 +407,9 @@ python -m voidfarer.cli contracts refresh
 23 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time. Quantum freight ships cargo for a fee, paying on arrival. Landed teams survey, core-sample, explore ruins, salvage, or rest. War captures displace civilians and leave scars.
 
 ### 19. Stellaris-Style Windows Cockpit
-Launch the Stellaris-inspired Windows command console:
-```bash
-python -m voidfarer.cli serve --port 8080
-```
-Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
-- **Top Status Bar & Chronometer (`G-007`, `G-011`)**: Vitals plus the chrono deck, sized for 1280x720 through 4K.
-- **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a three-column bottom strip (reactor, abilities, radar settings above the log).
-- **Menu, Settings & Saves (`ESC`)**: volume, auto-pause on intercepts/events, auto-claim, order lot, key list, reset; saves.
-- **Left Terminal & Commerce**: `[`/`]` cycle tabs, `\` hides the drawer; order lots, cost and margins.
-- **Planet Inspector**: Gravity, atmosphere, habitability, orbit, moons, resources, colony tiers.
-- **Transit, Landing & Fleet**: Timed transit, quantum jumps, surveys and drones.
-- **Living Galaxy**: Procedural worlds, AI traders, dynamic markets and reputation.
-- **Strategic Map**: faction territories, borders, war fronts and powers legend.
-- **Mission Panels**: Quests, contracts, diplomacy, depots, messages, COMMS, factions and combat.
-- **Space-Opera Campaign**: five acts, live objectives, three endings.
-- **Hollow Between**: readiness, lane dives, stability, emergency emerge.
-- **REPL Server Lifecycle**: `serve` runs the HTTP server and ticker; `serve stop` saves and shuts down.
-- **Reactor Matrix**: four sliders, presets, `Q/W/E/R`, heat, modes and VENT.
-- **Sector Map Modifiers**: radar chips alter fuel, scans, encounters, trade and reactor heat.
-- **Player, Skills & Crew Tabs**: PLAYER is a dossier; the bottom strip is the six-power ability bar (`SHIFT+1..6`), while SKILLS holds training, talents and relics. Crew splits into ROSTER (morale, XP, drills) and AWAY TEAMS (body expeditions, risk pills, deployment and recall).
-- **Ship Configuration Tab**: Fixed-height silhouette, compact stats, and a full-width module ledger; refits require a docked drydock or station.
-- **Commander Creation & Death**: creation and death overlay with run summary.
-- **Stellaris-Style HUD**: gold-on-navy, 720p-4K, density/HUD scale, DPR radar.
-- **Derelict Boarding & Fuel Scooping**: salvage and finite fuel taps.
-- **Captain's Log & Discovery Codex**: career stats, milestones, rewards, filters and log.
+
+The Stellaris-style Windows cockpit, its panels, controls and launch options are documented in
+[docs/COCKPIT.md](docs/COCKPIT.md).
 
 ### 20. Captain's Log & Discovery Codex
 ```bash
@@ -457,3 +439,7 @@ See ADR-041 and ADR-047.
 3. **Fast Test Verification**: Comprehensive 625-test suite runs in about 18 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
+
+## 📜 License
+
+Free for personal play under the Aegean Game License 1.1 (AGL-1.1); see [LICENSE](LICENSE). It is DRM-free: Licensor ships no DRM and a distributor may not add it. Streaming, modding and free mods are allowed. Commercial use, paid mods and AI training need the Aegean Commercial License 1.0 (ACL-1.0); see [COMMERCIAL.md](COMMERCIAL.md).

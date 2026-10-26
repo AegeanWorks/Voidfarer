@@ -824,3 +824,9 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Give the compact reactor strip proportional 4-column doctrine tracks (`1.12fr 1.12fr 1.22fr 0.82fr`), hide `.pwr-icon` and `.hud-command-strip .skill-quick-icon`, and prevent `.panel-title` from shrinking so `REACTOR [P] 100% ALLOCATED [HIDE]`, all four doctrines, `VENT`, and `Battle Focus` render intact across all viewports.
   4. Anchor `.nav-target-card` with `position: absolute` inside `#panelCenter`, move the `NAV-RADAR` watermark header to the top-left of `#panelCenter`, lay out `.surface-op-main` as a 2-line flex row (title + reward on line 1, description on line 2), and scroll `.nav-target-card` directly when `#surfaceOps` opens.
 - **Consequences**: Real-browser Edge captures at 1920x1080, 1366x768, and 1280x720 across `contracts` and `surface` scenarios pass with zero errors, zero horizontal scroll, zero tiny text, zero cross-panel overlap, and full legibility of all five surface operations and contract titles; approved by G-015 vision review. Suite: 628 tests (36 suites).
+
+## Licensing migration (2026-10-26)
+
+- New versions use the Aegean Game License 1.1 (AGL-1.1).
+- Rights holder: AegeanWorks; commercial use under ACL-1.0.
+- Counsel review of the 1.1 texts remains pending.
