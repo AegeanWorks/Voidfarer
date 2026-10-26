@@ -755,7 +755,7 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. `active_pirate` now freezes `tick`, `jump`, `orbit`, `start_travel`, `scan`, `trade`, `scoop_fuel`, `land_on_body`, `salvage_derelict`, away launches and surface operations until pay/fight/evade. The HTTP layer returns 409 for all other POSTs, the CLI guard blocks one-shot commands, and the cockpit keyboard handler treats both decision and pirate cards as blocking overlays.
   3. Surface operation cargo rows use inventory display names in both the report and the grant log; the UI no longer leaks ids such as `microchips`.
   4. The quantum board is rendered above the local commodity table and limits to four best routes below 1500px width, so its header stays visible at 1366x768. Natural (unscrolled) Edge captures were used for final review; the earlier cropped laptop image was a capture-scroll artifact, not a layout bug.
-- **Consequences**: Encounter state can no longer be bypassed by another action, item names remain consistent across away/surface/freight surfaces, and the freight board stays readable at the smallest supported desktop. Suite: 622 tests (36 suites). Final graphical review approved the natural 1920/1366 freight board, surface operations, pirate card, decision modal and compact outliner.
+- **Consequences**: Encounter state can no longer be bypassed by another action, item names remain consistent across away/surface/freight surfaces, and the freight board stays readable at the smallest supported desktop. Suite: 623 tests (36 suites). Final graphical review approved the natural 1920/1366 freight board, surface operations, pirate card, decision modal and compact outliner.
 
 ### ADR-062: Post-Push Audit Hardening
 - **Date**: 2026-10-26
@@ -768,4 +768,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Landing no longer advances the surface contract; only an actual surface operation does. Field Rest is risk-free, and unpopulated bodies no longer gain devastation from a capture.
   5. Initial faction and corporation standings now include the four frontier factions and two frontier corporations. The unused Sol population special case was removed.
   6. Contract cards expose the full title plus description on hover so ledger ellipsis does not hide intent.
-- **Consequences**: The new encounters cannot be bypassed through a second UI path or REPL command, state stays valid on 409 responses, and surface contracts reflect real operations. Graphical review confirmed the 23-system galaxy view is readable at 1920/1366/1280, all nine faction cards are present and scrollable, the freight board and surface panel fit the gold/navy console, and the apparent clipped rows were normal panel scrolling. Suite: 622 tests (36 suites).
+- **Consequences**: The new encounters cannot be bypassed through a second UI path or REPL command, state stays valid on 409 responses, and surface contracts reflect real operations. Graphical review confirmed the 23-system galaxy view is readable at 1920/1366/1280, all nine faction cards are present and scrollable, the freight board and surface panel fit the gold/navy console, and the apparent clipped rows were normal panel scrolling. Suite: 623 tests (36 suites).
+
+### ADR-063: Guaranteed Anomaly Exit and Long-Run Stress Verification
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: A 1,200-tick simulation with live decisions, jumps, pirates, anomalies and combat exposed three older anomalies whose every choice required a reactor power threshold. A later audit also needed a guard against future additions repeating that pattern.
+- **Decision**:
+  1. Every anomaly catalog entry now includes a `required_power: none` retreat/withdraw choice. Derelict Dreadnought, Tachyon Rift and Pirate Lure Beacon received explicit escape branches.
+  2. A catalog test enforces one power-free escape per anomaly, so a future anomaly cannot strand a low-power ship.
+  3. A 1,200-tick deterministic stress run with live encounter events produced no invariant violations: credits/fuel/hull stayed non-negative, populations stayed non-negative, and all 23 systems remained present through 16 wars and repeated decisions.
+- **Consequences**: Active anomalies cannot deadlock flight through unmet power gates; failed checks still cause their intended hull damage and clear the encounter. Suite: 623 tests (36 suites).

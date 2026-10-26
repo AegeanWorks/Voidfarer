@@ -55,6 +55,15 @@ class FrontierContentTest(unittest.TestCase):
         self.assertLess(after, before)
         self.assertTrue(any(body.devastation > 0 for body in devastated.bodies))
 
+    def test_every_anomaly_has_a_power_free_escape(self):
+        for anomaly in ANOMALIES_CATALOG:
+            escape = [
+                choice for choice in anomaly["choices"]
+                if choice.get("required_power") == "none"
+                and int(choice.get("min_power_threshold", 0)) <= 0
+            ]
+            self.assertTrue(escape, anomaly["id"])
+
     def test_initial_standings_include_frontier_powers(self):
         engine = SimulationEngine(seed=42)
         for faction_id in ("kepler_concord", "helios_compact", "ashen_choir", "iron_meridian"):

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `74`
 - **Total Classes**: `198`
 - **Total Top-Level Functions**: `255`
-- **Total Class Methods**: `1095`
-- **Total Source Lines**: `32189`
+- **Total Class Methods**: `1096`
+- **Total Source Lines**: `32231`
 
 ---
 
@@ -610,13 +610,14 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `329` lines (`16134` bytes)
+**Size**: `338` lines (`16504` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
   - Method `.test_galaxy_has_more_systems_factions_and_anomalies()`
   - Method `.test_populations_are_realistic_and_devastation_kills_growth()`
   - Method `.test_war_capture_devastates_and_displaces_population()`
+  - Method `.test_every_anomaly_has_a_power_free_escape()`
   - Method `.test_initial_standings_include_frontier_powers()`
   - Method `.test_contract_board_has_new_categories()`
 - `class PirateEncounterTest`
@@ -1801,7 +1802,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1183` lines (`52981` bytes)
+**Size**: `1216` lines (`54385` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
