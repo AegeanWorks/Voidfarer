@@ -90,7 +90,7 @@
 ### [`tests/test_away_missions.py`](tests/test_away_missions.py)
 > *Away-team expeditions: catalog, deterministic outcomes, injuries, XP, parity and saves.*
 
-**Size**: `307` lines (`12956` bytes)
+**Size**: `307` lines (`12972` bytes)
 
 **Classes:**
 - `class AwayCatalogTest`
