@@ -1,28 +1,22 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "anomaly-escape-audit",
-    "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793004219.2385762,
+    "task_id": "last10-audit",
+    "last_phase": "phase 2",
+    "active_phase": 2,
+    "status": "in_progress",
+    "updated_at": 1793005235.0611894,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": [],
-    "completed_at": 1793004235.6537282
+    "impact_assessment": {
+      "why": "The user asked for verification and analysis of every change in the last ten pushes, including images.",
+      "benefits": "Removes corrupted CLI/cockpit text, guarantees ADR UTF-8 validity, adds a mojibake regression test, and confirms feature/hardening/anomaly commits still hold.",
+      "risks": "contract: ASCII-safe labels and encoding guard only; dependency: none; concurrency: unchanged; state: docs re-encoded without changing ADR meaning",
+      "mitigation": "Byte-level ADR repair, source/static UTF-8 scan test, full suite, 4/4 gates, and retained graphical evidence"
+    }
   },
   "checkpoints": [
-    {
-      "task_id": "ability-bar-balance-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/5] Ability bar + balance + review hardening verified: 582 tests, 4/4 gates, ADR-058 corrected; reviewers found and I fixed rank-7 unlock reconciliation on creation/load, 0-hull defeat with no bounty, no double outpost level scaling, whole-credit yields, skill TRAIN buttons, charm target validation, cooldown-safe failures and ability-bar context states; vision review approved 7 real-browser captures at 1920/1366/1280; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792954222.3826716,
-      "timestamp_str": "2026-10-25 21:50:22",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "ability-bar-balance-v1",
       "phase": "completed",
@@ -292,6 +286,23 @@
       "timestamp": 1793004235.653732,
       "timestamp_str": "2026-10-26 11:43:55",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "last10-audit",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Audit the last ten commits commit-by-commit, scan source/docs for encoding damage, fix player-visible mojibake and invalid ADR bytes, and re-run graphical/state checks.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793005235.0611894,
+      "timestamp_str": "2026-10-26 12:00:35",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The user asked for verification and analysis of every change in the last ten pushes, including images.",
+        "benefits": "Removes corrupted CLI/cockpit text, guarantees ADR UTF-8 validity, adds a mojibake regression test, and confirms feature/hardening/anomaly commits still hold.",
+        "risks": "contract: ASCII-safe labels and encoding guard only; dependency: none; concurrency: unchanged; state: docs re-encoded without changing ADR meaning",
+        "mitigation": "Byte-level ADR repair, source/static UTF-8 scan test, full suite, 4/4 gates, and retained graphical evidence"
+      }
     }
   ]
 }
