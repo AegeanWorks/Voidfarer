@@ -146,7 +146,7 @@ def _devastate_system(
     lost_total = 0
     for body in system.bodies:
         if body.population <= 0:
-            bodies.append(replace(body, devastation=min(100.0, (body.devastation or 0.0) + 2.0 * severity)))
+            bodies.append(body)
             continue
         loss_rate = rng.uniform(0.018, 0.052) * max(0.4, severity)
         lost = max(1, int(body.population * loss_rate))

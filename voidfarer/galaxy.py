@@ -879,8 +879,6 @@ class GalaxyGenerator:
                     * core_boost
                     * (0.75 + (i % 3) * 0.18)
                 )
-                if sys_id == "sol" and i == 1:
-                    body_pop = 8_200_000_000
                 body_gov = default_gov
             elif is_station:
                 body_pop = 450_000 + (i + 1) * 140_000

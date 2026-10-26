@@ -97,6 +97,8 @@ def _stable_unit(*parts: object) -> float:
 
 
 def surface_risk(operation: SurfaceOperation, body: CelestialBody) -> int:
+    if operation.risk <= 0:
+        return 0
     hazard = sum(1 for _ in body.hazards) * 3
     gravity = max(0.0, abs(float(body.gravity or 1.0) - 1.0) * 8.0)
     return max(0, min(70, int(round(operation.risk + hazard + gravity))))

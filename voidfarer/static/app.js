@@ -2386,9 +2386,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else {
                 this.appendLog(`[FREIGHT BLOCKED] ${json.message}`, "hazard");
             }
-            this.state = json.state;
-            this.renderHUD();
-            this.loadQuantumFreight();
+            if (json.state) {
+                this.state = json.state;
+                this.renderHUD();
+                this.loadQuantumFreight();
+            }
         } catch (e) {
             this.appendLog(`[ERROR] Quantum freight failed: ${e.message}`, "hazard");
         }
@@ -2972,7 +2974,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     renderSurfaceOps() {
         if (!this.surfaceOps) return;
         const data = this.state?.surface_report;
-        if (!data || !data.landed) {
+        if (
+            !data || !data.landed || this.selectedType !== "body"
+            || String(this.selectedTarget?.id || "") !== String(data.body?.id || "")
+        ) {
             this.surfaceOps.style.display = "none";
             return;
         }
@@ -3026,8 +3031,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else {
                 this.appendLog(`[SURFACE BLOCKED] ${json.message}`, "hazard");
             }
-            this.state = json.state;
-            this.renderHUD();
+            if (json.state) {
+                this.state = json.state;
+                this.renderHUD();
+            }
         } catch (e) {
             this.appendLog(`[ERROR] Surface operation failed: ${e.message}`, "hazard");
         }
@@ -3454,7 +3461,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         contracts.forEach(c => {
             const card = document.createElement("div");
             card.className = `contract-card ${c.completed ? 'completed' : ''}`;
-            card.title = c.description || "";
+            card.title = `${c.title || "Contract"} - ${c.description || ""}`;
 
             const pct = Math.min(100, Math.round((c.current_count / c.target_count) * 100));
             const relicBadge = c.reward_relic_tier ? `<span class="reward-pill relic">+Relic [${c.reward_relic_tier.toUpperCase()}]</span>` : '';
@@ -4052,8 +4059,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else {
                 this.appendLog(`[BLOCKED] ${json.message}`, "hazard");
             }
-            this.state = json.state;
-            this.renderHUD();
+            if (json.state) {
+                this.state = json.state;
+                this.renderHUD();
+            }
         } catch (e) {
             this.appendLog(`[ERROR] Pirate action failed: ${e.message}`, "hazard");
         }
@@ -4074,8 +4083,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else {
                 this.appendLog(`[DECISION FAILED] ${json.message}`, "hazard");
             }
-            this.state = json.state;
-            this.renderHUD();
+            if (json.state) {
+                this.state = json.state;
+                this.renderHUD();
+            }
         } catch (e) {
             this.appendLog(`[ERROR] Decision action failed: ${e.message}`, "hazard");
         }

@@ -2054,6 +2054,22 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
         parts = line.split()
         cmd = parts[0].lower()
 
+        pending = engine.state.pending_decision
+        pirate = engine.state.active_pirate
+        allowed_while_blocked = {
+            "decision", "decide", "pirate", "corsair", "status", "save",
+            "serve", "time", "help", "?", "exit", "quit", "q",
+        }
+        if (pending is not None or pirate is not None) and cmd not in allowed_while_blocked:
+            if pending is not None:
+                print(f"{RED}Decision required:{RESET} {pending.title}. Use `decision` first.")
+            else:
+                print(
+                    f"{RED}Pirate intercept unresolved:{RESET} {pirate.band_name} demands "
+                    f"{pirate.toll_credits} cr. Use `pirate pay`, `pirate fight`, or `pirate evade`."
+                )
+            continue
+
         if cmd in ("exit", "quit", "q"):
             break
         elif cmd == "status":

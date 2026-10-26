@@ -9,8 +9,8 @@
 - **Total Python Modules**: `74`
 - **Total Classes**: `198`
 - **Total Top-Level Functions**: `255`
-- **Total Class Methods**: `1094`
-- **Total Source Lines**: `32152`
+- **Total Class Methods**: `1095`
+- **Total Source Lines**: `32189`
 
 ---
 
@@ -610,13 +610,14 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `317` lines (`15417` bytes)
+**Size**: `329` lines (`16134` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
   - Method `.test_galaxy_has_more_systems_factions_and_anomalies()`
   - Method `.test_populations_are_realistic_and_devastation_kills_growth()`
   - Method `.test_war_capture_devastates_and_displaces_population()`
+  - Method `.test_initial_standings_include_frontier_powers()`
   - Method `.test_contract_board_has_new_categories()`
 - `class PirateEncounterTest`
   - Method `.test_risk_rises_in_havens()`
@@ -1376,7 +1377,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2909` lines (`149270` bytes)
+**Size**: `2925` lines (`150042` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1540,7 +1541,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7011` lines (`349959` bytes)
+**Size**: `7015` lines (`350030` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1726,7 +1727,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `310` lines (`14066` bytes)
+**Size**: `310` lines (`13989` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -1800,7 +1801,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1185` lines (`53073` bytes)
+**Size**: `1183` lines (`52981` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -2135,7 +2136,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1271` lines (`54014` bytes)
+**Size**: `1276` lines (`54314` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -2143,7 +2144,7 @@
   - Method `.log_message(format, *args)` - *Suppress standard access logs for clean terminal output.*
   - Method `._send_json(data, status)`
   - Method `._without_catalogs(data)` - *Drop static catalogs from the snapshot a response carries under `state` or `data`.*
-  - Method `._send_error_json(message, status)`
+  - Method `._send_error_json(message, status, include_state)`
   - Method `._read_body_json()`
   - Method `.do_OPTIONS()`
   - Method `.do_GET()`
@@ -2223,7 +2224,7 @@
 ### [`voidfarer/surface.py`](voidfarer/surface.py)
 > *Surface operations: choose what your landing party does after touchdown.*
 
-**Size**: `167` lines (`5220` bytes)
+**Size**: `169` lines (`5265` bytes)
 
 **Classes:**
 - `class SurfaceOperation`

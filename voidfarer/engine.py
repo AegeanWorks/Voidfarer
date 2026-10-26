@@ -906,6 +906,10 @@ class SimulationEngine:
                 "precursor_watch": 0,
                 "nebula_collective": 0,
                 "outlaw_corsairs": -15,
+                "kepler_concord": 0,
+                "helios_compact": 0,
+                "ashen_choir": 0,
+                "iron_meridian": 0,
             },
             corp_standings={
                 "hyperion_dynamics": 0,
@@ -913,6 +917,8 @@ class SimulationEngine:
                 "omnicorp_mining": 0,
                 "nexus_cybernetics": 0,
                 "vortex_fuel": 0,
+                "helios_forge": 0,
+                "choir_reliquary": 0,
             },
         )
 
@@ -5768,12 +5774,10 @@ class SimulationEngine:
             stats["landings"] = stats.get("landings", 0) + 1
             stats["credits_earned"] = stats.get("credits_earned", 0) + reward
             log_entry = f"SURFACE LANDING: Touched down on {body.name}. Survey reward +{reward} cr."
-            new_contracts, contract_logs = self._progress_contracts("surface", 1)
             new_ship = self._clone_ship(
                 credits=self.state.ship.credits + reward,
                 landed_body_id=body_id,
-                active_contracts=new_contracts,
-                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log_entry] + contract_logs),
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log_entry]),
             )
             self.state = self._clone_state(ship=new_ship, stats=stats)
             if self.allow_decision_events:

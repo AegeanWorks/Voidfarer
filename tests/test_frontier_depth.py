@@ -55,6 +55,14 @@ class FrontierContentTest(unittest.TestCase):
         self.assertLess(after, before)
         self.assertTrue(any(body.devastation > 0 for body in devastated.bodies))
 
+    def test_initial_standings_include_frontier_powers(self):
+        engine = SimulationEngine(seed=42)
+        for faction_id in ("kepler_concord", "helios_compact", "ashen_choir", "iron_meridian"):
+            self.assertIn(faction_id, engine.state.ship.faction_standings)
+            self.assertEqual(engine.state.ship.faction_standings[faction_id], 0)
+        for corp_id in ("helios_forge", "choir_reliquary"):
+            self.assertIn(corp_id, engine.state.ship.corp_standings)
+
     def test_contract_board_has_new_categories(self):
         for category in ("pirates", "delivery", "surface", "anomaly", "diplomacy"):
             contract = generate_contract(__import__("random").Random(3), category=category)
@@ -262,6 +270,8 @@ class FrontierApiTest(unittest.TestCase):
         status, data = self._request("POST", "/api/contracts/refresh", {})
         self.assertEqual(status, 409)
         self.assertFalse(data["ok"])
+        self.assertIn("Decision required", data["message"])
+        self.assertIn("pending_decision", data["state"])
         status, data = self._request("POST", "/api/decision/resolve", {"choice_id": definition.choices[0].id})
         self.assertEqual(status, 200)
         self.assertTrue(data["ok"])
@@ -273,6 +283,8 @@ class FrontierApiTest(unittest.TestCase):
         engine.state = engine._clone_state(active_pirate=pirate)
         status, data = self._request("POST", "/api/trade", {"commodity_id": "titanium", "quantity": 1, "is_buy": True})
         self.assertEqual(status, 409)
+        self.assertIn("Pirate intercept", data["message"])
+        self.assertIn("active_pirate", data["state"])
         status, data = self._request("POST", "/api/pirate/resolve", {"action": "pay"})
         self.assertEqual(status, 200)
         self.assertTrue(data["ok"], data)

@@ -121,8 +121,11 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
                 trimmed[key] = {k: v for k, v in snapshot.items() if k not in STATIC_SNAPSHOT_KEYS}
         return trimmed
 
-    def _send_error_json(self, message: str, status: int = 400) -> None:
-        self._send_json({"ok": False, "error": message}, status=status)
+    def _send_error_json(self, message: str, status: int = 400, include_state: bool = False) -> None:
+        payload: dict[str, Any] = {"ok": False, "error": message, "message": message}
+        if include_state and getattr(self, "engine", None) is not None:
+            payload["state"] = self.engine.get_status_snapshot()
+        self._send_json(payload, status=status)
 
     def _read_body_json(self) -> dict[str, Any]:
         raw_length = self.headers.get("Content-Length", "0")
@@ -410,6 +413,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_error_json(
                 f"Decision required: {pending.title}. Resolve it before continuing.",
                 status=HTTPStatus.CONFLICT,
+                include_state=True,
             )
             return
 
@@ -422,6 +426,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
                 f"Pirate intercept unresolved: {pirate.band_name} demands {pirate.toll_credits} cr. "
                 "Pay, fight, or evade before continuing.",
                 status=HTTPStatus.CONFLICT,
+                include_state=True,
             )
             return
 
