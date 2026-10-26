@@ -1,55 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "frontier-postpush-audit",
+    "task_id": "anomaly-escape-audit",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793003074.969729,
+    "updated_at": 1793004219.2385762,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": [],
-    "completed_at": 1793003106.305255
+    "completed_at": 1793004235.6537282
   },
   "checkpoints": [
-    {
-      "task_id": "grand-strategy-v1",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'grand-strategy-v1' completed successfully.",
-      "status": "completed",
-      "timestamp": 1792935628.391652,
-      "timestamp_str": "2026-10-25 16:40:28",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "ability-bar-balance-v1",
-      "phase": "planning",
-      "phase_num": 2,
-      "description": "[1/5] Plan: (1) replace the bottom-strip TRAINING chips with the commander's activatable abilities (icons, SHIFT+1..6 hotkeys, cooldown/ready state, click-to-use, charm target resolution); (2) make abilities progress (unlock charm/trade at skill 7, overclock becomes a timed reactor surge) and rebalance yields; (3) rebalance outpost yields/upgrades and early combat threat; (4) ADR-058 and README; (5) 100% tests, 4/4 gates, real-browser UI review by vision model",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792948323.2125654,
-      "timestamp_str": "2026-10-25 20:12:03",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The bottom-strip SKILLS panel trains passive ranks with SHIFT+1..6, but the design calls for the commander's activatable powers (Reactor Overclock, Emergency Repair, ...) with hotkeys; two of six abilities are unreachable, overclock is a duplicate of the reactor-mode button, and measured economy data shows outposts pay back in 1-1.5 months while early combat kills in 3 shots without hull damage.",
-        "benefits": "The cockpit's most-used strip becomes a tactical ability bar; all six powers are reachable through play; overclock is a unique burst; outposts become a longer-term investment than active play; early fights carry real risk; ability and outpost values are documented with measured numbers.",
-        "risks": "contract: new ReactorState surge fields and ability-unlock thresholds must stay save-compatible; outpost and enemy stat changes shift documented balance; UI contract surface (static/server) changes; dependency: none beyond the standard library; concurrency: engine lock unchanged, no new threads; state: ReactorState gains defaulted fields, character abilities gain entries only",
-        "mitigation": "Backward-compatible defaults on every new field, or-from_dict tests for old saves, ability unlock additive to existing tuples, measured before/after simulation table in ADR-058, failing-first tests for each balance assertion, bounded UI diff inside the cockpit surface, full suite and 4/4 gates before any delivery"
-      }
-    },
-    {
-      "task_id": "ability-bar-balance-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/5] Ability bar + balance verified: 576 tests, 4/4 gates, real-browser captures at 1920/1366/1280; vision review found clipped labels and hidden hint, both fixed and re-approved (4 READY, 2 LOCKED, SHIFT hint visible); ADR-058 and README updated; checklists: passed; delivery pending user authorization",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792950541.617316,
-      "timestamp_str": "2026-10-25 20:49:01",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "ability-bar-balance-v1",
       "phase": "phase 4",
@@ -286,6 +248,49 @@
       "status": "completed",
       "timestamp": 1793003106.3052566,
       "timestamp_str": "2026-10-26 11:25:06",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "anomaly-escape-audit",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Stress-test the live frontier loops, add guaranteed anomaly escape branches, enforce the invariant in tests, and re-run gates.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793004175.91049,
+      "timestamp_str": "2026-10-26 11:42:55",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "A long deterministic simulation showed three old anomaly profiles had only power-gated choices; low reactor power could leave no valid resolution.",
+        "benefits": "Every anomaly now has a no-power withdrawal, so the encounter can always clear without soft-locking flight.",
+        "risks": "contract: additive catalog choices only; dependency: none; concurrency: engine lock unchanged; state: legacy saves and RNG streams remain stable",
+        "mitigation": "Add one escape per anomaly, enforce a catalog test, run a 1,200-tick stress pass and full 4/4 gates"
+      }
+    },
+    {
+      "task_id": "anomaly-escape-audit",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Added explicit power-free withdrawal choices to Derelict Dreadnought, Tachyon Rift and Pirate Lure Beacon; added a catalog invariant test; 1,200-tick live-encounter stress pass showed no invariant violations. checklists: passed (4/4 gates). Tests: 623.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793004219.2385762,
+      "timestamp_str": "2026-10-26 11:43:39",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "623 tests and 4/4 gates",
+        "next": "commit ledger, strict check, push",
+        "evidence": "ui-review/postpush and ADR-063"
+      }
+    },
+    {
+      "task_id": "anomaly-escape-audit",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'anomaly-escape-audit' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793004235.653732,
+      "timestamp_str": "2026-10-26 11:43:55",
       "agent": "kilo:1"
     }
   ]
