@@ -2931,7 +2931,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.crewRoster.innerHTML = crew.length ? crew.map(m => {
                 const morale = Math.round(m.morale);
                 const moraleClass = morale < 20 ? "crew-morale-critical" : (morale < 35 ? "crew-morale-low" : "");
-                const moraleNote = morale < 20 ? " âš  NEAR DESERTION" : (morale < 35 ? " LOW" : "");
+                const moraleNote = morale < 20 ? " !! NEAR DESERTION" : (morale < 35 ? " LOW" : "");
                 const injury = Number(m.injury_ticks || 0);
                 const xpToNext = Math.max(1, Number(m.skill || 1) * 40);
                 const away = (this.state.away_report?.active || []).find(mission => (mission.crew_ids || []).includes(m.id));
@@ -5266,8 +5266,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     </div>
                     <div class="war-meta">${(w.fronts || []).length} front lane(s) · ${captured} system(s) taken · since tick ${w.started_tick}</div>
                     <div class="war-actions">
-                        <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.attacker_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.attacker.split(" ")[0].toUpperCase())} Â· 500</button>
-                        <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.defender_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.defender.split(" ")[0].toUpperCase())} Â· 500</button>
+                        <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.attacker_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.attacker.split(" ")[0].toUpperCase())} / 500</button>
+                        <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.defender_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.defender.split(" ")[0].toUpperCase())} / 500</button>
                     </div>
                     ${pledge(w.attacker_id) || pledge(w.defender_id) ? `<div class="war-meta">Your pledges: ${pledge(w.attacker_id)} / ${pledge(w.defender_id)} cr</div>` : ""}
                 </div>`;

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `74`
 - **Total Classes**: `198`
 - **Total Top-Level Functions**: `255`
-- **Total Class Methods**: `1096`
-- **Total Source Lines**: `32231`
+- **Total Class Methods**: `1097`
+- **Total Source Lines**: `32245`
 
 ---
 
@@ -610,7 +610,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `338` lines (`16504` bytes)
+**Size**: `352` lines (`17146` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
@@ -634,6 +634,7 @@
   - Method `.test_landing_opens_choices_and_marks_site_branch_worked()`
 - `class FrontierUiContractTest`
   - Method `.test_cockpit_has_new_mechanics_surfaces()`
+  - Method `.test_source_files_have_no_mojibake()`
 - `class FrontierApiTest`
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
@@ -1378,7 +1379,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2925` lines (`150042` bytes)
+**Size**: `2925` lines (`150038` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2137,7 +2138,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1276` lines (`54314` bytes)
+**Size**: `1276` lines (`54307` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

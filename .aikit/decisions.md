@@ -779,3 +779,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. A catalog test enforces one power-free escape per anomaly, so a future anomaly cannot strand a low-power ship.
   3. A 1,200-tick deterministic stress run with live encounter events produced no invariant violations: credits/fuel/hull stayed non-negative, populations stayed non-negative, and all 23 systems remained present through 16 wars and repeated decisions.
 - **Consequences**: Active anomalies cannot deadlock flight through unmet power gates; failed checks still cause their intended hull damage and clear the encounter. Suite: 623 tests (36 suites).
+
+### ADR-064: Last-Ten-Commit Audit and Source Encoding Cleanup
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: The user asked for a commit-by-commit verification of the last ten pushes. The audit covered the frontier feature commit, the freight-label fix, the UI evidence/map/task bookkeeping commits, the post-push hardening commit, the accessibility commit, the anomaly-escape fix and its bookkeeping. Besides logic checks, a text scan found mojibake introduced in the crew morale labels and older cockpit/server banner strings.
+- **Decision**:
+  1. Replace corrupted `⚠`/`·`/emoji sequences in `cli.py`, `static/app.js` and `server.py` with ASCII-safe labels (`!! NEAR DESERTION`, ` / `, `[COSMIC TIME]` text).
+  2. Add a source-encoding regression test that scans all Python modules and the three cockpit static files for common mojibake markers. Generated ADR history is deliberately excluded.
+  3. Reconfirm the feature and hardening commits: 623 tests pass, 4/4 gates pass, the 1,200-tick live-encounter stress pass remains clean, all 23 systems stay connected, all 9 factions are present in the roster, all 9 anomalies have a power-free exit, and cockpit panels match the gold/navy theme at 1920/1366/1280.
+- **Consequences**: Player-visible text no longer contains encoding damage, and future source edits that reintroduce it fail the suite. The last ten commits are audited as feature, UI evidence, map/ledger, hardening, accessibility, anomaly-escape and bookkeeping changes with no remaining invariant failures. Suite: 624 tests (36 suites).

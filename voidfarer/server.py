@@ -419,7 +419,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if (
             self.engine.state.active_pirate is not None
-            and path not in ("/api/pirate/resolve", "/api/time", "/api/save")
+            and path not in ("/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save")
         ):
             pirate = self.engine.state.active_pirate
             self._send_error_json(
@@ -1211,10 +1211,10 @@ def run_server(
         return 1
     url = f"http://{host}:{port}"
     print(f"\n=======================================================")
-    print(f"ğŸš€ VOIDFARER HOLOGRAPHIC COCKPIT ACTIVE")
-    print(f"ğŸ“¡ Cockpit HUD URL: {url}")
-    print(f"â ±ï¸  Cosmic Time: {engine.state.time.current_date} (Tick #{engine.state.time.tick})")
-    print(f"âš¡ Press Ctrl+C to disconnect sub-space uplink")
+    print("  VOIDFARER HOLOGRAPHIC COCKPIT ACTIVE")
+    print(f"  Cockpit HUD URL: {url}")
+    print(f"  Cosmic Time: {engine.state.time.current_date} (Tick #{engine.state.time.tick})")
+    print("  Press Ctrl+C to disconnect sub-space uplink")
     print(f"=======================================================\n")
 
     ticker_stop = threading.Event()

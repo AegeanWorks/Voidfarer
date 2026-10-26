@@ -220,6 +220,20 @@ class FrontierUiContractTest(unittest.TestCase):
         self.assertIn("height: auto", css)
         self.assertIn("#targetDevastation.is-devastated", css)
 
+    def test_source_files_have_no_mojibake(self):
+        root = Path(__file__).parent.parent
+        paths = list((root / "voidfarer").glob("*.py"))
+        paths.extend([
+            root / "voidfarer" / "static" / "app.js",
+            root / "voidfarer" / "static" / "index.html",
+            root / "voidfarer" / "static" / "style.css",
+        ])
+        for path in paths:
+            text = path.read_text(encoding="utf-8")
+            for marker in ("â", "Â", "Ã", "ð"):
+                self.assertNotIn(marker, text, f"mojibake {marker!r} in {path.name}")
+        (root / ".aikit" / "decisions.md").read_text(encoding="utf-8")
+
 
 class FrontierApiTest(unittest.TestCase):
     @classmethod

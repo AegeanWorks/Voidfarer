@@ -1737,7 +1737,7 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
         print(f"\n{BOLD}{CYAN}=== CREW ROSTER ==={RESET}")
         print(f"Active {report['active']}/{report['capacity']} | Upkeep {report['upkeep']} cr/month")
         for member in report["crew"]:
-            morale_note = f"{RED}âš  NEAR DESERTION{RESET}" if member["morale"] < 20 else (f"{YELLOW}LOW{RESET}" if member["morale"] < 35 else f"{GREEN}OK{RESET}")
+            morale_note = f"{RED}!! NEAR DESERTION{RESET}" if member["morale"] < 20 else (f"{YELLOW}LOW{RESET}" if member["morale"] < 35 else f"{GREEN}OK{RESET}")
             injury_note = f" {RED}INJURED {member.get('injury_ticks', 0)}t{RESET}" if member.get("injury_ticks", 0) else ""
             xp_note = f"{CYAN}XP {member.get('xp', 0)}/{max(1, member['skill'] * 40)}{RESET}"
             print(
