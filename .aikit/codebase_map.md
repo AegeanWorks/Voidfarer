@@ -10,7 +10,7 @@
 - **Total Classes**: `198`
 - **Total Top-Level Functions**: `255`
 - **Total Class Methods**: `1098`
-- **Total Source Lines**: `32278`
+- **Total Source Lines**: `32280`
 
 ---
 
@@ -610,7 +610,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `385` lines (`19054` bytes)
+**Size**: `387` lines (`19202` bytes)
 
 **Classes:**
 - `class FrontierContentTest`

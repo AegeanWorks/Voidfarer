@@ -265,7 +265,9 @@ class FrontierUiContractTest(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             for marker in ("â", "Â", "Ã", "ð"):
                 self.assertNotIn(marker, text, f"mojibake {marker!r} in {path.name}")
-        (root / ".aikit" / "decisions.md").read_text(encoding="utf-8")
+        decisions = (root / ".aikit" / "decisions.md").read_text(encoding="utf-8")
+        for marker in ("â", "Â", "Ã", "ð"):
+            self.assertNotIn(marker, decisions, f"mojibake {marker!r} in decisions.md")
 
 
 class FrontierApiTest(unittest.TestCase):
