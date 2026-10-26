@@ -2314,11 +2314,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const ship = this.state?.ship || {};
         const orders = ship.trade_orders || data?.orders || [];
         this.quantumFreight.style.display = "";
+        const commodityNames = new Map(
+            (this.state?.market_quotes || []).map(quote => [quote.commodity_id, quote.name])
+        );
         const orderRows = orders.length ? orders.map(order => {
             const eta = Math.max(0, Number(order.arrival_tick || 0) - Number(this.state.time?.tick || 0));
+            const commodityName = commodityNames.get(order.commodity_id) || order.commodity_id;
             return `<div class="quantum-order-row">
                 <span class="q-order-id">${this.escapeHtml(order.id)}</span>
-                <span>${order.quantity}x ${this.escapeHtml(order.commodity_id)} -> ${this.escapeHtml(order.destination_name)}</span>
+                <span>${order.quantity}x ${this.escapeHtml(commodityName)} -> ${this.escapeHtml(order.destination_name)}</span>
                 <span class="q-order-eta">ETA ${eta}T</span>
             </div>`;
         }).join("") : `<p class="panel-intro-text">No freight in transit.</p>`;
