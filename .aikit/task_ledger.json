@@ -2,43 +2,16 @@
   "version": 1,
   "active_task": {
     "task_id": "frontier-postpush-audit",
-    "last_phase": "phase 2",
-    "active_phase": 2,
-    "status": "in_progress",
-    "updated_at": 1793002770.4764476,
+    "last_phase": "phase 4",
+    "active_phase": 5,
+    "status": "completed",
+    "updated_at": 1793003074.969729,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": [],
-    "impact_assessment": {
-      "why": "The user asked to continue verifying the last push, fix whatever is needed, and check graphical fit with subagents.",
-      "benefits": "Prevents 409 responses from corrupting cockpit state, closes REPL bypasses, initializes frontier standings, fixes double-counted surface contracts and false field-rest risk, and keeps land/surface graphics coherent.",
-      "risks": "contract: additive state/error payloads and UI guards; dependency: none; concurrency: engine lock and REPL/HTTP guards; state: old saves and deterministic RNG must remain stable",
-      "mitigation": "Add regression assertions, gate blocked actions, run 4/4 checks, review natural Edge captures with the free vision subagent, then commit/push"
-    }
+    "completed_at": 1793003106.305255
   },
   "checkpoints": [
-    {
-      "task_id": "grand-strategy-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/5] Grand-strategy layer reviewed and hardened: cargo cost basis reconciles every hold mutation, defender-only last stand, capital falls last, transit risk floor 3%, monthly payroll log ordering, war in REPL, outpost options from can_build_on, pan-cached territory layer, sprite LRU, equal 3-column 1280 strip, fresh system owner dossier; 570 tests; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792934514.8205342,
-      "timestamp_str": "2026-10-25 16:21:54",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "grand-strategy-v1",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[5/5] Cockpit evidence: real-browser captures at 1280x720, 1366x768, 1920x1080, 4K; vision review found clipped edge labels and a tight legend, both fixed and re-approved; README tree updated; 4/4 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1792935553.904484,
-      "timestamp_str": "2026-10-25 16:39:13",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "grand-strategy-v1",
       "phase": "completed",
@@ -288,6 +261,32 @@
         "risks": "contract: additive state/error payloads and UI guards; dependency: none; concurrency: engine lock and REPL/HTTP guards; state: old saves and deterministic RNG must remain stable",
         "mitigation": "Add regression assertions, gate blocked actions, run 4/4 checks, review natural Edge captures with the free vision subagent, then commit/push"
       }
+    },
+    {
+      "task_id": "frontier-postpush-audit",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[3/3] Post-push audit complete: 409 responses now carry message/state, new cockpit handlers guard missing state, REPL and HTTP locks cover decisions and pirates, frontier factions/corps are initialized, surface contracts only advance on operations, field rest is risk-free, uninhabited bodies no longer gain devastation, and contract tooltips expose full titles. Graphical review covered galaxy, faction bottom, contracts, active freight order, and scrolled surface ops; normal panel scrolling explains the apparent clipped rows. checklists: passed (4/4 gates). Tests: 622. UI cockpit task finished with aria-live polish.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793003074.969729,
+      "timestamp_str": "2026-10-26 11:24:34",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "622 tests and 4/4 gates",
+        "next": "commit ledger and push origin/master",
+        "evidence": "ui-review/postpush and ADR-062"
+      }
+    },
+    {
+      "task_id": "frontier-postpush-audit",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'frontier-postpush-audit' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793003106.3052566,
+      "timestamp_str": "2026-10-26 11:25:06",
+      "agent": "kilo:1"
     }
   ]
 }
