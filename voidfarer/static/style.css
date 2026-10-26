@@ -8175,3 +8175,33 @@ body.cockpit-theme .panel-center {
   .panel-left .deck-tabs-header::before { top: 6px; padding-bottom: 4px; }
   .panel-left .deck-tabs-header::after { padding: 4px 4px 0; line-height: 1.35; }
 }
+
+/* Crew rows: keep identity readable and place morale on its own row under it. */
+.crew-row {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, auto) auto;
+    row-gap: 4px;
+}
+.crew-row .crew-portrait { grid-column: 1; grid-row: 1 / span 2; }
+.crew-row .crew-info-block { grid-column: 2; grid-row: 1; }
+.crew-row .crew-morale-bar { grid-column: 2; grid-row: 2; width: 100%; max-width: none; margin: 0; }
+.crew-row .crew-actions { grid-column: 3; grid-row: 1 / span 2; }
+
+/* Quantum lanes: stack metadata under the route at laptop widths instead of squeezing four columns. */
+@media (max-width: 1500px) {
+    .quantum-route-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "main action"
+            "meta net";
+        row-gap: 4px;
+    }
+    .q-route-main { grid-area: main; }
+    .q-route-meta { grid-area: meta; flex-direction: row; align-items: baseline; justify-content: flex-start; gap: 7px; }
+    .q-route-net { grid-area: net; flex-direction: row; align-items: baseline; justify-content: flex-end; gap: 5px; }
+    .quantum-route-row .btn-hud { grid-area: action; align-self: center; }
+}
+
+/* Crew morale gets a dedicated row; the role/XP/status line may wrap above it. */
+.crew-row .crew-info-block small { white-space: normal; overflow: visible; text-overflow: clip; }
+.crew-row .crew-morale-text { white-space: nowrap; }

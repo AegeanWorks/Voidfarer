@@ -682,7 +682,7 @@ class TestCrewSimulationCockpit(unittest.TestCase):
 
     def test_crew_section_source_order(self):
         order = []
-        for element_id in ("crewCashFlow", "crewAssignments", "crewRoster", "crewShoreRow"):
+        for element_id in ("crewCashFlow", "crewRoster", "crewShoreRow", "crewAssignments"):
             index = self.html.find(f'id="{element_id}"')
             self.assertGreaterEqual(index, 0, f"#{element_id} missing from index.html")
             order.append(index)

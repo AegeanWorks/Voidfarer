@@ -785,7 +785,7 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Status**: Accepted
 - **Context**: The user asked for a commit-by-commit verification of the last ten pushes. The audit covered the frontier feature commit, the freight-label fix, the UI evidence/map/task bookkeeping commits, the post-push hardening commit, the accessibility commit, the anomaly-escape fix and its bookkeeping. Besides logic checks, a text scan found mojibake introduced in the crew morale labels and older cockpit/server banner strings.
 - **Decision**:
-  1. Replace corrupted `⚠`/`·`/emoji sequences in `cli.py`, `static/app.js` and `server.py` with ASCII-safe labels (`!! NEAR DESERTION`, ` / `, `[COSMIC TIME]` text).
+  1. Replace corrupted `⚠`/`|`/emoji sequences in `cli.py`, `static/app.js` and `server.py` with ASCII-safe labels (`!! NEAR DESERTION`, ` / `, `[COSMIC TIME]` text).
   2. Add a source-encoding regression test that scans all Python modules and the three cockpit static files for common mojibake markers. Generated ADR history is deliberately excluded.
   3. Reconfirm the feature and hardening commits: 623 tests pass, 4/4 gates pass, the 1,200-tick live-encounter stress pass remains clean, all 23 systems stay connected, all 9 factions are present in the roster, all 9 anomalies have a power-free exit, and cockpit panels match the gold/navy theme at 1920/1366/1280.
 - **Consequences**: Player-visible text no longer contains encoding damage, and future source edits that reintroduce it fail the suite. The last ten commits are audited as feature, UI evidence, map/ledger, hardening, accessibility, anomaly-escape and bookkeeping changes with no remaining invariant failures. Suite: 624 tests (36 suites).
@@ -803,3 +803,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Context**: The encoding audit found old ADR lines with double-encoded dashes, arrows and ellipses. The new source test covered code and static assets but only required the ADR register to decode, not to be marker-free.
 - **Decision**: Normalize the legacy ADR punctuation to ASCII (`--`, `->`, `...`), add the ADR register to the mojibake-marker assertion, and verify the low-morale crew label in a real Edge capture (`10 !! NEAR DESERTION`, no corrupted glyphs).
 - **Consequences**: Documentation is consistently UTF-8 and free of the known mojibake markers; the encoding regression test now covers the full source tree and ADR register. Suite: 625 tests (36 suites).
+
+### ADR-067: Cockpit Layout Corrections from Image Review
+- **Date**: 2026-10-26
+- **Status**: Accepted
+- **Context**: Natural 1366x768 and 1280x720 captures showed the crew morale line competing with the role/XP line, and quantum freight route metadata squeezing FEE/NET/SHIP into narrow columns. The crew roster also sat below shore leave and role recruitment, hiding the actual people first.
+- **Decision**:
+  1. Give each crew row a dedicated second line for the morale bar, keep the portrait spanning both rows and the action column aligned, and allow the role/XP/status line to wrap instead of clipping.
+  2. Order the roster as cash flow, roster, shore leave, then assignments/roles, so the people lead the tab.
+  3. At widths below 1500px, stack quantum route metadata under the commodity/destination line and keep SHIP plus NET on the second row.
+- **Consequences**: Natural captures at 1366 and 1280 show `engineer | SKILL 3 | XP 0/120` and `!! NEAR DESERTION` in full, with aligned portraits/actions, and readable freight rows (`Titanium Alloy x8`, destination, `3J / 9T`, FEE, NET, SHIP). The free vision reviewer approved both panels and the gold/navy theme. Suite: 625 tests (36 suites).
