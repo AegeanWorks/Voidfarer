@@ -264,5 +264,19 @@
     "final_snapshot_digest": "05aa1712917a68e66f3eb54c6a4ff33d2a1d3697edf779cbe4afab69af45bfd5",
     "final_snapshot_entries": 909,
     "surface_digest": "e282998b8800e16c7bdfefc8da4668535cba604bf94d9a7dd3010fe4f8382ae1"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "4f02845cfd99fd46668fefaf317d0fabc9911674",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793096460.2056243,
+    "finished_at": 1793099342.1859934,
+    "strikes": 2,
+    "reviewer": "NVIDIA Nemotron 3.5 Super VL (free) vision subagent via Kilo, authorized by the user; reviewed 12 cockpit captures at 1280x720 and 1920x1080 on 2026-10-27",
+    "allowed_removals": [],
+    "final_snapshot_digest": "47d5de707a20f89e95c10a1fda7efd8bfc0c816c09d7c32979d60104930eddda",
+    "final_snapshot_entries": 915,
+    "surface_digest": "8007281a8ae8313330ce9f8548c9243ffba0baf45a2e9c433155395791aa4a24"
   }
 ]

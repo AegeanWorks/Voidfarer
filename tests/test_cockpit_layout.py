@@ -956,6 +956,7 @@ class TestTerminalDeckScrolling(unittest.TestCase):
     def setUpClass(cls):
         cls.css = STYLE_CSS.read_text(encoding="utf-8")
         cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
 
     def test_active_tab_content_scrolls_within_the_left_deck(self):
         self.assertRegex(
@@ -988,3 +989,10 @@ class TestTerminalDeckScrolling(unittest.TestCase):
         self.assertIn("hasDysonSwarm", self.js)
         self.assertIn('if (b.body_type === "star" && hasDysonSwarm)', self.js)
         self.assertIn('b.body_type === "dyson_sphere" ? cx', self.js)
+
+    def test_more_below_cue_is_a_real_element_not_the_decorative_frame(self):
+        self.assertIn('id="deckScrollCue"', self.html)
+        self.assertIn("deck-scroll-cue", self.css)
+        self.assertIn(".panel-left.has-more-below .deck-scroll-cue", self.css)
+        self.assertIn("initDeckScrollHint", self.js)
+        self.assertIn('classList.toggle("has-more-below"', self.js)

@@ -5,29 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793093922.4161434,
+    "updated_at": 1793099451.144429,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "doc-encoding-final",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Normalize legacy ADR mojibake, extend the encoding guard to decisions.md, and visually verify the low-morale crew label.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793011365.5224068,
-      "timestamp_str": "2026-10-26 13:42:45",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The last-ten audit found double-encoded old ADR punctuation and the crew morale label needed a real cockpit check.",
-        "benefits": "The generated decision register is marker-free and the source encoding test now covers it; the low-morale crew text is visually clean.",
-        "risks": "contract: documentation/test only; dependency: none; concurrency: none; state: no game behavior, save schema, or RNG change",
-        "mitigation": "Normalize punctuation to ASCII, assert decisions.md in the encoding test, review a 1366px Edge capture, run 4/4 gates"
-      }
-    },
     {
       "task_id": "doc-encoding-final",
       "phase": "phase 4",
@@ -312,6 +295,23 @@
         "next": "commit and push",
         "open": "UI contract needs human --reviewed",
         "evidence": "unittest 657 OK, VL vision 'no defects seen'"
+      }
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[6/6] Added explicit SCROLL cue (real element; ::after collision fixed), removed thin scrollbar override, closed cockpit UI task with free Nemotron VL vision reviewer, tests 658. checklists: passed (tests, hygiene, guidelines, secrets).",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793099451.144429,
+      "timestamp_str": "2026-10-27 14:10:51",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "4/4 gates, UI task closed",
+        "next": "commit and push",
+        "open": "none",
+        "evidence": "ui verify OK, VL vision CUE VISIBLE, unittest 658 OK"
       }
     }
   ]

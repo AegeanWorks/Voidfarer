@@ -378,6 +378,7 @@ class CockpitApp {
         this.initDOMElements();
         this.bindEvents();
         this.initTooltips();
+        this.initDeckScrollHint();
         this.openInitialTerminalTab();
         this.applyViewportProfile();
         this.syncRadarControlState();
@@ -5593,6 +5594,29 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const overlay = document.getElementById("mainMenuOverlay");
         if (overlay) overlay.classList.add("hidden");
         this.sound.playBeep(640, 0.04);
+    }
+
+    initDeckScrollHint() {
+        // Signal that the terminal deck continues below the fold, so a row cut by the
+        // scroll edge reads as "more content" instead of a clipped layout.
+        const stack = document.querySelector("#panelLeft > .terminal-content-stack");
+        if (!stack) return;
+        const host = stack.closest(".panel-left");
+        const sync = () => {
+            const more = stack.scrollTop + stack.clientHeight < stack.scrollHeight - 2;
+            if (host) host.classList.toggle("has-more-below", more);
+        };
+        stack.addEventListener("scroll", sync, { passive: true });
+        if (typeof ResizeObserver === "function") {
+            new ResizeObserver(sync).observe(stack);
+        }
+        if (typeof MutationObserver === "function") {
+            new MutationObserver(() => requestAnimationFrame(sync)).observe(stack, {
+                childList: true,
+                subtree: true,
+            });
+        }
+        sync();
     }
 
     initTooltips() {

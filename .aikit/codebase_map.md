@@ -9,8 +9,8 @@
 - **Total Python Modules**: `77`
 - **Total Classes**: `205`
 - **Total Top-Level Functions**: `277`
-- **Total Class Methods**: `1137`
-- **Total Source Lines**: `33583`
+- **Total Class Methods**: `1138`
+- **Total Source Lines**: `33591`
 
 ---
 
@@ -218,7 +218,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `990` lines (`44845` bytes)
+**Size**: `998` lines (`45288` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -367,6 +367,7 @@
   - Method `.test_left_deck_stretches_its_rows_so_the_scroll_area_has_a_height()`
   - Method `.test_faction_list_fills_the_deck_instead_of_a_pixel_cap()`
   - Method `.test_dyson_shell_replaces_the_star_corona()`
+  - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
 
 ---
 

@@ -895,3 +895,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Replace the faction panel's `max-height: 520px` with `max-height: 100%` so it fills the deck.
   5. On capture, inhabited and dockable sites adopt the winner's flag and government, while empty bodies become `Unclaimed`/`None`, matching how generation leaves an owned system.
 - **Consequences**: The swarm now renders as a shell of discrete collector panels around a small core in both 1280 and 1920 captures, with legible 0.90 g and population figures. Empire and faction content scroll to their last row and card without being clipped. The vision pass reports no remaining defects on the five re-captured surfaces, and console errors stay at zero. Suite: 657 tests (37 suites), adding CSS-contract tests for the deck scroller and faction cap plus a swarm-physics test.
+
+### ADR-075: Explicit Deck Scroll Cue and AI-Assisted UI Contract Sign-Off
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: The vision reviewer still flagged the last row of a scrolling terminal tab as clipped, because Edge uses an overlay scrollbar that never appears in a static capture and the decorative `.panel-left::after` frame rule (content `""`) silently overrode the first gradient cue. The user then authorized an AI subagent to perform the UI review in place of a human, which makes the `ui` contract's review step possible without a false human-review claim.
+- **Decision**:
+  1. Add a real `#deckScrollCue` element ("SCROLL ▾") instead of a pseudo-element, styled as a small gold-bordered badge and shown only while the deck has more content below; the existing `has-more-below` toggle drives it and disappears at the end of the list.
+  2. Keep the WebKit scrollbar rules but drop `scrollbar-width: thin`, which had disabled them and left only the transient overlay bar.
+  3. Close the cockpit UI task for the current static surface, recording the reviewer as the NVIDIA Nemotron 3.5 Super VL vision subagent, authorized by the user, against 12 captures at 1280x720 and 1920x1080.
+- **Consequences**: The cue renders at 1280 and 1920 (69x17 px, opacity 1 at the top of a scroll, 0 at the bottom) and the vision reviewer confirms it reads as "more content below". The UI contract now has a finished task with a surface digest instead of a standing warning. Suite: 658 tests (37 suites).

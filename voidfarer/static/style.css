@@ -5192,6 +5192,31 @@ body.cockpit-theme {
     min-height: 0;
     align-items: stretch;
     overflow: hidden;
+    position: relative;
+}
+
+/* "More below" cue: the deck is scrolled, so a row at the fold is clipped by the
+   viewport rather than by a broken layout. Removed automatically at the end.
+   A real element is used because a later decorative ::after owns the panel frame. */
+.deck-scroll-cue {
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    z-index: 6;
+    padding: 2px 7px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    color: rgba(201, 163, 90, 0.95);
+    background: rgba(6, 10, 18, 0.94);
+    border: 1px solid rgba(201, 163, 90, 0.45);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+}
+.panel-left.has-more-below .deck-scroll-cue {
+    opacity: 1;
 }
 
 /* The tab rail stays put while the active tab scrolls; without this the Empire,
@@ -5200,8 +5225,8 @@ body.cockpit-theme {
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(201, 163, 90, 0.55) transparent;
+    /* No scrollbar-width here: it would disable the always-visible WebKit bar below
+       and leave Edge with a transient overlay scrollbar. */
     padding-right: 4px;
 }
 .panel-left > .terminal-content-stack::-webkit-scrollbar {
