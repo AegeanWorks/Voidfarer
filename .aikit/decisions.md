@@ -883,3 +883,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Pass a `broke_factions` set into `simulate_faction_behaviors` so an unfunded fleet cannot declare war.
   5. Serve static assets with an explicit `charset=utf-8`, which also removes any dependence on the document encoding for future non-ASCII cockpit strings.
 - **Consequences**: Conquered worlds report the winner's flag, government, technology and capacity; outposts stop at their housing ceiling; the cockpit and backend cannot drift on devastation loss; a broke faction only defends. An investigation note: em dashes in the empire panel appeared as replacement characters in the audit console, but the DOM held U+2014 and the header change was hardening, not a rendering fix. Suite: 652 tests (37 suites); Edge audit at 1280x720 and 1920x1080 shows no overflow and no console errors.
+
+### ADR-074: Dyson Swarm Composition, Megastructure Physics and Scrollable Terminal Decks
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: A vision review of the real cockpit captures (performed by the free NVIDIA Nemotron 3.5 Super VL model through Kilo, because the primary model rejects image input) rejected two surfaces that DOM metrics had passed. The Sol swarm still read as one bright globe because its shell was drawn 2 px from the primary on top of the star's 3.2r corona and radiating rays. Separately, the left terminal deck had no scroll container: at 1280x720 the Empire tab was 1861 px tall inside a 529 px deck, so most of the research, outpost, diplomacy and faction content was unreachable. The faction list was additionally capped at a hard 520 px, wasting space on 1080p.
+- **Decision**:
+  1. Pin the swarm to the system centre, suppress the star sprite and its corona whenever a Dyson swarm exists, and let the swarm paint its own enclosed core; apply the same pinned position to hover and click hit-testing.
+  2. Give megastructures honest physics: the swarm has 0.90 g from its habitat rings and a vacuum-outside atmosphere, and the ring world uses engineered 1.00 g instead of gravity derived from its megastructure radius.
+  3. Make `#panelLeft > .terminal-content-stack` the scroll container (`overflow-y: auto`, `overscroll-behavior: contain`, visible thin scrollbar) and stretch the deck grid rows so that container has a height.
+  4. Replace the faction panel's `max-height: 520px` with `max-height: 100%` so it fills the deck.
+  5. On capture, inhabited and dockable sites adopt the winner's flag and government, while empty bodies become `Unclaimed`/`None`, matching how generation leaves an owned system.
+- **Consequences**: The swarm now renders as a shell of discrete collector panels around a small core in both 1280 and 1920 captures, with legible 0.90 g and population figures. Empire and faction content scroll to their last row and card without being clipped. The vision pass reports no remaining defects on the five re-captured surfaces, and console errors stay at zero. Suite: 657 tests (37 suites), adding CSS-contract tests for the deck scroller and faction cap plus a swarm-physics test.

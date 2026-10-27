@@ -559,7 +559,7 @@ SCIENTIFIC_ATMO_MAP: dict[str, str] = {
     "orbital_station": "Regulated N2 79%, O2 21% (1.0 atm)",
     "research_outpost": "Regulated N2 78%, O2 21% (0.95 atm)",
     "ring_world": "Regulated N2 78%, O2 21% (1.0 atm, megastructure)",
-    "dyson_sphere": "Engineered stellar atmosphere / collected flux",
+    "dyson_sphere": "Vacuum outside sealed habitat rings (N2/O2 inside)",
     "quantum_relay": "Regulated N2 79%, O2 21% (station habitat)",
     "solar_collector": "Vacuum / photovoltaic lattice",
     "wormhole": "Exotic spacetime throat (no atmosphere)",
@@ -662,6 +662,12 @@ def compute_scientific_planet_properties(
         gravity = 0.40
     elif body_type == "black_hole":
         gravity = 999.0
+    elif body_type == "dyson_sphere":
+        # A collector swarm has no surface. Only its sealed habitat rings provide gravity.
+        gravity = 0.90
+    elif body_type == "ring_world":
+        # Spin gravity is engineered, not derived from the habitat's radius.
+        gravity = 1.00
     else:
         density = rho_min + v * (rho_max - rho_min)
         gravity = round(max(0.02, (radius_km / 6371.0) * (density / 5.514)), 2)

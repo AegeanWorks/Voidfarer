@@ -2704,8 +2704,12 @@ body.void-transit::after {
     flex-direction: column;
     gap: 1.2rem;
     overflow-y: auto;
-    max-height: 520px;
+    /* Fill the deck instead of a magic pixel cap that wasted vertical space on
+       1080p and clipped the last card on 720p. */
+    max-height: 100%;
+    min-height: 0;
     padding-right: 6px;
+    scrollbar-width: thin;
 }
 
 .subpanel-title {
@@ -5186,6 +5190,29 @@ body.cockpit-theme {
     gap: 10px;
     padding: 10px;
     min-height: 0;
+    align-items: stretch;
+    overflow: hidden;
+}
+
+/* The tab rail stays put while the active tab scrolls; without this the Empire,
+   Contracts and Messages tabs extend past the viewport with no way to reach them. */
+.panel-left > .terminal-content-stack {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 163, 90, 0.55) transparent;
+    padding-right: 4px;
+}
+.panel-left > .terminal-content-stack::-webkit-scrollbar {
+    width: 8px;
+}
+.panel-left > .terminal-content-stack::-webkit-scrollbar-thumb {
+    background: rgba(201, 163, 90, 0.55);
+    border-radius: 4px;
+}
+.panel-left > .terminal-content-stack::-webkit-scrollbar-track {
+    background: transparent;
 }
 .panel-center { grid-column: 2; grid-row: 1; min-height: 0; }
 .hud-command-strip {

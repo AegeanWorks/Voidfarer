@@ -947,3 +947,44 @@ class TestPostPushPolishLayout(unittest.TestCase):
         self.assertIn('"surface"', self.browser_tool)
         self.assertIn("def _prepare_surface(", self.browser_tool)
         self.assertIn("engine.allow_decision_events = False", self.browser_tool)
+
+
+class TestTerminalDeckScrolling(unittest.TestCase):
+    """Long terminal tabs must scroll inside the deck instead of running off-screen."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_active_tab_content_scrolls_within_the_left_deck(self):
+        self.assertRegex(
+            self.css,
+            r"\.panel-left\s*>\s*\.terminal-content-stack\s*\{[^}]*overflow-y:\s*auto",
+            re.S,
+        )
+        self.assertRegex(
+            self.css,
+            r"\.panel-left\s*>\s*\.terminal-content-stack\s*\{[^}]*overscroll-behavior:\s*contain",
+            re.S,
+        )
+
+    def test_left_deck_stretches_its_rows_so_the_scroll_area_has_a_height(self):
+        self.assertRegex(
+            self.css,
+            r"\.panel-left\s*\{[^}]*align-items:\s*stretch",
+            re.S,
+        )
+
+    def test_faction_list_fills_the_deck_instead_of_a_pixel_cap(self):
+        self.assertRegex(
+            self.css,
+            r"\.factions-panel\s*\{[^}]*max-height:\s*100%",
+            re.S,
+        )
+        self.assertNotRegex(self.css, r"\.factions-panel\s*\{[^}]*max-height:\s*520px")
+
+    def test_dyson_shell_replaces_the_star_corona(self):
+        self.assertIn("hasDysonSwarm", self.js)
+        self.assertIn('if (b.body_type === "star" && hasDysonSwarm)', self.js)
+        self.assertIn('b.body_type === "dyson_sphere" ? cx', self.js)

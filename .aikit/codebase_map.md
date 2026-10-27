@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `77`
-- **Total Classes**: `204`
+- **Total Classes**: `205`
 - **Total Top-Level Functions**: `277`
-- **Total Class Methods**: `1131`
-- **Total Source Lines**: `33519`
+- **Total Class Methods**: `1137`
+- **Total Source Lines**: `33583`
 
 ---
 
@@ -218,7 +218,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `949` lines (`43372` bytes)
+**Size**: `990` lines (`44845` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -361,6 +361,12 @@
   - Method `.test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths()`
   - Method `.test_compact_reactor_strip_uses_four_proportional_tracks()`
   - Method `.test_surface_ops_scrolls_target_card_and_browser_driver_prepares_surface()`
+- `class TestTerminalDeckScrolling` - *Long terminal tabs must scroll inside the deck instead of running off-screen.*
+  - Method `.setUpClass()`
+  - Method `.test_active_tab_content_scrolls_within_the_left_deck()`
+  - Method `.test_left_deck_stretches_its_rows_so_the_scroll_area_has_a_height()`
+  - Method `.test_faction_list_fills_the_deck_instead_of_a_pixel_cap()`
+  - Method `.test_dyson_shell_replaces_the_star_corona()`
 
 ---
 
@@ -880,7 +886,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `319` lines (`13985` bytes)
+**Size**: `334` lines (`14804` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -894,6 +900,7 @@
   - Method `.test_civil_order_changes_population_growth()`
   - Method `.test_devastation_recovery_scales_with_tech_and_order()`
   - Method `.test_dyson_swarm_is_a_small_maintenance_population_not_a_planet()`
+  - Method `.test_swarm_physics_describe_habitats_not_a_planet_surface()`
 - `class TestWarDevastation`
   - Method `.test_front_worlds_lose_people_and_gain_devastation()`
 - `class TestFactionEconomy`
@@ -1807,7 +1814,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `466` lines (`20837` bytes)
+**Size**: `468` lines (`20988` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -1885,7 +1892,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1276` lines (`56995` bytes)
+**Size**: `1282` lines (`57287` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*

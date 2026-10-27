@@ -293,11 +293,13 @@ def _apply_owner_technology(system: StarSystem, owner_name: str) -> StarSystem:
         bodies.append(
             replace(
                 body,
-                faction=owner_name if inhabited else body.faction,
+                # Inhabited sites fly the winner's flag; empty rocks are unclaimed here,
+                # exactly as generation leaves them in an owned system.
+                faction=owner_name if inhabited else "Unclaimed",
                 government=(
                     government_for(owner_name, body.body_type)
                     if inhabited
-                    else body.government
+                    else "None"
                 ),
                 tech_level=tech,
                 population_capacity=capacity,

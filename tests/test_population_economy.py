@@ -94,6 +94,15 @@ class TestPopulationCapacity(unittest.TestCase):
         self.assertLess(swarm.population_capacity, 1_000_000_000)
         self.assertEqual(swarm.tech_level, 10)
 
+    def test_swarm_physics_describe_habitats_not_a_planet_surface(self):
+        sol = GalaxyGenerator(seed=42).generate_galaxy()["sol"]
+        swarm = next(b for b in sol.bodies if b.body_type == "dyson_sphere")
+        self.assertLess(swarm.gravity, 1.1)
+        self.assertGreater(swarm.gravity, 0.0)
+        self.assertIn("Vacuum outside", swarm.atmosphere)
+        ring = next(b for b in sol.bodies if b.body_type == "ring_world")
+        self.assertEqual(ring.gravity, 1.0)
+
 
 class TestWarDevastation(unittest.TestCase):
     def test_front_worlds_lose_people_and_gain_devastation(self):
@@ -141,6 +150,12 @@ class TestFactionEconomy(unittest.TestCase):
         self.assertLessEqual(after.population, after.population_capacity)
         self.assertEqual(after.faction, "Void Corsairs")
         self.assertEqual(after.government, "Pirate Warlordship")
+        for body in retuned.bodies:
+            if body.body_type in ("star", "black_hole", "wormhole"):
+                continue
+            if body.population == 0 and not body.station_dockable:
+                self.assertEqual(body.faction, "Unclaimed", body.name)
+                self.assertEqual(body.government, "None", body.name)
 
     def test_broke_faction_cannot_open_a_new_front(self):
         systems = GalaxyGenerator(seed=42).generate_galaxy()

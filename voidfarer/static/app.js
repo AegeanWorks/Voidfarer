@@ -4671,8 +4671,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const bodies = curSys.bodies;
         const ship = this.state.ship;
         const now = Date.now() * 0.001;
-
         const auScale = 45 * this.zoom * this.radarScale();
+        // A Dyson swarm encloses its primary. Drawing the star's corona underneath would
+        // bury the collector shell in glare, so the swarm replaces the star sprite.
+        const hasDysonSwarm = bodies.some(b => b.body_type === "dyson_sphere");
+
 
         if (this.radarGrid) {
             ctx.strokeStyle = "rgba(127, 183, 201, 0.06)";
@@ -4691,6 +4694,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         bodies.forEach(b => {
+            if (b.body_type === "star" && hasDysonSwarm) {
+                // The swarm paints its own enclosed core.
+                return;
+            }
             if (b.body_type === "star" && this.celestial) {
                 this.celestial.drawStar(ctx, b, cx, cy, 13 * Math.max(0.8, this.zoom) * Math.min(1.6, this.radarScale()), now);
                 return;
@@ -4731,8 +4738,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
             // Live simulated planetary orbital angle
             const angle = b.current_angle || 0;
-            const bx = cx + Math.cos(angle) * orbitR;
-            const by = cy + Math.sin(angle) * orbitR;
+            let bx = cx + Math.cos(angle) * orbitR;
+            let by = cy + Math.sin(angle) * orbitR;
+            if (b.body_type === "dyson_sphere") {
+                // Pinned to the primary: a swarm is a shell around the star, not a body
+                // orbiting a few pixels away from it.
+                bx = cx;
+                by = cy;
+            }
 
             const bodyRadius = this.bodyDisplayRadius(b);
 
@@ -5201,8 +5214,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 if (b.body_type === "star") continue;
                 const orbitR = b.orbit_radius * auScale;
                 const angle = b.current_angle || 0;
-                const bx = cx + Math.cos(angle) * orbitR;
-                const by = cy + Math.sin(angle) * orbitR;
+                const bx = b.body_type === "dyson_sphere" ? cx : cx + Math.cos(angle) * orbitR;
+                const by = b.body_type === "dyson_sphere" ? cy : cy + Math.sin(angle) * orbitR;
                 const dist = Math.hypot(mx - bx, my - by);
                 if (dist < Math.max(18, this.bodyDisplayRadius(b) + 4)) {
                     hit = { item: b, type: "body" };
@@ -5244,8 +5257,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 if (b.body_type === "star") continue;
                 const orbitR = b.orbit_radius * auScale;
                 const angle = b.current_angle || 0;
-                const bx = cx + Math.cos(angle) * orbitR;
-                const by = cy + Math.sin(angle) * orbitR;
+                const bx = b.body_type === "dyson_sphere" ? cx : cx + Math.cos(angle) * orbitR;
+                const by = b.body_type === "dyson_sphere" ? cy : cy + Math.sin(angle) * orbitR;
                 if (Math.hypot(mx - bx, my - by) < Math.max(18, this.bodyDisplayRadius(b) + 4)) {
                     this.selectedTarget = b;
                     this.selectedType = "body";
