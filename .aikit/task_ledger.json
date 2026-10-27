@@ -5,28 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793099451.144429,
+    "updated_at": 1793111913.248364,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "doc-encoding-final",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Normalized legacy ADR punctuation, extended the mojibake guard to decisions.md, and visually verified the 10-morale crew row showing 10 !! NEAR DESERTION with no corrupted glyphs in a 1366px Edge capture. checklists: passed (4/4 gates). Tests: 625.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793011407.2534275,
-      "timestamp_str": "2026-10-26 13:43:27",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "625 tests and 4/4 gates",
-        "next": "complete task, commit ledger, strict check, push",
-        "evidence": "ui-review/encoding/crew-morale-laptop.png and ADR-066"
-      }
-    },
     {
       "task_id": "doc-encoding-final",
       "phase": "completed",
@@ -312,6 +296,23 @@
         "next": "commit and push",
         "open": "none",
         "evidence": "ui verify OK, VL vision CUE VISIBLE, unittest 658 OK"
+      }
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[6/6] Added legacy-save migration regression (strip new fields, load, reload idempotent, war-killed world stays empty); tests 659. checklists: passed.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793111913.248364,
+      "timestamp_str": "2026-10-27 17:38:33",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "4/4 gates, UI closed",
+        "next": "commit, complete task and push",
+        "open": "none",
+        "evidence": "unittest 659 OK, legacy migration check"
       }
     }
   ]

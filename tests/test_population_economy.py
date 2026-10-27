@@ -281,6 +281,41 @@ class TestFactionEconomy(unittest.TestCase):
         restored = GameState.from_dict(data)
         self.assertEqual(restored.faction_economies, engine.state.faction_economies)
 
+    def test_legacy_save_without_capacity_migrates_once(self):
+        engine = SimulationEngine(seed=42)
+        data = engine.state.to_dict()
+        for system in data["systems"].values():
+            for body in system["bodies"]:
+                body.pop("population_capacity", None)
+                body.pop("tech_level", None)
+        for outpost in data.get("outposts", []):
+            outpost.pop("population_capacity", None)
+        data.pop("faction_economies", None)
+        swarm = next(
+            body
+            for system in data["systems"].values()
+            for body in system["bodies"]
+            if body.get("body_type") == "dyson_sphere"
+        )
+        swarm["population"] = 2_400_000_000
+
+        migrated = SimulationEngine(state=GameState.from_dict(data))
+        restored_swarm = next(b for b in migrated.state.systems["sol"].bodies if b.body_type == "dyson_sphere")
+        self.assertLessEqual(restored_swarm.population, restored_swarm.population_capacity)
+        self.assertGreater(restored_swarm.population_capacity, 0)
+        self.assertEqual(len(migrated.state.faction_economies), 9)
+
+        first = {
+            sid: [(b.population, b.population_capacity, b.tech_level) for b in system.bodies]
+            for sid, system in migrated.state.systems.items()
+        }
+        reloaded = SimulationEngine(state=GameState.from_dict(migrated.state.to_dict()))
+        second = {
+            sid: [(b.population, b.population_capacity, b.tech_level) for b in system.bodies]
+            for sid, system in reloaded.state.systems.items()
+        }
+        self.assertEqual(first, second)
+
     def test_batched_tick_still_declares_wars_and_scars_worlds(self):
         engine = SimulationEngine(seed=42)
         engine.tick(50)

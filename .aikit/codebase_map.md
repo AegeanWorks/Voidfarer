@@ -9,8 +9,8 @@
 - **Total Python Modules**: `77`
 - **Total Classes**: `205`
 - **Total Top-Level Functions**: `277`
-- **Total Class Methods**: `1138`
-- **Total Source Lines**: `33591`
+- **Total Class Methods**: `1139`
+- **Total Source Lines**: `33626`
 
 ---
 
@@ -887,7 +887,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `334` lines (`14804` bytes)
+**Size**: `369` lines (`16430` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -916,6 +916,7 @@
   - Method `.test_war_adds_upkeep_and_reduces_net_income()`
   - Method `.test_tick_pays_income_into_the_treasury()`
   - Method `.test_faction_economies_survive_a_game_state_round_trip()`
+  - Method `.test_legacy_save_without_capacity_migrates_once()`
   - Method `.test_batched_tick_still_declares_wars_and_scars_worlds()`
   - Method `.test_reload_does_not_repopulate_a_war_killed_world()`
   - Method `.test_war_tick_lowers_front_population()`
