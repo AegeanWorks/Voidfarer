@@ -3,24 +3,15 @@
   "active_task": {
     "task_id": "galaxy-population-economy",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1793111913.248364,
     "owner": "kilo:1",
     "started_by": "kilo:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1793111974.2410314
   },
   "checkpoints": [
-    {
-      "task_id": "doc-encoding-final",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'doc-encoding-final' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793011420.0162945,
-      "timestamp_str": "2026-10-26 13:43:40",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "cockpit-layout-audit",
       "phase": "phase 2",
@@ -314,6 +305,16 @@
         "open": "none",
         "evidence": "unittest 659 OK, legacy migration check"
       }
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'galaxy-population-economy' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793111974.241033,
+      "timestamp_str": "2026-10-27 17:39:34",
+      "agent": "kilo:1"
     }
   ]
 }
