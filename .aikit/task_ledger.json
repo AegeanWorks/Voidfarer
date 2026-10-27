@@ -1,60 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "postpush-polish-verify",
-    "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793042036.8370857,
-    "owner": "antigravity:1",
-    "started_by": "antigravity:1",
-    "continuations": [],
-    "completed_at": 1793042036.9899187
+    "task_id": "galaxy-population-economy",
+    "last_phase": "in_progress",
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1793082913.5514102,
+    "owner": "kilo:1",
+    "started_by": "kilo:1",
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "anomaly-escape-audit",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Added explicit power-free withdrawal choices to Derelict Dreadnought, Tachyon Rift and Pirate Lure Beacon; added a catalog invariant test; 1,200-tick live-encounter stress pass showed no invariant violations. checklists: passed (4/4 gates). Tests: 623.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793004219.2385762,
-      "timestamp_str": "2026-10-26 11:43:39",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "623 tests and 4/4 gates",
-        "next": "commit ledger, strict check, push",
-        "evidence": "ui-review/postpush and ADR-063"
-      }
-    },
-    {
-      "task_id": "anomaly-escape-audit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'anomaly-escape-audit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793004235.653732,
-      "timestamp_str": "2026-10-26 11:43:55",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "last10-audit",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Audit the last ten commits commit-by-commit, scan source/docs for encoding damage, fix player-visible mojibake and invalid ADR bytes, and re-run graphical/state checks.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793005235.0611894,
-      "timestamp_str": "2026-10-26 12:00:35",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The user asked for verification and analysis of every change in the last ten pushes, including images.",
-        "benefits": "Removes corrupted CLI/cockpit text, guarantees ADR UTF-8 validity, adds a mojibake regression test, and confirms feature/hardening/anomaly commits still hold.",
-        "risks": "contract: ASCII-safe labels and encoding guard only; dependency: none; concurrency: unchanged; state: docs re-encoded without changing ADR meaning",
-        "mitigation": "Byte-level ADR repair, source/static UTF-8 scan test, full suite, 4/4 gates, and retained graphical evidence"
-      }
-    },
     {
       "task_id": "last10-audit",
       "phase": "phase 4",
@@ -284,6 +240,63 @@
       "timestamp": 1793042036.9899206,
       "timestamp_str": "2026-10-26 22:13:56",
       "agent": "antigravity:1"
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/6] Plan population capacity and tech limits, normalized worlds, wartime devastation, faction economies, and a physically plausible Dyson swarm render.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793079683.3561525,
+      "timestamp_str": "2026-10-27 08:41:23",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The user reports the Dyson sphere is visually wrong, populations are implausible per planet, and asks for tech/habitability population limits, wartime devastation, and basic faction economies.",
+        "benefits": "Populations scale from world surface area, habitability and technology; growth stops at capacity; war grinds worlds down; factions show treasury/income/upkeep; the Dyson sphere reads as a star-harvesting swarm.",
+        "risks": "contract: CelestialBody and GameState save schema additions; dependency: stdlib only; concurrency: engine tick path; state: population and economy values change across saves",
+        "mitigation": "Backward-compatible defaults, deterministic formulas, focused tests, full project check, real-browser vision review"
+      },
+      "handoff": {
+        "state": "planning complete",
+        "next": "implement population model",
+        "open": "tech level per body",
+        "evidence": "none"
+      }
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/6] Population normalized; tech/habitability capacity, wartime attrition, faction treasuries and Dyson swarm render implemented. checklists: passed (test 638, hygiene, guidelines, secrets).",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793080850.7513287,
+      "timestamp_str": "2026-10-27 09:00:50",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "all gates pass",
+        "next": "optional vision review",
+        "open": "screenshot aesthetics unverified without image-capable model",
+        "evidence": "aikit check 4/4"
+      }
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[3/6] Audit since last three pushes: fixed batched logistic overshoot, legacy repopulation of war-killed worlds, target dossier overflow at 720p, package/CLI version drift, stale README counts, and Dyson panel legibility. checklists: passed (tests 642, hygiene, guidelines, secrets).",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793082913.5514102,
+      "timestamp_str": "2026-10-27 09:35:13",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "4/4 gates pass, UI contract evidence still warns",
+        "next": "commit and push",
+        "open": "automated pixel/DOM review only",
+        "evidence": "aikit check 4/4"
+      }
     }
   ]
 }

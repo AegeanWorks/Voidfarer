@@ -89,6 +89,11 @@ WAR_LAST_STAND_EDGE = 0.6
 WAR_TRUCE_TICKS = 600
 # Chance per tick that aggressive leaders consider a new war (capped per batch).
 WAR_DECLARATION_RATE = 0.025
+# Continuous front bombardment: every contested world bleeds people and gains
+# devastation while the war lasts, not only on the tick it is captured.
+WAR_FRONT_POP_LOSS = 0.0015
+WAR_FRONT_DEVASTATION = 0.22
+WAR_FRONT_CHANCE = 0.45
 
 
 def _faction_name(faction_id: str) -> str:
@@ -168,6 +173,66 @@ def frontier_systems(winner_name: str, loser_name: str, systems: dict[str, StarS
         if system.faction == loser_name
         and any(systems[n].faction == winner_name for n in system.connections if n in systems)
     )
+
+
+def apply_war_devastation(
+    wars: Sequence[WarState],
+    systems: dict[str, StarSystem],
+    rng: random.Random,
+    num_ticks: int = 1,
+) -> tuple[dict[str, StarSystem], list[str]]:
+    """Bombard both sides of every active front: civilians die and devastation accumulates."""
+    updated = dict(systems)
+    total_lost = 0
+    total_devastation = 0.0
+    ticks = max(1, int(num_ticks))
+    for war in wars:
+        if not war.active:
+            continue
+        attacker = _faction_name(war.attacker_id)
+        defender = _faction_name(war.defender_id)
+        fronts = sorted(set(
+            frontier_systems(attacker, defender, updated)
+            + frontier_systems(defender, attacker, updated)
+        ))
+        severity = 1.0 + min(1.5, abs(war.war_score) / max(1.0, WAR_CAPTURE_THRESHOLD))
+        # A batched tick represents many bombardments: convert the per-tick chance and
+        # loss into their compounded equivalents instead of multiplying one linear roll.
+        strike_chance = min(0.95, 1.0 - (1.0 - WAR_FRONT_CHANCE) ** ticks)
+        loss_fraction = 1.0 - (1.0 - WAR_FRONT_POP_LOSS * severity) ** ticks
+        for sid in fronts:
+            if rng.random() > strike_chance:
+                continue
+            system = updated[sid]
+            bodies = []
+            for body in system.bodies:
+                if body.population <= 0:
+                    if body.landable and body.devastation < 100.0:
+                        bodies.append(replace(
+                            body,
+                            devastation=min(100.0, body.devastation + WAR_FRONT_DEVASTATION * 0.35 * severity * ticks),
+                        ))
+                    else:
+                        bodies.append(body)
+                    continue
+                loss = max(1, int(body.population * loss_fraction))
+                gain = WAR_FRONT_DEVASTATION * severity * ticks
+                total_lost += loss
+                total_devastation += gain
+                bodies.append(replace(
+                    body,
+                    population=max(0, body.population - loss),
+                    devastation=min(100.0, (body.devastation or 0.0) + gain),
+                ))
+            updated[sid] = replace(system, bodies=tuple(bodies))
+
+    logs: list[str] = []
+    if total_lost > 0 and total_devastation >= 2.5:
+        logs.append(
+            f"WAR ATTRITION: {total_lost:,} civilians lost and {total_devastation:.1f}% "
+            f"devastation added across active fronts."
+        )
+    return updated, logs
 
 
 def _end_war(war: WarState, score: float, current_tick: int, logs: list[str]) -> WarState:
@@ -298,6 +363,9 @@ def simulate_faction_behaviors(
             defender_name = CANONICAL_FACTIONS[weakest].name if weakest in CANONICAL_FACTIONS else weakest
             logs.append(f"WAR DECLARED: {attacker_name} ({leader.name}) moves against {defender_name}.")
             break
+
+    systems, attrition_logs = apply_war_devastation(new_wars, systems, rng, num_ticks)
+    logs.extend(attrition_logs)
 
     resolved_wars, systems, eliminated_now, war_logs = resolve_wars(
         new_wars, systems, rng, current_tick, eliminated

@@ -142,7 +142,10 @@ from voidfarer.galaxy import (
     compute_scientific_planet_properties,
     get_colony_tier,
     step_population_dynamics,
+    world_tech_level,
 )
+from voidfarer.demographics import compute_population_capacity, initial_population
+from voidfarer.faction_economy import initialize_faction_economies, tick_faction_economies
 from voidfarer.messaging import choice_by_id, follow_up_message, tree_catalog, tree_root_message
 from voidfarer.mapmods import (
     aggregate_map_modifiers,
@@ -400,28 +403,22 @@ class SimulationEngine:
             body_changed = False
             for idx, body in enumerate(sys_obj.bodies):
                 updated_body = body
-                if (updated_body.station_dockable or updated_body.landable) and updated_body.population == 0:
-                    pop = 120_000_000 + idx * 45_000_000 if updated_body.landable else 250_000 + idx * 85_000
-                    gov = "Science Directorate" if updated_body.body_type == "research_outpost" else gov_map.get(sys_obj.faction, "Colonial Republic")
-                    updated_body = replace(
-                        updated_body,
-                        faction=sys_obj.faction if updated_body.faction == "Unclaimed" else updated_body.faction,
-                        population=pop,
-                        government=gov if updated_body.government == "None" else updated_body.government,
-                    )
-                    body_changed = True
-                if updated_body.body_type != "star" and ("(" not in updated_body.atmosphere or (updated_body.habitability == 0.0 and updated_body.body_type not in ("gas_giant", "ringed_giant", "ice_giant", "methane_storm", "lava_world"))):
+                # A body with no capacity field predates the demographics model; only
+                # those legacy worlds are seeded. A world emptied by war keeps its
+                # population at zero instead of being silently repopulated on load.
+                legacy_body = body.population_capacity <= 0
+                if body.body_type not in ("star", "black_hole", "wormhole") and ("(" not in body.atmosphere or (body.habitability == 0.0 and body.body_type not in ("gas_giant", "ringed_giant", "ice_giant", "methane_storm", "lava_world"))):
                     rad_seed = 4000.0 + ((idx + len(sys_id)) % 9) * 6500.0
                     grav_seed = 0.65 + ((idx * 3 + len(sys_id)) % 7) * 0.22
                     jitter_seed = ((idx * 5 + len(sys_id)) % 9) - 4
                     phys = compute_scientific_planet_properties(
-                        body_type=updated_body.body_type,
+                        body_type=body.body_type,
                         spectral_type=sys_obj.spectral_type,
-                        orbit_radius_au=updated_body.orbit_radius,
+                        orbit_radius_au=body.orbit_radius,
                         rad_sample=rad_seed,
                         grav_sample=grav_seed,
                         temp_jitter=jitter_seed,
-                        hazards=updated_body.hazards,
+                        hazards=body.hazards,
                     )
                     updated_body = replace(
                         updated_body,
@@ -431,6 +428,50 @@ class SimulationEngine:
                         temperature_c=int(phys["temperature_c"]),
                         habitability=float(phys["habitability"]),
                     )
+                if updated_body.body_type not in ("star", "black_hole", "wormhole"):
+                    tech = world_tech_level(
+                        sys_obj.faction, updated_body.body_type, updated_body.market_archetype
+                    )
+                    capacity = compute_population_capacity(
+                        updated_body.body_type,
+                        updated_body.radius_km,
+                        updated_body.habitability,
+                        tech,
+                    )
+                    if tech != updated_body.tech_level or capacity != updated_body.population_capacity:
+                        updated_body = replace(
+                            updated_body,
+                            tech_level=tech,
+                            population_capacity=capacity,
+                        )
+                if (
+                    legacy_body
+                    and updated_body.devastation <= 0.0
+                    and (updated_body.station_dockable or updated_body.landable)
+                    and updated_body.population == 0
+                ):
+                    pop = initial_population(
+                        updated_body.body_type,
+                        updated_body.radius_km,
+                        updated_body.habitability,
+                        updated_body.tech_level,
+                        sys_obj.faction,
+                        updated_body.market_archetype,
+                        updated_body.station_dockable,
+                    )
+                    gov = "Science Directorate" if updated_body.body_type == "research_outpost" else gov_map.get(sys_obj.faction, "Colonial Republic")
+                    updated_body = replace(
+                        updated_body,
+                        faction=sys_obj.faction if updated_body.faction == "Unclaimed" else updated_body.faction,
+                        population=pop,
+                        government=gov if updated_body.government == "None" else updated_body.government,
+                    )
+                elif updated_body.population > updated_body.population_capacity > 0:
+                    updated_body = replace(
+                        updated_body,
+                        population=updated_body.population_capacity,
+                    )
+                if updated_body != body:
                     body_changed = True
                 new_bodies.append(updated_body)
             # Backfill black-hole event horizons for legacy saves predating void gates
@@ -444,6 +485,10 @@ class SimulationEngine:
                 updated_systems[sys_id] = sys_obj
         if systems_changed:
             updates["systems"] = updated_systems
+        if not self.state.faction_economies:
+            updates["faction_economies"] = initialize_faction_economies(
+                updated_systems, self.state.wars, self.state.eliminated_factions
+            )
         if updates:
             self.state = self._clone_state(**updates)
 
@@ -529,6 +574,7 @@ class SimulationEngine:
             outposts=kwargs.get("outposts", cur.outposts),
             faction_leaders=kwargs.get("faction_leaders", cur.faction_leaders),
             wars=kwargs.get("wars", cur.wars),
+            faction_economies=kwargs.get("faction_economies", cur.faction_economies),
             eliminated_factions=kwargs.get("eliminated_factions", cur.eliminated_factions),
             codex=kwargs.get("codex", cur.codex),
             local_dock_purchases=kwargs.get("local_dock_purchases", cur.local_dock_purchases),
@@ -5298,6 +5344,7 @@ class SimulationEngine:
                 "outposts": [o.to_dict() for o in self.state.outposts],
                 "faction_leaders": [leader.to_dict() for leader in self.state.faction_leaders],
                 "wars": [war.to_dict() for war in self.state.wars],
+                "faction_economies": [e.to_dict() for e in self.state.faction_economies],
                 "galactic_politics": self.galactic_politics(),
                 "eliminated_factions": list(self.state.eliminated_factions),
                 "crew": [c.to_dict() for c in self.state.ship.crew],
@@ -5418,6 +5465,7 @@ class SimulationEngine:
             colors = {f.name: f.primary_color for f in CANONICAL_FACTIONS.values()}
             ids = {f.name: fid for fid, f in CANONICAL_FACTIONS.items()}
             active = [w for w in self.state.wars if w.active]
+            economies = {e.faction_id: e for e in self.state.faction_economies}
             enemies: dict[str, set[str]] = {}
             for w in active:
                 enemies.setdefault(w.attacker_id, set()).add(w.defender_id)
@@ -5445,6 +5493,19 @@ class SimulationEngine:
                     "systems": sum(1 for s in systems.values() if s.faction == f.name),
                     "strength": round(faction_strength(fid, systems), 1),
                     "at_war_with": sorted(enemies.get(fid, set())),
+                    **(
+                        economies[fid].to_dict()
+                        if fid in economies
+                        else {
+                            "treasury": 0,
+                            "net_income": 0,
+                            "population": 0,
+                            "worlds": 0,
+                            "tech_level": 1,
+                            "stability": 0.0,
+                            "war_burden": 0.0,
+                        }
+                    ),
                 }
                 for fid, f in CANONICAL_FACTIONS.items()
                 if fid not in self.state.eliminated_factions
@@ -6352,7 +6413,7 @@ class SimulationEngine:
                             body,
                             current_angle=(body.current_angle + d_angle) % (2.0 * math.pi),
                             population=updated_pop,
-                            devastation=max(0.0, (body.devastation or 0.0) - 0.35 * num_ticks),
+                            devastation=max(0.0, (body.devastation or 0.0) - 0.015 * num_ticks),
                             volatile_tapped=tapped,
                             volatile_recharge_tick=recharge_tick,
                         )
@@ -6508,6 +6569,14 @@ class SimulationEngine:
                 self.state.eliminated_factions,
                 num_ticks,
             )
+            new_faction_economies, faction_economy_logs = tick_faction_economies(
+                self.state.faction_economies,
+                updated_systems,
+                new_wars,
+                new_eliminated,
+                num_ticks,
+            )
+            faction_logs.extend(faction_economy_logs)
 
             # 9. Reactor thermal simulation: heat, cooling, derating, and core wear
             tick_system = self.state.systems.get(cur_ship.current_system_id, self.current_system)
@@ -6900,6 +6969,7 @@ class SimulationEngine:
                 outposts=tuple(updated_outposts),
                 depots=tuple(updated_depots),
                 wars=new_wars,
+                faction_economies=new_faction_economies,
                 eliminated_factions=new_eliminated,
             )
 

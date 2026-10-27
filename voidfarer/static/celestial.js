@@ -285,17 +285,67 @@ class CelestialRenderer {
     }
 
     paintDyson(ctx, R, body, rng) {
-        const core = ctx.createRadialGradient(0, 0, 0, 0, 0, R);
-        core.addColorStop(0, "#fff8e1");
-        core.addColorStop(0.5, body.color || "#ffd166");
-        core.addColorStop(1, "rgba(255, 209, 102, 0)");
+        // A Dyson swarm is a star wrapped in millions of independent collectors, not a
+        // solid wireframe globe. Keep the shell mostly transparent: a dim stellar core,
+        // faint orbital tracks, and discrete dark collector panels with gold edges.
+        const glow = ctx.createRadialGradient(0, 0, R * 0.12, 0, 0, R * 1.2);
+        glow.addColorStop(0, "rgba(255, 240, 190, 0.34)");
+        glow.addColorStop(0.35, "rgba(255, 196, 96, 0.12)");
+        glow.addColorStop(0.72, "rgba(255, 150, 50, 0.04)");
+        glow.addColorStop(1, "rgba(255, 140, 40, 0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.arc(0, 0, R * 1.2, 0, Math.PI * 2); ctx.fill();
+
+        const core = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.20);
+        core.addColorStop(0, "#ffffff");
+        core.addColorStop(0.38, "#fff0b0");
+        core.addColorStop(1, "rgba(255, 170, 60, 0)");
         ctx.fillStyle = core;
-        ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = "rgba(60, 40, 10, 0.85)";
-        ctx.lineWidth = Math.max(0.8, R * 0.05);
-        for (let i = 0; i < 6; i++) {
-            ctx.beginPath(); ctx.ellipse(0, 0, R * 0.92, R * 0.92 * Math.abs(Math.cos(i * Math.PI / 6)), 0, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath(); ctx.ellipse(0, 0, R * 0.92 * Math.abs(Math.cos(i * Math.PI / 6)), R * 0.92, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 0, R * 0.20, 0, Math.PI * 2); ctx.fill();
+
+        const bands = [
+            { dist: 0.30, tilt: 0.90, panels: 11, spin: 0.35, size: 0.120 },
+            { dist: 0.46, tilt: 0.72, panels: 15, spin: -0.22, size: 0.112 },
+            { dist: 0.62, tilt: 0.55, panels: 19, spin: 0.12, size: 0.104 },
+            { dist: 0.78, tilt: 0.38, panels: 23, spin: -0.40, size: 0.096 },
+            { dist: 0.93, tilt: 0.22, panels: 27, spin: 0.05, size: 0.088 },
+        ];
+        for (const band of bands) {
+            ctx.save();
+            ctx.rotate(band.spin);
+            ctx.strokeStyle = "rgba(255, 209, 102, 0.10)";
+            ctx.lineWidth = Math.max(0.4, R * 0.008);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, R * band.dist, R * band.dist * band.tilt, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            for (let i = 0; i < band.panels; i++) {
+                const angle = (i / band.panels) * Math.PI * 2 + rng() * 0.10;
+                const dist = R * band.dist * (0.97 + rng() * 0.06);
+                const x = Math.cos(angle) * dist;
+                const y = Math.sin(angle) * dist * band.tilt;
+                const w = Math.max(2.2, R * band.size);
+                const h = Math.max(1.3, R * band.size * 0.58);
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle + Math.PI / 2);
+                ctx.fillStyle = i % 7 === 0 ? "rgba(255, 226, 150, 0.98)" : "rgba(10, 14, 21, 0.98)";
+                ctx.fillRect(-w / 2, -h / 2, w, h);
+                ctx.strokeStyle = "rgba(255, 205, 120, 0.88)";
+                ctx.lineWidth = Math.max(0.4, R * 0.007);
+                ctx.strokeRect(-w / 2, -h / 2, w, h);
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+
+        // Broken shell arcs show the swarm is unbuilt, not a sealed planet.
+        ctx.strokeStyle = "rgba(255, 236, 180, 0.35)";
+        ctx.lineWidth = Math.max(0.6, R * 0.014);
+        for (let i = 0; i < 4; i++) {
+            const start = i * 1.6 + rng() * 0.3;
+            ctx.beginPath();
+            ctx.arc(0, 0, R * 0.99, start, start + 0.55);
+            ctx.stroke();
         }
     }
 

@@ -830,3 +830,16 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - New versions use the Aegean Game License 1.1 (AGL-1.1).
 - Rights holder: AegeanWorks; commercial use under ACL-1.0.
 - Counsel review of the 1.1 texts remains pending.
+
+### ADR-069: Area-and-Tech Demographics, Wartime Attrition, Faction Treasuries, and a Dyson Swarm
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: World populations were hard-coded per system index, so a 149-million-kilometre Dyson sphere carried 2.4 billion people while an Earth-sized colony carried a similar figure, and nothing stopped growth or linked it to habitability or technology. War only displaced people at the instant of capture. Factions had standing and strength but no treasury, income or upkeep. The Sol megastructure rendered as an opaque wireframe globe and sat on a planetary orbit.
+- **Decision**:
+  1. Add `demographics.py`: capacity derives from body surface area (or artificial habitat volume), a body-type land factor, habitability^1.8, and a faction tech multiplier; every world stores `population_capacity` and `tech_level`. Opening population is a faction occupancy share of that capacity.
+  2. Replace per-tick growth with closed-form logistic growth, so large `tick(n)` batches converge on capacity instead of overshooting; deaths from devastation reduce the effective ceiling and add a mortality term.
+  3. Apply continuous front attrition in `apply_war_devastation`, compounding both strike chance and civilian loss for batched ticks; only legacy saves with an unset capacity are seeded with population, so a world emptied by war stays empty after reload.
+  4. Add `faction_economy.py`: population, worlds, tech, stability, tax, trade, industry, military upkeep, war burden, net income and treasury per canonical faction, persisted in `GameState` and surfaced through `galactic_politics`.
+  5. Render the Sol megastructure as a partial Dyson swarm (stellar core, five collector bands, dark panels with gold edges) with a maintenance population and a shell radius of 0.25 AU at 0.06 AU visual orbit; add population capacity and world tech to the target dossier and economy rows to faction cards.
+  6. Bound the absolute target dossier with `overflow-y: auto` so the expanded rows scroll at 1280x720 instead of spilling into the command strip; align package `__version__`, CLI banner, README test counts and project metadata at 0.2.0.
+- **Consequences**: Generated populations are area- and habitability-scaled (Sol ring world ~10.5B, Dyson swarm maintenance ~21.6M of 44.1M, small stations under 4M), no body exceeds capacity after 2000 batched ticks, front worlds lose population and gain devastation, war-killed worlds stay empty, and every surviving faction reports a treasury and cash flow. Full suite: 642 tests (37 suites); Edge DOM/pixel audit at 1280x720, 1920x1080 and 2560x1440 shows no label, card, or page overflow. Automated audit only: this model rejects image input, so the captures were inspected through pixels and DOM geometry, not human vision.

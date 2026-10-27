@@ -18,6 +18,7 @@ try:
 except (ValueError, OSError):  # hygiene: allow non-reconfigurable stdio streams in test harnesses
     pass
 
+from voidfarer import __version__
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -85,7 +86,7 @@ __      __ _____  _____  _____   ______        _____   ______  _____
    \\  /  | |___| |_| |_ | |__| || | / ____ \\  | | \\ \\ | |____ | | \\ \\ 
     \\/    \\_____/|_____||_____/ |_|/_/    \\_\\ |_|  \\_\\|______||_|  \\_\\
 {RESET}
-{DIM}Autonomous Deep-Space Fleet & Procedural Galaxy Simulator v0.2.0{RESET}
+{DIM}Autonomous Deep-Space Fleet & Procedural Galaxy Simulator v{__version__}{RESET}
 """
 
 

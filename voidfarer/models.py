@@ -60,6 +60,8 @@ class CelestialBody:
     landable: bool = False
     faction: str = "Unclaimed"
     population: int = 0
+    population_capacity: int = 0
+    tech_level: int = 1
     devastation: float = 0.0
     government: str = "None"
     habitability: float = 0.0
@@ -94,6 +96,8 @@ class CelestialBody:
             landable=bool(data.get("landable", str(data.get("body_type", "")) in {"terrestrial", "oceanic", "savanna", "tundra"})),
             faction=str(data.get("faction", "Unclaimed")),
             population=int(data.get("population", 0)),
+            population_capacity=max(0, int(data.get("population_capacity", 0))),
+            tech_level=max(1, min(10, int(data.get("tech_level", 1)))),
             devastation=max(0.0, min(100.0, float(data.get("devastation", 0.0)))),
             government=str(data.get("government", "None")),
             habitability=float(data.get("habitability", 0.0)),
@@ -1447,6 +1451,44 @@ class WarState:
 
 
 @dataclass(frozen=True)
+class FactionEconomy:
+    """Per-faction treasury and the derived flows that feed it every tick."""
+
+    faction_id: str
+    treasury: int = 0
+    population: int = 0
+    worlds: int = 0
+    tech_level: int = 1
+    stability: float = 50.0
+    tax_income: int = 0
+    trade_income: int = 0
+    industrial_output: int = 0
+    military_upkeep: int = 0
+    war_burden: float = 0.0
+    net_income: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> FactionEconomy:
+        return cls(
+            faction_id=str(data["faction_id"]),
+            treasury=max(0, int(data.get("treasury", 0))),
+            population=max(0, int(data.get("population", 0))),
+            worlds=max(0, int(data.get("worlds", 0))),
+            tech_level=max(1, min(10, int(data.get("tech_level", 1)))),
+            stability=max(0.0, min(100.0, float(data.get("stability", 50.0)))),
+            tax_income=int(data.get("tax_income", 0)),
+            trade_income=int(data.get("trade_income", 0)),
+            industrial_output=int(data.get("industrial_output", 0)),
+            military_upkeep=max(0, int(data.get("military_upkeep", 0))),
+            war_burden=max(0.0, float(data.get("war_burden", 0.0))),
+            net_income=int(data.get("net_income", 0)),
+        )
+
+
+@dataclass(frozen=True)
 class CrewMember:
     """Recruitable crew specialist with a role, morale, wage, and portrait."""
 
@@ -1944,6 +1986,7 @@ class GameState:
     outposts: tuple[Outpost, ...] = ()
     faction_leaders: tuple[FactionLeader, ...] = ()
     wars: tuple[WarState, ...] = ()
+    faction_economies: tuple[FactionEconomy, ...] = ()
     eliminated_factions: tuple[str, ...] = ()
     codex: CodexState = field(default_factory=CodexState)
     local_dock_purchases: dict[tuple[str, str, str], tuple[int, int]] = field(default_factory=dict)
@@ -1972,6 +2015,7 @@ class GameState:
             "outposts": [o.to_dict() for o in self.outposts],
             "faction_leaders": [l.to_dict() for l in self.faction_leaders],
             "wars": [w.to_dict() for w in self.wars],
+            "faction_economies": [e.to_dict() for e in self.faction_economies],
             "eliminated_factions": list(self.eliminated_factions),
             "codex": self.codex.to_dict(),
             "local_dock_purchases": {
@@ -2047,6 +2091,9 @@ class GameState:
             outposts=tuple(Outpost.from_dict(o) for o in data.get("outposts", ())),
             faction_leaders=tuple(FactionLeader.from_dict(l) for l in data.get("faction_leaders", ())),
             wars=tuple(WarState.from_dict(w) for w in data.get("wars", ())),
+            faction_economies=tuple(
+                FactionEconomy.from_dict(e) for e in data.get("faction_economies", ())
+            ),
             eliminated_factions=tuple(data.get("eliminated_factions", ())),
             codex=CodexState.from_dict(data.get("codex", {})),
             local_dock_purchases=dock_purchases,

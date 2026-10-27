@@ -67,6 +67,7 @@ voidfarer/
 │   ├── factions.py       <- sovereign factions, megacorps & standing tiers
 │   ├── enemies.py        <- tactical enemy archetypes, abilities & generator
 │   ├── galaxy.py         <- procedural star system & hyperlane generator
+│   ├── demographics.py   <- world capacity, tech limits & logistic population
 │   ├── engine.py         <- deterministic state machine & coordinator
 │   ├── reactor.py        <- reactor modes, heat, cooling & derating
 │   ├── mapmods.py        <- procedural sector map modifiers
@@ -75,6 +76,7 @@ voidfarer/
 │   ├── research.py       <- research projects & technology bonuses
 │   ├── outposts.py       <- outpost catalogs & tick production
 │   ├── faction_state.py  <- faction leaders, behaviors, wars & elimination
+│   ├── faction_economy.py <- faction treasuries, tax base, upkeep & war burden
 │   ├── fleet.py          <- escort warships, formations & battle support
 │   ├── navigation.py     <- multi-jump routing, void lanes & black-hole hazards
 │   ├── messaging.py      <- branching quantum message trees
@@ -108,7 +110,7 @@ voidfarer/
 │   ├── ui_audit.py       <- layout metrics
 │   ├── ui_browser.py     <- real browser review
 │   └── ui_inventory.py   <- cockpit inventory proof
-└── tests/                <- unit & integration test suite (36 suites)
+└── tests/                <- unit & integration test suite (37 suites)
 ```
 
 ---
@@ -404,7 +406,7 @@ python -m voidfarer.cli quantum ship titanium 2 kepler
 python -m voidfarer.cli surface
 python -m voidfarer.cli contracts refresh
 ```
-23 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time. Quantum freight ships cargo for a fee, paying on arrival. Landed teams survey, core-sample, explore ruins, salvage, or rest. War captures displace civilians and leave scars.
+23 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time. Quantum freight ships cargo for a fee, paying on arrival. Landed teams survey, core-sample, explore ruins, salvage, or rest. War captures displace civilians and leave scars. Populations scale with world surface, habitability, and tech level; every faction pays taxes, upkeep, and a wartime burden from its own treasury. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
 
 ### 19. Stellaris-Style Windows Cockpit
 
@@ -436,7 +438,7 @@ See ADR-041 and ADR-047.
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules (`math`, `random`, `dataclasses`, `http.server`, `json`, `pathlib`).
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 625-test suite runs in about 18 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 642-test suite runs in about 11 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

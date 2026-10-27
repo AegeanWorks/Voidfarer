@@ -5,6 +5,34 @@
 
 const TICKS_PER_SECOND = 2.0;
 
+const BODY_TYPE_LABELS = {
+    dyson_sphere: "DYSON SWARM",
+    ring_world: "RING WORLD",
+    orbital_station: "ORBITAL STATION",
+    research_outpost: "RESEARCH OUTPOST",
+    quantum_relay: "QUANTUM RELAY",
+    solar_collector: "SOLAR COLLECTOR",
+    desert_world: "DESERT WORLD",
+    ice_world: "ICE WORLD",
+    lava_world: "LAVA WORLD",
+    gas_giant: "GAS GIANT",
+    ringed_giant: "RINGED GIANT",
+    ice_giant: "ICE GIANT",
+    methane_storm: "METHANE STORM",
+    super_earth: "SUPER-EARTH",
+    asteroid_belt: "ASTEROID BELT",
+    black_hole: "BLACK HOLE",
+    wormhole: "WORMHOLE",
+    terrestrial: "TERRESTRIAL",
+    savanna: "SAVANNA",
+    tundra: "TUNDRA",
+    oceanic: "OCEANIC",
+    barren: "BARREN",
+    toxic: "TOXIC",
+    volcanic: "VOLCANIC",
+    star: "STAR",
+};
+
 const SKILL_META = {
     piloting: { name: "Piloting", icon: "✈", desc: "Improves sublight maneuverability, warp efficiency, and evasion." },
     engineering: { name: "Engineering", icon: "⚙", desc: "Boosts repair speed, shield recharge, and module efficiency." },
@@ -410,6 +438,8 @@ class CockpitApp {
         this.targetAtmosphere = document.getElementById("targetAtmosphere");
         this.targetTemp = document.getElementById("targetTemp");
         this.targetHabitability = document.getElementById("targetHabitability");
+        this.targetCapacity = document.getElementById("targetCapacity");
+        this.targetTech = document.getElementById("targetTech");
         this.targetMoons = document.getElementById("targetMoons");
         this.targetFaction = document.getElementById("targetFaction");
         this.targetPopulation = document.getElementById("targetPopulation");
@@ -4263,7 +4293,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const sublightSpeed = Math.max(0.35, 1.15 * engineFactor);
             const estTicks = Math.max(1, Math.ceil(distAu / sublightSpeed));
 
-            this.targetType.textContent = `TARGET: ${b.body_type.toUpperCase()}`;
+            this.targetType.textContent = `TARGET: ${this.bodyTypeLabel(b)}`;
             this.targetName.textContent = b.name;
             this.targetDist.textContent = `${distAu.toFixed(2)} AU (ORBIT ${b.orbit_radius.toFixed(2)} AU)`;
             const survey = this.state.survey;
@@ -4306,6 +4336,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     : (hab >= 75 ? "OPTIMAL" : (hab >= 45 ? "MARGINAL" : (hab >= 15 ? "HOSTILE" : "BARREN")));
                 this.targetHabitability.textContent = `${hab.toFixed(1)}% (${habLabel})`;
             }
+            if (this.targetCapacity) {
+                const capacity = Number(b.population_capacity ?? 0);
+                const devastation = Number(b.devastation ?? 0);
+                const remaining = Math.max(0, Math.round(capacity * (1 - 0.65 * devastation / 100)));
+                this.targetCapacity.textContent = capacity > 0
+                    ? `${this.compactCount(remaining)} / ${this.compactCount(capacity)}`
+                    : "None";
+            }
+            if (this.targetTech) {
+                this.targetTech.textContent = `TL ${Number(b.tech_level ?? 1)}`;
+            }
             this.targetMoons.textContent = `${(b.moons || []).length}`;
             if (this.targetFaction) this.targetFaction.textContent = b.faction || "Unclaimed";
             if (this.targetPopulation) {
@@ -4320,7 +4361,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.targetGovernment) this.targetGovernment.textContent = b.government || "None";
             if (this.targetDevastation) {
                 const devastation = Number(b.devastation || 0);
-                this.targetDevastation.textContent = devastation > 0 ? `${devastation.toFixed(1)}%` : "None";
+                const capacityLoss = Math.round(devastation * 0.65);
+                this.targetDevastation.textContent = devastation > 0
+                    ? `${devastation.toFixed(1)}% (CAP -${capacityLoss}%)`
+                    : "None";
                 this.targetDevastation.classList.toggle("is-devastated", devastation >= 25);
             }
             this.targetResources.innerHTML = (b.resources || []).map(r => `<span>${this.escapeHtml(r)}</span>`).join("");
@@ -4389,6 +4433,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.targetAtmosphere.textContent = `${(s.security * 100).toFixed(0)}% sec`;
             this.targetTemp.textContent = `${s.connections.length} links`;
             if (this.targetHabitability) this.targetHabitability.textContent = "--";
+            if (this.targetCapacity) this.targetCapacity.textContent = "--";
+            if (this.targetTech) this.targetTech.textContent = "--";
             this.targetMoons.textContent = factionName;
             if (this.targetFaction) this.targetFaction.textContent = factionName || "Unclaimed";
             if (this.targetPopulation) this.targetPopulation.textContent = "--";
@@ -4794,9 +4840,26 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     // Display size is logarithmic in real radius: an Earth ~14px, a gas giant ~22px at 1x,
     // so every world is big enough to show its surface model. Drawing and hit tests share it.
+    bodyTypeLabel(body) {
+        const type = String((body && body.body_type) || "body");
+        return BODY_TYPE_LABELS[type] || type.replace(/_/g, " ").toUpperCase();
+    }
+
+    compactCount(value) {
+        const number = Number(value || 0);
+        if (number >= 1e12) return `${(number / 1e12).toFixed(2)}T`;
+        if (number >= 1e9) return `${(number / 1e9).toFixed(2)}B`;
+        if (number >= 1e6) return `${(number / 1e6).toFixed(1)}M`;
+        if (number >= 1e3) return `${(number / 1e3).toFixed(1)}K`;
+        return String(Math.max(0, Math.round(number)));
+    }
+
     bodyDisplayRadius(b) {
+        const scale = this.zoom * Math.min(1.4, this.radarScale());
+        if (b.body_type === "dyson_sphere") return 34 * scale;
+        if (b.body_type === "ring_world") return 24 * scale;
         const sizeLog = Math.log2(Math.max(1, (b.radius_km || 1000) / 1000));
-        return Math.max(6, Math.min(22, 6 + sizeLog * 3)) * this.zoom * Math.min(1.4, this.radarScale());
+        return Math.max(6, Math.min(22, 6 + sizeLog * 3)) * scale;
     }
 
     galaxyTransform(cx, cy) {
@@ -5297,6 +5360,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.state.factions || !this.factionsGrid) return;
 
         this.factionsGrid.innerHTML = "";
+        const politics = this.state.galactic_politics || { factions: [] };
+        const economyById = {};
+        (politics.factions || []).forEach(f => { economyById[f.id] = f; });
         Object.entries(this.state.factions).forEach(([fid, f]) => {
             const card = document.createElement("div");
             card.className = "faction-card";
@@ -5304,6 +5370,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             card.style.borderColor = `${factionColor}44`;
             const tierClass = `tier-${this.escapeHtml(f.standing_tier.toLowerCase())}`;
             const barPct = Math.max(0, Math.min(100, Math.round(((f.standing + 100) / 200) * 100)));
+            const econ = economyById[fid] || {};
+            const treasury = Number(econ.treasury || 0);
+            const net = Number(econ.net_income || 0);
+            const stability = Number(econ.stability || 0);
+            const population = Number(econ.population || 0);
+            const worlds = Number(econ.worlds || 0);
+            const tech = Number(econ.tech_level || 1);
+            const netLabel = `${net >= 0 ? "+" : ""}${net.toLocaleString("en-US")}`;
 
             card.innerHTML = `
                 <div class="faction-top-row">
@@ -5314,6 +5388,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 <div class="standing-bar-wrap">
                     <div class="standing-bar-fill" style="width: ${barPct}%; background: ${factionColor};"></div>
                 </div>
+                <div class="faction-economy">TREASURY ${treasury.toLocaleString("en-US")} cr // NET ${netLabel}/t // STABILITY ${stability.toFixed(0)}%</div>
+                <div class="faction-economy">POP ${this.compactCount(population)} // WORLDS ${worlds} // TECH TL${tech}</div>
                 <div class="faction-perk">Diplomatic Status: <strong>${this.escapeHtml(f.active_perk)}</strong></div>
             `;
             this.factionsGrid.appendChild(card);

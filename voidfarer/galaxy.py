@@ -7,6 +7,12 @@ import random
 from dataclasses import replace
 from typing import Sequence
 
+from voidfarer.demographics import (
+    FACTION_TECH_LEVELS,
+    compute_population_capacity,
+    initial_population,
+    step_population,
+)
 from voidfarer.mapmods import generate_map_modifiers
 from voidfarer.models import (
     AnomalyChoice,
@@ -703,24 +709,32 @@ def get_colony_tier(population: int) -> str:
 
 
 def step_population_dynamics(body: CelestialBody, num_ticks: int = 1) -> int:
-    """Advance population deterministically based on habitability and world type."""
+    """Advance population with capacity, technology and devastation limits."""
     if body.population <= 0 or num_ticks <= 0:
         return 0
-    hab = max(0.0, min(100.0, float(body.habitability)))
-    if body.station_dockable or body.body_type in ("orbital_station", "research_outpost"):
-        growth_rate = 0.00015
-    else:
-        growth_rate = (hab / 100.0) * 0.00025
+    capacity = body.population_capacity
+    if capacity <= 0:
+        capacity = compute_population_capacity(
+            body.body_type, body.radius_km, body.habitability, body.tech_level
+        )
+    return step_population(
+        body.population,
+        capacity,
+        body.habitability,
+        body.tech_level,
+        body.devastation,
+        num_ticks,
+    )
 
-    factor = (1.0 + growth_rate) ** num_ticks
-    devastation = max(0.0, min(100.0, float(body.devastation or 0.0)))
-    if devastation > 0:
-        death_rate = (devastation / 100.0) ** 1.5 * 0.0022
-        factor *= max(0.90, 1.0 - death_rate * num_ticks)
-    growth = int(round(body.population * (factor - 1.0)))
-    if growth == 0 and growth_rate > 0 and devastation <= 0:
-        growth = 1
-    return max(0, body.population + growth)
+
+def world_tech_level(faction: str, body_type: str, market_archetype: str = "none") -> int:
+    """Technology available on a world from its owner and local industrial base."""
+    tech = FACTION_TECH_LEVELS.get(faction, FACTION_TECH_LEVELS["Unclaimed"])
+    if market_archetype == "high_tech":
+        tech += 1
+    if body_type in ("orbital_station", "research_outpost", "quantum_relay", "dyson_sphere"):
+        tech += 1
+    return max(1, min(10, tech))
 
 
 class GalaxyGenerator:
@@ -904,22 +918,6 @@ class GalaxyGenerator:
                 for j in range(moon_count)
             )
 
-            is_inhabited = is_station or body_type in habitable_types
-            if body_type in habitable_types:
-                core_boost = 2.8 if sys_id in ("sol", "alpha_centauri", "kepler", "helios", "meridian") else 1.0
-                body_pop = int(
-                    (140_000_000 + (i + 1) * 55_000_000)
-                    * core_boost
-                    * (0.75 + (i % 3) * 0.18)
-                )
-                body_gov = default_gov
-            elif is_station:
-                body_pop = 450_000 + (i + 1) * 140_000
-                body_gov = "Science Directorate" if body_type == "research_outpost" else default_gov
-            else:
-                body_pop = 0
-                body_gov = "None"
-
             body_hazards = ("pirate_activity",) if market_arch == "black_market" else ()
             rad_seed = 4000.0 + ((i + len(sys_id)) % 9) * 6500.0
             grav_seed = 0.65 + ((i * 3 + len(sys_id)) % 7) * 0.22
@@ -933,6 +931,26 @@ class GalaxyGenerator:
                 temp_jitter=jitter_seed,
                 hazards=body_hazards,
             )
+
+            is_inhabited = is_station or body_type in habitable_types
+            body_tech = world_tech_level(faction, body_type, market_arch)
+            body_capacity = compute_population_capacity(
+                body_type, float(phys["radius_km"]), float(phys["habitability"]), body_tech
+            )
+            if body_type in habitable_types or is_station:
+                body_pop = initial_population(
+                    body_type,
+                    float(phys["radius_km"]),
+                    float(phys["habitability"]),
+                    body_tech,
+                    faction,
+                    market_arch,
+                    is_station,
+                )
+                body_gov = "Science Directorate" if body_type == "research_outpost" else default_gov
+            else:
+                body_pop = 0
+                body_gov = "None"
 
             bodies.append(
                 CelestialBody(
@@ -957,13 +975,15 @@ class GalaxyGenerator:
                     landable=body_type in habitable_types,
                     faction=faction if is_inhabited else "Unclaimed",
                     population=body_pop,
+                    population_capacity=body_capacity,
+                    tech_level=body_tech,
                     government=body_gov,
                     habitability=float(phys["habitability"]),
                 )
             )
 
         special_objects = {
-            "sol": ("dyson_sphere", "Dyson Sphere Helios", 0.82, "#ffd166", "Stellar-scale photovoltaic shell harvesting the Sol primary.", True),
+            "sol": ("dyson_sphere", "Helios Dyson Swarm", 0.06, "#ffd166", "Partial Dyson swarm: millions of collector panels and maintenance habitats harvesting the Sol primary.", True),
             "alpha_centauri": ("quantum_relay", "Quantum Relay Alpha", 2.4, "#7bf1a8", "Entanglement relay node carrying instant messages across the frontier.", True),
             "cygnus_x1": ("wormhole", "Cygnus Throat", 4.8, "#d0bfff", "Stable wormhole mouth bending local hyperspace lanes.", False),
             "cyclops": ("solar_collector", "Cyclops Collector Swarm", 3.1, "#ffd60a", "Orbital solar-panel lattice feeding the colony grid.", True),
@@ -979,6 +999,32 @@ class GalaxyGenerator:
                 temp_jitter=0,
                 hazards=(),
             )
+            obj_tech = world_tech_level(faction, obj_type, "high_tech" if obj_dock else "none")
+            # A swarm is a shell around the primary, not a planet orbiting at its own
+            # radius: its physical radius is the collector-shell distance (0.25 AU).
+            obj_radius = (
+                0.25 * 149_600_000.0 if obj_type == "dyson_sphere" else float(obj_phys["radius_km"])
+            )
+            obj_population = (
+                initial_population(
+                    obj_type,
+                    obj_radius,
+                    float(obj_phys["habitability"]),
+                    obj_tech,
+                    faction,
+                    "high_tech",
+                    obj_dock,
+                )
+                if obj_dock
+                else 0
+            )
+            obj_capacity = (
+                compute_population_capacity(
+                    obj_type, obj_radius, float(obj_phys["habitability"]), obj_tech
+                )
+                if obj_dock
+                else 0
+            )
             bodies.append(
                 CelestialBody(
                     id=f"{sys_id}_{obj_type}",
@@ -987,7 +1033,7 @@ class GalaxyGenerator:
                     orbit_radius=obj_orbit,
                     orbit_speed=0.045,
                     current_angle=1.7,
-                    radius_km=float(obj_phys["radius_km"]) if obj_type != "dyson_sphere" else 149_600_000.0,
+                    radius_km=obj_radius,
                     color=obj_color,
                     hazards=() if obj_type != "wormhole" else ("tidal_shear",),
                     station_dockable=obj_dock,
@@ -1001,7 +1047,9 @@ class GalaxyGenerator:
                     moons=(),
                     landable=obj_dock,
                     faction=faction if obj_dock else "Unclaimed",
-                    population=2_400_000_000 if obj_type == "dyson_sphere" else (120_000 if obj_dock else 0),
+                    population=obj_population,
+                    population_capacity=obj_capacity,
+                    tech_level=obj_tech,
                     government="Solar Engineering Directorate" if obj_type == "dyson_sphere" else ("Relay Authority" if obj_dock else "None"),
                     habitability=float(obj_phys["habitability"]),
                 )
@@ -1017,6 +1065,11 @@ class GalaxyGenerator:
                 temp_jitter=0,
                 hazards=(),
             )
+            ring_tech = world_tech_level(faction, "ring_world", "high_tech")
+            ring_radius = float(ring_phys["radius_km"])
+            ring_capacity = compute_population_capacity(
+                "ring_world", ring_radius, float(ring_phys["habitability"]), ring_tech
+            )
             bodies.append(
                 CelestialBody(
                     id=f"{sys_id}_ring_world",
@@ -1025,7 +1078,7 @@ class GalaxyGenerator:
                     orbit_radius=4.2,
                     orbit_speed=0.035,
                     current_angle=0.9,
-                    radius_km=float(ring_phys["radius_km"]),
+                    radius_km=ring_radius,
                     color="#c77dff",
                     hazards=(),
                     station_dockable=True,
@@ -1039,7 +1092,11 @@ class GalaxyGenerator:
                     moons=(),
                     landable=True,
                     faction=faction,
-                    population=650_000_000,
+                    population=initial_population(
+                        "ring_world", ring_radius, float(ring_phys["habitability"]), ring_tech, faction, "high_tech", True
+                    ),
+                    population_capacity=ring_capacity,
+                    tech_level=ring_tech,
                     government=gov_map.get(faction, "Ring Assembly"),
                     habitability=float(ring_phys["habitability"]),
                 )
@@ -1059,11 +1116,13 @@ class GalaxyGenerator:
                 temp_jitter=0,
                 hazards=bodies[landable_index].hazards,
             )
+            savanna_tech = world_tech_level(faction, "savanna", "agricultural")
+            savanna_radius = float(savanna_phys["radius_km"])
             bodies[landable_index] = replace(
                 bodies[landable_index],
                 body_type="savanna",
                 color="#90be6d",
-                radius_km=float(savanna_phys["radius_km"]),
+                radius_km=savanna_radius,
                 atmosphere=str(savanna_phys["atmosphere"]),
                 temperature_c=int(savanna_phys["temperature_c"]),
                 gravity=float(savanna_phys["gravity"]),
@@ -1073,7 +1132,13 @@ class GalaxyGenerator:
                 station_dockable=True,
                 scan_discovery="Temperate savanna world with a breathable atmosphere and fertile colony belts.",
                 faction=faction,
-                population=185_000_000,
+                population=initial_population(
+                    "savanna", savanna_radius, float(savanna_phys["habitability"]), savanna_tech, faction, "agricultural", True
+                ),
+                population_capacity=compute_population_capacity(
+                    "savanna", savanna_radius, float(savanna_phys["habitability"]), savanna_tech
+                ),
+                tech_level=savanna_tech,
                 government=default_gov,
             )
 
@@ -1083,11 +1148,13 @@ class GalaxyGenerator:
                 spectral_type=spectral,
                 orbit_radius_au=bodies[-1].orbit_radius,
             )
+            station_tech = world_tech_level(faction, "orbital_station", "high_tech")
+            station_radius = float(station_phys["radius_km"])
             bodies[-1] = replace(
                 bodies[-1],
                 body_type="orbital_station",
                 color="#00f0ff",
-                radius_km=float(station_phys["radius_km"]),
+                radius_km=station_radius,
                 gravity=float(station_phys["gravity"]),
                 atmosphere=str(station_phys["atmosphere"]),
                 temperature_c=int(station_phys["temperature_c"]),
@@ -1097,7 +1164,13 @@ class GalaxyGenerator:
                 market_archetype="high_tech",
                 scan_discovery="Orbital trade citadel servicing deep-space convoys.",
                 faction=faction,
-                population=420_000,
+                population=initial_population(
+                    "orbital_station", station_radius, float(station_phys["habitability"]), station_tech, faction, "high_tech", True
+                ),
+                population_capacity=compute_population_capacity(
+                    "orbital_station", station_radius, float(station_phys["habitability"]), station_tech
+                ),
+                tech_level=station_tech,
                 government=default_gov,
             )
 

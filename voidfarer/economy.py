@@ -168,10 +168,23 @@ def tick_global_economy(
 
     # 1. Update stockpiles across systems
     for sys_id, market in state.markets.items():
+        system = systems.get(sys_id)
+        populated = [body for body in system.bodies if body.population > 0] if system else []
+        if populated:
+            average_devastation = sum(
+                max(0.0, float(body.devastation or 0.0)) for body in populated
+            ) / len(populated)
+        elif system and system.bodies:
+            average_devastation = sum(
+                max(0.0, float(body.devastation or 0.0)) for body in system.bodies
+            ) / len(system.bodies)
+        else:
+            average_devastation = 0.0
+        production_factor = max(0.25, 1.0 - average_devastation / 100.0 * 0.60)
         new_stocks = dict(market.stockpiles)
         for comm_id, p_rate in market.production_rates.items():
-            # Production adds units over ticks
-            growth = int((p_rate * num_ticks) / 4)
+            # Production adds units over ticks; bombed industry cannot meet its old rate.
+            growth = int((p_rate * num_ticks) / 4 * production_factor)
             new_stocks[comm_id] = min(MAX_STOCK, new_stocks.get(comm_id, 50) + growth)
 
         for comm_id, c_rate in market.consumption_rates.items():

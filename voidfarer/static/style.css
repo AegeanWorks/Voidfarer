@@ -2790,6 +2790,14 @@ body.void-transit::after {
     transition: width 0.3s ease;
 }
 
+.faction-economy {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    line-height: 1.45;
+}
+
 .faction-perk, .corp-perk {
     font-family: var(--font-mono);
     font-size: 0.70rem;
@@ -8233,6 +8241,9 @@ body.cockpit-theme .nav-panel > .panel-header {
     bottom: 4px;
     width: min(440px, 55vw);
     max-height: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
 }
 .surface-op-main {
     flex-direction: row;

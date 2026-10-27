@@ -915,7 +915,18 @@ class TestPostPushPolishLayout(unittest.TestCase):
     def setUpClass(cls):
         cls.css = STYLE_CSS.read_text(encoding="utf-8")
         cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
         cls.browser_tool = (STATIC_DIR.parent.parent / "tools" / "ui_browser.py").read_text(encoding="utf-8")
+
+    def test_target_card_scrolls_instead_of_spilling_at_short_viewports(self):
+        self.assertRegex(self.css, r"\.nav-target-card\s*\{[^}]*overflow-y:\s*auto", re.S)
+        self.assertRegex(self.css, r"\.nav-target-card\s*\{[^}]*overscroll-behavior:\s*contain", re.S)
+
+    def test_target_card_reports_population_capacity_and_world_tech(self):
+        self.assertIn('id="targetCapacity"', self.html)
+        self.assertIn('id="targetTech"', self.html)
+        self.assertIn("population_capacity", self.js)
+        self.assertIn("DYSON SWARM", self.js)
 
     def test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths(self):
         self.assertIn("contract-cat-label-full", self.js)
