@@ -8,7 +8,7 @@ from dataclasses import replace
 from typing import Any, Sequence
 
 from voidfarer.demographics import compute_population_capacity, world_tech_level
-from voidfarer.factions import CANONICAL_FACTIONS
+from voidfarer.factions import CANONICAL_FACTIONS, government_for
 from voidfarer.models import FactionLeader, StarSystem, WarState
 
 LEADER_ARCHETYPES: dict[str, dict[str, Any]] = {
@@ -279,7 +279,7 @@ def force_peace_for_broke_factions(
 
 
 def _apply_owner_technology(system: StarSystem, owner_name: str) -> StarSystem:
-    """A conquered world's life support and capacity follow its new owner's technology."""
+    """A conquered world adopts its new owner's flag, government, tech and capacity."""
     bodies = []
     for body in system.bodies:
         if body.body_type in ("star", "black_hole", "wormhole"):
@@ -289,9 +289,16 @@ def _apply_owner_technology(system: StarSystem, owner_name: str) -> StarSystem:
         capacity = compute_population_capacity(
             body.body_type, body.radius_km, body.habitability, tech
         )
+        inhabited = body.population > 0 or body.station_dockable
         bodies.append(
             replace(
                 body,
+                faction=owner_name if inhabited else body.faction,
+                government=(
+                    government_for(owner_name, body.body_type)
+                    if inhabited
+                    else body.government
+                ),
                 tech_level=tech,
                 population_capacity=capacity,
                 population=min(body.population, capacity) if capacity > 0 else 0,
@@ -391,6 +398,7 @@ def simulate_faction_behaviors(
     current_tick: int,
     eliminated: tuple[str, ...],
     num_ticks: int = 1,
+    broke_factions: frozenset[str] = frozenset(),
 ) -> tuple[tuple[WarState, ...], dict[str, StarSystem], tuple[str, ...], list[str]]:
     """Apply leader archetypes: declare wars, then resolve active fronts."""
     logs: list[str] = []
@@ -414,6 +422,9 @@ def simulate_faction_behaviors(
     if declaration_chance > 0.0 and rng.random() < declaration_chance:
         for leader in leaders:
             if leader.faction_id not in living or leader.aggression < 0.55:
+                continue
+            # An empty treasury cannot fund an offensive, so a broke fleet stays home.
+            if leader.faction_id in broke_factions:
                 continue
             # No dogpiling: a faction already defending one war cannot be attacked again.
             defending = {w.defender_id for w in new_wars if w.active}

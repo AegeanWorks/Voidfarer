@@ -103,6 +103,33 @@ def can_build_on(body: CelestialBody, outpost_type: OutpostType) -> bool:
     return body.body_type in outpost_type.allowed_bodies
 
 
+def outpost_population_capacity(outpost_type: str, level: int) -> int:
+    """Housing ceiling for an installation: colony domes hold far more than a mining rig."""
+    base = 30_000 if outpost_type == "colony" else 6_000
+    return base * max(1, int(level))
+
+
+def outpost_capacity_for(outpost: Outpost) -> int:
+    """Stored housing ceiling, falling back to the catalog for older saves."""
+    if outpost.population_capacity > 0:
+        return outpost.population_capacity
+    return outpost_population_capacity(outpost.outpost_type, outpost.level)
+
+
+def grow_outpost_population(outpost: Outpost, num_ticks: int) -> int:
+    """Logistic settlement growth toward the housing ceiling, never past it."""
+    capacity = outpost_capacity_for(outpost)
+    population = max(0, int(outpost.population))
+    ticks = max(0, int(num_ticks))
+    if population <= 0 or capacity <= 0 or ticks <= 0:
+        return min(population, capacity)
+    if population >= capacity:
+        return capacity
+    rate = 0.00005
+    ratio = (capacity - population) / population * pow(2.718281828459045, -rate * ticks)
+    return max(population, min(capacity, int(round(capacity / (1.0 + ratio)))))
+
+
 def build_outpost(
     outpost_type: OutpostType,
     system_id: str,
@@ -118,6 +145,7 @@ def build_outpost(
         outpost_type=outpost_type.id,
         level=1,
         population=250 if outpost_type.id != "colony" else 1200,
+        population_capacity=outpost_population_capacity(outpost_type.id, 1),
         modules={outpost_type.module: 1},
         production=dict(outpost_type.production),
         integrity=100.0,
@@ -148,6 +176,10 @@ def upgrade_outpost(outpost: Outpost, cost_scale: int = 450) -> tuple[bool, Outp
         outpost,
         level=outpost.level + 1,
         integrity=100.0,
-        population=int(outpost.population * 1.25),
+        population_capacity=outpost_population_capacity(outpost.outpost_type, outpost.level + 1),
+        population=min(
+            int(outpost.population * 1.25),
+            outpost_population_capacity(outpost.outpost_type, outpost.level + 1),
+        ),
     )
     return True, upgraded, cost, f"Upgraded {outpost.name} to level {upgraded.level} for {cost} cr."

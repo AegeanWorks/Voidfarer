@@ -117,6 +117,7 @@ from voidfarer.outposts import (
     build_outpost,
     can_build_on,
     get_outpost_type,
+    grow_outpost_population,
     outpost_tick_production,
     upgrade_outpost,
 )
@@ -6534,7 +6535,7 @@ class SimulationEngine:
                             break
                 updated_outposts.append(replace(
                     outpost,
-                    population=int(outpost.population * (1.0 + 0.00005 * num_ticks)),
+                    population=grow_outpost_population(outpost, num_ticks),
                     integrity=min(100.0, outpost.integrity + 0.1 * num_ticks),
                 ))
 
@@ -6596,6 +6597,11 @@ class SimulationEngine:
                 new_tick,
                 self.state.eliminated_factions,
                 num_ticks,
+                frozenset(
+                    economy.faction_id
+                    for economy in self.state.faction_economies
+                    if economy.treasury <= 0 and economy.net_income < 0
+                ),
             )
             new_faction_economies, faction_economy_logs = tick_faction_economies(
                 self.state.faction_economies,

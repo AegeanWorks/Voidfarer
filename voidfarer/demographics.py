@@ -78,6 +78,10 @@ ZERO_CAPACITY_TYPES = frozenset({
 # People per square kilometre at tech level 1 on a perfectly habitable world.
 BASE_DENSITY = 4.5
 
+# Share of a world's capacity that war devastation can permanently take away. The cockpit
+# mirrors this value for its capacity readout; tests keep both in step.
+DEVASTATION_CAPACITY_LOSS = 0.65
+
 
 def clamp_tech_level(tech_level: int | float) -> int:
     """Return a whole tech level in the supported 1..10 band."""
@@ -100,7 +104,7 @@ def effective_capacity(population_capacity: int, devastation: float = 0.0) -> in
     if cap <= 0:
         return 0
     dev = max(0.0, min(100.0, float(devastation or 0.0)))
-    return max(0, int(round(cap * (1.0 - 0.65 * dev / 100.0))))
+    return max(0, int(round(cap * (1.0 - DEVASTATION_CAPACITY_LOSS * dev / 100.0))))
 
 
 def compute_population_capacity(

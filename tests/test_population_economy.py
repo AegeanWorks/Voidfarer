@@ -1,10 +1,13 @@
 """Population capacity, technology limits, wartime devastation and faction treasuries."""
 
 import random
+import re
 import unittest
 from dataclasses import replace
+from pathlib import Path
 
 from voidfarer.demographics import (
+    DEVASTATION_CAPACITY_LOSS,
     compute_population_capacity,
     devastation_recovery,
     step_population,
@@ -16,10 +19,18 @@ from voidfarer.faction_state import (
     apply_war_devastation,
     force_peace_for_broke_factions,
     frontier_systems,
+    generate_faction_leaders,
     resolve_wars,
+    simulate_faction_behaviors,
 )
 from voidfarer.galaxy import GalaxyGenerator
 from voidfarer.models import FactionEconomy, GameState, WarState
+from voidfarer.outposts import (
+    build_outpost,
+    get_outpost_type,
+    grow_outpost_population,
+    upgrade_outpost,
+)
 
 
 class FixedZeroRng(random.Random):
@@ -128,6 +139,42 @@ class TestFactionEconomy(unittest.TestCase):
         self.assertLess(after.tech_level, before.tech_level)
         self.assertLess(after.population_capacity, before.population_capacity)
         self.assertLessEqual(after.population, after.population_capacity)
+        self.assertEqual(after.faction, "Void Corsairs")
+        self.assertEqual(after.government, "Pirate Warlordship")
+
+    def test_broke_faction_cannot_open_a_new_front(self):
+        systems = GalaxyGenerator(seed=42).generate_galaxy()
+        leaders = generate_faction_leaders(seed=42)
+        wars, _, _, logs = simulate_faction_behaviors(
+            leaders,
+            (),
+            systems,
+            FixedZeroRng(),
+            10,
+            (),
+            1,
+            frozenset(leader.faction_id for leader in leaders),
+        )
+        self.assertEqual(wars, ())
+        self.assertFalse(any("WAR DECLARED" in line for line in logs))
+
+    def test_outposts_grow_to_their_housing_ceiling_and_stop(self):
+        body = GalaxyGenerator(seed=42).generate_galaxy()["sol"].bodies[2]
+        outpost = build_outpost(get_outpost_type("mining"), "sol", body, 0, 0)
+        self.assertEqual(outpost.population_capacity, 6_000)
+        late = grow_outpost_population(outpost, 10_000_000)
+        self.assertEqual(late, outpost.population_capacity)
+        upgraded = upgrade_outpost(outpost)[1]
+        self.assertEqual(upgraded.population_capacity, 12_000)
+        self.assertLessEqual(upgraded.population, upgraded.population_capacity)
+
+    def test_cockpit_capacity_constant_matches_python(self):
+        app_js = (Path(__file__).resolve().parents[1] / "voidfarer" / "static" / "app.js").read_text(
+            encoding="utf-8"
+        )
+        match = re.search(r"const DEVASTATION_CAPACITY_LOSS = ([0-9.]+);", app_js)
+        self.assertIsNotNone(match)
+        self.assertAlmostEqual(float(match.group(1)), DEVASTATION_CAPACITY_LOSS)
 
     def test_batched_resolution_advances_wars_across_the_batch(self):
         systems = GalaxyGenerator(seed=42).generate_galaxy()

@@ -14,6 +14,7 @@ from voidfarer.demographics import (
     step_population,
     world_tech_level as _world_tech_level,
 )
+from voidfarer.factions import GOVERNMENT_BY_FACTION, government_for
 from voidfarer.mapmods import generate_map_modifiers
 from voidfarer.models import (
     AnomalyChoice,
@@ -873,18 +874,7 @@ class GalaxyGenerator:
             "solar_collector": ("fuel_cells",), "wormhole": ("xenoliths",),
         }
         moon_colors = ("#c0c0c0", "#9a8c98", "#e0e1dd", "#8ecae6")
-        gov_map = {
-            "Sol Coalition": "Federal Democracy",
-            "Free Spacers Syndicate": "Trade Directorate",
-            "Nebula Collective": "Technocratic Council",
-            "Void Corsairs": "Pirate Warlordship",
-            "Precursor Watch": "Monastic Curate",
-            "Kepler Concord": "Research Concordat",
-            "Helios Compact": "Foundry Assembly",
-            "Ashen Choir": "Relic Curate",
-            "Iron Meridian": "Chartered Directorate",
-        }
-        default_gov = gov_map.get(faction, "Colonial Republic")
+        default_gov = government_for(faction)
 
         num_bodies = 6 if sys_id in ("sol", "betelgeuse") else 5
         for i in range(num_bodies):
@@ -1094,7 +1084,7 @@ class GalaxyGenerator:
                     ),
                     population_capacity=ring_capacity,
                     tech_level=ring_tech,
-                    government=gov_map.get(faction, "Ring Assembly"),
+                    government=government_for(faction) if faction in GOVERNMENT_BY_FACTION else "Ring Assembly",
                     habitability=float(ring_phys["habitability"]),
                 )
             )

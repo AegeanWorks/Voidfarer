@@ -5,6 +5,9 @@
 
 const TICKS_PER_SECOND = 2.0;
 
+// Must match voidfarer/demographics.py DEVASTATION_CAPACITY_LOSS.
+const DEVASTATION_CAPACITY_LOSS = 0.65;
+
 const BODY_TYPE_LABELS = {
     dyson_sphere: "DYSON SWARM",
     ring_world: "RING WORLD",
@@ -3239,7 +3242,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             : "No outposts founded yet. Orbit a world and found one below.";
         this.renderOutpostBuild();
         this.outpostList.innerHTML = outposts.map(o => `
-            <div class="outpost-row"><span>${this.escapeHtml(o.name)} — LVL ${o.level} — POP ${Number(o.population).toLocaleString()}</span>
+            <div class="outpost-row"><span>${this.escapeHtml(o.name)} — LVL ${o.level} — POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}</span>
             <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button></div>
         `).join("");
         this.outpostList.querySelectorAll("[data-outpost-upgrade]").forEach(btn =>
@@ -4339,7 +4342,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.targetCapacity) {
                 const capacity = Number(b.population_capacity ?? 0);
                 const devastation = Number(b.devastation ?? 0);
-                const remaining = Math.max(0, Math.round(capacity * (1 - 0.65 * devastation / 100)));
+                const remaining = Math.max(0, Math.round(capacity * (1 - DEVASTATION_CAPACITY_LOSS * devastation / 100)));
                 this.targetCapacity.textContent = capacity > 0
                     ? `${this.compactCount(remaining)} / ${this.compactCount(capacity)}`
                     : "None";
@@ -4355,13 +4358,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     this.targetPopulation.textContent = "Uninhabited";
                 } else {
                     const tier = pop < 10000 ? "Outpost" : (pop < 1000000 ? "Colony" : (pop < 50000000 ? "Settlement" : (pop < 1000000000 ? "Metropolis" : "Mega-Ecumenopolis")));
-                    this.targetPopulation.textContent = `${pop.toLocaleString("en-US")} [${tier.toUpperCase()}]`;
+                    this.targetPopulation.textContent = `${this.compactCount(pop)} [${tier.toUpperCase()}]`;
                 }
             }
             if (this.targetGovernment) this.targetGovernment.textContent = b.government || "None";
             if (this.targetDevastation) {
                 const devastation = Number(b.devastation || 0);
-                const capacityLoss = Math.round(devastation * 0.65);
+                const capacityLoss = Math.round(devastation * DEVASTATION_CAPACITY_LOSS);
                 this.targetDevastation.textContent = devastation > 0
                     ? `${devastation.toFixed(1)}% (CAP -${capacityLoss}%)`
                     : "None";

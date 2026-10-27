@@ -383,6 +383,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         mime_type, _ = mimetypes.guess_type(str(file_path))
         if not mime_type:
             mime_type = "application/octet-stream"
+        # Without an explicit charset a browser decodes text/* as latin-1 and every em dash,
+        # arrow or accented name in the cockpit becomes a replacement character.
+        if mime_type.startswith("text/") or mime_type in (
+            "application/javascript",
+            "application/json",
+            "image/svg+xml",
+        ):
+            mime_type = f"{mime_type}; charset=utf-8"
 
         try:
             with open(file_path, "rb") as f:

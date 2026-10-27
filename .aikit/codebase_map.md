@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `77`
 - **Total Classes**: `204`
-- **Total Top-Level Functions**: `273`
-- **Total Class Methods**: `1128`
-- **Total Source Lines**: `33391`
+- **Total Top-Level Functions**: `277`
+- **Total Class Methods**: `1131`
+- **Total Source Lines**: `33519`
 
 ---
 
@@ -880,7 +880,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `272` lines (`12072` bytes)
+**Size**: `319` lines (`13985` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -898,6 +898,9 @@
   - Method `.test_front_worlds_lose_people_and_gain_devastation()`
 - `class TestFactionEconomy`
   - Method `.test_capture_retunes_worlds_to_the_new_owner_technology()`
+  - Method `.test_broke_faction_cannot_open_a_new_front()`
+  - Method `.test_outposts_grow_to_their_housing_ceiling_and_stop()`
+  - Method `.test_cockpit_capacity_constant_matches_python()`
   - Method `.test_batched_resolution_advances_wars_across_the_batch()`
   - Method `.test_bankrupt_faction_sues_for_peace()`
   - Method `.test_solvent_factions_keep_fighting()`
@@ -1557,7 +1560,7 @@
 ### [`voidfarer/demographics.py`](voidfarer/demographics.py)
 > *Population capacity, technology limits, and logistic growth for VoidFarer worlds.*
 
-**Size**: `219` lines (`7622` bytes)
+**Size**: `223` lines (`7839` bytes)
 
 **Functions:**
 - `def clamp_tech_level(tech_level)` - *Return a whole tech level in the supported 1..10 band.*
@@ -1603,7 +1606,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7117` lines (`354837` bytes)
+**Size**: `7123` lines (`355077` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1804,7 +1807,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `455` lines (`20293` bytes)
+**Size**: `466` lines (`20837` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -1819,9 +1822,9 @@
 - `def apply_war_devastation(wars, systems, rng, num_ticks)` - *Bombard both sides of every active front: civilians die and devastation accumulates.*
 - `def _end_war(war, score, current_tick, logs)`
 - `def force_peace_for_broke_factions(wars, economies, current_tick)` - *A faction that cannot pay its upkeep sues for peace instead of fighting on.*
-- `def _apply_owner_technology(system, owner_name)` - *A conquered world's life support and capacity follow its new owner's technology.*
+- `def _apply_owner_technology(system, owner_name)` - *A conquered world adopts its new owner's flag, government, tech and capacity.*
 - `def resolve_wars(wars, systems, rng, current_tick, eliminated, num_ticks)` - *Advance wars toward resolution: strength drives momentum, captures follow fronts.*
-- `def simulate_faction_behaviors(leaders, wars, systems, rng, current_tick, eliminated, num_ticks)` - *Apply leader archetypes: declare wars, then resolve active fronts.*
+- `def simulate_faction_behaviors(leaders, wars, systems, rng, current_tick, eliminated, num_ticks, broke_factions)` - *Apply leader archetypes: declare wars, then resolve active fronts.*
 - `def leader_for(leaders, faction_id)`
 
 ---
@@ -1829,7 +1832,7 @@
 ### [`voidfarer/factions.py`](voidfarer/factions.py)
 > *Galactic Factions, Megacorporations, Standings, and Geopolitical Mechanics.*
 
-**Size**: `308` lines (`12587` bytes)
+**Size**: `332` lines (`13550` bytes)
 
 **Classes:**
 - `class Faction` - *Sovereign faction or interstellar coalition.*
@@ -1841,6 +1844,7 @@
 
 **Functions:**
 - `def get_faction(faction_id)` - *Retrieve canonical faction by ID.*
+- `def government_for(faction_name, body_type)` - *Government installed by a faction, preserving science outposts as directorates.*
 - `def get_corporation(corp_id)` - *Retrieve canonical corporation by ID.*
 - `def get_faction_standing_tier(standing)` - *Calculate standing tier label and active perk description.*
 - `def calculate_faction_market_modifier(faction_id, standing)` - *Calculate purchase price multiplier based on faction standing.*
@@ -1881,7 +1885,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1286` lines (`57397` bytes)
+**Size**: `1276` lines (`56995` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -1954,7 +1958,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2101` lines (`77666` bytes)
+**Size**: `2107` lines (`77926` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -2143,7 +2147,7 @@
 ### [`voidfarer/outposts.py`](voidfarer/outposts.py)
 > *Outpost construction and production catalogs.*
 
-**Size**: `153` lines (`5396` bytes)
+**Size**: `185` lines (`6852` bytes)
 
 **Classes:**
 - `class OutpostType`
@@ -2152,6 +2156,9 @@
 **Functions:**
 - `def get_outpost_type(outpost_type)`
 - `def can_build_on(body, outpost_type)`
+- `def outpost_population_capacity(outpost_type, level)` - *Housing ceiling for an installation: colony domes hold far more than a mining rig.*
+- `def outpost_capacity_for(outpost)` - *Stored housing ceiling, falling back to the catalog for older saves.*
+- `def grow_outpost_population(outpost, num_ticks)` - *Logistic settlement growth toward the housing ceiling, never past it.*
 - `def build_outpost(outpost_type, system_id, body, current_tick, existing_count)`
 - `def outpost_tick_production(outpost, yield_multiplier)` - *Effective per-tick yield: catalog base, level growth, then modules and map multipliers.*
 - `def upgrade_outpost(outpost, cost_scale)`
@@ -2220,7 +2227,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1276` lines (`54307` bytes)
+**Size**: `1284` lines (`54704` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

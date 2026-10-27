@@ -1319,6 +1319,7 @@ class Outpost:
     outpost_type: str = "mining"
     level: int = 1
     population: int = 250
+    population_capacity: int = 6_000
     modules: dict[str, int] = field(default_factory=lambda: {"extractor": 1})
     production: dict[str, float] = field(default_factory=lambda: {"credits": 8.0, "research": 1.0})
     integrity: float = 100.0
@@ -1337,6 +1338,11 @@ class Outpost:
             outpost_type=str(data.get("outpost_type", "mining")),
             level=max(1, int(data.get("level", 1))),
             population=max(0, int(data.get("population", 250))),
+            population_capacity=max(
+                0,
+                int(data.get("population_capacity")
+                    or (30_000 if str(data.get("outpost_type", "mining")) == "colony" else 6_000)),
+            ),
             modules={str(k): int(v) for k, v in data.get("modules", {"extractor": 1}).items()},
             production={str(k): float(v) for k, v in data.get("production", {}).items()},
             integrity=float(data.get("integrity", 100.0)),

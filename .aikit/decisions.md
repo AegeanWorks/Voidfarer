@@ -871,3 +871,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Move `world_tech_level` into `demographics.py` (re-exported from `galaxy.py` for existing callers) and add `_apply_owner_technology`, which recomputes tech and capacity for every non-stellar body on capture and clamps population to the new ceiling.
   3. Thread faction stability and devastation recovery through the hyperspace `jump()` population path via one `_faction_stability()` helper shared with `tick()`.
 - **Consequences**: Batched and sequential play now agree on war progress; captures retune conquered worlds to the winner's technology; a 25-step batch resolution yields strictly more captures than a single step in regression tests; jump transit no longer ignores civil order. Suite: 649 tests (37 suites).
+
+### ADR-073: Conquered Flags, Outpost Housing Ceilings and a Shared Devastation Constant
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: The post-push audit found four inconsistencies around the population model. A captured system changed `StarSystem.faction` but left every `CelestialBody.faction` and `government` on the old owner, so the dossier and planet inspector named the defeated faction (11 stale bodies in a 3000-tick run). Player outposts grew without limit (`population *= 1.00005^ticks`), contradicting the capacity rule the user asked for, and older colony saves would have defaulted to the mining ceiling. The cockpit hard-coded `0.65` for devastation capacity loss, duplicating a backend formula with no guard. Separately, a faction with an empty treasury could still open a new war even though it then sued for peace at once.
+- **Decision**:
+  1. Add `GOVERNMENT_BY_FACTION` and `government_for()` to `factions.py`, use them in generation, and have `_apply_owner_technology` set the new owner's flag and government on inhabited or dockable bodies at capture.
+  2. Give `Outpost` a `population_capacity`, derive it from type and level (`6,000` standard, `30,000` colony, per level), grow outposts logistically toward it, and show `POP x / y` in the empire panel; older saves compute their ceiling from the outpost type.
+  3. Promote the loss share to `DEVASTATION_CAPACITY_LOSS` in `demographics.py`, mirror it as a named constant in `app.js`, and test that the two agree.
+  4. Pass a `broke_factions` set into `simulate_faction_behaviors` so an unfunded fleet cannot declare war.
+  5. Serve static assets with an explicit `charset=utf-8`, which also removes any dependence on the document encoding for future non-ASCII cockpit strings.
+- **Consequences**: Conquered worlds report the winner's flag, government, technology and capacity; outposts stop at their housing ceiling; the cockpit and backend cannot drift on devastation loss; a broke faction only defends. An investigation note: em dashes in the empire panel appeared as replacement characters in the audit console, but the DOM held U+2014 and the header change was hardening, not a rendering fix. Suite: 652 tests (37 suites); Edge audit at 1280x720 and 1920x1080 shows no overflow and no console errors.

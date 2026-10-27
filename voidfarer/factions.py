@@ -224,6 +224,30 @@ def get_faction(faction_id: str) -> Faction | None:
     return CANONICAL_FACTIONS.get(faction_id)
 
 
+# The civil government a faction installs on its worlds. Generation, conquest and the
+# cockpit all read this one table so a captured world never keeps a rival's government.
+GOVERNMENT_BY_FACTION: dict[str, str] = {
+    "Sol Coalition": "Federal Democracy",
+    "Free Spacers Syndicate": "Trade Directorate",
+    "Nebula Collective": "Technocratic Council",
+    "Void Corsairs": "Pirate Warlordship",
+    "Precursor Watch": "Monastic Curate",
+    "Kepler Concord": "Research Concordat",
+    "Helios Compact": "Foundry Assembly",
+    "Ashen Choir": "Relic Curate",
+    "Iron Meridian": "Chartered Directorate",
+}
+
+DEFAULT_GOVERNMENT = "Colonial Republic"
+
+
+def government_for(faction_name: str, body_type: str = "") -> str:
+    """Government installed by a faction, preserving science outposts as directorates."""
+    if body_type == "research_outpost":
+        return "Science Directorate"
+    return GOVERNMENT_BY_FACTION.get(faction_name, DEFAULT_GOVERNMENT)
+
+
 def get_corporation(corp_id: str) -> Corporation | None:
     """Retrieve canonical corporation by ID."""
     return CANONICAL_CORPORATIONS.get(corp_id)
