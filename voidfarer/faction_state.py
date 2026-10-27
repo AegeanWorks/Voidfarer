@@ -245,6 +245,38 @@ def _end_war(war: WarState, score: float, current_tick: int, logs: list[str]) ->
     return replace(war, war_score=round(score, 2), active=False, ended_tick=current_tick)
 
 
+def force_peace_for_broke_factions(
+    wars: Sequence[WarState],
+    economies: Sequence[Any],
+    current_tick: int,
+) -> tuple[tuple[WarState, ...], list[str]]:
+    """A faction that cannot pay its upkeep sues for peace instead of fighting on."""
+    broke = {
+        economy.faction_id
+        for economy in economies
+        if economy.treasury <= 0 and economy.net_income < 0
+    }
+    if not broke:
+        return tuple(wars), []
+    logs: list[str] = []
+    updated: list[WarState] = []
+    for war in wars:
+        if war.active and (war.attacker_id in broke or war.defender_id in broke):
+            broke_id = war.attacker_id if war.attacker_id in broke else war.defender_id
+            faction = CANONICAL_FACTIONS.get(broke_id)
+            attacker, defender = _faction_name(war.attacker_id), _faction_name(war.defender_id)
+            logs.append(
+                f"BANKRUPT PEACE: {faction.name if faction else broke_id} cannot pay its fleets, "
+                f"and {attacker} and {defender} sign a treaty."
+            )
+            updated.append(
+                replace(war, war_score=round(war.war_score, 2), active=False, ended_tick=current_tick)
+            )
+            continue
+        updated.append(war)
+    return tuple(updated), logs
+
+
 def resolve_wars(
     wars: Sequence[WarState],
     systems: dict[str, StarSystem],

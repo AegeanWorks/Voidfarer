@@ -4,12 +4,16 @@ import random
 import unittest
 from dataclasses import replace
 
-from voidfarer.demographics import compute_population_capacity, step_population
+from voidfarer.demographics import (
+    compute_population_capacity,
+    devastation_recovery,
+    step_population,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.faction_economy import compute_faction_economy, tick_faction_economies
-from voidfarer.faction_state import apply_war_devastation
+from voidfarer.faction_state import apply_war_devastation, force_peace_for_broke_factions
 from voidfarer.galaxy import GalaxyGenerator
-from voidfarer.models import GameState, WarState
+from voidfarer.models import FactionEconomy, GameState, WarState
 
 
 class FixedZeroRng(random.Random):
@@ -56,6 +60,15 @@ class TestPopulationCapacity(unittest.TestCase):
         self.assertGreater(healthy, 100_000)
         self.assertLess(ruined, healthy)
 
+    def test_civil_order_changes_population_growth(self):
+        stable = step_population(1_000_000, 10_000_000, 80.0, 8, 0.0, 40, 90.0)
+        unstable = step_population(1_000_000, 10_000_000, 80.0, 8, 0.0, 40, 10.0)
+        self.assertGreater(stable, unstable)
+
+    def test_devastation_recovery_scales_with_tech_and_order(self):
+        self.assertGreater(devastation_recovery(9, 90.0), devastation_recovery(9, 20.0))
+        self.assertGreater(devastation_recovery(9, 90.0), devastation_recovery(3, 90.0))
+
     def test_dyson_swarm_is_a_small_maintenance_population_not_a_planet(self):
         sol = GalaxyGenerator(seed=42).generate_galaxy()["sol"]
         swarm = next(body for body in sol.bodies if body.body_type == "dyson_sphere")
@@ -97,6 +110,38 @@ class TestWarDevastation(unittest.TestCase):
 
 
 class TestFactionEconomy(unittest.TestCase):
+    def test_bankrupt_faction_sues_for_peace(self):
+        war = WarState(
+            id="w_broke",
+            attacker_id="sol_coalition",
+            defender_id="nebula_collective",
+            started_tick=0,
+        )
+        broken = FactionEconomy(
+            faction_id="sol_coalition", treasury=0, net_income=-500, stability=20.0
+        )
+        solvent = FactionEconomy(
+            faction_id="nebula_collective", treasury=5_000, net_income=400, stability=60.0
+        )
+        wars, logs = force_peace_for_broke_factions((war,), (broken, solvent), 120)
+        self.assertFalse(wars[0].active)
+        self.assertEqual(wars[0].ended_tick, 120)
+        self.assertTrue(any("BANKRUPT PEACE" in line for line in logs))
+
+    def test_solvent_factions_keep_fighting(self):
+        war = WarState(
+            id="w_solvent",
+            attacker_id="sol_coalition",
+            defender_id="nebula_collective",
+            started_tick=0,
+        )
+        rich = FactionEconomy(
+            faction_id="sol_coalition", treasury=10_000, net_income=300, stability=60.0
+        )
+        wars, logs = force_peace_for_broke_factions((war,), (rich,), 120)
+        self.assertTrue(wars[0].active)
+        self.assertEqual(logs, [])
+
     def test_every_surviving_faction_has_a_treasury_and_cash_flow(self):
         engine = SimulationEngine(seed=42)
         economies = {e.faction_id: e for e in engine.state.faction_economies}

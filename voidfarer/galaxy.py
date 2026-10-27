@@ -708,8 +708,8 @@ def get_colony_tier(population: int) -> str:
     return "Mega-Ecumenopolis"
 
 
-def step_population_dynamics(body: CelestialBody, num_ticks: int = 1) -> int:
-    """Advance population with capacity, technology and devastation limits."""
+def step_population_dynamics(body: CelestialBody, num_ticks: int = 1, stability: float = 50.0) -> int:
+    """Advance population with capacity, technology, devastation and civil-order limits."""
     if body.population <= 0 or num_ticks <= 0:
         return 0
     capacity = body.population_capacity
@@ -724,6 +724,7 @@ def step_population_dynamics(body: CelestialBody, num_ticks: int = 1) -> int:
         body.tech_level,
         body.devastation,
         num_ticks,
+        stability,
     )
 
 

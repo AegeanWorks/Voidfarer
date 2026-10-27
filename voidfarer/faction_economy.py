@@ -75,8 +75,13 @@ def compute_faction_economy(
         * (1.0 + tech / 10.0)
         * (1.0 - weighted_devastation / 100.0)
     )
-    military_upkeep = int(worlds * 6 + active_wars * 45)
-    net_income = tax_income + trade_income + industrial_output - military_upkeep
+    gross_income = tax_income + trade_income + industrial_output
+    # Peacetime garrisons are cheap; a shooting war consumes a large share of the
+    # economy, so two simultaneous fronts can outrun a treasury and force a peace.
+    peacetime_upkeep = int(worlds * 8 + population_millions * 0.003)
+    war_fraction = min(0.95, active_wars * 0.50 + weighted_devastation / 100.0 * 0.20)
+    military_upkeep = peacetime_upkeep + int(gross_income * war_fraction)
+    net_income = gross_income - military_upkeep
 
     return FactionEconomy(
         faction_id=canonical_id,

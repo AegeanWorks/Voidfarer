@@ -157,6 +157,13 @@ def initial_population(
     return max(0, min(capacity, int(round(capacity * occupancy))))
 
 
+def devastation_recovery(tech_level: int | float, stability: float) -> float:
+    """Points of devastation a world repairs per tick from its tech and civil order."""
+    tech = clamp_tech_level(tech_level)
+    order = max(0.0, min(100.0, float(stability or 0.0))) / 100.0
+    return 0.030 * (0.60 + tech / 20.0) * (0.40 + 0.60 * order)
+
+
 def step_population(
     population: int,
     population_capacity: int,
@@ -164,6 +171,7 @@ def step_population(
     tech_level: int | float,
     devastation: float = 0.0,
     num_ticks: int = 1,
+    stability: float = 50.0,
 ) -> int:
     """Advance one world's population with logistic growth, tech limits and war deaths."""
     pop = max(0, int(population))
@@ -177,7 +185,9 @@ def step_population(
     hab = max(0.0, min(100.0, float(habitability or 0.0))) / 100.0
     tech = clamp_tech_level(tech_level)
     tech_growth = 1.0 + 0.08 * (tech - 1)
-    base_rate = 0.00045 * tech_growth * (0.10 + 0.90 * hab)
+    order = max(0.0, min(100.0, float(stability or 0.0))) / 100.0
+    civil_growth = 0.70 + 0.60 * order
+    base_rate = 0.00045 * tech_growth * (0.10 + 0.90 * hab) * civil_growth
 
     if pop > cap:
         # Over-capacity worlds shed people through emigration, famine, and crowding.

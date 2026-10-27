@@ -89,6 +89,7 @@ from voidfarer.economy import (
 )
 from voidfarer.faction_state import (
     faction_strength,
+    force_peace_for_broke_factions,
     generate_faction_leaders,
     leader_for,
     simulate_faction_behaviors,
@@ -144,7 +145,11 @@ from voidfarer.galaxy import (
     step_population_dynamics,
     world_tech_level,
 )
-from voidfarer.demographics import compute_population_capacity, initial_population
+from voidfarer.demographics import (
+    compute_population_capacity,
+    devastation_recovery,
+    initial_population,
+)
 from voidfarer.faction_economy import initialize_faction_economies, tick_faction_economies
 from voidfarer.messaging import choice_by_id, follow_up_message, tree_catalog, tree_root_message
 from voidfarer.mapmods import (
@@ -6397,23 +6402,34 @@ class SimulationEngine:
             )
 
             # 1. Orbital revolution: advance current_angle for every body in every star system
+            stability_by_faction = {
+                CANONICAL_FACTIONS[economy.faction_id].name: economy.stability
+                for economy in self.state.faction_economies
+                if economy.faction_id in CANONICAL_FACTIONS
+            }
             updated_systems = {}
             for sys_id, system in self.state.systems.items():
+                faction_stability = stability_by_faction.get(system.faction, 50.0)
                 updated_bodies = []
                 for body in system.bodies:
                     d_angle = body.orbit_speed * 0.05 * num_ticks
-                    updated_pop = step_population_dynamics(body, num_ticks) if body.population > 0 else body.population
+                    updated_pop = (
+                        step_population_dynamics(body, num_ticks, faction_stability)
+                        if body.population > 0
+                        else body.population
+                    )
                     tapped, recharge_tick = recharge_volatile_reserve(
                         body.volatile_tapped,
                         body.volatile_recharge_tick,
                         new_tick,
                     )
+                    recovery = devastation_recovery(body.tech_level, faction_stability)
                     updated_bodies.append(
                         replace(
                             body,
                             current_angle=(body.current_angle + d_angle) % (2.0 * math.pi),
                             population=updated_pop,
-                            devastation=max(0.0, (body.devastation or 0.0) - 0.015 * num_ticks),
+                            devastation=max(0.0, (body.devastation or 0.0) - recovery * num_ticks),
                             volatile_tapped=tapped,
                             volatile_recharge_tick=recharge_tick,
                         )
@@ -6577,6 +6593,10 @@ class SimulationEngine:
                 num_ticks,
             )
             faction_logs.extend(faction_economy_logs)
+            new_wars, bankrupt_peace_logs = force_peace_for_broke_factions(
+                new_wars, new_faction_economies, new_tick
+            )
+            faction_logs.extend(bankrupt_peace_logs)
 
             # 9. Reactor thermal simulation: heat, cooling, derating, and core wear
             tick_system = self.state.systems.get(cur_ship.current_system_id, self.current_system)

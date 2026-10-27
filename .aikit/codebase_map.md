@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `77`
 - **Total Classes**: `204`
-- **Total Top-Level Functions**: `269`
-- **Total Class Methods**: `1121`
-- **Total Source Lines**: `33186`
+- **Total Top-Level Functions**: `271`
+- **Total Class Methods**: `1125`
+- **Total Source Lines**: `33299`
 
 ---
 
@@ -880,7 +880,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `191` lines (`8598` bytes)
+**Size**: `236` lines (`10440` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -891,10 +891,14 @@
   - Method `.test_technology_and_habitability_raise_capacity()`
   - Method `.test_batched_ticks_never_overshoot_capacity()`
   - Method `.test_growth_stops_at_capacity_and_devastation_reverses_it()`
+  - Method `.test_civil_order_changes_population_growth()`
+  - Method `.test_devastation_recovery_scales_with_tech_and_order()`
   - Method `.test_dyson_swarm_is_a_small_maintenance_population_not_a_planet()`
 - `class TestWarDevastation`
   - Method `.test_front_worlds_lose_people_and_gain_devastation()`
 - `class TestFactionEconomy`
+  - Method `.test_bankrupt_faction_sues_for_peace()`
+  - Method `.test_solvent_factions_keep_fighting()`
   - Method `.test_every_surviving_faction_has_a_treasury_and_cash_flow()`
   - Method `.test_war_adds_upkeep_and_reduces_net_income()`
   - Method `.test_tick_pays_income_into_the_treasury()`
@@ -1551,7 +1555,7 @@
 ### [`voidfarer/demographics.py`](voidfarer/demographics.py)
 > *Population capacity, technology limits, and logistic growth for VoidFarer worlds.*
 
-**Size**: `199` lines (`6677` bytes)
+**Size**: `209` lines (`7164` bytes)
 
 **Functions:**
 - `def clamp_tech_level(tech_level)` - *Return a whole tech level in the supported 1..10 band.*
@@ -1559,7 +1563,8 @@
 - `def effective_capacity(population_capacity, devastation)` - *Capacity left after war damage; devastation removes up to 65% of the ceiling.*
 - `def compute_population_capacity(body_type, radius_km, habitability, tech_level)` - *Maximum sustainable population from surface area, habitability and technology.*
 - `def initial_population(body_type, radius_km, habitability, tech_level, faction, market_archetype, station_dockable)` - *Settle a generated world at a faction-appropriate share of its capacity.*
-- `def step_population(population, population_capacity, habitability, tech_level, devastation, num_ticks)` - *Advance one world's population with logistic growth, tech limits and war deaths.*
+- `def devastation_recovery(tech_level, stability)` - *Points of devastation a world repairs per tick from its tech and civil order.*
+- `def step_population(population, population_capacity, habitability, tech_level, devastation, num_ticks, stability)` - *Advance one world's population with logistic growth, tech limits and war deaths.*
 
 ---
 
@@ -1595,7 +1600,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7085` lines (`353410` bytes)
+**Size**: `7105` lines (`354225` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1781,7 +1786,7 @@
 ### [`voidfarer/faction_economy.py`](voidfarer/faction_economy.py)
 > *Basic per-faction economy: tax base, industry, upkeep, treasury and war burden.*
 
-**Size**: `149` lines (`5464` bytes)
+**Size**: `154` lines (`5834` bytes)
 
 **Functions:**
 - `def _owned_systems(faction_name, systems)`
@@ -1795,7 +1800,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `385` lines (`17200` bytes)
+**Size**: `417` lines (`18469` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -1809,6 +1814,7 @@
 - `def frontier_systems(winner_name, loser_name, systems)` - *Loser-held systems with a hyperlane into winner territory, sorted for determinism.*
 - `def apply_war_devastation(wars, systems, rng, num_ticks)` - *Bombard both sides of every active front: civilians die and devastation accumulates.*
 - `def _end_war(war, score, current_tick, logs)`
+- `def force_peace_for_broke_factions(wars, economies, current_tick)` - *A faction that cannot pay its upkeep sues for peace instead of fighting on.*
 - `def resolve_wars(wars, systems, rng, current_tick, eliminated)` - *Advance wars one step: strength drives momentum, captures follow hyperlane fronts.*
 - `def simulate_faction_behaviors(leaders, wars, systems, rng, current_tick, eliminated, num_ticks)` - *Apply leader archetypes: declare wars, then resolve active fronts.*
 - `def leader_for(leaders, faction_id)`
@@ -1870,7 +1876,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1289` lines (`57507` bytes)
+**Size**: `1290` lines (`57564` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -1886,7 +1892,7 @@
 - `def compute_habitability_index(body_type, gravity, temperature_c, atmosphere, hazards)` - *Compute a scientific Earth Similarity / Habitability Index in [0.0, 100.0].*
 - `def compute_scientific_planet_properties(body_type, spectral_type, orbit_radius_au, rad_sample, grav_sample, temp_jitter, hazards)` - *Derive physically consistent radius_km, gravity, atmosphere, temperature_c, and habitability.*
 - `def get_colony_tier(population)` - *Classify world or habitat population into sociological colony tiers.*
-- `def step_population_dynamics(body, num_ticks)` - *Advance population with capacity, technology and devastation limits.*
+- `def step_population_dynamics(body, num_ticks, stability)` - *Advance population with capacity, technology, devastation and civil-order limits.*
 - `def world_tech_level(faction, body_type, market_archetype)` - *Technology available on a world from its owner and local industrial base.*
 
 ---

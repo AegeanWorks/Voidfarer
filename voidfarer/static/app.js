@@ -5377,7 +5377,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const population = Number(econ.population || 0);
             const worlds = Number(econ.worlds || 0);
             const tech = Number(econ.tech_level || 1);
+            const warBurden = Number(econ.war_burden || 0);
             const netLabel = `${net >= 0 ? "+" : ""}${net.toLocaleString("en-US")}`;
+            const bankrupt = treasury <= 0 && net < 0;
 
             card.innerHTML = `
                 <div class="faction-top-row">
@@ -5388,8 +5390,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 <div class="standing-bar-wrap">
                     <div class="standing-bar-fill" style="width: ${barPct}%; background: ${factionColor};"></div>
                 </div>
-                <div class="faction-economy">TREASURY ${treasury.toLocaleString("en-US")} cr // NET ${netLabel}/t // STABILITY ${stability.toFixed(0)}%</div>
-                <div class="faction-economy">POP ${this.compactCount(population)} // WORLDS ${worlds} // TECH TL${tech}</div>
+                <div class="faction-economy${bankrupt ? " is-broke" : ""}">TREASURY ${treasury.toLocaleString("en-US")} cr // NET ${netLabel}/t // STABILITY ${stability.toFixed(0)}%</div>
+                <div class="faction-economy${bankrupt ? " is-broke" : ""}">POP ${this.compactCount(population)} // WORLDS ${worlds} // TECH TL${tech} // WAR BURDEN ${Math.round(warBurden * 100)}%</div>
                 <div class="faction-perk">Diplomatic Status: <strong>${this.escapeHtml(f.active_perk)}</strong></div>
             `;
             this.factionsGrid.appendChild(card);

@@ -850,3 +850,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
 - **Context**: The follow-up audit simulated `tick(2000)` and found zero wars, while 400 single ticks produced nine wars and 35 devastated worlds. War declarations used one linear roll per call (`WAR_DECLARATION_RATE * num_ticks`), so a batched tick was as peaceful as a single tick and the new devastation, attrition and war-burden mechanics were unreachable in batch gameplay and tests.
 - **Decision**: Compute the declaration chance as `1 - (1 - WAR_DECLARATION_RATE) ** num_ticks`, matching the compounding already used for front attrition, and cover it with a regression test that `tick(50)` declares a war and scars at least one world.
 - **Consequences**: Batched and real-time play now agree on war frequency; seed 42 declares a war within 50 ticks and leaves devastated worlds and wartime upkeep visible. Suite: 643 tests (37 suites).
+
+### ADR-071: Treasuries, Civil Order and War Costs Feed Back Into Population and Peace
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: The new faction economy was cosmetic. Treasuries only grew, peacetime upkeep was a few hundred credits against thousands of income, so no faction could ever go broke, and stability was computed but influenced nothing outside its own display. Population growth ignored civil order, and devastated worlds recovered at a fixed rate regardless of who owned them or how advanced they were.
+- **Decision**:
+  1. Price wartime upkeep as a share of gross income (`0.50` per active war plus `0.20` per 100% population-weighted devastation, capped at `0.95`), keeping peacetime garrisons cheap. One war is affordable; two simultaneous fronts drive a large faction's net income negative.
+  2. End active wars for a faction whose treasury is empty and whose net income is negative, with an explicit `BANKRUPT PEACE` log, so the economy can force a treaty.
+  3. Feed faction stability into population growth (`0.70 + 0.60 * stability`) and into devastation recovery (`0.030 * (0.60 + tech/20) * (0.40 + 0.60 * stability)`), threading stability from the stored economies into `step_population_dynamics`.
+  4. Show `WAR BURDEN` on faction cards and colour treasury/net rows when a faction is broke.
+- **Consequences**: War now has a budget: two-front wars turn net income negative, stability falls, growth slows, worlds rebuild slower, and an exhausted treasury ends the war. Seed 42 after 1500 ticks shows one treaty, eight devastated worlds and a broke corsair faction. Suite: 647 tests (37 suites); Edge faction-panel audit at 1280x720 reports nine cards, no card or panel overflow and zero console errors.

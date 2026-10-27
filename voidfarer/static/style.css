@@ -2798,6 +2798,10 @@ body.void-transit::after {
     line-height: 1.45;
 }
 
+.faction-economy.is-broke {
+    color: #ff8a5c;
+}
+
 .faction-perk, .corp-perk {
     font-family: var(--font-mono);
     font-size: 0.70rem;

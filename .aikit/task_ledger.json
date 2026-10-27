@@ -5,22 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793086281.0789492,
+    "updated_at": 1793086945.7159271,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "last10-audit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'last10-audit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793005362.61235,
-      "timestamp_str": "2026-10-26 12:02:42",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "state-roundtrip-audit",
       "phase": "phase 2",
@@ -297,6 +287,23 @@
         "next": "commit and push",
         "open": "UI contract evidence",
         "evidence": "unittest 643 OK"
+      }
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[5/6] War now costs a share of gross income, broke factions sue for peace, stability drives growth and rebuilding, and faction cards show war burden. checklists: passed (tests 647, hygiene, guidelines, secrets).",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793086945.7159271,
+      "timestamp_str": "2026-10-27 10:42:25",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "4/4 gates",
+        "next": "commit and push",
+        "open": "UI contract evidence",
+        "evidence": "unittest 647 OK, Edge audit clean"
       }
     }
   ]
