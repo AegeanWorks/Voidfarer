@@ -7,6 +7,7 @@ import random
 from dataclasses import replace
 from typing import Any, Sequence
 
+from voidfarer.demographics import compute_population_capacity, world_tech_level
 from voidfarer.factions import CANONICAL_FACTIONS
 from voidfarer.models import FactionLeader, StarSystem, WarState
 
@@ -277,71 +278,108 @@ def force_peace_for_broke_factions(
     return tuple(updated), logs
 
 
+def _apply_owner_technology(system: StarSystem, owner_name: str) -> StarSystem:
+    """A conquered world's life support and capacity follow its new owner's technology."""
+    bodies = []
+    for body in system.bodies:
+        if body.body_type in ("star", "black_hole", "wormhole"):
+            bodies.append(body)
+            continue
+        tech = world_tech_level(owner_name, body.body_type, body.market_archetype)
+        capacity = compute_population_capacity(
+            body.body_type, body.radius_km, body.habitability, tech
+        )
+        bodies.append(
+            replace(
+                body,
+                tech_level=tech,
+                population_capacity=capacity,
+                population=min(body.population, capacity) if capacity > 0 else 0,
+            )
+        )
+    return replace(system, bodies=tuple(bodies))
+
+
 def resolve_wars(
     wars: Sequence[WarState],
     systems: dict[str, StarSystem],
     rng: random.Random,
     current_tick: int,
     eliminated: tuple[str, ...],
+    num_ticks: int = 1,
 ) -> tuple[tuple[WarState, ...], dict[str, StarSystem], tuple[str, ...], list[str]]:
-    """Advance wars one step: strength drives momentum, captures follow hyperlane fronts.
+    """Advance wars toward resolution: strength drives momentum, captures follow fronts.
 
     Positive score favours the attacker. Reaching the threshold captures one front system
     and spends the threshold; with no shared border the advance stalls at half. Wars end in
     a treaty after WAR_EXHAUSTION_TICKS or WAR_MAX_CAPTURES captures, or when a side is gone.
+    A batched tick resolves the same number of steps as the ticks it stands for, so a
+    fast-forward is not a single strategic turn.
     """
     logs: list[str] = []
     updated_wars: list[WarState] = []
     updated_systems = dict(systems)
     removed = set(eliminated)
+    steps = max(1, min(int(num_ticks), WAR_EXHAUSTION_TICKS))
+    first_tick = current_tick - steps + 1
     for war in wars:
         if not war.active:
             updated_wars.append(war)
             continue
-        attacker_name, defender_name = _faction_name(war.attacker_id), _faction_name(war.defender_id)
-        momentum = war_momentum(war.attacker_id, war.defender_id, updated_systems)
-        score = war.war_score * (1.0 - WAR_ATTRITION) + momentum + rng.uniform(-WAR_NOISE, WAR_NOISE)
-        captured = war.captured_systems
-        if abs(score) >= WAR_CAPTURE_THRESHOLD:
-            sign = 1.0 if score > 0 else -1.0
-            winner_name, loser_name = (attacker_name, defender_name) if sign > 0 else (defender_name, attacker_name)
-            loser_id = war.defender_id if sign > 0 else war.attacker_id
-            front = frontier_systems(winner_name, loser_name, updated_systems)
-            target = _capture_target(front, loser_id, loser_name, score, updated_systems, rng)
-            if target is not None:
-                updated_systems[target] = replace(updated_systems[target], faction=winner_name)
-                severity = 2.0 if abs(score) >= 2 * WAR_CAPTURE_THRESHOLD else 1.0
-                updated_systems[target], civilians_lost = _devastate_system(
-                    updated_systems[target], rng, severity
-                )
-                captured = captured + (target,)
-                score -= sign * WAR_CAPTURE_THRESHOLD
-                logs.append(
-                    f"WAR: {winner_name} captured {updated_systems[target].name} from {loser_name}; "
-                    f"{civilians_lost:,} civilians displaced and the world left devastated."
-                )
-            elif not front:
-                # No shared border: the offensive stalls until a front opens.
-                score = sign * WAR_CAPTURE_THRESHOLD / 2
-            else:
-                # Only a defended capital faces the attacker: the siege holds below double score.
-                score = sign * min(abs(score), 2 * WAR_CAPTURE_THRESHOLD - 0.01)
-        war = replace(war, war_score=round(score, 2), captured_systems=captured)
+        # A war declared during this batch has not been fighting since the batch started.
+        war_first_tick = max(first_tick, war.started_tick)
+        war_steps = max(1, min(steps, current_tick - war_first_tick + 1))
+        for offset in range(war_steps):
+            step_tick = war_first_tick + offset
+            attacker_name, defender_name = _faction_name(war.attacker_id), _faction_name(war.defender_id)
+            momentum = war_momentum(war.attacker_id, war.defender_id, updated_systems)
+            score = war.war_score * (1.0 - WAR_ATTRITION) + momentum + rng.uniform(-WAR_NOISE, WAR_NOISE)
+            captured = war.captured_systems
+            if abs(score) >= WAR_CAPTURE_THRESHOLD:
+                sign = 1.0 if score > 0 else -1.0
+                winner_name, loser_name = (attacker_name, defender_name) if sign > 0 else (defender_name, attacker_name)
+                loser_id = war.defender_id if sign > 0 else war.attacker_id
+                front = frontier_systems(winner_name, loser_name, updated_systems)
+                target = _capture_target(front, loser_id, loser_name, score, updated_systems, rng)
+                if target is not None:
+                    updated_systems[target] = replace(updated_systems[target], faction=winner_name)
+                    severity = 2.0 if abs(score) >= 2 * WAR_CAPTURE_THRESHOLD else 1.0
+                    updated_systems[target], civilians_lost = _devastate_system(
+                        updated_systems[target], rng, severity
+                    )
+                    updated_systems[target] = _apply_owner_technology(
+                        updated_systems[target], winner_name
+                    )
+                    captured = captured + (target,)
+                    score -= sign * WAR_CAPTURE_THRESHOLD
+                    logs.append(
+                        f"WAR: {winner_name} captured {updated_systems[target].name} from {loser_name}; "
+                        f"{civilians_lost:,} civilians displaced and the world left devastated."
+                    )
+                elif not front:
+                    # No shared border: the offensive stalls until a front opens.
+                    score = sign * WAR_CAPTURE_THRESHOLD / 2
+                else:
+                    # Only a defended capital faces the attacker: the siege holds below double score.
+                    score = sign * min(abs(score), 2 * WAR_CAPTURE_THRESHOLD - 0.01)
+            war = replace(war, war_score=round(score, 2), captured_systems=captured)
 
-        gone = next(
-            (fid for fid in (war.attacker_id, war.defender_id)
-             if not _faction_systems(fid, updated_systems)),
-            None,
-        )
-        if gone is not None:
-            if gone not in removed:
-                removed.add(gone)
-                logs.append(f"FACTION ELIMINATED: {gone} has no remaining territory.")
-            updated_wars.append(replace(war, active=False, ended_tick=current_tick))
-        elif len(captured) >= WAR_MAX_CAPTURES or current_tick - war.started_tick >= WAR_EXHAUSTION_TICKS:
-            updated_wars.append(_end_war(war, score, current_tick, logs))
-        else:
-            updated_wars.append(war)
+            gone = next(
+                (fid for fid in (war.attacker_id, war.defender_id)
+                 if not _faction_systems(fid, updated_systems)),
+                None,
+            )
+            if gone is not None:
+                if gone not in removed:
+                    removed.add(gone)
+                    logs.append(f"FACTION ELIMINATED: {gone} has no remaining territory.")
+                war = replace(war, active=False, ended_tick=step_tick)
+                break
+            if len(captured) >= WAR_MAX_CAPTURES or step_tick - war.started_tick >= WAR_EXHAUSTION_TICKS:
+                war = _end_war(war, war.war_score, step_tick, logs)
+                break
+
+        updated_wars.append(war)
     return tuple(updated_wars), updated_systems, tuple(sorted(removed)), logs
 
 
@@ -407,7 +445,7 @@ def simulate_faction_behaviors(
     logs.extend(attrition_logs)
 
     resolved_wars, systems, eliminated_now, war_logs = resolve_wars(
-        new_wars, systems, rng, current_tick, eliminated
+        new_wars, systems, rng, current_tick, eliminated, num_ticks
     )
     logs.extend(war_logs)
     return resolved_wars, systems, eliminated_now, logs

@@ -11,7 +11,13 @@ from voidfarer.demographics import (
 )
 from voidfarer.engine import SimulationEngine
 from voidfarer.faction_economy import compute_faction_economy, tick_faction_economies
-from voidfarer.faction_state import apply_war_devastation, force_peace_for_broke_factions
+from voidfarer.faction_state import (
+    _apply_owner_technology,
+    apply_war_devastation,
+    force_peace_for_broke_factions,
+    frontier_systems,
+    resolve_wars,
+)
 from voidfarer.galaxy import GalaxyGenerator
 from voidfarer.models import FactionEconomy, GameState, WarState
 
@@ -110,6 +116,36 @@ class TestWarDevastation(unittest.TestCase):
 
 
 class TestFactionEconomy(unittest.TestCase):
+    def test_capture_retunes_worlds_to_the_new_owner_technology(self):
+        systems = GalaxyGenerator(seed=42).generate_galaxy()
+        system = next(
+            s for s in systems.values()
+            if any(b.body_type == "savanna" and b.population > 0 for b in s.bodies)
+        )
+        before = next(b for b in system.bodies if b.body_type == "savanna")
+        retuned = _apply_owner_technology(system, "Void Corsairs")
+        after = next(b for b in retuned.bodies if b.body_type == "savanna")
+        self.assertLess(after.tech_level, before.tech_level)
+        self.assertLess(after.population_capacity, before.population_capacity)
+        self.assertLessEqual(after.population, after.population_capacity)
+
+    def test_batched_resolution_advances_wars_across_the_batch(self):
+        systems = GalaxyGenerator(seed=42).generate_galaxy()
+        war = WarState(
+            id="w_batch",
+            attacker_id="sol_coalition",
+            defender_id="nebula_collective",
+            started_tick=50,
+            war_score=40.0,
+        )
+        single, _, _, _ = resolve_wars((war,), systems, FixedZeroRng(), 100, (), 1)
+        batched, _, _, _ = resolve_wars((war,), systems, FixedZeroRng(), 100, (), 25)
+        single_captures = len(single[0].captured_systems)
+        batched_captures = len(batched[0].captured_systems)
+        if not frontier_systems("Sol Coalition", "Nebula Collective", systems):
+            self.skipTest("seed 42 has no Sol/Nebula border")
+        self.assertGreater(batched_captures, single_captures)
+
     def test_bankrupt_faction_sues_for_peace(self):
         war = WarState(
             id="w_broke",

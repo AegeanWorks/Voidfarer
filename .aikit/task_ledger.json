@@ -5,29 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793086945.7159271,
+    "updated_at": 1793088093.7791808,
     "owner": "kilo:1",
     "started_by": "kilo:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "state-roundtrip-audit",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Add combined persistence coverage for pending decisions, pirate intercepts, trade orders, away missions and surface branches.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793007887.6362236,
-      "timestamp_str": "2026-10-26 12:44:47",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The last-ten audit did not have one test proving the combined new state survives save/load.",
-        "benefits": "Locks the JSON-safe round trip for all new state fields and documents the verification.",
-        "risks": "contract: test/documentation only; dependency: none; concurrency: none; state: no production behavior changes",
-        "mitigation": "Construct one complete state, round-trip through GameState.to_dict/from_dict, assert every field, run 4/4 gates"
-      }
-    },
     {
       "task_id": "state-roundtrip-audit",
       "phase": "phase 4",
@@ -304,6 +287,23 @@
         "next": "commit and push",
         "open": "UI contract evidence",
         "evidence": "unittest 647 OK, Edge audit clean"
+      }
+    },
+    {
+      "task_id": "galaxy-population-economy",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[6/6] Batched wars resolve per tick, captured worlds adopt owner tech, jump transit honors stability. checklists: passed (tests 649, hygiene, guidelines, secrets).",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793088093.7791808,
+      "timestamp_str": "2026-10-27 11:01:33",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "4/4 gates",
+        "next": "commit and push",
+        "open": "UI contract evidence",
+        "evidence": "unittest 649 OK"
       }
     }
   ]

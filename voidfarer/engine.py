@@ -615,6 +615,14 @@ class SimulationEngine:
         assigned = {cid for mission in target.away_missions for cid in mission.crew_ids}
         return calculate_crew_bonuses(tuple(member for member in target.crew if member.id not in assigned))
 
+    def _faction_stability(self) -> dict[str, float]:
+        """System owner name -> its faction's civil stability (default 50 for unclaimed)."""
+        return {
+            CANONICAL_FACTIONS[economy.faction_id].name: economy.stability
+            for economy in self.state.faction_economies
+            if economy.faction_id in CANONICAL_FACTIONS
+        }
+
     def _map_effects(self, system: StarSystem | None = None) -> dict[str, float]:
         """Aggregate the active map modifiers of a system (defaults to the current one)."""
         return aggregate_map_modifiers(system if system is not None else self.current_system)
@@ -1530,17 +1538,25 @@ class SimulationEngine:
             )
 
             # Advance planetary orbits across all systems by 2 transit ticks
+            stability_by_faction = self._faction_stability()
             updated_systems = {}
             for sys_id, system in self.state.systems.items():
+                faction_stability = stability_by_faction.get(system.faction, 50.0)
                 updated_bodies = []
                 for body in system.bodies:
                     d_angle = body.orbit_speed * 0.05 * 2
-                    updated_pop = step_population_dynamics(body, 2) if body.population > 0 else body.population
+                    updated_pop = (
+                        step_population_dynamics(body, 2, faction_stability)
+                        if body.population > 0
+                        else body.population
+                    )
+                    recovery = devastation_recovery(body.tech_level, faction_stability) * 2
                     updated_bodies.append(
                         replace(
                             body,
                             current_angle=(body.current_angle + d_angle) % (2.0 * math.pi),
                             population=updated_pop,
+                            devastation=max(0.0, (body.devastation or 0.0) - recovery),
                         )
                     )
                 updated_systems[sys_id] = StarSystem(
@@ -6402,11 +6418,7 @@ class SimulationEngine:
             )
 
             # 1. Orbital revolution: advance current_angle for every body in every star system
-            stability_by_faction = {
-                CANONICAL_FACTIONS[economy.faction_id].name: economy.stability
-                for economy in self.state.faction_economies
-                if economy.faction_id in CANONICAL_FACTIONS
-            }
+            stability_by_faction = self._faction_stability()
             updated_systems = {}
             for sys_id, system in self.state.systems.items():
                 faction_stability = stability_by_faction.get(system.faction, 50.0)

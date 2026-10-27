@@ -861,3 +861,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Feed faction stability into population growth (`0.70 + 0.60 * stability`) and into devastation recovery (`0.030 * (0.60 + tech/20) * (0.40 + 0.60 * stability)`), threading stability from the stored economies into `step_population_dynamics`.
   4. Show `WAR BURDEN` on faction cards and colour treasury/net rows when a faction is broke.
 - **Consequences**: War now has a budget: two-front wars turn net income negative, stability falls, growth slows, worlds rebuild slower, and an exhausted treasury ends the war. Seed 42 after 1500 ticks shows one treaty, eight devastated worlds and a broke corsair faction. Suite: 647 tests (37 suites); Edge faction-panel audit at 1280x720 reports nine cards, no card or panel overflow and zero console errors.
+
+### ADR-072: Batched Wars Resolve Per Tick and Conquered Worlds Adopt Owner Tech
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: The post-push audit found two batch and ownership gaps. `resolve_wars` advanced exactly one strategic step per `tick()` call, so a `tick(3000)` fast-forward declared a war but gave it a single roll, while 60 sequential `tick(50)` calls produced 25 wars, 11 captures and two eliminations. Separately, a captured world kept the previous owner's `tech_level` and `population_capacity`, so a low-tech corsair conquest retained high-tech carrying capacity, and the hyperspace `jump()` path advanced population without stability or devastation recovery, diverging from the main tick.
+- **Decision**:
+  1. Give `resolve_wars` a `num_ticks` parameter and resolve up to `WAR_EXHAUSTION_TICKS` steps, each with its own tick timestamp; clamp a war declared inside the batch so it cannot fight before its declaration tick.
+  2. Move `world_tech_level` into `demographics.py` (re-exported from `galaxy.py` for existing callers) and add `_apply_owner_technology`, which recomputes tech and capacity for every non-stellar body on capture and clamps population to the new ceiling.
+  3. Thread faction stability and devastation recovery through the hyperspace `jump()` population path via one `_faction_stability()` helper shared with `tick()`.
+- **Consequences**: Batched and sequential play now agree on war progress; captures retune conquered worlds to the winner's technology; a 25-step batch resolution yields strictly more captures than a single step in regression tests; jump transit no longer ignores civil order. Suite: 649 tests (37 suites).

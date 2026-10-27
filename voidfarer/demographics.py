@@ -131,6 +131,16 @@ def compute_population_capacity(
     return max(0, int(round(capacity)))
 
 
+def world_tech_level(faction: str, body_type: str, market_archetype: str = "none") -> int:
+    """Technology available on a world from its owner and local industrial base."""
+    tech = FACTION_TECH_LEVELS.get(faction, FACTION_TECH_LEVELS["Unclaimed"])
+    if market_archetype == "high_tech":
+        tech += 1
+    if body_type in ("orbital_station", "research_outpost", "quantum_relay", "dyson_sphere"):
+        tech += 1
+    return max(1, min(10, tech))
+
+
 def initial_population(
     body_type: str,
     radius_km: float,
