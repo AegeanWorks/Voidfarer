@@ -5397,6 +5397,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const warBurden = Number(econ.war_burden || 0);
             const netLabel = `${net >= 0 ? "+" : ""}${net.toLocaleString("en-US")}`;
             const bankrupt = treasury <= 0 && net < 0;
+            const tax = Number(econ.tax_income || 0);
+            const trade = Number(econ.trade_income || 0);
+            const industry = Number(econ.industrial_output || 0);
+            const upkeep = Number(econ.military_upkeep || 0);
+            const partners = Number(econ.trade_partners || 0);
+            const partnerNames = (econ.trade_partner_names || []).join(", ");
+            const techProgress = Math.round(Number(econ.tech_progress || 0));
+            const signed = value => `${value >= 0 ? "+" : ""}${value.toLocaleString("en-US")}`;
 
             card.innerHTML = `
                 <div class="faction-top-row">
@@ -5407,8 +5415,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 <div class="standing-bar-wrap">
                     <div class="standing-bar-fill" style="width: ${barPct}%; background: ${factionColor};"></div>
                 </div>
-                <div class="faction-economy${bankrupt ? " is-broke" : ""}">TREASURY ${treasury.toLocaleString("en-US")} cr // NET ${netLabel}/t // STABILITY ${stability.toFixed(0)}%</div>
-                <div class="faction-economy${bankrupt ? " is-broke" : ""}">POP ${this.compactCount(population)} // WORLDS ${worlds} // TECH TL${tech} // WAR BURDEN ${Math.round(warBurden * 100)}%</div>
+                <div class="faction-economy${bankrupt ? " is-broke" : ""}">TREASURY ${treasury.toLocaleString("en-US")} cr // NET <span class="econ-net ${net >= 0 ? "is-pos" : "is-neg"}">${netLabel}</span>/t // STABILITY ${stability.toFixed(0)}%</div>
+                <div class="faction-economy${bankrupt ? " is-broke" : ""} econ-breakdown" title="Per tick: taxes, trade income, industrial output, military upkeep"><span>TAX ${signed(tax)} · TRADE ${signed(trade)}</span> <span>IND ${signed(industry)} · UPKEEP −${upkeep.toLocaleString("en-US")}</span></div>
+                <div class="faction-economy${bankrupt ? " is-broke" : ""} econ-breakdown" title="${partnerNames ? `Trade partners: ${this.escapeHtml(partnerNames)}` : "No active trade routes"}"><span>POP ${this.compactCount(population)} · ${worlds} WORLDS</span> <span>TL${tech} ${techProgress}% · TRADE ${partners}</span></div>
+                <div class="faction-economy${bankrupt ? " is-broke" : ""}">WAR BURDEN ${Math.round(warBurden * 100)}%${bankrupt ? " · BANKRUPT" : ""}</div>
                 <div class="faction-perk">Diplomatic Status: <strong>${this.escapeHtml(f.active_perk)}</strong></div>
             `;
             this.factionsGrid.appendChild(card);
@@ -5603,10 +5613,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!stack) return;
         const host = stack.closest(".panel-left");
         const sync = () => {
-            const more = stack.scrollTop + stack.clientHeight < stack.scrollHeight - 2;
+            const stackMore = stack.scrollTop + stack.clientHeight < stack.scrollHeight - 2;
+            let more = stackMore;
+            if (!more) {
+                // Some tabs (FACTIONS, MESSAGES) scroll their own panel instead of the
+                // stack, so the cue must watch the active inner scroller too.
+                for (const panel of stack.querySelectorAll(".tab-content")) {
+                    if (panel.offsetParent === null) continue;
+                    if (panel.scrollHeight > panel.clientHeight + 2
+                        && panel.scrollTop + panel.clientHeight < panel.scrollHeight - 2) {
+                        more = true;
+                        break;
+                    }
+                }
+            }
             if (host) host.classList.toggle("has-more-below", more);
         };
         stack.addEventListener("scroll", sync, { passive: true });
+        stack.addEventListener("scroll", sync, true);
         if (typeof ResizeObserver === "function") {
             new ResizeObserver(sync).observe(stack);
         }

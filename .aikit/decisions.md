@@ -917,3 +917,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Drift worlds toward their owner's level after the economy step, once per `TECH_DRIFT_TICKS` (200), recomputing population capacity when a world upgrades. The `world_tech_level` helper now accepts a faction-level override, and `galaxy.py` re-exports the wider signature.
   5. Expose tax, trade, industry, upkeep, net, partners and tech progress in `galactic_politics` for the cockpit.
 - **Consequences**: A fresh galaxy has 11 routes; Sol trades with three partners for 235 cr/t. War severs only the belligerents' routes. A 20,000-tick run lifts most major factions to TL10, spreads world tech across 4-10, and grows population to 281B against 330B total capacity with zero over-capacity worlds. Suite: 671 tests (38 suites), including a new `test_faction_trade_tech` module.
+
+### ADR-077: Player-Visible Faction Economy Breakdown
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: ADR-076 exposed tax, trade, industry, upkeep, partners and tech progress, but the cockpit still showed only treasury, net and stability, so a player could not see where the money came from or went. The first draft broke the summary into long lines that wrapped mid-value at 1280px, and the new "SCROLL" cue did not appear on the FACTIONS tab because that tab scrolls its own panel rather than the deck stack.
+- **Decision**:
+  1. Show four compact lines per faction card: treasury/net/stability; `TAX · TRADE · IND · UPKEEP`; `POP · WORLDS · TL progress · TRADE partners`; war burden, with an explicit `BANKRUPT` marker.
+  2. Group each breakdown into `<span>` pairs under `flex-wrap`, so a narrow card wraps between whole figures, never inside a value; colour positive net green and negative net red; expose the full meaning and partner names through `title` tooltips.
+  3. Extend the deck scroll cue to inspect visible `.tab-content` scrollers using a capture-phase scroll listener, so FACTIONS, MESSAGES and similar tabs get the "more below" badge too.
+- **Consequences**: A DOM audit at 1280x720 and 1920x1080 shows zero line overflow, card `scrollHeight == clientHeight` (no internal clipping), and the SCROLL cue at opacity 1 on the factions tab. The free Nemotron 3.5 Super VL reviewer quoted all four Sol lines, confirmed the grouped wraps, the proper minus sign and green net, and reported only the expected panel-edge fold with the SCROLL badge. Suite: 676 tests (38 suites).

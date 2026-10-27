@@ -996,3 +996,43 @@ class TestTerminalDeckScrolling(unittest.TestCase):
         self.assertIn(".panel-left.has-more-below .deck-scroll-cue", self.css)
         self.assertIn("initDeckScrollHint", self.js)
         self.assertIn('classList.toggle("has-more-below"', self.js)
+
+    def test_cue_also_watches_inner_tab_scrollers(self):
+        self.assertIn('stack.addEventListener("scroll", sync, true)', self.js)
+        self.assertIn('querySelectorAll(".tab-content")', self.js)
+
+
+class TestFactionEconomyCard(unittest.TestCase):
+    """The faction card must show where money comes from and where it goes."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+
+    def test_card_lists_tax_trade_industry_and_upkeep(self):
+        self.assertIn("econ-breakdown", self.js)
+        self.assertIn("TAX ${signed(tax)}", self.js)
+        self.assertIn("TRADE ${signed(trade)}", self.js)
+        self.assertIn("IND ${signed(industry)}", self.js)
+        self.assertIn("UPKEEP", self.js)
+
+    def test_breakdown_wraps_between_figures_not_mid_value(self):
+        self.assertRegex(
+            self.css,
+            r"\.faction-economy\.econ-breakdown\s*\{[^}]*flex-wrap:\s*wrap",
+            re.S,
+        )
+        self.assertIn('<span>TAX', self.js)
+
+    def test_card_shows_positive_net_in_green(self):
+        self.assertIn("econ-net", self.js)
+        self.assertIn('net >= 0 ? "is-pos" : "is-neg"', self.js)
+        self.assertRegex(self.css, r"\.econ-net\.is-pos\s*\{[^}]*color:")
+
+    def test_card_shows_trade_partners_and_tech_progress(self):
+        self.assertIn("trade_partner_names", self.js)
+        self.assertIn("trade_partners", self.js)
+        self.assertIn("tech_progress", self.js)
+        self.assertIn("TRADE ${partners}", self.js)

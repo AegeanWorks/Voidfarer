@@ -2802,8 +2802,26 @@ body.void-transit::after {
     line-height: 1.45;
 }
 
+/* Group the breakdown so a narrow card wraps between figures, never mid-value. */
+.faction-economy.econ-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 12px;
+    row-gap: 2px;
+}
+
 .faction-economy.is-broke {
     color: #ff8a5c;
+}
+
+.econ-net {
+    font-weight: 600;
+}
+.econ-net.is-pos {
+    color: #8be28f;
+}
+.econ-net.is-neg {
+    color: #ff9b7a;
 }
 
 .faction-perk, .corp-perk {

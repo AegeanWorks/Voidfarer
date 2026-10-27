@@ -278,5 +278,19 @@
     "final_snapshot_digest": "47d5de707a20f89e95c10a1fda7efd8bfc0c816c09d7c32979d60104930eddda",
     "final_snapshot_entries": 915,
     "surface_digest": "8007281a8ae8313330ce9f8548c9243ffba0baf45a2e9c433155395791aa4a24"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "0d782803f471b4513fa365c9d1c63c9d5e666dab",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793117772.369262,
+    "finished_at": 1793119501.3001382,
+    "strikes": 0,
+    "reviewer": "NVIDIA Nemotron 3.5 Super VL (free) vision subagent via Kilo, authorized by the user; reviewed faction economy cards at 1280x720 and 1920x1080 on 2026-10-27",
+    "allowed_removals": [],
+    "final_snapshot_digest": "47d5de707a20f89e95c10a1fda7efd8bfc0c816c09d7c32979d60104930eddda",
+    "final_snapshot_entries": 915,
+    "surface_digest": "e9ae5ac79699124200c0bc7f2a1f8de20f8b66ec31fc54c548f31a9d020635be"
   }
 ]

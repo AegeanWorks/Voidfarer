@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `79`
-- **Total Classes**: `208`
+- **Total Classes**: `209`
 - **Total Top-Level Functions**: `286`
-- **Total Class Methods**: `1157`
-- **Total Source Lines**: `34142`
+- **Total Class Methods**: `1163`
+- **Total Source Lines**: `34182`
 
 ---
 
@@ -218,7 +218,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `998` lines (`45288` bytes)
+**Size**: `1038` lines (`46919` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -368,6 +368,13 @@
   - Method `.test_faction_list_fills_the_deck_instead_of_a_pixel_cap()`
   - Method `.test_dyson_shell_replaces_the_star_corona()`
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
+  - Method `.test_cue_also_watches_inner_tab_scrollers()`
+- `class TestFactionEconomyCard` - *The faction card must show where money comes from and where it goes.*
+  - Method `.setUpClass()`
+  - Method `.test_card_lists_tax_trade_industry_and_upkeep()`
+  - Method `.test_breakdown_wraps_between_figures_not_mid_value()`
+  - Method `.test_card_shows_positive_net_in_green()`
+  - Method `.test_card_shows_trade_partners_and_tech_progress()`
 
 ---
 
