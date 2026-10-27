@@ -334,7 +334,14 @@ def simulate_faction_behaviors(
         fid for fid in CANONICAL_FACTIONS
         if fid not in eliminated and _faction_systems(fid, systems)
     ]
-    if len(living) >= 2 and rng.random() < min(0.30, WAR_DECLARATION_RATE * num_ticks):
+    if len(living) >= 2:
+        # One roll covers the whole batch, so compound the per-tick chance; a single
+        # linear roll would make tick(2000) as peaceful as tick(1).
+        ticks = max(1, int(num_ticks))
+        declaration_chance = 1.0 - (1.0 - WAR_DECLARATION_RATE) ** ticks
+    else:
+        declaration_chance = 0.0
+    if declaration_chance > 0.0 and rng.random() < declaration_chance:
         for leader in leaders:
             if leader.faction_id not in living or leader.aggression < 0.55:
                 continue

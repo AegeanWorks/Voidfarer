@@ -9,8 +9,8 @@
 - **Total Python Modules**: `77`
 - **Total Classes**: `204`
 - **Total Top-Level Functions**: `269`
-- **Total Class Methods**: `1120`
-- **Total Source Lines**: `33171`
+- **Total Class Methods**: `1121`
+- **Total Source Lines**: `33186`
 
 ---
 
@@ -880,7 +880,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `183` lines (`8274` bytes)
+**Size**: `191` lines (`8598` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -899,6 +899,7 @@
   - Method `.test_war_adds_upkeep_and_reduces_net_income()`
   - Method `.test_tick_pays_income_into_the_treasury()`
   - Method `.test_faction_economies_survive_a_game_state_round_trip()`
+  - Method `.test_batched_tick_still_declares_wars_and_scars_worlds()`
   - Method `.test_reload_does_not_repopulate_a_war_killed_world()`
   - Method `.test_war_tick_lowers_front_population()`
 
@@ -1794,7 +1795,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `378` lines (`16884` bytes)
+**Size**: `385` lines (`17200` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*

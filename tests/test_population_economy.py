@@ -138,6 +138,14 @@ class TestFactionEconomy(unittest.TestCase):
         restored = GameState.from_dict(data)
         self.assertEqual(restored.faction_economies, engine.state.faction_economies)
 
+    def test_batched_tick_still_declares_wars_and_scars_worlds(self):
+        engine = SimulationEngine(seed=42)
+        engine.tick(50)
+        self.assertTrue(engine.state.wars)
+        self.assertTrue(
+            any(body.devastation > 0 for system in engine.state.systems.values() for body in system.bodies)
+        )
+
     def test_reload_does_not_repopulate_a_war_killed_world(self):
         engine = SimulationEngine(seed=42)
         sol = engine.state.systems["sol"]
