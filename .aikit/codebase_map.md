@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `77`
-- **Total Classes**: `205`
-- **Total Top-Level Functions**: `277`
-- **Total Class Methods**: `1139`
-- **Total Source Lines**: `33626`
+- **Total Python Modules**: `79`
+- **Total Classes**: `208`
+- **Total Top-Level Functions**: `286`
+- **Total Class Methods**: `1157`
+- **Total Source Lines**: `34142`
 
 ---
 
@@ -600,6 +600,34 @@
 
 ---
 
+### [`tests/test_faction_trade_tech.py`](tests/test_faction_trade_tech.py)
+> *Faction trade links and technology drift across the simulation.*
+
+**Size**: `169` lines (`6330` bytes)
+
+**Classes:**
+- `class TestTradeLinks`
+  - Method `.setUpClass()`
+  - Method `.test_peaceful_neighbours_trade()`
+  - Method `.test_every_link_crosses_a_hyperlane_between_the_two_owners()`
+  - Method `.test_war_severs_the_route()`
+  - Method `.test_each_faction_keeps_at_most_three_partners()`
+  - Method `.test_route_pays_half_its_volume_to_each_endpoint()`
+  - Method `.test_partner_names_are_canonical_names()`
+  - Method `.test_trade_links_round_trip_in_a_save()`
+- `class TestTechnologyDrift`
+  - Method `.setUpClass()`
+  - Method `.test_research_accumulates_into_a_new_tech_level()`
+  - Method `.test_tech_never_exceeds_the_cap()`
+  - Method `.test_economy_carries_trade_partners_and_income()`
+  - Method `.test_worlds_drift_up_and_capacity_follows()`
+  - Method `.test_faction_tech_levels_advance_over_time()`
+
+**Functions:**
+- `def _pair(link)`
+
+---
+
 ### [`tests/test_factions_and_enemies.py`](tests/test_factions_and_enemies.py)
 > *Unit tests for Factions, Corporations, and Enhanced Combat Enemies.*
 
@@ -887,7 +915,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `369` lines (`16430` bytes)
+**Size**: `373` lines (`16481` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -1569,14 +1597,14 @@
 ### [`voidfarer/demographics.py`](voidfarer/demographics.py)
 > *Population capacity, technology limits, and logistic growth for VoidFarer worlds.*
 
-**Size**: `223` lines (`7839` bytes)
+**Size**: `243` lines (`8440` bytes)
 
 **Functions:**
 - `def clamp_tech_level(tech_level)` - *Return a whole tech level in the supported 1..10 band.*
 - `def tech_capacity_multiplier(tech_level)` - *Life-support and density multiplier: roughly 0.7x at TL1, 4.5x at TL8.*
 - `def effective_capacity(population_capacity, devastation)` - *Capacity left after war damage; devastation removes up to 65% of the ceiling.*
 - `def compute_population_capacity(body_type, radius_km, habitability, tech_level)` - *Maximum sustainable population from surface area, habitability and technology.*
-- `def world_tech_level(faction, body_type, market_archetype)` - *Technology available on a world from its owner and local industrial base.*
+- `def world_tech_level(faction, body_type, market_archetype, faction_tech)` - *Technology available on a world from its owner and local industrial base.*
 - `def initial_population(body_type, radius_km, habitability, tech_level, faction, market_archetype, station_dockable)` - *Settle a generated world at a faction-appropriate share of its capacity.*
 - `def devastation_recovery(tech_level, stability)` - *Points of devastation a world repairs per tick from its tech and civil order.*
 - `def step_population(population, population_capacity, habitability, tech_level, devastation, num_ticks, stability)` - *Advance one world's population with logistic growth, tech limits and war deaths.*
@@ -1615,7 +1643,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7123` lines (`355077` bytes)
+**Size**: `7212` lines (`358717` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1629,6 +1657,8 @@
   - Method `._combined_equipment(ship)`
   - Method `._crew_bonuses(ship)`
   - Method `._faction_stability()` - *System owner name -> its faction's civil stability (default 50 for unclaimed).*
+  - Method `._faction_technology()` - *System owner name -> its faction's current technology level.*
+  - Method `._drift_world_technology(systems, faction_tech, previous_tick, new_tick)` - *Upgrade settled worlds toward their owner's tech at most once per drift window.*
   - Method `._map_effects(system)` - *Aggregate the active map modifiers of a system (defaults to the current one).*
   - Method `._effective_power(subsystem, ship)` - *Allocated subsystem power after reactor mode, heat, and integrity derating.*
   - Method `._recompute_caps(ship, equipped, ship_mods)` - *Recompute maximum hull, shield, cargo, and fuel from chassis, modules, and mods.*
@@ -1802,14 +1832,14 @@
 ### [`voidfarer/faction_economy.py`](voidfarer/faction_economy.py)
 > *Basic per-faction economy: tax base, industry, upkeep, treasury and war burden.*
 
-**Size**: `154` lines (`5834` bytes)
+**Size**: `206` lines (`7614` bytes)
 
 **Functions:**
 - `def _owned_systems(faction_name, systems)`
 - `def _faction_identity(faction_id)`
-- `def compute_faction_economy(faction_id, systems, wars, treasury, stability)` - *Derive one faction's population, output, wartime burden and per-tick cash flow.*
-- `def initialize_faction_economies(systems, wars, eliminated)` - *Create opening treasuries for every surviving canonical faction.*
-- `def tick_faction_economies(economies, systems, wars, eliminated, num_ticks)` - *Advance faction treasuries and report when a war drains one dry.*
+- `def compute_faction_economy(faction_id, systems, wars, treasury, stability, trade_links, tech_level, tech_progress, num_ticks)` - *Derive one faction's population, output, wartime burden and per-tick cash flow.*
+- `def initialize_faction_economies(systems, wars, eliminated, trade_links)` - *Create opening treasuries for every surviving canonical faction.*
+- `def tick_faction_economies(economies, systems, wars, eliminated, num_ticks, trade_links)` - *Advance faction treasuries, research and trade; report a war drain or a breakthrough.*
 
 ---
 
@@ -1835,6 +1865,23 @@
 - `def resolve_wars(wars, systems, rng, current_tick, eliminated, num_ticks)` - *Advance wars toward resolution: strength drives momentum, captures follow fronts.*
 - `def simulate_faction_behaviors(leaders, wars, systems, rng, current_tick, eliminated, num_ticks, broke_factions)` - *Apply leader archetypes: declare wars, then resolve active fronts.*
 - `def leader_for(leaders, faction_id)`
+
+---
+
+### [`voidfarer/faction_trade.py`](voidfarer/faction_trade.py)
+> *Faction-to-faction trade: hyperlane-adjacent, peaceful pairs exchange goods.*
+
+**Size**: `148` lines (`5197` bytes)
+
+**Functions:**
+- `def _faction_name(faction_id)`
+- `def _systems_owned(systems, faction_name)`
+- `def _cross_lanes(systems, left_name, right_name)` - *Hyperlanes with one endpoint owned by each faction.*
+- `def warring_pairs(wars)` - *Canonical faction pairs currently fighting; their trade is blockaded.*
+- `def compute_trade_links(systems, wars, economies, eliminated)` - *Derive the strongest peaceful hyperlane routes, capped per faction.*
+- `def trade_income_for(faction_id, links)` - *Each route pays half its volume to each endpoint.*
+- `def trade_partners_for(faction_id, links)`
+- `def trade_partner_names(faction_id, links)`
 
 ---
 
@@ -1894,7 +1941,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1282` lines (`57287` bytes)
+**Size**: `1287` lines (`57353` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -1911,7 +1958,7 @@
 - `def compute_scientific_planet_properties(body_type, spectral_type, orbit_radius_au, rad_sample, grav_sample, temp_jitter, hazards)` - *Derive physically consistent radius_km, gravity, atmosphere, temperature_c, and habitability.*
 - `def get_colony_tier(population)` - *Classify world or habitat population into sociological colony tiers.*
 - `def step_population_dynamics(body, num_ticks, stability)` - *Advance population with capacity, technology, devastation and civil-order limits.*
-- `def world_tech_level(faction, body_type, market_archetype)` - *Re-exported from demographics: tech level of a world from owner and industry.*
+- `def world_tech_level(faction, body_type, market_archetype, faction_tech)` - *Re-exported from demographics: tech level of a world from owner and industry.*
 
 ---
 
@@ -1967,7 +2014,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2107` lines (`77926` bytes)
+**Size**: `2136` lines (`78867` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -2098,6 +2145,9 @@
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class FactionEconomy` - *Per-faction treasury and the derived flows that feed it every tick.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+- `class TradeLink` - *A live commercial route between two peaceful factions.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class CrewMember` - *Recruitable crew specialist with a role, morale, wage, and portrait.*

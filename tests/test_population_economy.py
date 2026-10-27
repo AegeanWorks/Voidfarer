@@ -266,11 +266,15 @@ class TestFactionEconomy(unittest.TestCase):
         self.assertLess(wartime.net_income, peace.net_income)
 
     def test_tick_pays_income_into_the_treasury(self):
-        systems = GalaxyGenerator(seed=42).generate_galaxy()
         engine = SimulationEngine(seed=42)
         start = next(e for e in engine.state.faction_economies if e.faction_id == "sol_coalition")
         updated, _ = tick_faction_economies(
-            (start,), systems, (), (), num_ticks=10
+            (start,),
+            engine.state.systems,
+            (),
+            (),
+            num_ticks=10,
+            trade_links=engine.state.trade_links,
         )
         self.assertGreater(updated[0].treasury, start.treasury)
         self.assertAlmostEqual(updated[0].treasury, start.treasury + start.net_income * 10, delta=1000)

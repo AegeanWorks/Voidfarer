@@ -1465,9 +1465,11 @@ class FactionEconomy:
     population: int = 0
     worlds: int = 0
     tech_level: int = 1
+    tech_progress: float = 0.0
     stability: float = 50.0
     tax_income: int = 0
     trade_income: int = 0
+    trade_partners: int = 0
     industrial_output: int = 0
     military_upkeep: int = 0
     war_burden: float = 0.0
@@ -1484,13 +1486,35 @@ class FactionEconomy:
             population=max(0, int(data.get("population", 0))),
             worlds=max(0, int(data.get("worlds", 0))),
             tech_level=max(1, min(10, int(data.get("tech_level", 1)))),
+            tech_progress=max(0.0, min(99.9, float(data.get("tech_progress", 0.0)))),
             stability=max(0.0, min(100.0, float(data.get("stability", 50.0)))),
             tax_income=int(data.get("tax_income", 0)),
             trade_income=int(data.get("trade_income", 0)),
+            trade_partners=max(0, int(data.get("trade_partners", 0))),
             industrial_output=int(data.get("industrial_output", 0)),
             military_upkeep=max(0, int(data.get("military_upkeep", 0))),
             war_burden=max(0.0, float(data.get("war_burden", 0.0))),
             net_income=int(data.get("net_income", 0)),
+        )
+
+
+@dataclass(frozen=True)
+class TradeLink:
+    """A live commercial route between two peaceful factions."""
+
+    faction_a: str
+    faction_b: str
+    volume: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TradeLink:
+        return cls(
+            faction_a=str(data["faction_a"]),
+            faction_b=str(data["faction_b"]),
+            volume=max(0, int(data.get("volume", 0))),
         )
 
 
@@ -1993,6 +2017,7 @@ class GameState:
     faction_leaders: tuple[FactionLeader, ...] = ()
     wars: tuple[WarState, ...] = ()
     faction_economies: tuple[FactionEconomy, ...] = ()
+    trade_links: tuple[TradeLink, ...] = ()
     eliminated_factions: tuple[str, ...] = ()
     codex: CodexState = field(default_factory=CodexState)
     local_dock_purchases: dict[tuple[str, str, str], tuple[int, int]] = field(default_factory=dict)
@@ -2022,6 +2047,7 @@ class GameState:
             "faction_leaders": [l.to_dict() for l in self.faction_leaders],
             "wars": [w.to_dict() for w in self.wars],
             "faction_economies": [e.to_dict() for e in self.faction_economies],
+            "trade_links": [t.to_dict() for t in self.trade_links],
             "eliminated_factions": list(self.eliminated_factions),
             "codex": self.codex.to_dict(),
             "local_dock_purchases": {
@@ -2099,6 +2125,9 @@ class GameState:
             wars=tuple(WarState.from_dict(w) for w in data.get("wars", ())),
             faction_economies=tuple(
                 FactionEconomy.from_dict(e) for e in data.get("faction_economies", ())
+            ),
+            trade_links=tuple(
+                TradeLink.from_dict(t) for t in data.get("trade_links", ())
             ),
             eliminated_factions=tuple(data.get("eliminated_factions", ())),
             codex=CodexState.from_dict(data.get("codex", {})),

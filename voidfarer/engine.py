@@ -147,11 +147,13 @@ from voidfarer.galaxy import (
     world_tech_level,
 )
 from voidfarer.demographics import (
+    TECH_DRIFT_TICKS,
     compute_population_capacity,
     devastation_recovery,
     initial_population,
 )
 from voidfarer.faction_economy import initialize_faction_economies, tick_faction_economies
+from voidfarer.faction_trade import compute_trade_links, trade_partner_names
 from voidfarer.messaging import choice_by_id, follow_up_message, tree_catalog, tree_root_message
 from voidfarer.mapmods import (
     aggregate_map_modifiers,
@@ -491,10 +493,21 @@ class SimulationEngine:
                 updated_systems[sys_id] = sys_obj
         if systems_changed:
             updates["systems"] = updated_systems
+        trade_links = compute_trade_links(
+            updated_systems,
+            self.state.wars,
+            self.state.faction_economies,
+            self.state.eliminated_factions,
+        )
         if not self.state.faction_economies:
             updates["faction_economies"] = initialize_faction_economies(
-                updated_systems, self.state.wars, self.state.eliminated_factions
+                updated_systems,
+                self.state.wars,
+                self.state.eliminated_factions,
+                trade_links,
             )
+        if trade_links != self.state.trade_links:
+            updates["trade_links"] = trade_links
         if updates:
             self.state = self._clone_state(**updates)
 
@@ -581,6 +594,7 @@ class SimulationEngine:
             faction_leaders=kwargs.get("faction_leaders", cur.faction_leaders),
             wars=kwargs.get("wars", cur.wars),
             faction_economies=kwargs.get("faction_economies", cur.faction_economies),
+            trade_links=kwargs.get("trade_links", cur.trade_links),
             eliminated_factions=kwargs.get("eliminated_factions", cur.eliminated_factions),
             codex=kwargs.get("codex", cur.codex),
             local_dock_purchases=kwargs.get("local_dock_purchases", cur.local_dock_purchases),
@@ -623,6 +637,54 @@ class SimulationEngine:
             for economy in self.state.faction_economies
             if economy.faction_id in CANONICAL_FACTIONS
         }
+
+    def _faction_technology(self) -> dict[str, int]:
+        """System owner name -> its faction's current technology level."""
+        return {
+            CANONICAL_FACTIONS[economy.faction_id].name: economy.tech_level
+            for economy in self.state.faction_economies
+            if economy.faction_id in CANONICAL_FACTIONS
+        }
+
+    def _drift_world_technology(
+        self,
+        systems: dict[str, StarSystem],
+        faction_tech: dict[str, int],
+        previous_tick: int,
+        new_tick: int,
+    ) -> dict[str, StarSystem]:
+        """Upgrade settled worlds toward their owner's tech at most once per drift window."""
+        cycles = new_tick // TECH_DRIFT_TICKS - previous_tick // TECH_DRIFT_TICKS
+        if cycles <= 0:
+            return systems
+        updated: dict[str, StarSystem] = {}
+        for sys_id, system in systems.items():
+            owner_tech = faction_tech.get(system.faction)
+            bodies = []
+            changed = False
+            for body in system.bodies:
+                target = world_tech_level(
+                    system.faction,
+                    body.body_type,
+                    body.market_archetype,
+                    owner_tech,
+                )
+                if target > body.tech_level:
+                    tech = min(target, body.tech_level + cycles)
+                    capacity = compute_population_capacity(
+                        body.body_type,
+                        body.radius_km,
+                        body.habitability,
+                        tech,
+                    )
+                    bodies.append(
+                        replace(body, tech_level=tech, population_capacity=capacity)
+                    )
+                    changed = True
+                else:
+                    bodies.append(body)
+            updated[sys_id] = replace(system, bodies=tuple(bodies)) if changed else system
+        return updated
 
     def _map_effects(self, system: StarSystem | None = None) -> dict[str, float]:
         """Aggregate the active map modifiers of a system (defaults to the current one)."""
@@ -5367,6 +5429,7 @@ class SimulationEngine:
                 "faction_leaders": [leader.to_dict() for leader in self.state.faction_leaders],
                 "wars": [war.to_dict() for war in self.state.wars],
                 "faction_economies": [e.to_dict() for e in self.state.faction_economies],
+                "trade_links": [t.to_dict() for t in self.state.trade_links],
                 "galactic_politics": self.galactic_politics(),
                 "eliminated_factions": list(self.state.eliminated_factions),
                 "crew": [c.to_dict() for c in self.state.ship.crew],
@@ -5515,6 +5578,7 @@ class SimulationEngine:
                     "systems": sum(1 for s in systems.values() if s.faction == f.name),
                     "strength": round(faction_strength(fid, systems), 1),
                     "at_war_with": sorted(enemies.get(fid, set())),
+                    "trade_partner_names": trade_partner_names(fid, self.state.trade_links),
                     **(
                         economies[fid].to_dict()
                         if fid in economies
@@ -5547,7 +5611,12 @@ class SimulationEngine:
                     "defender": CANONICAL_FACTIONS[w.defender_id].name if w.defender_id in CANONICAL_FACTIONS else w.defender_id,
                     "fronts": [list(f) for f in fronts],
                 })
-            return {"systems": system_view, "factions": factions, "wars": war_view}
+            return {
+                "systems": system_view,
+                "factions": factions,
+                "wars": war_view,
+                "trade_links": [t.to_dict() for t in self.state.trade_links],
+            }
 
     def get_quests(self) -> list[dict[str, Any]]:
         """Return a unified quest panel view of the story chapter and active contracts."""
@@ -6420,6 +6489,7 @@ class SimulationEngine:
 
             # 1. Orbital revolution: advance current_angle for every body in every star system
             stability_by_faction = self._faction_stability()
+            previous_tick = new_tick - num_ticks
             updated_systems = {}
             for sys_id, system in self.state.systems.items():
                 faction_stability = stability_by_faction.get(system.faction, 50.0)
@@ -6603,18 +6673,36 @@ class SimulationEngine:
                     if economy.treasury <= 0 and economy.net_income < 0
                 ),
             )
+            new_trade_links = compute_trade_links(
+                updated_systems,
+                new_wars,
+                self.state.faction_economies,
+                new_eliminated,
+            )
             new_faction_economies, faction_economy_logs = tick_faction_economies(
                 self.state.faction_economies,
                 updated_systems,
                 new_wars,
                 new_eliminated,
                 num_ticks,
+                new_trade_links,
             )
             faction_logs.extend(faction_economy_logs)
             new_wars, bankrupt_peace_logs = force_peace_for_broke_factions(
                 new_wars, new_faction_economies, new_tick
             )
             faction_logs.extend(bankrupt_peace_logs)
+
+            # Technology drift runs after the economy so today's breakthrough upgrades
+            # the worlds that can support it, raising their carrying capacity.
+            tech_by_name = {
+                CANONICAL_FACTIONS[economy.faction_id].name: economy.tech_level
+                for economy in new_faction_economies
+                if economy.faction_id in CANONICAL_FACTIONS
+            }
+            updated_systems = self._drift_world_technology(
+                updated_systems, tech_by_name, previous_tick, new_tick
+            )
 
             # 9. Reactor thermal simulation: heat, cooling, derating, and core wear
             tick_system = self.state.systems.get(cur_ship.current_system_id, self.current_system)
@@ -7008,6 +7096,7 @@ class SimulationEngine:
                 depots=tuple(updated_depots),
                 wars=new_wars,
                 faction_economies=new_faction_economies,
+                trade_links=new_trade_links,
                 eliminated_factions=new_eliminated,
             )
 

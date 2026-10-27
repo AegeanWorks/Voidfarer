@@ -5,9 +5,17 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Sequence
 
-from voidfarer.demographics import FACTION_TECH_LEVELS
+from voidfarer.demographics import (
+    FACTION_TECH_LEVELS,
+    MAX_TECH_LEVEL,
+    TECH_PROGRESS_INDUSTRY,
+    TECH_PROGRESS_ORDER,
+    TECH_PROGRESS_PER_LEVEL,
+    clamp_tech_level,
+)
+from voidfarer.faction_trade import trade_income_for, trade_partners_for
 from voidfarer.factions import CANONICAL_FACTIONS
-from voidfarer.models import FactionEconomy, StarSystem, WarState
+from voidfarer.models import FactionEconomy, StarSystem, TradeLink, WarState
 
 
 def _owned_systems(faction_name: str, systems: dict[str, StarSystem]) -> list[StarSystem]:
@@ -27,13 +35,21 @@ def compute_faction_economy(
     wars: Sequence[WarState] = (),
     treasury: int = 0,
     stability: float = 50.0,
+    trade_links: Sequence[TradeLink] = (),
+    tech_level: int | None = None,
+    tech_progress: float = 0.0,
+    num_ticks: int = 1,
 ) -> FactionEconomy:
     """Derive one faction's population, output, wartime burden and per-tick cash flow."""
     canonical_id, faction_name = _faction_identity(faction_id)
     owned = _owned_systems(faction_name, systems)
     population = sum(body.population for system in owned for body in system.bodies)
     worlds = sum(1 for system in owned for body in system.bodies if body.population > 0)
-    tech = FACTION_TECH_LEVELS.get(faction_name, FACTION_TECH_LEVELS["Unclaimed"])
+    tech = clamp_tech_level(
+        tech_level
+        if tech_level is not None
+        else FACTION_TECH_LEVELS.get(faction_name, FACTION_TECH_LEVELS["Unclaimed"])
+    )
     active_wars = sum(
         1 for war in wars
         if war.active and canonical_id in (war.attacker_id, war.defender_id)
@@ -68,7 +84,11 @@ def compute_faction_economy(
         * (new_stability / 100.0)
         * (1.0 - war_burden * 0.5)
     )
-    trade_income = int(population_millions * 0.004 + len(owned) * 2)
+    trade_income = (
+        trade_income_for(canonical_id, trade_links)
+        + int(population_millions * 0.001)
+    )
+    trade_partners = trade_partners_for(canonical_id, trade_links)
     industrial_output = int(
         population_millions
         * 0.008
@@ -83,15 +103,29 @@ def compute_faction_economy(
     military_upkeep = peacetime_upkeep + int(gross_income * war_fraction)
     net_income = gross_income - military_upkeep
 
+    # Research accumulates from industry and civil order; each 100 points is a tech level.
+    progress = max(0.0, float(tech_progress))
+    progress += (
+        industrial_output * TECH_PROGRESS_INDUSTRY
+        + new_stability * TECH_PROGRESS_ORDER
+    ) * max(1, int(num_ticks))
+    while progress >= TECH_PROGRESS_PER_LEVEL and tech < MAX_TECH_LEVEL:
+        progress -= TECH_PROGRESS_PER_LEVEL
+        tech += 1
+    if tech >= MAX_TECH_LEVEL:
+        progress = min(progress, TECH_PROGRESS_PER_LEVEL - 0.1)
+
     return FactionEconomy(
         faction_id=canonical_id,
         treasury=max(0, int(treasury)),
         population=max(0, int(population)),
         worlds=worlds,
         tech_level=tech,
+        tech_progress=round(progress, 2),
         stability=round(new_stability, 1),
         tax_income=max(0, tax_income),
         trade_income=max(0, trade_income),
+        trade_partners=trade_partners,
         industrial_output=max(0, industrial_output),
         military_upkeep=max(0, military_upkeep),
         war_burden=round(war_burden, 3),
@@ -103,6 +137,7 @@ def initialize_faction_economies(
     systems: dict[str, StarSystem],
     wars: Sequence[WarState] = (),
     eliminated: Sequence[str] = (),
+    trade_links: Sequence[TradeLink] = (),
 ) -> tuple[FactionEconomy, ...]:
     """Create opening treasuries for every surviving canonical faction."""
     removed = set(eliminated)
@@ -117,8 +152,15 @@ def initialize_faction_economies(
             for body in system.bodies
         )
         opening = 50_000 + int(population / 1_000_000.0 * 2.0)
-        economy = compute_faction_economy(faction_id, systems, wars, treasury=opening, stability=50.0)
-        economies.append(replace(economy, treasury=opening))
+        economy = compute_faction_economy(
+            faction_id,
+            systems,
+            wars,
+            treasury=opening,
+            stability=50.0,
+            trade_links=trade_links,
+        )
+        economies.append(replace(economy, treasury=opening, tech_progress=0.0))
     return tuple(economies)
 
 
@@ -128,8 +170,9 @@ def tick_faction_economies(
     wars: Sequence[WarState],
     eliminated: Sequence[str],
     num_ticks: int = 1,
+    trade_links: Sequence[TradeLink] = (),
 ) -> tuple[tuple[FactionEconomy, ...], list[str]]:
-    """Advance faction treasuries and report when a war drains one dry."""
+    """Advance faction treasuries, research and trade; report a war drain or a breakthrough."""
     removed = set(eliminated)
     updated: list[FactionEconomy] = []
     logs: list[str] = []
@@ -143,10 +186,19 @@ def tick_faction_economies(
             wars,
             treasury=economy.treasury,
             stability=economy.stability,
+            trade_links=trade_links,
+            tech_level=economy.tech_level,
+            tech_progress=economy.tech_progress,
+            num_ticks=num_ticks,
         )
         new_treasury = max(0, economy.treasury + report.net_income * max(0, int(num_ticks)))
+        name = CANONICAL_FACTIONS.get(economy.faction_id)
+        if report.tech_level > economy.tech_level:
+            logs.append(
+                f"TECH BREAKTHROUGH: {name.name if name else economy.faction_id} "
+                f"reached tech level {report.tech_level}."
+            )
         if economy.treasury > 0 and new_treasury == 0 and report.net_income < 0:
-            name = CANONICAL_FACTIONS.get(economy.faction_id)
             logs.append(
                 f"TREASURY EXHAUSTED: {name.name if name else economy.faction_id} cannot pay its wartime upkeep."
             )

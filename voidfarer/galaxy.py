@@ -736,9 +736,14 @@ def step_population_dynamics(body: CelestialBody, num_ticks: int = 1, stability:
     )
 
 
-def world_tech_level(faction: str, body_type: str, market_archetype: str = "none") -> int:
+def world_tech_level(
+    faction: str,
+    body_type: str,
+    market_archetype: str = "none",
+    faction_tech: int | None = None,
+) -> int:
     """Re-exported from demographics: tech level of a world from owner and industry."""
-    return _world_tech_level(faction, body_type, market_archetype)
+    return _world_tech_level(faction, body_type, market_archetype, faction_tech)
 
 
 class GalaxyGenerator:

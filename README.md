@@ -77,6 +77,7 @@ voidfarer/
 │   ├── outposts.py       <- outpost catalogs & tick production
 │   ├── faction_state.py  <- faction leaders, behaviors, wars & elimination
 │   ├── faction_economy.py <- faction treasuries, tax base, upkeep & war burden
+│   ├── faction_trade.py  <- hyperlane trade links between peaceful factions
 │   ├── fleet.py          <- escort warships, formations & battle support
 │   ├── navigation.py     <- multi-jump routing, void lanes & black-hole hazards
 │   ├── messaging.py      <- branching quantum message trees
@@ -406,7 +407,7 @@ python -m voidfarer.cli quantum ship titanium 2 kepler
 python -m voidfarer.cli surface
 python -m voidfarer.cli contracts refresh
 ```
-23 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time. Quantum freight ships cargo for a fee, paying on arrival. Landed teams survey, core-sample, explore ruins, salvage, or rest. War captures displace civilians and leave scars. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
+23 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time. Quantum freight ships cargo for a fee, paying on arrival. Landed teams survey, core-sample, explore ruins, salvage, or rest. War captures displace civilians and leave scars. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
 
 ### 19. Stellaris-Style Windows Cockpit
 
@@ -438,7 +439,7 @@ See ADR-041 and ADR-047.
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules (`math`, `random`, `dataclasses`, `http.server`, `json`, `pathlib`).
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 659-test suite runs in about 12 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 671-test suite runs in about 12 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

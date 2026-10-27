@@ -1,59 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "galaxy-population-economy",
+    "task_id": "faction-trade-tech-drift",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793111913.248364,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1793117714.7045174,
     "owner": "kilo:1",
     "started_by": "kilo:1",
-    "continuations": [],
-    "completed_at": 1793111974.2410314
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "cockpit-layout-audit",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Fix crew row wrapping and quantum route layout found in natural 1366/1280 captures, reorder roster ahead of shore/roles, and record image-review evidence.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793014183.41012,
-      "timestamp_str": "2026-10-26 14:29:43",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The user asked for continued verification with images; natural captures showed morale/XP clipping and squeezed freight metadata.",
-        "benefits": "Crew identity, XP, morale and actions are readable at all supported widths; freight routes keep FEE/NET/SHIP legible without horizontal pressure.",
-        "risks": "contract: CSS/DOM order only; dependency: none; concurrency: none; state: no engine/save/RNG change",
-        "mitigation": "Natural captures at 1366/1280, free vision review, layout tests, full suite and 4/4 gates"
-      }
-    },
-    {
-      "task_id": "cockpit-layout-audit",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Crew rows now give identity/XP/status and morale their own readable lines, roster precedes shore/roles, and quantum freight routes stack metadata at <1500px. Natural 1366/1280 captures show engineer | SKILL 3 | XP 0/120, 10 !! NEAR DESERTION, and full FEE/NET/SHIP rows; free vision review APPROVED. checklists: passed (4/4 gates). Tests: 625.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793014329.5525756,
-      "timestamp_str": "2026-10-26 14:32:09",
-      "agent": "kilo:1",
-      "handoff": {
-        "next": "complete ledger task, strict check, push",
-        "evidence": "ui-review/layout-final and ADR-067"
-      }
-    },
-    {
-      "task_id": "cockpit-layout-audit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'cockpit-layout-audit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793014350.0871375,
-      "timestamp_str": "2026-10-26 14:32:30",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "postpush-polish-verify",
       "phase": "phase 2",
@@ -315,6 +272,63 @@
       "timestamp": 1793111974.241033,
       "timestamp_str": "2026-10-27 17:39:34",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "faction-trade-tech-drift",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/6] Plan player-visible faction economy, hyperlane trade links severed by war, and slow faction/world technology drift that raises carrying capacity.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793114649.5350766,
+      "timestamp_str": "2026-10-27 18:24:09",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "Faction economy is visible but opaque, trade income is an abstract formula with no partners, and world tech levels never change, so the demographic model is static.",
+        "benefits": "Players can read where a faction's money comes from and goes, peaceful neighbours profit from real trade, war cuts those links, and long games see technology raise population ceilings.",
+        "risks": "contract: GameState/FactionEconomy schema additions; dependency: stdlib only; concurrency: tick ordering between trade, economy and population; state: derived trade links must round-trip",
+        "mitigation": "Backward-compatible defaults, deterministic formulas, focused unit tests, UI task with vision review, full gates"
+      },
+      "handoff": {
+        "state": "planning",
+        "next": "schema",
+        "open": "trade link formula",
+        "evidence": "none"
+      }
+    },
+    {
+      "task_id": "faction-trade-tech-drift",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/6] TradeLink schema, derived hyperlane trade, trade income/partners, faction tech progression and world capacity drift implemented; 671 tests pass. checklists: passed.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793117297.365508,
+      "timestamp_str": "2026-10-27 19:08:17",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "4/4 gates",
+        "next": "backend commit then cockpit breakdown",
+        "open": "UI layer",
+        "evidence": "unittest 671 OK, 11 links, TL drift"
+      }
+    },
+    {
+      "task_id": "faction-trade-tech-drift",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/6] Backend trade/tech layer verified, README tree updated for faction_trade.py; 671 tests pass. checklists: passed.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793117714.7045174,
+      "timestamp_str": "2026-10-27 19:15:14",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "4/4 gates",
+        "next": "backend commit then cockpit breakdown",
+        "open": "UI layer",
+        "evidence": "gates 4/4"
+      }
     }
   ]
 }

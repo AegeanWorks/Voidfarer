@@ -905,3 +905,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Keep the WebKit scrollbar rules but drop `scrollbar-width: thin`, which had disabled them and left only the transient overlay bar.
   3. Close the cockpit UI task for the current static surface, recording the reviewer as the NVIDIA Nemotron 3.5 Super VL vision subagent, authorized by the user, against 12 captures at 1280x720 and 1920x1080.
 - **Consequences**: The cue renders at 1280 and 1920 (69x17 px, opacity 1 at the top of a scroll, 0 at the bottom) and the vision reviewer confirms it reads as "more content below". The UI contract now has a finished task with a surface digest instead of a standing warning. Suite: 658 tests (37 suites).
+
+### ADR-076: Hyperlane Trade Links and Technology Drift
+- **Date**: 2026-10-27
+- **Status**: Accepted
+- **Context**: Faction finance had opaque inputs, `trade_income` was an abstract population formula with no partners, and `tech_level` was frozen at generation, so the demographic model could never improve within a campaign. The user asked for a simple player-visible faction economy, faction-to-faction trade, and technology drift over time.
+- **Decision**:
+  1. Add `TradeLink(faction_a, faction_b, volume)` to the save schema and derive links each tick in `faction_trade.py`: both partners must own systems joined by a hyperlane, must not be at war, and volume scales with the geometric mean of their populations, the number of cross-lanes (capped at four) and the weaker partner's stability. Each faction keeps at most three richest routes, so the summary stays readable.
+  2. Replace the abstract trade term with half of each route's volume plus a small internal baseline; expose `trade_partners` on `FactionEconomy` and partner names through `galactic_politics`. War removes routes automatically because links are derived, never stored as player state.
+  3. Add `tech_progress` to `FactionEconomy`: industry and civil order accumulate research, 100 points raises the tech level, capped at 10. `tick_faction_economies` logs a `TECH BREAKTHROUGH`.
+  4. Drift worlds toward their owner's level after the economy step, once per `TECH_DRIFT_TICKS` (200), recomputing population capacity when a world upgrades. The `world_tech_level` helper now accepts a faction-level override, and `galaxy.py` re-exports the wider signature.
+  5. Expose tax, trade, industry, upkeep, net, partners and tech progress in `galactic_politics` for the cockpit.
+- **Consequences**: A fresh galaxy has 11 routes; Sol trades with three partners for 235 cr/t. War severs only the belligerents' routes. A 20,000-tick run lifts most major factions to TL10, spreads world tech across 4-10, and grows population to 281B against 330B total capacity with zero over-capacity worlds. Suite: 671 tests (38 suites), including a new `test_faction_trade_tech` module.

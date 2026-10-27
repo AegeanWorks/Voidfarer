@@ -82,6 +82,14 @@ BASE_DENSITY = 4.5
 # mirrors this value for its capacity readout; tests keep both in step.
 DEVASTATION_CAPACITY_LOSS = 0.65
 
+# Technology drift: factions accumulate research from industry and civil order, and
+# worlds upgrade toward their owner's level once every TECH_DRIFT_TICKS.
+TECH_PROGRESS_PER_LEVEL = 100.0
+TECH_PROGRESS_INDUSTRY = 0.00002
+TECH_PROGRESS_ORDER = 0.0002
+TECH_DRIFT_TICKS = 200
+MAX_TECH_LEVEL = 10
+
 
 def clamp_tech_level(tech_level: int | float) -> int:
     """Return a whole tech level in the supported 1..10 band."""
@@ -135,9 +143,21 @@ def compute_population_capacity(
     return max(0, int(round(capacity)))
 
 
-def world_tech_level(faction: str, body_type: str, market_archetype: str = "none") -> int:
-    """Technology available on a world from its owner and local industrial base."""
-    tech = FACTION_TECH_LEVELS.get(faction, FACTION_TECH_LEVELS["Unclaimed"])
+def world_tech_level(
+    faction: str,
+    body_type: str,
+    market_archetype: str = "none",
+    faction_tech: int | None = None,
+) -> int:
+    """Technology available on a world from its owner and local industrial base.
+
+    ``faction_tech`` lets a faction's drifting technology level raise its worlds;
+    without it the static opening tier from ``FACTION_TECH_LEVELS`` applies.
+    """
+    if faction_tech is None:
+        tech = FACTION_TECH_LEVELS.get(faction, FACTION_TECH_LEVELS["Unclaimed"])
+    else:
+        tech = clamp_tech_level(faction_tech)
     if market_archetype == "high_tech":
         tech += 1
     if body_type in ("orbital_station", "research_outpost", "quantum_relay", "dyson_sphere"):
