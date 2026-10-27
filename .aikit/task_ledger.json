@@ -3,32 +3,15 @@
   "active_task": {
     "task_id": "faction-trade-tech-drift",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1793119889.2712698,
     "owner": "kilo:1",
     "started_by": "kilo:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1793119957.8484206
   },
   "checkpoints": [
-    {
-      "task_id": "postpush-polish-verify",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Verify the two uncommitted post-push cockpit changes, make screenshot captures deterministic (no random decision modal), add a real surface-ops scenario, and fix the clipped contract-title header and compact strip/surface layout at 1280-1366.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793039960.7177024,
-      "timestamp_str": "2026-10-26 21:39:20",
-      "agent": "antigravity:1",
-      "impact_assessment": {
-        "why": "The only work since origin/master is an uncommitted contract-title clamp and surface autoscroll; capture evidence shows the title still loses its identity at 1280x720, the reactor strip clips SILENT/VENT at 1280-1366, and the surface dossier overlaps the command strip while clipping the fifth operation.",
-        "benefits": "Deterministic, reproducible screenshots; contract titles stay readable without ellipsis at 1920/1366/1280; reactor doctrine modes fit inside the compact strip; surface operations fit cleanly above the command strip.",
-        "risks": "contract: CSS/markup and a dev-only tool; dependency: none; concurrency: server ticker unchanged; state: no engine/save/RNG change, only tooling event suppression",
-        "mitigation": "Recapture at 1920/1366/1280, visually verify and run G-015 review, pin the header and strip layout in test_cockpit_layout, run the full suite and 4/4 gates"
-      },
-      "continued_from": "kilo:1"
-    },
     {
       "task_id": "postpush-polish-verify",
       "phase": "completed",
@@ -329,6 +312,16 @@
         "open": "none",
         "evidence": "VL no internal clipping, unittest 676 OK"
       }
+    },
+    {
+      "task_id": "faction-trade-tech-drift",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'faction-trade-tech-drift' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793119957.8484218,
+      "timestamp_str": "2026-10-27 19:52:37",
+      "agent": "kilo:1"
     }
   ]
 }
