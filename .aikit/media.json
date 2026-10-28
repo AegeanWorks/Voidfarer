@@ -14,38 +14,17 @@
   "layout": "split",
   "assets": {
     "logo": {
-      "path": "assets/logo.png",
-      "status": "approved",
-      "commit": "",
-      "generated_at": "2026-10-28T13:53:44",
-      "review": {
-        "status": "approved",
-        "reviewer": "subagent:brand-review",
-        "method": "vision",
-        "notes": "VO monogram badge clean. GAME eyebrow fits sci-fi fleet management game. Voidfarer in title case, well-spaced, unclipped. Planet/space fleet imagery fits sci-fi theme. No footer.",
-        "score": 89,
-        "reviewed_at": "2026-10-28T14:00:02"
-      }
-    },
-    "social_preview": {
-      "path": "assets/social-preview.png",
-      "status": "approved",
-      "commit": "",
-      "generated_at": "2026-10-28T13:53:44",
-      "review": {
-        "status": "approved",
-        "reviewer": "subagent:brand-review",
-        "method": "vision",
-        "notes": "Sci-fi fleet management game; tagline 'Command a fleet across a procedural void.' Clean purple card, no clipping; chips (fleet management, game, html5 canvas) and URL readable; spaceship-and-planet image fits space fleet theme.",
-        "score": 93,
-        "reviewed_at": "2026-10-28T14:00:02"
-      }
-    },
-    "artwork": {
-      "path": "assets/artwork.jpg",
+      "path": "assets/logo.jpg",
       "status": "pending_review",
       "commit": "",
-      "generated_at": "2026-10-28T13:34:45",
+      "generated_at": "2026-10-28T16:46:33",
+      "review": null
+    },
+    "social_preview": {
+      "path": "assets/social-preview.jpg",
+      "status": "pending_review",
+      "commit": "",
+      "generated_at": "2026-10-28T16:46:33",
       "review": null
     }
   },
@@ -69,5 +48,6 @@
         "reviewed_at": "2026-10-28T11:49:30"
       }
     }
-  ]
+  ],
+  "model": "community/scriptsnsenses-sys/flux-2-dev-free"
 }
