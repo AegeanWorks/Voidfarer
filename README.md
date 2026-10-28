@@ -1,8 +1,8 @@
 # VoidFarer
 
 <!-- aegean:media:start -->
-<p align="center"><img src="assets/logo.jpg" alt="Voidfarer logo" width="96" height="96"></p>
 <p align="center"><img src="assets/social-preview.png" alt="Voidfarer social preview" width="100%"></p>
+*Brand assets are generated and may not fully represent the project scope.*
 <!-- aegean:media:end -->
 
 [![Built with AIKit](https://img.shields.io/badge/built%20with-AIKit-6f42c1)](https://github.com/AegeanWorks/AIKit)
@@ -457,5 +457,5 @@ Free for personal play under the Aegean Game License 1.1 (AGL-1.1); see [LICENSE
 
 <a href="https://github.com/AegeanWorks/Voidfarer/commit/1262ed9"><img src="assets/screenshots/2026-10-28-index.png" alt="Voidfarer interface at 2026-10-28"></a>
 
-*Voidfarer interface captured from C:\Users\Yunus-Emre\Desktop\portable_agent_kit\projects\voidfarer\voidfarer\static\index.html* · commit `1262ed9` · 2026-10-28
+*commit `1262ed9` · 2026-10-28*
 <!-- aegean:screenshots:end -->
