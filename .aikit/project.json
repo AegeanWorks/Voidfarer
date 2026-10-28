@@ -14,6 +14,10 @@
   "ui_source": "detected",
   "topics": [
     "aikit",
+    "source-available",
+    "aegean-game-license",
+    "drm-free",
+    "commercial-license",
     "fleet-management",
     "game",
     "html5-canvas",
@@ -26,13 +30,9 @@
     "space-simulation",
     "terminal-game",
     "zero-dependency",
-    "drm-free",
-    "source-available",
     "aegeanworks",
-    "software",
-    "web-app",
-    "user-interface",
-    "sci-fi-game"
+    "sci-fi-game",
+    "user-interface"
   ],
   "topics_source": "ai:kilo:2026-10-27",
   "topics_reviewed_at": "2026-10-28",
@@ -42,5 +42,11 @@
     "web-app",
     "user-interface",
     "sci-fi-game"
+  ],
+  "license_topics": [
+    "source-available",
+    "aegean-game-license",
+    "drm-free",
+    "commercial-license"
   ]
 }
