@@ -1,5 +1,10 @@
 # VoidFarer
 
+<!-- aegean:media:start -->
+<p align="center"><img src="assets/logo.svg" alt="Voidfarer logo" width="96" height="96"></p>
+<p align="center"><img src="assets/social-preview.svg" alt="Voidfarer social preview" width="100%"></p>
+<!-- aegean:media:end -->
+
 [![Built with AIKit](https://img.shields.io/badge/built%20with-AIKit-6f42c1)](https://github.com/AegeanWorks/AIKit)
 
 > **Autonomous Deep-Space Fleet, Procedural Galaxy & Windows Cockpit Simulator.**
@@ -446,3 +451,11 @@ See ADR-041 and ADR-047.
 ## 📜 License
 
 Free for personal play under the Aegean Game License 1.1 (AGL-1.1); see [LICENSE](LICENSE). It is DRM-free: Licensor ships no DRM and a distributor may not add it. Streaming, modding and free mods are allowed. Commercial use, paid mods and AI training need the Aegean Commercial License 1.0 (ACL-1.0); see [COMMERCIAL.md](COMMERCIAL.md).
+
+<!-- aegean:screenshots:start -->
+## Screenshots
+
+<a href="https://github.com/AegeanWorks/Voidfarer/commit/1262ed9"><img src="assets/screenshots/2026-10-28-index.png" alt="Voidfarer interface at 2026-10-28"></a>
+
+*Voidfarer interface captured from C:\Users\Yunus-Emre\Desktop\portable_agent_kit\projects\voidfarer\voidfarer\static\index.html* · commit `1262ed9` · 2026-10-28
+<!-- aegean:screenshots:end -->
