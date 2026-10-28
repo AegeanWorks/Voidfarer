@@ -14,46 +14,39 @@
   "layout": "split",
   "assets": {
     "logo": {
-      "path": "assets/logo.svg",
+      "path": "assets/logo.png",
       "status": "approved",
       "commit": "",
-      "generated_at": "2026-10-28T08:47:18",
+      "generated_at": "2026-10-28T11:44:01",
       "review": {
         "status": "approved",
         "reviewer": "subagent:vision-review",
         "method": "vision",
-        "notes": "VO atom/galaxy, attractive",
-        "score": 90,
-        "reviewed_at": "2026-10-28T08:58:22"
+        "notes": "Monogram VO matches project; legible, unclipped, no overlaps/watermark, premium.",
+        "score": 91,
+        "reviewed_at": "2026-10-28T11:49:30"
       }
     },
     "social_preview": {
-      "path": "assets/social-preview.svg",
+      "path": "assets/social-preview.png",
       "status": "approved",
       "commit": "",
-      "generated_at": "2026-10-28T08:47:18",
+      "generated_at": "2026-10-28T11:44:01",
       "review": {
         "status": "approved",
         "reviewer": "subagent:vision-review",
         "method": "vision",
-        "notes": "Consistent template, legible",
-        "score": 89,
-        "reviewed_at": "2026-10-28T08:58:22"
+        "notes": "Strong hierarchy; legible, unclipped; premium card, no watermark.",
+        "score": 90,
+        "reviewed_at": "2026-10-28T11:49:30"
       }
     },
-    "social_preview_png": {
-      "path": "assets/social-preview.png",
-      "status": "approved",
+    "artwork": {
+      "path": "assets/artwork.jpg",
+      "status": "pending_review",
       "commit": "",
-      "generated_at": "2026-10-28T08:47:19",
-      "review": {
-        "status": "approved",
-        "reviewer": "subagent:vision-review",
-        "method": "structural",
-        "notes": "Rendered from the approved 1280x640 social SVG; exact dimensions verified.",
-        "score": null,
-        "reviewed_at": "2026-10-28T09:03:13"
-      }
+      "generated_at": "2026-10-28T11:44:01",
+      "review": null
     }
   },
   "screenshots": [
@@ -71,9 +64,9 @@
         "status": "approved",
         "reviewer": "subagent:vision-review",
         "method": "vision",
-        "notes": "Real index login UI VOIDFARER VANGUARD, non-blank",
-        "score": 89,
-        "reviewed_at": "2026-10-28T08:58:22"
+        "notes": "Real non-blank UI: Voidfarer login with Vanguard panel; legible, unclipped.",
+        "score": 90,
+        "reviewed_at": "2026-10-28T11:49:30"
       }
     }
   ]
