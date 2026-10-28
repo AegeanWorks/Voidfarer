@@ -5,53 +5,48 @@
   "has_ui": true,
   "ui_kind": "web",
   "palette": [
-    "#07111f",
-    "#0e2a47",
-    "#60a5fa",
-    "#e2f8ff"
+    "#100b1a",
+    "#2a1b3d",
+    "#c026d3",
+    "#fcd34d"
   ],
+  "motif": "orbit",
+  "layout": "split",
   "assets": {
     "logo": {
       "path": "assets/logo.svg",
       "status": "approved",
       "commit": "",
-      "generated_at": "2026-10-28T08:02:59",
+      "generated_at": "2026-10-28T08:47:18",
       "review": {
         "status": "approved",
         "reviewer": "subagent:vision-review",
         "method": "vision",
-        "notes": "VO monogram in blue, dark teal, coherent with set.",
-        "score": 93,
-        "reviewed_at": "2026-10-28T08:10:44"
+        "notes": "VO atom/galaxy, attractive",
+        "score": 90,
+        "reviewed_at": "2026-10-28T08:58:22"
       }
     },
     "social_preview": {
       "path": "assets/social-preview.svg",
       "status": "approved",
       "commit": "",
-      "generated_at": "2026-10-28T08:02:59",
+      "generated_at": "2026-10-28T08:47:18",
       "review": {
         "status": "approved",
         "reviewer": "subagent:vision-review",
         "method": "vision",
-        "notes": "VO icon, title, Deep-Space Fleet description, WEB tag, coherent.",
-        "score": 93,
-        "reviewed_at": "2026-10-28T08:10:44"
+        "notes": "Consistent template, legible",
+        "score": 89,
+        "reviewed_at": "2026-10-28T08:58:22"
       }
     },
     "social_preview_png": {
       "path": "assets/social-preview.png",
-      "status": "approved",
+      "status": "pending_review",
       "commit": "",
-      "generated_at": "2026-10-28T08:03:00",
-      "review": {
-        "status": "approved",
-        "reviewer": "subagent:vision-review",
-        "method": "structural",
-        "notes": "Rendered from the approved 1280x640 social SVG; exact dimensions verified.",
-        "score": null,
-        "reviewed_at": "2026-10-28T08:17:28"
-      }
+      "generated_at": "2026-10-28T08:47:19",
+      "review": null
     }
   },
   "screenshots": [
@@ -69,9 +64,9 @@
         "status": "approved",
         "reviewer": "subagent:vision-review",
         "method": "vision",
-        "notes": "2026-10-28-index.png \u2014 real auth/login UI 'VOIDFARER COMMAND AUTHORITY' form, non-blank.",
-        "score": 92,
-        "reviewed_at": "2026-10-28T08:10:44"
+        "notes": "Real index login UI VOIDFARER VANGUARD, non-blank",
+        "score": 89,
+        "reviewed_at": "2026-10-28T08:58:22"
       }
     }
   ]
