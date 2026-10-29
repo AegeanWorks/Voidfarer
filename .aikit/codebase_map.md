@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `88`
-- **Total Classes**: `229`
-- **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1347`
-- **Total Source Lines**: `37239`
+- **Total Python Modules**: `89`
+- **Total Classes**: `233`
+- **Total Top-Level Functions**: `304`
+- **Total Class Methods**: `1363`
+- **Total Source Lines**: `37724`
 
 ---
 
@@ -202,7 +202,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `223` lines (`9667` bytes)
+**Size**: `229` lines (`9977` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -212,6 +212,7 @@
   - Method `.test_cli_status()`
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
+  - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
   - Method `.test_cli_combat_accepts_documented_actions()`
   - Method `.test_cli_shipyard_subcommands_parse()`
   - Method `.test_cli_corporations_alias()`
@@ -240,7 +241,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1191` lines (`54508` bytes)
+**Size**: `1215` lines (`55633` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -419,6 +420,11 @@
   - Method `.test_point_travel_starts_the_transit_animation()`
   - Method `.test_transit_animation_marks_the_destination_vector()`
   - Method `.test_browser_review_can_select_a_vector()`
+- `class TestWorldReliefCockpit` - *The target card must expose post-war rebuilding and relief controls.*
+  - Method `.setUpClass()`
+  - Method `.test_target_card_holds_rebuild_and_relief_actions()`
+  - Method `.test_reconstruction_controls_have_stable_testids()`
+  - Method `.test_browser_review_prepares_a_devastated_world()`
 
 ---
 
@@ -1156,7 +1162,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `434` lines (`19156` bytes)
+**Size**: `462` lines (`20447` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1193,6 +1199,7 @@
   - Method `.test_post_inventory_buy_rejects_non_numeric_quantity()`
   - Method `.test_frontier_endpoints()`
   - Method `.test_landing_and_depot_endpoints()`
+  - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_save_load_delete_endpoints()`
   - Method `.test_multiple_save_slots_endpoints_and_listing()`
   - Method `.test_codex_claim_endpoint()`
@@ -1528,6 +1535,27 @@
 
 ---
 
+### [`tests/test_world_relief.py`](tests/test_world_relief.py)
+> *Post-war reconstruction, relief cargo and the market premium for bombed worlds.*
+
+**Size**: `155` lines (`6737` bytes)
+
+**Classes:**
+- `class WorldReliefEngineTest`
+  - Method `.setUp()`
+  - Method `._body()`
+  - Method `.test_credits_rebuild_reduces_devastation_and_earns_standing()`
+  - Method `.test_relief_cargo_reduces_more_devastation_and_lifts_morale()`
+  - Method `.test_reconstruction_requires_orbit_and_damage()`
+  - Method `.test_relief_refuses_when_cargo_is_missing()`
+  - Method `.test_unknown_mode_is_rejected()`
+- `class DevastationMarketTest`
+  - Method `.test_bombed_world_pays_a_relief_premium()`
+- `class OrphanedWarCleanupTest`
+  - Method `.test_a_war_against_a_territory_less_faction_is_closed()`
+
+---
+
 ### [`tools/__init__.py`](tools/__init__.py)
 > *Developer proofs for VoidFarer.*
 
@@ -1568,13 +1596,14 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `467` lines (`21108` bytes)
+**Size**: `516` lines (`22937` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
 - `def _metrics(page)` - *Return viewport, scroll, element and tiny-text counts from the live page.*
 - `def _click_probe(page)` - *Enumerate every cockpit control through the shipped click map and prove handles are unique.*
 - `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll, click_map)` - *Open one real browser viewport, drive it and capture a true screenshot.*
+- `def _prepare_relief(engine)` - *Devastate an inhabited Sol world and put the flagship in orbit for the target card.*
 - `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
 - `def _prepare_waypoint(engine)` - *Fly the flagship to an open-space vector so the void anchor is on screen.*
 - `def _prepare_factions(engine)` - *Advance a fresh campaign until the Coalition is at war, so the petition control renders.*
@@ -1629,7 +1658,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `748` lines (`32204` bytes)
+**Size**: `749` lines (`32275` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1743,7 +1772,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2954` lines (`151715` bytes)
+**Size**: `2986` lines (`153045` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1761,6 +1790,7 @@
 - `def cmd_messages(engine, storage, parts)`
 - `def cmd_depot(engine, storage, parts)`
 - `def cmd_land(engine, storage, body_id)`
+- `def cmd_reconstruct(engine, storage, body_id, mode)`
 - `def cmd_saves(engine, storage, parts)` - *List, save, load, or delete named save slots.*
 - `def cmd_mercs(engine, storage, parts)`
 - `def cmd_allies(engine, storage, parts)`
@@ -1806,7 +1836,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `606` lines (`20869` bytes)
+**Size**: `627` lines (`21681` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -1896,7 +1926,7 @@
 ### [`voidfarer/economy.py`](voidfarer/economy.py)
 > *Dynamic Global Economy, supply/demand simulation, economic events, and galactic trade network.*
 
-**Size**: `412` lines (`15732` bytes)
+**Size**: `427` lines (`16366` bytes)
 
 **Functions:**
 - `def generate_initial_economy(systems, rng)` - *Construct baseline economy state with localized stockpiles and initial macroeconomic conditions.*
@@ -1925,7 +1955,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7646` lines (`379570` bytes)
+**Size**: `7769` lines (`385475` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2069,6 +2099,7 @@
   - Method `.withdraw_cargo(item_id, quantity)`
   - Method `.sell_from_depot(item_id, quantity)`
   - Method `.land_on_body(body_id)` - *Land on a habitable body and collect surface discovery rewards.*
+  - Method `.reconstruct_world(body_id, mode)` - *Rebuild a devastated inhabited world with credits or relief cargo.*
   - Method `.get_surface_report()` - *Landing-party operations available on the currently landed body.*
   - Method `.perform_surface_operation(operation_id)` - *Run one surface operation, then mark the site branch as worked.*
   - Method `.salvage_derelict()` - *Board the current body's derelict hulk for cargo, credits, and hazard risk.*
@@ -2141,7 +2172,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `473` lines (`21147` bytes)
+**Size**: `496` lines (`22067` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -2593,7 +2624,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1331` lines (`56642` bytes)
+**Size**: `1339` lines (`57020` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

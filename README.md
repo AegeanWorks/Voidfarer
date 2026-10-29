@@ -470,7 +470,19 @@ python -m voidfarer.cli quantum ship titanium 2 kepler
 python -m voidfarer.cli surface
 python -m voidfarer.cli contracts refresh
 ```
-32 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time, but the default relaxed cadence rolls only once per 36-tick window. Quantum freight ships cargo for a fee, paying on arrival. Landed teams choose from 13 operations: survey, core-sample, explore ruins, salvage, rest, tap geothermal heat, bio-prospect, recover a crash site, drill ice, tap magma, harvest reefs, scoop gas clouds, or deep-mine; environment-specific operations are offered only on matching worlds. War captures displace civilians and leave scars. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
+32 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time, but the default relaxed cadence rolls only once per 36-tick window. Quantum freight ships cargo for a fee, paying on arrival. Landed teams choose from 13 operations: survey, core-sample, explore ruins, salvage, rest, tap geothermal heat, bio-prospect, recover a crash site, drill ice, tap magma, harvest reefs, scoop gas clouds, or deep-mine; environment-specific operations are offered only on matching worlds. War captures displace civilians and leave scars.
+
+### 18c. Post-War Reconstruction & Relief
+```bash
+# Spend credits to remove 20 devastation from an inhabited world under orbit
+python -m voidfarer.cli reconstruct sol_body_1
+
+# Or deliver 2 medicines + 2 hydroponics + 1 fuel cell for 40 devastation
+python -m voidfarer.cli reconstruct sol_body_1 --relief
+
+# The same actions are on the target card and POST /api/reconstruct
+```
+Rebuilding earns standing with the world's owner and feeds the Rebuilder / Relief Runner codex milestones. Devastated markets pay a relief premium for medicines, food, fuel and construction goods, so running supplies into a war zone is a real trade. Wars whose belligerent has no territory left are closed and reported instead of lingering as phantom fronts. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
 
 ### 19. Stellaris-Style Windows Cockpit
 

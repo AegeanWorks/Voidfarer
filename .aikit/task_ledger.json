@@ -1,83 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "feature-batch-7",
+    "task_id": "world-relief",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793311753.3675947,
-    "owner": "opencode:feature",
-    "started_by": "opencode:feature",
+    "updated_at": 1793312946.526336,
+    "owner": "opencode:mechanics",
+    "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793311759.2967477
+    "completed_at": 1793312954.0680685
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-2",
-      "phase": "reforge stage 43",
-      "phase_num": 3,
-      "description": "Reforge stage 43: window 129, 3 commit(s), 25 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793307026.1012568,
-      "timestamp_str": "2026-10-29 23:50:26",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-2",
-      "phase": "reforge stage 44",
-      "phase_num": 3,
-      "description": "Reforge stage 44: window 132, 3 commit(s), 20 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793307186.7150419,
-      "timestamp_str": "2026-10-29 23:53:06",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-2",
-      "phase": "reforge stage 45",
-      "phase_num": 3,
-      "description": "Reforge stage 45: window 135, 3 commit(s), 35 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793307415.672784,
-      "timestamp_str": "2026-10-29 23:56:55",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-2",
-      "phase": "reforge stage 46",
-      "phase_num": 3,
-      "description": "Reforge stage 46: window 138, 3 commit(s), 10 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793308835.8328943,
-      "timestamp_str": "2026-10-30 00:20:35",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-2",
-      "phase": "reforge stage 47",
-      "phase_num": 3,
-      "description": "Reforge stage 47: window 141, 3 commit(s), 8 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793309006.9902875,
-      "timestamp_str": "2026-10-30 00:23:26",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "reforge:run-2",
-      "phase": "reforge stage 48",
-      "phase_num": 3,
-      "description": "Reforge stage 48: window 144, 3 commit(s), 9 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793309063.754484,
-      "timestamp_str": "2026-10-30 00:24:23",
-      "agent": "opencode"
-    },
     {
       "task_id": "reforge:run-2",
       "phase": "reforge stage 49",
@@ -236,6 +170,77 @@
       "timestamp": 1793311759.2967496,
       "timestamp_str": "2026-10-30 01:09:19",
       "agent": "opencode:feature"
+    },
+    {
+      "task_id": "world-relief",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/5] Plan post-war reconstruction and relief: a repeatable rebuild/relief action for devastated inhabited worlds, relief-demand pricing, orphaned-war cleanup, REST/CLI/cockpit parity, and balance tests.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793312237.021264,
+      "timestamp_str": "2026-10-30 01:17:17",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "War devastation is currently permanent until a very slow passive recovery, and the only player response is to wait. The market also treats a bombed world like a healthy one, so relief cargo has no premium and collapsed wars can linger in state.",
+        "benefits": "Players get a meaningful post-war choice: spend credits to rebuild or spend medicines, hydroponics and fuel on relief. Devastated markets pay relief premiums, and wars against territory-less factions are closed instead of lingering.",
+        "risks": "contract: new endpoints and cockpit controls must stay discoverable by the click map and AI catalog; dependency: none, stdlib only; concurrency: rebuilding mutates systems, ship cargo/credits, standings and events in one clone, so no partial state may leak; state: new stats and event kinds must survive old saves and the reconstruction action must refuse mid-transit, in combat, or at a non-orbit body.",
+        "mitigation": "Add failing engine, market, API, CLI and layout tests first, keep old-save defaults, mutate through _clone_state once, document the endpoints in README/COCKPIT and add the action to the AI context catalog, then run the full suite, aikit gates and a real-browser target-card capture."
+      }
+    },
+    {
+      "task_id": "world-relief",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/5] Reconstruction and relief engine actions, relief market premiums, orphaned-war cleanup and codex metrics implemented with engine and market regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793312946.1167872,
+      "timestamp_str": "2026-10-30 01:29:06",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "world-relief",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[3/5] /api/reconstruct and reconstruct CLI/REPL parity added; server and CLI regressions pass.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793312946.2536404,
+      "timestamp_str": "2026-10-30 01:29:06",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "world-relief",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[4/5] Target-card REBUILD WORLD and DELIVER RELIEF controls, relief browser scenario and layout regressions added; real-browser click verified 600 cr and 20 devastation.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793312946.390063,
+      "timestamp_str": "2026-10-30 01:29:06",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "world-relief",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[5/5] README, COCKPIT guide and ADR-088 recorded; 792 tests pass and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793312946.526336,
+      "timestamp_str": "2026-10-30 01:29:06",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "world-relief",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'world-relief' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793312954.06807,
+      "timestamp_str": "2026-10-30 01:29:14",
+      "agent": "opencode:mechanics"
     }
   ]
 }
