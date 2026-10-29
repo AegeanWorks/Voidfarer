@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from voidfarer.agent_play import AiCaptain, ApiClient
 from voidfarer.decisions import DECISION_DEFINITIONS
+from voidfarer.demographics import compute_population_capacity
 from voidfarer.economy import MAX_STOCK, MIN_STOCK
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import get_faction_id_from_name
@@ -167,6 +168,35 @@ class EconomyIntegrityTest(unittest.TestCase):
         }
         self.assertEqual(after, before, "stock must be conserved, never destroyed at the ceiling")
         self.assertEqual(updated_captains[0].system_id, "sol")
+
+
+class LegacyMigrationTest(unittest.TestCase):
+    def test_tech_drift_survives_save_and_load(self):
+        engine = SimulationEngine(seed=42)
+        system = engine.state.systems["sol"]
+        body = next(
+            b for b in system.bodies
+            if b.body_type in ("desert_world", "ice_world", "lava_world", "terrestrial")
+        )
+        capacity = compute_population_capacity(
+            body.body_type, body.radius_km, body.habitability, 10
+        )
+        body = replace(body, tech_level=10, population_capacity=capacity)
+        system = replace(
+            system,
+            bodies=tuple(body if b.id == body.id else b for b in system.bodies),
+        )
+        engine.state = engine._clone_state(
+            systems={**engine.state.systems, "sol": system}
+        )
+        saved = type(engine.state).from_dict(engine.state.to_dict())
+        loaded = SimulationEngine(seed=7)
+        self.assertTrue(loaded.load_state(saved)[0])
+        restored = next(
+            b for b in loaded.state.systems["sol"].bodies if b.id == body.id
+        )
+        self.assertEqual(restored.tech_level, 10)
+        self.assertEqual(restored.population_capacity, capacity)
 
 
 class CadenceLifecycleTest(unittest.TestCase):

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `88`
-- **Total Classes**: `227`
+- **Total Classes**: `228`
 - **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1326`
-- **Total Source Lines**: `36868`
+- **Total Class Methods**: `1327`
+- **Total Source Lines**: `36903`
 
 ---
 
@@ -1110,7 +1110,7 @@
 ### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
 > *Regressions pinned by the post-implementation review pass.*
 
-**Size**: `297` lines (`12777` bytes)
+**Size**: `327` lines (`14027` bytes)
 
 **Classes:**
 - `class FlightSafetyTest`
@@ -1122,6 +1122,8 @@
 - `class EconomyIntegrityTest`
   - Method `.test_ai_trade_cannot_mint_stock_at_the_floor()`
   - Method `.test_ai_trade_cannot_destroy_stock_at_the_ceiling()`
+- `class LegacyMigrationTest`
+  - Method `.test_tech_drift_survives_save_and_load()`
 - `class CadenceLifecycleTest`
   - Method `.test_cadence_is_restored_on_load_and_reset_to_default()`
   - Method `.test_a_batched_tick_compounds_the_decision_windows()`
@@ -1905,7 +1907,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7606` lines (`377765` bytes)
+**Size**: `7611` lines (`378006` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

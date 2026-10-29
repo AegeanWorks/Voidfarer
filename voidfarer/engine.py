@@ -475,7 +475,12 @@ class SimulationEngine:
                         temperature_c=int(phys["temperature_c"]),
                         habitability=float(phys["habitability"]),
                     )
-                if updated_body.body_type not in ("star", "black_hole", "wormhole"):
+                if (
+                    updated_body.body_type not in ("star", "black_hole", "wormhole")
+                    and legacy_body
+                ):
+                    # Only a pre-demographics world needs its capacity backfilled; a
+                    # drifted or conquered world must keep the level it earned.
                     tech = world_tech_level(
                         sys_obj.faction, updated_body.body_type, updated_body.market_archetype
                     )
