@@ -8451,3 +8451,136 @@ body.cockpit-theme .nav-panel > .panel-header {
 .contract-cat-badge.cat-anomaly { color: #d8c49a; background: rgba(169, 139, 189, 0.12); border-color: rgba(169, 139, 189, 0.4); }
 .contract-cat-badge.cat-diplomacy { color: #b9dce8; background: rgba(127, 183, 201, 0.14); border-color: rgba(127, 183, 201, 0.4); }
 .contract-cat-badge.cat-fleet { color: #b9dce8; background: rgba(127, 183, 201, 0.14); border-color: rgba(127, 183, 201, 0.4); }
+
+/* --- G-013: one command panel for reactor routing and abilities; the left
+   outliner ends with its sections instead of stretching to the footer. --- */
+.hud-command-strip {
+    grid-template-columns: minmax(0, 2.15fr) minmax(280px, 1fr);
+    align-items: stretch;
+}
+
+.power-abilities-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 9px 11px;
+    min-width: 0;
+}
+
+.power-abilities-header {
+    align-items: center;
+    border-bottom: 1px solid rgba(201, 163, 90, 0.24);
+    padding-bottom: 5px;
+}
+
+.power-abilities-header .panel-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.82rem;
+    letter-spacing: 1.5px;
+}
+
+.power-abilities-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.92fr);
+    gap: 10px;
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+.reactor-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding-right: 10px;
+    border-right: 1px solid rgba(201, 163, 90, 0.18);
+}
+
+.subsection-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(201, 163, 90, 0.12);
+}
+
+.subsection-header .panel-tag {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.56rem;
+    letter-spacing: 0.06em;
+}
+
+.subsection-header .text-btn {
+    font-size: 0.56rem;
+    padding: 1px 4px;
+}
+
+.power-abilities-panel .skills-quick-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.power-abilities-panel .skills-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.power-abilities-panel .skill-quick-chip {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+        "hotkey name"
+        "bar rank";
+    align-items: center;
+    gap: 2px 6px;
+    padding: 3px 6px;
+}
+
+.power-abilities-panel .skill-quick-hotkey { grid-area: hotkey; }
+.power-abilities-panel .skill-quick-icon { display: none; }
+.power-abilities-panel .skill-quick-name {
+    grid-area: name;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+}
+.power-abilities-panel .skill-quick-rank {
+    grid-area: rank;
+    justify-self: end;
+    white-space: nowrap;
+    font-size: 0.5rem;
+    line-height: 1.15;
+}
+.power-abilities-panel .skill-quick-bar { grid-area: bar; height: 3px; }
+
+.power-abilities-panel .panel-tag,
+.power-abilities-panel .power-total,
+.power-abilities-panel .text-btn,
+.power-abilities-panel .skill-quick-name,
+.power-abilities-panel .skill-quick-rank,
+.power-abilities-panel .skill-quick-hotkey,
+.power-abilities-panel .skills-quick-hint { font-size: 12px; }
+
+.power-abilities-panel .skills-quick-hint {
+    margin-top: auto;
+    font-size: 0.48rem;
+    line-height: 1.25;
+}
+
+.reactor-panel.reactor-collapsed .power-abilities-body { grid-template-columns: max-content minmax(0, 1fr); }
+.reactor-panel.reactor-collapsed .reactor-column { border-right: 0; padding-right: 0; }
+
+.panel-left {
+    align-self: start;
+    height: fit-content;
+    max-height: 100%;
+}

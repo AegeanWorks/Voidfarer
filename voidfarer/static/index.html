@@ -101,8 +101,8 @@
                         <label class="setting-row"><span>Claim finished contracts automatically</span><input type="checkbox" id="settingAutoClaim"></label>
                         <label class="setting-row"><span>Quick-time decision cadence</span>
                             <select id="settingDecisionCadence" data-testid="setting-decision-cadence">
-                                <option value="relaxed">RELAXED (rare)</option>
-                                <option value="normal" selected>NORMAL</option>
+                                <option value="relaxed" selected>RELAXED (rare)</option>
+                                <option value="normal">NORMAL</option>
                                 <option value="frequent">FREQUENT</option>
                             </select>
                         </label>
@@ -938,19 +938,22 @@
                     </div>
                 </div>
             </section>
-            <!-- Bottom command strip: reactor left, skills center, radar settings + flight log right (G-013) -->
+            <!-- Bottom command strip: reactor + abilities share one wide panel; radar/log stay right (G-013) -->
             <section class="hud-command-strip" id="hudCommandStrip" aria-label="Command strip">
-                <!-- Reactor Power Matrix -->
-                <div class="sub-panel reactor-panel hud-strip-panel" id="panelReactor">
-                    <div class="panel-header">
-                        <div class="panel-tag"><span class="badge-dot dot-amber"></span><span class="strip-icon">⚡</span> POWER-ROUTING</div>
-                        <h2 class="panel-title">REACTOR<span class="title-long"> DISTRIBUTION</span></h2>
-                        <span class="hotkey-chip" title="Toggle reactor distribution (P)">P</span>
+                <!-- Combined command panel: power routing and abilities in one frame -->
+                <div class="sub-panel reactor-panel power-abilities-panel hud-strip-panel" id="panelReactor">
+                    <div class="panel-header power-abilities-header">
+                        <div class="panel-tag"><span class="badge-dot dot-amber"></span><span class="strip-icon">⚡</span> COMMAND SYSTEMS</div>
+                        <h2 class="panel-title">REACTOR + ABILITIES</h2>
                         <span class="power-total" id="powerTotal">100% ALLOCATED</span>
-                        <div class="reactor-header-actions">
-                            <button class="text-btn" id="btnToggleReactor" aria-controls="panelReactor" aria-expanded="true" title="Hide or show reactor power routing (P)">HIDE</button>
-                        </div>
                     </div>
+                    <div class="power-abilities-body">
+                        <div class="reactor-column">
+                            <div class="subsection-header">
+                                <div class="panel-tag"><span class="badge-dot dot-amber"></span> POWER-ROUTING</div>
+                                <span class="hotkey-chip" title="Toggle reactor distribution (P)">P</span>
+                                <button class="text-btn" id="btnToggleReactor" aria-controls="panelReactor" aria-expanded="true" title="Hide or show reactor power routing (P)">HIDE</button>
+                            </div>
 
                     <div class="reactor-sim-strip">
                         <div class="reactor-thermal">
@@ -1010,25 +1013,25 @@
                         </div>
                     </div>
 
-                    <div class="power-action-row">
-                        <button class="btn-hud" id="presetBalanced">BALANCED</button>
-                        <button class="btn-hud" id="presetSprint">SPEED</button>
-                        <button class="btn-hud" id="presetScience">SCIENCE</button>
-                        <button class="btn-hud btn-green" id="applyPowerBtn">APPLY ROUTE</button>
-                    </div>
-                </div>
+                            <div class="power-action-row">
+                                <button class="btn-hud" id="presetBalanced">BALANCED</button>
+                                <button class="btn-hud" id="presetSprint">SPEED</button>
+                                <button class="btn-hud" id="presetScience">SCIENCE</button>
+                                <button class="btn-hud btn-green" id="applyPowerBtn">APPLY ROUTE</button>
+                            </div>
+                        </div>
 
-                <!-- Ability quick strip -->
-                <div class="sub-panel skills-quick-panel hud-strip-panel" id="hudSkillsPanel">
-                    <div class="panel-header">
-                        <div class="panel-tag"><span class="badge-dot dot-purple"></span><span class="strip-icon">✦</span> POWERS</div>
-                        <h2 class="panel-title">ABILITIES</h2>
-                        <button class="hotkey-chip" id="btnToggleSkills" title="Toggle abilities strip (K)" aria-label="Toggle abilities strip" aria-controls="hudSkillsPanel" aria-expanded="true">K</button>
-                        <span class="skills-quick-points"><strong id="hudSkillsReady">0</strong> READY</span>
-                        <button class="text-btn" id="btnOpenSkillsTab" title="Open commander skills, ranks and perks">DOSSIER</button>
+                        <div class="skills-quick-panel" id="hudSkillsPanel">
+                            <div class="subsection-header">
+                                <div class="panel-tag"><span class="badge-dot dot-purple"></span><span class="strip-icon">✦</span> POWERS</div>
+                                <span class="skills-quick-points"><strong id="hudSkillsReady">0</strong> READY</span>
+                                <button class="hotkey-chip" id="btnToggleSkills" title="Toggle abilities strip (K)" aria-label="Toggle abilities strip" aria-controls="hudSkillsPanel" aria-expanded="true">K</button>
+                                <button class="text-btn" id="btnOpenSkillsTab" title="Open commander skills, ranks and perks">DOSSIER</button>
+                            </div>
+                            <div class="skills-quick-grid" id="hudSkillsGrid"></div>
+                            <p class="skills-quick-hint">SHIFT+1..6 USE ABILITY // K TO HIDE // DOSSIER TO TRAIN SKILLS</p>
+                        </div>
                     </div>
-                    <div class="skills-quick-grid" id="hudSkillsGrid"></div>
-                    <p class="skills-quick-hint">SHIFT+1..6 USE ABILITY // K TO HIDE // DOSSIER TO TRAIN SKILLS</p>
                 </div>
 
                 <!-- Right column: radar settings above, flight log below (separate panels) -->

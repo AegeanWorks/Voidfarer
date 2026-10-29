@@ -4993,6 +4993,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.fillText("VF-FLAGSHIP (OPEN SPACE)", sx + 10, sy - 7);
         }
         this.drawSystemTraffic(ctx, cx, cy, auScale, now);
+        this.drawPointSelection(ctx, cx, cy, auScale, ship);
         this.drawTravelAnimation(ctx, cx, cy, auScale);
     }
 
@@ -6347,12 +6348,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleTravelAction(mode = "sublight") {
         if (!this.selectedTarget) return;
         if (this.selectedType === "point") {
+            const fromId = this.state?.ship?.orbiting_body_id || null;
             const res = await this.postAction("/api/travel/point", {
                 distance_au: this.selectedTarget.au,
                 angle: this.selectedTarget.angle,
                 mode,
             });
-            if (res && res.ok) this.selectedTarget = null;
+            if (res && res.ok) {
+                const activeTravel = this.state?.ship?.travel || this.state?.travel || null;
+                this.startTravelAnimation(fromId, null, activeTravel);
+                this.selectedTarget = null;
+            }
             this.updateTargetCard();
             return;
         }
@@ -6400,18 +6406,31 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const destId = activeTravel?.destination_body_id || toBodyId;
         const from = bodies.find(b => b.id === origId);
         const to = bodies.find(b => b.id === destId);
-        if (!to) return;
+        const isPoint = Boolean(activeTravel && activeTravel.destination_body_id == null);
+        if (!isPoint && !to) return;
+        // A point trip has no destination body: both ends come from the waypoint
+        // coordinates, and the origin falls back to the ship's open-space anchor.
+        const ship = this.state.ship || {};
+        const fromAngle = from ? (from.current_angle || 0) : Number(ship.waypoint_angle ?? 0);
+        const fromRadius = from ? from.orbit_radius : Number(ship.waypoint_au ?? 0);
+        const toAngle = isPoint ? Number(activeTravel?.waypoint_angle ?? 0) : (to.current_angle || 0);
+        const toRadius = isPoint ? Number(activeTravel?.waypoint_au ?? 0) : to.orbit_radius;
         const speed = Math.max(0.25, this.state.time?.speed || 1.0);
         const totalTicks = activeTravel
             ? Math.max(1, activeTravel.duration_ticks || (activeTravel.arrival_tick - activeTravel.started_tick) || 1)
             : 1;
+        const travelKey = activeTravel
+            ? `${activeTravel.destination_body_id ?? "point"}:${activeTravel.started_tick}:${activeTravel.waypoint_au ?? ""}:${activeTravel.waypoint_angle ?? ""}`
+            : `orbit:${destId}:${performance.now()}`;
         this.travelAnimation = {
             fromBodyId: origId,
-            toBodyId: destId,
-            fromAngle: from ? (from.current_angle || 0) : 0,
-            fromRadius: from ? from.orbit_radius : 0,
-            toAngle: to.current_angle || 0,
-            toRadius: to.orbit_radius,
+            toBodyId: isPoint ? null : destId,
+            isPoint: isPoint,
+            travelKey: travelKey,
+            fromAngle: fromAngle,
+            fromRadius: fromRadius,
+            toAngle: toAngle,
+            toRadius: toRadius,
             startedTick: activeTravel ? activeTravel.started_tick : (this.state.time?.tick || 0),
             arrivalTick: activeTravel ? activeTravel.arrival_tick : ((this.state.time?.tick || 0) + 1),
             totalTicks: totalTicks,
@@ -6427,10 +6446,62 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         };
     }
 
+    drawPointSelection(ctx, cx, cy, auScale, ship) {
+        if (this.selectedType !== "point" || !this.selectedTarget) return;
+        if (ship?.travel || this.state?.travel || this.travelAnimation) return;
+        const au = Number(this.selectedTarget.au);
+        const angle = Number(this.selectedTarget.angle);
+        if (!Number.isFinite(au) || !Number.isFinite(angle) || au <= 0) return;
+        const tx = cx + Math.cos(angle) * au * auScale;
+        const ty = cy + Math.sin(angle) * au * auScale;
+        const orbitBody = (this.state?.current_system?.bodies || [])
+            .find(b => b.id === ship?.orbiting_body_id);
+        const originAu = orbitBody ? Number(orbitBody.orbit_radius || 0) : Number(ship?.waypoint_au || 0);
+        const originAngle = orbitBody ? Number(orbitBody.current_angle || 0) : Number(ship?.waypoint_angle || 0);
+        const ox = cx + Math.cos(originAngle) * originAu * auScale;
+        const oy = cy + Math.sin(originAngle) * originAu * auScale;
+        ctx.save();
+        ctx.setLineDash([4, 5]);
+        ctx.strokeStyle = "rgba(127, 183, 201, 0.55)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = "#7fb7c9";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(tx, ty, 11, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(tx, ty, 18, 0, Math.PI * 2);
+        ctx.globalAlpha = 0.45;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.moveTo(tx - 15, ty);
+        ctx.lineTo(tx + 15, ty);
+        ctx.moveTo(tx, ty - 15);
+        ctx.lineTo(tx, ty + 15);
+        ctx.stroke();
+        ctx.font = "12px 'Share Tech Mono'";
+        ctx.fillStyle = "#7fb7c9";
+        ctx.fillText(
+            `VECTOR ${au.toFixed(2)} AU // ${(angle * 180 / Math.PI).toFixed(0)} DEG`,
+            tx + 16,
+            ty - 12,
+        );
+        ctx.restore();
+    }
+
     drawTravelAnimation(ctx, cx, cy, auScale) {
         const activeTravel = this.state?.ship?.travel || this.state?.travel || null;
+        const travelKey = activeTravel
+            ? `${activeTravel.destination_body_id ?? "point"}:${activeTravel.started_tick}:${activeTravel.waypoint_au ?? ""}:${activeTravel.waypoint_angle ?? ""}`
+            : "";
         if (this.travelAnimationEnabled && activeTravel) {
-            if (!this.travelAnimation || this.travelAnimation.toBodyId !== activeTravel.destination_body_id) {
+            if (!this.travelAnimation || this.travelAnimation.travelKey !== travelKey) {
                 this.startTravelAnimation(activeTravel.origin_body_id, activeTravel.destination_body_id, activeTravel);
             }
         }
@@ -6438,7 +6509,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const anim = this.travelAnimation;
         const bodies = this.state?.current_system?.bodies || [];
         const liveFrom = bodies.find(b => b.id === anim.fromBodyId);
-        const liveTo = bodies.find(b => b.id === anim.toBodyId);
+        const liveTo = anim.isPoint ? null : bodies.find(b => b.id === anim.toBodyId);
         if (liveFrom) {
             anim.fromAngle = liveFrom.current_angle || 0;
             anim.fromRadius = liveFrom.orbit_radius || 0;
@@ -6494,6 +6565,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         ctx.setLineDash([5, 4]);
         ctx.stroke();
         ctx.setLineDash([]);
+
+        // The destination reticle stays on the selected vector for the whole trip.
+        ctx.beginPath();
+        ctx.arc(tx, ty, 9, 0, Math.PI * 2);
+        ctx.strokeStyle = anim.isPoint ? "#7fb7c9" : "rgba(127, 183, 201, 0.55)";
+        ctx.lineWidth = 1.25;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(tx - 12, ty);
+        ctx.lineTo(tx + 12, ty);
+        ctx.moveTo(tx, ty - 12);
+        ctx.lineTo(tx, ty + 12);
+        ctx.stroke();
+        if (anim.isPoint) {
+            ctx.font = "12px 'Segoe UI'";
+            ctx.fillStyle = "#7fb7c9";
+            ctx.fillText("DESTINATION VECTOR", tx + 15, ty - 11);
+        }
 
         if (this.celestial) {
             this.celestial.drawShip(ctx, x, y, Math.atan2(ty - oy, tx - ox), 9 * Math.max(1, this.zoom), "#7fb7c9");

@@ -146,24 +146,27 @@ class TestCockpitLayout(unittest.TestCase):
         self.assertIsNotNone(log_panel.find_by_id("flightLogStream"),
                              "flight log stream must be inside the log panel")
 
-    def test_command_strip_holds_reactor_skills_and_right_column(self):
+    def test_command_strip_holds_combined_power_panel_and_right_column(self):
         strip = self.dom.find_by_id("hudCommandStrip")
         self.assertIsNotNone(strip, "command strip (#hudCommandStrip) missing")
         child_ids = [child.attrs.get("id") for child in strip.children]
         self.assertEqual(
             child_ids,
-            ["panelReactor", "hudSkillsPanel", "hudStripRight"],
-            "strip order must be reactor, skills, radar/log column",
+            ["panelReactor", "hudStripRight"],
+            "strip order must be the combined power panel, then the radar/log column",
+        )
+        reactor = self.dom.find_by_id("panelReactor")
+        self.assertIsNotNone(reactor.find_by_id("hudSkillsPanel"),
+                             "abilities must live inside the combined power panel")
+        self.assertRegex(
+            self.css,
+            r"\.hud-command-strip\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*2\.15fr\)\s*minmax\(280px,\s*1fr\)",
+            "the combined power panel must take the wide column and radar/log the narrow column",
         )
         self.assertRegex(
             self.css,
-            r"\.hud-command-strip\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)",
-            "reactor, skills, and radar/log must stretch equally",
-        )
-        self.assertRegex(
-            self._rule_body(".hud-command-strip"),
-            r"grid-template-columns",
-            "the command strip must lay its three columns out in one row",
+            r"\.power-abilities-body\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1\.18fr\)\s*minmax\(0,\s*0\.92fr\)",
+            "reactor routing and abilities must share one two-section body",
         )
         self.assertRegex(
             self.css,
@@ -995,6 +998,8 @@ class TestPostPushPolishLayout(unittest.TestCase):
         self.assertIn('data-testid="aikit-link"', self.html)
         self.assertIn('data-testid="setting-decision-cadence"', self.html)
         self.assertIn('"/api/settings/decisions"', self.js)
+        self.assertIn('<option value="relaxed" selected>', self.html,
+                      "the settings form must default to the relaxed cadence")
 
     def test_repeated_row_controls_get_unique_testids(self):
         self.assertIn("element.dataset[identity[0]]}-${index}", self.js)
@@ -1109,6 +1114,17 @@ class TestTerminalDeckScrolling(unittest.TestCase):
         self.assertIn('stack.addEventListener("scroll", sync, true)', self.js)
         self.assertIn('querySelectorAll(".tab-content")', self.js)
 
+    def test_outliner_panel_ends_with_its_sections(self):
+        rules = re.findall(r"\.panel-left\s*\{([^}]*)\}", self.css, re.S)
+        self.assertTrue(rules, "missing .panel-left rule")
+        final_rule = rules[-1]
+        self.assertIn("align-self: start", final_rule,
+                      "the left drawer must not stretch to the bottom of its grid area")
+        self.assertIn("height: fit-content", final_rule,
+                      "the left drawer must end with its content instead of filling the column")
+        self.assertIn("max-height: 100%", final_rule,
+                      "long tab content must still scroll inside the viewport")
+
 
 class TestFactionEconomyCard(unittest.TestCase):
     """The faction card must show where money comes from and where it goes."""
@@ -1144,3 +1160,32 @@ class TestFactionEconomyCard(unittest.TestCase):
         self.assertIn("trade_partners", self.js)
         self.assertIn("tech_progress", self.js)
         self.assertIn("TRADE ${partners}", self.js)
+
+class TestVectorTravelCockpit(unittest.TestCase):
+    """Open-space vectors need a visible reticle and the same transit animation as bodies."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_selected_vector_draws_a_reticle_and_course(self):
+        self.assertIn("drawPointSelection(ctx, cx, cy, auScale, ship);", self.js)
+        self.assertIn("drawPointSelection(ctx, cx, cy, auScale, ship) {", self.js)
+        self.assertIn("VECTOR ", self.js)
+        self.assertIn("this.selectedType === \"point\"", self.js)
+
+    def test_point_travel_starts_the_transit_animation(self):
+        self.assertIn("this.startTravelAnimation(fromId, null, activeTravel);", self.js)
+        self.assertIn("isPoint", self.js)
+        self.assertIn("activeTravel.waypoint_au", self.js)
+        self.assertIn("activeTravel.waypoint_angle", self.js)
+
+    def test_transit_animation_marks_the_destination_vector(self):
+        self.assertIn("anim.isPoint", self.js)
+        self.assertIn("DESTINATION VECTOR", self.js)
+
+    def test_browser_review_can_select_a_vector(self):
+        tool = (STATIC_DIR.parent.parent / "tools" / "ui_browser.py").read_text(encoding="utf-8")
+        self.assertIn('"vector"', tool)
+        self.assertIn('selectedType = "point"', tool)
