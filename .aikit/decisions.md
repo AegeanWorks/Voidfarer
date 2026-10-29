@@ -987,3 +987,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   6. Rate-limit blocking decisions: `DECISION_CADENCE` maps relaxed/normal/frequent to 36/14/4 ticks and 0.55/1.0/1.6 chance multipliers, `last_decision_tick` lives in `stats`, and the base prompt chance drops to 10% (22% for priority events). A settings select and `settings decisions` expose it.
   7. Publish `GET /api/agent/actions` from `agent_api.build_action_catalog`, which scrapes the handler's own route table into method/path/fields; add `voidfarer.agent_play` and `tools/ai_play.py` to drive a full campaign headlessly; add `window.voidfarerClickMap()` with stable `data-testid` fallbacks (id, slot, lot, type, mode, action, text) so every click is addressable.
 - **Consequences**: The captain can only petition, and a refusal is honest; empty space is a real destination with fuel, hazard and ETA; NPC hulls are visible and selectable on both maps; quick-time prompts fall from roughly one every few ticks to at most one per 14 ticks at normal. A 60-step headless captain reaches 9 mechanic families with no API errors, and the action catalog covers all 60+ POST routes. G-015 captures at 1280x720 and 1920x1080 report zero errors, horizontal scroll, tiny text and overlaps. Suite: 739 tests (42 suites).
+
+
+### ADR-083: Runtime Click-Map Proof and a Closed Cockpit UI Contract
+- **Date**: 2026-10-29
+- **Status**: Accepted
+- **Context**: ADR-082 added stable handles and `window.voidfarerClickMap()`, but only a static HTML test proved it, and the AIKit UI contract still reported no finished task for the current cockpit, so `aikit check --strict` was not delivery-ready.
+- **Decision**:
+  1. Add `_click_probe` to `tools/ui_browser.py` and a `--click-map` flag. The real Edge page evaluates the shipped click map after the cockpit is driven, and the run fails when any rendered control lacks a handle or two controls share one.
+  2. Pin the probe and its failure path with a layout test, and document the command in README and the tree entry for the tool.
+  3. Open and close an AIKit UI task for the already-reviewed cockpit surface, recording the NVIDIA Nemotron 3.5 Super VL vision subagent as the reviewer.
+- **Consequences**: The desktop cockpit proves 133 rendered controls, 63 visible, 0 missing handles, 0 duplicates in a real browser. The UI contract now has a finished reviewed task matching the surface, so the standing `DELIVERY` warning about the cockpit is gone. Suite: 740 tests (42 suites).

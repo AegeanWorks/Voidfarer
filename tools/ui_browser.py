@@ -227,9 +227,27 @@ def _metrics(page: Any) -> Dict[str, Any]:
     )
 
 
+def _click_probe(page: Any) -> Dict[str, Any]:
+    """Enumerate every cockpit control through the shipped click map and prove handles are unique."""
+    controls = page.evaluate("() => window.voidfarerClickMap ? window.voidfarerClickMap() : []")
+    testids = [str(control.get("testid") or "") for control in controls]
+    duplicates = sorted({testid for testid in testids if testids.count(testid) > 1})
+    missing = sum(1 for testid in testids if not testid)
+    visible = [control for control in controls if not control.get("hidden")]
+    clickable = [control for control in visible if not control.get("disabled")]
+    return {
+        "total": len(controls),
+        "visible": len(visible),
+        "clickable": len(clickable),
+        "missing_testid": missing,
+        "duplicates": duplicates,
+        "sample": [control.get("testid") for control in visible[:8]],
+    }
+
+
 def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
                   scenario: str, tab: str, out: Path, timeout: int,
-                  scroll: str = "top") -> Dict[str, Any]:
+                  scroll: str = "top", click_map: bool = False) -> Dict[str, Any]:
     """Open one real browser viewport, drive it and capture a true screenshot."""
     context = browser.new_context(
         viewport={"width": viewport[0], "height": viewport[1]},
@@ -263,6 +281,7 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
             page.wait_for_timeout(300)
         page.screenshot(path=str(target), full_page=False, animations="disabled")
         metrics = _metrics(page)
+        clicks = _click_probe(page) if click_map else None
     finally:
         context.close()
     return {
@@ -273,6 +292,7 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
         "viewport": list(viewport),
         "screenshot": target.name,
         "errors": errors,
+        "clicks": clicks,
         **metrics,
     }
 
@@ -323,6 +343,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                         help="scroll the terminal content to the top or bottom")
     parser.add_argument("--headed", action="store_true", help="show the browser window")
     parser.add_argument("--channel", default="msedge", help="Playwright browser channel")
+    parser.add_argument("--click-map", action="store_true",
+                        help="enumerate every cockpit control via window.voidfarerClickMap()")
     args = parser.parse_args(argv)
 
     names = [name.strip() for name in args.viewports.split(",") if name.strip()]
@@ -373,11 +395,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             try:
                 for name in names:
                     report = _run_viewport(browser, url, name, VIEWPORTS[name], args.scenario,
-                                           args.tab, out, args.timeout, args.scroll)
+                                           args.tab, out, args.timeout, args.scroll, args.click_map)
                     reports.append(report)
+                    clicks = report.get("clicks")
+                    click_note = ""
+                    if clicks:
+                        click_note = (f" clicks {clicks['total']} (visible {clicks['visible']}, "
+                                      f"missing {clicks['missing_testid']}, dup {len(clicks['duplicates'])})")
                     print(f"{report['name']}: errors {len(report['errors'])} "
-                          f"hscroll {int(report['horizontal'])} tiny {report['tinyText']} -> "
+                          f"hscroll {int(report['horizontal'])} tiny {report['tinyText']}{click_note} -> "
                           f"{out / report['screenshot']}")
+                    if clicks and (clicks["missing_testid"] or clicks["duplicates"]):
+                        print("Why: a cockpit control has no stable handle for automated play.")
+                        print("Fix: give it an id/data-testid or a data hook the click map can read.")
+                        return 1
             finally:
                 browser.close()
         payload = {

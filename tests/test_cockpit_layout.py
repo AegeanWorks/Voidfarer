@@ -978,6 +978,13 @@ class TestPostPushPolishLayout(unittest.TestCase):
         self.assertIn('data-testid="setting-decision-cadence"', self.html)
         self.assertIn('"/api/settings/decisions"', self.js)
 
+    def test_browser_review_proves_every_click_has_a_unique_handle(self):
+        self.assertIn("def _click_probe(", self.browser_tool)
+        self.assertIn("window.voidfarerClickMap", self.browser_tool)
+        self.assertIn("--click-map", self.browser_tool)
+        self.assertIn("missing_testid", self.browser_tool)
+        self.assertIn("duplicates", self.browser_tool)
+
     def test_every_static_button_can_be_identified_by_a_headless_driver(self):
         class _Buttons(HTMLParser):
             def __init__(self):

@@ -1,84 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "captain-powers",
+    "task_id": "clickmap-proof",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793275922.7021086,
+    "updated_at": 1793277920.6193874,
     "owner": "kilo:2",
     "started_by": "kilo:2",
     "continuations": [],
-    "completed_at": 1793275996.714927
+    "completed_at": 1793277920.8739555
   },
   "checkpoints": [
-    {
-      "task_id": "faction-trade-tech-drift",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[3/6] Cockpit faction cards now show tax/trade/industry/upkeep, partners, tech progress and war burden; grouped wraps, green/red net, inner-scroller scroll cue. UI task finished with VL review; 676 tests pass. checklists: passed.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793119889.2712698,
-      "timestamp_str": "2026-10-27 19:51:29",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "4/4 gates, UI closed",
-        "next": "commit and push",
-        "open": "none",
-        "evidence": "VL no internal clipping, unittest 676 OK"
-      }
-    },
-    {
-      "task_id": "faction-trade-tech-drift",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'faction-trade-tech-drift' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793119957.8484218,
-      "timestamp_str": "2026-10-27 19:52:37",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "cockpit-720p-legibility",
-      "phase": "phase 1",
-      "phase_num": 1,
-      "description": "[1/3] Fix 720p cockpit legibility: event toasts cover the left terminal, the SCROLL cue is 10px, and reactor/skill controls are 21-22px tall.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793229241.0123544,
-      "timestamp_str": "2026-10-29 02:14:01",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "G-015 vision review and the DOM audit of the 1280x720 cockpit found notification cards spanning x=360-920 over the left terminal (x=8-473), a 10px SCROLL cue, and 11 controls below the 24px target size.",
-        "benefits": "Event notifications stop hiding terminal tabs and content at the minimum supported viewport, the scroll affordance becomes readable, and the compact command strip meets the 24px mouse target floor without losing its three-column layout.",
-        "risks": "contract: none; dependency: stdlib only; concurrency: none; state: none; visual: responsive CSS could reflow the 720p command strip or toast stack",
-        "mitigation": "CSS-only media-query changes, a DOM geometry probe before and after, new CSS-contract tests, full gates, and a G-015 vision re-review of fresh 1280x720 and 1920x1080 captures"
-      },
-      "handoff": {
-        "state": "planning complete",
-        "next": "edit style.css",
-        "open": "none",
-        "evidence": "probe_ui geometry and ui-review/audit-20261028"
-      }
-    },
-    {
-      "task_id": "cockpit-720p-legibility",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/3] 720p toasts no longer cover the left terminal; SCROLL cue raised to 12px; reactor/vent/power/skill targets raised to 24px; DOM audit now reports 0 tiny text and 0 sub-24px targets at 1280x720 and 1920x1080; 3 CSS-contract tests added; 679 tests pass; 4/4 gates green. Vision re-review pending: evren2 daily quota exhausted, so no visual approval claimed. checklists: passed (test, hygiene, guidelines, secrets).",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793230103.536134,
-      "timestamp_str": "2026-10-29 02:28:23",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "4/4 gates, visual re-review pending",
-        "next": "resume vision review when evren2 quota resets and open/finish the cockpit UI task from a clean baseline",
-        "open": "UI contract warning, vision quota",
-        "evidence": "ui-review/audit-20261028b, ui-review/review-20261028b, unittest 679 OK"
-      }
-    },
     {
       "task_id": "cockpit-720p-legibility",
       "phase": "phase 4",
@@ -323,6 +256,65 @@
       "status": "completed",
       "timestamp": 1793275996.7149284,
       "timestamp_str": "2026-10-29 15:13:16",
+      "agent": "kilo:2"
+    },
+    {
+      "task_id": "clickmap-proof",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Runtime click-map proof (tools/ui_browser.py --click-map), README tree/tool entries, ADR-083, and a finished reviewed cockpit UI task. checklists: passed. 740 tests quorum; click map 133/63/0/0.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793277896.5911813,
+      "timestamp_str": "2026-10-29 15:44:56",
+      "agent": "kilo:2",
+      "handoff": {
+        "state": "complete",
+        "next": "run aikit check and commit",
+        "evidence": "133 controls, 0 missing, 0 duplicates, 740 tests OK"
+      }
+    },
+    {
+      "task_id": "clickmap-proof",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] plan: runtime click-map proof and UI contract closure",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793277899.3255308,
+      "timestamp_str": "2026-10-29 15:44:59",
+      "agent": "kilo:2",
+      "impact_assessment": {
+        "why": "static-only proof and an unclosed UI contract",
+        "benefits": "delivery readiness",
+        "risks": "contract: tool-only; dependency: playwright dev-only; concurrency: none; state: none",
+        "mitigation": "focused test and gate run"
+      }
+    },
+    {
+      "task_id": "clickmap-proof",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Runtime click-map proof (tools/ui_browser.py --click-map), README tree/tool entries, ADR-083, and a finished reviewed cockpit UI task. checklists: passed. 740 tests quorum; click map 133/63/0/0.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793277920.6193874,
+      "timestamp_str": "2026-10-29 15:45:20",
+      "agent": "kilo:2",
+      "handoff": {
+        "state": "complete",
+        "next": "run aikit check and commit",
+        "evidence": "133 controls, 0 missing, 0 duplicates, 740 tests OK"
+      }
+    },
+    {
+      "task_id": "clickmap-proof",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'clickmap-proof' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793277920.873957,
+      "timestamp_str": "2026-10-29 15:45:20",
       "agent": "kilo:2"
     }
   ]

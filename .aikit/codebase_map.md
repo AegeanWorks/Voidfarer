@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `87`
 - **Total Classes**: `222`
-- **Total Top-Level Functions**: `299`
-- **Total Class Methods**: `1250`
-- **Total Source Lines**: `35790`
+- **Total Top-Level Functions**: `300`
+- **Total Class Methods**: `1251`
+- **Total Source Lines**: `35828`
 
 ---
 
@@ -238,7 +238,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1112` lines (`50214` bytes)
+**Size**: `1119` lines (`50590` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -386,6 +386,7 @@
   - Method `.test_factions_review_prepares_a_coalition_war_for_the_petition_control()`
   - Method `.test_every_click_has_a_stable_handle_for_automation()`
   - Method `.test_aikit_link_and_decision_cadence_are_visible()`
+  - Method `.test_browser_review_proves_every_click_has_a_unique_handle()`
   - Method `.test_every_static_button_can_be_identified_by_a_headless_driver()`
   - Method `.test_event_toasts_clear_the_left_terminal_at_720p()`
   - Method `.test_scroll_cue_text_meets_the_twelve_pixel_floor()`
@@ -1509,12 +1510,13 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `409` lines (`18161` bytes)
+**Size**: `440` lines (`19979` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
 - `def _metrics(page)` - *Return viewport, scroll, element and tiny-text counts from the live page.*
-- `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll)` - *Open one real browser viewport, drive it and capture a true screenshot.*
+- `def _click_probe(page)` - *Enumerate every cockpit control through the shipped click map and prove handles are unique.*
+- `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll, click_map)` - *Open one real browser viewport, drive it and capture a true screenshot.*
 - `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
 - `def _prepare_factions(engine)` - *Advance a fresh campaign until the Coalition is at war, so the petition control renders.*
 - `def main(argv)` - *Run the browser review driver and write screenshots plus a small JSON report.*

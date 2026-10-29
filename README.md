@@ -107,6 +107,8 @@ voidfarer/
 │   ├── logbook.py        <- flight-log windowing that keeps galactic war news
 │   ├── storage.py        <- crash-safe atomic persistence & shadow backup
 │   ├── server.py         <- zero-dependency HTTP REST & cockpit server
+│   ├── agent_api.py      <- action catalog scraped from the server route table
+│   ├── agent_play.py     <- deterministic headless captain policy over the REST API
 │   ├── cli.py            <- ANSI terminal interface & interactive REPL
 │   └── static/           <- Stellaris-style command console UI
 │       ├── index.html    <- semantic HUD structure & radar canvas
@@ -119,9 +121,10 @@ voidfarer/
 ├── tools/                <- developer proofs
 │   ├── __init__.py       <- package marker
 │   ├── ui_audit.py       <- layout metrics
-│   ├── ui_browser.py     <- real browser review
-│   └── ui_inventory.py   <- cockpit inventory proof
-└── tests/                <- unit & integration test suite (37 suites)
+│   ├── ui_browser.py     <- real browser review and click-map proof
+│   ├── ui_inventory.py   <- cockpit inventory proof
+│   └── ai_play.py        <- headless AI campaign with mechanic coverage
+└── tests/                <- unit & integration test suite (42 suites)
 ```
 
 ---
@@ -341,7 +344,12 @@ plays a full campaign through the same HTTP API the UI uses.
 ```bash
 python tools/ai_play.py --steps 60            # human-readable mechanic coverage
 python tools/ai_play.py --steps 60 --json     # machine-readable report
+python tools/ui_browser.py --click-map --viewports desktop --out ui-review/clickmap
 ```
+
+The click-map run enumerates every rendered control through `window.voidfarerClickMap()`
+and fails if any control lacks a stable handle or two controls share one (desktop
+cockpit: 133 controls, 63 visible, 0 missing, 0 duplicates).
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
