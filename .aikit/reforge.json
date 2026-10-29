@@ -909,12 +909,35 @@
           "32a70808e552ec2a40890b2c5ead97082755f4fb",
           "689e0a0ff027f5ca72fb0c141cd611e09f853ea0"
         ],
-        "findings": [],
+        "findings": [
+          {
+            "code": "review-invalid-save-slot-500",
+            "category": "review",
+            "severity": "medium",
+            "path": "voidfarer/server.py",
+            "line": 462,
+            "message": "The multi-slot save endpoints passed the raw slot name to resolve_slot_name(), whose ValueError escaped the HTTP handler. A user typing an invalid slot such as 'bad slot!' received a 500/closed connection instead of a clear 400. The endpoint now validates through _resolve_slot() and answers with the Why/Fix message; a regression pins the 400 response.",
+            "evidence": "slot = self._resolve_slot(body)",
+            "commit": "147b6b26350f6cd9f7b73a7604981df01e5bf887",
+            "hunk": "",
+            "symbol": "",
+            "introduced": true,
+            "reproducible": false,
+            "fixable": false,
+            "interaction": "",
+            "repaired": false,
+            "source": "review",
+            "patch_old": "",
+            "patch_new": ""
+          }
+        ],
         "repairs": [],
-        "counts": {},
+        "counts": {
+          "review": 1
+        },
         "reviewed": 12,
         "review": {
-          "status": "unreviewed",
+          "status": "reviewed",
           "rejected": [],
           "files": [
             ".aikit/codebase_map.md",
@@ -932,8 +955,29 @@
           ],
           "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-2-49-147b6b26350f.md",
           "redacted": 0,
-          "reason": "awaiting the reviewer's findings",
-          "findings": []
+          "reason": "",
+          "findings": [
+            {
+              "code": "review-invalid-save-slot-500",
+              "category": "review",
+              "severity": "medium",
+              "path": "voidfarer/server.py",
+              "line": 462,
+              "message": "The multi-slot save endpoints passed the raw slot name to resolve_slot_name(), whose ValueError escaped the HTTP handler. A user typing an invalid slot such as 'bad slot!' received a 500/closed connection instead of a clear 400. The endpoint now validates through _resolve_slot() and answers with the Why/Fix message; a regression pins the 400 response.",
+              "evidence": "slot = self._resolve_slot(body)",
+              "commit": "147b6b26350f6cd9f7b73a7604981df01e5bf887",
+              "hunk": "",
+              "symbol": "",
+              "introduced": true,
+              "reproducible": false,
+              "fixable": false,
+              "interaction": "",
+              "repaired": false,
+              "source": "review",
+              "patch_old": "",
+              "patch_new": ""
+            }
+          ]
         },
         "skipped": [],
         "tests": {},
@@ -7668,12 +7712,35 @@
             "32a70808e552ec2a40890b2c5ead97082755f4fb",
             "689e0a0ff027f5ca72fb0c141cd611e09f853ea0"
           ],
-          "findings": [],
+          "findings": [
+            {
+              "code": "review-invalid-save-slot-500",
+              "category": "review",
+              "severity": "medium",
+              "path": "voidfarer/server.py",
+              "line": 462,
+              "message": "The multi-slot save endpoints passed the raw slot name to resolve_slot_name(), whose ValueError escaped the HTTP handler. A user typing an invalid slot such as 'bad slot!' received a 500/closed connection instead of a clear 400. The endpoint now validates through _resolve_slot() and answers with the Why/Fix message; a regression pins the 400 response.",
+              "evidence": "slot = self._resolve_slot(body)",
+              "commit": "147b6b26350f6cd9f7b73a7604981df01e5bf887",
+              "hunk": "",
+              "symbol": "",
+              "introduced": true,
+              "reproducible": false,
+              "fixable": false,
+              "interaction": "",
+              "repaired": false,
+              "source": "review",
+              "patch_old": "",
+              "patch_new": ""
+            }
+          ],
           "repairs": [],
-          "counts": {},
+          "counts": {
+            "review": 1
+          },
           "reviewed": 12,
           "review": {
-            "status": "unreviewed",
+            "status": "reviewed",
             "rejected": [],
             "files": [
               ".aikit/codebase_map.md",
@@ -7691,8 +7758,29 @@
             ],
             "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-2-49-147b6b26350f.md",
             "redacted": 0,
-            "reason": "awaiting the reviewer's findings",
-            "findings": []
+            "reason": "",
+            "findings": [
+              {
+                "code": "review-invalid-save-slot-500",
+                "category": "review",
+                "severity": "medium",
+                "path": "voidfarer/server.py",
+                "line": 462,
+                "message": "The multi-slot save endpoints passed the raw slot name to resolve_slot_name(), whose ValueError escaped the HTTP handler. A user typing an invalid slot such as 'bad slot!' received a 500/closed connection instead of a clear 400. The endpoint now validates through _resolve_slot() and answers with the Why/Fix message; a regression pins the 400 response.",
+                "evidence": "slot = self._resolve_slot(body)",
+                "commit": "147b6b26350f6cd9f7b73a7604981df01e5bf887",
+                "hunk": "",
+                "symbol": "",
+                "introduced": true,
+                "reproducible": false,
+                "fixable": false,
+                "interaction": "",
+                "repaired": false,
+                "source": "review",
+                "patch_old": "",
+                "patch_new": ""
+              }
+            ]
           },
           "skipped": [],
           "tests": {},
