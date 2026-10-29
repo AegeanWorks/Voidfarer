@@ -12,32 +12,6 @@
   },
   "checkpoints": [
     {
-      "task_id": "captain-powers",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'captain-powers' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793275996.7149284,
-      "timestamp_str": "2026-10-29 15:13:16",
-      "agent": "kilo:2"
-    },
-    {
-      "task_id": "clickmap-proof",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Runtime click-map proof (tools/ui_browser.py --click-map), README tree/tool entries, ADR-083, and a finished reviewed cockpit UI task. checklists: passed. 740 tests quorum; click map 133/63/0/0.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793277896.5911813,
-      "timestamp_str": "2026-10-29 15:44:56",
-      "agent": "kilo:2",
-      "handoff": {
-        "state": "complete",
-        "next": "run aikit check and commit",
-        "evidence": "133 controls, 0 missing, 0 duplicates, 740 tests OK"
-      }
-    },
-    {
       "task_id": "clickmap-proof",
       "phase": "in_progress",
       "phase_num": 2,
@@ -273,6 +247,28 @@
       "status": "in_progress",
       "timestamp": 1793299342.0255277,
       "timestamp_str": "2026-10-29 21:42:22",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 3",
+      "phase_num": 3,
+      "description": "Reforge stage 3: window 9, 3 commit(s), 10 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793299567.175866,
+      "timestamp_str": "2026-10-29 21:46:07",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 4",
+      "phase_num": 3,
+      "description": "Reforge stage 4: window 12, 3 commit(s), 24 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793299658.9054995,
+      "timestamp_str": "2026-10-29 21:47:38",
       "agent": "opencode"
     }
   ]
