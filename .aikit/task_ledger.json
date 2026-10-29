@@ -3,31 +3,15 @@
   "active_task": {
     "task_id": "galactic-war-news",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1793260502.1336489,
     "owner": "kilo:1",
     "started_by": "kilo:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1793260587.17077
   },
   "checkpoints": [
-    {
-      "task_id": "galaxy-population-economy",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[6/6] Added explicit SCROLL cue (real element; ::after collision fixed), removed thin scrollbar override, closed cockpit UI task with free Nemotron VL vision reviewer, tests 658. checklists: passed (tests, hygiene, guidelines, secrets).",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793099451.144429,
-      "timestamp_str": "2026-10-27 14:10:51",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "4/4 gates, UI task closed",
-        "next": "commit and push",
-        "open": "none",
-        "evidence": "ui verify OK, VL vision CUE VISIBLE, unittest 658 OK"
-      }
-    },
     {
       "task_id": "galaxy-population-economy",
       "phase": "in_progress",
@@ -345,6 +329,16 @@
         "open": "none",
         "evidence": "ui-review/review-20261029d, unittest 707 OK"
       }
+    },
+    {
+      "task_id": "galactic-war-news",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'galactic-war-news' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793260587.1707711,
+      "timestamp_str": "2026-10-29 10:56:27",
+      "agent": "kilo:1"
     }
   ]
 }
