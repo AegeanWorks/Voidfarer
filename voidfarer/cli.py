@@ -548,7 +548,12 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
                 f"HULL {ship['hull']}/{ship['max_hull']} SHIELD {ship['shield']}/{ship['max_shield']} "
                 f"DMG {ship['damage']} {status_color}{ship['status']:<10}{RESET} SYS {ship['assigned_system_id']}"
             )
-        print(f"\nFormation damage: {report['total_damage']} | Screen evasion: +{report['evasion_bonus']*100:.0f}%")
+        print(
+            f"\nFormation damage: {report['total_damage']} total / "
+            f"{report.get('local_damage', report['total_damage'])} local | "
+            f"Screen evasion: +{report['evasion_bonus']*100:.0f}% total / "
+            f"+{report.get('local_evasion_bonus', report['evasion_bonus'])*100:.0f}% local"
+        )
         print(f"{DIM}Catalog: {', '.join(ESCORT_CATALOG)}. Commands: fleet buy_escort <type> | fleet assign <id> <system> | fleet repair_escorts | fleet sell_escort <id> | fleet dismiss_escort <id>{RESET}")
         return 0
     if sub in ("buy_escort", "recruit_escort"):

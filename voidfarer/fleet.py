@@ -79,6 +79,11 @@ def build_fleet_ship(escort_type: str, system_id: str, count: int) -> FleetShip:
     )
 
 
+def fleet_ships_in_system(ships: tuple[FleetShip, ...], system_id: str) -> tuple[FleetShip, ...]:
+    """Escorts physically stationed in one system; remote patrols do not join a fight."""
+    return tuple(ship for ship in ships if ship.assigned_system_id == system_id)
+
+
 def escort_sale_value(ship: FleetShip) -> int:
     """Drydock resale value of an escort or prize, discounted for battle damage."""
     base = max(0, ship.max_hull) * 10 + max(0, ship.damage) * 60 + max(0, ship.max_shield) * 2

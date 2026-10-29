@@ -50,6 +50,7 @@ def pirate_risk(
     faction_standing: int,
     has_escort: bool = False,
     evasion: float = 0.0,
+    patrol_escorts: int = 0,
 ) -> PirateRisk:
     """Risk of a pirate toll encounter in a system, before the engine RNG roll."""
     chance = 0.04
@@ -69,6 +70,9 @@ def pirate_risk(
     if has_escort:
         chance *= 0.45
         reasons.append("escort screen")
+    if patrol_escorts > 0:
+        chance *= max(0.25, 1.0 - min(0.75, 0.12 * int(patrol_escorts)))
+        reasons.append("patrol escort")
     chance *= max(0.20, 1.0 - max(0.0, min(0.90, evasion)))
     return PirateRisk(chance=max(0.01, min(0.75, chance)), reason=", ".join(reasons) or "routine traffic")
 

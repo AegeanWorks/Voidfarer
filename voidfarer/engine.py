@@ -99,6 +99,7 @@ from voidfarer.fleet import (
     build_fleet_ship,
     escort_sale_value,
     fleet_damage,
+    fleet_ships_in_system,
     fleet_evasion_bonus,
     get_escort_template,
     repair_fleet_ships,
@@ -624,6 +625,15 @@ class SimulationEngine:
             waypoint_au=kwargs.get("waypoint_au", cur.waypoint_au),
             waypoint_angle=kwargs.get("waypoint_angle", cur.waypoint_angle),
         )
+
+    def _merge_fleet_ships(self, updated_local: tuple[FleetShip, ...]) -> tuple[FleetShip, ...]:
+        """Apply local battle updates without dropping escorts on patrol elsewhere."""
+        local_by_id = {ship.id: ship for ship in updated_local}
+        current = self.state.ship.fleet_ships
+        current_ids = {ship.id for ship in current}
+        merged = [local_by_id.get(ship.id, ship) for ship in current]
+        merged.extend(ship for ship in updated_local if ship.id not in current_ids)
+        return tuple(merged)
 
     def _clone_state(self, **kwargs: Any) -> GameState:
         """Create a new GameState preserving time, stats, economy, and all unspecified universe fields."""
@@ -1575,7 +1585,14 @@ class SimulationEngine:
 
             active_pirate = None
             if not combat and not anomaly and self.allow_decision_events:
-                raid_risk = pirate_risk(target_sys, standing, has_escort, encounter_evasion)
+                patrol_escorts = sum(
+                    1 for escort in self.state.ship.fleet_ships
+                    if escort.assigned_system_id == target_system_id and escort.hull > 0
+                )
+                raid_risk = pirate_risk(
+                    target_sys, standing, has_escort, encounter_evasion,
+                    patrol_escorts=patrol_escorts,
+                )
                 pirate_roll = self._stable_unit(
                     self.state.galaxy_seed, "pirate", target_system_id, self.state.time.tick
                 )
@@ -3015,6 +3032,7 @@ class SimulationEngine:
     def get_fleet_manager_report(self) -> dict[str, Any]:
         with self.lock:
             ships = self.state.ship.fleet_ships
+            local = fleet_ships_in_system(ships, self.state.ship.current_system_id)
             return {
                 "ships": [
                     {**ship.to_dict(), "sale_value": escort_sale_value(ship)}
@@ -3022,7 +3040,9 @@ class SimulationEngine:
                 ],
                 "catalog": ESCORT_CATALOG,
                 "total_damage": fleet_damage(ships),
+                "local_damage": fleet_damage(local),
                 "evasion_bonus": round(fleet_evasion_bonus(ships), 3),
+                "local_evasion_bonus": round(fleet_evasion_bonus(local), 3),
                 "formations": ["balanced", "aggressive", "defensive"],
             }
 
@@ -4505,7 +4525,9 @@ class SimulationEngine:
             weapon_miss = False
             enemy_hull_before = enemy_rem_hull
             enemy_shield_before = enemy_rem_shield
-            fleet_ships = self.state.ship.fleet_ships
+            fleet_ships = fleet_ships_in_system(
+                self.state.ship.fleet_ships, self.state.ship.current_system_id
+            )
             fleet_volley = 0
             boarding_crew = None
             battle_stance = self.state.ship.battle_stance
@@ -4611,7 +4633,7 @@ class SimulationEngine:
                         status="escorting",
                         experience=0,
                     )
-                    new_fleet_ships = fleet_ships + (prize,)
+                    new_fleet_ships = self._merge_fleet_ships(fleet_ships + (prize,))
                     stats["ships_captured"] = int(stats.get("ships_captured", 0)) + 1
                     stats["combat_victories"] = int(stats.get("combat_victories", 0)) + 1
                     msg = (
@@ -4837,7 +4859,8 @@ class SimulationEngine:
 
                 new_fleet_ships = tuple(
                     replace(s, experience=s.experience + 3, status="escorting" if s.hull > 0 else "destroyed")
-                    for s in fleet_ships
+                    if s.id in {local.id for local in fleet_ships} else s
+                    for s in self.state.ship.fleet_ships
                 )
                 victory_crew, morale_log = apply_morale_event(self.state.ship.crew, 5.0, "combat victory celebrated")
                 if morale_log:
@@ -4941,7 +4964,8 @@ class SimulationEngine:
 
             if new_hull <= 0:
                 return self._combat_defeat(
-                    combat, note=breach_log, fleet_ships=fleet_ships,
+                    combat, note=breach_log,
+                    fleet_ships=self._merge_fleet_ships(fleet_ships),
                     crew=breach_crew if breach_crew is not None else boarding_crew,
                     streak=new_streak,
                 )
@@ -4997,7 +5021,7 @@ class SimulationEngine:
                     else boarding_crew if boarding_crew is not None
                     else self.state.ship.crew
                 ),
-                fleet_ships=fleet_ships,
+                fleet_ships=self._merge_fleet_ships(fleet_ships),
                 flight_log=tuple(new_log[-20:]),
             )
 
@@ -5831,7 +5855,13 @@ class SimulationEngine:
                     ],
                     "catalog": ESCORT_CATALOG,
                     "total_damage": fleet_damage(self.state.ship.fleet_ships),
+                    "local_damage": fleet_damage(fleet_ships_in_system(
+                        self.state.ship.fleet_ships, self.state.ship.current_system_id
+                    )),
                     "evasion_bonus": round(fleet_evasion_bonus(self.state.ship.fleet_ships), 3),
+                    "local_evasion_bonus": round(fleet_evasion_bonus(fleet_ships_in_system(
+                        self.state.ship.fleet_ships, self.state.ship.current_system_id
+                    )), 3),
                 },
                 "ship_mods": {
                     "slots": list(SHIP_MOD_SLOTS),

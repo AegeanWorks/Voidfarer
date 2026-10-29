@@ -3457,8 +3457,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.fleetShipRoster.innerHTML = ships.map(ship => `
                 <div class="fleet-ship-card">
                     <div class="fleet-head"><strong>${this.escapeHtml(ship.name)}</strong> <span class="ship-role">${this.escapeHtml(ship.role.toUpperCase())}</span></div>
-                    <div class="fleet-sub">HULL ${ship.hull}/${ship.max_hull} | SHIELD ${ship.shield}/${ship.max_shield} | DMG ${ship.damage}</div>
-                    <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())}</div>
+                    <div class="fleet-sub">HULL ${ship.hull}/${ship.max_hull} | SHIELD ${ship.shield}/${ship.max_shield} | DMG ${ship.damage} | SYS ${this.escapeHtml(ship.assigned_system_id || "?")}</div>
+                    <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())} // ${ship.assigned_system_id === this.state.ship.current_system_id ? "LOCAL" : "PATROL"}</div>
                     <div class="ship-actions">
                         <button class="btn-hud btn-amber" data-escort-repair="${this.escapeHtml(ship.id)}">REPAIR</button>
                         <button class="btn-hud btn-green" data-escort-sell="${this.escapeHtml(ship.id)}">SELL (${Number(ship.sale_value || 0)} CR)</button>
