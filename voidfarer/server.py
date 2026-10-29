@@ -128,6 +128,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             payload["state"] = self.engine.get_status_snapshot()
         self._send_json(payload, status=status)
 
+    def _resolve_slot(self, body: dict[str, Any]) -> str | None:
+        """Validate a save slot and answer a bad one with a 400 instead of raising."""
+        try:
+            return resolve_slot_name(body.get("slot"))
+        except ValueError as exc:
+            self._send_error_json(str(exc))
+            return None
+
     def _read_body_json(self) -> dict[str, Any]:
         raw_length = self.headers.get("Content-Length", "0")
         try:
@@ -451,7 +459,9 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/save":
-            slot = resolve_slot_name(body.get("slot"))
+            slot = self._resolve_slot(body)
+            if slot is None:
+                return
             self.storage.save(self.engine.state, slot=slot)
             self._send_json({
                 "ok": True,
@@ -462,7 +472,9 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/load":
-            slot = resolve_slot_name(body.get("slot"))
+            slot = self._resolve_slot(body)
+            if slot is None:
+                return
             loaded = self.storage.load(slot=slot)
             if loaded is None:
                 self._send_error_json(f"No save file is available for slot '{slot}'.", status=HTTPStatus.NOT_FOUND)
@@ -478,7 +490,9 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/delete-save":
-            slot = resolve_slot_name(body.get("slot"))
+            slot = self._resolve_slot(body)
+            if slot is None:
+                return
             self.storage.clear(slot=slot)
             self._send_json({
                 "ok": True,
@@ -490,7 +504,9 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/new-game":
             seed = _int_field(body, "seed", 42, minimum=0)
-            slot = resolve_slot_name(body.get("slot"))
+            slot = self._resolve_slot(body)
+            if slot is None:
+                return
             profile = body.get("profile") if isinstance(body.get("profile"), dict) else None
             ok, msg = self.engine.reset(seed, profile=profile)
             if ok:

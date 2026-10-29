@@ -161,6 +161,13 @@ class TestServer(unittest.TestCase):
         self.assertTrue(payload["ok"], payload.get("message"))
         self.assertIsNone(VoidFarerHandler.engine.state.pending_decision)
 
+    def test_invalid_save_slot_returns_400(self):
+        status, data = self._post("/api/save", {"slot": "bad slot!"})
+        self.assertEqual(status, 400)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertFalse(payload["ok"])
+        self.assertIn("Invalid save slot", payload["message"])
+
     def test_character_research_fleet_diplomacy_endpoints(self):
         for path in ("/api/character", "/api/research", "/api/outposts", "/api/diplomacy", "/api/fleet/ships"):
             status, data = self._get(path)

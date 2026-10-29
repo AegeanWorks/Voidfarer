@@ -9,8 +9,8 @@
 - **Total Python Modules**: `88`
 - **Total Classes**: `228`
 - **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1329`
-- **Total Source Lines**: `36929`
+- **Total Class Methods**: `1331`
+- **Total Source Lines**: `36952`
 
 ---
 
@@ -1142,7 +1142,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `427` lines (`18843` bytes)
+**Size**: `434` lines (`19156` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1159,6 +1159,7 @@
   - Method `.test_new_game_applies_commander_profile()`
   - Method `.test_new_game_rejects_over_budget_commander_profile()`
   - Method `.test_load_is_allowed_while_a_decision_is_pending()`
+  - Method `.test_invalid_save_slot_returns_400()`
   - Method `.test_character_research_fleet_diplomacy_endpoints()`
   - Method `.test_crew_weapon_and_message_tree_endpoints()`
   - Method `.test_post_power()`
@@ -2576,7 +2577,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1315` lines (`56155` bytes)
+**Size**: `1331` lines (`56642` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -2585,6 +2586,7 @@
   - Method `._send_json(data, status)`
   - Method `._without_catalogs(data)` - *Drop static catalogs from the snapshot a response carries under `state` or `data`.*
   - Method `._send_error_json(message, status, include_state)`
+  - Method `._resolve_slot(body)` - *Validate a save slot and answer a bad one with a 400 instead of raising.*
   - Method `._read_body_json()`
   - Method `.do_OPTIONS()`
   - Method `.do_GET()`
