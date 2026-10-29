@@ -320,5 +320,19 @@
     "final_snapshot_digest": "47d5de707a20f89e95c10a1fda7efd8bfc0c816c09d7c32979d60104930eddda",
     "final_snapshot_entries": 915,
     "surface_digest": "564606e321299cac4765be641c964f91a45f0cdeea39dff665c4d7e810efed1d"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "ff6ae0fc273ed94175bf6d862964e1a181f181f0",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793260542.8676894,
+    "finished_at": 1793260578.0347211,
+    "strikes": 0,
+    "reviewer": "gemma-4-31b vision subagent via Kilo (G-015), authorized by the user; approved the war/peace notification stack at 1280x720 and 1920x1080 on 2026-10-29",
+    "allowed_removals": [],
+    "final_snapshot_digest": "47d5de707a20f89e95c10a1fda7efd8bfc0c816c09d7c32979d60104930eddda",
+    "final_snapshot_entries": 915,
+    "surface_digest": "564606e321299cac4765be641c964f91a45f0cdeea39dff665c4d7e810efed1d"
   }
 ]
