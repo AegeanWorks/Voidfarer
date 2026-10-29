@@ -1265,3 +1265,22 @@ class TestOutpostModuleCockpit(unittest.TestCase):
         for marker in ("data-outpost-module-select", "data-outpost-module-install", '"/api/outpost/module"', "outpost_modules"):
             self.assertIn(marker, self.js)
         self.assertIn(".outpost-module-bar", self.css)
+
+class TestTradeAutomationCockpit(unittest.TestCase):
+    """The Commerce tab must expose the docked auto-trade broker."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_market_tab_holds_the_broker_controls(self):
+        for element_id in (
+            "tradeAutomationPanel", "autoTradeCommodity", "autoTradeBuy",
+            "autoTradeSell", "autoTradeQty", "btnAutoTradeEnable", "btnAutoTradeDisable",
+        ):
+            self.assertIn(f'id="{element_id}"', self.html)
+        for marker in ("renderTradeAutomation", "handleTradeAutomation", '"/api/trade/automation"'):
+            self.assertIn(marker, self.js)
+        self.assertIn(".trade-automation", self.css)

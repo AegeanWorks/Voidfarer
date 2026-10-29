@@ -40,6 +40,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/outpost/module": "needs a founded outpost and module credits",
     "/api/drone/collect": "needs a deployed drone",
     "/api/depot/sell": "needs stock sitting in a depot",
+    "/api/trade/automation": "needs a docked market and configured thresholds",
     "/api/depot/withdraw": "needs stock sitting in a depot",
     "/api/fleet/dismiss": "needs an owned escort",
     "/api/fleet/escort/assign": "needs an owned escort",

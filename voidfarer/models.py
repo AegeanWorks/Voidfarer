@@ -1596,6 +1596,36 @@ class TradeOrder:
 
 
 @dataclass(frozen=True)
+class TradeAutomation:
+    """Docked broker policy: buy one commodity below a price and sell it above another."""
+
+    enabled: bool = False
+    commodity_id: str = ""
+    buy_below: int = 0
+    sell_above: int = 0
+    quantity: int = 1
+    last_trade_tick: int = -10**9
+    trades: int = 0
+    realized_credits: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TradeAutomation:
+        return cls(
+            enabled=bool(data.get("enabled", False)),
+            commodity_id=str(data.get("commodity_id", "")),
+            buy_below=max(0, int(data.get("buy_below", 0))),
+            sell_above=max(0, int(data.get("sell_above", 0))),
+            quantity=max(1, min(100, int(data.get("quantity", 1)))),
+            last_trade_tick=int(data.get("last_trade_tick", -10**9)),
+            trades=max(0, int(data.get("trades", 0))),
+            realized_credits=int(data.get("realized_credits", 0)),
+        )
+
+
+@dataclass(frozen=True)
 class AwayMission:
     """An away-team expedition assigned to a celestial body for a finite duration."""
 
@@ -2033,6 +2063,7 @@ class GameState:
     eliminated_factions: tuple[str, ...] = ()
     codex: CodexState = field(default_factory=CodexState)
     local_dock_purchases: dict[tuple[str, str, str], tuple[int, int]] = field(default_factory=dict)
+    trade_automation: TradeAutomation = field(default_factory=TradeAutomation)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -2066,6 +2097,7 @@ class GameState:
                 "|".join(tag): [quantity, cost]
                 for tag, (quantity, cost) in self.local_dock_purchases.items()
             },
+            "trade_automation": self.trade_automation.to_dict(),
         }
 
     @classmethod
@@ -2144,5 +2176,6 @@ class GameState:
             eliminated_factions=tuple(data.get("eliminated_factions", ())),
             codex=CodexState.from_dict(data.get("codex", {})),
             local_dock_purchases=dock_purchases,
+            trade_automation=TradeAutomation.from_dict(data.get("trade_automation", {})),
         )
 

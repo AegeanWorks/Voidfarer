@@ -260,6 +260,10 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, "quantum": self.engine.get_quantum_trade_report()})
             return
 
+        if path == "/api/trade/automation":
+            self._send_json({"ok": True, "automation": self.engine.get_trade_automation_report()})
+            return
+
         if path == "/api/surface":
             self._send_json({"ok": True, "surface": self.engine.get_surface_report(), "state": self.engine.get_status_snapshot()})
             return
@@ -904,6 +908,18 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             else:
                 qty = _int_field(body, "quantity", 0, minimum=0)
                 ok, msg = self.engine.trade(comm_id, qty, is_buy)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/trade/automation":
+            ok, msg = self.engine.set_trade_automation(
+                str(body.get("commodity_id", "")),
+                _int_field(body, "buy_below", 0, minimum=0),
+                _int_field(body, "sell_above", 0, minimum=0),
+                _int_field(body, "quantity", 1, minimum=1),
+                _bool_field(body, "enabled", True),
+            )
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

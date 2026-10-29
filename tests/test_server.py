@@ -409,6 +409,22 @@ class TestServer(unittest.TestCase):
         self.assertEqual(payload["state"]["ship"]["fleet_ships"], [])
         self.assertEqual(payload["state"]["stats"]["ships_sold"], 1)
 
+    def test_trade_automation_endpoints_configure_and_report(self):
+        status, data = self._get("/api/trade/automation")
+        self.assertEqual(status, 200)
+        self.assertTrue(json.loads(data.decode("utf-8"))["ok"])
+        status, data = self._post(
+            "/api/trade/automation",
+            {"enabled": True, "commodity_id": "titanium", "buy_below": 40, "sell_above": 80, "quantity": 2},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        automation = payload["state"]["trade_automation"]
+        self.assertTrue(automation["enabled"])
+        self.assertEqual(automation["commodity_id"], "titanium")
+        self.assertEqual(automation["quantity"], 2)
+
     def test_outpost_module_endpoint_installs_a_stack(self):
         engine = VoidFarerHandler.engine
         outpost = Outpost(

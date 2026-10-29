@@ -8606,3 +8606,12 @@ body.cockpit-theme .nav-panel > .panel-header {
 .outpost-module-bar { display: flex; gap: 6px; align-items: center; margin-top: -3px; }
 .outpost-module-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
 .outpost-module-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }
+
+/* Docked trade broker: compact controls above the commodity table. */
+.trade-automation { margin: 4px 0 8px; padding: 7px 9px; border: 1px solid rgba(143, 191, 159, 0.28); border-left: 2px solid rgba(143, 191, 159, 0.7); background: rgba(5, 11, 22, 0.62); }
+.auto-trade-header { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; color: #8fbf9f; font-family: var(--font-display); font-size: 12px; letter-spacing: 0.06em; }
+.auto-trade-grid { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, minmax(52px, 0.45fr)) auto auto; gap: 5px; align-items: end; margin-top: 5px; }
+.auto-trade-grid label { display: flex; flex-direction: column; gap: 2px; color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.auto-trade-grid select, .auto-trade-grid input { width: 100%; min-width: 0; height: 26px; font-size: 12px; }
+.auto-trade-grid .btn-hud { min-height: 26px; padding: 2px 7px; font-size: 12px; }
+.auto-trade-note { margin: 4px 0 0; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }

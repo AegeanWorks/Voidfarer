@@ -405,6 +405,31 @@
                             </button>
                         </div>
 
+                        <!-- Automated docked broker -->
+                        <div class="trade-automation" id="tradeAutomationPanel">
+                            <div class="auto-trade-header">
+                                <span>AUTO-TRADE BROKER</span>
+                                <strong id="autoTradeStatus">OFF</strong>
+                            </div>
+                            <div class="auto-trade-grid">
+                                <label>COMMODITY
+                                    <select id="autoTradeCommodity"></select>
+                                </label>
+                                <label>BUY ≤
+                                    <input type="number" id="autoTradeBuy" min="0" step="1" placeholder="--">
+                                </label>
+                                <label>SELL ≥
+                                    <input type="number" id="autoTradeSell" min="0" step="1" placeholder="--">
+                                </label>
+                                <label>QTY
+                                    <input type="number" id="autoTradeQty" min="1" max="100" step="1" value="1">
+                                </label>
+                                <button class="btn-hud btn-green" id="btnAutoTradeEnable">ENABLE</button>
+                                <button class="btn-hud" id="btnAutoTradeDisable">DISABLE</button>
+                            </div>
+                            <p class="auto-trade-note" id="autoTradeNote">Dock at a station to configure the broker.</p>
+                        </div>
+
                         <!-- Cargo Hold Meter -->
                         <div class="cargo-capacity-box">
                             <div class="cargo-header">

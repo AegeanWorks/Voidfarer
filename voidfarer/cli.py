@@ -326,6 +326,46 @@ def cmd_chart(engine: SimulationEngine) -> int:
     return 0
 
 
+def cmd_autotrade(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """Inspect or configure the docked buy-low/sell-high broker."""
+    action = parts[1].lower() if len(parts) > 1 else "status"
+    if action in ("status", "show"):
+        report = engine.get_trade_automation_report()
+        auto = report["automation"]
+        state = "ON" if auto["enabled"] else "OFF"
+        print(f"\n{BOLD}{CYAN}=== AUTO-TRADE BROKER ==={RESET}")
+        print(
+            f"Status: {state} | Commodity: {auto['commodity_id'] or '--'} | "
+            f"Qty: {auto['quantity']} | Buy ≤ {auto['buy_below'] or '--'} | "
+            f"Sell ≥ {auto['sell_above'] or '--'}"
+        )
+        print(f"Trades: {auto['trades']} | Realized: {auto['realized_credits']:+d} cr | Docked: {'yes' if report['docked'] else 'no'}")
+        return 0
+    if action in ("off", "disable", "stop"):
+        ok, msg = engine.set_trade_automation(enabled=False)
+        print((GREEN if ok else RED) + msg + RESET)
+        storage.save(engine.state)
+        return 0 if ok else 1
+    if action in ("on", "enable", "start"):
+        if len(parts) < 5:
+            print(f"{RED}Usage:{RESET} autotrade on <commodity_id> <buy_below> <sell_above> [quantity]")
+            return 1
+        try:
+            buy_below = int(parts[3])
+            sell_above = int(parts[4])
+            quantity = int(parts[5]) if len(parts) > 5 else 1
+        except ValueError:
+            print(f"{RED}Usage:{RESET} autotrade on <commodity_id> <buy_below> <sell_above> [quantity]")
+            return 1
+        ok, msg = engine.set_trade_automation(parts[2].lower(), buy_below, sell_above, quantity, True)
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown autotrade action '{action}'. Use status, on, or off.{RESET}")
+    return 1
+
+
 def cmd_market(engine: SimulationEngine) -> int:
     """Display commodity prices and supply/demand at the current orbital body."""
     body = engine.orbiting_body
@@ -2154,6 +2194,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_quantum(engine, storage, parts)
         elif cmd in ("surface", "landing"):
             cmd_surface(engine, storage, parts)
+        elif cmd in ("autotrade", "broker"):
+            cmd_autotrade(engine, storage, parts)
         elif cmd in ("reconstruct", "rebuild", "relief"):
             mode = "relief" if cmd == "relief" or "--relief" in parts else "credits"
             body_id = next((part for part in parts[1:] if not part.startswith("-")), "")
@@ -2408,6 +2450,7 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             print("  depot [status|deposit|withdraw|sell] - System cargo depot operations")
             print("  land <body_id>                 - Land on a habitable body")
             print("  reconstruct <body_id> [--relief] - Rebuild a devastated inhabited world")
+            print("  autotrade [status|on|off]      - Configure the docked trade broker")
             print("  mercs [list|hire|dismiss|refit] - Mercenary contracts and fleet refits")
             print("  allies [list|form]             - Alliance roster and formation")
             print("  saves [list|save|load|delete] [slot] - Manage multiple save slots")
@@ -2475,6 +2518,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     subparsers.add_parser("chart", help="Display star systems and orbital bodies")
     subparsers.add_parser("market", help="Display local commodity exchange quotes")
     subparsers.add_parser("economy", help="Display galactic economy shocks and trade routes")
+    autotrade_p = subparsers.add_parser("autotrade", help="Configure the docked buy-low/sell-high broker")
+    autotrade_p.add_argument("action", nargs="?", default="status", choices=["status", "on", "off"])
+    autotrade_p.add_argument("commodity_id", nargs="?", help="Commodity id")
+    autotrade_p.add_argument("buy_below", nargs="?", type=int, help="Buy at or below this price")
+    autotrade_p.add_argument("sell_above", nargs="?", type=int, help="Sell at or above this price")
+    autotrade_p.add_argument("quantity", nargs="?", type=int, default=1, help="Units per automated trade")
     inv_p = subparsers.add_parser("inventory", help="Inspect cargo hold manifest, buy consumables, and use items")
     inv_p.add_argument("action", nargs="?", default="list", choices=["list", "buy", "use", "jettison"])
     inv_p.add_argument("arg1", nargs="?", help="Item ID")
@@ -2821,6 +2870,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_chart(engine)
     elif args.command == "market":
         return cmd_market(engine)
+    elif args.command == "autotrade":
+        return cmd_autotrade(
+            engine,
+            storage,
+            ["autotrade", args.action]
+            + [str(value) for value in (args.commodity_id, args.buy_below, args.sell_above, args.quantity)
+               if value is not None],
+        )
     elif args.command == "economy":
         return cmd_economy(engine)
     elif args.command == "inventory":

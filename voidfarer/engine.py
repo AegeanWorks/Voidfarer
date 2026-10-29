@@ -347,6 +347,7 @@ class SimulationEngine:
     # Only the dramatic headlines reach the cockpit as notifications; declarations stay
     # in the flight log so a long war does not bury the player in toasts.
     AI_TRADE_LOG_TICKS = 5
+    TRADE_AUTOMATION_COOLDOWN = 3
     WAR_NEWS_COOLDOWN_TICKS = 12
     RECONSTRUCTION_CREDIT_COST = 600
     RECONSTRUCTION_CREDIT_DEVASTATION = 20.0
@@ -668,6 +669,7 @@ class SimulationEngine:
             eliminated_factions=kwargs.get("eliminated_factions", cur.eliminated_factions),
             codex=kwargs.get("codex", cur.codex),
             local_dock_purchases=kwargs.get("local_dock_purchases", cur.local_dock_purchases),
+            trade_automation=kwargs.get("trade_automation", cur.trade_automation),
         )
 
     def _research_bonuses(self) -> dict[str, float]:
@@ -3623,6 +3625,117 @@ class SimulationEngine:
                 return False, f"Insufficient credits: {ship.credits} cr available is below one unit's price."
             return self.trade(commodity_id, quantity, is_buy)
 
+    def set_trade_automation(
+        self,
+        commodity_id: str = "",
+        buy_below: int = 0,
+        sell_above: int = 0,
+        quantity: int = 1,
+        enabled: bool = True,
+    ) -> tuple[bool, str]:
+        """Configure the docked broker that buys low and sells high on a cooldown."""
+        with self.lock:
+            if not enabled:
+                self.state = self._clone_state(
+                    trade_automation=replace(self.state.trade_automation, enabled=False)
+                )
+                return True, "Trade automation disabled."
+            body = self.docked_body
+            if body is None or not body.station_dockable:
+                return False, "Dock at a station or colony to configure trade automation."
+            commodity_id = str(commodity_id).strip().lower()
+            if commodity_id not in COMMODITY_MAP:
+                return False, f"Unknown commodity '{commodity_id}'."
+            quantity = max(1, min(100, int(quantity)))
+            buy_below = max(0, int(buy_below))
+            sell_above = max(0, int(sell_above))
+            if buy_below <= 0 and sell_above <= 0:
+                return False, "Set a buy threshold, a sell threshold, or both."
+            if buy_below and sell_above and buy_below >= sell_above:
+                return False, "Buy threshold must be below the sell threshold."
+            automation = replace(
+                self.state.trade_automation,
+                enabled=True,
+                commodity_id=commodity_id,
+                buy_below=buy_below,
+                sell_above=sell_above,
+                quantity=quantity,
+                last_trade_tick=-10**9,
+            )
+            self.state = self._clone_state(trade_automation=automation)
+            name = COMMODITY_MAP[commodity_id].name
+            return (
+                True,
+                f"Trade automation armed: {name} x{quantity}, buy ≤ {buy_below or '--'}, "
+                f"sell ≥ {sell_above or '--'}.",
+            )
+
+    def get_trade_automation_report(self) -> dict[str, Any]:
+        with self.lock:
+            return {
+                "automation": self.state.trade_automation.to_dict(),
+                "docked": self.docked_body is not None,
+                "commodities": [
+                    {"id": item.id, "name": item.name}
+                    for item in COMMODITY_MAP.values()
+                ],
+            }
+
+    def _run_trade_automation(self) -> None:
+        """Execute at most one automated trade per cooldown while docked."""
+        automation = self.state.trade_automation
+        if not automation.enabled or not automation.commodity_id:
+            return
+        tick = self.state.time.tick
+        if tick - automation.last_trade_tick < self.TRADE_AUTOMATION_COOLDOWN:
+            return
+        body = self.docked_body
+        if body is None or not body.station_dockable:
+            return
+        if (
+            self.state.active_combat is not None
+            or self.state.active_anomaly is not None
+            or self.state.active_pirate is not None
+            or self.state.ship.void_traversal is not None
+            or self.state.ship.travel is not None
+        ):
+            return
+        commodity = COMMODITY_MAP.get(automation.commodity_id)
+        if commodity is None:
+            return
+        standing = self.state.ship.faction_standings.get(
+            get_faction_id_from_name(self.current_system.faction), 0
+        )
+        quote = calculate_dynamic_market_quote(
+            self.current_system, body, commodity, self.state.economy, faction_standing=standing
+        )
+        ship = self.state.ship
+        is_sell = (
+            automation.sell_above > 0
+            and ship.cargo.get(commodity.id, 0) >= automation.quantity
+            and quote.sell_price >= automation.sell_above
+        )
+        is_buy = (
+            not is_sell
+            and automation.buy_below > 0
+            and quote.buy_price <= automation.buy_below
+            and ship.credits >= quote.buy_price * automation.quantity
+        )
+        if not is_sell and not is_buy:
+            return
+        before = ship.credits
+        ok, _ = self.trade(commodity.id, automation.quantity, not is_sell)
+        if not ok:
+            return
+        realized = max(0, self.state.ship.credits - before) if is_sell else 0
+        updated = replace(
+            automation,
+            last_trade_tick=tick,
+            trades=automation.trades + 1,
+            realized_credits=automation.realized_credits + realized,
+        )
+        self.state = self._clone_state(trade_automation=updated)
+
     def trade(self, commodity_id: str, quantity: int, is_buy: bool) -> tuple[bool, str]:
         """Execute buy or sell commodity order at orbiting market."""
         with self.lock:
@@ -5877,6 +5990,7 @@ class SimulationEngine:
                 "away_report": self.get_away_report(),
                 "surface_report": self.get_surface_report(),
                 "primary_weapon": self.state.ship.primary_weapon,
+                "trade_automation": self.state.trade_automation.to_dict(),
                 "fleet_manager": {
                     "ships": [
                         {**ship.to_dict(), "sale_value": escort_sale_value(ship)}
@@ -7824,6 +7938,7 @@ class SimulationEngine:
                 eliminated_factions=new_eliminated,
             )
 
+            self._run_trade_automation()
             decision = (
                 self.maybe_trigger_decision("tick", num_ticks) if self.allow_decision_events else None
             )

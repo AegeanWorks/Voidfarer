@@ -641,6 +641,14 @@ class CockpitApp {
         this.marketTitle = document.getElementById("marketTitle");
         this.marketArch = document.getElementById("marketArch");
         this.marketTableBody = document.getElementById("marketTableBody");
+        this.autoTradeCommodity = document.getElementById("autoTradeCommodity");
+        this.autoTradeBuy = document.getElementById("autoTradeBuy");
+        this.autoTradeSell = document.getElementById("autoTradeSell");
+        this.autoTradeQty = document.getElementById("autoTradeQty");
+        this.autoTradeStatus = document.getElementById("autoTradeStatus");
+        this.autoTradeNote = document.getElementById("autoTradeNote");
+        this.btnAutoTradeEnable = document.getElementById("btnAutoTradeEnable");
+        this.btnAutoTradeDisable = document.getElementById("btnAutoTradeDisable");
         this.quantumFreight = document.getElementById("quantumFreight");
         this.quantumData = null;
         this.quantumBodyId = null;
@@ -892,6 +900,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         document.querySelectorAll("#marketLotBar .market-lot-btn").forEach(button => {
             button.addEventListener("click", () => this.setTradeLot(button.getAttribute("data-lot")));
         });
+        this.btnAutoTradeEnable?.addEventListener("click", () => this.handleTradeAutomation(true));
+        this.btnAutoTradeDisable?.addEventListener("click", () => this.handleTradeAutomation(false));
         this.panelLeft?.addEventListener("pointerdown", () => { this.terminalPointerDown = true; });
         this.hudSkillsGrid?.addEventListener("pointerdown", () => { this.skillsPointerDown = true; });
         window.addEventListener("pointerup", () => { this.terminalPointerDown = false; this.skillsPointerDown = false; });
@@ -2318,6 +2328,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     renderMarketTable() {
         if (!this.state) return;
         this.syncMarketLotBar();
+        this.renderTradeAutomation();
         this.marketTableBody.innerHTML = "";
         const quotes = this.state.market_quotes || [];
         const cargo = this.state.ship.cargo || {};
@@ -2361,6 +2372,48 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
             this.marketTableBody.appendChild(tr);
         });
+    }
+
+    renderTradeAutomation() {
+        if (!this.autoTradeCommodity || !this.state) return;
+        const quotes = this.state.market_quotes || [];
+        const auto = this.state.trade_automation || {};
+        const select = this.autoTradeCommodity;
+        const signature = quotes.map(quote => `${quote.commodity_id}:${quote.name}`).join("|");
+        if (select.dataset.signature !== signature) {
+            select.innerHTML = quotes.map(quote =>
+                `<option value="${this.escapeHtml(quote.commodity_id)}">${this.escapeHtml(quote.name)}</option>`
+            ).join("");
+            select.dataset.signature = signature;
+        }
+        if (auto.commodity_id) select.value = auto.commodity_id;
+        if (this.autoTradeBuy) this.autoTradeBuy.value = auto.buy_below || "";
+        if (this.autoTradeSell) this.autoTradeSell.value = auto.sell_above || "";
+        if (this.autoTradeQty) this.autoTradeQty.value = auto.quantity || 1;
+        if (this.autoTradeStatus) {
+            this.autoTradeStatus.textContent = auto.enabled
+                ? `ON // ${auto.trades || 0} TRADES // ${auto.realized_credits >= 0 ? "+" : ""}${auto.realized_credits || 0} CR`
+                : "OFF";
+        }
+        if (this.autoTradeNote) {
+            this.autoTradeNote.textContent = quotes.length
+                ? "Broker executes at most one buy or sell every 3 ticks while docked."
+                : "Dock at a station or colony to configure the broker.";
+        }
+    }
+
+    async handleTradeAutomation(enabled) {
+        if (!this.state) return;
+        const commodity = this.autoTradeCommodity ? this.autoTradeCommodity.value : "";
+        const payload = {
+            enabled: Boolean(enabled),
+            commodity_id: commodity,
+            buy_below: Number(this.autoTradeBuy?.value || 0),
+            sell_above: Number(this.autoTradeSell?.value || 0),
+            quantity: Number(this.autoTradeQty?.value || 1),
+        };
+        const res = await this.postAction("/api/trade/automation", payload, "market");
+        if (res && res.ok) this.renderTradeAutomation();
     }
 
     syncMarketLotBar() {
