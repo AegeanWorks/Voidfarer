@@ -3,31 +3,15 @@
   "active_task": {
     "task_id": "dpr-audit-coverage",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1793256007.7707818,
     "owner": "kilo:1",
     "started_by": "kilo:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1793256034.6186137
   },
   "checkpoints": [
-    {
-      "task_id": "galaxy-population-economy",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[6/6] Batched wars resolve per tick, captured worlds adopt owner tech, jump transit honors stability. checklists: passed (tests 649, hygiene, guidelines, secrets).",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793088093.7791808,
-      "timestamp_str": "2026-10-27 11:01:33",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "4/4 gates",
-        "next": "commit and push",
-        "open": "UI contract evidence",
-        "evidence": "unittest 649 OK"
-      }
-    },
     {
       "task_id": "galaxy-population-economy",
       "phase": "in_progress",
@@ -346,6 +330,16 @@
         "open": "none",
         "evidence": "ui-review/dpr-20261029, unittest 689 OK"
       }
+    },
+    {
+      "task_id": "dpr-audit-coverage",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'dpr-audit-coverage' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793256034.6186152,
+      "timestamp_str": "2026-10-29 09:40:34",
+      "agent": "kilo:1"
     }
   ]
 }
