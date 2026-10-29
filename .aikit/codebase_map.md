@@ -9,8 +9,8 @@
 - **Total Python Modules**: `88`
 - **Total Classes**: `228`
 - **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1327`
-- **Total Source Lines**: `36903`
+- **Total Class Methods**: `1329`
+- **Total Source Lines**: `36929`
 
 ---
 
@@ -240,7 +240,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1139` lines (`51635` bytes)
+**Size**: `1146` lines (`52028` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -381,6 +381,7 @@
   - Method `.test_treasury_is_reported_per_month()`
 - `class TestPostPushPolishLayout` - *Contract header readability, compact reactor strip and deterministic surface scenario.*
   - Method `.setUpClass()`
+  - Method `.test_decision_overlay_sits_above_the_main_menu()`
   - Method `.test_target_card_scrolls_instead_of_spilling_at_short_viewports()`
   - Method `.test_target_card_reports_population_capacity_and_world_tech()`
   - Method `.test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths()`
@@ -1141,7 +1142,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `410` lines (`18125` bytes)
+**Size**: `427` lines (`18843` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1157,6 +1158,7 @@
   - Method `.test_reactor_map_and_shipmod_endpoints()`
   - Method `.test_new_game_applies_commander_profile()`
   - Method `.test_new_game_rejects_over_budget_commander_profile()`
+  - Method `.test_load_is_allowed_while_a_decision_is_pending()`
   - Method `.test_character_research_fleet_diplomacy_endpoints()`
   - Method `.test_crew_weapon_and_message_tree_endpoints()`
   - Method `.test_post_power()`
@@ -2574,7 +2576,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1313` lines (`55999` bytes)
+**Size**: `1315` lines (`56155` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

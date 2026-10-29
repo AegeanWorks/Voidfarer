@@ -935,6 +935,13 @@ class TestPostPushPolishLayout(unittest.TestCase):
         cls.html = INDEX_HTML.read_text(encoding="utf-8")
         cls.browser_tool = (STATIC_DIR.parent.parent / "tools" / "ui_browser.py").read_text(encoding="utf-8")
 
+    def test_decision_overlay_sits_above_the_main_menu(self):
+        decision = re.search(r"\.decision-overlay\s*\{[^}]*z-index:\s*(\d+)", self.css, re.S)
+        menu = re.search(r"\.main-menu-overlay\s*\{[^}]*z-index:\s*(\d+)", self.css, re.S)
+        self.assertIsNotNone(decision)
+        self.assertIsNotNone(menu)
+        self.assertGreater(int(decision.group(1)), int(menu.group(1)))
+
     def test_target_card_scrolls_instead_of_spilling_at_short_viewports(self):
         self.assertRegex(self.css, r"\.nav-target-card\s*\{[^}]*overflow-y:\s*auto", re.S)
         self.assertRegex(self.css, r"\.nav-target-card\s*\{[^}]*overscroll-behavior:\s*contain", re.S)

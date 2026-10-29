@@ -7,6 +7,7 @@ import threading
 import unittest
 from pathlib import Path
 
+from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
 from voidfarer.engine import SimulationEngine
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
@@ -143,6 +144,22 @@ class TestServer(unittest.TestCase):
         payload = json.loads(data.decode("utf-8"))
         self.assertFalse(payload["ok"])
         self.assertIn("budget", payload["message"])
+
+    def test_load_is_allowed_while_a_decision_is_pending(self):
+        engine = VoidFarerHandler.engine
+        VoidFarerHandler.storage.save(engine.state)
+        engine.state = engine._clone_state(
+            pending_decision=make_decision_event(
+                DECISION_DEFINITIONS[0], engine.state.time.tick, "tick"
+            )
+        )
+
+        status, data = self._post("/api/load", {"slot": "default"})
+
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertIsNone(VoidFarerHandler.engine.state.pending_decision)
 
     def test_character_research_fleet_diplomacy_endpoints(self):
         for path in ("/api/character", "/api/research", "/api/outposts", "/api/diplomacy", "/api/fleet/ships"):

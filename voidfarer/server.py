@@ -424,6 +424,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         pending = self.engine.state.pending_decision
         if pending is not None and path not in (
             "/api/decision/resolve", "/api/time", "/api/save", "/api/settings/decisions",
+            "/api/load", "/api/new-game", "/api/reset", "/api/delete-save",
         ):
             self._send_error_json(
                 f"Decision required: {pending.title}. Resolve it before continuing.",
@@ -436,7 +437,8 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self.engine.state.active_pirate is not None
             and path not in (
                 "/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save",
-                "/api/settings/decisions",
+                "/api/settings/decisions", "/api/load", "/api/new-game", "/api/reset",
+                "/api/delete-save",
             )
         ):
             pirate = self.engine.state.active_pirate

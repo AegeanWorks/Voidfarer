@@ -8226,7 +8226,7 @@ body.cockpit-theme .panel-center {
 .pirate-choices .anomaly-choice-btn { text-align: left; }
 
 /* Blocking decision modal: high-contrast command interrupt over the cockpit. */
-.decision-overlay { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(2, 5, 12, 0.78); backdrop-filter: blur(5px); }
+.decision-overlay { position: fixed; inset: 0; z-index: 12000; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(2, 5, 12, 0.78); backdrop-filter: blur(5px); }
 .decision-modal { width: min(620px, 92vw); max-height: 82vh; overflow-y: auto; padding: 20px 22px 16px; border: 1px solid rgba(201, 163, 90, 0.55); border-top: 3px solid var(--console-gold); background: linear-gradient(180deg, rgba(15, 23, 38, 0.98), rgba(5, 9, 18, 0.98)); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), inset 0 0 40px rgba(201, 163, 90, 0.04); }
 .decision-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; color: var(--console-gold-bright); }
 .decision-title { margin: 6px 0 8px; font-family: var(--font-display); font-size: 22px; letter-spacing: 0.03em; color: var(--console-ivory); }
