@@ -948,6 +948,32 @@ class TestPostPushPolishLayout(unittest.TestCase):
         self.assertIn("def _prepare_surface(", self.browser_tool)
         self.assertIn("engine.allow_decision_events = False", self.browser_tool)
 
+    def test_event_toasts_clear_the_left_terminal_at_720p(self):
+        self.assertRegex(
+            self.css,
+            r"@media\s*\(max-width:\s*1599px\)\s*\{[^@]*\.event-popup-container\s*\{"
+            r"[^}]*left:\s*auto[^}]*right:\s*448px[^}]*width:\s*min\(360px,\s*28vw\)",
+            re.S,
+        )
+
+    def test_scroll_cue_text_meets_the_twelve_pixel_floor(self):
+        self.assertRegex(
+            self.css,
+            r"\.deck-scroll-cue\s*\{[^}]*font-size:\s*12px",
+            re.S,
+        )
+
+    def test_compact_command_strip_controls_meet_the_24px_target(self):
+        self.assertIn(
+            ".hud-command-strip .reactor-mode-btn,\n"
+            "    .hud-command-strip #btnVentReactor { min-height: 24px; }",
+            self.css,
+        )
+        self.assertIn(
+            ".hud-command-strip .skill-quick-chip { min-height: 24px; padding: 1px 5px; }",
+            self.css,
+        )
+
 
 class TestTerminalDeckScrolling(unittest.TestCase):
     """Long terminal tabs must scroll inside the deck instead of running off-screen."""

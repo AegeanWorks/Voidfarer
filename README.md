@@ -48,6 +48,7 @@ voidfarer/
 │   ├── decisions.md      <- monotonic ADR register
 │   ├── guidelines.md     <- project-specific guidelines
 │   ├── project.json      <- stack and gate configuration
+│   ├── media.json        <- approved brand asset manifest
 │   ├── ui.json           <- committed cockpit UI surface contract
 │   ├── ui_history.json   <- append-only UI task evidence
 │   └── task_ledger.json  <- power-loss safe task state
@@ -61,6 +62,10 @@ voidfarer/
 ├── REUSE.toml            <- Machine-readable SPDX metadata
 ├── ASSETS.md             <- Asset/data manifest: what the license covers
 ├── COMMERCIAL.md         <- commercial licensing and support terms
+├── assets/               <- approved logo, social preview & screenshots
+│   ├── logo.jpg          <- model-rendered project mark
+│   ├── social-preview.png <- README banner and repository preview
+│   └── screenshots/      <- committed cockpit captures
 ├── pyproject.toml        <- build and package configuration
 ├── play.bat              <- 1-click interactive Windows launcher (default: Windows Cockpit)
 ├── voidfarer.bat         <- 1-click Windows CLI passthrough launcher

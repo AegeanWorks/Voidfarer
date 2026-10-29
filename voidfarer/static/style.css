@@ -5230,7 +5230,7 @@ body.cockpit-theme {
     border: 1px solid rgba(201, 163, 90, 0.45);
     border-radius: 3px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.08em;
 }
 .panel-left.has-more-below .deck-scroll-cue {
@@ -7122,6 +7122,13 @@ input[type="text"], input[type="number"], select, textarea { min-height: 30px; b
 
 @media (max-width: 1599px) {
     .event-popup-container, .combat-alert-card, .anomaly-alert-card { top: 150px; }
+
+    .event-popup-container {
+        left: auto;
+        right: 448px;
+        transform: none;
+        width: min(360px, 28vw);
+    }
 }
 
 .target-info-grid strong { font-size: 12.5px; }
@@ -8398,10 +8405,10 @@ body.cockpit-theme .nav-panel > .panel-header {
     .hud-command-strip .flight-log-stream { height: 48px; max-height: 48px; padding: 4px 7px; }
     .hud-command-strip .reactor-sim-strip { gap: 2px; padding-bottom: 2px; }
     .hud-command-strip .reactor-mode-btn,
-    .hud-command-strip #btnVentReactor { min-height: 22px; }
+    .hud-command-strip #btnVentReactor { min-height: 24px; }
     .hud-command-strip .pwr-slider { height: 15px; }
-    .hud-command-strip .power-action-row .btn-hud { min-height: 22px; }
-    .hud-command-strip .skill-quick-chip { min-height: 21px; padding: 1px 5px; }
+    .hud-command-strip .power-action-row .btn-hud { min-height: 24px; }
+    .hud-command-strip .skill-quick-chip { min-height: 24px; padding: 1px 5px; }
     .skills-quick-hint { margin: 1px 0 0; line-height: 1.15; letter-spacing: -0.02em; }
     .nav-target-card { top: 2px; right: 2px; bottom: 2px; width: min(432px, 54vw); max-height: none; padding: 5px 8px; }
     .surface-ops { margin-top: 2px; padding: 3px 6px; }

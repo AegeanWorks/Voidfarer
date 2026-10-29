@@ -927,3 +927,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Group each breakdown into `<span>` pairs under `flex-wrap`, so a narrow card wraps between whole figures, never inside a value; colour positive net green and negative net red; expose the full meaning and partner names through `title` tooltips.
   3. Extend the deck scroll cue to inspect visible `.tab-content` scrollers using a capture-phase scroll listener, so FACTIONS, MESSAGES and similar tabs get the "more below" badge too.
 - **Consequences**: A DOM audit at 1280x720 and 1920x1080 shows zero line overflow, card `scrollHeight == clientHeight` (no internal clipping), and the SCROLL cue at opacity 1 on the factions tab. The free Nemotron 3.5 Super VL reviewer quoted all four Sol lines, confirmed the grouped wraps, the proper minus sign and green net, and reported only the expected panel-edge fold with the SCROLL badge. Suite: 676 tests (38 suites).
+
+### ADR-078: 720p Toast Placement and Compact-HUD Target Floors
+- **Date**: 2026-10-28
+- **Status**: Accepted
+- **Context**: A DOM probe of the 1280x720 cockpit showed the centered event-toast stack at x=360-920 while the left terminal spanned x=8-473, so live notifications covered the deck's right 113px, including tab content and part of the terminal content area. The same audit reported the SCROLL cue at 10px and eleven command-strip controls at 21-22px tall, below the 24px mouse-target floor. A G-015 vision pass independently flagged the notification/terminal collision at 720p.
+- **Decision**:
+  1. Below 1600px, anchor `.event-popup-container` to the gutter between the left terminal and the target dossier (`left:auto; right:448px; transform:none; width:min(360px,28vw)`) so a 1280px viewport leaves a 0.3px gap to the deck and 8px to the dossier.
+  2. Raise the SCROLL cue from 10px to 12px, matching the cockpit's text floor.
+  3. In the `max-height:800px` block, raise reactor doctrine, VENT, power-action and skill-chip minimum heights to 24px so the compact strip stays a compact strip while meeting the target floor.
+  4. Pin all three behaviours with CSS-contract tests in `tests/test_cockpit_layout.py`.
+- **Consequences**: The 1280x720 DOM audit now reports zero tiny text and zero sub-24px targets; event toasts occupy x=473.6-832 and no longer touch the deck (right edge 473.3). The two remaining audit overlaps are the intentional full-screen decision modal over the HUD. Fresh captures are in `ui-review/review-20261028b`; the G-015 vision re-review is still pending because the evren2 vision provider hit its daily token limit, so no visual approval is claimed. Suite: 679 tests (38 suites).

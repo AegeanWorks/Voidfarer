@@ -9,8 +9,8 @@
 - **Total Python Modules**: `79`
 - **Total Classes**: `209`
 - **Total Top-Level Functions**: `286`
-- **Total Class Methods**: `1163`
-- **Total Source Lines**: `34182`
+- **Total Class Methods**: `1166`
+- **Total Source Lines**: `34208`
 
 ---
 
@@ -218,7 +218,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1038` lines (`46919` bytes)
+**Size**: `1064` lines (`47842` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -361,6 +361,9 @@
   - Method `.test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths()`
   - Method `.test_compact_reactor_strip_uses_four_proportional_tracks()`
   - Method `.test_surface_ops_scrolls_target_card_and_browser_driver_prepares_surface()`
+  - Method `.test_event_toasts_clear_the_left_terminal_at_720p()`
+  - Method `.test_scroll_cue_text_meets_the_twelve_pixel_floor()`
+  - Method `.test_compact_command_strip_controls_meet_the_24px_target()`
 - `class TestTerminalDeckScrolling` - *Long terminal tabs must scroll inside the deck instead of running off-screen.*
   - Method `.setUpClass()`
   - Method `.test_active_tab_content_scrolls_within_the_left_deck()`
