@@ -84,17 +84,22 @@ class EconomyIntegrityTest(unittest.TestCase):
         trader = replace(trader, system_id="sol", credits=1000)
         markets = dict(engine.state.economy.markets)
         origin = markets["sol"]
-        commodity = max(origin.stockpiles, key=lambda cid: origin.stockpiles.get(cid, 0))
         # Every commodity at the floor, so whichever one the trader picks has nothing movable.
         origin = replace(origin, stockpiles={cid: MIN_STOCK for cid in origin.stockpiles})
         markets["sol"] = origin
         economy = replace(engine.state.economy, markets=markets)
-        before = sum(m.stockpiles.get(commodity, 0) for m in markets.values())
+        before = {
+            cid: sum(m.stockpiles.get(cid, 0) for m in markets.values())
+            for cid in origin.stockpiles
+        }
 
         updated_captains, updated_economy, _ = simulate_ai_trade(
             (trader,), economy, engine.state.systems, random.Random(3)
         )
-        after = sum(m.stockpiles.get(commodity, 0) for m in updated_economy.markets.values())
+        after = {
+            cid: sum(m.stockpiles.get(cid, 0) for m in updated_economy.markets.values())
+            for cid in origin.stockpiles
+        }
         self.assertEqual(after, before, "stock must be conserved, never minted from the floor")
         self.assertEqual(updated_captains[0].system_id, "sol")
 
@@ -172,6 +177,28 @@ class AgentTransportTest(unittest.TestCase):
         status, payload = ApiClient(port=port, timeout=0.4).get("/api/state")
         self.assertEqual(status, 0)
         self.assertFalse(payload["ok"])
+
+    def test_malformed_json_is_a_protocol_error(self):
+        class BrokenResponse:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc_info):
+                return False
+
+            def read(self):
+                return b"not json"
+
+        with patch(
+            "voidfarer.agent_play.urllib.request.urlopen",
+            return_value=BrokenResponse(),
+        ):
+            status, payload = ApiClient(port=1, timeout=0.1).get("/api/state")
+        self.assertEqual(status, 0)
+        self.assertFalse(payload["ok"])
+        self.assertIn("invalid JSON", payload["message"])
 
     def test_blocked_actions_are_not_counted_as_attempted(self):
         class BlockedClient:

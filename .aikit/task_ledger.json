@@ -12,82 +12,6 @@
   },
   "checkpoints": [
     {
-      "task_id": "galactic-war-news",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] War news now reaches the player: logbook summarization and priority trimming, 27 war notifications over 1200 ticks, vision APPROVED the two-card stack at 720p/1080p; 707 tests; 4/4 gates. checklists: passed (test, hygiene, guidelines, secrets).",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793260502.1336489,
-      "timestamp_str": "2026-10-29 10:55:02",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "verified, gates green",
-        "next": "commit",
-        "open": "none",
-        "evidence": "ui-review/review-20261029d, unittest 707 OK"
-      }
-    },
-    {
-      "task_id": "galactic-war-news",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'galactic-war-news' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793260587.1707711,
-      "timestamp_str": "2026-10-29 10:56:27",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "war-mediation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/6] Plan player-brokered mediation of AI-AI wars: spend credits to push a front toward a ceasefire, earn standing with both belligerents, and surface it in CLI, REST and the cockpit war cards. Also adopt the leftover war-news persistence regression test.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793263793.3345115,
-      "timestamp_str": "2026-10-29 11:49:53",
-      "agent": "kilo:2",
-      "impact_assessment": {
-        "why": "War news made galactic conflict visible (ADR-081), but the player can only bankroll a side or declare/leave their own wars; there is no pacifist lever to stop a war between third parties, and the leftover persistence test would otherwise be lost.",
-        "benefits": "Adds a diplomacy-skill and credit sink that ends AI wars, gains standing with both sides, produces peace headlines, and completes the war-news story with player agency.",
-        "risks": "contract: status/wars payload and endpoint additions only; dependency: stdlib only; concurrency: mutation under engine lock like support_war; state: war score/active/ended_tick already serialized, no schema change",
-        "mitigation": "Backward-compatible fields, deterministic score maths, failing-first engine/REST/CLI tests, cockpit contract tests, G-015 vision review, full aikit check"
-      }
-    },
-    {
-      "task_id": "war-mediation",
-      "phase": "phase 3",
-      "phase_num": 3,
-      "description": "[2/6] Engine mediate_war: third-party only, 300 cr minimum, diplomacy-scaled shift, both-side standing, peace headline on settlement, 50-event cap; 717-test baseline target. [3/6] CLI 'war mediate' and POST /api/war/mediate parity. [4/6] Factions war cards gained MEDIATE CEASEFIRE / 600 with CSS contract.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793264771.470343,
-      "timestamp_str": "2026-10-29 12:06:11",
-      "agent": "kilo:2",
-      "handoff": {
-        "state": "implementation done",
-        "next": "G-015 visual review then docs/gates",
-        "evidence": "715 tests OK"
-      }
-    },
-    {
-      "task_id": "captain-powers",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[6/6] Delivered captain-scale petition ceasefire (no declare/mediate), open-space vectors with fuel/hazard ETA, NPC hulls on both maps, rate-limited decision cadence with settings, action catalog + headless AI captain + stable click handles, AIKit link. checklists: passed. G-015 vision review approved; gates 4/4; suite 739.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793275922.7021086,
-      "timestamp_str": "2026-10-29 15:12:02",
-      "agent": "kilo:2",
-      "handoff": {
-        "state": "complete and reviewed",
-        "next": "commit the working tree",
-        "evidence": "739 tests OK, aikit check 4/4, zero UI audit findings"
-      }
-    },
-    {
       "task_id": "war-mediation",
       "phase": "superseded",
       "phase_num": 3,
@@ -294,6 +218,61 @@
         "next": "commit and push",
         "evidence": "strict gates pending commit"
       }
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge run",
+      "phase_num": 3,
+      "description": "run started (start=3, step=3, stop=None)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793297326.5575762,
+      "timestamp_str": "2026-10-29 21:08:46",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 1",
+      "phase_num": 3,
+      "description": "Reforge stage 1: window 3, 3 commit(s), 14 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793297336.771458,
+      "timestamp_str": "2026-10-29 21:08:56",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-1",
+      "phase": "reforge stage 1",
+      "phase_num": 3,
+      "description": "Reforge stage 1: run stopped at stage 1; resume it with `reforge resume`",
+      "files_affected": [],
+      "status": "suspended",
+      "timestamp": 1793298144.624667,
+      "timestamp_str": "2026-10-29 21:22:24",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge run",
+      "phase_num": 3,
+      "description": "run started (start=3, step=3, stop=None)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793298151.0951116,
+      "timestamp_str": "2026-10-29 21:22:31",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 1",
+      "phase_num": 3,
+      "description": "Reforge stage 1: window 3, 3 commit(s), 14 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793298162.4276803,
+      "timestamp_str": "2026-10-29 21:22:42",
+      "agent": "opencode"
     }
   ]
 }

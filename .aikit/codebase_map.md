@@ -9,8 +9,8 @@
 - **Total Python Modules**: `88`
 - **Total Classes**: `227`
 - **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1322`
-- **Total Source Lines**: `36753`
+- **Total Class Methods**: `1323`
+- **Total Source Lines**: `36780`
 
 ---
 
@@ -1110,7 +1110,7 @@
 ### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
 > *Regressions pinned by the post-implementation review pass.*
 
-**Size**: `205` lines (`9084` bytes)
+**Size**: `232` lines (`9779` bytes)
 
 **Classes:**
 - `class FlightSafetyTest`
@@ -1128,6 +1128,7 @@
   - Method `.test_jump_keeps_hostile_arrival_morale_even_with_economy_news()`
 - `class AgentTransportTest`
   - Method `.test_transport_failure_returns_a_reportable_error()`
+  - Method `.test_malformed_json_is_a_protocol_error()`
   - Method `.test_blocked_actions_are_not_counted_as_attempted()`
   - Method `.test_missing_catalog_is_an_error_not_silent_coverage()`
 
@@ -1607,7 +1608,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `727` lines (`31163` bytes)
+**Size**: `727` lines (`31177` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

@@ -86,7 +86,7 @@ class ApiClient:
                 try:
                     return response.status, json.loads(raw)
                 except json.JSONDecodeError:
-                    return response.status, {"ok": False, "message": raw[:200]}
+                    return 0, {"ok": False, "message": f"invalid JSON response: {raw[:200]}"}
         except urllib.error.HTTPError as exc:
             raw = exc.read().decode("utf-8", "replace")
             try:
