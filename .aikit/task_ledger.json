@@ -12,135 +12,6 @@
   },
   "checkpoints": [
     {
-      "task_id": "clickmap-proof",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] plan: runtime click-map proof and UI contract closure",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793277899.3255308,
-      "timestamp_str": "2026-10-29 15:44:59",
-      "agent": "kilo:2",
-      "impact_assessment": {
-        "why": "static-only proof and an unclosed UI contract",
-        "benefits": "delivery readiness",
-        "risks": "contract: tool-only; dependency: playwright dev-only; concurrency: none; state: none",
-        "mitigation": "focused test and gate run"
-      }
-    },
-    {
-      "task_id": "clickmap-proof",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Runtime click-map proof (tools/ui_browser.py --click-map), README tree/tool entries, ADR-083, and a finished reviewed cockpit UI task. checklists: passed. 740 tests quorum; click map 133/63/0/0.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793277920.6193874,
-      "timestamp_str": "2026-10-29 15:45:20",
-      "agent": "kilo:2",
-      "handoff": {
-        "state": "complete",
-        "next": "run aikit check and commit",
-        "evidence": "133 controls, 0 missing, 0 duplicates, 740 tests OK"
-      }
-    },
-    {
-      "task_id": "clickmap-proof",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'clickmap-proof' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793277920.873957,
-      "timestamp_str": "2026-10-29 15:45:20",
-      "agent": "kilo:2"
-    },
-    {
-      "task_id": "review-fixes",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan review fixes: persist the open-space anchor, persist decision cadence, correct the petition-pressure sign, and add a waypoint UI scenario.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793283209.6552703,
-      "timestamp_str": "2026-10-29 17:13:29",
-      "agent": "kilo:2",
-      "impact_assessment": {
-        "why": "The unpushed captain/transit diff lost the open-space position on arrival, reset cadence on reload and made winning factions easier to persuade.",
-        "benefits": "Correct transit pricing from the void, durable settings, sane diplomacy odds, reviewed waypoint UI.",
-        "risks": "contract: ShipState/TravelState serialization only; dependency: stdlib; concurrency: none; state: new fields are defaulted and backward compatible",
-        "mitigation": "Failing-first anchor/cadence/sign tests, G-015 re-review, full gates"
-      }
-    },
-    {
-      "task_id": "review-fixes",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/3] Anchor persistence (ship.waypoint_au/angle), anchor-priced transit, cadence persistence, petition pressure sign, waypoint scenario + README. checklists: passed. 746 tests, G-015 vision approved, AI captain 9 families.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793283249.8444526,
-      "timestamp_str": "2026-10-29 17:14:09",
-      "agent": "kilo:2",
-      "handoff": {
-        "state": "complete",
-        "next": "aikit check and commit",
-        "evidence": "746 tests OK, 4/4 gates, waypoint vision approved"
-      }
-    },
-    {
-      "task_id": "review-fixes",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'review-fixes' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793283250.1080759,
-      "timestamp_str": "2026-10-29 17:14:10",
-      "agent": "kilo:2"
-    },
-    {
-      "task_id": "ai-coverage",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan a coverage contract: the headless captain must attempt every POST action or document why it cannot, and the mechanics gate must run it.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793286867.8565986,
-      "timestamp_str": "2026-10-29 18:14:27",
-      "agent": "kilo:2",
-      "impact_assessment": {
-        "why": "Nine families proved drivability, not playability; a mechanic could ship with no AI path.",
-        "benefits": "Every action exercised or justified; project check runs the captain as a gate.",
-        "risks": "contract: agent API report fields only; dependency: stdlib; concurrency: none; state: none",
-        "mitigation": "Deterministic 180-step run, explicit CONTEXT_ACTIONS, failing test on gaps"
-      }
-    },
-    {
-      "task_id": "ai-coverage",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Guided tour, attempted/succeeded ledger, coverage_gaps invariant, project.json mechanics contract (5/5 gates), README/COCKPIT/ADR-085. checklists: passed. 44 families, 43 succeeded, 52 attempted, 0 gaps, 748 tests.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793286868.1215818,
-      "timestamp_str": "2026-10-29 18:14:28",
-      "agent": "kilo:2",
-      "handoff": {
-        "state": "complete",
-        "next": "aikit check --strict and commit",
-        "evidence": "mechanics gate 7.5s pass"
-      }
-    },
-    {
-      "task_id": "ai-coverage",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-coverage' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793286868.3821726,
-      "timestamp_str": "2026-10-29 18:14:28",
-      "agent": "kilo:2"
-    },
-    {
       "task_id": "review-hardening",
       "phase": "phase 2",
       "phase_num": 2,
@@ -182,17 +53,6 @@
         "next": "commit and push",
         "evidence": "strict gates pending commit"
       }
-    },
-    {
-      "task_id": "reforge:run-1",
-      "phase": "reforge run",
-      "phase_num": 3,
-      "description": "run started (start=3, step=3, stop=None)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793297326.5575762,
-      "timestamp_str": "2026-10-29 21:08:46",
-      "agent": "opencode"
     },
     {
       "task_id": "reforge:run-1",
@@ -269,6 +129,128 @@
       "status": "in_progress",
       "timestamp": 1793299658.9054995,
       "timestamp_str": "2026-10-29 21:47:38",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 5",
+      "phase_num": 3,
+      "description": "Reforge stage 5: window 15, 3 commit(s), 1 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793300068.1960435,
+      "timestamp_str": "2026-10-29 21:54:28",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 6",
+      "phase_num": 3,
+      "description": "Reforge stage 6: window 18, 3 commit(s), 10 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793300098.987906,
+      "timestamp_str": "2026-10-29 21:54:58",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 7",
+      "phase_num": 3,
+      "description": "Reforge stage 7: window 21, 3 commit(s), 11 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793300145.807536,
+      "timestamp_str": "2026-10-29 21:55:45",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 8",
+      "phase_num": 3,
+      "description": "Reforge stage 8: window 24, 3 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793300186.5511196,
+      "timestamp_str": "2026-10-29 21:56:26",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 9",
+      "phase_num": 3,
+      "description": "Reforge stage 9: window 27, 3 commit(s), 7 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793300211.757337,
+      "timestamp_str": "2026-10-29 21:56:51",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 10",
+      "phase_num": 3,
+      "description": "Reforge stage 10: window 30, 3 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793300244.6379857,
+      "timestamp_str": "2026-10-29 21:57:24",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 11",
+      "phase_num": 3,
+      "description": "Reforge stage 11: window 33, 3 commit(s), 2 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired, 4 binary not analysed",
+      "files_affected": [
+        "assets/logo.jpg",
+        "assets/logo.png",
+        "assets/social-preview.jpg",
+        "assets/social-preview.png"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793300269.0513303,
+      "timestamp_str": "2026-10-29 21:57:49",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 12",
+      "phase_num": 3,
+      "description": "Reforge stage 12: window 36, 3 commit(s), 4 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired, 3 binary not analysed",
+      "files_affected": [
+        "assets/artwork.jpg",
+        "assets/logo.png",
+        "assets/social-preview.png"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793300288.9045486,
+      "timestamp_str": "2026-10-29 21:58:08",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 13",
+      "phase_num": 3,
+      "description": "Reforge stage 13: window 39, 3 commit(s), 5 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired, 2 binary not analysed",
+      "files_affected": [
+        "assets/screenshots/2026-10-28-index.png",
+        "assets/social-preview.png"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793300324.3037755,
+      "timestamp_str": "2026-10-29 21:58:44",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 14",
+      "phase_num": 3,
+      "description": "Reforge stage 14: window 42, 3 commit(s), 15 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793300774.4131293,
+      "timestamp_str": "2026-10-29 22:06:14",
       "agent": "opencode"
     }
   ]
