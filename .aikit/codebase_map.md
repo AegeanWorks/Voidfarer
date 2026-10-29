@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `79`
 - **Total Classes**: `210`
-- **Total Top-Level Functions**: `287`
-- **Total Class Methods**: `1174`
-- **Total Source Lines**: `34295`
+- **Total Top-Level Functions**: `288`
+- **Total Class Methods**: `1177`
+- **Total Source Lines**: `34378`
 
 ---
 
@@ -1291,7 +1291,7 @@
 ### [`tests/test_ui_audit.py`](tests/test_ui_audit.py)
 > *The headless cockpit audit has deterministic viewport, parsing and wrapper helpers.*
 
-**Size**: `55` lines (`2424` bytes)
+**Size**: `78` lines (`3811` bytes)
 
 **Classes:**
 - `class AuditHelpersTest`
@@ -1302,6 +1302,9 @@
   - Method `.test_prepare_static_injects_the_collector_and_wrapper()`
   - Method `.test_severe_findings_name_the_blocking_categories()`
   - Method `.test_modal_layers_are_not_reported_as_hud_collisions()`
+  - Method `.test_browser_command_emulates_windows_scaling()`
+  - Method `.test_a_blurry_radar_backing_store_is_a_severe_finding()`
+  - Method `.test_summary_line_reports_the_radar_state()`
 
 ---
 
@@ -1376,15 +1379,16 @@
 ### [`tools/ui_audit.py`](tools/ui_audit.py)
 > *Capture VoidFarer cockpit screenshots and a measurable UI audit with headless Edge or Chrome.*
 
-**Size**: `864` lines (`33453` bytes)
+**Size**: `924` lines (`36684` bytes)
 
 **Functions:**
 - `def find_browser()` - *Locate an installed Edge or Chrome executable without a third-party dependency.*
 - `def outer_window(viewport)` - *Outer window size that yields the requested inner viewport for Windows desktop sizes.*
 - `def prepare_static(source, workdir)` - *Copy the cockpit and add a same-origin viewport wrapper plus an error collector.*
 - `def parse_audit(dom)` - *Read the JSON audit payload out of a dumped wrapper DOM.*
-- `def run_browser(browser, url, viewport, profile, screenshot, timeout)` - *Run one headless capture at a viewport and return stdout, stderr and the exit code.*
-- `def audit_viewport(browser, port, name, viewport, workdir, out, timeout, scenario, tab)` - *Capture one viewport and return its parsed audit report.*
+- `def browser_command(browser, viewport, profile, screenshot, url, dpr)` - *Headless Edge/Chrome argument list for one capture at a device scale factor.*
+- `def run_browser(browser, url, viewport, profile, screenshot, timeout, dpr)` - *Run one headless capture at a viewport and return stdout, stderr and the exit code.*
+- `def audit_viewport(browser, port, name, viewport, workdir, out, timeout, scenario, tab, dpr)` - *Capture one viewport and return its parsed audit report.*
 - `def summary_line(report)` - *One ASCII-safe console line for a viewport report.*
 - `def severe_findings(report)` - *Names of findings that should fail an explicit audit check.*
 - `def write_report(reports, out, browser)` - *Write the combined JSON and Markdown evidence packet.*

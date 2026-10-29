@@ -475,6 +475,23 @@ WRAPPER_JS = r"""
       highdpi: win.matchMedia("(min-resolution: 1.5dppx)").matches,
       reduced: win.matchMedia("(prefers-reduced-motion: reduce)").matches
     };
+    // G-011 asks for a DPR-correct radar: the canvas backing store must grow with
+    // devicePixelRatio while its CSS box stays put. A ratio of 1 at dpr 2 means a
+    // blurry map on a 200%-scaled 4K display.
+    var radarCanvas = doc.getElementById("radarCanvas");
+    if (radarCanvas) {
+      var radarBox = radarCanvas.getBoundingClientRect();
+      var deviceRatio = win.devicePixelRatio || 1;
+      var cssWidth = Math.max(1, Math.round(radarBox.width));
+      var expected = Math.round(cssWidth * Math.min(3, Math.max(1, deviceRatio)));
+      report.radar = {
+        css: [cssWidth, Math.max(1, Math.round(radarBox.height))],
+        backing: [radarCanvas.width, radarCanvas.height],
+        dpr: deviceRatio,
+        expectedBackingWidth: expected,
+        dprCorrect: Math.abs(radarCanvas.width - expected) <= 2
+      };
+    }
     report.headings = Array.prototype.slice.call(
       doc.querySelectorAll("h1,h2,h3,[role=heading]"), 0, 30
     ).map(function (heading) {
@@ -661,17 +678,21 @@ def parse_audit(dom: str) -> Dict[str, Any]:
     return json.loads(payload)
 
 
-def run_browser(browser: Path, url: str, viewport: Tuple[int, int], profile: Path,
-                screenshot: Path, timeout: int) -> Tuple[str, str, int]:
-    """Run one headless capture at a viewport and return stdout, stderr and the exit code."""
+def browser_command(browser: Path, viewport: Tuple[int, int], profile: Path,
+                    screenshot: Path, url: str, dpr: float = 1) -> List[str]:
+    """Headless Edge/Chrome argument list for one capture at a device scale factor.
+
+    Windows scaling is what makes the radar DPR path run: a 4K display at 200% reports
+    a 1920x1080 CSS viewport with devicePixelRatio 2, so `--dpr 2` reproduces it.
+    """
     outer_width, outer_height = outer_window(viewport)
-    command = [
+    return [
         str(browser),
         "--headless=new",
         "--disable-gpu",
         "--hide-scrollbars",
         "--no-first-run",
-        "--force-device-scale-factor=1",
+        f"--force-device-scale-factor={dpr:g}",
         f"--user-data-dir={profile}",
         f"--window-size={outer_width},{outer_height}",
         "--virtual-time-budget=15000",
@@ -680,6 +701,12 @@ def run_browser(browser: Path, url: str, viewport: Tuple[int, int], profile: Pat
         "--dump-dom",
         url,
     ]
+
+
+def run_browser(browser: Path, url: str, viewport: Tuple[int, int], profile: Path,
+                screenshot: Path, timeout: int, dpr: float = 1) -> Tuple[str, str, int]:
+    """Run one headless capture at a viewport and return stdout, stderr and the exit code."""
+    command = browser_command(browser, viewport, profile, screenshot, url, dpr)
     result = subprocess.run(
         command, capture_output=True, text=True, encoding="utf-8", errors="replace",
         timeout=timeout,
@@ -689,17 +716,20 @@ def run_browser(browser: Path, url: str, viewport: Tuple[int, int], profile: Pat
 
 def audit_viewport(browser: Path, port: int, name: str, viewport: Tuple[int, int],
                    workdir: Path, out: Path, timeout: int, scenario: str,
-                   tab: str = "") -> Dict[str, Any]:
+                   tab: str = "", dpr: float = 1) -> Dict[str, Any]:
     """Capture one viewport and return its parsed audit report."""
     width, height = viewport
     label = f"{name}-{tab}" if tab else name
+    if dpr != 1:
+        label = f"{label}@{dpr:g}x"
     url = (f"http://127.0.0.1:{port}/__ui_audit__.html?w={width}&h={height}"
            f"&target=/&scenario={scenario}")
     if tab:
         url += f"&tab={tab}"
     profile = workdir / f"profile-{label}"
     screenshot = out / f"{label}.png"
-    stdout, stderr, code = run_browser(browser, url, viewport, profile, screenshot, timeout)
+    stdout, stderr, code = run_browser(browser, url, viewport, profile, screenshot,
+                                       timeout, dpr)
     if code != 0:
         (out / f"{label}-browser.txt").write_text(stderr[-4000:], encoding="utf-8")
     try:
@@ -710,6 +740,7 @@ def audit_viewport(browser: Path, port: int, name: str, viewport: Tuple[int, int
         raise RuntimeError(f"{label}: {exc}") from exc
     report["name"] = label
     report["screenshot"] = screenshot.name
+    report["dpr"] = dpr
     return report
 
 
@@ -728,6 +759,9 @@ def summary_line(report: Dict[str, Any]) -> str:
         ("overlaps", len(report.get("overlaps") or [])),
     )
     body = " ".join(f"{name} {value}" for name, value in counts)
+    radar = report.get("radar") or {}
+    if radar:
+        body += f" radar {'ok' if radar.get('dprCorrect') else 'BLURRY'}"
     return f"{report.get('name', 'unknown'):10} {viewport.get('width', 0)}x{viewport.get('height', 0)}: {body}"
 
 
@@ -743,6 +777,9 @@ def severe_findings(report: Dict[str, Any]) -> List[str]:
     for key in ("clipped", "tinyText", "smallTargets", "contrast", "unlabeled"):
         if report.get(key):
             names.append(key)
+    radar = report.get("radar") or {}
+    if radar and not radar.get("dprCorrect", True):
+        names.append("radarDpr")
     return names
 
 
@@ -751,6 +788,7 @@ def write_report(reports: Sequence[Dict[str, Any]], out: Path, browser: Optional
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "browser": str(browser) if browser else None,
+        "dpr": reports[0].get("dpr", 1) if reports else 1,
         "viewports": list(reports),
     }
     (out / "report.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -772,6 +810,13 @@ def write_report(reports: Sequence[Dict[str, Any]], out: Path, browser: Optional
             f"| {len(report.get('overlaps') or [])} |")
     for report in reports:
         lines.extend(["", f"## {report.get('name', '?')}", ""])
+        radar = report.get("radar")
+        if radar:
+            lines.append(
+                f"- radar canvas: CSS {radar['css'][0]}x{radar['css'][1]} px, backing store "
+                f"{radar['backing'][0]}x{radar['backing'][1]} px at dpr {radar['dpr']:g} "
+                f"({'DPR-correct' if radar.get('dprCorrect') else 'BLURRY: backing store did not scale'})")
+            lines.append("")
         for key in ("tinyText", "contrast", "smallTargets", "unlabeled", "clipped", "offscreen", "overlaps"):
             findings = report.get(key) or []
             if not findings:
@@ -798,6 +843,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--tab", default="", choices=("",) + TABS,
                         help="open an in-game terminal tab before auditing")
     parser.add_argument("--timeout", type=int, default=120, help="seconds per viewport")
+    parser.add_argument("--dpr", type=float, default=1.0,
+                        help="device pixel ratio to emulate Windows display scaling "
+                             "(1.5 = 150%%, 2 = 200%%); default 1. The per-viewport "
+                             "timeout scales with dpr squared because raster cost does")
     parser.add_argument("--check", action="store_true", help="exit 1 when severe findings exist")
     args = parser.parse_args(argv)
 
@@ -806,6 +855,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if unknown:
         print(f"Why: unknown viewport(s): {', '.join(unknown)}.")
         print(f"Fix: choose from {', '.join(VIEWPORTS)}.")
+        return 2
+    if not 1 <= args.dpr <= 3:
+        print(f"Why: --dpr {args.dpr:g} is outside the Windows scaling range this tool emulates.")
+        print("Fix: pass --dpr 1, 1.25, 1.5 or 2 (100% to 200% scaling).")
         return 2
     browser = Path(args.browser) if args.browser else find_browser()
     if browser is None or not browser.is_file():
@@ -828,11 +881,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print("Fix: stop the process holding the port or retry.")
             return 1
         VoidFarerHandler.static_dir = static
+        # A 2x capture rasters four times the pixels and settles the same animated
+        # radar for the same virtual time; a measured 1080p@2x pass takes ~350 s, so
+        # scaling by dpr squared alone would sit right on the limit.
+        timeout = max(1, int(round(args.timeout * max(1.0, 2.0 * args.dpr * args.dpr))))
+        if args.dpr != 1:
+            print(f"Scaling {args.dpr:g}x: {timeout}s per viewport "
+                  f"(a 2x 1080p capture measured ~350s)")
         for name in names:
             viewport = VIEWPORTS[name]
             try:
                 report = audit_viewport(browser, handle.port, name, viewport, workdir, out,
-                                        args.timeout, args.scenario, args.tab)
+                                        timeout, args.scenario, args.tab, args.dpr)
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
                 print(f"[FAIL] {name}: {exc}")
                 continue

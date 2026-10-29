@@ -950,3 +950,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Treat any fixed layer at z-index 50 or above as its own audit layer in `tools/ui_audit.py`, so a modal that deliberately covers the HUD is recorded as occlusion, not as a HUD collision.
   5. Pin all four behaviours with tests, including one that fails if the status snapshot stops carrying `slot_codes`.
 - **Consequences**: The silhouette reads OPS, THM, FRM, CORE, DRV with no clipping, catalog names are fully spelled, and research costs and buttons align; the vision reviewer approved all three fixes plus a follow-up pass and quoted every slot code. Tab audits now report zero overlaps on MARKET instead of three. Suite: 686 tests (38 suites).
+
+### ADR-080: Device-Pixel-Ratio Audit Coverage
+- **Date**: 2026-10-29
+- **Status**: Accepted
+- **Context**: G-011 requires the cockpit to work from 1280x720 to 4K at 100-200% Windows scaling with a DPR-correct radar, but `tools/ui_audit.py` hard-coded `--force-device-scale-factor=1`, so every audit ran at devicePixelRatio 1. The radar's backing-store maths (`min(3, max(1, devicePixelRatio))`, the `@dpr` cache key and the `setTransform(dpr, ...)` calls in `app.js`) had never been exercised by the audit at all. A 200%-scaled 4K display is a 1920x1080 CSS viewport at dpr 2, which the tool could not reproduce.
+- **Decision**:
+  1. Add `browser_command()` as a pure argument builder, add `--dpr` to the audit (1-3, default 1) and thread it through `audit_viewport`, `run_browser` and the report payload; label captures `desktop@2x` so they never overwrite 1x evidence.
+  2. Record radar geometry in every report (`css` box, `backing` store, `dpr`, `expectedBackingWidth`, `dprCorrect`) and fail `--check` with `radarDpr` when the backing store did not scale, because a wrong ratio is a blurry map, not a cosmetic detail.
+  3. Scale the per-viewport timeout by `2 * dpr^2` and print the effective budget, because a measured 1920x1080@2x pass takes ~350 s and the previous 480 s cap sat right on the limit and failed intermittently.
+  4. Reject `--dpr` outside 1-3 with a `Why:`/`Fix:` pair instead of silently clamping.
+  5. Pin the builder, the severity mapping and the summary text with unit tests.
+- **Consequences**: Audits at 1.25x, 1.5x and 2x all pass with zero errors, clipped text, tiny text, small targets or overlaps, and report `radar ok` with backing stores of 1630x1015, 2880x1620 and 2560x1440 for CSS boxes of 1280x720 and 1920x1080. Suite: 689 tests (38 suites).
