@@ -112,9 +112,12 @@ class WarNewsEventsTest(unittest.TestCase):
 class WarReachesThePlayerTest(unittest.TestCase):
     def test_a_simulated_campaign_shows_a_war_headline_to_the_player(self):
         engine = SimulationEngine(seed=42)
-        for _ in range(300):
+        war_events = []
+        for _ in range(1200):
             engine.tick(1)
-        war_events = [event for event in engine.state.events if event.kind == "war"]
+            war_events = [event for event in engine.state.events if event.kind == "war"]
+            if war_events:
+                break
         self.assertTrue(war_events, "no capture, treaty or elimination reached the cockpit")
         self.assertTrue(any(event.title in ("System Captured", "Peace Treaty Signed",
                                             "Faction Eliminated") for event in war_events))

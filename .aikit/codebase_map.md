@@ -9,8 +9,8 @@
 - **Total Python Modules**: `88`
 - **Total Classes**: `227`
 - **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1323`
-- **Total Source Lines**: `36780`
+- **Total Class Methods**: `1326`
+- **Total Source Lines**: `36865`
 
 ---
 
@@ -879,7 +879,7 @@
 ### [`tests/test_logbook.py`](tests/test_logbook.py)
 > *Flight-log windowing: galactic news must outlive routine AI-trade chatter.*
 
-**Size**: `140` lines (`5962` bytes)
+**Size**: `143` lines (`6040` bytes)
 
 **Classes:**
 - `class SummarizeTradesTest`
@@ -1110,16 +1110,18 @@
 ### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
 > *Regressions pinned by the post-implementation review pass.*
 
-**Size**: `232` lines (`9779` bytes)
+**Size**: `294` lines (`12620` bytes)
 
 **Classes:**
 - `class FlightSafetyTest`
   - Method `.test_void_traversal_locks_flight_and_body_actions()`
   - Method `.test_transit_blocks_body_services_until_arrival_or_origin_abort()`
+  - Method `.test_transit_blocks_station_trade_and_refuel()`
   - Method `.test_waypoint_extremes_are_rejected_without_raising()`
   - Method `.test_home_traffic_survives_the_first_tick()`
 - `class EconomyIntegrityTest`
   - Method `.test_ai_trade_cannot_mint_stock_at_the_floor()`
+  - Method `.test_ai_trade_cannot_destroy_stock_at_the_ceiling()`
 - `class CadenceLifecycleTest`
   - Method `.test_cadence_is_restored_on_load_and_reset_to_default()`
   - Method `.test_a_batched_tick_compounds_the_decision_windows()`
@@ -1498,7 +1500,7 @@
 ### [`tests/test_war_news_persistence.py`](tests/test_war_news_persistence.py)
 > *War news must survive a real save/load cycle, like every other game state.*
 
-**Size**: `48` lines (`2088` bytes)
+**Size**: `58` lines (`2369` bytes)
 
 **Classes:**
 - `class WarNewsPersistenceTest`
@@ -1903,7 +1905,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7599` lines (`377500` bytes)
+**Size**: `7606` lines (`377765` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1936,6 +1938,7 @@
   - Method `._create_initial_state(seed)` - *Construct a fresh universe state rooted at Sol System.*
   - Property `.current_system`
   - Property `.orbiting_body`
+  - Property `.docked_body` - *The body whose station services are available; none in transit or the void.*
   - Method `._body_by_id(body_id)` - *Look up a celestial body anywhere in the known galaxy.*
   - Method `._void_storm_chance()` - *Current void storm probability, calmed by open gateways.*
   - Method `._void_resonance_payout(resonance, share)` - *Convert weathered-storm resonance into credits and pilot XP.*
@@ -2198,7 +2201,7 @@
 ### [`voidfarer/frontier.py`](voidfarer/frontier.py)
 > *Frontier systems: autonomous captains, depots, mercenaries, and quantum messages.*
 
-**Size**: `194` lines (`7795` bytes)
+**Size**: `197` lines (`7981` bytes)
 
 **Functions:**
 - `def generate_ai_captains(systems, seed)` - *Create a deterministic roster of autonomous captains distributed across the galaxy.*

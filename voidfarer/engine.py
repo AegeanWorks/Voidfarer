@@ -1152,6 +1152,13 @@ class SimulationEngine:
                 return b
         return None
 
+    @property
+    def docked_body(self) -> CelestialBody | None:
+        """The body whose station services are available; none in transit or the void."""
+        if self.state.ship.travel is not None or self.state.ship.void_traversal is not None:
+            return None
+        return self.orbiting_body
+
     def _body_by_id(self, body_id: str) -> CelestialBody | None:
         """Look up a celestial body anywhere in the known galaxy."""
         for system in self.state.systems.values():
@@ -2156,7 +2163,7 @@ class SimulationEngine:
             transit = self._transit_lock_reason()
             if transit:
                 return False, transit, {}
-            body = self.orbiting_body
+            body = self.docked_body
             if not body:
                 return False, "Cannot scan: ship must establish orbit around a celestial body first.", {}
 
@@ -3063,7 +3070,7 @@ class SimulationEngine:
         """Body expeditions available from orbit, active teams, and crew readiness."""
         with self.lock:
             ship = self.state.ship
-            body = self.orbiting_body
+            body = self.docked_body
             assigned = self._away_assigned_ids(ship)
             tick = self.state.time.tick
             active: list[dict[str, Any]] = []
@@ -3168,7 +3175,7 @@ class SimulationEngine:
             if lock:
                 return False, lock
             ship = self.state.ship
-            body = self.orbiting_body
+            body = self.docked_body
             if body is None:
                 return False, "Establish orbit around a body before deploying an away team."
             if self.state.active_combat:
@@ -3481,7 +3488,7 @@ class SimulationEngine:
         with self.lock:
             if not is_buy:
                 return int(self.state.ship.cargo.get(commodity_id, 0))
-            body = self.orbiting_body
+            body = self.docked_body
             comm = COMMODITY_MAP.get(commodity_id)
             if not body or not body.station_dockable or not comm:
                 return 0
@@ -3509,7 +3516,7 @@ class SimulationEngine:
             if quantity <= 0:
                 if not is_buy:
                     return False, f"No {commodity_id} in the hold to sell."
-                body = self.orbiting_body
+                body = self.docked_body
                 if not body or not body.station_dockable or commodity_id not in COMMODITY_MAP:
                     # Let the regular order explain the docking or catalogue refusal.
                     return self.trade(commodity_id, 1, is_buy)
@@ -3526,7 +3533,7 @@ class SimulationEngine:
             lock = self._action_lock_reason()
             if lock:
                 return False, lock
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Docking authorization required: ship must orbit a station or habitable colony to trade."
 
@@ -3761,7 +3768,7 @@ class SimulationEngine:
     def get_quantum_trade_report(self) -> dict[str, Any]:
         """Arbitrage routes for cargo already in the hold, with fees and transit times."""
         with self.lock:
-            body = self.orbiting_body
+            body = self.docked_body
             if body is None or not body.station_dockable:
                 return {
                     "docked": False,
@@ -3830,7 +3837,7 @@ class SimulationEngine:
             lock = self._action_lock_reason()
             if lock:
                 return False, lock
-            body = self.orbiting_body
+            body = self.docked_body
             if body is None or not body.station_dockable:
                 return False, "Quantum freight requires a docked station or colony."
             commodity = COMMODITY_MAP.get(str(commodity_id))
@@ -3961,7 +3968,7 @@ class SimulationEngine:
     def buy_upgrade(self, upgrade_id: str) -> tuple[bool, str]:
         """Purchase and install a hardware upgrade module at an orbital station."""
         with self.lock:
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Upgrade bay drydock requires docking at a station or colony."
 
@@ -4022,7 +4029,7 @@ class SimulationEngine:
     def sell_upgrade(self, slot: str) -> tuple[bool, str]:
         """Uninstall and sell an equipped hardware module back to shipyard for credits."""
         with self.lock:
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Shipyard drydock authorization required: dock at a station or colony to uninstall modules."
 
@@ -4067,7 +4074,7 @@ class SimulationEngine:
     def buy_ship_chassis(self, chassis_id: str) -> tuple[bool, str]:
         """Purchase and commission a new spacecraft hull chassis at an orbital shipyard."""
         with self.lock:
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Shipyard drydock authorization required: dock at a station or colony to commission a new chassis."
 
@@ -4173,7 +4180,7 @@ class SimulationEngine:
             if quantity <= 0:
                 return False, "Quantity must be greater than zero."
 
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Station terminal requires docking at a station or colony."
 
@@ -4223,7 +4230,7 @@ class SimulationEngine:
     def buy_drone(self, drone_type: str, assigned_system_id: str | None = None) -> tuple[bool, str]:
         """Purchase and commission an autonomous fleet drone."""
         with self.lock:
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Drone commissioning hangar requires docking at a station or colony."
 
@@ -5033,7 +5040,7 @@ class SimulationEngine:
         with self.lock:
             if not isinstance(amount, int) or isinstance(amount, bool) or amount <= 0:
                 return False, "Repair amount must be a positive integer."
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Repair drydocks available at orbital stations or colonies only."
 
@@ -5062,7 +5069,7 @@ class SimulationEngine:
         with self.lock:
             if not isinstance(amount, int) or isinstance(amount, bool) or amount <= 0:
                 return False, "Refuel amount must be a positive integer."
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Fuel refinery available at orbital stations or colonies only."
 
@@ -5543,7 +5550,7 @@ class SimulationEngine:
         """
         with self.lock:
             cur_sys = self.current_system
-            orb_body = self.orbiting_body
+            orb_body = self.docked_body
             market_quotes = []
             if orb_body and orb_body.station_dockable:
                 quotes = [
@@ -6051,7 +6058,7 @@ class SimulationEngine:
     def _require_docked(self) -> tuple[bool, str]:
         if self.state.active_combat is not None:
             return False, "Depot operations are unavailable during combat."
-        body = self.orbiting_body
+        body = self.docked_body
         if not body or not body.station_dockable:
             return False, "Dock at an orbital station or colony to access depot services."
         return True, ""
@@ -6123,7 +6130,7 @@ class SimulationEngine:
                 return False, "No depot is registered in this system."
             if depot.cargo.get(item_id, 0) < quantity:
                 return False, f"Depot contains only {depot.cargo.get(item_id, 0)} units of {item_id}."
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or body.market_archetype == "none":
                 return False, "Current orbital location has no commercial market exchange."
             comm = COMMODITY_MAP.get(item_id)
@@ -6305,7 +6312,7 @@ class SimulationEngine:
             transit = self._transit_lock_reason()
             if transit:
                 return False, transit, {}
-            body = self.orbiting_body
+            body = self.docked_body
             if not body:
                 return False, "Cannot salvage: establish orbit around a body first.", {}
             if self.state.active_combat:
@@ -6394,7 +6401,7 @@ class SimulationEngine:
             transit = self._transit_lock_reason()
             if transit:
                 return False, transit
-            body = self.orbiting_body
+            body = self.docked_body
             if not body:
                 return False, "Cannot scoop fuel: establish orbit around a scoopable body first."
             if self.state.active_combat:
@@ -6477,7 +6484,7 @@ class SimulationEngine:
     def shore_leave(self) -> tuple[bool, str]:
         """Grant fleet-wide shore leave at a docked station, restoring crew morale for credits."""
         with self.lock:
-            body = self.orbiting_body
+            body = self.docked_body
             if not body or not body.station_dockable:
                 return False, "Shore leave requires docking at a station or colony with leisure decks."
 

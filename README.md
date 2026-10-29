@@ -51,6 +51,7 @@ voidfarer/
 │   ├── media.json        <- approved brand asset manifest
 │   ├── ui.json           <- committed cockpit UI surface contract
 │   ├── ui_history.json   <- append-only UI task evidence
+│   ├── reforge.json      <- crash-safe audit run and repair history
 │   └── task_ledger.json  <- power-loss safe task state
 ├── docs/                 <- comprehensive system design & research
 │   ├── COCKPIT.md        <- Windows cockpit panels, controls and launch options

@@ -166,9 +166,12 @@ def simulate_ai_trade(
         commodity_id = max(origin_market.stockpiles, key=lambda cid: origin_market.stockpiles.get(cid, 0))
         requested = min(4, max(1, captain.credits // 120))
         stock = origin_market.stockpiles.get(commodity_id, 0)
-        # Never lift stock out of the reserve floor: the clamp would mint the difference.
+        # Never lift stock out of the reserve floor or over the destination ceiling:
+        # the clamps would mint or destroy the difference.
         movable = max(0, stock - MIN_STOCK)
-        quantity = min(requested, movable)
+        target_stock = target_market.stockpiles.get(commodity_id, 50)
+        headroom = max(0, MAX_STOCK - target_stock)
+        quantity = min(requested, movable, headroom)
         if quantity <= 0:
             # Keep the shared RNG stream identical to the old trade path.
             if stock > requested:

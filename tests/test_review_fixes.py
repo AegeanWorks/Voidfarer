@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from voidfarer.agent_play import AiCaptain, ApiClient
 from voidfarer.decisions import DECISION_DEFINITIONS
-from voidfarer.economy import MIN_STOCK
+from voidfarer.economy import MAX_STOCK, MIN_STOCK
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import get_faction_id_from_name
 from voidfarer.frontier import simulate_ai_trade
@@ -27,7 +27,9 @@ class FlightSafetyTest(unittest.TestCase):
             duration_ticks=5,
             stability=100.0,
         )
-        engine.state = engine._clone_state(ship=engine._clone_ship(void_traversal=traversal))
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(fuel=10, void_traversal=traversal)
+        )
         checks = [
             engine.jump("alpha_centauri"),
             engine.orbit("sol_body_1"),
@@ -38,6 +40,9 @@ class FlightSafetyTest(unittest.TestCase):
         for ok, message in checks:
             self.assertFalse(ok, message)
             self.assertIn("Void traversal", message)
+        ok, message = engine.refuel(5)
+        self.assertFalse(ok, "station services must be locked during a void traversal")
+        self.assertIn("Fuel refinery", message)
 
     def test_transit_blocks_body_services_until_arrival_or_origin_abort(self):
         engine = SimulationEngine(seed=42)
@@ -58,6 +63,20 @@ class FlightSafetyTest(unittest.TestCase):
         self.assertTrue(ok, "orbiting the origin aborts the trip")
         self.assertIsNone(engine.state.ship.travel)
         self.assertTrue(engine.scan()[0])
+
+    def test_transit_blocks_station_trade_and_refuel(self):
+        engine = SimulationEngine(seed=42)
+        self.assertTrue(engine.orbit("sol_body_1")[0])
+        engine.state = engine._clone_state(ship=engine._clone_ship(fuel=10))
+        self.assertTrue(engine.start_travel("sol_body_2", "sublight")[0])
+        commodity = next(iter(engine.state.economy.markets["sol"].stockpiles))
+
+        ok, message = engine.trade(commodity, 1, True)
+        self.assertFalse(ok, "a station market must not trade while the ship is in transit")
+        self.assertIn("Docking authorization", message)
+        ok, message = engine.refuel(5)
+        self.assertFalse(ok, "a station refinery must not refuel while the ship is in transit")
+        self.assertIn("Fuel refinery", message)
 
     def test_waypoint_extremes_are_rejected_without_raising(self):
         engine = SimulationEngine(seed=42)
@@ -101,6 +120,49 @@ class EconomyIntegrityTest(unittest.TestCase):
             for cid in origin.stockpiles
         }
         self.assertEqual(after, before, "stock must be conserved, never minted from the floor")
+        self.assertEqual(updated_captains[0].system_id, "sol")
+
+    def test_ai_trade_cannot_destroy_stock_at_the_ceiling(self):
+        engine = SimulationEngine(seed=42)
+        trader = next(c for c in engine.state.ai_captains if c.archetype == "trader")
+        trader = replace(trader, system_id="sol", credits=1000)
+        markets = dict(engine.state.economy.markets)
+        origin = markets["sol"]
+        commodity = max(origin.stockpiles, key=lambda cid: origin.stockpiles.get(cid, 0))
+        origin = replace(
+            origin,
+            stockpiles={
+                cid: (100 if cid == commodity else MIN_STOCK)
+                for cid in origin.stockpiles
+            },
+        )
+        markets["sol"] = origin
+        # Every reachable destination is full, so the trader has nowhere to put cargo.
+        for system_id in engine.state.systems["sol"].connections:
+            target = markets.get(system_id)
+            if target is None:
+                continue
+            markets[system_id] = replace(
+                target,
+                stockpiles={
+                    cid: (MAX_STOCK if cid == commodity else MIN_STOCK)
+                    for cid in target.stockpiles
+                },
+            )
+        economy = replace(engine.state.economy, markets=markets)
+        before = {
+            cid: sum(m.stockpiles.get(cid, 0) for m in markets.values())
+            for cid in origin.stockpiles
+        }
+
+        updated_captains, updated_economy, _ = simulate_ai_trade(
+            (trader,), economy, engine.state.systems, random.Random(3)
+        )
+        after = {
+            cid: sum(m.stockpiles.get(cid, 0) for m in updated_economy.markets.values())
+            for cid in origin.stockpiles
+        }
+        self.assertEqual(after, before, "stock must be conserved, never destroyed at the ceiling")
         self.assertEqual(updated_captains[0].system_id, "sol")
 
 
