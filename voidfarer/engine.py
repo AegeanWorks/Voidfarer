@@ -343,6 +343,7 @@ class SimulationEngine:
     # Only the dramatic headlines reach the cockpit as notifications; declarations stay
     # in the flight log so a long war does not bury the player in toasts.
     AI_TRADE_LOG_TICKS = 5
+    WAR_NEWS_COOLDOWN_TICKS = 12
     WAR_NEWS_TITLES = (
         ("WAR: ", "System Captured"),
         ("PEACE: ", "Peace Treaty Signed"),
@@ -352,7 +353,13 @@ class SimulationEngine:
 
     @classmethod
     def war_news_events(cls, lines: list[str], tick: int, existing: list[GameEvent]) -> list[GameEvent]:
-        """Turn this tick's captures, treaties and eliminations into at most two events."""
+        """Turn this tick's captures, treaties and eliminations into one headline at most."""
+        latest_war_tick = max(
+            (event.tick for event in existing if event.kind == "war" and not event.dismissed),
+            default=-10**9,
+        )
+        if tick - latest_war_tick < cls.WAR_NEWS_COOLDOWN_TICKS:
+            return []
         seen = {event.message for event in existing if not event.dismissed}
         events: list[GameEvent] = []
         for line in lines:
@@ -370,7 +377,7 @@ class SimulationEngine:
                     dismissed=False,
                 )
             )
-            if len(events) >= 2:
+            if len(events) >= 1:
                 break
         return events
 
@@ -1134,6 +1141,7 @@ class SimulationEngine:
                 "landings": 0,
                 "surface_ops": 0,
                 "decisions_resolved": 0,
+                "last_decision_tick": 0,
                 "quantum_orders": 0,
                 "deliveries": 0,
             },
@@ -6253,6 +6261,12 @@ class SimulationEngine:
             operation = SURFACE_OPERATION_MAP.get(str(operation_id))
             if operation is None:
                 return False, f"Unknown surface operation '{operation_id}'."
+            if not operation.available_on(body):
+                return (
+                    False,
+                    f"{operation.name} is not available on {body.name} "
+                    f"({body.body_type.replace('_', ' ')} surface).",
+                )
             key = f"{body.id}:{operation.id}"
             if key in self.state.ship.surface_used:
                 return False, f"{operation.name} has already been completed on {body.name}."
@@ -6629,10 +6643,10 @@ class SimulationEngine:
     # and the odds stay low so a normal session sees a handful of them.
     DECISION_CADENCE = {
         "relaxed": (36, 0.55),
-        "normal": (14, 1.0),
-        "frequent": (4, 1.6),
+        "normal": (18, 1.0),
+        "frequent": (6, 1.6),
     }
-    DEFAULT_DECISION_CADENCE = "normal"
+    DEFAULT_DECISION_CADENCE = "relaxed"
 
     def _cadence_from_state(self, state: GameState) -> str:
         """Read the saved cadence, falling back to the default for unknown values."""
@@ -6662,9 +6676,26 @@ class SimulationEngine:
         self.decision_cadence = key
         return True, f"Decision cadence set to {key} (one prompt per {self._decision_cooldown()} ticks)."
 
+    def _last_decision_eval_tick(self) -> int:
+        """Last tick that consumed a decision window, prompt or failed roll."""
+        stats = self.state.stats
+
+        def _as_int(raw: object) -> int:
+            try:
+                return int(raw)
+            except (TypeError, ValueError):
+                return 0
+
+        # Older saves only know last_decision_tick. When the eval key is absent, that
+        # key is the only anchor; otherwise the later of the two wins.
+        eval_raw = stats.get("last_decision_eval_tick")
+        if eval_raw is None:
+            return _as_int(stats.get("last_decision_tick", 0))
+        return max(_as_int(eval_raw), _as_int(stats.get("last_decision_tick", 0)))
+
     def decisions_ready_in(self) -> int:
-        """Ticks left before another blocking decision may open."""
-        last = int(self.state.stats.get("last_decision_tick", -10**9))
+        """Ticks left before another blocking decision may be evaluated."""
+        last = self._last_decision_eval_tick()
         return max(0, self._decision_cooldown() - (self.state.time.tick - last))
 
     def maybe_trigger_decision(
@@ -6689,14 +6720,18 @@ class SimulationEngine:
             roll = self._stable_unit(
                 self.state.galaxy_seed, "decision", trigger, self.state.time.tick, chosen.id
             )
-            base = 0.45 if chosen.priority >= 85 else 0.10
+            base = 0.38 if chosen.priority >= 85 else 0.08
             per_window = min(0.95, max(chosen.chance, base) * self._decision_chance_multiplier())
             windows = max(1, min(1000, int(elapsed_ticks) // self._decision_cooldown()))
             threshold = min(0.999, 1.0 - (1.0 - per_window) ** windows)
+            stats = dict(self.state.stats)
+            stats["last_decision_eval_tick"] = self.state.time.tick
             if roll > threshold:
+                # One roll per cadence window: a miss moves the window forward instead of
+                # rerolling every tick until something opens.
+                self.state = self._clone_state(stats=stats)
                 return None
             event = make_decision_event(chosen, self.state.time.tick, trigger)
-            stats = dict(self.state.stats)
             stats["last_decision_tick"] = self.state.time.tick
             log = f"DECISION REQUIRED: {event.title}."
             self.state = self._clone_state(

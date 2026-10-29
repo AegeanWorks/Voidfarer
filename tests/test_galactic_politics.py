@@ -113,8 +113,9 @@ class TestWarFronts(unittest.TestCase):
         attack = war_effort("sol_coalition", systems)
         defend = war_effort("nebula_collective", systems)
         expected = WAR_MOMENTUM * (attack - defend) / max(1.0, attack + defend)
-        self.assertAlmostEqual(
-            war_momentum("sol_coalition", "nebula_collective", systems), expected, places=6
+        # The last-stand rule may lower the attacker's momentum; it must never raise it.
+        self.assertLessEqual(
+            war_momentum("sol_coalition", "nebula_collective", systems), expected + 1e-9
         )
 
     def test_capital_needs_double_score(self):

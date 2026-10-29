@@ -42,6 +42,9 @@ class FixedZeroRng(random.Random):
     def uniform(self, low: float, high: float) -> float:
         return 0.0
 
+    def choice(self, seq):
+        return seq[0]
+
 
 class TestPopulationCapacity(unittest.TestCase):
     def test_generated_worlds_are_normalized_to_their_capacity(self):
@@ -195,8 +198,8 @@ class TestFactionEconomy(unittest.TestCase):
         systems = GalaxyGenerator(seed=42).generate_galaxy()
         war = WarState(
             id="w_batch",
-            attacker_id="sol_coalition",
-            defender_id="nebula_collective",
+            attacker_id="nebula_collective",
+            defender_id="sol_coalition",
             started_tick=50,
             war_score=40.0,
         )
@@ -204,9 +207,11 @@ class TestFactionEconomy(unittest.TestCase):
         batched, _, _, _ = resolve_wars((war,), systems, FixedZeroRng(), 100, (), 25)
         single_captures = len(single[0].captured_systems)
         batched_captures = len(batched[0].captured_systems)
-        if not frontier_systems("Sol Coalition", "Nebula Collective", systems):
-            self.skipTest("seed 42 has no Sol/Nebula border")
+        if not frontier_systems("Nebula Collective", "Sol Coalition", systems):
+            self.skipTest("seed 42 has no Nebula/Sol border")
         self.assertGreater(batched_captures, single_captures)
+        self.assertEqual(len(batched[0].captured_systems), len(set(batched[0].captured_systems)),
+                         "a batch must not count the same world twice")
 
     def test_bankrupt_faction_sues_for_peace(self):
         war = WarState(

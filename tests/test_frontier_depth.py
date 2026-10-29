@@ -7,6 +7,7 @@ import tempfile
 import threading
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from voidfarer.decisions import DECISION_DEFINITIONS, eligible_decisions, make_decision_event
 from voidfarer.engine import SimulationEngine
@@ -18,17 +19,30 @@ from voidfarer.pirates import generate_pirate_encounter, pirate_risk
 from voidfarer.retention import generate_contract
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
+from voidfarer.surface import SURFACE_OPERATIONS, SURFACE_OPERATION_MAP
 
 
 class FrontierContentTest(unittest.TestCase):
     def test_galaxy_has_more_systems_factions_and_anomalies(self):
         systems = GalaxyGenerator(42).generate_galaxy()
-        self.assertGreaterEqual(len(systems), 23)
+        self.assertGreaterEqual(len(systems), 31)
         self.assertGreaterEqual(len(CANONICAL_FACTIONS), 9)
         self.assertGreaterEqual(len(ANOMALIES_CATALOG), 9)
-        for required in ("kepler", "helios", "ashen", "meridian", "vela", "lyra", "draco", "phoenix"):
+        for required in (
+            "kepler", "helios", "ashen", "meridian", "vela", "lyra", "draco", "phoenix",
+            "altair", "deneb", "rigel", "capella", "tau_ceti", "epsilon_eridani", "luyten", "pollux",
+        ):
             self.assertIn(required, systems)
         self.assertTrue(any(system.faction == "Kepler Concord" for system in systems.values()))
+
+    def test_every_system_has_a_deeper_planet_roster(self):
+        systems = GalaxyGenerator(42).generate_galaxy()
+        for system_id, system in systems.items():
+            self.assertGreaterEqual(
+                len(system.bodies), 7,
+                f"{system_id} must keep at least seven celestial bodies",
+            )
+        self.assertGreaterEqual(len(systems["sol"].bodies), 8)
 
     def test_populations_are_realistic_and_devastation_kills_growth(self):
         systems = GalaxyGenerator(42).generate_galaxy()
@@ -186,6 +200,34 @@ class DecisionEventTest(unittest.TestCase):
         )
         self.assertEqual(engine.decisions_ready_in(), 0)
 
+    def test_first_decision_waits_for_the_initial_relaxed_window(self):
+        engine = SimulationEngine(seed=42)
+        engine.allow_decision_events = True
+        definition = DECISION_DEFINITIONS[0]
+        self.assertEqual(engine.decision_cadence, "relaxed")
+        self.assertEqual(engine.decisions_ready_in(), 36)
+        with patch("voidfarer.engine.eligible_decisions", return_value=[definition]), \
+                patch.object(engine, "_stable_unit", return_value=0.0):
+            self.assertIsNone(engine.maybe_trigger_decision("tick"), "tick 0 must stay quiet")
+            engine.state = engine._clone_state(time=replace(engine.state.time, tick=35))
+            self.assertIsNone(engine.maybe_trigger_decision("tick"), "tick 35 is still the grace window")
+            engine.state = engine._clone_state(time=replace(engine.state.time, tick=36))
+            self.assertIsNotNone(engine.maybe_trigger_decision("tick"),
+                                 "the first prompt may open after the relaxed window")
+
+    def test_a_failed_roll_still_consumes_the_cadence_window(self):
+        engine = SimulationEngine(seed=42)
+        engine.allow_decision_events = True
+        definition = DECISION_DEFINITIONS[0]
+        engine.state = engine._clone_state(time=replace(engine.state.time, tick=36))
+        with patch("voidfarer.engine.eligible_decisions", return_value=[definition]), \
+                patch.object(engine, "_stable_unit", return_value=1.0):
+            self.assertIsNone(engine.maybe_trigger_decision("tick"),
+                              "a failed roll must not open a prompt")
+        self.assertEqual(engine.state.stats.get("last_decision_eval_tick"), 36)
+        self.assertEqual(engine.decisions_ready_in(), 36,
+                         "the next evaluation waits for the next relaxed window")
+
     def test_cadence_choices_and_snapshot(self):
         engine = SimulationEngine(seed=42)
         ok, msg = engine.set_decision_cadence("frequent")
@@ -205,7 +247,7 @@ class DecisionEventTest(unittest.TestCase):
         self.assertEqual(reloaded._decision_cooldown(), 36)
         # An unknown saved value falls back to the default instead of breaking the run.
         engine.state = engine._clone_state(stats={**engine.state.stats, "decision_cadence": "warp"})
-        self.assertEqual(SimulationEngine(state=engine.state).decision_cadence, "normal")
+        self.assertEqual(SimulationEngine(state=engine.state).decision_cadence, "relaxed")
 
     def test_low_hull_event_is_eligible(self):
         engine = SimulationEngine(seed=42)
@@ -266,7 +308,7 @@ class SurfaceOperationTest(unittest.TestCase):
         )
         report = engine.get_surface_report()
         self.assertTrue(report["landed"])
-        self.assertEqual(len(report["operations"]), 5)
+        self.assertGreaterEqual(len(report["operations"]), 8)
         ok, msg = engine.perform_surface_operation("surface_survey")
         self.assertTrue(ok, msg)
         self.assertIn(f"{body.id}:surface_survey", engine.state.ship.surface_used)
@@ -275,6 +317,29 @@ class SurfaceOperationTest(unittest.TestCase):
         self.assertTrue(survey["used"])
         ok, _ = engine.perform_surface_operation("surface_survey")
         self.assertFalse(ok)
+
+    def test_surface_catalog_is_deeper_and_body_specific(self):
+        self.assertGreaterEqual(len(SURFACE_OPERATIONS), 12)
+        op = SURFACE_OPERATION_MAP["cryo_drill"]
+        body = next(body for body in SimulationEngine(seed=42).current_system.bodies if body.landable)
+        self.assertTrue(op.available_on(replace(body, body_type="ice_world")))
+        self.assertFalse(op.available_on(replace(body, body_type="lava_world")))
+        self.assertTrue(any(operation.body_types for operation in SURFACE_OPERATIONS),
+                        "at least one operation must be tied to a surface environment")
+
+    def test_an_operation_for_another_environment_is_refused(self):
+        engine = SimulationEngine(seed=42)
+        body = next(body for body in engine.current_system.bodies if body.landable)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(orbiting_body_id=body.id, landed_body_id=body.id)
+        )
+        incompatible = next(
+            operation for operation in SURFACE_OPERATIONS
+            if operation.body_types and not operation.available_on(body)
+        )
+        ok, message = engine.perform_surface_operation(incompatible.id)
+        self.assertFalse(ok)
+        self.assertIn("not available", message)
 
 
 class FrontierUiContractTest(unittest.TestCase):

@@ -83,20 +83,27 @@ class NotableNewsTest(unittest.TestCase):
 
 
 class WarNewsEventsTest(unittest.TestCase):
-    def test_capture_and_treaty_become_notifications(self):
+    def test_capture_becomes_one_notification(self):
         events = SimulationEngine.war_news_events([WAR, PEACE], 120, [])
-        self.assertEqual([event.kind for event in events], ["war", "war"])
-        self.assertEqual([event.title for event in events],
-                         ["System Captured", "Peace Treaty Signed"])
+        self.assertEqual([event.kind for event in events], ["war"])
+        self.assertEqual([event.title for event in events], ["System Captured"])
         self.assertEqual(events[0].message, WAR)
         self.assertFalse(events[0].dismissed)
 
     def test_declarations_stay_in_the_log_only(self):
         self.assertEqual(SimulationEngine.war_news_events([DECLARED], 7, []), [])
 
-    def test_at_most_two_events_per_tick(self):
+    def test_at_most_one_event_per_tick(self):
         lines = [WAR, PEACE, ELIMINATED]
-        self.assertEqual(len(SimulationEngine.war_news_events(lines, 9, [])), 2)
+        self.assertEqual(len(SimulationEngine.war_news_events(lines, 9, [])), 1)
+
+    def test_headlines_keep_a_cooldown_between_them(self):
+        recent = [GameEvent(id="evt_10_1", kind="war", title="System Captured",
+                            message="WAR: old news", tick=10, dismissed=False)]
+        self.assertEqual(SimulationEngine.war_news_events([WAR], 20, recent), [],
+                         "a second headline inside the cooldown is log-only")
+        self.assertEqual(len(SimulationEngine.war_news_events([WAR], 22, recent)), 1,
+                         "the next window may headline again")
 
     def test_an_undismissed_duplicate_is_not_repeated(self):
         existing = [GameEvent(id="evt_1_1", kind="war", title="System Captured",

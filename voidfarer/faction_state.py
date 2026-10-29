@@ -76,7 +76,7 @@ WAR_MAX_CAPTURES = 3
 WAR_MOMENTUM = 3.0
 WAR_NOISE = 2.5
 # Every system beyond the core dilutes a faction's war effort (administrative overextension).
-WAR_CORE_SIZE = 3
+WAR_CORE_SIZE = 6
 WAR_OVEREXTENSION = 0.35
 # Attrition pulls the score back toward a stalemate each step, so only a sustained edge
 # (steady state = momentum / attrition) reaches the capture threshold.
@@ -348,7 +348,10 @@ def resolve_wars(
                 sign = 1.0 if score > 0 else -1.0
                 winner_name, loser_name = (attacker_name, defender_name) if sign > 0 else (defender_name, attacker_name)
                 loser_id = war.defender_id if sign > 0 else war.attacker_id
-                front = frontier_systems(winner_name, loser_name, updated_systems)
+                front = [
+                    sid for sid in frontier_systems(winner_name, loser_name, updated_systems)
+                    if sid not in captured
+                ]
                 target = _capture_target(front, loser_id, loser_name, score, updated_systems, rng)
                 if target is not None:
                     updated_systems[target] = replace(updated_systems[target], faction=winner_name)

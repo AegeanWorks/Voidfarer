@@ -26,6 +26,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/anomaly": "prompt-driven: an anomaly must be resolved",
     "/api/combat": "prompt-driven: a hostile intercept must occur",
     "/api/pirate/resolve": "prompt-driven: a pirate toll must intercept",
+    "/api/decision/resolve": "prompt-driven: a blocking decision must be pending",
     "/api/void/dive": "needs a black-hole horizon",
     "/api/void/emerge": "needs an active void traversal",
     "/api/inventory/buy": "no item shop catalog is exposed by the API",
@@ -276,6 +277,7 @@ class AiCaptain:
             self._tour_weapon,
             self._tour_shipmod,
             self._tour_outpost,
+            self._tour_land,
             self._tour_surface,
             self._tour_away,
             self._tour_ai,
@@ -421,6 +423,24 @@ class AiCaptain:
             return None
         return "/api/outpost/build", {"body_id": body_id, "outpost_type": outpost_type}, "outpost"
 
+    def _tour_land(self):
+        """Reach a landable body so the surface-operation tour has real work to do."""
+        ship = self.state.get("ship") or {}
+        if ship.get("landed_body_id") or ship.get("travel") or ship.get("void_traversal"):
+            return None
+        body = self.state.get("orbiting_body") or {}
+        if body.get("landable") and body.get("id"):
+            return "/api/land", {"target": body["id"]}, "land"
+        current = self.state.get("current_system") or {}
+        target = next(
+            (candidate for candidate in current.get("bodies") or []
+             if isinstance(candidate, dict) and candidate.get("landable") and candidate.get("id")),
+            None,
+        )
+        if target and ship.get("orbiting_body_id") != target["id"]:
+            return "/api/travel", {"body_id": target["id"], "mode": "sublight"}, "travel"
+        return None
+
     def _tour_surface(self):
         report = self.state.get("surface_report") or {}
         if not report.get("landed"):
@@ -441,9 +461,10 @@ class AiCaptain:
         return None
 
     def _tour_ai(self):
-        system_id = (self.state.get("current_system") or {}).get("id")
+        # Hailing runs over the quantum link, so any known captain is reachable even
+        # when the flagship is between systems.
         for captain in self.state.get("ai_captains") or []:
-            if isinstance(captain, dict) and captain.get("system_id") == system_id and captain.get("id"):
+            if isinstance(captain, dict) and captain.get("id"):
                 return "/api/ai/interact", {"captain_id": captain["id"], "action": "hail"}, "ai"
         return None
 

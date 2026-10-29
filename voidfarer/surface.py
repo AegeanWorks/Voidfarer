@@ -22,6 +22,11 @@ class SurfaceOperation:
     morale: int = 0
     heal_injuries: int = 0
     credit_cost: int = 0
+    body_types: tuple[str, ...] = ()
+
+    def available_on(self, body: CelestialBody) -> bool:
+        """An empty body_types tuple means the operation works anywhere."""
+        return not self.body_types or body.body_type in self.body_types
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -39,6 +44,7 @@ class SurfaceOperation:
             "morale": self.morale,
             "heal_injuries": self.heal_injuries,
             "credit_cost": self.credit_cost,
+            "body_types": list(self.body_types),
         }
 
 
@@ -85,6 +91,76 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         heal_injuries=5,
         credit_cost=120,
     ),
+    SurfaceOperation(
+        id="geothermal_tap",
+        name="Geothermal Tap",
+        description="Sink a heat exchanger into a shallow magma chamber and bottle the steam.",
+        risk=20,
+        credits=90,
+        cargo=(("fuel_cells", 3),),
+        hull_delta=-6,
+    ),
+    SurfaceOperation(
+        id="bio_prospecting",
+        name="Bio-Prospecting",
+        description="Collect extremophile samples from shaded vents and seep pools.",
+        risk=10,
+        research=20,
+        cargo=(("medicines", 2),),
+        morale=2,
+    ),
+    SurfaceOperation(
+        id="crash_site_recovery",
+        name="Crash-Site Recovery",
+        description="Strip a fresh impact scar for avionics, plate and flight recorders.",
+        risk=24,
+        cargo=(("microchips", 2), ("titanium", 1)),
+        hull_delta=-7,
+    ),
+    SurfaceOperation(
+        id="cryo_drill",
+        name="Cryo Drill",
+        description="Melt through the ice sheet to tap a sealed subglacial fuel lens.",
+        risk=16,
+        research=25,
+        cargo=(("fuel_cells", 2),),
+        body_types=("ice_world", "ice_giant", "tundra"),
+    ),
+    SurfaceOperation(
+        id="magma_tap",
+        name="Magma Tap",
+        description="Run a shielded siphon along an active lava tube for rare xenoliths.",
+        risk=26,
+        cargo=(("xenoliths", 1), ("fuel_cells", 2)),
+        hull_delta=-8,
+        body_types=("lava_world", "volcanic"),
+    ),
+    SurfaceOperation(
+        id="reef_harvest",
+        name="Reef Harvest",
+        description="Harvest cultivated kelp and reef biomass from the coastal shelf.",
+        risk=9,
+        credits=120,
+        cargo=(("hydroponics", 4),),
+        body_types=("oceanic", "savanna"),
+    ),
+    SurfaceOperation(
+        id="cloud_scoop",
+        name="Cloud Scoop",
+        description="Drop a ram scoop through the upper cloud deck for deuterium.",
+        risk=18,
+        cargo=(("fuel_cells", 3),),
+        body_types=("gas_giant", "ringed_giant"),
+    ),
+    SurfaceOperation(
+        id="deep_mine",
+        name="Deep Mine",
+        description="Sink a shaft through basement rock into a high-grade ore seam.",
+        risk=22,
+        cargo=(("titanium", 4),),
+        hull_delta=-6,
+        body_types=("terrestrial", "super_earth", "barren", "desert_world"),
+    ),
 )
 
 SURFACE_OPERATION_MAP = {operation.id: operation for operation in SURFACE_OPERATIONS}
@@ -110,6 +186,8 @@ def surface_report(ship: ShipState, body: CelestialBody | None) -> dict[str, obj
     used = set(ship.surface_used)
     operations = []
     for operation in SURFACE_OPERATIONS:
+        if not operation.available_on(body):
+            continue
         key = f"{body.id}:{operation.id}"
         row = operation.to_dict()
         row["risk"] = surface_risk(operation, body)

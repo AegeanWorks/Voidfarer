@@ -61,6 +61,15 @@ SYSTEM_ARCHETYPES = [
     ("lyra", "Lyra Breadbasket", 76.0, -12.0, "A", "#e0f2fe", 0.61, "Free Spacers Syndicate", "astraea_pharma"),
     ("draco", "Draco Reach", -30.0, -68.0, "K", "#f97316", 0.22, "Iron Meridian", "omnicorp_mining"),
     ("phoenix", "Phoenix Verge", 40.0, 62.0, "G", "#fde68a", 0.44, "Helios Compact", "helios_forge"),
+    ("altair", "Altair Reach", 28.0, 10.0, "A", "#bfd7ff", 0.63, "Sol Coalition", "hyperion_dynamics"),
+    ("deneb", "Deneb Crown", -12.0, -74.0, "A", "#dbeafe", 0.37, "Nebula Collective", "omnicorp_mining"),
+    ("rigel", "Rigel Gate", 86.0, 38.0, "B", "#a5b4fc", 0.31, "Helios Compact", "helios_forge"),
+    ("capella", "Capella Drift", -88.0, 14.0, "G", "#fde68a", 0.49, "Kepler Concord", "astraea_pharma"),
+    ("tau_ceti", "Tau Ceti Haven", -8.0, 34.0, "G", "#ffe8a3", 0.68, "Sol Coalition", "astraea_pharma"),
+    ("epsilon_eridani", "Epsilon Eridani", 46.0, -8.0, "K", "#ffb86b", 0.57, "Free Spacers Syndicate", "nexus_cybernetics"),
+    ("luyten", "Luyten Junction", 2.0, -56.0, "M", "#ff8866", 0.34, "Iron Meridian", "omnicorp_mining"),
+    ("pollux", "Pollux Bastion", 58.0, -68.0, "K", "#ffa94d", 0.42, "Iron Meridian", "hyperion_dynamics"),
+    ("barnard", "Barnard's Reach", -44.0, -28.0, "M", "#ff7755", 0.29, "Void Corsairs", None),
 ]
 
 # Systems whose generator appends a black-hole event horizon (void traversal gates)
@@ -887,7 +896,7 @@ class GalaxyGenerator:
         moon_colors = ("#c0c0c0", "#9a8c98", "#e0e1dd", "#8ecae6")
         default_gov = government_for(faction)
 
-        num_bodies = 6 if sys_id in ("sol", "betelgeuse") else 5
+        num_bodies = 8 if sys_id in ("sol", "betelgeuse") else 7
         for i in range(num_bodies):
             body_type, designation, market_arch, color, discovery = archetype_pool[
                 (i + len(sys_id)) % len(archetype_pool)
@@ -1200,6 +1209,13 @@ class GalaxyGenerator:
             s_b = sys_list[i + 1].id
             adj[s_a].add(s_b)
             adj[s_b].add(s_a)
+
+        # Campaign-critical lanes stay direct as the map grows; the story sends the
+        # captain from Sirius to Vega without asking for a multi-hop route.
+        for s_a, s_b in (("sirius", "vega"),):
+            if s_a in adj and s_b in adj:
+                adj[s_a].add(s_b)
+                adj[s_b].add(s_a)
 
         return adj
 

@@ -209,7 +209,7 @@ class CadenceLifecycleTest(unittest.TestCase):
         self.assertEqual(loaded.decision_cadence, "relaxed")
         self.assertEqual(loaded._decision_cooldown(), 36)
         loaded.reset(seed=7)
-        self.assertEqual(loaded.decision_cadence, "normal")
+        self.assertEqual(loaded.decision_cadence, "relaxed")
 
     def test_a_batched_tick_compounds_the_decision_windows(self):
         engine = SimulationEngine(seed=42)
@@ -219,6 +219,7 @@ class CadenceLifecycleTest(unittest.TestCase):
         with patch("voidfarer.engine.eligible_decisions", return_value=[definition]), \
                 patch.object(engine, "_stable_unit", return_value=0.5):
             self.assertIsNone(engine.maybe_trigger_decision("tick", 1))
+            engine.state = engine._clone_state(time=replace(engine.state.time, tick=200))
             self.assertIsNotNone(
                 engine.maybe_trigger_decision("tick", 200),
                 "200 batched ticks must roll the crossed cadence windows",
