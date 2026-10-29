@@ -1,60 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "trade-automation",
+    "task_id": "faction-alliances",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793316712.7889514,
+    "updated_at": 1793317289.2365317,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793316722.4659357
+    "completed_at": 1793317299.6089702
   },
   "checkpoints": [
-    {
-      "task_id": "boarding-prizes",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/4] Boarding/prize engine action, marine injury failure path, save round-trip and Privateer codex metric implemented with combat regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793313528.4435842,
-      "timestamp_str": "2026-10-30 01:38:48",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "boarding-prizes",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[3/4] CLI combat board aliases, gated cockpit button and boarding browser scenario added; live Edge click captured a 20-hull prize and click map shows 136 controls with no gaps.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793313528.5817785,
-      "timestamp_str": "2026-10-30 01:38:48",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "boarding-prizes",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[4/4] README, COCKPIT guide and ADR-089 recorded; 798 tests pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793313528.7131395,
-      "timestamp_str": "2026-10-30 01:38:48",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "boarding-prizes",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'boarding-prizes' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793313536.665617,
-      "timestamp_str": "2026-10-30 01:38:56",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "prize-sales",
       "phase": "2",
@@ -249,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793316722.465937,
       "timestamp_str": "2026-10-30 02:32:02",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "faction-alliances",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan visible faction diplomacy: reject duplicate alliances, expose improve/gift/ally/ceasefire in the Empire tab, and make allied territory cut pirate risk.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793317214.4655018,
+      "timestamp_str": "2026-10-30 02:40:14",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Faction alliance existed in the engine but the cockpit only exposed IMPROVE, a second alliance silently succeeded, and allied space gave no patrol benefit, so diplomacy was neither visible nor meaningful.",
+        "benefits": "Players can see and use every diplomatic action, alliances are a one-time milestone, and allied patrols make friendly territory measurably safer.",
+        "risks": "contract: alliance must stay gated at standing 70 and the new allied flag must not apply to Unclaimed space; dependency: pirate_risk signature gains a default-False parameter; concurrency: diplomacy mutates standings, credits, allies and the flight log in one locked transaction; state: allies must persist and duplicate formation must be refused.",
+        "mitigation": "Add engine, pirate-risk and cockpit layout regressions first; default the new pirate_risk flag; gate allied reduction on a real faction; verify alliance formation in live Edge."
+      }
+    },
+    {
+      "task_id": "faction-alliances",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Duplicate alliance refusal, ALLIANCE FORMED flight log, allied pirate-risk modifier gated to claimed space, and Empire-tab IMPROVE/GIFT/ALLY/PETITION actions with ALLIED/WAR labels implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793317289.0255423,
+      "timestamp_str": "2026-10-30 02:41:29",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "faction-alliances",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-094 recorded; live Edge formed a Sol Coalition alliance; 829 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793317289.2365317,
+      "timestamp_str": "2026-10-30 02:41:29",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "faction-alliances",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'faction-alliances' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793317299.6089718,
+      "timestamp_str": "2026-10-30 02:41:39",
       "agent": "opencode:mechanics"
     }
   ]

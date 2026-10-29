@@ -1114,3 +1114,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Expose `GET/POST /api/trade/automation`, `autotrade status|on|off` in the CLI/REPL, and a Commerce-tab broker panel with commodity, thresholds, quantity and ENABLE/DISABLE controls.
   4. Persist realized credits and trade counts in the automation record; the status snapshot and UI show both.
 - **Consequences**: A docked captain can run a standing local market policy between other actions. The broker respects stock, cargo volume, credits, tariffs and faction pricing because it calls the normal `trade` path. In live Edge, enabling a fuel-cell buy at ?9999 executed three one-unit buys by tick 15 with no console errors. Suite: 826 tests (48 suites), 5/5 gates.
+
+### ADR-094: Visible Faction Diplomacy and Allied Patrols
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: `faction_diplomacy` supported improve, gift, alliance and ceasefire, but the Empire tab only exposed IMPROVE. Alliances were also repeatable (the second call silently succeeded) and allied territory had no effect beyond the generic ally bonus.
+- **Decision**:
+  1. Reject a second alliance with the same faction and keep the standing-70 gate.
+  2. Add IMPROVE, GIFT 300, ALLY and conditional PETITION 500 controls to every faction row, with disabled reasons and an `ALLIED` / `WAR` status label.
+  3. Make allied territory reduce pirate risk by 28% with an `allied patrol` reason, alongside the existing patrol-escort reduction.
+- **Consequences**: Faction alliances are discoverable from the cockpit, cannot be accidentally duplicated, and grant a concrete patrol benefit in allied space. The generic +5% trade margin and +3 combat damage from allied captains remain unchanged. Suite: 829 tests (50 suites), 5/5 gates.

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `93`
-- **Total Classes**: `244`
+- **Total Python Modules**: `94`
+- **Total Classes**: `246`
 - **Total Top-Level Functions**: `309`
-- **Total Class Methods**: `1413`
-- **Total Source Lines**: `38821`
+- **Total Class Methods**: `1418`
+- **Total Source Lines**: `38896`
 
 ---
 
@@ -106,6 +106,19 @@
   - Method `.test_calendar_date_advances_and_rolls_over_months()`
   - Method `.test_time_payload_exposes_date()`
   - Method `.test_engine_tick_updates_calendar_date()`
+
+---
+
+### [`tests/test_alliances.py`](tests/test_alliances.py)
+> *Faction alliances: formation rules, allied patrols and the command-card wiring.*
+
+**Size**: `40` lines (`1510` bytes)
+
+**Classes:**
+- `class FactionAllianceTest`
+  - Method `.setUp()`
+  - Method `.test_alliance_requires_standing_and_forms_once()`
+  - Method `.test_allied_territory_reduces_pirate_risk()`
 
 ---
 
@@ -244,7 +257,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1286` lines (`58752` bytes)
+**Size**: `1306` lines (`59474` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -442,6 +455,9 @@
 - `class TestTradeAutomationCockpit` - *The Commerce tab must expose the docked auto-trade broker.*
   - Method `.setUpClass()`
   - Method `.test_market_tab_holds_the_broker_controls()`
+- `class TestDiplomacyActionsCockpit` - *Faction rows must expose improve, gift, alliance and ceasefire actions.*
+  - Method `.setUpClass()`
+  - Method `.test_diplomacy_rows_offer_the_full_action_set()`
 
 ---
 
@@ -2048,7 +2064,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8053` lines (`399042` bytes)
+**Size**: `8064` lines (`399599` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2669,13 +2685,13 @@
 ### [`voidfarer/pirates.py`](voidfarer/pirates.py)
 > *Pirate bands, toll encounters, and deterministic raid generation.*
 
-**Size**: `102` lines (`3266` bytes)
+**Size**: `106` lines (`3370` bytes)
 
 **Classes:**
 - `class PirateRisk`
 
 **Functions:**
-- `def pirate_risk(system, faction_standing, has_escort, evasion, patrol_escorts)` - *Risk of a pirate toll encounter in a system, before the engine RNG roll.*
+- `def pirate_risk(system, faction_standing, has_escort, evasion, patrol_escorts, allied)` - *Risk of a pirate toll encounter in a system, before the engine RNG roll.*
 - `def generate_pirate_encounter(system, seed, threat_level, standing)` - *Build a deterministic pirate toll encounter for one jump or orbit.*
 
 ---
