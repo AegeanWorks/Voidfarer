@@ -99,6 +99,13 @@
                         <label class="setting-row"><span>Travel animation</span><input type="checkbox" id="settingAnimation" checked></label>
                         <label class="setting-row"><span>Pause time on hostile intercept or new event</span><input type="checkbox" id="settingAutoPause" checked></label>
                         <label class="setting-row"><span>Claim finished contracts automatically</span><input type="checkbox" id="settingAutoClaim"></label>
+                        <label class="setting-row"><span>Quick-time decision cadence</span>
+                            <select id="settingDecisionCadence" data-testid="setting-decision-cadence">
+                                <option value="relaxed">RELAXED (rare)</option>
+                                <option value="normal" selected>NORMAL</option>
+                                <option value="frequent">FREQUENT</option>
+                            </select>
+                        </label>
                         <label class="setting-row"><span>Default market order lot</span>
                             <select id="settingTradeLot">
                                 <option value="1">×1</option>
@@ -226,6 +233,7 @@
                 <div class="hud-title-group">
                     <h1 class="hud-glitch-title" data-text="VOIDFARER">VOIDFARER</h1>
                     <span class="hud-sub">WINDOWS COMMAND DECK // v0.2.0</span>
+                    <span class="hud-aikit" id="aikitLink" data-testid="aikit-link" title="AIKit project memory, action catalog and headless AI play harness are online">AIKIT LINK // AGENT API</span>
                 </div>
             </div>
 
@@ -923,6 +931,8 @@
                             <button class="btn-action btn-red" id="btnSalvageTarget" style="display:none;" disabled>BOARD DERELICT</button>
                             <button class="btn-action btn-amber" id="btnScoopFuel" style="display:none;" disabled>SCOOP FUEL</button>
                             <button class="btn-action btn-purple" id="btnJumpTarget" style="display:none;" disabled>HYPERSPACE JUMP</button>
+                            <button class="btn-action btn-cyan" id="btnHailTarget" style="display:none;" data-testid="hail-target" disabled>HAIL SHIP</button>
+                            <button class="btn-action" id="btnClearTarget" style="display:none;" data-testid="clear-target" title="Clear the selected target">CLEAR</button>
                         </div>
                         <div class="surface-ops" id="surfaceOps" style="display:none;" aria-live="polite"></div>
                     </div>

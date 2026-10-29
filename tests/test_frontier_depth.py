@@ -170,6 +170,32 @@ class DecisionEventTest(unittest.TestCase):
         self.assertEqual(engine.state.ship.credits, credits - 300)
         self.assertIn(definition.id, engine.state.decision_history)
 
+    def test_decisions_are_rate_limited_by_the_cadence_window(self):
+        engine = SimulationEngine(seed=42)
+        engine.allow_decision_events = True
+        engine.set_decision_cadence("relaxed")
+        self.assertEqual(engine._decision_cooldown(), 36)
+        tick = engine.state.time.tick
+        engine.state = engine._clone_state(
+            stats={**engine.state.stats, "last_decision_tick": tick},
+        )
+        self.assertEqual(engine.decisions_ready_in(), 36)
+        self.assertIsNone(engine.maybe_trigger_decision("tick"), "inside the window no prompt may open")
+        engine.state = engine._clone_state(
+            stats={**engine.state.stats, "last_decision_tick": tick - 40},
+        )
+        self.assertEqual(engine.decisions_ready_in(), 0)
+
+    def test_cadence_choices_and_snapshot(self):
+        engine = SimulationEngine(seed=42)
+        ok, msg = engine.set_decision_cadence("frequent")
+        self.assertTrue(ok, msg)
+        self.assertTrue(engine.set_decision_cadence("normal")[0])
+        self.assertFalse(engine.set_decision_cadence("always")[0])
+        settings = engine.get_status_snapshot()["settings"]
+        self.assertEqual(settings["decision_cadence"], "normal")
+        self.assertIn("relaxed", settings["decision_cadences"])
+
     def test_low_hull_event_is_eligible(self):
         engine = SimulationEngine(seed=42)
         engine.state = engine._clone_state(ship=engine._clone_ship(hull=10))

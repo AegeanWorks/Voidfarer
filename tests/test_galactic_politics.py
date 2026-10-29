@@ -210,6 +210,81 @@ class TestWarSupport(unittest.TestCase):
         self.assertTrue(any(f["id"] == "sol_coalition" for f in politics["factions"]))
 
 
+def _engine_third_party_war(credits=5000, war_score=8.0, active=True):
+    engine = SimulationEngine(seed=42)
+    war = WarState(
+        id="w_third",
+        attacker_id="nebula_collective",
+        defender_id="precursor_watch",
+        started_tick=0,
+        war_score=war_score,
+        active=active,
+    )
+    engine.state = engine._clone_state(wars=(war,), ship=engine._clone_ship(credits=credits))
+    return engine
+
+
+class TestCaptainDiplomacyLimits(unittest.TestCase):
+    """A privateer captain petitions; they never command sovereign war and peace."""
+
+    def test_a_captain_cannot_declare_war(self):
+        engine = SimulationEngine(seed=42)
+        ok, msg = engine.faction_diplomacy("vanguard_syndicate", "declare_war")
+        self.assertFalse(ok)
+        self.assertIn("captain", msg)
+        self.assertFalse(any(w.active for w in engine.state.wars))
+
+    def test_cannot_petition_a_war_you_are_not_in(self):
+        engine = _engine_third_party_war()
+        ok, msg = engine.faction_diplomacy("nebula_collective", "ceasefire")
+        self.assertFalse(ok)
+        self.assertIn("No active war", msg)
+        self.assertTrue(engine.state.wars[0].active, "third-party wars are not the captain's to end")
+
+    def test_petition_needs_the_envoy_fee(self):
+        engine = _engine_at_war(credits=100)
+        ok, msg = engine.faction_diplomacy("nebula_collective", "ceasefire")
+        self.assertFalse(ok)
+        self.assertIn("envoy", msg)
+        self.assertTrue(engine.state.wars[0].active)
+        self.assertEqual(engine.state.ship.credits, 100)
+
+    def test_petition_acceptance_ends_the_war_and_charges_the_envoy(self):
+        engine = _engine_at_war()
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(
+                credits=5000,
+                faction_standings={"nebula_collective": 95},
+            ),
+        )
+        with patch.object(engine, "_stable_unit", return_value=0.0):
+            ok, msg = engine.faction_diplomacy("nebula_collective", "ceasefire")
+        self.assertTrue(ok, msg)
+        war = engine.state.wars[0]
+        self.assertFalse(war.active)
+        self.assertEqual(war.ended_tick, engine.state.time.tick)
+        self.assertEqual(engine.state.ship.credits, 5000 - engine.CEASEFIRE_ENVOY_COST)
+
+    def test_petition_refusal_is_reported_and_costs_nothing(self):
+        engine = _engine_at_war()
+        with patch.object(engine, "_stable_unit", return_value=0.999):
+            ok, msg = engine.faction_diplomacy("nebula_collective", "ceasefire")
+        self.assertFalse(ok)
+        self.assertIn("refuses", msg)
+        self.assertTrue(engine.state.wars[0].active)
+        self.assertEqual(engine.state.ship.credits, 5000)
+
+    def test_petition_odds_rise_with_standing_and_diplomacy(self):
+        engine = _engine_at_war()
+        war = engine.state.wars[0]
+        low = engine._ceasefire_chance("nebula_collective", war)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(faction_standings={"nebula_collective": 90}),
+        )
+        self.assertGreater(engine._ceasefire_chance("nebula_collective", war), low)
+        self.assertLessEqual(engine._ceasefire_chance("nebula_collective", war), 0.90)
+
+
 class TestWarSupportParity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -244,6 +319,40 @@ class TestWarSupportParity(unittest.TestCase):
                     self.assertEqual(main(["war", "support", "w_test", "sol_coalition", "600"]), 0)
                 self.assertIn("w_test", out.getvalue())
                 self.assertEqual(StorageManager(Path(home) / ".voidfarer").load().ship.credits, 5000 - 600)
+
+    def test_rest_ceasefire_is_a_petition(self):
+        engine = _engine_at_war()
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(credits=5000, faction_standings={"nebula_collective": 95}),
+        )
+        VoidFarerHandler.engine = engine
+        VoidFarerHandler.storage = StorageManager(self.temp_dir.name)
+        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=2)
+        body = json.dumps({"faction_id": "nebula_collective", "action": "ceasefire"})
+        with patch.object(engine, "_stable_unit", return_value=0.0):
+            conn.request("POST", "/api/diplomacy", body=body, headers={"Content-Type": "application/json"})
+            payload = json.loads(conn.getresponse().read())
+        conn.close()
+        self.assertTrue(payload["ok"], payload["message"])
+        self.assertFalse(payload["state"]["wars"][0]["active"])
+        self.assertEqual(payload["state"]["ship"]["credits"], 5000 - engine.CEASEFIRE_ENVOY_COST)
+
+    def test_cli_diplomacy_cannot_declare_war(self):
+        with TemporaryDirectory() as home:
+            with patch.dict("os.environ", {"LOCALAPPDATA": home, "HOME": home, "USERPROFILE": home}):
+                StorageManager(Path(home) / ".voidfarer").save(_engine_at_war().state)
+                with self.assertRaises(SystemExit), patch("sys.stderr", new_callable=io.StringIO):
+                    main(["diplomacy", "declare_war", "nebula_collective"])
+
+    def test_cli_war_list_marks_your_own_wars(self):
+        with TemporaryDirectory() as home:
+            with patch.dict("os.environ", {"LOCALAPPDATA": home, "HOME": home, "USERPROFILE": home}):
+                StorageManager(Path(home) / ".voidfarer").save(_engine_at_war().state)
+                with patch("sys.stdout", new_callable=io.StringIO) as out:
+                    self.assertEqual(main(["war", "list"]), 0)
+                text = out.getvalue()
+                self.assertIn("diplomacy ceasefire", text)
+                self.assertNotIn("mediate", text)
 
 
 if __name__ == "__main__":

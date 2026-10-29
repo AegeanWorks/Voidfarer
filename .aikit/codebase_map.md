@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `81`
-- **Total Classes**: `214`
-- **Total Top-Level Functions**: `291`
-- **Total Class Methods**: `1196`
-- **Total Source Lines**: `34656`
+- **Total Python Modules**: `87`
+- **Total Classes**: `222`
+- **Total Top-Level Functions**: `299`
+- **Total Class Methods**: `1250`
+- **Total Source Lines**: `35790`
 
 ---
 
@@ -55,6 +55,26 @@
   - Method `.setUpClass()`
   - Method `.test_api_and_cli_expose_the_new_mechanics()`
   - Method `.test_cockpit_exposes_new_action_buttons()`
+
+---
+
+### [`tests/test_agent_play.py`](tests/test_agent_play.py)
+> *The headless AI captain must be able to reach and exercise the game without a human.*
+
+**Size**: `94` lines (`4025` bytes)
+
+**Classes:**
+- `class AgentApiCatalogTest`
+  - Method `.setUpClass()`
+  - Method `.test_catalog_describes_every_post_route()`
+  - Method `.test_catalog_fields_match_the_endpoint_contract()`
+  - Method `.test_observations_include_state()`
+- `class AgentPlayTest`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.test_catalog_is_served_over_rest()`
+  - Method `.test_ai_captain_plays_without_a_human()`
+  - Method `.test_the_engine_state_stays_loadable_after_play()`
 
 ---
 
@@ -218,7 +238,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1064` lines (`47842` bytes)
+**Size**: `1112` lines (`50214` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -352,6 +372,8 @@
 - `class TestStrategyPanels` - *Strategy actions in the cockpit: war pledges, outpost founding and the monthly treasury.*
   - Method `.setUpClass()`
   - Method `.test_wars_panel_sits_in_the_factions_tab_and_pledges()`
+  - Method `.test_only_your_own_wars_offer_a_ceasefire_petition()`
+  - Method `.test_third_party_wars_never_expose_a_player_peace_button()`
   - Method `.test_outposts_are_founded_from_the_empire_tab()`
   - Method `.test_treasury_is_reported_per_month()`
 - `class TestPostPushPolishLayout` - *Contract header readability, compact reactor strip and deterministic surface scenario.*
@@ -361,6 +383,10 @@
   - Method `.test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths()`
   - Method `.test_compact_reactor_strip_uses_four_proportional_tracks()`
   - Method `.test_surface_ops_scrolls_target_card_and_browser_driver_prepares_surface()`
+  - Method `.test_factions_review_prepares_a_coalition_war_for_the_petition_control()`
+  - Method `.test_every_click_has_a_stable_handle_for_automation()`
+  - Method `.test_aikit_link_and_decision_cadence_are_visible()`
+  - Method `.test_every_static_button_can_be_identified_by_a_headless_driver()`
   - Method `.test_event_toasts_clear_the_left_terminal_at_720p()`
   - Method `.test_scroll_cue_text_meets_the_twelve_pixel_floor()`
   - Method `.test_compact_command_strip_controls_meet_the_24px_target()`
@@ -450,7 +476,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `390` lines (`18511` bytes)
+**Size**: `391` lines (`18610` bytes)
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -477,7 +503,7 @@
 - `class FactionDiplomacyWarTest`
   - Method `.setUp()`
   - Method `.test_leaders_generated_deterministically()`
-  - Method `.test_diplomacy_improve_and_declare_war()`
+  - Method `.test_diplomacy_improve_and_no_captain_declared_war()`
   - Method `.test_resolve_wars_captures_and_eliminates_faction()`
 - `class FleetAndNavigationTest`
   - Method `.setUp()`
@@ -662,7 +688,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `387` lines (`19202` bytes)
+**Size**: `413` lines (`20481` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
@@ -679,6 +705,8 @@
 - `class DecisionEventTest`
   - Method `.test_at_least_twenty_five_conditional_events()`
   - Method `.test_pending_decision_blocks_time_until_resolved()`
+  - Method `.test_decisions_are_rate_limited_by_the_cadence_window()`
+  - Method `.test_cadence_choices_and_snapshot()`
   - Method `.test_low_hull_event_is_eligible()`
 - `class QuantumFreightTest`
   - Method `.test_freight_costs_fee_arrives_later_and_progresses_delivery_contract()`
@@ -748,7 +776,7 @@
 ### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
 > *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
 
-**Size**: `250` lines (`11935` bytes)
+**Size**: `359` lines (`17199` bytes)
 
 **Classes:**
 - `class FixedRng` - *Noise-free rng: uniform returns a fixed value, choice takes the first item.*
@@ -775,15 +803,26 @@
   - Method `.test_support_spends_credits_shifts_score_and_standing()`
   - Method `.test_support_is_refused_when_it_cannot_apply()`
   - Method `.test_snapshot_exposes_territory_and_fronts()`
+- `class TestCaptainDiplomacyLimits` - *A privateer captain petitions; they never command sovereign war and peace.*
+  - Method `.test_a_captain_cannot_declare_war()`
+  - Method `.test_cannot_petition_a_war_you_are_not_in()`
+  - Method `.test_petition_needs_the_envoy_fee()`
+  - Method `.test_petition_acceptance_ends_the_war_and_charges_the_envoy()`
+  - Method `.test_petition_refusal_is_reported_and_costs_nothing()`
+  - Method `.test_petition_odds_rise_with_standing_and_diplomacy()`
 - `class TestWarSupportParity`
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
   - Method `.test_rest_support()`
   - Method `.test_cli_war_list_and_support()`
+  - Method `.test_rest_ceasefire_is_a_petition()`
+  - Method `.test_cli_diplomacy_cannot_declare_war()`
+  - Method `.test_cli_war_list_marks_your_own_wars()`
 
 **Functions:**
 - `def _owner_ids(systems, name)`
 - `def _engine_at_war(credits)`
+- `def _engine_third_party_war(credits, war_score, active)`
 
 ---
 
@@ -923,6 +962,24 @@
   - Method `.test_a_new_commander_pays_one_month_of_wages_per_month()`
   - Method `.test_cash_flow_reports_monthly_rates()`
   - Method `.test_month_end_report_is_logged_once_per_month()`
+
+---
+
+### [`tests/test_navigation_traffic.py`](tests/test_navigation_traffic.py)
+> *Open-space transit vectors and the NPC traffic that shares the map.*
+
+**Size**: `84` lines (`3572` bytes)
+
+**Classes:**
+- `class EmptySpaceTransitTest`
+  - Method `.test_waypoint_transit_does_not_promise_an_orbit()`
+  - Method `.test_arrival_holds_station_in_open_space()`
+  - Method `.test_waypoint_is_refused_outside_the_transit_envelope()`
+  - Method `.test_a_second_vector_cannot_be_plotted_mid_flight()`
+  - Method `.test_survey_and_orbit_actions_need_a_body()`
+  - Method `.test_waypoint_survives_a_save_round_trip()`
+- `class NpcTrafficTest`
+  - Method `.test_every_captain_has_a_place_on_the_map()`
 
 ---
 
@@ -1400,10 +1457,32 @@
 
 ---
 
+### [`tests/test_war_news_persistence.py`](tests/test_war_news_persistence.py)
+> *War news must survive a real save/load cycle, like every other game state.*
+
+**Size**: `48` lines (`2088` bytes)
+
+**Classes:**
+- `class WarNewsPersistenceTest`
+  - Method `.test_war_notifications_and_trimmed_log_survive_a_disk_round_trip()`
+  - Method `.test_a_reloaded_campaign_keeps_announcing_new_wars()`
+
+---
+
 ### [`tools/__init__.py`](tools/__init__.py)
 > *Developer proofs for VoidFarer.*
 
 **Size**: `1` lines (`38` bytes)
+
+---
+
+### [`tools/ai_play.py`](tools/ai_play.py)
+> *Play VoidFarer headlessly through the public API and report mechanic coverage.*
+
+**Size**: `69` lines (`2678` bytes)
+
+**Functions:**
+- `def main(argv)`
 
 ---
 
@@ -1430,13 +1509,14 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `391` lines (`17418` bytes)
+**Size**: `409` lines (`18161` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
 - `def _metrics(page)` - *Return viewport, scroll, element and tiny-text counts from the live page.*
 - `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll)` - *Open one real browser viewport, drive it and capture a true screenshot.*
 - `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
+- `def _prepare_factions(engine)` - *Advance a fresh campaign until the Coalition is at war, so the petition control renders.*
 - `def main(argv)` - *Run the browser review driver and write screenshots plus a small JSON report.*
 
 ---
@@ -1469,6 +1549,42 @@
 > *VoidFarer: Autonomous deep-space fleet, procedural galaxy, and holographic cockpit simulation engine.*
 
 **Size**: `4` lines (`159` bytes)
+
+---
+
+### [`voidfarer/agent_api.py`](voidfarer/agent_api.py)
+> *Discoverable action catalog so an AI can play every mechanic through the public API.*
+
+**Size**: `78` lines (`2653` bytes)
+
+**Functions:**
+- `def _sections(source)` - *Split the handler source into the GET and POST halves.*
+- `def _route_blocks(section)`
+- `def _fields(block)`
+- `def build_action_catalog(handler_cls)` - *Read the handler's own route table and describe every callable endpoint.*
+
+---
+
+### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
+> *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
+
+**Size**: `239` lines (`10128` bytes)
+
+**Classes:**
+- `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
+  - Method `.__init__(host, port, timeout)`
+  - Method `.get(path)`
+  - Method `.post(path, payload)`
+  - Method `._open(request)`
+- `class AiCaptain` - *A deterministic policy that exercises every mechanic family it can reach.*
+  - Method `.__init__(client, seed)`
+  - Method `.play(steps)`
+  - Method `._choose(step)`
+  - Method `._current_faction_id()`
+  - Method `._pick_body(prefer_unvisited)`
+  - Method `._cheapest_quote(quotes)`
+  - Method `._first_research_project()`
+  - Method `.report()`
 
 ---
 
@@ -1516,7 +1632,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2926` lines (`150080` bytes)
+**Size**: `2954` lines (`151715` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1540,6 +1656,7 @@
 - `def cmd_upgrades(engine, storage, parts)` - *Inspect and purchase hardware modules from station arsenal.*
 - `def cmd_combat(engine, storage, parts)` - *Execute tactical combat maneuvers during hostile intercepts.*
 - `def cmd_war(engine, storage, action, args)` - *List active wars and their fronts, or pledge credits to one side.*
+- `def cmd_settings(engine, storage, action, args)` - *Show or change simulation options, chiefly how often quick-time decisions interrupt.*
 - `def cmd_factions(engine, storage, parts)` - *Inspect galactic sovereign factions, standings, active territory, and diplomatic perks.*
 - `def cmd_corporations(engine, storage, parts)` - *Inspect interstellar megacorporations, commercial specialties, and corporate standing.*
 - `def cmd_contracts(engine, storage, parts)` - *Inspect dynamic sector bounties, claim completed contracts, and trigger fresh assignments.*
@@ -1697,7 +1814,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7255` lines (`360805` bytes)
+**Size**: `7509` lines (`373174` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1743,6 +1860,8 @@
   - Method `._transit_risk(system, mode, effects)` - *Sector hazard risk for one in-system transit, reduced by piloting and quantum drive.*
   - Method `._travel_plan(body_id, mode)` - *Compute a transit plan without mutating state; shared by preview and execution.*
   - Method `.preview_travel(body_id, mode)` - *Return ETA, fuel, risk and hazard names for a potential transit.*
+  - Method `._point_travel_plan(waypoint_au, waypoint_angle, mode)` - *Plan a transit to an empty-space vector, measured from the system's star.*
+  - Method `.start_travel_to_point(waypoint_au, waypoint_angle, mode)` - *Fly to an empty-space vector instead of a body: no orbit is established on arrival.*
   - Method `.start_travel(body_id, mode)` - *Initiate sublight or quantum in-system transit toward a celestial body.*
   - Method `.scan()` - *Perform sensor sweep of current body or local space.*
   - Method `.route_power(engines, shields, sensors, weapons)` - *Adjust reactor power distribution across ship subsystems.*
@@ -1823,6 +1942,7 @@
   - Property `.current_chassis_id` - *Id of the chassis matching the ship's commissioned class (falls back to the class name).*
   - Method `.get_status_snapshot(include_static)` - *Produce a JSON serializable telemetry snapshot for the HUD.*
   - Method `.support_war(war_id, faction_id, credits)` - *Pledge credits to one side of an active war: shifts its score and your standings.*
+  - Method `._ceasefire_chance(faction_id, war)` - *Odds a petition is accepted: standing, diplomacy skill and how the war is going.*
   - Method `.galactic_politics()` - *Territory, borders and war fronts for the strategic map and the factions panel.*
   - Method `.get_quests()` - *Return a unified quest panel view of the story chapter and active contracts.*
   - Method `._find_ai_captain(captain_id)`
@@ -1848,6 +1968,10 @@
   - Method `.form_alliance(captain_id)`
   - Method `._decision_lock_reason()`
   - Method `._action_lock_reason()` - *Reason flight or exploration actions are frozen (decision or pirate toll).*
+  - Method `._decision_cooldown()`
+  - Method `._decision_chance_multiplier()`
+  - Method `.set_decision_cadence(cadence)` - *Choose how often blocking quick-time decisions may interrupt the flight.*
+  - Method `.decisions_ready_in()` - *Ticks left before another blocking decision may open.*
   - Method `.maybe_trigger_decision(trigger)` - *Evaluate conditional events and open at most one blocking decision.*
   - Method `.resolve_decision(choice_id)` - *Apply a decision choice; time and flight remain locked until this succeeds.*
   - Method `.tick(num_ticks)` - *Advance the simulation universe by num_ticks.*
@@ -1982,7 +2106,7 @@
 ### [`voidfarer/frontier.py`](voidfarer/frontier.py)
 > *Frontier systems: autonomous captains, depots, mercenaries, and quantum messages.*
 
-**Size**: `176` lines (`6939` bytes)
+**Size**: `180` lines (`7193` bytes)
 
 **Functions:**
 - `def generate_ai_captains(systems, seed)` - *Create a deterministic roster of autonomous captains distributed across the galaxy.*
@@ -2081,7 +2205,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2136` lines (`78867` bytes)
+**Size**: `2141` lines (`79298` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -2170,7 +2294,7 @@
   - Property `.faction_reputation`
   - Method `.to_dict()`
   - Method `.from_dict(data)`
-- `class TravelState` - *In-system transit between two celestial bodies.*
+- `class TravelState` - *In-system transit to a celestial body or to an empty-space vector.*
   - Method `.progress(current_tick)`
   - Method `.to_dict()`
   - Method `.from_dict(data)`
@@ -2353,7 +2477,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1284` lines (`54704` bytes)
+**Size**: `1313` lines (`55984` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

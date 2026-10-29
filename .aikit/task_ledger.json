@@ -1,101 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "galactic-war-news",
+    "task_id": "captain-powers",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793260502.1336489,
-    "owner": "kilo:1",
-    "started_by": "kilo:1",
+    "updated_at": 1793275922.7021086,
+    "owner": "kilo:2",
+    "started_by": "kilo:2",
     "continuations": [],
-    "completed_at": 1793260587.17077
+    "completed_at": 1793275996.714927
   },
   "checkpoints": [
-    {
-      "task_id": "galaxy-population-economy",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[6/6] Added legacy-save migration regression (strip new fields, load, reload idempotent, war-killed world stays empty); tests 659. checklists: passed.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793111913.248364,
-      "timestamp_str": "2026-10-27 17:38:33",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "4/4 gates, UI closed",
-        "next": "commit, complete task and push",
-        "open": "none",
-        "evidence": "unittest 659 OK, legacy migration check"
-      }
-    },
-    {
-      "task_id": "galaxy-population-economy",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'galaxy-population-economy' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793111974.241033,
-      "timestamp_str": "2026-10-27 17:39:34",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "faction-trade-tech-drift",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/6] Plan player-visible faction economy, hyperlane trade links severed by war, and slow faction/world technology drift that raises carrying capacity.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793114649.5350766,
-      "timestamp_str": "2026-10-27 18:24:09",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "Faction economy is visible but opaque, trade income is an abstract formula with no partners, and world tech levels never change, so the demographic model is static.",
-        "benefits": "Players can read where a faction's money comes from and goes, peaceful neighbours profit from real trade, war cuts those links, and long games see technology raise population ceilings.",
-        "risks": "contract: GameState/FactionEconomy schema additions; dependency: stdlib only; concurrency: tick ordering between trade, economy and population; state: derived trade links must round-trip",
-        "mitigation": "Backward-compatible defaults, deterministic formulas, focused unit tests, UI task with vision review, full gates"
-      },
-      "handoff": {
-        "state": "planning",
-        "next": "schema",
-        "open": "trade link formula",
-        "evidence": "none"
-      }
-    },
-    {
-      "task_id": "faction-trade-tech-drift",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/6] TradeLink schema, derived hyperlane trade, trade income/partners, faction tech progression and world capacity drift implemented; 671 tests pass. checklists: passed.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793117297.365508,
-      "timestamp_str": "2026-10-27 19:08:17",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "4/4 gates",
-        "next": "backend commit then cockpit breakdown",
-        "open": "UI layer",
-        "evidence": "unittest 671 OK, 11 links, TL drift"
-      }
-    },
-    {
-      "task_id": "faction-trade-tech-drift",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/6] Backend trade/tech layer verified, README tree updated for faction_trade.py; 671 tests pass. checklists: passed.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793117714.7045174,
-      "timestamp_str": "2026-10-27 19:15:14",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "4/4 gates",
-        "next": "backend commit then cockpit breakdown",
-        "open": "UI layer",
-        "evidence": "gates 4/4"
-      }
-    },
     {
       "task_id": "faction-trade-tech-drift",
       "phase": "in_progress",
@@ -339,6 +255,75 @@
       "timestamp": 1793260587.1707711,
       "timestamp_str": "2026-10-29 10:56:27",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "war-mediation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/6] Plan player-brokered mediation of AI-AI wars: spend credits to push a front toward a ceasefire, earn standing with both belligerents, and surface it in CLI, REST and the cockpit war cards. Also adopt the leftover war-news persistence regression test.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793263793.3345115,
+      "timestamp_str": "2026-10-29 11:49:53",
+      "agent": "kilo:2",
+      "impact_assessment": {
+        "why": "War news made galactic conflict visible (ADR-081), but the player can only bankroll a side or declare/leave their own wars; there is no pacifist lever to stop a war between third parties, and the leftover persistence test would otherwise be lost.",
+        "benefits": "Adds a diplomacy-skill and credit sink that ends AI wars, gains standing with both sides, produces peace headlines, and completes the war-news story with player agency.",
+        "risks": "contract: status/wars payload and endpoint additions only; dependency: stdlib only; concurrency: mutation under engine lock like support_war; state: war score/active/ended_tick already serialized, no schema change",
+        "mitigation": "Backward-compatible fields, deterministic score maths, failing-first engine/REST/CLI tests, cockpit contract tests, G-015 vision review, full aikit check"
+      }
+    },
+    {
+      "task_id": "war-mediation",
+      "phase": "phase 3",
+      "phase_num": 3,
+      "description": "[2/6] Engine mediate_war: third-party only, 300 cr minimum, diplomacy-scaled shift, both-side standing, peace headline on settlement, 50-event cap; 717-test baseline target. [3/6] CLI 'war mediate' and POST /api/war/mediate parity. [4/6] Factions war cards gained MEDIATE CEASEFIRE / 600 with CSS contract.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793264771.470343,
+      "timestamp_str": "2026-10-29 12:06:11",
+      "agent": "kilo:2",
+      "handoff": {
+        "state": "implementation done",
+        "next": "G-015 visual review then docs/gates",
+        "evidence": "715 tests OK"
+      }
+    },
+    {
+      "task_id": "captain-powers",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[6/6] Delivered captain-scale petition ceasefire (no declare/mediate), open-space vectors with fuel/hazard ETA, NPC hulls on both maps, rate-limited decision cadence with settings, action catalog + headless AI captain + stable click handles, AIKit link. checklists: passed. G-015 vision review approved; gates 4/4; suite 739.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793275922.7021086,
+      "timestamp_str": "2026-10-29 15:12:02",
+      "agent": "kilo:2",
+      "handoff": {
+        "state": "complete and reviewed",
+        "next": "commit the working tree",
+        "evidence": "739 tests OK, aikit check 4/4, zero UI audit findings"
+      }
+    },
+    {
+      "task_id": "war-mediation",
+      "phase": "superseded",
+      "phase_num": 3,
+      "description": "Superseded by 'captain-powers' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1793275922.7021086,
+      "timestamp_str": "2026-10-29 15:12:02",
+      "agent": "kilo:2"
+    },
+    {
+      "task_id": "captain-powers",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'captain-powers' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793275996.7149284,
+      "timestamp_str": "2026-10-29 15:13:16",
+      "agent": "kilo:2"
     }
   ]
 }

@@ -313,6 +313,36 @@ python -m voidfarer.cli war list
 python -m voidfarer.cli war support w_1 vanguard_syndicate 800
 ```
 
+A ship's captain commands no sovereign power: the Coalition's wars are not yours to start,
+and third-party wars are not yours to end. If your own polity is at war, you can send an
+envoy to petition the enemy leadership (`diplomacy ceasefire <faction_id>`, 500 cr only if
+they accept). Everything else ends by exhaustion, capture or a bankrupt treasury.
+
+### 14b. Empty-Space Vectors, NPC Traffic & Decision Cadence
+
+Clicking empty space on the orbital radar selects a vector instead of clearing the
+target: `TRANSIT & ORBIT` becomes `MOVE TO VECTOR`, and on arrival the ship holds station
+in the void with no body in orbit. NPC captains are drawn on both maps (system radar and
+galaxy) and can be selected and hailed from their target card.
+
+```bash
+# Rare, normal or frequent blocking quick-time decisions (normal = one per 14 ticks)
+python -m voidfarer.cli settings decisions relaxed
+python -m voidfarer.cli settings show
+```
+
+### 14c. Headless AI Play & Testable Clicks
+
+Every mechanic is reachable without a human. `GET /api/agent/actions` publishes the
+action catalog scraped from the server's own route table, `window.voidfarerClickMap()`
+enumerates every cockpit control with a stable `data-testid`, and the bundled captain
+plays a full campaign through the same HTTP API the UI uses.
+
+```bash
+python tools/ai_play.py --steps 60            # human-readable mechanic coverage
+python tools/ai_play.py --steps 60 --json     # machine-readable report
+```
+
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
 # Check the in-game calendar date, stardate, and active simulation tick

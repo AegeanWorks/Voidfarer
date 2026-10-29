@@ -297,6 +297,20 @@ def _prepare_surface(engine: SimulationEngine) -> Optional[str]:
     return target.id if ok else None
 
 
+def _prepare_factions(engine: SimulationEngine) -> bool:
+    """Advance a fresh campaign until the Coalition is at war, so the petition control renders."""
+    def coalition_at_war() -> bool:
+        return any(
+            war.active and "sol_coalition" in (war.attacker_id, war.defender_id)
+            for war in engine.state.wars
+        )
+    for _ in range(400):
+        if coalition_at_war():
+            return True
+        engine.tick(1)
+    return coalition_at_war()
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """Run the browser review driver and write screenshots plus a small JSON report."""
     parser = argparse.ArgumentParser(description="Playwright browser review for VoidFarer")
@@ -343,6 +357,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.scenario == "surface" and _prepare_surface(engine) is None:
             print("Why: no landable body was available for the surface scenario.")
             print("Fix: retry with a save that has a habitable body in the current system.")
+            return 1
+        if args.tab == "factions" and not _prepare_factions(engine):
+            print("Why: the Coalition was not at war within 400 ticks for the factions review.")
+            print("Fix: retry with a different seed or review another tab.")
             return 1
         url = f"http://127.0.0.1:{handle.port}/"
         with sync_playwright() as playwright:

@@ -943,7 +943,27 @@ def cmd_war(engine: SimulationEngine, storage: StorageManager, action: str, args
         lead = w["attacker"] if w["war_score"] >= 0 else w["defender"]
         print(f"  {w['id']}: {w['attacker']} vs {w['defender']}  score {w['war_score']:+.1f} ({lead} advancing)")
         print(f"    fronts: {len(w['fronts'])} lanes  captured: {', '.join(w['captured_systems']) or 'none'}")
+        if w.get("player_party"):
+            print(f"    {DIM}Your envoy can petition for a ceasefire: diplomacy ceasefire <faction_id>{RESET}")
     print(f"\n{DIM}Pledge credits: war support <war_id> <faction_id> <credits>{RESET}")
+    print(f"{DIM}Sovereign wars end without you: exhaustion, captures or a bankrupt side.{RESET}")
+    return 0
+
+
+def cmd_settings(engine: SimulationEngine, storage: StorageManager, action: str, args: list[str]) -> int:
+    """Show or change simulation options, chiefly how often quick-time decisions interrupt."""
+    if action == "decisions" and args:
+        ok, msg = engine.set_decision_cadence(args[0])
+        print((GREEN if ok else RED) + msg + RESET)
+        storage.save(engine.state)
+        return 0 if ok else 1
+    cadence = engine.decision_cadence
+    cooldown = engine._decision_cooldown()
+    ready_in = engine.decisions_ready_in()
+    print(f"\n{BOLD}{CYAN}SIMULATION SETTINGS{RESET}")
+    print(f"  Decision cadence: {YELLOW}{cadence}{RESET} (one prompt per {cooldown} ticks)")
+    print(f"  Next decision possible in {ready_in} tick(s)")
+    print(f"{DIM}Change it: settings decisions relaxed|normal|frequent{RESET}")
     return 0
 
 
@@ -2280,6 +2300,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_factions(engine, storage, parts)
         elif cmd in ("war", "wars"):
             cmd_war(engine, storage, parts[1].lower() if len(parts) > 1 else "list", parts[2:])
+        elif cmd in ("settings", "options"):
+            cmd_settings(engine, storage, parts[1].lower() if len(parts) > 1 else "show", parts[2:])
         elif cmd in ("corps", "corporations", "corp"):
             cmd_corporations(engine, storage, parts)
         elif cmd in ("time", "chrono", "tick", "wait"):
@@ -2560,6 +2582,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     surface_p.add_argument("action", nargs="?", default="list", choices=["list", "op"])
     surface_p.add_argument("operation_id", nargs="?", help="Surface operation id")
 
+    settings_p = subparsers.add_parser("settings", help="Simulation options such as decision cadence")
+    settings_p.add_argument("action", nargs="?", default="show", choices=["show", "decisions"])
+    settings_p.add_argument("value", nargs="?", help="relaxed, normal or frequent")
+
     subparsers.add_parser("salvage", help="Board the derelict at the current body")
     subparsers.add_parser("scoop", help="Scoop fuel from a star, gas giant, or ice body")
 
@@ -2582,7 +2608,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     outpost_p.add_argument("body_id", nargs="?", help="Body id for construction")
 
     diplomacy_p = subparsers.add_parser("diplomacy", help="Faction diplomacy, leaders, and wars")
-    diplomacy_p.add_argument("action", nargs="?", default="list", choices=["list", "improve", "gift", "alliance", "declare_war", "peace"])
+    diplomacy_p.add_argument("action", nargs="?", default="list", choices=["list", "improve", "gift", "alliance", "ceasefire"])
     diplomacy_p.add_argument("faction_id", nargs="?", help="Faction id")
     diplomacy_p.add_argument("amount", nargs="?", type=int, default=0, help="Aid amount")
 
@@ -2725,6 +2751,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_factions(engine, storage, ["factions"])
     elif args.command == "war":
         return cmd_war(engine, storage, args.action, args.args)
+    elif args.command == "settings":
+        return cmd_settings(engine, storage, args.action, [args.value] if args.value else [])
     elif args.command == "corps":
         return cmd_corporations(engine, storage, ["corps"])
     elif args.command == "corporations":

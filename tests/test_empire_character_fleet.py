@@ -233,15 +233,16 @@ class FactionDiplomacyWarTest(unittest.TestCase):
         self.assertEqual(len(first), len(CANONICAL_FACTIONS))
         self.assertTrue(all(l.behavior for l in first))
 
-    def test_diplomacy_improve_and_declare_war(self):
+    def test_diplomacy_improve_and_no_captain_declared_war(self):
         before = self.engine.state.ship.faction_standings.get("vanguard_syndicate", 0)
         ok, _ = self.engine.faction_diplomacy("vanguard_syndicate", "improve")
         self.assertTrue(ok)
         self.assertGreater(self.engine.state.ship.faction_standings["vanguard_syndicate"], before)
 
-        ok, _ = self.engine.faction_diplomacy("vanguard_syndicate", "declare_war")
-        self.assertTrue(ok)
-        self.assertTrue(any(
+        ok, msg = self.engine.faction_diplomacy("vanguard_syndicate", "declare_war")
+        self.assertFalse(ok, "a captain has no authority to declare war")
+        self.assertIn("captain", msg)
+        self.assertFalse(any(
             w.active and "vanguard_syndicate" in (w.attacker_id, w.defender_id)
             for w in self.engine.state.wars
         ))

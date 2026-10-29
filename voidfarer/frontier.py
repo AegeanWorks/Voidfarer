@@ -52,6 +52,10 @@ def generate_ai_captains(systems: dict[str, StarSystem], seed: int = 42) -> tupl
     """Create a deterministic roster of autonomous captains distributed across the galaxy."""
     rng = random.Random(seed + 9001)
     system_ids = sorted(systems)
+    # The home system always carries traffic: a captain in local space is the difference
+    # between an empty map and a living one on the first screen.
+    if "sol" in systems:
+        system_ids = ["sol"] + [sid for sid in system_ids if sid != "sol"]
     captures: list[AICaptain] = []
     for index, (captain_id, name, archetype) in enumerate(AI_CAPTAIN_SEEDS):
         system_id = system_ids[index % len(system_ids)] if system_ids else "sol"

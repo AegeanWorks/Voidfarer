@@ -6471,6 +6471,19 @@ body.cockpit-theme {
     text-shadow: none;
 }
 .hud-sub { color: var(--console-muted); font-size: 12px; letter-spacing: 0.1em; }
+.hud-aikit {
+    display: inline-block;
+    margin-top: 3px;
+    padding: 1px 6px;
+    border: 1px solid rgba(127, 183, 201, 0.45);
+    border-radius: 2px;
+    color: var(--neon-cyan);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+    white-space: nowrap;
+}
 .hud-top-actions {
     padding: 7px 10px;
     border: 0;
@@ -8149,6 +8162,8 @@ body.cockpit-theme .panel-center {
 .war-meta { color: var(--console-muted); font-size: 12px; }
 .war-actions { display: flex; gap: 6px; margin-top: 7px; }
 .war-actions .btn-hud { flex: 1 1 0; min-width: 0; min-height: 28px; padding: 3px 6px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.war-mediate { display: flex; margin-top: 6px; }
+.war-mediate .btn-hud { flex: 1 1 100%; min-height: 28px; font-size: 12px; }
 .outpost-build { display: flex; flex-direction: column; margin-top: 8px; }
 
 

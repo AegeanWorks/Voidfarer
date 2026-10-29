@@ -438,6 +438,8 @@ class CockpitApp {
         this.btnScoopFuel = document.getElementById("btnScoopFuel");
         this.salvageInfo = document.getElementById("salvageInfo");
         this.btnJumpTarget = document.getElementById("btnJumpTarget");
+        this.btnHailTarget = document.getElementById("btnHailTarget");
+        this.btnClearTarget = document.getElementById("btnClearTarget");
         this.targetGravity = document.getElementById("targetGravity");
         this.targetAtmosphere = document.getElementById("targetAtmosphere");
         this.targetTemp = document.getElementById("targetTemp");
@@ -758,6 +760,16 @@ class CockpitApp {
         this.btnOrbitTarget.addEventListener("click", () => this.handleTravelAction("sublight"));
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
         this.btnJumpTarget.addEventListener("click", () => this.handleJumpAction());
+        this.btnHailTarget?.addEventListener("click", () => {
+            if (this.selectedType === "captain" && this.selectedTarget) {
+                this.handleAIAction(this.selectedTarget.id, "hail");
+            }
+        });
+        this.btnClearTarget?.addEventListener("click", () => {
+            this.selectedTarget = null;
+            this.selectedType = null;
+            this.updateTargetCard();
+        });
 
         // Power Sliders
         const sliders = [this.sliderEng, this.sliderShd, this.sliderSen, this.sliderWep];
@@ -881,6 +893,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             "settingDensity", "settingUiScale", "settingRememberTab", "settingAutoPause", "settingAutoClaim", "settingTradeLot",
         ].forEach(id => {
             document.getElementById(id)?.addEventListener("input", () => this.applySettingsFromUI());
+        });
+        document.getElementById("settingDecisionCadence")?.addEventListener("change", (event) => {
+            this.postAction("/api/settings/decisions", { cadence: event.target.value });
         });
         document.getElementById("btnResetSettings")?.addEventListener("click", () => this.resetSettings());
         document.querySelectorAll(".settings-nav-item").forEach(link => {
@@ -1464,7 +1479,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     renderHUD() {
         if (!this.state) return;
-        
+
+        // The server owns decision cadence, so mirror it back into the settings select.
+        const cadenceSelect = document.getElementById("settingDecisionCadence");
+        const cadence = (this.state.settings || {}).decision_cadence;
+        if (cadenceSelect && cadence && cadenceSelect.value !== cadence) {
+            cadenceSelect.value = cadence;
+        }
+
         // Safety: if state somehow loaded but game not started, show menu
         if (!this.gameStarted) {
             this.openMainMenu();
@@ -4309,6 +4331,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.targetDesc.textContent = (b.scan_completed ? b.scan_discovery : "Uncharted body. Orbital sensor sweep required.") + surveyNote;
             this.btnOrbitTarget.style.display = "inline-block";
             this.btnJumpTarget.style.display = "none";
+            if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
+            if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
             const inOrbitHere = (this.state.ship.orbiting_body_id === b.id && !travel);
             const inTransitHere = Boolean(travel && travel.destination_body_id === b.id);
             const hasTravel = Boolean(travel);
@@ -4413,6 +4437,87 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         : depleted ? "RESERVOIR DEPLETED" : "TANKS FULL";
                 }
             }
+        } else if (this.selectedType === "captain") {
+            const captain = (this.state.ai_captains || []).find(c => c.id === this.selectedTarget.id);
+            if (!captain) {
+                this.selectedTarget = null;
+                return this.updateTargetCard();
+            }
+            this.selectedTarget = captain;
+            this.targetType.textContent = `TARGET: ${String(captain.archetype || "unknown").toUpperCase()} HULL`;
+            this.targetName.textContent = captain.name;
+            this.targetDist.textContent = `${String(captain.system_id).toUpperCase()} // TRUST ${captain.trust} // STANDING ${captain.standing}`;
+            this.targetDesc.textContent = captain.description || "An independent hull running its own agenda.";
+            const cargo = Object.entries(captain.cargo || {}).map(([k, v]) => `${k} x${v}`).join(", ") || "empty hold";
+            this.targetGravity.textContent = `${captain.hull}/${captain.max_hull} hull`;
+            this.targetAtmosphere.textContent = captain.ally ? "allied" : (captain.hired ? "hired" : "independent");
+            this.targetTemp.textContent = `DMG ${captain.damage}`;
+            if (this.targetHabitability) this.targetHabitability.textContent = "--";
+            if (this.targetCapacity) this.targetCapacity.textContent = cargo;
+            if (this.targetTech) this.targetTech.textContent = "--";
+            this.targetMoons.textContent = "--";
+            if (this.targetFaction) this.targetFaction.textContent = captain.archetype;
+            if (this.targetPopulation) this.targetPopulation.textContent = `${captain.credits} cr`;
+            if (this.targetGovernment) this.targetGovernment.textContent = "--";
+            if (this.targetDevastation) this.targetDevastation.textContent = "--";
+            this.targetResources.innerHTML = "";
+            this.btnOrbitTarget.style.display = "none";
+            this.btnQuantumTarget.style.display = "none";
+            this.btnJumpTarget.style.display = "none";
+            this.btnLandTarget.style.display = "none";
+            this.btnSalvageTarget.style.display = "none";
+            this.btnScoopFuel.style.display = "none";
+            if (this.salvageInfo) this.salvageInfo.style.display = "none";
+            if (this.transitPlan) this.transitPlan.style.display = "none";
+            if (this.btnHailTarget) {
+                this.btnHailTarget.style.display = "inline-block";
+                this.btnHailTarget.disabled = false;
+            }
+            if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
+        } else if (this.selectedType === "point") {
+            const p = this.selectedTarget;
+            const orbBody = this.state.orbiting_body || (this.state.current_system?.bodies || []).find(x => x.id === this.state.ship?.orbiting_body_id) || null;
+            const originAu = Number(orbBody?.orbit_radius ?? 0);
+            const originAngle = Number(orbBody?.current_angle ?? 0);
+            const dx = Math.cos(p.angle) * p.au - Math.cos(originAngle) * originAu;
+            const dy = Math.sin(p.angle) * p.au - Math.sin(originAngle) * originAu;
+            const distAu = Math.max(0, Math.hypot(dx, dy));
+            const engPwr = this.state.ship?.power?.engines ?? 25;
+            const piloting = Number(this.state.character?.skills?.piloting ?? 1);
+            const engineFactor = Math.max(0.4, engPwr / 25.0) * (1.0 + Math.max(0, piloting - 1) * 0.04);
+            const estTicks = Math.max(1, Math.ceil(distAu / Math.max(0.35, 1.15 * engineFactor)));
+            this.targetType.textContent = "TARGET: OPEN SPACE";
+            this.targetName.textContent = `VECTOR ${p.au.toFixed(2)} AU`;
+            this.targetDist.textContent = `${distAu.toFixed(2)} AU TRANSIT // BEARING ${(p.angle * 180 / Math.PI).toFixed(0)} DEG`;
+            this.targetDesc.textContent = "Empty void: no body, no orbit. Hold station here to cut a lane, lie low, or wait out a patrol.";
+            this.targetGravity.textContent = "--";
+            this.targetAtmosphere.textContent = "vacuum";
+            this.targetTemp.textContent = "--";
+            if (this.targetHabitability) this.targetHabitability.textContent = "--";
+            if (this.targetCapacity) this.targetCapacity.textContent = "--";
+            if (this.targetTech) this.targetTech.textContent = "--";
+            this.targetMoons.textContent = "0";
+            if (this.targetFaction) this.targetFaction.textContent = "Unclaimed";
+            if (this.targetPopulation) this.targetPopulation.textContent = "Uninhabited";
+            if (this.targetGovernment) this.targetGovernment.textContent = "None";
+            if (this.targetDevastation) this.targetDevastation.textContent = "None";
+            this.targetResources.innerHTML = "";
+            const hasTravel = Boolean(travel);
+            this.btnOrbitTarget.style.display = "inline-block";
+            this.btnOrbitTarget.disabled = hasTravel;
+            this.btnOrbitTarget.textContent = hasTravel ? "TRANSIT LOCKED" : `MOVE TO VECTOR (${estTicks}T)`;
+            this.btnOrbitTarget.title = "Sublight transit to this empty-space vector; the ship holds station on arrival.";
+            this.btnQuantumTarget.style.display = "inline-block";
+            this.btnQuantumTarget.disabled = hasTravel;
+            this.btnQuantumTarget.textContent = hasTravel ? "TRANSIT LOCKED" : "QUANTUM VECTOR (1T)";
+            this.btnJumpTarget.style.display = "none";
+            this.btnLandTarget.style.display = "none";
+            this.btnSalvageTarget.style.display = "none";
+            this.btnScoopFuel.style.display = "none";
+            if (this.salvageInfo) this.salvageInfo.style.display = "none";
+            if (this.transitPlan) this.transitPlan.style.display = "none";
+            if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
+            if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
         } else if (this.selectedType === "system") {
             this.transitPreviewToken += 1;
             this.transitPreviewData = null;
@@ -4458,6 +4563,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.btnJumpTarget.style.display = "inline-block";
             this.btnJumpTarget.disabled = (!isConn || s.id === curSys.id);
             this.btnJumpTarget.textContent = (s.id === curSys.id) ? "CURRENT LOCATION" : (isConn ? "EXECUTE HYPERSPACE JUMP" : "OUT OF HYPERLANE RANGE");
+            if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
+            if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
         }
     }
 
@@ -4856,6 +4963,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.restore();
         }
 
+        this.drawSystemTraffic(ctx, cx, cy, auScale, now);
         this.drawTravelAnimation(ctx, cx, cy, auScale);
     }
 
@@ -4919,6 +5027,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         const transform = this.galaxyTransform(cx, cy);
         const scale = transform.scale;
+        const now = Date.now() * 0.001;
         const gx = transform.cx;
         const gy = transform.cy;
         const nodeScale = transform.nodeScale;
@@ -5022,7 +5131,112 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.fillText(label, lx, sy + 4 * nodeScale);
         });
 
+        this.drawGalaxyTraffic(ctx, transform, now);
         this.drawPoliticsLegend(ctx, politics);
+    }
+
+    // NPC traffic: every AI captain is somewhere, so every system with a hull shows one.
+    captainHash(id) {
+        let hash = 0;
+        const text = String(id || "");
+        for (let i = 0; i < text.length; i += 1) {
+            hash = (hash * 31 + text.charCodeAt(i)) % 1000003;
+        }
+        return hash;
+    }
+
+    captainMarker(captain, cx, cy, auScale, now, maxAu) {
+        const hash = this.captainHash(captain.id);
+        const baseAngle = (hash % 6283) / 1000;
+        const au = 0.3 + ((hash >> 7) % 1000) / 1000 * Math.max(1, maxAu * 0.7);
+        const drift = 0.02 + ((hash >> 13) % 100) / 100 * 0.10;
+        const angle = baseAngle + now * drift;
+        return { x: cx + Math.cos(angle) * au * auScale, y: cy + Math.sin(angle) * au * auScale, angle };
+    }
+
+    captainColor(captain) {
+        if (captain.archetype === "pirate") return "#e07a66";
+        if (captain.archetype === "mercenary") return "#c9a35a";
+        if (captain.ally) return "#8fbf9f";
+        return "#6fc3d7";
+    }
+
+    drawShipGlyph(ctx, x, y, angle, color, size) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle + Math.PI / 2);
+        ctx.beginPath();
+        ctx.moveTo(0, -size);
+        ctx.lineTo(size * 0.7, size * 0.8);
+        ctx.lineTo(0, size * 0.4);
+        ctx.lineTo(-size * 0.7, size * 0.8);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.restore();
+    }
+
+    systemTrafficPositions(cx, cy, auScale, now) {
+        const s = this.state;
+        if (!s || !s.current_system) return [];
+        const systemId = s.current_system.id;
+        const captains = (s.ai_captains || []).filter(c => c.system_id === systemId);
+        if (!captains.length) return [];
+        const maxAu = Math.max(1, ...s.current_system.bodies.map(b => b.orbit_radius || 0));
+        return captains.map(captain => ({
+            captain,
+            ...this.captainMarker(captain, cx, cy, auScale, now, maxAu),
+        }));
+    }
+
+    drawSystemTraffic(ctx, cx, cy, auScale, now) {
+        this.systemTrafficPositions(cx, cy, auScale, now).forEach(({ captain, x, y, angle }) => {
+            const pos = { x, y, angle };
+            const color = this.captainColor(captain);
+            const selected = this.selectedType === "captain" && this.selectedTarget && this.selectedTarget.id === captain.id;
+            this.drawShipGlyph(ctx, pos.x, pos.y, pos.angle, color, selected ? 7 : 5);
+            if (selected) {
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 12, 0, Math.PI * 2);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+            }
+            if (this.radarLabels || selected) {
+                ctx.font = "11px 'Share Tech Mono'";
+                ctx.fillStyle = color;
+                ctx.fillText(captain.name, pos.x + 9, pos.y - 6);
+            }
+        });
+    }
+
+    drawGalaxyTraffic(ctx, transform, now) {
+        const captains = (this.state && this.state.ai_captains) || [];
+        if (!captains.length) return;
+        const bySystem = new Map();
+        captains.forEach(c => {
+            if (!bySystem.has(c.system_id)) bySystem.set(c.system_id, []);
+            bySystem.get(c.system_id).push(c);
+        });
+        const nodeScale = Math.max(0.8, transform.nodeScale);
+        bySystem.forEach((list, systemId) => {
+            const system = this.galaxySystems[systemId];
+            if (!system) return;
+            const sx = transform.cx + system.x * transform.scale;
+            const sy = transform.cy + system.y * transform.scale;
+            list.slice(0, 4).forEach((captain, index) => {
+                const angle = now * 0.4 + index * 1.7;
+                const radius = 15 * nodeScale;
+                this.drawShipGlyph(
+                    ctx,
+                    sx + Math.cos(angle) * radius,
+                    sy + Math.sin(angle) * radius,
+                    angle + Math.PI / 2,
+                    this.captainColor(captain),
+                    3.4 * nodeScale,
+                );
+            });
+        });
     }
 
     drawStarGlyph(ctx, x, y, radius, color) {
@@ -5227,6 +5441,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     break;
                 }
             }
+            if (!hit) {
+                for (const traffic of this.systemTrafficPositions(cx, cy, auScale, Date.now() * 0.001)) {
+                    if (Math.hypot(mx - traffic.x, my - traffic.y) < 14) {
+                        hit = { item: traffic.captain, type: "captain" };
+                        break;
+                    }
+                }
+            }
         } else if (this.viewMode === "GALAXY") {
             const transform = this.galaxyTransform(cx, cy);
             const hitRadius = 18 * Math.max(1, transform.nodeScale);
@@ -5272,6 +5494,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     hit = true;
                     return;
                 }
+            }
+            for (const traffic of this.systemTrafficPositions(cx, cy, auScale, Date.now() * 0.001)) {
+                if (Math.hypot(mx - traffic.x, my - traffic.y) < 14) {
+                    this.selectedTarget = traffic.captain;
+                    this.selectedType = "captain";
+                    this.sound.playBeep(1000);
+                    this.updateTargetCard();
+                    hit = true;
+                    return;
+                }
+            }
+            // Nothing under the cursor: propose an open-space vector instead of doing nothing.
+            const dx = mx - cx;
+            const dy = my - cy;
+            const distanceAu = Math.hypot(dx, dy) / auScale;
+            if (distanceAu >= 0.05) {
+                this.selectedTarget = { au: distanceAu, angle: Math.atan2(dy, dx) };
+                this.selectedType = "point";
+                this.sound.playBeep(760, 0.05);
+                this.updateTargetCard();
+                hit = true;
             }
         } else if (this.viewMode === "GALAXY") {
             const transform = this.galaxyTransform(cx, cy);
@@ -5344,11 +5587,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const colors = {};
         ((this.state.galactic_politics || {}).factions || []).forEach(f => { colors[f.id] = this.safeColor(f.color); });
         const affordable = this.state.ship.credits >= 500;
+        const canAffordEnvoy = this.state.ship.credits >= 500;
         host.innerHTML = wars.map(w => {
             const lead = Math.max(-1, Math.min(1, w.war_score / 24));
             const attackerShare = Math.round(50 + lead * 50);
             const captured = (w.captured_systems || []).length;
             const pledge = id => (w.support || {})[id] || 0;
+            const enemy = w.attacker_id === "sol_coalition" ? w.defender_id : (w.defender_id === "sol_coalition" ? w.attacker_id : null);
             return `
                 <div class="war-card">
                     <div class="war-sides">
@@ -5365,12 +5610,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.attacker_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.attacker.split(" ")[0].toUpperCase())} / 500</button>
                         <button class="btn-hud" data-war="${this.escapeHtml(w.id)}" data-side="${this.escapeHtml(w.defender_id)}" ${affordable ? "" : "disabled"} title="${affordable ? "Pledge 500 cr to this side" : "Needs 500 cr to pledge support"}">BACK ${this.escapeHtml(w.defender.split(" ")[0].toUpperCase())} / 500</button>
                     </div>
+                    ${enemy ? `<div class="war-mediate">
+                        <button class="btn-hud" data-petition-ceasefire="${this.escapeHtml(enemy)}" ${canAffordEnvoy ? "" : "disabled"} title="${canAffordEnvoy ? "Send a 500 cr envoy to petition the enemy leadership for a ceasefire; they may refuse" : "An envoy costs 500 cr"}">PETITION CEASEFIRE / 500</button>
+                    </div>` : `<div class="war-meta">Sovereign war: only the powers themselves can end it.</div>`}
                     ${pledge(w.attacker_id) || pledge(w.defender_id) ? `<div class="war-meta">Your pledges: ${pledge(w.attacker_id)} / ${pledge(w.defender_id)} cr</div>` : ""}
                 </div>`;
         }).join("");
         host.querySelectorAll("[data-war]").forEach(btn => btn.addEventListener("click", () =>
             this.postAction("/api/war/support", {
                 war_id: btn.getAttribute("data-war"), faction_id: btn.getAttribute("data-side"), credits: 500,
+            }, "factions")
+        ));
+        host.querySelectorAll("[data-petition-ceasefire]").forEach(btn => btn.addEventListener("click", () =>
+            this.postAction("/api/diplomacy", {
+                faction_id: btn.getAttribute("data-petition-ceasefire"), action: "ceasefire",
             }, "factions")
         ));
     }
@@ -6021,7 +6274,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     async handleTravelAction(mode = "sublight") {
-        if (!this.selectedTarget || this.selectedType !== "body") return;
+        if (!this.selectedTarget) return;
+        if (this.selectedType === "point") {
+            const res = await this.postAction("/api/travel/point", {
+                distance_au: this.selectedTarget.au,
+                angle: this.selectedTarget.angle,
+                mode,
+            });
+            if (res && res.ok) this.selectedTarget = null;
+            this.updateTargetCard();
+            return;
+        }
+        if (this.selectedType !== "body") return;
         const fromId = this.state?.ship?.orbiting_body_id || null;
         const targetId = this.selectedTarget.id;
         const res = await this.postAction("/api/travel", { body_id: targetId, mode });
@@ -6221,9 +6485,57 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         }
     }
+
+    // Every control gets a stable handle so a headless test or AI can click it by name.
+    ensureTestId(element, index) {
+        if (element.dataset.testid) return element.dataset.testid;
+        let testId = "";
+        const identity = [
+            ["slot", "slot"], ["lot", "lot"], ["type", "drone"],
+            ["mode", "mode"], ["action", "action"],
+        ].find(([key]) => element.dataset[key] !== undefined && element.dataset[key] !== "");
+        if (element.id) {
+            testId = `id-${element.id}`;
+        } else if (identity) {
+            testId = `${identity[1]}-${element.dataset[identity[0]]}`;
+        } else {
+            const label = (element.textContent || element.getAttribute("aria-label") || element.value || "")
+                .trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+            testId = `${label || element.tagName.toLowerCase()}-${index}`;
+        }
+        element.dataset.testid = testId;
+        return testId;
+    }
+
+    clickMap() {
+        const selector = [
+            "button", "a[href]", "select", "input[type='range']", "input[type='checkbox']",
+            "[role='button']", "[data-action]", "[data-captain]", "[data-diplo]", "[data-tab]",
+            "[data-war]", "[data-petition-ceasefire]", "[data-mediate-war]", "[data-dismiss-event]",
+        ].join(",");
+        const controls = Array.from(document.querySelectorAll(selector))
+            .filter(element => !element.closest("[aria-hidden='true']"));
+        return controls.map((element, index) => ({
+            testid: this.ensureTestId(element, index),
+            tag: element.tagName.toLowerCase(),
+            id: element.id || null,
+            text: (element.textContent || element.getAttribute("aria-label") || "").trim().replace(/\s+/g, " ").slice(0, 48),
+            disabled: Boolean(element.disabled),
+            hidden: element.offsetParent === null,
+            action: element.getAttribute("data-action")
+                || element.getAttribute("data-tab")
+                || element.getAttribute("data-captain")
+                || element.getAttribute("data-diplo")
+                || null,
+        }));
+    }
 }
 
 // Instantiate on load
 window.addEventListener("DOMContentLoaded", () => {
     window.cockpit = new CockpitApp();
 });
+
+// Stable handles for automated play: no human needed to enumerate or click the cockpit.
+window.voidfarerClickMap = () => (window.cockpit ? window.cockpit.clickMap() : []);
+window.voidfarerAgentActions = () => fetch("/api/agent/actions").then(response => response.json());

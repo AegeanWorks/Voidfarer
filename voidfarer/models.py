@@ -993,15 +993,17 @@ class StoryState:
 
 @dataclass(frozen=True)
 class TravelState:
-    """In-system transit between two celestial bodies."""
+    """In-system transit to a celestial body or to an empty-space vector."""
 
     origin_body_id: str | None
-    destination_body_id: str
+    destination_body_id: str | None = None  # None: the destination is open space
     mode: str = "sublight"  # 'sublight' or 'quantum'
     started_tick: int = 0
     arrival_tick: int = 0
     distance_au: float = 0.0
     duration_ticks: int = 1
+    waypoint_au: float = 0.0  # distance from the star for an open-space vector
+    waypoint_angle: float = 0.0  # radians from the system's reference axis
 
     def progress(self, current_tick: int) -> float:
         total = max(1, self.arrival_tick - self.started_tick)
@@ -1013,14 +1015,17 @@ class TravelState:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> TravelState:
+        destination = data.get("destination_body_id")
         return cls(
             origin_body_id=data.get("origin_body_id"),
-            destination_body_id=str(data["destination_body_id"]),
+            destination_body_id=str(destination) if destination is not None else None,
             mode=str(data.get("mode", "sublight")),
             started_tick=int(data.get("started_tick", 0)),
             arrival_tick=int(data.get("arrival_tick", 0)),
             distance_au=float(data.get("distance_au", 0.0)),
             duration_ticks=int(data.get("duration_ticks", 1)),
+            waypoint_au=float(data.get("waypoint_au", 0.0)),
+            waypoint_angle=float(data.get("waypoint_angle", 0.0)),
         )
 
 

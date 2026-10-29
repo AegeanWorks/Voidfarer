@@ -91,7 +91,6 @@ from voidfarer.faction_state import (
     faction_strength,
     force_peace_for_broke_factions,
     generate_faction_leaders,
-    leader_for,
     simulate_faction_behaviors,
 )
 from voidfarer.fleet import (
@@ -379,6 +378,7 @@ class SimulationEngine:
         self.seed = seed
         self.rng = random.Random(seed)
         self.allow_decision_events = False
+        self.decision_cadence = self.DEFAULT_DECISION_CADENCE
 
         if state is not None:
             ship = state.ship
@@ -1847,7 +1847,7 @@ class SimulationEngine:
             active = self.state.ship.travel
             destination_name = next(
                 (b.name for b in cur_sys.bodies if b.id == active.destination_body_id),
-                active.destination_body_id,
+                "open space" if active.destination_body_id is None else active.destination_body_id,
             )
             blocked_reason = (
                 f"Already in transit to {destination_name}; "
@@ -1876,6 +1876,166 @@ class SimulationEngine:
             if plan is None:
                 return False, message
             return True, plan
+
+    EMPTY_SPACE_MIN_AU = 0.05
+    EMPTY_SPACE_MAX_AU = 60.0
+
+    def _point_travel_plan(
+        self, waypoint_au: float, waypoint_angle: float, mode: str
+    ) -> tuple[dict[str, Any] | None, str]:
+        """Plan a transit to an empty-space vector, measured from the system's star."""
+        norm_mode = str(mode).strip().lower()
+        if norm_mode not in ("sublight", "quantum"):
+            return None, f"Invalid transit mode '{mode}'. Choose 'sublight' or 'quantum'."
+        try:
+            target_au = float(waypoint_au)
+            target_angle = float(waypoint_angle)
+        except (TypeError, ValueError):
+            return None, "Waypoint needs a numeric distance and bearing."
+        if not self.EMPTY_SPACE_MIN_AU <= target_au <= self.EMPTY_SPACE_MAX_AU:
+            return (
+                None,
+                f"Waypoint {target_au:.2f} AU is outside the "
+                f"{self.EMPTY_SPACE_MIN_AU}-{self.EMPTY_SPACE_MAX_AU} AU transit envelope.",
+            )
+        if not math.isfinite(target_angle):
+            return None, "Waypoint bearing must be a finite angle in radians."
+
+        cur_sys = self.current_system
+        origin = self.orbiting_body
+        origin_au = float(origin.orbit_radius) if origin else 0.0
+        origin_angle = float(origin.current_angle or 0.0) if origin else 0.0
+        dx = math.cos(target_angle) * target_au - math.cos(origin_angle) * origin_au
+        dy = math.sin(target_angle) * target_au - math.sin(origin_angle) * origin_au
+        distance_au = max(0.0, math.hypot(dx, dy))
+        map_effects = self._map_effects(cur_sys)
+        risk, hazards = self._transit_risk(cur_sys, norm_mode, map_effects)
+
+        fuel_cost = 0
+        if norm_mode == "quantum":
+            equipment = self._combined_equipment()
+            passives = calculate_passive_multipliers(self.state.ship)
+            research = self._research_bonuses()
+            fuel_mult = (
+                float(map_effects["fuel_mult"])
+                * equipment["fuel_efficiency"]
+                * passives.get("fuel_efficiency", 1.0)
+                * research.get("fuel_efficiency", 1.0)
+                * (1.0 - min(0.25, self._skill("piloting")))
+            )
+            fuel_cost = max(2, int(math.ceil(distance_au * 1.0 * fuel_mult)))
+            duration_ticks = 1
+        else:
+            engine_factor = max(0.4, self._effective_power("engines") / 25.0) * (1.0 + self._skill("piloting"))
+            sublight_speed_au = max(0.35, 1.15 * engine_factor)
+            duration_ticks = max(1, int(math.ceil(distance_au / sublight_speed_au)))
+
+        blocked_reason = ""
+        if distance_au < 0.05:
+            blocked_reason = "You are already holding station at that vector."
+        elif self.state.ship.travel is not None:
+            active = self.state.ship.travel
+            destination_name = next(
+                (b.name for b in cur_sys.bodies if b.id == active.destination_body_id),
+                "open space",
+            )
+            blocked_reason = (
+                f"Already in transit to {destination_name}; "
+                f"arrival is scheduled for tick {active.arrival_tick}."
+            )
+        elif norm_mode == "quantum" and self.state.ship.fuel < fuel_cost:
+            blocked_reason = f"Insufficient quantum fuel: need {fuel_cost}, have {self.state.ship.fuel}."
+        return {
+            "mode": norm_mode,
+            "body_id": None,
+            "body_name": f"Open space {target_au:.2f} AU",
+            "origin_body_id": origin.id if origin else None,
+            "destination_au": round(target_au, 3),
+            "destination_angle": round(target_angle, 4),
+            "distance_au": round(distance_au, 2),
+            "duration_ticks": duration_ticks,
+            "fuel_cost": fuel_cost,
+            "risk": risk,
+            "hazards": hazards,
+            "can_start": not blocked_reason,
+            "blocked_reason": blocked_reason,
+        }, ""
+
+    def start_travel_to_point(
+        self, waypoint_au: float, waypoint_angle: float, mode: str = "sublight"
+    ) -> tuple[bool, str]:
+        """Fly to an empty-space vector instead of a body: no orbit is established on arrival."""
+        with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+            plan, message = self._point_travel_plan(waypoint_au, waypoint_angle, mode)
+            if plan is None:
+                return False, message
+            if not plan["can_start"]:
+                return False, str(plan["blocked_reason"])
+
+            distance_au = float(plan["distance_au"])
+            duration_ticks = int(plan["duration_ticks"])
+            fuel_cost = int(plan["fuel_cost"])
+            hazard_hit = self.rng.random() < float(plan["risk"])
+            shield_loss = 0
+            hull_loss = 0
+            hazard_delay = 0
+            hazard_name = ""
+            if hazard_hit:
+                hazard_delay = 1
+                damage = max(4, min(18, int(4 + distance_au * 0.5)))
+                shield_loss = min(self.state.ship.shield, damage)
+                hull_loss = min(max(0, self.state.ship.hull - 1), damage - shield_loss)
+                hazard_name = " // ".join(plan["hazards"]) or "Micrometeoroid Swarm"
+
+            cur_tick = self.state.time.tick
+            total_ticks = duration_ticks + hazard_delay
+            travel = TravelState(
+                origin_body_id=plan["origin_body_id"],
+                destination_body_id=None,
+                mode=plan["mode"],
+                started_tick=cur_tick,
+                arrival_tick=cur_tick + total_ticks,
+                distance_au=distance_au,
+                duration_ticks=total_ticks,
+                waypoint_au=float(plan["destination_au"]),
+                waypoint_angle=float(plan["destination_angle"]),
+            )
+            label = plan["body_name"]
+            log_entry = (
+                f"Engaged {plan['mode']} drive toward {label} "
+                f"({distance_au:.1f} AU, ETA {total_ticks} tick(s), fuel: {fuel_cost})."
+            )
+            new_events = list(self.state.events)
+            if hazard_hit:
+                log_entry += (
+                    f" TRANSIT HAZARD: {hazard_name}; shields -{shield_loss}, "
+                    f"hull -{hull_loss}, ETA +{hazard_delay} tick."
+                )
+                new_events.append(GameEvent(
+                    id=f"evt_{cur_tick}_{len(new_events) + 1}",
+                    kind="hazard",
+                    title=f"Transit Hazard: {hazard_name}",
+                    message=(
+                        f"{hazard_name} struck during transit to {label}. "
+                        f"Shields -{shield_loss}, hull -{hull_loss}, arrival delayed by {hazard_delay} tick."
+                    ),
+                    tick=cur_tick,
+                    dismissed=False,
+                ))
+            new_ship = self._clone_ship(
+                fuel=self.state.ship.fuel - fuel_cost,
+                shield=self.state.ship.shield - shield_loss,
+                hull=self.state.ship.hull - hull_loss,
+                landed_body_id=None,
+                travel=travel,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log_entry]),
+            )
+            new_time = replace(self.state.time, is_paused=False) if self.state.time.is_paused else self.state.time
+            self.state = self._clone_state(ship=new_ship, time=new_time, events=tuple(new_events))
+            return True, log_entry
 
     def start_travel(self, body_id: str, mode: str = "sublight") -> tuple[bool, str]:
         """Initiate sublight or quantum in-system transit toward a celestial body."""
@@ -2616,7 +2776,6 @@ class SimulationEngine:
             act = action.strip().lower()
             standings = dict(self.state.ship.faction_standings)
             current = standings.get(faction_id, 0)
-            leader = leader_for(self.state.faction_leaders, faction_id)
             diplomacy_bonus = self._skill("diplomacy") + self._research_bonuses()["diplomacy_bonus"]
             if act in ("improve", "negotiate"):
                 gain = int(3 + diplomacy_bonus * 20 + min(5, max(0, amount)))
@@ -2647,37 +2806,60 @@ class SimulationEngine:
                 new_ship = self._clone_ship(allies=allies)
                 self.state = self._clone_state(ship=new_ship)
                 return True, f"Alliance formed with {CANONICAL_FACTIONS[faction_id].name}."
-            if act in ("peace", "ceasefire"):
-                wars = []
-                ended = False
-                for war in self.state.wars:
-                    if faction_id in (war.attacker_id, war.defender_id) and "sol_coalition" in (war.attacker_id, war.defender_id):
-                        wars.append(replace(war, active=False))
-                        ended = True
-                    else:
-                        wars.append(war)
-                standings[faction_id] = min(100, current + 10)
-                self.state = self._clone_state(
-                    ship=self._clone_ship(faction_standings=standings),
-                    wars=tuple(wars),
-                )
-                return (True, f"Ceasefire accepted by {CANONICAL_FACTIONS[faction_id].name}.") if ended else (False, "No active war with that faction.")
+            # A privateer captain has no authority to start or end a sovereign war; the
+            # only lever is a petition carried to the enemy leadership by an envoy.
             if act in ("declare_war", "war"):
-                if current <= -80:
-                    return False, "Faction is already universally hostile."
-                standings[faction_id] = -100
-                war = WarState(
-                    id=f"war_{self.state.time.tick}_sol_{faction_id}",
-                    attacker_id="sol_coalition",
-                    defender_id=faction_id,
-                    started_tick=self.state.time.tick,
+                return False, "A ship's captain cannot declare war in the Coalition's name."
+            if act in ("peace", "ceasefire"):
+                faction_name = CANONICAL_FACTIONS[faction_id].name
+                war = next(
+                    (
+                        w for w in self.state.wars
+                        if w.active and faction_id in (w.attacker_id, w.defender_id)
+                        and "sol_coalition" in (w.attacker_id, w.defender_id)
+                    ),
+                    None,
+                )
+                if war is None:
+                    return False, f"No active war with {faction_name} to petition."
+                if self.state.ship.credits < self.CEASEFIRE_ENVOY_COST:
+                    return (
+                        False,
+                        f"An envoy costs {self.CEASEFIRE_ENVOY_COST} cr; you hold {self.state.ship.credits} cr.",
+                    )
+                chance = self._ceasefire_chance(faction_id, war)
+                roll = self._stable_unit(self.state.galaxy_seed, "ceasefire", war.id, self.state.time.tick)
+                if roll >= chance:
+                    self.state = self._clone_state(
+                        ship=self._clone_ship(
+                            flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [
+                                f"CEASEFIRE PETITION: {faction_name} refuses your envoy."
+                            ]),
+                        ),
+                    )
+                    return (
+                        False,
+                        f"{faction_name} refuses the petition (chance {chance:.0%}). "
+                        "Raise standing or let the front move, then petition again.",
+                    )
+                wars = tuple(
+                    replace(w, active=False, ended_tick=self.state.time.tick) if w.id == war.id else w
+                    for w in self.state.wars
+                )
+                standings[faction_id] = min(100, max(current, -40) + 10)
+                line = (
+                    f"CEASEFIRE: {faction_name} accepts your petition and stands down; "
+                    f"the envoy is paid {self.CEASEFIRE_ENVOY_COST} cr."
                 )
                 self.state = self._clone_state(
-                    ship=self._clone_ship(faction_standings=standings),
-                    wars=self.state.wars + (war,),
+                    ship=self._clone_ship(
+                        credits=self.state.ship.credits - self.CEASEFIRE_ENVOY_COST,
+                        faction_standings=standings,
+                        flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+                    ),
+                    wars=wars,
                 )
-                leader_note = f" Leader {leader.name} ({leader.behavior}) responds in kind." if leader else ""
-                return True, f"War declared on {CANONICAL_FACTIONS[faction_id].name}.{leader_note}"
+                return True, line
             return False, f"Unknown diplomacy action '{action}'."
 
     def buy_escort(self, escort_type: str, system_id: str | None = None) -> tuple[bool, str]:
@@ -5524,6 +5706,11 @@ class SimulationEngine:
                 "undismissed_events": [e.to_dict() for e in self.state.events if not e.dismissed],
                 "travel": self.state.ship.travel.to_dict() if self.state.ship.travel else None,
                 "void": self.void_status(),
+                "settings": {
+                    "decision_cadence": self.decision_cadence,
+                    "decisions_ready_in": self.decisions_ready_in(),
+                    "decision_cadences": sorted(self.DECISION_CADENCE),
+                },
                 "story_status": self.story_status(),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
@@ -5579,6 +5766,19 @@ class SimulationEngine:
                 ),
             )
             return True, msg
+
+    # A captain can only petition: the envoy fee is paid when the other side agrees.
+    CEASEFIRE_ENVOY_COST = 500
+
+    def _ceasefire_chance(self, faction_id: str, war: WarState) -> float:
+        """Odds a petition is accepted: standing, diplomacy skill and how the war is going."""
+        standing = self.state.ship.faction_standings.get(faction_id, 0)
+        skill = self._skill("diplomacy")
+        score = war.war_score if faction_id == war.defender_id else -war.war_score
+        # A faction that is winning has little reason to talk; a losing one listens.
+        pressure = max(-0.20, min(0.20, -score / 100.0))
+        chance = 0.15 + (standing + 100) / 200.0 * 0.45 + skill * 0.25 + pressure
+        return max(0.05, min(0.90, chance))
 
     def galactic_politics(self) -> dict[str, Any]:
         """Territory, borders and war fronts for the strategic map and the factions panel."""
@@ -5647,6 +5847,9 @@ class SimulationEngine:
                     "attacker": CANONICAL_FACTIONS[w.attacker_id].name if w.attacker_id in CANONICAL_FACTIONS else w.attacker_id,
                     "defender": CANONICAL_FACTIONS[w.defender_id].name if w.defender_id in CANONICAL_FACTIONS else w.defender_id,
                     "fronts": [list(f) for f in fronts],
+                    # The player is a privateer, not a power: only their own polity's wars
+                    # can be petitioned, and only a third-party war is pure politics.
+                    "player_party": "sol_coalition" in (w.attacker_id, w.defender_id),
                 })
             return {
                 "systems": system_view,
@@ -6348,12 +6551,48 @@ class SimulationEngine:
             )
         return ""
 
+    # Quick-time prompts are a garnish, not a drumbeat: one decision per cadence window,
+    # and the odds stay low so a normal session sees a handful of them.
+    DECISION_CADENCE = {
+        "relaxed": (36, 0.55),
+        "normal": (14, 1.0),
+        "frequent": (4, 1.6),
+    }
+    DEFAULT_DECISION_CADENCE = "normal"
+
+    def _decision_cooldown(self) -> int:
+        ticks, _ = self.DECISION_CADENCE.get(
+            self.decision_cadence, self.DECISION_CADENCE[self.DEFAULT_DECISION_CADENCE]
+        )
+        return ticks
+
+    def _decision_chance_multiplier(self) -> float:
+        _, multiplier = self.DECISION_CADENCE.get(
+            self.decision_cadence, self.DECISION_CADENCE[self.DEFAULT_DECISION_CADENCE]
+        )
+        return multiplier
+
+    def set_decision_cadence(self, cadence: str) -> tuple[bool, str]:
+        """Choose how often blocking quick-time decisions may interrupt the flight."""
+        key = str(cadence).strip().lower()
+        if key not in self.DECISION_CADENCE:
+            return False, f"Unknown cadence '{cadence}'. Choose {', '.join(self.DECISION_CADENCE)}."
+        self.decision_cadence = key
+        return True, f"Decision cadence set to {key} (one prompt per {self._decision_cooldown()} ticks)."
+
+    def decisions_ready_in(self) -> int:
+        """Ticks left before another blocking decision may open."""
+        last = int(self.state.stats.get("last_decision_tick", -10**9))
+        return max(0, self._decision_cooldown() - (self.state.time.tick - last))
+
     def maybe_trigger_decision(self, trigger: str = "tick") -> dict[str, Any] | None:
         """Evaluate conditional events and open at most one blocking decision."""
         with self.lock:
             if self.state.pending_decision is not None:
                 return None
             if self.state.active_combat or self.state.active_anomaly or self.state.active_pirate:
+                return None
+            if self.decisions_ready_in() > 0:
                 return None
             eligible = eligible_decisions(self.state, trigger)
             if not eligible:
@@ -6362,13 +6601,17 @@ class SimulationEngine:
             roll = self._stable_unit(
                 self.state.galaxy_seed, "decision", trigger, self.state.time.tick, chosen.id
             )
-            threshold = max(chosen.chance, 0.45 if chosen.priority >= 85 else 0.18)
+            base = 0.45 if chosen.priority >= 85 else 0.10
+            threshold = min(0.95, max(chosen.chance, base) * self._decision_chance_multiplier())
             if roll > threshold:
                 return None
             event = make_decision_event(chosen, self.state.time.tick, trigger)
+            stats = dict(self.state.stats)
+            stats["last_decision_tick"] = self.state.time.tick
             log = f"DECISION REQUIRED: {event.title}."
             self.state = self._clone_state(
                 ship=self._clone_ship(flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log])),
+                stats=stats,
                 pending_decision=event,
             )
             return event.to_dict()
@@ -6786,19 +7029,30 @@ class SimulationEngine:
                 new_landed_body_id = None
                 new_travel = None
                 cur_sys_obj = updated_systems.get(cur_ship.current_system_id, self.current_system)
-                dest_name = new_orbiting_body_id
-                for b in cur_sys_obj.bodies:
-                    if b.id == new_orbiting_body_id:
-                        dest_name = b.name
-                        break
-                arr_msg = f"Orbital capture achieved around {dest_name} after {cur_ship.travel.mode} transit."
+                if new_orbiting_body_id is None:
+                    # Open-space vector: the ship holds station in the void, orbiting nothing.
+                    dest_name = f"open space at {cur_ship.travel.waypoint_au:.2f} AU"
+                    arr_msg = (
+                        f"Holding station in {dest_name} after {cur_ship.travel.mode} transit."
+                    )
+                else:
+                    dest_name = new_orbiting_body_id
+                    for b in cur_sys_obj.bodies:
+                        if b.id == new_orbiting_body_id:
+                            dest_name = b.name
+                            break
+                    arr_msg = f"Orbital capture achieved around {dest_name} after {cur_ship.travel.mode} transit."
                 new_flight_log.append(arr_msg)
                 evt_id = f"evt_{new_tick}_{len(new_events) + 1}"
                 new_events.append(
                     GameEvent(
                         id=evt_id,
                         kind="arrival",
-                        title=f"Orbital Capture: {dest_name}",
+                        title=(
+                            f"Holding Station: {dest_name}"
+                            if new_orbiting_body_id is None
+                            else f"Orbital Capture: {dest_name}"
+                        ),
                         message=arr_msg,
                         tick=new_tick,
                         dismissed=False,

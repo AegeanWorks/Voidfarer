@@ -893,10 +893,22 @@ class TestStrategyPanels(unittest.TestCase):
         parser.close()
         cls.dom = parser.root
         cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
 
     def test_wars_panel_sits_in_the_factions_tab_and_pledges(self):
         self.assertIsNotNone(self.dom.find_by_id("tabContentFactions").find_by_id("warsList"))
         self.assertIn('"/api/war/support"', self.js)
+
+    def test_only_your_own_wars_offer_a_ceasefire_petition(self):
+        self.assertIn('data-petition-ceasefire', self.js)
+        self.assertIn("PETITION CEASEFIRE", self.js)
+        self.assertIn("Sovereign war", self.js, "third-party wars are not the captain's to end")
+        self.assertNotIn('"/api/war/mediate"', self.js)
+        self.assertRegex(self.css, r"\.war-mediate\s*\{[^}]*display:\s*flex")
+
+    def test_third_party_wars_never_expose_a_player_peace_button(self):
+        self.assertNotIn("MEDIATE CEASEFIRE", self.js)
+        self.assertNotIn("mediate_war", self.js)
 
     def test_outposts_are_founded_from_the_empire_tab(self):
         self.assertIsNotNone(self.dom.find_by_id("tabContentEmpire").find_by_id("outpostBuild"))
@@ -947,6 +959,42 @@ class TestPostPushPolishLayout(unittest.TestCase):
         self.assertIn('"surface"', self.browser_tool)
         self.assertIn("def _prepare_surface(", self.browser_tool)
         self.assertIn("engine.allow_decision_events = False", self.browser_tool)
+
+    def test_factions_review_prepares_a_coalition_war_for_the_petition_control(self):
+        self.assertIn("def _prepare_factions(", self.browser_tool)
+        self.assertIn('if args.tab == "factions"', self.browser_tool)
+        self.assertIn("_prepare_factions(engine)", self.browser_tool)
+        self.assertIn('"sol_coalition" in (war.attacker_id, war.defender_id)', self.browser_tool)
+
+    def test_every_click_has_a_stable_handle_for_automation(self):
+        self.assertIn("voidfarerClickMap", self.js)
+        self.assertIn("clickMap()", self.js)
+        self.assertIn("ensureTestId", self.js)
+        self.assertIn("voidfarerAgentActions", self.js)
+        self.assertIn("/api/agent/actions", self.js)
+
+    def test_aikit_link_and_decision_cadence_are_visible(self):
+        self.assertIn('data-testid="aikit-link"', self.html)
+        self.assertIn('data-testid="setting-decision-cadence"', self.html)
+        self.assertIn('"/api/settings/decisions"', self.js)
+
+    def test_every_static_button_can_be_identified_by_a_headless_driver(self):
+        class _Buttons(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.unidentified = []
+
+            def handle_starttag(self, tag, attrs):
+                if tag != "button":
+                    return
+                data = dict(attrs)
+                hooks = ("id", "data-testid", "data-slot", "data-lot", "data-type", "data-mode", "data-action")
+                if not any(data.get(hook) for hook in hooks):
+                    self.unidentified.append(data)
+
+        parser = _Buttons()
+        parser.feed(self.html)
+        self.assertEqual(parser.unidentified, [], "every button needs an id, testid or data hook")
 
     def test_event_toasts_clear_the_left_terminal_at_720p(self):
         self.assertRegex(

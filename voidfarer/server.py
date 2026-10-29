@@ -15,6 +15,7 @@ from pathlib import Path
 from socketserver import ThreadingMixIn
 from typing import Any
 
+from voidfarer.agent_api import build_action_catalog
 from voidfarer.economy import get_galactic_trade_routes
 from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
 from voidfarer.frontier import MERCENARY_CATALOG
@@ -164,6 +165,10 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             include_static = not self.headers.get(CATALOG_CACHE_HEADER)
             snapshot = self.engine.get_status_snapshot(include_static=include_static)
             self._send_json({"ok": True, "data": snapshot})
+            return
+
+        if path == "/api/agent/actions":
+            self._send_json(build_action_catalog(VoidFarerHandler))
             return
 
         if path == "/api/catalogs":
@@ -417,7 +422,9 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         body = self._read_body_json()
 
         pending = self.engine.state.pending_decision
-        if pending is not None and path not in ("/api/decision/resolve", "/api/time", "/api/save"):
+        if pending is not None and path not in (
+            "/api/decision/resolve", "/api/time", "/api/save", "/api/settings/decisions",
+        ):
             self._send_error_json(
                 f"Decision required: {pending.title}. Resolve it before continuing.",
                 status=HTTPStatus.CONFLICT,
@@ -427,7 +434,10 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if (
             self.engine.state.active_pirate is not None
-            and path not in ("/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save")
+            and path not in (
+                "/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save",
+                "/api/settings/decisions",
+            )
         ):
             pirate = self.engine.state.active_pirate
             self._send_error_json(
@@ -1015,6 +1025,12 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/settings/decisions":
+            ok, msg = self.engine.set_decision_cadence(str(body.get("cadence", "normal")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/time/pause":
             ok, msg = self.engine.pause_time()
             self.storage.save(self.engine.state)
@@ -1079,6 +1095,19 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             body_id = str(body.get("body_id", ""))
             mode = str(body.get("mode", "sublight"))
             ok, msg = self.engine.start_travel(body_id, mode=mode)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/travel/point":
+            mode = str(body.get("mode", "sublight"))
+            try:
+                waypoint_au = float(body.get("distance_au", 0.0))
+                waypoint_angle = float(body.get("angle", 0.0))
+            except (TypeError, ValueError):
+                self._send_error_json("Waypoint needs numeric distance_au and angle (radians).")
+                return
+            ok, msg = self.engine.start_travel_to_point(waypoint_au, waypoint_angle, mode=mode)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
