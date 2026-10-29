@@ -77,6 +77,9 @@ class FlightSafetyTest(unittest.TestCase):
         ok, message = engine.refuel(5)
         self.assertFalse(ok, "a station refinery must not refuel while the ship is in transit")
         self.assertIn("Fuel refinery", message)
+        snapshot = engine.get_status_snapshot()
+        self.assertEqual(snapshot["market_quotes"], [])
+        self.assertIsNone(snapshot["orbiting_body"])
 
     def test_waypoint_extremes_are_rejected_without_raising(self):
         engine = SimulationEngine(seed=42)

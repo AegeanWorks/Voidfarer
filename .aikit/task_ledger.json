@@ -12,16 +12,6 @@
   },
   "checkpoints": [
     {
-      "task_id": "war-mediation",
-      "phase": "superseded",
-      "phase_num": 3,
-      "description": "Superseded by 'captain-powers' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1793275922.7021086,
-      "timestamp_str": "2026-10-29 15:12:02",
-      "agent": "kilo:2"
-    },
-    {
       "task_id": "captain-powers",
       "phase": "completed",
       "phase_num": 5,
@@ -272,6 +262,17 @@
       "status": "in_progress",
       "timestamp": 1793298162.4276803,
       "timestamp_str": "2026-10-29 21:22:42",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 2",
+      "phase_num": 3,
+      "description": "Reforge stage 2: window 6, 3 commit(s), 9 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793299342.0255277,
+      "timestamp_str": "2026-10-29 21:42:22",
       "agent": "opencode"
     }
   ]

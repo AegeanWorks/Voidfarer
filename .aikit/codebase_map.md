@@ -10,7 +10,7 @@
 - **Total Classes**: `227`
 - **Total Top-Level Functions**: `302`
 - **Total Class Methods**: `1326`
-- **Total Source Lines**: `36865`
+- **Total Source Lines**: `36868`
 
 ---
 
@@ -1110,7 +1110,7 @@
 ### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
 > *Regressions pinned by the post-implementation review pass.*
 
-**Size**: `294` lines (`12620` bytes)
+**Size**: `297` lines (`12777` bytes)
 
 **Classes:**
 - `class FlightSafetyTest`
