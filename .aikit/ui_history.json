@@ -292,5 +292,19 @@
     "final_snapshot_digest": "47d5de707a20f89e95c10a1fda7efd8bfc0c816c09d7c32979d60104930eddda",
     "final_snapshot_entries": 915,
     "surface_digest": "e9ae5ac79699124200c0bc7f2a1f8de20f8b66ec31fc54c548f31a9d020635be"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "d7297323981e4c3395ae785411897580dc664c14",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793251971.6391337,
+    "finished_at": 1793252000.8629453,
+    "strikes": 0,
+    "reviewer": "gemma-4-31b vision subagent via Kilo (G-015), authorized by the user; re-reviewed cockpit and event captures at 1280x720 and 1920x1080 on 2026-10-29",
+    "allowed_removals": [],
+    "final_snapshot_digest": "47d5de707a20f89e95c10a1fda7efd8bfc0c816c09d7c32979d60104930eddda",
+    "final_snapshot_entries": 915,
+    "surface_digest": "5a50ac2ee09ce5701a1d98bec78619ce81b8d908da90ff32c2832ae88176eef4"
   }
 ]
