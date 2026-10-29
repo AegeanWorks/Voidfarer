@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `89`
-- **Total Classes**: `233`
-- **Total Top-Level Functions**: `304`
-- **Total Class Methods**: `1363`
-- **Total Source Lines**: `37724`
+- **Total Classes**: `235`
+- **Total Top-Level Functions**: `305`
+- **Total Class Methods**: `1371`
+- **Total Source Lines**: `37959`
 
 ---
 
@@ -202,7 +202,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `229` lines (`9977` bytes)
+**Size**: `234` lines (`10057` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -241,7 +241,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1215` lines (`55633` bytes)
+**Size**: `1239` lines (`56696` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -425,13 +425,18 @@
   - Method `.test_target_card_holds_rebuild_and_relief_actions()`
   - Method `.test_reconstruction_controls_have_stable_testids()`
   - Method `.test_browser_review_prepares_a_devastated_world()`
+- `class TestBoardingCockpit` - *The combat card must expose a gated boarding action.*
+  - Method `.setUpClass()`
+  - Method `.test_combat_card_holds_a_board_button()`
+  - Method `.test_board_button_is_gated_by_shields_hull_and_marine()`
+  - Method `.test_browser_review_prepares_a_boarding_action()`
 
 ---
 
 ### [`tests/test_combat_void_depth.py`](tests/test_combat_void_depth.py)
 > *Regression tests for progression-scaled combat and Hollow resonance risk/reward.*
 
-**Size**: `286` lines (`12577` bytes)
+**Size**: `358` lines (`15657` bytes)
 
 **Classes:**
 - `class TestProgressionThreatScaling`
@@ -443,6 +448,11 @@
   - Method `.test_defensive_actions_also_end_in_defeat()`
   - Method `.test_a_destroyed_ship_cannot_tick_back_to_life()`
   - Method `.test_zero_hull_ends_combat_as_a_defeat_without_bounty()`
+- `class TestBoardingAndPrizeCapture`
+  - Method `._engine_with_combat(*, shield, hull, marine)`
+  - Method `.test_a_crippled_enemy_can_be_captured_as_a_prize()`
+  - Method `.test_a_failed_boarding_action_injures_the_marine_party()`
+  - Method `.test_boarding_requires_down_shields_low_hull_and_a_marine()`
 - `class TestEvasiveBurnDiscipline`
   - Method `._engine(fuel, streak, combo)`
   - Method `.test_successful_evasive_burn_costs_fuel_and_resets_streak()`
@@ -1596,13 +1606,14 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `516` lines (`22937` bytes)
+**Size**: `551` lines (`24278` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
 - `def _metrics(page)` - *Return viewport, scroll, element and tiny-text counts from the live page.*
 - `def _click_probe(page)` - *Enumerate every cockpit control through the shipped click map and prove handles are unique.*
 - `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll, click_map)` - *Open one real browser viewport, drive it and capture a true screenshot.*
+- `def _prepare_boarding(engine)` - *Put a marine aboard and a crippled hostile in front of the flagship.*
 - `def _prepare_relief(engine)` - *Devastate an inhabited Sol world and put the flagship in orbit for the target card.*
 - `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
 - `def _prepare_waypoint(engine)` - *Fly the flagship to an open-space vector so the void anchor is on screen.*
@@ -1772,7 +1783,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2986` lines (`153045` bytes)
+**Size**: `2995` lines (`153347` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1836,7 +1847,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `627` lines (`21681` bytes)
+**Size**: `637` lines (`22068` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -1955,7 +1966,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7769` lines (`385475` bytes)
+**Size**: `7849` lines (`389440` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

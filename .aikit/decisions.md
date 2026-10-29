@@ -1060,3 +1060,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Close wars whose attacker or defender has no territory left inside `simulate_faction_behaviors`, mark the faction eliminated and record a `WAR ENDED` line so no phantom front survives.
   4. Add `/api/reconstruct` with `body_id` and `mode`, `reconstruct <body_id> [--relief]` in the CLI/REPL, target-card REBUILD WORLD / DELIVER RELIEF controls with stable test ids, a `relief` browser-review scenario, and Rebuilder / Relief Runner codex milestones.
 - **Consequences**: A player can now choose between credits and cargo to repair war damage, and the market rewards relief logistics. A seed-42 probe still shows 22 captures by tick 2000, but surviving worlds can be actively restored instead of waiting out the passive recovery. Suite: 792 tests (44 suites), 5/5 gates; real Edge at 1920x1080 and 1280x720 reports zero layout errors and one tiny-text element, and a live click reduced devastation by 20 and credits by 600.
+
+### ADR-089: Boarding Parties, Prize Ships and Marine Relevance
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Combat only offered destruction: marines contributed a passive boarding-defense bonus, but no action ever sent them across, and a crippled enemy always had to be shot apart for bounty and salvage. The new fleet manager could accept escorts but had no way to grow from combat.
+- **Decision**:
+  1. Add `board_enemy` (aliases `board`, `capture`, `prize`) to `combat_action`. It requires enemy shields at zero, enemy hull at or below 30% of maximum, and an active marine. Success chance is 35% + hull edge (up to 45%) + 2.5% per marine skill, capped at 92%.
+  2. A successful boarding ends combat and adds the enemy as a `FleetShip` prize with its remaining hull, half its damage, 8% evasion and role `prize`. It increments `ships_captured` and `combat_victories`; it does not also pay the full bounty or salvage, so capture trades immediate loot for a lasting escort.
+  3. A failed boarding injures the lead marine for four ticks, costs three crew morale, resets the combo and lets the enemy counter-battery resolve normally. Boarding is refused with a specific reason for shields, hull or missing marine.
+  4. Wire the action through the CLI (`combat board`), the combat card (`BOARD & CAPTURE`, gated by the same conditions), a real-browser `boarding` scenario and the Privateer codex milestone (`ships_captured`).
+- **Consequences**: Marines now have an active combat role and crippled enemies are a resource decision rather than a damage race. A live Edge run captured `Prize: Crippled Corsair` with 20 hull and 6 damage after collapsing its shields; the click map reported 136 controls with zero missing or duplicate handles. Suite: 798 tests (45 suites), 5/5 gates.

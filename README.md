@@ -482,7 +482,17 @@ python -m voidfarer.cli reconstruct sol_body_1 --relief
 
 # The same actions are on the target card and POST /api/reconstruct
 ```
-Rebuilding earns standing with the world's owner and feeds the Rebuilder / Relief Runner codex milestones. Devastated markets pay a relief premium for medicines, food, fuel and construction goods, so running supplies into a war zone is a real trade. Wars whose belligerent has no territory left are closed and reported instead of lingering as phantom fronts. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
+Rebuilding earns standing with the world's owner and feeds the Rebuilder / Relief Runner codex milestones. Devastated markets pay a relief premium for medicines, food, fuel and construction goods, so running supplies into a war zone is a real trade. Wars whose belligerent has no territory left are closed and reported instead of lingering as phantom fronts.
+
+### 18d. Boarding & Prize Capture
+```bash
+# Collapse the enemy shield first, then cripple its hull below 30%
+python -m voidfarer.cli combat fire
+
+# With an active marine aboard, send the boarding party across
+python -m voidfarer.cli combat board
+```
+A successful boarding ends the fight and takes the crippled hull as a fleet prize: it keeps its remaining hull, half its weapon damage and 8% evasion, but pays no full bounty or salvage. A failed boarding injures the lead marine, costs crew morale, resets the tactical combo and lets the enemy counter-attack. The combat card gates `BOARD & CAPTURE` on shields down, hull below 30% and an active marine; the Privateer codex milestone tracks the first prize. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
 
 ### 19. Stellaris-Style Windows Cockpit
 
