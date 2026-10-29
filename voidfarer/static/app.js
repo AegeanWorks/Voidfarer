@@ -5256,14 +5256,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const sy = transform.cy + system.y * transform.scale;
             list.slice(0, 4).forEach((captain, index) => {
                 const angle = now * 0.4 + index * 1.7;
-                const radius = 15 * nodeScale;
+                const radius = 24 * nodeScale;
                 positions.push({
                     captain,
                     x: sx + Math.cos(angle) * radius,
                     y: sy + Math.sin(angle) * radius,
                     angle,
-                    size: 3.4 * nodeScale,
-                    hitRadius: Math.max(6, 6 * nodeScale),
+                    size: Math.max(5.5, 7.5 * nodeScale),
+                    hitRadius: Math.max(10, 10 * nodeScale),
                 });
             });
         });
@@ -5272,12 +5272,23 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     drawGalaxyTraffic(ctx, transform, now) {
         this.galaxyTrafficPositions(transform, now).forEach(marker => {
+            const color = this.captainColor(marker.captain);
+            const selected = this.selectedType === "captain"
+                && this.selectedTarget && this.selectedTarget.id === marker.captain.id;
+            ctx.save();
+            ctx.globalAlpha = selected ? 0.95 : 0.55;
+            ctx.beginPath();
+            ctx.arc(marker.x, marker.y, marker.size * 2.1, 0, Math.PI * 2);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = selected ? 1.8 : 1.2;
+            ctx.stroke();
+            ctx.restore();
             this.drawShipGlyph(
                 ctx,
                 marker.x,
                 marker.y,
                 marker.angle + Math.PI / 2,
-                this.captainColor(marker.captain),
+                color,
                 marker.size,
             );
         });
