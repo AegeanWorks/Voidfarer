@@ -284,6 +284,16 @@ class TestCaptainDiplomacyLimits(unittest.TestCase):
         self.assertGreater(engine._ceasefire_chance("nebula_collective", war), low)
         self.assertLessEqual(engine._ceasefire_chance("nebula_collective", war), 0.90)
 
+    def test_a_losing_side_is_more_willing_to_talk_than_a_winning_one(self):
+        engine = _engine_at_war()
+        # Positive war score means Sol (the attacker) is winning.
+        winning_attacker = engine._ceasefire_chance("sol_coalition", replace(engine.state.wars[0], war_score=60.0))
+        losing_defender = engine._ceasefire_chance("nebula_collective", replace(engine.state.wars[0], war_score=60.0))
+        self.assertGreater(losing_defender, winning_attacker)
+        winning_defender = engine._ceasefire_chance("nebula_collective", replace(engine.state.wars[0], war_score=-60.0))
+        losing_attacker = engine._ceasefire_chance("sol_coalition", replace(engine.state.wars[0], war_score=-60.0))
+        self.assertGreater(losing_attacker, winning_defender)
+
 
 class TestWarSupportParity(unittest.TestCase):
     @classmethod

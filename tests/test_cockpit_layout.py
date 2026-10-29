@@ -906,6 +906,11 @@ class TestStrategyPanels(unittest.TestCase):
         self.assertNotIn('"/api/war/mediate"', self.js)
         self.assertRegex(self.css, r"\.war-mediate\s*\{[^}]*display:\s*flex")
 
+    def test_open_space_anchor_draws_the_flagship_and_prices_from_the_anchor(self):
+        self.assertIn("VF-FLAGSHIP (OPEN SPACE)", self.js)
+        self.assertIn("ship.waypoint_au", self.js)
+        self.assertIn("ship.waypoint_angle", self.js)
+
     def test_third_party_wars_never_expose_a_player_peace_button(self):
         self.assertNotIn("MEDIATE CEASEFIRE", self.js)
         self.assertNotIn("mediate_war", self.js)
@@ -959,6 +964,12 @@ class TestPostPushPolishLayout(unittest.TestCase):
         self.assertIn('"surface"', self.browser_tool)
         self.assertIn("def _prepare_surface(", self.browser_tool)
         self.assertIn("engine.allow_decision_events = False", self.browser_tool)
+
+    def test_waypoint_review_prepares_an_open_space_anchor(self):
+        self.assertIn('"waypoint"', self.browser_tool)
+        self.assertIn("def _prepare_waypoint(", self.browser_tool)
+        self.assertIn('args.scenario == "waypoint"', self.browser_tool)
+        self.assertIn("waypoint_au", self.browser_tool)
 
     def test_factions_review_prepares_a_coalition_war_for_the_petition_control(self):
         self.assertIn("def _prepare_factions(", self.browser_tool)

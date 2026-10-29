@@ -4477,8 +4477,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         } else if (this.selectedType === "point") {
             const p = this.selectedTarget;
             const orbBody = this.state.orbiting_body || (this.state.current_system?.bodies || []).find(x => x.id === this.state.ship?.orbiting_body_id) || null;
-            const originAu = Number(orbBody?.orbit_radius ?? 0);
-            const originAngle = Number(orbBody?.current_angle ?? 0);
+            // In open space the ship's anchor is the origin, not the star.
+            const originAu = orbBody ? Number(orbBody.orbit_radius ?? 0) : Number(this.state.ship?.waypoint_au ?? 0);
+            const originAngle = orbBody ? Number(orbBody.current_angle ?? 0) : Number(this.state.ship?.waypoint_angle ?? 0);
             const dx = Math.cos(p.angle) * p.au - Math.cos(originAngle) * originAu;
             const dy = Math.sin(p.angle) * p.au - Math.sin(originAngle) * originAu;
             const distAu = Math.max(0, Math.hypot(dx, dy));
@@ -4963,6 +4964,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.restore();
         }
 
+        // Holding station in open space: the flagship still has to be on the map.
+        if (ship && !ship.orbiting_body_id && !ship.travel && !ship.landed_body_id
+            && !this.travelAnimation && Number(ship.waypoint_au) > 0) {
+            const anchorAu = Number(ship.waypoint_au);
+            const anchorAngle = Number(ship.waypoint_angle);
+            const sx = cx + Math.cos(anchorAngle) * anchorAu * auScale;
+            const sy = cy + Math.sin(anchorAngle) * anchorAu * auScale;
+            if (this.celestial) {
+                this.celestial.drawShip(ctx, sx, sy, anchorAngle + Math.PI / 2, 6 * Math.max(1, this.zoom));
+            } else {
+                ctx.beginPath();
+                ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = "#8fbf9f";
+                ctx.fill();
+            }
+            ctx.font = "12px 'Share Tech Mono'";
+            ctx.fillStyle = "#8fbf9f";
+            ctx.fillText("VF-FLAGSHIP (OPEN SPACE)", sx + 10, sy - 7);
+        }
         this.drawSystemTraffic(ctx, cx, cy, auScale, now);
         this.drawTravelAnimation(ctx, cx, cy, auScale);
     }

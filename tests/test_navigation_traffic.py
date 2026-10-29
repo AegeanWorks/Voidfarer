@@ -1,5 +1,6 @@
 """Open-space transit vectors and the NPC traffic that shares the map."""
 
+import math
 import unittest
 
 from voidfarer.engine import SimulationEngine
@@ -27,9 +28,46 @@ class EmptySpaceTransitTest(unittest.TestCase):
             engine.tick(1)
         self.assertIsNone(engine.state.ship.travel)
         self.assertIsNone(engine.state.ship.orbiting_body_id)
+        self.assertAlmostEqual(engine.state.ship.waypoint_au, 2.0, places=3)
+        self.assertAlmostEqual(engine.state.ship.waypoint_angle, 0.5, places=4)
         arrivals = [e for e in engine.state.events if e.kind == "arrival"]
         self.assertTrue(arrivals, "an open-space arrival must still be announced")
         self.assertTrue(arrivals[-1].title.startswith("Holding Station"))
+
+    def test_leaving_open_space_prices_the_transit_from_the_anchor(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(ship=engine._clone_ship(credits=20000, fuel=60))
+        self.assertTrue(engine.start_travel_to_point(5.0, 0.0, "quantum")[0])
+        for _ in range(2):
+            engine.tick(1)
+        self.assertIsNone(engine.state.ship.orbiting_body_id)
+
+        target = next(b for b in engine.current_system.bodies if b.orbit_radius > 0 and b.body_type != "star")
+        star_distance = target.orbit_radius
+        origin_au = engine.state.ship.waypoint_au
+        origin_angle = engine.state.ship.waypoint_angle
+        dx = target.orbit_radius * math.cos(target.current_angle) - origin_au * math.cos(origin_angle)
+        dy = target.orbit_radius * math.sin(target.current_angle) - origin_au * math.sin(origin_angle)
+        expected = max(0.25, math.hypot(dx, dy))
+        ok, plan = engine.preview_travel(target.id, "sublight")
+        self.assertTrue(ok, plan)
+        self.assertAlmostEqual(plan["distance_au"], round(expected, 2), places=2)
+        self.assertNotAlmostEqual(plan["distance_au"], round(star_distance, 2), places=1)
+
+    def test_orbiting_a_body_clears_the_open_space_anchor(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(ship=engine._clone_ship(credits=20000, fuel=60))
+        self.assertTrue(engine.start_travel_to_point(3.0, 1.0, "quantum")[0])
+        for _ in range(2):
+            engine.tick(1)
+        self.assertGreater(engine.state.ship.waypoint_au, 0)
+        target = next(b for b in engine.current_system.bodies if b.orbit_radius > 0 and b.body_type != "star")
+        ok, msg = engine.start_travel(target.id, "quantum")
+        self.assertTrue(ok, msg)
+        for _ in range(2):
+            engine.tick(1)
+        self.assertEqual(engine.state.ship.orbiting_body_id, target.id)
+        self.assertEqual(engine.state.ship.waypoint_au, 0.0)
 
     def test_waypoint_is_refused_outside_the_transit_envelope(self):
         engine = SimulationEngine(seed=42)

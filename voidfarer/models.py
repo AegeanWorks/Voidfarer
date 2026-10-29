@@ -1689,6 +1689,9 @@ class ShipState:
     surface_used: tuple[str, ...] = ()
     # Credits paid for the units still in the hold, per commodity (trade P/L basis).
     cargo_cost: dict[str, int] = field(default_factory=dict)
+    # Open-space anchor in the current system; zero when the ship orbits a body.
+    waypoint_au: float = 0.0
+    waypoint_angle: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1738,6 +1741,8 @@ class ShipState:
             "away_completed": list(self.away_completed),
             "trade_orders": [order.to_dict() for order in self.trade_orders],
             "surface_used": list(self.surface_used),
+            "waypoint_au": self.waypoint_au,
+            "waypoint_angle": self.waypoint_angle,
         }
 
     @classmethod
@@ -1809,6 +1814,8 @@ class ShipState:
             away_completed=tuple(str(key) for key in data.get("away_completed", ())),
             trade_orders=tuple(TradeOrder.from_dict(order) for order in data.get("trade_orders", ())),
             surface_used=tuple(str(key) for key in data.get("surface_used", ())),
+            waypoint_au=float(data.get("waypoint_au", 0.0)),
+            waypoint_angle=float(data.get("waypoint_angle", 0.0)),
         )
 
 

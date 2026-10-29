@@ -31,7 +31,7 @@ from voidfarer.server import VoidFarerHandler, start_background_server  # noqa: 
 from voidfarer.storage import StorageManager  # noqa: E402
 from tools.ui_audit import TABS, VIEWPORTS  # noqa: E402
 
-SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "galaxy", "death", "ability", "surface")
+SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "galaxy", "death", "ability", "surface", "waypoint")
 TAB_IDS = {
     "player": "tabBtnPlayer",
     "skills": "tabBtnSkills",
@@ -317,6 +317,19 @@ def _prepare_surface(engine: SimulationEngine) -> Optional[str]:
     return target.id if ok else None
 
 
+def _prepare_waypoint(engine: SimulationEngine) -> bool:
+    """Fly the flagship to an open-space vector so the void anchor is on screen."""
+    ok, _ = engine.start_travel_to_point(5.0, 0.0, "quantum")
+    if not ok:
+        return False
+    for _ in range(4):
+        if engine.state.ship.waypoint_au > 0 and engine.state.ship.travel is None:
+            break
+        engine.tick(1)
+    engine.pause_time()
+    return engine.state.ship.travel is None and engine.state.ship.waypoint_au > 0
+
+
 def _prepare_factions(engine: SimulationEngine) -> bool:
     """Advance a fresh campaign until the Coalition is at war, so the petition control renders."""
     def coalition_at_war() -> bool:
@@ -383,6 +396,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.tab == "factions" and not _prepare_factions(engine):
             print("Why: the Coalition was not at war within 400 ticks for the factions review.")
             print("Fix: retry with a different seed or review another tab.")
+            return 1
+        if args.scenario == "waypoint" and not _prepare_waypoint(engine):
+            print("Why: the flagship could not reach an open-space vector for the waypoint review.")
+            print("Fix: retry with a fresh save or another scenario.")
             return 1
         url = f"http://127.0.0.1:{handle.port}/"
         with sync_playwright() as playwright:

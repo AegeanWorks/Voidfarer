@@ -1,67 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "clickmap-proof",
+    "task_id": "review-fixes",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793277920.6193874,
+    "updated_at": 1793283249.8444526,
     "owner": "kilo:2",
     "started_by": "kilo:2",
     "continuations": [],
-    "completed_at": 1793277920.8739555
+    "completed_at": 1793283250.1080747
   },
   "checkpoints": [
-    {
-      "task_id": "cockpit-720p-legibility",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/3] G-015 re-review APPROVED with no defects from gemma-4-31b (evren2): toasts clear the terminal, SCROLL cue legible, bottom strip uncluttered at 720p, no 1080p regression. Cockpit UI task closed with a surface digest; 679 tests; 4/4 gates. checklists: passed (test, hygiene, guidelines, secrets).",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793252027.860832,
-      "timestamp_str": "2026-10-29 08:33:47",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "complete, all gates green, vision approved",
-        "next": "push when authorized",
-        "open": "none",
-        "evidence": "ui_history entry, ui-review/review-20261028b"
-      }
-    },
-    {
-      "task_id": "cockpit-720p-legibility",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'cockpit-720p-legibility' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793252035.461023,
-      "timestamp_str": "2026-10-29 08:33:55",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "ship-dossier-legibility",
-      "phase": "phase 1",
-      "phase_num": 1,
-      "description": "[1/3] Fix the three vision-found SHIP/EMPIRE defects (clipped silhouette slot labels and a stray question-mark glyph, mid-word catalog name clipping, drifting research cost/START columns) and stop the audit from counting a modal as a HUD collision.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793253168.0185928,
-      "timestamp_str": "2026-10-29 08:52:48",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The G-015 vision reviewer rejected the ship and empire surfaces that DOM metrics had passed, and every tab audit reported the blocking decision modal as two or three HUD overlaps.",
-        "benefits": "Slot cases name their subsystem without clipping, installed modules show a wrench instead of a question mark, catalog names are fully readable in the 320px deck, research costs and buttons share a column, and audit overlap counts mean real HUD collisions.",
-        "risks": "contract: two additive JSON keys (slot_codes) in the ship report and status snapshot; dependency: stdlib only; concurrency: none; state: none; visual: CSS could reflow the ship rows or research cards at 720p",
-        "mitigation": "Additive keys with defaults, deterministic wrappers, contract tests including a snapshot-key pin, fresh 1280x720 and 1920x1080 captures, vision re-review, full gates"
-      },
-      "handoff": {
-        "state": "implementation complete, awaiting verification checkpoint",
-        "next": "gates then commit",
-        "open": "none",
-        "evidence": "ui-review/review-20261029c"
-      }
-    },
     {
       "task_id": "ship-dossier-legibility",
       "phase": "phase 4",
@@ -315,6 +265,49 @@
       "status": "completed",
       "timestamp": 1793277920.873957,
       "timestamp_str": "2026-10-29 15:45:20",
+      "agent": "kilo:2"
+    },
+    {
+      "task_id": "review-fixes",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan review fixes: persist the open-space anchor, persist decision cadence, correct the petition-pressure sign, and add a waypoint UI scenario.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283209.6552703,
+      "timestamp_str": "2026-10-29 17:13:29",
+      "agent": "kilo:2",
+      "impact_assessment": {
+        "why": "The unpushed captain/transit diff lost the open-space position on arrival, reset cadence on reload and made winning factions easier to persuade.",
+        "benefits": "Correct transit pricing from the void, durable settings, sane diplomacy odds, reviewed waypoint UI.",
+        "risks": "contract: ShipState/TravelState serialization only; dependency: stdlib; concurrency: none; state: new fields are defaulted and backward compatible",
+        "mitigation": "Failing-first anchor/cadence/sign tests, G-015 re-review, full gates"
+      }
+    },
+    {
+      "task_id": "review-fixes",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[3/3] Anchor persistence (ship.waypoint_au/angle), anchor-priced transit, cadence persistence, petition pressure sign, waypoint scenario + README. checklists: passed. 746 tests, G-015 vision approved, AI captain 9 families.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793283249.8444526,
+      "timestamp_str": "2026-10-29 17:14:09",
+      "agent": "kilo:2",
+      "handoff": {
+        "state": "complete",
+        "next": "aikit check and commit",
+        "evidence": "746 tests OK, 4/4 gates, waypoint vision approved"
+      }
+    },
+    {
+      "task_id": "review-fixes",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'review-fixes' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793283250.1080759,
+      "timestamp_str": "2026-10-29 17:14:10",
       "agent": "kilo:2"
     }
   ]

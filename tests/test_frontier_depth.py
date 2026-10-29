@@ -196,6 +196,17 @@ class DecisionEventTest(unittest.TestCase):
         self.assertEqual(settings["decision_cadence"], "normal")
         self.assertIn("relaxed", settings["decision_cadences"])
 
+    def test_cadence_is_persisted_with_the_save(self):
+        engine = SimulationEngine(seed=42)
+        self.assertTrue(engine.set_decision_cadence("relaxed")[0])
+        self.assertEqual(engine.state.stats.get("decision_cadence"), "relaxed")
+        reloaded = SimulationEngine(state=type(engine.state).from_dict(engine.state.to_dict()))
+        self.assertEqual(reloaded.decision_cadence, "relaxed")
+        self.assertEqual(reloaded._decision_cooldown(), 36)
+        # An unknown saved value falls back to the default instead of breaking the run.
+        engine.state = engine._clone_state(stats={**engine.state.stats, "decision_cadence": "warp"})
+        self.assertEqual(SimulationEngine(state=engine.state).decision_cadence, "normal")
+
     def test_low_hull_event_is_eligible(self):
         engine = SimulationEngine(seed=42)
         engine.state = engine._clone_state(ship=engine._clone_ship(hull=10))

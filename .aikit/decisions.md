@@ -998,3 +998,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Pin the probe and its failure path with a layout test, and document the command in README and the tree entry for the tool.
   3. Open and close an AIKit UI task for the already-reviewed cockpit surface, recording the NVIDIA Nemotron 3.5 Super VL vision subagent as the reviewer.
 - **Consequences**: The desktop cockpit proves 133 rendered controls, 63 visible, 0 missing handles, 0 duplicates in a real browser. The UI contract now has a finished reviewed task matching the surface, so the standing `DELIVERY` warning about the cockpit is gone. Suite: 740 tests (42 suites).
+
+
+### ADR-084: Review Fixes for the Open-Space Anchor, Petition Odds and Saved Cadence
+- **Date**: 2026-10-29
+- **Status**: Accepted
+- **Context**: A second pass over the unpushed captain/transit/agent diff found three contract gaps and one class of balance error that the tests did not cover. (1) `TravelState` carried the waypoint only while in transit, so on arrival the ship forgot where it was: `orbiting_body_id` became null and every later distance, fuel estimate and plan was measured from the star instead of the ship. (2) `decision_cadence` lived only on the `SimulationEngine`, so a reload silently reset a relaxed campaign to normal. (3) The petition pressure term used the asked side's disadvantage, which made a winning side easier to persuade than a losing one. (4) The manual BOM-strip used during the review corrupted the encoding of two files until repaired.
+- **Decision**:
+  1. Add `ShipState.waypoint_au`/`waypoint_angle` as the open-space anchor, persisted by `to_dict`/`from_dict` and cleared whenever the ship orbits a body, jumps or dives. `_ship_position` is the single origin for `compute_body_distance_au` and `_point_travel_plan`, and the arrival branch records the anchor. The cockpit prices vectors from the anchor and draws `VF-FLAGSHIP (OPEN SPACE)`.
+  2. Persist cadence in `stats["decision_cadence"]`, restore it on load with a safe fallback, and mirror it into `set_decision_cadence`; keep `last_decision_tick` as the cooldown anchor.
+  3. Compute petition pressure from the asked faction's own advantage (`war_score` for the attacker, negated for the defender), so a losing side is easier to persuade.
+  4. Add `waypoint` to the real-browser scenarios with `_prepare_waypoint`, pin it in layout tests, and re-run the G-015 capture and vision review.
+- **Consequences**: A ship that parks in the void stays there across saves and pays the true distance to its next destination; cadence survives restart; a losing belligerent is the one that listens. Regression tests cover anchor persistence, anchor-priced transit, anchor clearing on orbit, cadence persistence and both sides of the petition pressure sign. G-015 re-review (NVIDIA Nemotron 3.5 Super VL) approved the flagship label, NPC hull markers and arrival notice at 1920x1080 and 1280x720. Suite: 746 tests (42 suites).

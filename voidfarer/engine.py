@@ -378,7 +378,11 @@ class SimulationEngine:
         self.seed = seed
         self.rng = random.Random(seed)
         self.allow_decision_events = False
-        self.decision_cadence = self.DEFAULT_DECISION_CADENCE
+        # Cadence is a preference, so it lives in the save's stats rather than only in RAM.
+        saved_cadence = str(state.stats.get("decision_cadence", "")) if state is not None else ""
+        self.decision_cadence = (
+            saved_cadence if saved_cadence in self.DECISION_CADENCE else self.DEFAULT_DECISION_CADENCE
+        )
 
         if state is not None:
             ship = state.ship
@@ -600,6 +604,8 @@ class SimulationEngine:
             trade_orders=kwargs.get("trade_orders", cur.trade_orders),
             surface_used=kwargs.get("surface_used", cur.surface_used),
             cargo_cost=cargo_cost,
+            waypoint_au=kwargs.get("waypoint_au", cur.waypoint_au),
+            waypoint_angle=kwargs.get("waypoint_angle", cur.waypoint_angle),
         )
 
     def _clone_state(self, **kwargs: Any) -> GameState:
@@ -1249,6 +1255,8 @@ class SimulationEngine:
                 ship=self._clone_ship(
                     fuel=self.state.ship.fuel - fuel_cost,
                     orbiting_body_id=None,
+                    waypoint_au=0.0,
+                    waypoint_angle=0.0,
                     void_traversal=traversal,
                     flight_log=tuple(new_log[-20:]),
                 ),
@@ -1312,6 +1320,8 @@ class SimulationEngine:
                     credits=self.state.ship.credits + resonance_credits,
                     mastery=new_mastery,
                     orbiting_body_id=horizon_id,
+                    waypoint_au=0.0,
+                    waypoint_angle=0.0,
                     void_traversal=None,
                     flight_log=tuple(new_log[-20:]),
                 ),
@@ -1604,6 +1614,8 @@ class SimulationEngine:
                 orbiting_body_id=target_sys.bodies[0].id if target_sys.bodies else None,
                 landed_body_id=None,
                 travel=None,
+                waypoint_au=0.0,
+                waypoint_angle=0.0,
                 fleet_drones=updated_drones,
                 flight_log=tuple(new_log[-20:]),
                 streak=new_streak,
@@ -1692,6 +1704,8 @@ class SimulationEngine:
                     orbiting_body_id=new_ship.orbiting_body_id,
                     landed_body_id=None,
                     travel=None,
+                    waypoint_au=0.0,
+                    waypoint_angle=0.0,
                     power=new_ship.power,
                     upgrades=new_ship.upgrades,
                     equipped_upgrades=new_ship.equipped_upgrades,
@@ -1729,18 +1743,26 @@ class SimulationEngine:
                 msg += f" WARNING: Intercepted by {combat.enemy_name}!"
             return True, msg
 
+    def _ship_position(self) -> tuple[float, float]:
+        """Current in-system position: the orbited body, or the open-space anchor."""
+        origin = self.orbiting_body
+        if origin is not None:
+            return float(origin.orbit_radius), float(origin.current_angle or 0.0)
+        return float(self.state.ship.waypoint_au or 0.0), float(self.state.ship.waypoint_angle or 0.0)
+
     def compute_body_distance_au(
         self,
         target_body: CelestialBody,
         origin_body: CelestialBody | None = None,
     ) -> float:
-        """Compute 2D polar Euclidean distance in AU between two bodies (or current orbit/star origin)."""
-        origin = origin_body if origin_body is not None else self.orbiting_body
-        if origin is not None:
-            ox = origin.orbit_radius * math.cos(origin.current_angle)
-            oy = origin.orbit_radius * math.sin(origin.current_angle)
+        """Compute 2D polar Euclidean distance in AU from the current position to a body."""
+        if origin_body is not None:
+            origin_au = float(origin_body.orbit_radius)
+            origin_angle = float(origin_body.current_angle or 0.0)
         else:
-            ox, oy = 0.0, 0.0
+            origin_au, origin_angle = self._ship_position()
+        ox = origin_au * math.cos(origin_angle)
+        oy = origin_au * math.sin(origin_angle)
         tx = target_body.orbit_radius * math.cos(target_body.current_angle)
         ty = target_body.orbit_radius * math.sin(target_body.current_angle)
         return round(max(0.25, math.hypot(tx - ox, ty - oy)), 2)
@@ -1774,6 +1796,8 @@ class SimulationEngine:
                 orbiting_body_id=body_id,
                 landed_body_id=None,
                 travel=None,
+                waypoint_au=0.0,
+                waypoint_angle=0.0,
                 credits=self.state.ship.credits + tut_cr,
                 mastery=new_mastery,
                 relics=tuple(list(self.state.ship.relics) + tut_relics),
@@ -1817,7 +1841,7 @@ class SimulationEngine:
 
         origin = self.orbiting_body
         origin_id = origin.id if origin else None
-        distance_au = self.compute_body_distance_au(matched, origin)
+        distance_au = self.compute_body_distance_au(matched)
         map_effects = self._map_effects(cur_sys)
         risk, hazards = self._transit_risk(cur_sys, norm_mode, map_effects)
 
@@ -1903,8 +1927,7 @@ class SimulationEngine:
 
         cur_sys = self.current_system
         origin = self.orbiting_body
-        origin_au = float(origin.orbit_radius) if origin else 0.0
-        origin_angle = float(origin.current_angle or 0.0) if origin else 0.0
+        origin_au, origin_angle = self._ship_position()
         dx = math.cos(target_angle) * target_au - math.cos(origin_angle) * origin_au
         dy = math.sin(target_angle) * target_au - math.sin(origin_angle) * origin_au
         distance_au = max(0.0, math.hypot(dx, dy))
@@ -5774,9 +5797,10 @@ class SimulationEngine:
         """Odds a petition is accepted: standing, diplomacy skill and how the war is going."""
         standing = self.state.ship.faction_standings.get(faction_id, 0)
         skill = self._skill("diplomacy")
-        score = war.war_score if faction_id == war.defender_id else -war.war_score
+        # Positive war score favours the attacker, so this is the asked side's advantage.
+        advantage = war.war_score if faction_id == war.attacker_id else -war.war_score
         # A faction that is winning has little reason to talk; a losing one listens.
-        pressure = max(-0.20, min(0.20, -score / 100.0))
+        pressure = max(-0.20, min(0.20, -advantage / 100.0))
         chance = 0.15 + (standing + 100) / 200.0 * 0.45 + skill * 0.25 + pressure
         return max(0.05, min(0.90, chance))
 
@@ -6577,6 +6601,9 @@ class SimulationEngine:
         key = str(cadence).strip().lower()
         if key not in self.DECISION_CADENCE:
             return False, f"Unknown cadence '{cadence}'. Choose {', '.join(self.DECISION_CADENCE)}."
+        stats = dict(self.state.stats)
+        stats["decision_cadence"] = key
+        self.state = self._clone_state(stats=stats)
         self.decision_cadence = key
         return True, f"Decision cadence set to {key} (one prompt per {self._decision_cooldown()} ticks)."
 
@@ -7023,6 +7050,8 @@ class SimulationEngine:
             new_orbiting_body_id = cur_ship.orbiting_body_id
             new_landed_body_id = cur_ship.landed_body_id
             new_travel = cur_ship.travel
+            new_waypoint_au = cur_ship.waypoint_au
+            new_waypoint_angle = cur_ship.waypoint_angle
             new_events = list(self.state.events)
             if cur_ship.travel is not None and new_tick >= cur_ship.travel.arrival_tick:
                 new_orbiting_body_id = cur_ship.travel.destination_body_id
@@ -7031,11 +7060,15 @@ class SimulationEngine:
                 cur_sys_obj = updated_systems.get(cur_ship.current_system_id, self.current_system)
                 if new_orbiting_body_id is None:
                     # Open-space vector: the ship holds station in the void, orbiting nothing.
+                    new_waypoint_au = float(cur_ship.travel.waypoint_au)
+                    new_waypoint_angle = float(cur_ship.travel.waypoint_angle)
                     dest_name = f"open space at {cur_ship.travel.waypoint_au:.2f} AU"
                     arr_msg = (
                         f"Holding station in {dest_name} after {cur_ship.travel.mode} transit."
                     )
                 else:
+                    new_waypoint_au = 0.0
+                    new_waypoint_angle = 0.0
                     dest_name = new_orbiting_body_id
                     for b in cur_sys_obj.bodies:
                         if b.id == new_orbiting_body_id:
@@ -7365,6 +7398,8 @@ class SimulationEngine:
                 orbiting_body_id=new_orbiting_body_id,
                 landed_body_id=new_landed_body_id,
                 travel=new_travel,
+                waypoint_au=new_waypoint_au,
+                waypoint_angle=new_waypoint_angle,
                 void_traversal=new_void,
                 away_missions=new_away_missions,
                 away_completed=tuple(sorted(new_away_completed)),

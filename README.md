@@ -325,8 +325,10 @@ they accept). Everything else ends by exhaustion, capture or a bankrupt treasury
 
 Clicking empty space on the orbital radar selects a vector instead of clearing the
 target: `TRANSIT & ORBIT` becomes `MOVE TO VECTOR`, and on arrival the ship holds station
-in the void with no body in orbit. NPC captains are drawn on both maps (system radar and
-galaxy) and can be selected and hailed from their target card.
+in the void with no body in orbit. The anchor (`waypoint_au`/`waypoint_angle`) persists in
+the save and is drawn as `VF-FLAGSHIP (OPEN SPACE)`; the next transit is priced from that
+anchor, not from the star. NPC captains are drawn on both maps (system radar and galaxy)
+and can be selected and hailed from their target card.
 
 ```bash
 # Rare, normal or frequent blocking quick-time decisions (normal = one per 14 ticks)

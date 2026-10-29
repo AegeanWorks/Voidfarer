@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `87`
 - **Total Classes**: `222`
-- **Total Top-Level Functions**: `300`
-- **Total Class Methods**: `1251`
-- **Total Source Lines**: `35828`
+- **Total Top-Level Functions**: `301`
+- **Total Class Methods**: `1258`
+- **Total Source Lines**: `35957`
 
 ---
 
@@ -238,7 +238,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1119` lines (`50590` bytes)
+**Size**: `1130` lines (`51156` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -373,6 +373,7 @@
   - Method `.setUpClass()`
   - Method `.test_wars_panel_sits_in_the_factions_tab_and_pledges()`
   - Method `.test_only_your_own_wars_offer_a_ceasefire_petition()`
+  - Method `.test_open_space_anchor_draws_the_flagship_and_prices_from_the_anchor()`
   - Method `.test_third_party_wars_never_expose_a_player_peace_button()`
   - Method `.test_outposts_are_founded_from_the_empire_tab()`
   - Method `.test_treasury_is_reported_per_month()`
@@ -383,6 +384,7 @@
   - Method `.test_contract_header_stacks_short_badge_above_unclamped_title_at_narrow_widths()`
   - Method `.test_compact_reactor_strip_uses_four_proportional_tracks()`
   - Method `.test_surface_ops_scrolls_target_card_and_browser_driver_prepares_surface()`
+  - Method `.test_waypoint_review_prepares_an_open_space_anchor()`
   - Method `.test_factions_review_prepares_a_coalition_war_for_the_petition_control()`
   - Method `.test_every_click_has_a_stable_handle_for_automation()`
   - Method `.test_aikit_link_and_decision_cadence_are_visible()`
@@ -689,7 +691,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `413` lines (`20481` bytes)
+**Size**: `424` lines (`21225` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
@@ -708,6 +710,7 @@
   - Method `.test_pending_decision_blocks_time_until_resolved()`
   - Method `.test_decisions_are_rate_limited_by_the_cadence_window()`
   - Method `.test_cadence_choices_and_snapshot()`
+  - Method `.test_cadence_is_persisted_with_the_save()`
   - Method `.test_low_hull_event_is_eligible()`
 - `class QuantumFreightTest`
   - Method `.test_freight_costs_fee_arrives_later_and_progresses_delivery_contract()`
@@ -777,7 +780,7 @@
 ### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
 > *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
 
-**Size**: `359` lines (`17199` bytes)
+**Size**: `369` lines (`17973` bytes)
 
 **Classes:**
 - `class FixedRng` - *Noise-free rng: uniform returns a fixed value, choice takes the first item.*
@@ -811,6 +814,7 @@
   - Method `.test_petition_acceptance_ends_the_war_and_charges_the_envoy()`
   - Method `.test_petition_refusal_is_reported_and_costs_nothing()`
   - Method `.test_petition_odds_rise_with_standing_and_diplomacy()`
+  - Method `.test_a_losing_side_is_more_willing_to_talk_than_a_winning_one()`
 - `class TestWarSupportParity`
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
@@ -969,12 +973,14 @@
 ### [`tests/test_navigation_traffic.py`](tests/test_navigation_traffic.py)
 > *Open-space transit vectors and the NPC traffic that shares the map.*
 
-**Size**: `84` lines (`3572` bytes)
+**Size**: `122` lines (`5717` bytes)
 
 **Classes:**
 - `class EmptySpaceTransitTest`
   - Method `.test_waypoint_transit_does_not_promise_an_orbit()`
   - Method `.test_arrival_holds_station_in_open_space()`
+  - Method `.test_leaving_open_space_prices_the_transit_from_the_anchor()`
+  - Method `.test_orbiting_a_body_clears_the_open_space_anchor()`
   - Method `.test_waypoint_is_refused_outside_the_transit_envelope()`
   - Method `.test_a_second_vector_cannot_be_plotted_mid_flight()`
   - Method `.test_survey_and_orbit_actions_need_a_body()`
@@ -1510,7 +1516,7 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `440` lines (`19979` bytes)
+**Size**: `457` lines (`20752` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
@@ -1518,6 +1524,7 @@
 - `def _click_probe(page)` - *Enumerate every cockpit control through the shipped click map and prove handles are unique.*
 - `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll, click_map)` - *Open one real browser viewport, drive it and capture a true screenshot.*
 - `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
+- `def _prepare_waypoint(engine)` - *Fly the flagship to an open-space vector so the void anchor is on screen.*
 - `def _prepare_factions(engine)` - *Advance a fresh campaign until the Coalition is at war, so the petition control renders.*
 - `def main(argv)` - *Run the browser review driver and write screenshots plus a small JSON report.*
 
@@ -1816,7 +1823,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7509` lines (`373174` bytes)
+**Size**: `7544` lines (`374952` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1857,7 +1864,8 @@
   - Method `.void_status()` - *Void traversal readiness, lanes, and active traversal state (CLI/REST/cockpit parity).*
   - Method `._process_drone_cycle(ship)` - *Advance autonomous drone harvest cycle across star systems.*
   - Method `.jump(target_system_id)` - *Execute a hyperspace jump to an adjacent star system.*
-  - Method `.compute_body_distance_au(target_body, origin_body)` - *Compute 2D polar Euclidean distance in AU between two bodies (or current orbit/star origin).*
+  - Method `._ship_position()` - *Current in-system position: the orbited body, or the open-space anchor.*
+  - Method `.compute_body_distance_au(target_body, origin_body)` - *Compute 2D polar Euclidean distance in AU from the current position to a body.*
   - Method `.orbit(body_id)` - *Establish orbital trajectory around a celestial body in the current system.*
   - Method `._transit_risk(system, mode, effects)` - *Sector hazard risk for one in-system transit, reduced by piloting and quantum drive.*
   - Method `._travel_plan(body_id, mode)` - *Compute a transit plan without mutating state; shared by preview and execution.*
@@ -2207,7 +2215,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2141` lines (`79298` bytes)
+**Size**: `2148` lines (`79664` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
