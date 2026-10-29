@@ -318,6 +318,19 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "Turn the frontier into a stable coalition.",
         "allies", 3, 1200, 320,
     ),
+    # Reconstruction & relief
+    CodexEntry(
+        "rebuilder", "legacy", "Rebuilder",
+        "Rebuild five devastated worlds.",
+        "Spend credits at a devastated inhabited world.",
+        "worlds_rebuilt", 5, 1400, 350,
+    ),
+    CodexEntry(
+        "relief_runner", "legacy", "Relief Runner",
+        "Deliver relief supplies to three devastated worlds.",
+        "Load medicines, hydroponics and fuel, then deliver relief.",
+        "relief_deliveries", 3, 1000, 280,
+    ),
     # Legacy
     CodexEntry(
         "signal", "legacy", "Signal Decoded",
@@ -372,6 +385,8 @@ METRIC_LABELS: dict[str, str] = {
     "pirates_fought": "Pirates fought",
     "deliveries": "Quantum freight deliveries",
     "surface_ops": "Surface operations",
+    "worlds_rebuilt": "Worlds rebuilt",
+    "relief_deliveries": "Relief deliveries",
     "trades": "Commodity trades",
     "credits_earned": "Credits earned",
     "combat_victories": "Combat victories",
@@ -411,6 +426,8 @@ STATS_ORDER: tuple[str, ...] = (
     "pirates_fought",
     "deliveries",
     "surface_ops",
+    "worlds_rebuilt",
+    "relief_deliveries",
     "trades",
     "credits_earned",
     "combat_victories",
@@ -481,6 +498,10 @@ def metric_value(state: GameState, metric: str) -> int:
         return int(state.stats.get("deliveries", 0))
     if metric == "surface_ops":
         return int(state.stats.get("surface_ops", 0))
+    if metric == "worlds_rebuilt":
+        return int(state.stats.get("worlds_rebuilt", 0))
+    if metric == "relief_deliveries":
+        return int(state.stats.get("relief_deliveries", 0))
     if metric == "trades":
         return int(state.stats.get("trades", 0))
     if metric == "credits_earned":

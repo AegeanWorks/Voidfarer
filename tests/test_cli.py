@@ -55,6 +55,12 @@ class TestCLI(_IsolatedCliTestCase):
             code = main(["power", "25", "25", "25", "25"])
             self.assertEqual(code, 0)
 
+    def test_cli_reconstruct_parses_and_refuses_an_intact_world(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["reconstruct", "sol_body_1"])
+            self.assertEqual(code, 1)
+            self.assertIn("not devastated", mock_out.getvalue().lower())
+
     def test_cli_combat_accepts_documented_actions(self):
         for argv in (["combat", "drone"], ["combat", "target", "weapons"], ["combat", "target", "shields"]):
             with patch("sys.stdout", new_callable=io.StringIO) as mock_out:

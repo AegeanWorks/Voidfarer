@@ -1189,3 +1189,27 @@ class TestVectorTravelCockpit(unittest.TestCase):
         tool = (STATIC_DIR.parent.parent / "tools" / "ui_browser.py").read_text(encoding="utf-8")
         self.assertIn('"vector"', tool)
         self.assertIn('selectedType = "point"', tool)
+
+class TestWorldReliefCockpit(unittest.TestCase):
+    """The target card must expose post-war rebuilding and relief controls."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_target_card_holds_rebuild_and_relief_actions(self):
+        for element_id in ("btnRebuildTarget", "btnReliefTarget"):
+            self.assertIn(f'id="{element_id}"', self.html)
+        for marker in ("handleReconstructAction", '"/api/reconstruct"', "btnRebuildTarget", "btnReliefTarget"):
+            self.assertIn(marker, self.js)
+
+    def test_reconstruction_controls_have_stable_testids(self):
+        self.assertIn('data-testid="rebuild-target"', self.html)
+        self.assertIn('data-testid="relief-target"', self.html)
+
+    def test_browser_review_prepares_a_devastated_world(self):
+        tool = (STATIC_DIR.parent.parent / "tools" / "ui_browser.py").read_text(encoding="utf-8")
+        self.assertIn('"relief"', tool)
+        self.assertIn("def _prepare_relief(", tool)
+        self.assertIn("devastation=60.0", tool)

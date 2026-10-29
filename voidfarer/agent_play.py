@@ -27,6 +27,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/combat": "prompt-driven: a hostile intercept must occur",
     "/api/pirate/resolve": "prompt-driven: a pirate toll must intercept",
     "/api/decision/resolve": "prompt-driven: a blocking decision must be pending",
+    "/api/reconstruct": "needs a devastated inhabited world in orbit",
     "/api/void/dive": "needs a black-hole horizon",
     "/api/void/emerge": "needs an active void traversal",
     "/api/inventory/buy": "no item shop catalog is exposed by the API",

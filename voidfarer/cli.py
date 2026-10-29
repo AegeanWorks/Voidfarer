@@ -739,6 +739,18 @@ def cmd_land(engine: SimulationEngine, storage: StorageManager, body_id: str) ->
     return 0 if ok else 1
 
 
+def cmd_reconstruct(
+    engine: SimulationEngine,
+    storage: StorageManager,
+    body_id: str,
+    mode: str = "credits",
+) -> int:
+    ok, msg = engine.reconstruct_world(body_id, mode)
+    print((GREEN if ok else RED) + msg + RESET)
+    storage.save(engine.state)
+    return 0 if ok else 1
+
+
 def cmd_saves(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
     """List, save, load, or delete named save slots."""
     action = parts[1].lower() if len(parts) > 1 else "list"
@@ -2114,6 +2126,13 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_quantum(engine, storage, parts)
         elif cmd in ("surface", "landing"):
             cmd_surface(engine, storage, parts)
+        elif cmd in ("reconstruct", "rebuild", "relief"):
+            mode = "relief" if cmd == "relief" or "--relief" in parts else "credits"
+            body_id = next((part for part in parts[1:] if not part.startswith("-")), "")
+            if not body_id:
+                print(f"{RED}Usage:{RESET} reconstruct <body_id> [--relief]")
+            else:
+                cmd_reconstruct(engine, storage, body_id, mode)
         elif cmd in ("weapons", "weapon"):
             cmd_weapons(engine, storage, parts)
         elif cmd in ("reactor", "core", "thermal"):
@@ -2360,6 +2379,7 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             print("  messages [list|send|read]      - Intergalactic quantum messaging")
             print("  depot [status|deposit|withdraw|sell] - System cargo depot operations")
             print("  land <body_id>                 - Land on a habitable body")
+            print("  reconstruct <body_id> [--relief] - Rebuild a devastated inhabited world")
             print("  mercs [list|hire|dismiss|refit] - Mercenary contracts and fleet refits")
             print("  allies [list|form]             - Alliance roster and formation")
             print("  saves [list|save|load|delete] [slot] - Manage multiple save slots")
@@ -2461,6 +2481,14 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     land_p = subparsers.add_parser("land", help="Land on a habitable body")
     land_p.add_argument("body_id", help="Celestial body ID")
+
+    reconstruct_p = subparsers.add_parser(
+        "reconstruct", help="Rebuild a devastated inhabited world with credits or relief cargo"
+    )
+    reconstruct_p.add_argument("body_id", help="Celestial body ID")
+    reconstruct_p.add_argument(
+        "--relief", action="store_true", help="Use medicines, hydroponics and fuel instead of credits"
+    )
 
     merc_p = subparsers.add_parser("mercs", help="Mercenary contracts and fleet refits")
     merc_p.add_argument("action", nargs="?", default="list", choices=["list", "hire", "dismiss", "refit"])
@@ -2810,6 +2838,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_depot(engine, storage, parts)
     elif args.command == "land":
         return cmd_land(engine, storage, args.body_id)
+    elif args.command == "reconstruct":
+        return cmd_reconstruct(
+            engine, storage, args.body_id, "relief" if args.relief else "credits"
+        )
     elif args.command == "mercs":
         parts = ["mercs", args.action]
         if args.target_id:

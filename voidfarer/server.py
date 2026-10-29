@@ -527,6 +527,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/reconstruct":
+            body_id = str(body.get("body_id", ""))
+            mode = str(body.get("mode", "credits"))
+            ok, msg = self.engine.reconstruct_world(body_id, mode)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/ai/interact":
             captain_id = str(body.get("captain_id", ""))
             action = str(body.get("action", "hail"))

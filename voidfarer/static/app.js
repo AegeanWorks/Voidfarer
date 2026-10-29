@@ -7,6 +7,9 @@ const TICKS_PER_SECOND = 2.0;
 
 // Must match voidfarer/demographics.py DEVASTATION_CAPACITY_LOSS.
 const DEVASTATION_CAPACITY_LOSS = 0.65;
+// Must match SimulationEngine.RECONSTRUCTION_CREDIT_COST / RELIEF_CARGO.
+const RECONSTRUCTION_CREDIT_COST = 600;
+const RELIEF_CARGO = [["medicines", 2], ["hydroponics", 2], ["fuel_cells", 1]];
 
 const BODY_TYPE_LABELS = {
     dyson_sphere: "DYSON SWARM",
@@ -436,6 +439,8 @@ class CockpitApp {
         this.surfaceOps = document.getElementById("surfaceOps");
         this.btnSalvageTarget = document.getElementById("btnSalvageTarget");
         this.btnScoopFuel = document.getElementById("btnScoopFuel");
+        this.btnRebuildTarget = document.getElementById("btnRebuildTarget");
+        this.btnReliefTarget = document.getElementById("btnReliefTarget");
         this.salvageInfo = document.getElementById("salvageInfo");
         this.btnJumpTarget = document.getElementById("btnJumpTarget");
         this.btnHailTarget = document.getElementById("btnHailTarget");
@@ -759,6 +764,8 @@ class CockpitApp {
         // Target actions
         this.btnOrbitTarget.addEventListener("click", () => this.handleTravelAction("sublight"));
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
+        this.btnRebuildTarget?.addEventListener("click", () => this.handleReconstructAction("credits"));
+        this.btnReliefTarget?.addEventListener("click", () => this.handleReconstructAction("relief"));
         this.btnJumpTarget.addEventListener("click", () => this.handleJumpAction());
         this.btnHailTarget?.addEventListener("click", () => {
             if (this.selectedType === "captain" && this.selectedTarget) {
@@ -4406,6 +4413,34 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.btnLandTarget.disabled = !canLand;
                 this.btnLandTarget.textContent = this.state.ship.landed_body_id === b.id ? "LANDED" : "LAND ON SURFACE";
             }
+            const bodyDevastation = Number(b.devastation || 0);
+            const canReconstruct = (
+                !travel
+                && bodyDevastation > 0
+                && Number(b.population || 0) > 0
+                && (this.state.ship.orbiting_body_id === b.id || this.state.ship.landed_body_id === b.id)
+            );
+            const missingRelief = RELIEF_CARGO.filter(([item, quantity]) =>
+                Number((this.state.ship.cargo || {})[item] || 0) < quantity
+            );
+            if (this.btnRebuildTarget) {
+                this.btnRebuildTarget.style.display = canReconstruct ? "inline-block" : "none";
+                this.btnRebuildTarget.disabled = !canReconstruct || Number(this.state.ship.credits || 0) < RECONSTRUCTION_CREDIT_COST;
+                this.btnRebuildTarget.textContent = `REBUILD WORLD (${RECONSTRUCTION_CREDIT_COST} CR)`;
+                this.btnRebuildTarget.title = canReconstruct
+                    ? "Spend credits to remove 20 devastation from this world"
+                    : "Orbit or land on a devastated inhabited world to rebuild it";
+            }
+            if (this.btnReliefTarget) {
+                this.btnReliefTarget.style.display = canReconstruct ? "inline-block" : "none";
+                this.btnReliefTarget.disabled = !canReconstruct || missingRelief.length > 0;
+                this.btnReliefTarget.textContent = missingRelief.length
+                    ? `RELIEF NEEDS ${missingRelief.map(([item, quantity]) => `${quantity} ${item}`).join(", ")}`
+                    : "DELIVER RELIEF";
+                this.btnReliefTarget.title = missingRelief.length
+                    ? "Load the missing relief supplies first"
+                    : "Spend medicines, hydroponics and fuel to remove 40 devastation";
+            }
             const salvage = inOrbitHere ? this.state.salvage_site : null;
             if (this.btnSalvageTarget) {
                 this.btnSalvageTarget.style.display = salvage ? "inline-block" : "none";
@@ -4470,6 +4505,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.btnLandTarget.style.display = "none";
             this.btnSalvageTarget.style.display = "none";
             this.btnScoopFuel.style.display = "none";
+            if (this.btnRebuildTarget) this.btnRebuildTarget.style.display = "none";
+            if (this.btnReliefTarget) this.btnReliefTarget.style.display = "none";
             if (this.salvageInfo) this.salvageInfo.style.display = "none";
             if (this.transitPlan) this.transitPlan.style.display = "none";
             if (this.btnHailTarget) {
@@ -4521,6 +4558,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.btnLandTarget.style.display = "none";
             this.btnSalvageTarget.style.display = "none";
             this.btnScoopFuel.style.display = "none";
+            if (this.btnRebuildTarget) this.btnRebuildTarget.style.display = "none";
+            if (this.btnReliefTarget) this.btnReliefTarget.style.display = "none";
             if (this.salvageInfo) this.salvageInfo.style.display = "none";
             if (this.transitPlan) this.transitPlan.style.display = "none";
             if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
@@ -4567,6 +4606,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.btnLandTarget) this.btnLandTarget.style.display = "none";
             if (this.btnSalvageTarget) this.btnSalvageTarget.style.display = "none";
             if (this.btnScoopFuel) this.btnScoopFuel.style.display = "none";
+            if (this.btnRebuildTarget) this.btnRebuildTarget.style.display = "none";
+            if (this.btnReliefTarget) this.btnReliefTarget.style.display = "none";
             if (this.salvageInfo) this.salvageInfo.style.display = "none";
             if (this.btnQuantumTarget) this.btnQuantumTarget.style.display = "none";
             this.btnOrbitTarget.style.display = "none";
@@ -6325,6 +6366,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleLandAction() {
         if (!this.selectedTarget || this.selectedType !== "body") return;
         await this.postAction("/api/land", { target: this.selectedTarget.id });
+    }
+
+    async handleReconstructAction(mode = "credits") {
+        if (!this.selectedTarget || this.selectedType !== "body") return;
+        const res = await this.postAction("/api/reconstruct", {
+            body_id: this.selectedTarget.id,
+            mode,
+        });
+        if (res && res.ok) {
+            this.sound.playChime();
+            this.updateTargetCard();
+        }
     }
 
     async handleSalvage() {

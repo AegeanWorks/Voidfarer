@@ -466,7 +466,30 @@ def simulate_faction_behaviors(
         new_wars, systems, rng, current_tick, eliminated, num_ticks
     )
     logs.extend(war_logs)
-    return resolved_wars, systems, eliminated_now, logs
+
+    # A belligerent can lose its last world to a third party while this war is in
+    # another battle. Close that orphaned war instead of leaving a phantom front.
+    closed: list[WarState] = []
+    gone_now = set(eliminated_now)
+    for war in resolved_wars:
+        if not war.active:
+            closed.append(war)
+            continue
+        gone = next(
+            (fid for fid in (war.attacker_id, war.defender_id)
+             if not _faction_systems(fid, systems)),
+            None,
+        )
+        if gone is None:
+            closed.append(war)
+            continue
+        closed.append(replace(war, active=False, ended_tick=current_tick))
+        gone_now.add(gone)
+        logs.append(
+            f"WAR ENDED: {_faction_name(gone)} has no territory left; "
+            f"the war against {_faction_name(war.attacker_id if gone == war.defender_id else war.defender_id)} is closed."
+        )
+    return tuple(closed), systems, tuple(sorted(gone_now)), logs
 
 
 def leader_for(leaders: Sequence[FactionLeader], faction_id: str) -> FactionLeader | None:

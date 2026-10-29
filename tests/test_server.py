@@ -1,5 +1,6 @@
 """Unit and integration tests for embedded HTTP server REST endpoints."""
 
+from dataclasses import replace
 import http.client
 import json
 import tempfile
@@ -355,6 +356,33 @@ class TestServer(unittest.TestCase):
         status, data = self._post("/api/depot/deposit", {"item_id": "fuel_cells", "quantity": 1})
         self.assertEqual(status, 200)
         self.assertIn("Deposited", json.loads(data.decode("utf-8"))["message"])
+
+    def test_reconstruct_endpoint_restores_a_devastated_world(self):
+        engine = VoidFarerHandler.engine
+        body = next(candidate for candidate in engine.current_system.bodies if candidate.population > 0)
+        systems = dict(engine.state.systems)
+        system = systems[engine.current_system.id]
+        systems[system.id] = replace(
+            system,
+            bodies=tuple(
+                replace(candidate, devastation=60.0) if candidate.id == body.id else candidate
+                for candidate in system.bodies
+            ),
+        )
+        engine.state = engine._clone_state(
+            systems=systems,
+            ship=engine._clone_ship(orbiting_body_id=body.id, credits=5000),
+        )
+        status, data = self._post("/api/reconstruct", {"body_id": body.id, "mode": "credits"})
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        updated = next(
+            candidate for candidate in payload["state"]["current_system"]["bodies"]
+            if candidate["id"] == body.id
+        )
+        self.assertAlmostEqual(updated["devastation"], 40.0)
+        self.assertEqual(payload["state"]["ship"]["credits"], 4400)
 
     def test_save_load_delete_endpoints(self):
         status, _ = self._post("/api/save", {})

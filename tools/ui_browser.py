@@ -31,7 +31,7 @@ from voidfarer.server import VoidFarerHandler, start_background_server  # noqa: 
 from voidfarer.storage import StorageManager  # noqa: E402
 from tools.ui_audit import TABS, VIEWPORTS  # noqa: E402
 
-SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "galaxy", "death", "ability", "surface", "waypoint", "vector")
+SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "galaxy", "death", "ability", "surface", "waypoint", "vector", "relief")
 TAB_IDS = {
     "player": "tabBtnPlayer",
     "skills": "tabBtnSkills",
@@ -99,6 +99,20 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
                 cockpit.selectedTarget = { au: 4.2, angle: -2.4 };
                 cockpit.selectedType = "point";
                 cockpit.updateTargetCard();
+            }"""
+        )
+        page.wait_for_timeout(700)
+    elif scenario == "relief":
+        page.evaluate(
+            """() => {
+                const cockpit = window.cockpit;
+                const bodies = (cockpit.state.current_system && cockpit.state.current_system.bodies) || [];
+                const body = bodies.find(item => Number(item.population || 0) > 0);
+                if (body) {
+                    cockpit.selectedTarget = body;
+                    cockpit.selectedType = "body";
+                    cockpit.updateTargetCard();
+                }
             }"""
         )
         page.wait_for_timeout(700)
@@ -307,6 +321,37 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
     }
 
 
+def _prepare_relief(engine: SimulationEngine) -> Optional[str]:
+    """Devastate an inhabited Sol world and put the flagship in orbit for the target card."""
+    from dataclasses import replace
+
+    body = next(
+        (candidate for candidate in engine.current_system.bodies if candidate.population > 0),
+        None,
+    )
+    if body is None:
+        return None
+    systems = dict(engine.state.systems)
+    system = systems[engine.current_system.id]
+    systems[system.id] = replace(
+        system,
+        bodies=tuple(
+            replace(candidate, devastation=60.0) if candidate.id == body.id else candidate
+            for candidate in system.bodies
+        ),
+    )
+    engine.state = engine._clone_state(
+        systems=systems,
+        ship=engine._clone_ship(
+            orbiting_body_id=body.id,
+            credits=5000,
+            cargo={"medicines": 2, "hydroponics": 2, "fuel_cells": 1},
+        ),
+    )
+    engine.pause_time()
+    return body.id
+
+
 def _prepare_surface(engine: SimulationEngine) -> Optional[str]:
     """Put the live engine on a landed body so the surface-ops panel has real data."""
     landable = [body for body in engine.current_system.bodies if getattr(body, "landable", False)]
@@ -402,6 +447,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.scenario == "surface" and _prepare_surface(engine) is None:
             print("Why: no landable body was available for the surface scenario.")
             print("Fix: retry with a save that has a habitable body in the current system.")
+            return 1
+        if args.scenario == "relief" and _prepare_relief(engine) is None:
+            print("Why: no inhabited body was available for the relief scenario.")
+            print("Fix: retry with a save that has a settled world in the current system.")
             return 1
         if args.tab == "factions" and not _prepare_factions(engine):
             print("Why: the Coalition was not at war within 400 ticks for the factions review.")

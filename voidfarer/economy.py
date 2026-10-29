@@ -332,6 +332,21 @@ def calculate_dynamic_market_quote(
         if commodity.id in ("fuel_cells", "medicines", "xenoliths"):
             base = int(base * 1.25)
 
+    # 4a. Relief demand: bombed worlds pay a premium for medicine, food, fuel and
+    # construction materials. This gives war-devastated markets a real trade loop.
+    devastation = max(0.0, min(100.0, float(body.devastation or 0.0)))
+    relief_weights = {
+        "medicines": 0.55,
+        "hydroponics": 0.35,
+        "fuel_cells": 0.20,
+        "titanium": 0.25,
+        "microchips": 0.30,
+    }
+    relief_weight = relief_weights.get(commodity.id, 0.0)
+    if devastation > 0 and relief_weight:
+        base = int(base * (1.0 + relief_weight * devastation / 100.0))
+        demand = int(demand * (1.0 + devastation / 100.0))
+
     # 4b. Faction diplomatic discount or tariff
     if faction_standing != 0:
         base = max(2, int(base * faction_standing_price_factor(faction_standing)))

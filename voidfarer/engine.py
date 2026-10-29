@@ -344,6 +344,10 @@ class SimulationEngine:
     # in the flight log so a long war does not bury the player in toasts.
     AI_TRADE_LOG_TICKS = 5
     WAR_NEWS_COOLDOWN_TICKS = 12
+    RECONSTRUCTION_CREDIT_COST = 600
+    RECONSTRUCTION_CREDIT_DEVASTATION = 20.0
+    RELIEF_DEVASTATION = 40.0
+    RELIEF_CARGO = (("medicines", 2), ("hydroponics", 2), ("fuel_cells", 1))
     WAR_NEWS_TITLES = (
         ("WAR: ", "System Captured"),
         ("PEACE: ", "Peace Treaty Signed"),
@@ -1140,6 +1144,8 @@ class SimulationEngine:
                 "pirates_fought": 0,
                 "landings": 0,
                 "surface_ops": 0,
+                "worlds_rebuilt": 0,
+                "relief_deliveries": 0,
                 "decisions_resolved": 0,
                 "last_decision_tick": 0,
                 "quantum_orders": 0,
@@ -6235,6 +6241,123 @@ class SimulationEngine:
             if self.allow_decision_events:
                 self.maybe_trigger_decision("land")
             return True, log_entry
+
+    def reconstruct_world(self, body_id: str, mode: str = "credits") -> tuple[bool, str]:
+        """Rebuild a devastated inhabited world with credits or relief cargo.
+
+        This is the player's counter to war devastation: credits fund a construction
+        crew, while relief supplies (medicines, food and fuel) repair more damage and
+        earn more standing with the world's owner.
+        """
+        with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+            transit = self._transit_lock_reason()
+            if transit:
+                return False, transit
+            if self.state.active_combat is not None:
+                return False, "Cannot rebuild a world while under hostile fire."
+            body = next((candidate for candidate in self.current_system.bodies if candidate.id == body_id), None)
+            if body is None:
+                return False, f"Unknown body '{body_id}' in {self.current_system.name}."
+            ship = self.state.ship
+            if ship.orbiting_body_id != body.id and ship.landed_body_id != body.id:
+                return False, f"Establish orbit around {body.name} before starting reconstruction."
+            if body.population <= 0:
+                return False, f"{body.name} has no settled population to rebuild."
+            devastation = max(0.0, float(body.devastation or 0.0))
+            if devastation <= 0.0:
+                return False, f"{body.name} is not devastated; no reconstruction is needed."
+
+            normalized = str(mode).strip().lower()
+            if normalized not in ("credits", "relief"):
+                return False, "Unknown reconstruction mode. Use 'credits' or 'relief'."
+            cargo = dict(ship.cargo)
+            crew = ship.crew
+            credits = ship.credits
+            standings = dict(ship.faction_standings)
+            stats = dict(self.state.stats)
+            if normalized == "credits":
+                if credits < self.RECONSTRUCTION_CREDIT_COST:
+                    return (
+                        False,
+                        f"Reconstruction requires {self.RECONSTRUCTION_CREDIT_COST} cr; "
+                        f"treasury has {credits} cr.",
+                    )
+                credits -= self.RECONSTRUCTION_CREDIT_COST
+                reduction = self.RECONSTRUCTION_CREDIT_DEVASTATION
+                standing_delta = 2
+                kind = "reconstruction"
+                title = "World Reconstruction"
+                stats["worlds_rebuilt"] = int(stats.get("worlds_rebuilt", 0)) + 1
+                log = (
+                    f"REBUILD: {body.name} construction crews restored "
+                    f"{reduction:.0f} devastation for {self.RECONSTRUCTION_CREDIT_COST} cr."
+                )
+            else:
+                missing = [
+                    f"{quantity}x {item_id}"
+                    for item_id, quantity in self.RELIEF_CARGO
+                    if int(cargo.get(item_id, 0)) < quantity
+                ]
+                if missing:
+                    return False, f"Relief supplies missing: {', '.join(missing)}."
+                for item_id, quantity in self.RELIEF_CARGO:
+                    remaining = int(cargo.get(item_id, 0)) - quantity
+                    if remaining > 0:
+                        cargo[item_id] = remaining
+                    else:
+                        cargo.pop(item_id, None)
+                reduction = self.RELIEF_DEVASTATION
+                standing_delta = 5
+                kind = "relief"
+                title = "Relief Convoy Landed"
+                stats["relief_deliveries"] = int(stats.get("relief_deliveries", 0)) + 1
+                crew, _ = apply_morale_event(crew, 2.0, f"relief {body.name}")
+                log = (
+                    f"RELIEF: landed medicines, food and fuel at {body.name}; "
+                    f"devastation -{reduction:.0f}, crew morale lifted."
+                )
+
+            faction_id = get_faction_id_from_name(body.faction) if body.faction != "Unclaimed" else ""
+            if faction_id and faction_id not in self.state.eliminated_factions:
+                standings[faction_id] = max(-100, min(100, standings.get(faction_id, 0) + standing_delta))
+            new_devastation = max(0.0, devastation - reduction)
+            systems = dict(self.state.systems)
+            system = systems[self.current_system.id]
+            systems[system.id] = replace(
+                system,
+                bodies=tuple(
+                    replace(candidate, devastation=new_devastation) if candidate.id == body.id else candidate
+                    for candidate in system.bodies
+                ),
+            )
+            events = list(self.state.events)
+            events.append(
+                GameEvent(
+                    id=f"evt_{self.state.time.tick}_{len(events) + 1}",
+                    kind=kind,
+                    title=title,
+                    message=f"{body.name} is now at {new_devastation:.0f}% devastation.",
+                    tick=self.state.time.tick,
+                    dismissed=False,
+                )
+            )
+            new_ship = self._clone_ship(
+                credits=credits,
+                cargo=cargo,
+                crew=crew,
+                faction_standings=standings,
+                flight_log=tuple(list(ship.flight_log[-19:]) + [log]),
+            )
+            self.state = self._clone_state(
+                ship=new_ship,
+                systems=systems,
+                stats=stats,
+                events=tuple(events[-50:]),
+            )
+            return True, log
 
     def get_surface_report(self) -> dict[str, Any]:
         """Landing-party operations available on the currently landed body."""
