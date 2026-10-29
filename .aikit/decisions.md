@@ -1071,3 +1071,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. A failed boarding injures the lead marine for four ticks, costs three crew morale, resets the combo and lets the enemy counter-battery resolve normally. Boarding is refused with a specific reason for shields, hull or missing marine.
   4. Wire the action through the CLI (`combat board`), the combat card (`BOARD & CAPTURE`, gated by the same conditions), a real-browser `boarding` scenario and the Privateer codex milestone (`ships_captured`).
 - **Consequences**: Marines now have an active combat role and crippled enemies are a resource decision rather than a damage race. A live Edge run captured `Prize: Crippled Corsair` with 20 hull and 6 damage after collapsing its shields; the click map reported 136 controls with zero missing or duplicate handles. Suite: 798 tests (45 suites), 5/5 gates.
+
+### ADR-090: Prize Liquidation and a Readable Escort Ledger
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Boarding produced prize ships but the fleet manager only offered repair and dismissal; there was no way to turn a captured hull into credits, and the new third action squeezed the escort record so the name and stats overlapped the button column.
+- **Decision**:
+  1. Add `escort_sale_value` to the fleet catalog: half of hull, damage and shield value, discounted to 68% for damaged ships and 25% for destroyed hulks, with a 100 cr floor.
+  2. Add `sell_escort` at a docked station or colony, exposed as `POST /api/fleet/escort/sell`, `fleet sell_escort <id>`, and a SELL button in the fleet manager. The report and status snapshot now carry `sale_value` per ship.
+  3. Track `ships_sold` and add the Shipbreaker commerce milestone (sell three escorts or prizes).
+  4. Give the escort record explicit grid placement for head, stats, status and the three stacked actions so the name keeps the full body column.
+- **Consequences**: A captured prize can be kept as an escort or liquidated for a meaningful sum (a 100-hull, 6-damage frigate sells for 680 cr). The fleet row now reads as name/stats on the left and status/REPAIR/SELL/DISMISS on the right. A live Edge sale moved credits 1,000 -> 1,680 and removed the prize in one click. Suite: 805 tests (46 suites), 5/5 gates.

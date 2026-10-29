@@ -1,67 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "boarding-prizes",
+    "task_id": "prize-sales",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793313528.7131395,
+    "updated_at": 1793314319.8134906,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793313536.6656156
+    "completed_at": 1793314328.6406844
   },
   "checkpoints": [
-    {
-      "task_id": "reforge:run-2",
-      "phase": "reforge stage 54",
-      "phase_num": 3,
-      "description": "Reforge stage 54: window 162, 3 commit(s), 17 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793309663.5034318,
-      "timestamp_str": "2026-10-30 00:34:23",
-      "agent": "opencode"
-    },
-    {
-      "task_id": "review-hardening",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'review-hardening' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793310243.6356053,
-      "timestamp_str": "2026-10-30 00:44:03",
-      "agent": "opencode:feature",
-      "continued_from": "kilo:2"
-    },
-    {
-      "task_id": "feature-batch-7",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/6] Plan the seven cockpit and frontier improvements: vector reticle and point transit animation, calmer events, combined reactor+abilities panel, auto-height imperial outliner, 8 more star systems, 2 more planets per system, and 6 more surface operations.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793310250.9544315,
-      "timestamp_str": "2026-10-30 00:44:10",
-      "agent": "opencode:feature",
-      "impact_assessment": {
-        "why": "The user reported seven gameplay/UI gaps: vector selection has no visible marker or transit animation, blocking events interrupt too often, reactor and abilities are split across two strip panels, the imperial outliner runs past its sections, the galaxy has too few systems and planets, and landing offers only five operations.",
-        "benefits": "A selected vector is visible and animates like body transit; quick-time prompts become rare; one coherent command panel replaces two cramped ones; the left drawer ends with its content; about 31 systems and 7-8 planets each deepen exploration; extra surface operations give landings distinct risk/reward choices.",
-        "risks": "contract: the G-013 three-equal-column strip and its layout tests are superseded; dependency: none, changes stay stdlib/vanilla JS; concurrency: decision cadence and event throttling must remain deterministic and save-compatible; state: new stats defaults must load old saves, and point/body animation state must not leak between trips.",
-        "mitigation": "Record G-016 and an ADR, replace the superseded layout assertions with the combined-panel contract, keep old-save fallbacks, pin point animation, cadence and surface availability with regressions, then run the full suite, aikit gates and real-browser screenshots."
-      }
-    },
-    {
-      "task_id": "feature-batch-7",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/6] Vector reticle, point-transit animation, combined reactor+abilities panel and content-height imperial outliner implemented; focused layout and browser checks pass.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793311752.807232,
-      "timestamp_str": "2026-10-30 01:09:12",
-      "agent": "opencode:feature"
-    },
     {
       "task_id": "feature-batch-7",
       "phase": "3",
@@ -245,6 +195,55 @@
       "status": "completed",
       "timestamp": 1793313536.665617,
       "timestamp_str": "2026-10-30 01:38:56",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "prize-sales",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan prize liquidation: value captured escorts, sell them at a drydock through CLI/REST/cockpit, track Shipbreaker progression, and restore the escort ledger layout.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793314246.2772653,
+      "timestamp_str": "2026-10-30 01:50:46",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Boarding creates prizes, but the fleet manager only repairs or dismisses them; captured value cannot be converted to credits, and the third action broke the escort row layout.",
+        "benefits": "Prizes become a keep-or-sell decision, the fleet manager gains an economy loop, and the row stays readable at desktop and short widths.",
+        "risks": "contract: new endpoint must be discoverable and AI-documented; dependency: none; concurrency: sale mutates credits, fleet ships, stats and log in one clone; state: sale must refuse outside a dock and preserve old saves without sale_value.",
+        "mitigation": "Add engine/API/CLI/layout tests first, centralize the value formula in fleet.py, expose sale_value in both fleet reports, use explicit grid placement for the three actions, and verify a live Edge sale."
+      }
+    },
+    {
+      "task_id": "prize-sales",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Escort sale value, drydock sale, /api/fleet/escort/sell, CLI/REPL parity, Shipbreaker codex and fleet report sale_value implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793314319.6763704,
+      "timestamp_str": "2026-10-30 01:51:59",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "prize-sales",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] SELL control and explicit escort-row grid placement fixed; README, COCKPIT guide and ADR-090 recorded. Live Edge sale moved 1000 to 1680 cr; 805 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793314319.8134906,
+      "timestamp_str": "2026-10-30 01:51:59",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "prize-sales",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'prize-sales' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793314328.6406858,
+      "timestamp_str": "2026-10-30 01:52:08",
       "agent": "opencode:mechanics"
     }
   ]

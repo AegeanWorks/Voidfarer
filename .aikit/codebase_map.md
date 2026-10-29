@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `89`
-- **Total Classes**: `235`
-- **Total Top-Level Functions**: `305`
-- **Total Class Methods**: `1371`
-- **Total Source Lines**: `37959`
+- **Total Python Modules**: `90`
+- **Total Classes**: `237`
+- **Total Top-Level Functions**: `306`
+- **Total Class Methods**: `1381`
+- **Total Source Lines**: `38127`
 
 ---
 
@@ -202,7 +202,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `234` lines (`10057` bytes)
+**Size**: `240` lines (`10357` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -212,6 +212,7 @@
   - Method `.test_cli_status()`
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
+  - Method `.test_cli_fleet_sell_escort_parses()`
   - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
   - Method `.test_cli_combat_accepts_documented_actions()`
   - Method `.test_cli_shipyard_subcommands_parse()`
@@ -241,7 +242,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1239` lines (`56696` bytes)
+**Size**: `1254` lines (`57348` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -430,6 +431,9 @@
   - Method `.test_combat_card_holds_a_board_button()`
   - Method `.test_board_button_is_gated_by_shields_hull_and_marine()`
   - Method `.test_browser_review_prepares_a_boarding_action()`
+- `class TestFleetPrizeCockpit` - *Captured prizes must be sellable from the fleet manager.*
+  - Method `.setUpClass()`
+  - Method `.test_fleet_manager_has_a_sell_control()`
 
 ---
 
@@ -713,6 +717,21 @@
   - Method `.test_ship_state_faction_standings_migration()`
   - Method `.test_tactical_combat_shield_and_actions()`
   - Method `.test_combat_victory_faction_standing_shift()`
+
+---
+
+### [`tests/test_fleet_prize.py`](tests/test_fleet_prize.py)
+> *Prize-ship sale, fleet value reporting and the shipbreaker milestone.*
+
+**Size**: `59` lines (`2269` bytes)
+
+**Classes:**
+- `class FleetPrizeSaleTest`
+  - Method `.setUp()`
+  - Method `.test_a_prize_can_be_sold_at_a_station()`
+  - Method `.test_sale_requires_a_docked_station()`
+  - Method `.test_sale_rejects_an_unknown_escort()`
+  - Method `.test_fleet_report_exposes_sale_values()`
 
 ---
 
@@ -1172,7 +1191,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `462` lines (`20447` bytes)
+**Size**: `487` lines (`21450` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1210,6 +1229,7 @@
   - Method `.test_frontier_endpoints()`
   - Method `.test_landing_and_depot_endpoints()`
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
+  - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
   - Method `.test_save_load_delete_endpoints()`
   - Method `.test_multiple_save_slots_endpoints_and_listing()`
   - Method `.test_codex_claim_endpoint()`
@@ -1669,7 +1689,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `749` lines (`32275` bytes)
+**Size**: `750` lines (`32351` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1783,7 +1803,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `2995` lines (`153347` bytes)
+**Size**: `3004` lines (`153728` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1847,7 +1867,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `637` lines (`22068` bytes)
+**Size**: `647` lines (`22444` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -1966,7 +1986,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7849` lines (`389440` bytes)
+**Size**: `7879` lines (`390887` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2042,6 +2062,7 @@
   - Method `.assign_escort(ship_id, system_id)`
   - Method `.repair_escorts(amount)`
   - Method `.dismiss_escort(ship_id)`
+  - Method `.sell_escort(ship_id)` - *Sell an escort or captured prize at a docked station.*
   - Method `.get_fleet_manager_report()`
   - Method `.plan_route(target_system_id)`
   - Method `.navigate_to(target_system_id)`
@@ -2249,11 +2270,12 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `149` lines (`4884` bytes)
+**Size**: `156` lines (`5259` bytes)
 
 **Functions:**
 - `def get_escort_template(escort_type)`
 - `def build_fleet_ship(escort_type, system_id, count)`
+- `def escort_sale_value(ship)` - *Drydock resale value of an escort or prize, discounted for battle damage.*
 - `def fleet_damage(ships, formation)`
 - `def fleet_evasion_bonus(ships, formation)`
 - `def apply_fleet_casualties(ships, damage)` - *Distribute incoming damage across escorts, returning survivors and absorbed damage.*
@@ -2635,7 +2657,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1339` lines (`57020` bytes)
+**Size**: `1345` lines (`57310` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
