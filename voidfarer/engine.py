@@ -1596,6 +1596,11 @@ class SimulationEngine:
                 raid_risk = pirate_risk(
                     target_sys, standing, has_escort, encounter_evasion,
                     patrol_escorts=patrol_escorts,
+                    allied=(
+                        target_sys.faction != "Unclaimed"
+                        and get_faction_id_from_name(target_sys.faction)
+                        in self.state.ship.allies
+                    ),
                 )
                 pirate_roll = self._stable_unit(
                     self.state.galaxy_seed, "pirate", target_system_id, self.state.time.tick
@@ -2913,12 +2918,18 @@ class SimulationEngine:
                 self.state = self._clone_state(ship=new_ship)
                 return True, f"Aid package delivered to {CANONICAL_FACTIONS[faction_id].name} ({cost} cr, +{gain} standing)." + (" " + " ".join(contract_logs) if contract_logs else "")
             if act == "alliance":
+                if faction_id in self.state.ship.allies:
+                    return False, f"Already allied with {CANONICAL_FACTIONS[faction_id].name}."
                 if current < 70:
                     return False, f"Alliance requires standing >= 70 (current {current:+d})."
                 allies = tuple(sorted(set(self.state.ship.allies) | {faction_id}))
-                new_ship = self._clone_ship(allies=allies)
+                line = f"ALLIANCE FORMED: {CANONICAL_FACTIONS[faction_id].name} joins your coalition."
+                new_ship = self._clone_ship(
+                    allies=allies,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+                )
                 self.state = self._clone_state(ship=new_ship)
-                return True, f"Alliance formed with {CANONICAL_FACTIONS[faction_id].name}."
+                return True, line
             # A privateer captain has no authority to start or end a sovereign war; the
             # only lever is a petition carried to the enemy leadership by an envoy.
             if act in ("declare_war", "war"):

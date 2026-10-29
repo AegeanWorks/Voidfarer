@@ -3374,18 +3374,34 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const leaders = this.state.faction_leaders || [];
         const wars = this.state.wars || [];
         const standings = this.state.ship.faction_standings || {};
+        const allied = new Set(this.state.ship.allies || []);
         const eliminated = new Set(this.state.eliminated_factions || []);
         this.diplomacyList.innerHTML = leaders.map(l => {
+            const standing = Number(standings[l.faction_id] || 0);
+            const isEliminated = eliminated.has(l.faction_id);
+            const isAllied = allied.has(l.faction_id);
+            const ownWar = wars.find(w => w.active
+                && "sol_coalition" in (w.attacker_id, w.defender_id)
+                && l.faction_id in (w.attacker_id, w.defender_id));
             const atWar = wars.some(w => w.active && (w.defender_id === l.faction_id || w.attacker_id === l.faction_id));
-            return `<div class="diplomacy-row ${eliminated.has(l.faction_id) ? "eliminated" : ""}">
+            const canAlly = !isEliminated && !isAllied && standing >= 70;
+            const petition = ownWar && Number(this.state.ship.credits || 0) >= 500;
+            return `<div class="diplomacy-row ${isEliminated ? "eliminated" : ""}">
                 <span><strong>${this.escapeHtml(l.name)}</strong> (${this.escapeHtml(l.faction_id)})<br>
                 <small>${this.escapeHtml(l.title)} — <span class="leader-behavior">${this.escapeHtml(l.behavior)}</span></small></span>
-                <span>standing ${standings[l.faction_id] || 0}${atWar ? " | WAR" : ""}</span>
-                <button class="btn-hud" data-diplo="${this.escapeHtml(l.faction_id)}">IMPROVE</button>
+                <span>standing ${standing}${isAllied ? " | ALLIED" : ""}${atWar ? " | WAR" : ""}</span>
+                <div class="diplomacy-actions">
+                    <button class="btn-hud" data-diplo-action="improve" data-diplo-id="${this.escapeHtml(l.faction_id)}">IMPROVE</button>
+                    <button class="btn-hud btn-green" data-diplo-action="gift" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${isEliminated || Number(this.state.ship.credits || 0) < 300 ? "disabled" : ""}>GIFT 300</button>
+                    <button class="btn-hud btn-purple" data-diplo-action="alliance" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${canAlly ? "" : "disabled"} title="${isAllied ? "Already allied" : "Requires standing 70+ during this campaign"}">ALLY</button>
+                    ${ownWar ? `<button class="btn-hud btn-amber" data-diplo-action="ceasefire" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${petition ? "" : "disabled"} title="Envoy costs 500 cr">PETITION 500</button>` : ""}
+                </div>
             </div>`;
         }).join("");
-        this.diplomacyList.querySelectorAll("[data-diplo]").forEach(btn =>
-            btn.addEventListener("click", () => this.postAction("/api/diplomacy", { faction_id: btn.getAttribute("data-diplo"), action: "improve", amount: 0 }, "empire"))
+        this.diplomacyList.querySelectorAll("[data-diplo-action]").forEach(btn =>
+            btn.addEventListener("click", () => this.handleDiplomacyAction(
+                btn.getAttribute("data-diplo-id"), btn.getAttribute("data-diplo-action")
+            ))
         );
     }
 
@@ -6458,6 +6474,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleLandAction() {
         if (!this.selectedTarget || this.selectedType !== "body") return;
         await this.postAction("/api/land", { target: this.selectedTarget.id });
+    }
+
+    async handleDiplomacyAction(factionId, action) {
+        if (!factionId || !action) return;
+        const amount = action === "gift" ? 300 : 0;
+        await this.postAction("/api/diplomacy", { faction_id: factionId, action, amount }, "empire");
     }
 
     async handleReconstructAction(mode = "credits") {

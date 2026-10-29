@@ -8615,3 +8615,8 @@ body.cockpit-theme .nav-panel > .panel-header {
 .auto-trade-grid select, .auto-trade-grid input { width: 100%; min-width: 0; height: 26px; font-size: 12px; }
 .auto-trade-grid .btn-hud { min-height: 26px; padding: 2px 7px; font-size: 12px; }
 .auto-trade-note { margin: 4px 0 0; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
+
+/* Faction diplomacy: keep the four actions readable in the Empire drawer. */
+.diplomacy-row { align-items: flex-start; }
+.diplomacy-actions { display: flex; flex-wrap: wrap; gap: 3px; justify-content: flex-end; max-width: 220px; }
+.diplomacy-actions .btn-hud { min-height: 24px; padding: 2px 6px; font-size: 12px; }

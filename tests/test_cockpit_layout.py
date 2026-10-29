@@ -1284,3 +1284,23 @@ class TestTradeAutomationCockpit(unittest.TestCase):
         for marker in ("renderTradeAutomation", "handleTradeAutomation", '"/api/trade/automation"'):
             self.assertIn(marker, self.js)
         self.assertIn(".trade-automation", self.css)
+
+class TestDiplomacyActionsCockpit(unittest.TestCase):
+    """Faction rows must expose improve, gift, alliance and ceasefire actions."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_diplomacy_rows_offer_the_full_action_set(self):
+        for marker in (
+            "data-diplo-action",
+            'data-diplo-action="gift"',
+            'data-diplo-action="alliance"',
+            'data-diplo-action="ceasefire"',
+            "handleDiplomacyAction",
+        ):
+            self.assertIn(marker, self.js)
+        self.assertIn(".diplomacy-actions", self.css)
+        self.assertIn("ALLIED", self.js)
