@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `92`
-- **Total Classes**: `240`
-- **Total Top-Level Functions**: `308`
-- **Total Class Methods**: `1397`
-- **Total Source Lines**: `38451`
+- **Total Python Modules**: `93`
+- **Total Classes**: `244`
+- **Total Top-Level Functions**: `309`
+- **Total Class Methods**: `1413`
+- **Total Source Lines**: `38821`
 
 ---
 
@@ -202,7 +202,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `246` lines (`10668` bytes)
+**Size**: `252` lines (`10952` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -212,6 +212,7 @@
   - Method `.test_cli_status()`
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
+  - Method `.test_cli_autotrade_status_parses()`
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
   - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
@@ -243,7 +244,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1267` lines (`57903` bytes)
+**Size**: `1286` lines (`58752` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -438,6 +439,9 @@
 - `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
   - Method `.setUpClass()`
   - Method `.test_outpost_rows_offer_a_module_installer()`
+- `class TestTradeAutomationCockpit` - *The Commerce tab must expose the docked auto-trade broker.*
+  - Method `.setUpClass()`
+  - Method `.test_market_tab_holds_the_broker_controls()`
 
 ---
 
@@ -1228,7 +1232,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `512` lines (`22431` bytes)
+**Size**: `528` lines (`23225` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1267,6 +1271,7 @@
   - Method `.test_landing_and_depot_endpoints()`
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
+  - Method `.test_trade_automation_endpoints_configure_and_report()`
   - Method `.test_outpost_module_endpoint_installs_a_stack()`
   - Method `.test_save_load_delete_endpoints()`
   - Method `.test_multiple_save_slots_endpoints_and_listing()`
@@ -1450,6 +1455,24 @@
   - Method `.test_post_api_time_step()`
   - Method `.test_post_api_time_speed()`
   - Method `.test_post_api_time_pause_and_resume()`
+
+---
+
+### [`tests/test_trade_automation.py`](tests/test_trade_automation.py)
+> *Docked trade automation: configure thresholds, buy low, sell high, persist.*
+
+**Size**: `107` lines (`4550` bytes)
+
+**Classes:**
+- `class TradeAutomationTest`
+  - Method `.setUp()`
+  - Method `.test_configuration_requires_a_dock_and_valid_thresholds()`
+  - Method `.test_buy_low_executes_on_tick_and_respects_cooldown()`
+  - Method `.test_sell_high_executes_and_records_realized_credits()`
+  - Method `.test_disabled_automation_does_not_trade()`
+- `class TradeAutomationPersistenceTest`
+  - Method `.test_round_trip_preserves_the_policy()`
+  - Method `.test_legacy_payload_defaults_to_off()`
 
 ---
 
@@ -1727,7 +1750,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `751` lines (`32424` bytes)
+**Size**: `752` lines (`32504` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1841,7 +1864,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3018` lines (`154338` bytes)
+**Size**: `3075` lines (`157339` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1849,6 +1872,7 @@
 - `def cmd_status(engine)` - *Display current flagship telemetry, fleet roster, and star system status.*
 - `def cmd_time(engine, storage, argv)` - *Manage simulation cosmic time, ticks, and speed controls.*
 - `def cmd_chart(engine)` - *Print galaxy starmap and celestial bodies within current system.*
+- `def cmd_autotrade(engine, storage, parts)` - *Inspect or configure the docked buy-low/sell-high broker.*
 - `def cmd_market(engine)` - *Display commodity prices and supply/demand at the current orbital body.*
 - `def cmd_economy(engine)` - *Display galactic macroeconomic conditions, active events, and lucrative trade routes.*
 - `def cmd_inventory(engine, storage, parts)` - *Display and manage ship cargo manifest, usable consumables, and hold capacity.*
@@ -2024,7 +2048,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7938` lines (`394192` bytes)
+**Size**: `8053` lines (`399042` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2123,6 +2147,9 @@
   - Method `._bulk_buy_cost(body, comm, quantity, standing, unit_price)` - *Price a buy order by walking the local stockpile, so bulk orders move the price they pay.*
   - Method `.max_trade_quantity(commodity_id, is_buy)` - *Largest order that would succeed now: affordable and in-hold for buys, all held units for sells.*
   - Method `.trade_max(commodity_id, is_buy)` - *Buy as many units as credits and hold allow, or sell every unit held.*
+  - Method `.set_trade_automation(commodity_id, buy_below, sell_above, quantity, enabled)` - *Configure the docked broker that buys low and sells high on a cooldown.*
+  - Method `.get_trade_automation_report()`
+  - Method `._run_trade_automation()` - *Execute at most one automated trade per cooldown while docked.*
   - Method `.trade(commodity_id, quantity, is_buy)` - *Execute buy or sell commodity order at orbiting market.*
   - Method `._destination_market_body(system)`
   - Method `._quantum_fee(commodity, quantity, jumps)`
@@ -2426,7 +2453,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2148` lines (`79664` bytes)
+**Size**: `2181` lines (`80927` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -2568,6 +2595,9 @@
 - `class TradeOrder` - *A quantum freight order: cargo leaves now and is sold at the destination on arrival.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
+- `class TradeAutomation` - *Docked broker policy: buy one commodity below a price and sell it above another.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
 - `class AwayMission` - *An away-team expedition assigned to a celestial body for a finite duration.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
@@ -2698,7 +2728,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1353` lines (`57673` bytes)
+**Size**: `1369` lines (`58405` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "outpost-modules",
+    "task_id": "trade-automation",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793315762.9054272,
+    "updated_at": 1793316712.7889514,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793315773.8188467
+    "completed_at": 1793316722.4659357
   },
   "checkpoints": [
-    {
-      "task_id": "world-relief",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[4/5] Target-card REBUILD WORLD and DELIVER RELIEF controls, relief browser scenario and layout regressions added; real-browser click verified 600 cr and 20 devastation.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793312946.390063,
-      "timestamp_str": "2026-10-30 01:29:06",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "world-relief",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[5/5] README, COCKPIT guide and ADR-088 recorded; 792 tests pass and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793312946.526336,
-      "timestamp_str": "2026-10-30 01:29:06",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "world-relief",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'world-relief' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793312954.06807,
-      "timestamp_str": "2026-10-30 01:29:14",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "boarding-prizes",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/4] Plan boarding and prize capture: a marine-gated combat action that turns a crippled hostile into a fleet prize, with CLI/cockpit parity, browser review and codex progression.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793313460.6632144,
-      "timestamp_str": "2026-10-30 01:37:40",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Combat offers only destruction; the marine crew role has no active use, and the fleet manager has no combat-driven growth path.",
-        "benefits": "Crippled enemies become a tactical choice: finish them for bounty or board for a lasting escort. Marines gain an active role, and fleet composition can grow from play.",
-        "risks": "contract: new combat action must stay discoverable through CLI, REST, click map and AI catalog; dependency: no new libraries; concurrency: capture mutates crew injury, morale, fleet ships, stats and active combat in one state clone; state: prize ships must round-trip through saves and a failed boarding must not end combat.",
-        "mitigation": "Add engine, CLI, layout and browser-scenario tests first; gate boarding on shields, hull and marine; include prize defaults in FleetShip; verify save round-trip and a live Edge click; then run the full suite and gates."
-      }
-    },
     {
       "task_id": "boarding-prizes",
       "phase": "3",
@@ -249,6 +200,55 @@
       "status": "completed",
       "timestamp": 1793315773.818849,
       "timestamp_str": "2026-10-30 02:16:13",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "trade-automation",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan docked trade automation: persist a buy-low/sell-high broker policy, execute on a safe cooldown, and wire API/CLI/cockpit with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793316639.2572703,
+      "timestamp_str": "2026-10-30 02:30:39",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Trading requires repeated manual clicks; there is no way to leave a standing price policy running while handling navigation, combat or diplomacy.",
+        "benefits": "A docked captain can automate a local market strategy, realized results are visible, and trade progression continues between other actions.",
+        "risks": "contract: new state field must default for legacy saves and the broker must not trade in transit/combat/decision/void; dependency: reuses the normal trade path; concurrency: tick-time trade mutates state, stats, cargo and credits, so the automation record updates after the trade clone; state: cooldown and realized totals must persist.",
+        "mitigation": "Add engine, persistence, API, CLI and layout tests first; clamp quantity and thresholds; route through normal trade; verify a live Edge enable and multiple automated buys."
+      }
+    },
+    {
+      "task_id": "trade-automation",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] TradeAutomation model, docked broker with 3-tick cooldown, safe-action guards, realized-credit tracking, /api/trade/automation and autotrade CLI implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793316712.6610315,
+      "timestamp_str": "2026-10-30 02:31:52",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "trade-automation",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] Commerce broker panel, README/COCKPIT and ADR-093 recorded; live Edge enabled a fuel-cell buy and executed three trades by tick 15. 826 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793316712.7889514,
+      "timestamp_str": "2026-10-30 02:31:52",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "trade-automation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'trade-automation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793316722.465937,
+      "timestamp_str": "2026-10-30 02:32:02",
       "agent": "opencode:mechanics"
     }
   ]

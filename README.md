@@ -266,7 +266,13 @@ python -m voidfarer.cli economy
 python -m voidfarer.cli inventory
 python -m voidfarer.cli inventory buy nanite_repair_paste 2
 python -m voidfarer.cli inventory use nanite_repair_paste
+
+# Leave a docked broker buying low and selling high while you handle other work
+python -m voidfarer.cli autotrade on fuel_cells 55 85 1
+python -m voidfarer.cli autotrade status
+python -m voidfarer.cli autotrade off
 ```
+The auto-trade broker executes at most one qualifying buy or sell every 3 ticks while docked. It sells first when the sell threshold is met, otherwise buys below the buy threshold, and respects cargo volume, credits, stock and faction pricing. The Commerce tab exposes the same commodity, thresholds, quantity and ENABLE/DISABLE controls.
 
 ### 12. Cadet Flight Academy (Situated Scaffolding)
 ```bash

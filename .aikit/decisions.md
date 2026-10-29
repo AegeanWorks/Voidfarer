@@ -1103,3 +1103,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Installing a stack updates the outpost modules in one state clone and immediately feeds `outpost_tick_production`.
   3. Expose the catalog as `outpost_modules` in the static catalogs for the cockpit, add `POST /api/outpost/module`, `outpost module <outpost_id> <module_id>`, and a module picker/INSTALL MODULE control under every outpost row.
 - **Consequences**: Outposts grow horizontally as well as vertically; a second extractor stack costs 800 cr and raises production without requiring a level-up. The Empire tab now has a working module loop with credits spent, output raised and state persisted. Suite: 817 tests (47 suites), 5/5 gates.
+
+### ADR-093: Docked Trade Automation
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Every commodity trade required a manual BUY/SELL click. Player wealth could grow through repeated price dips, but there was no way to leave a standing buy-low/sell-high policy running while the player attended to navigation, combat or diplomacy.
+- **Decision**:
+  1. Add a persisted `TradeAutomation` policy (`enabled`, commodity, buy/sell thresholds, quantity, last trade tick, trades, realized credits) as a first-class `GameState` field with a legacy-safe default.
+  2. Add `set_trade_automation` and a docked broker that executes at most one qualifying buy or sell every 3 ticks. It sells first when the sell threshold is met, otherwise buys below the buy threshold, and refuses while travelling, in combat, in a decision or in the void.
+  3. Expose `GET/POST /api/trade/automation`, `autotrade status|on|off` in the CLI/REPL, and a Commerce-tab broker panel with commodity, thresholds, quantity and ENABLE/DISABLE controls.
+  4. Persist realized credits and trade counts in the automation record; the status snapshot and UI show both.
+- **Consequences**: A docked captain can run a standing local market policy between other actions. The broker respects stock, cargo volume, credits, tariffs and faction pricing because it calls the normal `trade` path. In live Edge, enabling a fuel-cell buy at ?9999 executed three one-unit buys by tick 15 with no console errors. Suite: 826 tests (48 suites), 5/5 gates.
