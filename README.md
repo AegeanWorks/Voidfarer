@@ -144,7 +144,7 @@ Displays commander dossier, vital telemetry (hull, shields, fuel), reactor power
 ```bash
 python -m voidfarer.cli chart
 ```
-Prints hyperlanes, visited flags, security and every local body; each system has 5-6 worlds and a dockable station.
+Prints hyperlanes, visited flags, security and every local body; each system has 7-8 worlds and a dockable station (the Sol and Betelgeuse forges carry eight).
 
 ### 3. Navigation & Spaceflight
 ```bash
@@ -325,14 +325,17 @@ they accept). Everything else ends by exhaustion, capture or a bankrupt treasury
 ### 14b. Empty-Space Vectors, NPC Traffic & Decision Cadence
 
 Clicking empty space on the orbital radar selects a vector instead of clearing the
-target: `TRANSIT & ORBIT` becomes `MOVE TO VECTOR`, and on arrival the ship holds station
-in the void with no body in orbit. The anchor (`waypoint_au`/`waypoint_angle`) persists in
-the save and is drawn as `VF-FLAGSHIP (OPEN SPACE)`; the next transit is priced from that
-anchor, not from the star. NPC captains are drawn on both maps (system radar and galaxy)
-and can be selected and hailed from their target card.
+target: `TRANSIT & ORBIT` becomes `MOVE TO VECTOR`, a reticle and dashed course mark the
+chosen position, and the same transit animation used for planets flies the ship to it. On
+arrival the ship holds station in the void with no body in orbit. The anchor
+(`waypoint_au`/`waypoint_angle`) persists in the save and is drawn as
+`VF-FLAGSHIP (OPEN SPACE)`; the next transit is priced from that anchor, not from the star.
+NPC captains are drawn on both maps (system radar and galaxy) and can be selected and hailed
+from their target card.
 
 ```bash
-# Rare, normal or frequent blocking quick-time decisions (normal = one per 14 ticks)
+# Default is relaxed: at most one blocking decision evaluation per 36 ticks.
+# Normal is 18 ticks, frequent 6; a failed roll still consumes its window.
 python -m voidfarer.cli settings decisions relaxed
 python -m voidfarer.cli settings show
 ```
@@ -467,7 +470,7 @@ python -m voidfarer.cli quantum ship titanium 2 kepler
 python -m voidfarer.cli surface
 python -m voidfarer.cli contracts refresh
 ```
-23 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time. Quantum freight ships cargo for a fee, paying on arrival. Landed teams survey, core-sample, explore ruins, salvage, or rest. War captures displace civilians and leave scars. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
+32 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time, but the default relaxed cadence rolls only once per 36-tick window. Quantum freight ships cargo for a fee, paying on arrival. Landed teams choose from 13 operations: survey, core-sample, explore ruins, salvage, rest, tap geothermal heat, bio-prospect, recover a crash site, drill ice, tap magma, harvest reefs, scoop gas clouds, or deep-mine; environment-specific operations are offered only on matching worlds. War captures displace civilians and leave scars. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
 
 ### 19. Stellaris-Style Windows Cockpit
 

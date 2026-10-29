@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `88`
-- **Total Classes**: `228`
+- **Total Classes**: `229`
 - **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1331`
-- **Total Source Lines**: `36952`
+- **Total Class Methods**: `1347`
+- **Total Source Lines**: `37239`
 
 ---
 
@@ -240,7 +240,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1146` lines (`52028` bytes)
+**Size**: `1191` lines (`54508` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -260,7 +260,7 @@
   - Method `._ancestor_ids(node)`
   - Method `._document_order()`
   - Method `.test_telemetry_log_sits_in_the_right_of_the_bottom_command_strip()`
-  - Method `.test_command_strip_holds_reactor_skills_and_right_column()`
+  - Method `.test_command_strip_holds_combined_power_panel_and_right_column()`
   - Method `.test_source_order_keeps_the_strip_after_the_cockpit()`
   - Method `.test_radar_settings_sit_above_the_flight_log_but_are_separate()`
   - Method `.test_radar_zoom_controls_are_vertical_with_center_in_middle()`
@@ -406,12 +406,19 @@
   - Method `.test_dyson_shell_replaces_the_star_corona()`
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
+  - Method `.test_outliner_panel_ends_with_its_sections()`
 - `class TestFactionEconomyCard` - *The faction card must show where money comes from and where it goes.*
   - Method `.setUpClass()`
   - Method `.test_card_lists_tax_trade_industry_and_upkeep()`
   - Method `.test_breakdown_wraps_between_figures_not_mid_value()`
   - Method `.test_card_shows_positive_net_in_green()`
   - Method `.test_card_shows_trade_partners_and_tech_progress()`
+- `class TestVectorTravelCockpit` - *Open-space vectors need a visible reticle and the same transit animation as bodies.*
+  - Method `.setUpClass()`
+  - Method `.test_selected_vector_draws_a_reticle_and_course()`
+  - Method `.test_point_travel_starts_the_transit_animation()`
+  - Method `.test_transit_animation_marks_the_destination_vector()`
+  - Method `.test_browser_review_can_select_a_vector()`
 
 ---
 
@@ -696,11 +703,12 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `424` lines (`21225` bytes)
+**Size**: `489` lines (`24951` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
   - Method `.test_galaxy_has_more_systems_factions_and_anomalies()`
+  - Method `.test_every_system_has_a_deeper_planet_roster()`
   - Method `.test_populations_are_realistic_and_devastation_kills_growth()`
   - Method `.test_war_capture_devastates_and_displaces_population()`
   - Method `.test_every_anomaly_has_a_power_free_escape()`
@@ -714,6 +722,8 @@
   - Method `.test_at_least_twenty_five_conditional_events()`
   - Method `.test_pending_decision_blocks_time_until_resolved()`
   - Method `.test_decisions_are_rate_limited_by_the_cadence_window()`
+  - Method `.test_first_decision_waits_for_the_initial_relaxed_window()`
+  - Method `.test_a_failed_roll_still_consumes_the_cadence_window()`
   - Method `.test_cadence_choices_and_snapshot()`
   - Method `.test_cadence_is_persisted_with_the_save()`
   - Method `.test_low_hull_event_is_eligible()`
@@ -722,6 +732,8 @@
   - Method `.test_quantum_report_lists_lanes()`
 - `class SurfaceOperationTest`
   - Method `.test_landing_opens_choices_and_marks_site_branch_worked()`
+  - Method `.test_surface_catalog_is_deeper_and_body_specific()`
+  - Method `.test_an_operation_for_another_environment_is_refused()`
 - `class FrontierUiContractTest`
   - Method `.test_cockpit_has_new_mechanics_surfaces()`
   - Method `.test_source_files_have_no_mojibake()`
@@ -785,7 +797,7 @@
 ### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
 > *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
 
-**Size**: `369` lines (`17973` bytes)
+**Size**: `370` lines (`18057` bytes)
 
 **Classes:**
 - `class FixedRng` - *Noise-free rng: uniform returns a fixed value, choice takes the first item.*
@@ -880,7 +892,7 @@
 ### [`tests/test_logbook.py`](tests/test_logbook.py)
 > *Flight-log windowing: galactic news must outlive routine AI-trade chatter.*
 
-**Size**: `143` lines (`6040` bytes)
+**Size**: `150` lines (`6506` bytes)
 
 **Classes:**
 - `class SummarizeTradesTest`
@@ -896,9 +908,10 @@
   - Method `.test_trim_keeps_the_newest_lines_when_nothing_is_notable()`
   - Method `.test_short_logs_are_untouched()`
 - `class WarNewsEventsTest`
-  - Method `.test_capture_and_treaty_become_notifications()`
+  - Method `.test_capture_becomes_one_notification()`
   - Method `.test_declarations_stay_in_the_log_only()`
-  - Method `.test_at_most_two_events_per_tick()`
+  - Method `.test_at_most_one_event_per_tick()`
+  - Method `.test_headlines_keep_a_cooldown_between_them()`
   - Method `.test_an_undismissed_duplicate_is_not_repeated()`
   - Method `.test_a_dismissed_event_may_be_announced_again()`
 - `class WarReachesThePlayerTest`
@@ -1025,12 +1038,13 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `373` lines (`16481` bytes)
+**Size**: `378` lines (`16701` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
   - Method `.random()`
   - Method `.uniform(low, high)`
+  - Method `.choice(seq)`
 - `class TestPopulationCapacity`
   - Method `.test_generated_worlds_are_normalized_to_their_capacity()`
   - Method `.test_technology_and_habitability_raise_capacity()`
@@ -1111,7 +1125,7 @@
 ### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
 > *Regressions pinned by the post-implementation review pass.*
 
-**Size**: `327` lines (`14027` bytes)
+**Size**: `328` lines (`14118` bytes)
 
 **Classes:**
 - `class FlightSafetyTest`
@@ -1554,7 +1568,7 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `457` lines (`20752` bytes)
+**Size**: `467` lines (`21108` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
@@ -1615,7 +1629,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `727` lines (`31177` bytes)
+**Size**: `748` lines (`32204` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1640,6 +1654,7 @@
   - Method `._tour_weapon()`
   - Method `._tour_shipmod()`
   - Method `._tour_outpost()`
+  - Method `._tour_land()` - *Reach a landable body so the surface-operation tour has real work to do.*
   - Method `._tour_surface()`
   - Method `._tour_away()`
   - Method `._tour_ai()`
@@ -1910,12 +1925,12 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7611` lines (`378006` bytes)
+**Size**: `7646` lines (`379570` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
   - Method `._stable_unit(*parts)` - *Deterministic [0,1) roll that does not disturb the live RNG stream.*
-  - Method `.war_news_events(lines, tick, existing)` - *Turn this tick's captures, treaties and eliminations into at most two events.*
+  - Method `.war_news_events(lines, tick, existing)` - *Turn this tick's captures, treaties and eliminations into one headline at most.*
   - Method `.__init__(seed, state)`
   - Method `._bootstrap_frontier()` - *Backfill frontier systems for legacy saves without changing the save schema.*
   - Method `._clone_ship(**kwargs)` - *Create a new ShipState preserving all unspecified telemetry and inventory attributes.*
@@ -2071,7 +2086,8 @@
   - Method `._decision_cooldown()`
   - Method `._decision_chance_multiplier()`
   - Method `.set_decision_cadence(cadence)` - *Choose how often blocking quick-time decisions may interrupt the flight.*
-  - Method `.decisions_ready_in()` - *Ticks left before another blocking decision may open.*
+  - Method `._last_decision_eval_tick()` - *Last tick that consumed a decision window, prompt or failed roll.*
+  - Method `.decisions_ready_in()` - *Ticks left before another blocking decision may be evaluated.*
   - Method `.maybe_trigger_decision(trigger, elapsed_ticks)` - *Evaluate conditional events and open at most one blocking decision.*
   - Method `.resolve_decision(choice_id)` - *Apply a decision choice; time and flight remain locked until this succeeds.*
   - Method `.tick(num_ticks)` - *Advance the simulation universe by num_ticks.*
@@ -2125,7 +2141,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `470` lines (`21049` bytes)
+**Size**: `473` lines (`21147` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -2220,7 +2236,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1287` lines (`57353` bytes)
+**Size**: `1303` lines (`58620` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -2667,10 +2683,11 @@
 ### [`voidfarer/surface.py`](voidfarer/surface.py)
 > *Surface operations: choose what your landing party does after touchdown.*
 
-**Size**: `169` lines (`5265` bytes)
+**Size**: `247` lines (`7940` bytes)
 
 **Classes:**
 - `class SurfaceOperation`
+  - Method `.available_on(body)` - *An empty body_types tuple means the operation works anywhere.*
   - Method `.to_dict()`
 
 **Functions:**
