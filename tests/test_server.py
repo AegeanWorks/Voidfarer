@@ -10,6 +10,7 @@ from pathlib import Path
 
 from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
 from voidfarer.engine import SimulationEngine
+from voidfarer.models import FleetShip
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
 
@@ -383,6 +384,30 @@ class TestServer(unittest.TestCase):
         )
         self.assertAlmostEqual(updated["devastation"], 40.0)
         self.assertEqual(payload["state"]["ship"]["credits"], 4400)
+
+    def test_fleet_sell_endpoint_converts_a_prize_to_credits(self):
+        engine = VoidFarerHandler.engine
+        prize = FleetShip(
+            id="http_prize",
+            name="Prize: Test Corsair",
+            ship_class="Frigate",
+            role="prize",
+            hull=40,
+            max_hull=100,
+            shield=0,
+            max_shield=0,
+            damage=6,
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(fleet_ships=(prize,), credits=1000),
+        )
+        status, data = self._post("/api/fleet/escort/sell", {"ship_id": prize.id})
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertGreater(payload["state"]["ship"]["credits"], 1000)
+        self.assertEqual(payload["state"]["ship"]["fleet_ships"], [])
+        self.assertEqual(payload["state"]["stats"]["ships_sold"], 1)
 
     def test_save_load_delete_endpoints(self):
         status, _ = self._post("/api/save", {})

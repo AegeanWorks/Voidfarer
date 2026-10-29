@@ -3461,12 +3461,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())}</div>
                     <div class="ship-actions">
                         <button class="btn-hud btn-amber" data-escort-repair="${this.escapeHtml(ship.id)}">REPAIR</button>
+                        <button class="btn-hud btn-green" data-escort-sell="${this.escapeHtml(ship.id)}">SELL (${Number(ship.sale_value || 0)} CR)</button>
                         <button class="btn-hud" data-escort-dismiss="${this.escapeHtml(ship.id)}">DISMISS</button>
                     </div>
                 </div>
             `).join("");
             this.fleetShipRoster.querySelectorAll("[data-escort-repair]").forEach(btn =>
                 btn.addEventListener("click", () => this.postAction("/api/fleet/escort/repair", { amount: 60 }, "fleet"))
+            );
+            this.fleetShipRoster.querySelectorAll("[data-escort-sell]").forEach(btn =>
+                btn.addEventListener("click", () => this.postAction("/api/fleet/escort/sell", { ship_id: btn.getAttribute("data-escort-sell") }, "fleet"))
             );
             this.fleetShipRoster.querySelectorAll("[data-escort-dismiss]").forEach(btn =>
                 btn.addEventListener("click", () => this.postAction("/api/fleet/escort/dismiss", { ship_id: btn.getAttribute("data-escort-dismiss") }, "fleet"))

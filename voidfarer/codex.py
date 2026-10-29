@@ -268,6 +268,12 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "Claim finished assignments from the contracts board.",
         "contracts_completed", 3, 700, 220,
     ),
+    CodexEntry(
+        "shipbreaker", "commerce", "Shipbreaker",
+        "Sell three escorts or captured prizes at a drydock.",
+        "Board a crippled hostile, then sell the prize at a station.",
+        "ships_sold", 3, 800, 220,
+    ),
     # Combat
     CodexEntry(
         "first_blood", "combat", "First Blood",
@@ -397,6 +403,7 @@ METRIC_LABELS: dict[str, str] = {
     "credits_earned": "Credits earned",
     "combat_victories": "Combat victories",
     "ships_captured": "Prizes captured",
+    "ships_sold": "Ships sold",
     "contracts_completed": "Contracts completed",
     "anomalies_resolved": "Anomalies resolved",
     "messages_resolved": "Message branches",
@@ -439,6 +446,7 @@ STATS_ORDER: tuple[str, ...] = (
     "credits_earned",
     "combat_victories",
     "ships_captured",
+    "ships_sold",
     "contracts_completed",
     "anomalies_resolved",
     "messages_resolved",
@@ -518,6 +526,8 @@ def metric_value(state: GameState, metric: str) -> int:
         return int(state.stats.get("combat_victories", 0))
     if metric == "ships_captured":
         return int(state.stats.get("ships_captured", 0))
+    if metric == "ships_sold":
+        return int(state.stats.get("ships_sold", 0))
     if metric == "contracts_completed":
         return int(state.stats.get("contracts_completed", 0))
     if metric == "anomalies_resolved":

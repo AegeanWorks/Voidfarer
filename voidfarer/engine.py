@@ -97,6 +97,7 @@ from voidfarer.fleet import (
     ESCORT_CATALOG,
     apply_fleet_casualties,
     build_fleet_ship,
+    escort_sale_value,
     fleet_damage,
     fleet_evasion_bonus,
     get_escort_template,
@@ -1133,6 +1134,7 @@ class SimulationEngine:
                 "anomalies_resolved": 0,
                 "combat_victories": 0,
                 "ships_captured": 0,
+                "ships_sold": 0,
                 "credits_earned": 0,
                 "contracts_completed": 0,
                 "away_missions": 0,
@@ -2988,11 +2990,36 @@ class SimulationEngine:
             self.state = self._clone_state(ship=self._clone_ship(fleet_ships=remaining))
             return True, f"Escort {target.name} decommissioned."
 
+    def sell_escort(self, ship_id: str) -> tuple[bool, str]:
+        """Sell an escort or captured prize at a docked station."""
+        with self.lock:
+            body = self.docked_body
+            if body is None or not body.station_dockable:
+                return False, "Dock at a station or colony to sell an escort."
+            target = next((s for s in self.state.ship.fleet_ships if s.id == ship_id), None)
+            if target is None:
+                return False, f"Unknown escort '{ship_id}'."
+            value = escort_sale_value(target)
+            remaining = tuple(s for s in self.state.ship.fleet_ships if s.id != ship_id)
+            stats = dict(self.state.stats)
+            stats["ships_sold"] = int(stats.get("ships_sold", 0)) + 1
+            log = f"SOLD: {target.name} decommissioned for {value} cr."
+            new_ship = self._clone_ship(
+                fleet_ships=remaining,
+                credits=self.state.ship.credits + value,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+            )
+            self.state = self._clone_state(ship=new_ship, stats=stats)
+            return True, log
+
     def get_fleet_manager_report(self) -> dict[str, Any]:
         with self.lock:
             ships = self.state.ship.fleet_ships
             return {
-                "ships": [s.to_dict() for s in ships],
+                "ships": [
+                    {**ship.to_dict(), "sale_value": escort_sale_value(ship)}
+                    for ship in ships
+                ],
                 "catalog": ESCORT_CATALOG,
                 "total_damage": fleet_damage(ships),
                 "evasion_bonus": round(fleet_evasion_bonus(ships), 3),
@@ -5798,7 +5825,10 @@ class SimulationEngine:
                 "surface_report": self.get_surface_report(),
                 "primary_weapon": self.state.ship.primary_weapon,
                 "fleet_manager": {
-                    "ships": [s.to_dict() for s in self.state.ship.fleet_ships],
+                    "ships": [
+                        {**ship.to_dict(), "sale_value": escort_sale_value(ship)}
+                        for ship in self.state.ship.fleet_ships
+                    ],
                     "catalog": ESCORT_CATALOG,
                     "total_damage": fleet_damage(self.state.ship.fleet_ships),
                     "evasion_bonus": round(fleet_evasion_bonus(self.state.ship.fleet_ships), 3),

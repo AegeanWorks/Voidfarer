@@ -8584,3 +8584,20 @@ body.cockpit-theme .nav-panel > .panel-header {
     height: fit-content;
     max-height: 100%;
 }
+
+/* Prize/escort rows carry REPAIR, SELL and DISMISS: stack them so the name keeps
+   the full record column instead of being squeezed by three inline buttons. */
+.fleet-ship-card > .ship-actions { flex-direction: column; gap: 2px; }
+.fleet-ship-card > .ship-actions .btn-hud { min-height: 22px; padding: 1px 5px; }
+
+/* The ledger grid has no named areas; place the escort record explicitly so the
+   head and stats stay in the body column while REPAIR/SELL/DISMISS stack right. */
+.fleet-ship-card > .fleet-head { grid-column: 2; grid-row: 1; }
+.fleet-ship-card > .fleet-sub { grid-column: 2; grid-row: 2; }
+.fleet-ship-card > .fleet-value { grid-column: 3; grid-row: 1; }
+.fleet-ship-card > .ship-actions { grid-column: 3; grid-row: 2 / span 2; }
+
+.fleet-ship-card > div.fleet-head { grid-column: 2; grid-row: 1; }
+.fleet-ship-card > div.fleet-sub { grid-column: 2; grid-row: 2; }
+.fleet-ship-card > div.fleet-value { grid-column: 3; grid-row: 1; }
+.fleet-ship-card > div.ship-actions { grid-column: 3; grid-row: 2 / span 2; }

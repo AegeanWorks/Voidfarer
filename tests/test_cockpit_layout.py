@@ -1237,3 +1237,18 @@ class TestBoardingCockpit(unittest.TestCase):
         self.assertIn('"boarding"', tool)
         self.assertIn("def _prepare_boarding(", tool)
         self.assertIn("enemy_hull=20", tool)
+
+class TestFleetPrizeCockpit(unittest.TestCase):
+    """Captured prizes must be sellable from the fleet manager."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_fleet_manager_has_a_sell_control(self):
+        self.assertIn("data-escort-sell", self.js)
+        self.assertIn('"/api/fleet/escort/sell"', self.js)
+        self.assertIn("sale_value", self.js)
+        self.assertIn(".fleet-ship-card > div.fleet-head { grid-column: 2;", self.css)
+        self.assertIn(".fleet-ship-card > div.ship-actions { grid-column: 3;", self.css)

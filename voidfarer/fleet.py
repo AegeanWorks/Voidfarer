@@ -79,6 +79,13 @@ def build_fleet_ship(escort_type: str, system_id: str, count: int) -> FleetShip:
     )
 
 
+def escort_sale_value(ship: FleetShip) -> int:
+    """Drydock resale value of an escort or prize, discounted for battle damage."""
+    base = max(0, ship.max_hull) * 10 + max(0, ship.damage) * 60 + max(0, ship.max_shield) * 2
+    condition = 0.25 if ship.status == "destroyed" else 0.68 if ship.status == "damaged" else 1.0
+    return max(100, int(base * 0.5 * condition))
+
+
 def fleet_damage(ships: tuple[FleetShip, ...], formation: str = "balanced") -> int:
     if not ships:
         return 0
