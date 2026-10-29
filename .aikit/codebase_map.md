@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `79`
-- **Total Classes**: `209`
-- **Total Top-Level Functions**: `286`
-- **Total Class Methods**: `1166`
-- **Total Source Lines**: `34208`
+- **Total Classes**: `210`
+- **Total Top-Level Functions**: `287`
+- **Total Class Methods**: `1174`
+- **Total Source Lines**: `34295`
 
 ---
 
@@ -964,7 +964,7 @@
 ### [`tests/test_reactor_map_shipmods.py`](tests/test_reactor_map_shipmods.py)
 > *Regression tests for reactor simulation, sector map modifiers, and ship modifications.*
 
-**Size**: `269` lines (`11583` bytes)
+**Size**: `330` lines (`14316` bytes)
 
 **Classes:**
 - `class ReactorSimulationTest`
@@ -997,6 +997,14 @@
 - `class NewCLIAndCockpitWiringTest`
   - Method `.test_cli_runs_new_simulation_commands()`
   - Method `.test_cockpit_contains_ship_mod_and_reactor_controls()`
+- `class ShipDossierLegibilityTest` - *The 48px silhouette cases and the narrow catalog rows must stay readable.*
+  - Method `.setUpClass()`
+  - Method `.test_every_slot_has_a_code_that_fits_the_case()`
+  - Method `.test_report_ships_slot_codes_to_the_cockpit()`
+  - Method `.test_status_snapshot_also_carries_the_slot_codes()`
+  - Method `.test_silhouette_cases_show_the_code_and_a_real_wrench_glyph()`
+  - Method `.test_catalog_names_wrap_instead_of_losing_words()`
+  - Method `.test_research_rows_align_their_cost_and_start_button()`
 
 ---
 
@@ -1283,7 +1291,7 @@
 ### [`tests/test_ui_audit.py`](tests/test_ui_audit.py)
 > *The headless cockpit audit has deterministic viewport, parsing and wrapper helpers.*
 
-**Size**: `50` lines (`2155` bytes)
+**Size**: `55` lines (`2424` bytes)
 
 **Classes:**
 - `class AuditHelpersTest`
@@ -1293,6 +1301,7 @@
   - Method `.test_parse_audit_refuses_a_missing_payload()`
   - Method `.test_prepare_static_injects_the_collector_and_wrapper()`
   - Method `.test_severe_findings_name_the_blocking_categories()`
+  - Method `.test_modal_layers_are_not_reported_as_hud_collisions()`
 
 ---
 
@@ -1367,7 +1376,7 @@
 ### [`tools/ui_audit.py`](tools/ui_audit.py)
 > *Capture VoidFarer cockpit screenshots and a measurable UI audit with headless Edge or Chrome.*
 
-**Size**: `861` lines (`33205` bytes)
+**Size**: `864` lines (`33453` bytes)
 
 **Functions:**
 - `def find_browser()` - *Locate an installed Edge or Chrome executable without a third-party dependency.*
@@ -1653,7 +1662,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7212` lines (`358717` bytes)
+**Size**: `7215` lines (`358900` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2328,7 +2337,7 @@
 ### [`voidfarer/shipmods.py`](voidfarer/shipmods.py)
 > *Structural ship modifications: permanent refits with explicit trade-offs.*
 
-**Size**: `193` lines (`6683` bytes)
+**Size**: `208` lines (`7179` bytes)
 
 **Classes:**
 - `class ShipMod` - *A permanent structural refit available at orbital drydocks.*
@@ -2340,6 +2349,7 @@
 - `def get_ship_mod_sell_value(mod_id)`
 - `def calculate_ship_mod_bonuses(ship_mods)` - *Aggregate structural modification effects into the common bonus keyspace.*
 - `def slot_label(slot)`
+- `def slot_code(slot)` - *Short, always-fitting code for the 48px silhouette case.*
 
 ---
 

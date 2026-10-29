@@ -27,3 +27,4 @@ Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Derelict Boarding & Fuel Scooping**: salvage and finite fuel taps.
 - **Captain's Log & Discovery Codex**: career stats, milestones, rewards, filters and log.
 - **Notification Toasts & Minimum Targets**: event cards anchor between the left terminal and target dossier below 1600px so they never cover the deck at 1280x720; the SCROLL cue is 12px and compact command-strip controls keep a 24px target height.
+- **Ship Dossier Legibility**: the five silhouette cases show short codes (FRM, CORE, THM, DRV, OPS) with the full slot label and installed module in the tooltip; catalog names wrap rather than ellipsize; research rows keep cost and START on fixed columns.

@@ -178,6 +178,7 @@ from voidfarer.shipmods import (
     get_available_ship_mods,
     get_ship_mod,
     get_ship_mod_sell_value,
+    slot_code,
     slot_label,
 )
 from voidfarer.models import (
@@ -2302,6 +2303,7 @@ class SimulationEngine:
             return {
                 "slots": list(SHIP_MOD_SLOTS),
                 "slot_labels": {slot: slot_label(slot) for slot in SHIP_MOD_SLOTS},
+                "slot_codes": {slot: slot_code(slot) for slot in SHIP_MOD_SLOTS},
                 "installed": installed,
                 "installed_details": {
                     slot: get_ship_mod(mod_id).to_dict() if get_ship_mod(mod_id) else {"id": mod_id}
@@ -5446,6 +5448,7 @@ class SimulationEngine:
                 "ship_mods": {
                     "slots": list(SHIP_MOD_SLOTS),
                     "slot_labels": {slot: slot_label(slot) for slot in SHIP_MOD_SLOTS},
+                    "slot_codes": {slot: slot_code(slot) for slot in SHIP_MOD_SLOTS},
                     "installed": dict(self.state.ship.ship_mods),
                     "installed_details": {
                         slot: get_ship_mod(mod_id).to_dict() if get_ship_mod(mod_id) else {"id": mod_id}

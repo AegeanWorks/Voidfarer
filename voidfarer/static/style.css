@@ -3218,6 +3218,13 @@ body.void-transit::after {
 .ability-row.locked { opacity: .45; }
 .research-row .progress { flex: 1; height: 4px; background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden; margin: 0 8px; }
 .research-row .progress div { height: 100%; background: var(--neon-cyan); }
+/* Fixed columns keep "START" and the point cost on one vertical line; flex let the
+   cost drift with each project's description length. */
+.research-projects .research-row { display: grid; grid-template-columns: minmax(0, 1fr) 54px auto; align-items: center; }
+.research-projects .research-row > span:first-child { min-width: 0; }
+.research-projects .research-row > span:nth-child(2) { text-align: right; white-space: nowrap; color: var(--console-muted); }
+.research-projects .research-row > button { justify-self: end; min-width: 62px; }
+.research-projects .research-row small { display: block; color: var(--console-muted); font-size: 12px; overflow-wrap: anywhere; }
 .empire-section { margin-bottom: 14px; }
 .diplomacy-row .leader-behavior { color: var(--neon-amber); font-size: .6rem; }
 .diplomacy-row.eliminated { opacity: .4; text-decoration: line-through; }
@@ -4176,12 +4183,14 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 
 .ship-module-name {
     font-family: var(--font-mono);
-    font-size: 0.55rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     color: var(--text-secondary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: clip;
     max-width: 44px;
 }
 
@@ -7810,7 +7819,9 @@ body.cockpit-theme .panel-center {
 .ship-module-row:last-child { border-bottom: 0; }
 .ship-module-glyph { grid-column: 1; align-self: center; color: var(--console-cyan); font-size: 16px; text-align: center; }
 .ship-module-info { grid-column: 2; min-width: 0; }
-.ship-module-info strong { display: block; color: var(--console-ivory); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The name wraps instead of ellipsizing: at 320px the fourth column left only ~100px
+   for text, so "Reinforced Structural Spine" read as "Reinforced Structural Sp...". */
+.ship-module-info strong { display: block; color: var(--console-ivory); font-size: 13.5px; white-space: normal; overflow-wrap: anywhere; }
 .ship-module-info small { display: block; color: var(--console-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ship-module-effects { grid-column: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 3px 6px; }
 .ship-module-stat { font-size: 12px; }

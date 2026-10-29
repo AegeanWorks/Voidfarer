@@ -2,6 +2,7 @@
 
 import contextlib
 import io
+import re
 import tempfile
 import unittest
 from dataclasses import replace
@@ -10,6 +11,7 @@ from pathlib import Path
 from voidfarer.cli import main
 from voidfarer.engine import SimulationEngine
 from voidfarer.galaxy import GalaxyGenerator
+from voidfarer.storage import StorageManager
 from voidfarer.mapmods import (
     MAP_MODIFIER_MAP,
     aggregate_map_modifiers,
@@ -17,7 +19,7 @@ from voidfarer.mapmods import (
 )
 from voidfarer.models import MapModifier, ReactorState, ShipState, StarSystem
 from voidfarer.reactor import reactor_output_efficiency
-from voidfarer.shipmods import CATALOG_SHIP_MODS
+from voidfarer.shipmods import CATALOG_SHIP_MODS, SHIP_MOD_SLOTS, slot_code, slot_label
 
 
 class ReactorSimulationTest(unittest.TestCase):
@@ -263,6 +265,65 @@ class NewCLIAndCockpitWiringTest(unittest.TestCase):
             "/api/reactor/vent",
         ):
             self.assertIn(symbol, script)
+
+
+class ShipDossierLegibilityTest(unittest.TestCase):
+    """The 48px silhouette cases and the narrow catalog rows must stay readable."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.static = Path(__file__).parent.parent / "voidfarer" / "static"
+        cls.css = (cls.static / "style.css").read_text(encoding="utf-8")
+        cls.js = (cls.static / "app.js").read_text(encoding="utf-8")
+
+    def test_every_slot_has_a_code_that_fits_the_case(self):
+        for slot in SHIP_MOD_SLOTS:
+            code = slot_code(slot)
+            self.assertTrue(code)
+            self.assertLessEqual(len(code), 4)
+            self.assertEqual(code, code.upper())
+            self.assertNotIn("_", code)
+        self.assertEqual(slot_code("reactor_core"), "CORE")
+        self.assertEqual(slot_label("thermal"), "Thermal Control")
+
+    def test_report_ships_slot_codes_to_the_cockpit(self):
+        engine = SimulationEngine(state=StorageManager(Path(tempfile.mkdtemp()) / "save").load())
+        report = engine.get_ship_mod_report()
+        self.assertEqual(set(report["slot_codes"]), set(SHIP_MOD_SLOTS))
+        self.assertEqual(report["slot_codes"]["ops"], "OPS")
+
+    def test_status_snapshot_also_carries_the_slot_codes(self):
+        engine = SimulationEngine(state=StorageManager(Path(tempfile.mkdtemp()) / "save").load())
+        snapshot = engine.get_status_snapshot()
+        self.assertEqual(snapshot["ship_mods"]["slot_codes"]["reactor_core"], "CORE")
+
+    def test_silhouette_cases_show_the_code_and_a_real_wrench_glyph(self):
+        self.assertIn("const codes = report.slot_codes || {};", self.js)
+        self.assertIn("this.escapeHtml(code)", self.js)
+        self.assertNotIn('<span class="ship-module-icon">?</span>', self.js)
+        self.assertIn('<span class="ship-module-icon">🛠</span>', self.js)
+        self.assertIn('slotDiv.setAttribute("aria-label"', self.js)
+
+    def test_catalog_names_wrap_instead_of_losing_words(self):
+        self.assertRegex(
+            self.css,
+            r"\.ship-module-info strong \{[^}]*white-space: normal[^}]*overflow-wrap: anywhere",
+            re.S,
+        )
+        self.assertRegex(
+            self.css,
+            r"\.ship-module-name \{[^}]*font-size: 11px[^}]*text-overflow: clip",
+            re.S,
+        )
+
+    def test_research_rows_align_their_cost_and_start_button(self):
+        self.assertRegex(
+            self.css,
+            r"\.research-projects \.research-row \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 54px auto",
+            re.S,
+        )
+        self.assertIn(".research-projects .research-row > button { justify-self: end;", self.css)
+
 
 
 if __name__ == "__main__":

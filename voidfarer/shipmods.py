@@ -15,6 +15,16 @@ SHIP_MOD_SLOT_LABELS: dict[str, str] = {
     "ops": "Operations Suite",
 }
 
+# The silhouette slot boxes are 48px squares, so a full label clips to "Therm...".
+# These three-letter codes fit; the full label stays in the tooltip and aria-label.
+SHIP_MOD_SLOT_CODES: dict[str, str] = {
+    "frame": "FRM",
+    "reactor_core": "CORE",
+    "thermal": "THM",
+    "drive": "DRV",
+    "ops": "OPS",
+}
+
 
 @dataclass(frozen=True)
 class ShipMod:
@@ -191,3 +201,8 @@ def calculate_ship_mod_bonuses(ship_mods: dict[str, str]) -> dict[str, float]:
 
 def slot_label(slot: str) -> str:
     return SHIP_MOD_SLOT_LABELS.get(slot, slot.replace("_", " ").title())
+
+
+def slot_code(slot: str) -> str:
+    """Short, always-fitting code for the 48px silhouette case."""
+    return SHIP_MOD_SLOT_CODES.get(slot, slot.replace("_", "")[:4].upper())

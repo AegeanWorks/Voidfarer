@@ -6,7 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.ui_audit import ERROR_COLLECTOR, outer_window, parse_audit, prepare_static, severe_findings
+from tools.ui_audit import (ERROR_COLLECTOR, WRAPPER_JS, outer_window, parse_audit,
+                            prepare_static, severe_findings)
 
 
 class AuditHelpersTest(unittest.TestCase):
@@ -44,6 +45,10 @@ class AuditHelpersTest(unittest.TestCase):
                   "tinyText": [{"el": "span"}], "smallTargets": [{"el": "button"}],
                   "contrast": []}
         self.assertEqual(severe_findings(report), ["console", "hscroll", "tinyText", "smallTargets"])
+
+    def test_modal_layers_are_not_reported_as_hud_collisions(self):
+        self.assertIn('parseInt(style.zIndex || "0", 10) >= 50', WRAPPER_JS)
+        self.assertNotIn('parseInt(style.zIndex || "0", 10) >= 500', WRAPPER_JS)
 
 
 if __name__ == "__main__":

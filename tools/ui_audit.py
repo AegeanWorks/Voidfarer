@@ -293,11 +293,14 @@ WRAPPER_JS = r"""
     return false;
   }
 
+  // A fixed layer at 50 or above (decision modal 90, main menu 5100, tooltips 20000)
+  // deliberately covers the HUD, so a control under it is occluded, not colliding.
+  // Comparing across such layers reported the modal as a defect on every tab.
   function overlayRoot(element, win, doc) {
     var node = element;
     while (node && node !== doc.body) {
       var style = win.getComputedStyle(node);
-      if (style.position === "fixed" && parseInt(style.zIndex || "0", 10) >= 500) {
+      if (style.position === "fixed" && parseInt(style.zIndex || "0", 10) >= 50) {
         return node;
       }
       node = node.parentElement;

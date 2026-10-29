@@ -2781,6 +2781,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const report = this.state.ship_mods || {};
         const slots = report.slots || [];
         const labels = report.slot_labels || {};
+        const codes = report.slot_codes || {};
         const installed = report.installed || {};
         const catalog = report.catalog || [];
         const docked = !!(this.state.orbiting_body && this.state.orbiting_body.station_dockable);
@@ -2818,12 +2819,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             slotDiv.style.top = position.top;
             slotDiv.style.left = position.left;
             slotDiv.dataset.slot = slot;
+            const code = codes[slot] || String(slot).replace(/_/g, "").slice(0, 4).toUpperCase();
+            const slotLabel = labels[slot] || slot;
             slotDiv.innerHTML = mod
-                ? `<span class="ship-module-icon">?</span><span class="ship-module-name">${this.escapeHtml(mod.name)}</span>`
-                : `<span class="ship-module-icon">+</span><span class="ship-module-name">${this.escapeHtml(labels[slot] || slot)}</span>`;
+                ? `<span class="ship-module-icon">🛠</span><span class="ship-module-name">${this.escapeHtml(code)}</span>`
+                : `<span class="ship-module-icon">+</span><span class="ship-module-name">${this.escapeHtml(code)}</span>`;
             slotDiv.title = mod
-                ? `${mod.name}: ${mod.description}`
-                : `${labels[slot] || slot} ? pick a compatible module below`;
+                ? `${slotLabel} — ${mod.name}: ${mod.description}`
+                : `${slotLabel} — pick a compatible module below`;
+            slotDiv.setAttribute("aria-label", mod ? `${slotLabel}: ${mod.name}` : `${slotLabel}: empty`);
             slotDiv.addEventListener("click", () => {
                 if (mod && docked) {
                     this.handleModuleAction(mod.id, "uninstall");

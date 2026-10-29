@@ -1,57 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "cockpit-720p-legibility",
+    "task_id": "ship-dossier-legibility",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793252027.860832,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1793253222.5267038,
     "owner": "kilo:1",
     "started_by": "kilo:1",
-    "continuations": [],
-    "completed_at": 1793252035.4610214
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "galaxy-population-economy",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/6] Plan population capacity and tech limits, normalized worlds, wartime devastation, faction economies, and a physically plausible Dyson swarm render.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793079683.3561525,
-      "timestamp_str": "2026-10-27 08:41:23",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "The user reports the Dyson sphere is visually wrong, populations are implausible per planet, and asks for tech/habitability population limits, wartime devastation, and basic faction economies.",
-        "benefits": "Populations scale from world surface area, habitability and technology; growth stops at capacity; war grinds worlds down; factions show treasury/income/upkeep; the Dyson sphere reads as a star-harvesting swarm.",
-        "risks": "contract: CelestialBody and GameState save schema additions; dependency: stdlib only; concurrency: engine tick path; state: population and economy values change across saves",
-        "mitigation": "Backward-compatible defaults, deterministic formulas, focused tests, full project check, real-browser vision review"
-      },
-      "handoff": {
-        "state": "planning complete",
-        "next": "implement population model",
-        "open": "tech level per body",
-        "evidence": "none"
-      }
-    },
-    {
-      "task_id": "galaxy-population-economy",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/6] Population normalized; tech/habitability capacity, wartime attrition, faction treasuries and Dyson swarm render implemented. checklists: passed (test 638, hygiene, guidelines, secrets).",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793080850.7513287,
-      "timestamp_str": "2026-10-27 09:00:50",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "all gates pass",
-        "next": "optional vision review",
-        "open": "screenshot aesthetics unverified without image-capable model",
-        "evidence": "aikit check 4/4"
-      }
-    },
     {
       "task_id": "galaxy-population-economy",
       "phase": "in_progress",
@@ -348,6 +307,46 @@
       "timestamp": 1793252035.461023,
       "timestamp_str": "2026-10-29 08:33:55",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "ship-dossier-legibility",
+      "phase": "phase 1",
+      "phase_num": 1,
+      "description": "[1/3] Fix the three vision-found SHIP/EMPIRE defects (clipped silhouette slot labels and a stray question-mark glyph, mid-word catalog name clipping, drifting research cost/START columns) and stop the audit from counting a modal as a HUD collision.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793253168.0185928,
+      "timestamp_str": "2026-10-29 08:52:48",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "The G-015 vision reviewer rejected the ship and empire surfaces that DOM metrics had passed, and every tab audit reported the blocking decision modal as two or three HUD overlaps.",
+        "benefits": "Slot cases name their subsystem without clipping, installed modules show a wrench instead of a question mark, catalog names are fully readable in the 320px deck, research costs and buttons share a column, and audit overlap counts mean real HUD collisions.",
+        "risks": "contract: two additive JSON keys (slot_codes) in the ship report and status snapshot; dependency: stdlib only; concurrency: none; state: none; visual: CSS could reflow the ship rows or research cards at 720p",
+        "mitigation": "Additive keys with defaults, deterministic wrappers, contract tests including a snapshot-key pin, fresh 1280x720 and 1920x1080 captures, vision re-review, full gates"
+      },
+      "handoff": {
+        "state": "implementation complete, awaiting verification checkpoint",
+        "next": "gates then commit",
+        "open": "none",
+        "evidence": "ui-review/review-20261029c"
+      }
+    },
+    {
+      "task_id": "ship-dossier-legibility",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/3] Slot codes FRM/CORE/THM/DRV/OPS now render in the silhouette cases (wrench glyph, aria-label, full label in tooltip), catalog names wrap, research cost/START use fixed columns, and the audit treats fixed layers at z>=50 as separate layers. Vision APPROVED all three fixes and quoted every slot code at 1280x720 and 1920x1080; 686 tests pass; 4/4 gates. checklists: passed (test, hygiene, guidelines, secrets).",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793253222.5267038,
+      "timestamp_str": "2026-10-29 08:53:42",
+      "agent": "kilo:1",
+      "handoff": {
+        "state": "verified, gates green",
+        "next": "commit then close the cockpit UI task",
+        "open": "UI contract warning",
+        "evidence": "ui-review/review-20261029c, unittest 686 OK"
+      }
     }
   ]
 }

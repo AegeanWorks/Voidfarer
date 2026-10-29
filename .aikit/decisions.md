@@ -938,3 +938,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. In the `max-height:800px` block, raise reactor doctrine, VENT, power-action and skill-chip minimum heights to 24px so the compact strip stays a compact strip while meeting the target floor.
   4. Pin all three behaviours with CSS-contract tests in `tests/test_cockpit_layout.py`.
 - **Consequences**: The 1280x720 DOM audit now reports zero tiny text and zero sub-24px targets; event toasts occupy x=473.6-832 and no longer touch the deck (right edge 473.3). The two remaining audit overlaps are the intentional full-screen decision modal over the HUD. Fresh captures are in `ui-review/review-20261028b`; the G-015 vision re-review is still pending because the evren2 vision provider hit its daily token limit, so no visual approval is claimed. Suite: 679 tests (38 suites).
+
+### ADR-079: Legible Ship Dossier Slots and Honest Audit Layers
+- **Date**: 2026-10-29
+- **Status**: Accepted
+- **Context**: A G-015 vision pass over the SHIP and EMPIRE tabs found three defects the DOM audit could not see: the 48px silhouette cases rendered full slot labels, so they clipped to "Therm..." and "Opera..." while an installed module showed a stray "?" glyph; catalog names clipped mid-word to "Reinforced Structural Sp..."; and research rows let the point cost drift with each description, so the START buttons and costs did not share a column. Separately, every tab audit reported the blocking decision modal as two or three HUD collisions because the overlap check only treated fixed layers at z-index 500 or above as separate layers, while `.decision-overlay` sits at 90.
+- **Decision**:
+  1. Add `SHIP_MOD_SLOT_CODES` (FRM, CORE, THM, DRV, OPS) and `slot_code()` in `shipmods.py`, expose `slot_codes` from both `get_ship_mod_report` and the status snapshot, and render the code inside each case with the full label plus installed module in `title` and `aria-label`. Installed cases now use the wrench glyph instead of a question mark; case text is 11px bold.
+  2. Let catalog names wrap with `overflow-wrap: anywhere` instead of ellipsizing, because the fourth grid column leaves about 100px for the name at 320px deck width.
+  3. Make research rows a `minmax(0,1fr) 54px auto` grid so the cost column and the START button share a vertical edge for every project.
+  4. Treat any fixed layer at z-index 50 or above as its own audit layer in `tools/ui_audit.py`, so a modal that deliberately covers the HUD is recorded as occlusion, not as a HUD collision.
+  5. Pin all four behaviours with tests, including one that fails if the status snapshot stops carrying `slot_codes`.
+- **Consequences**: The silhouette reads OPS, THM, FRM, CORE, DRV with no clipping, catalog names are fully spelled, and research costs and buttons align; the vision reviewer approved all three fixes plus a follow-up pass and quoted every slot code. Tab audits now report zero overlaps on MARKET instead of three. Suite: 686 tests (38 suites).
