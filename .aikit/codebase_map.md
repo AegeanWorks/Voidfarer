@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `79`
-- **Total Classes**: `210`
-- **Total Top-Level Functions**: `288`
-- **Total Class Methods**: `1177`
-- **Total Source Lines**: `34378`
+- **Total Python Modules**: `81`
+- **Total Classes**: `214`
+- **Total Top-Level Functions**: `291`
+- **Total Class Methods**: `1196`
+- **Total Source Lines**: `34656`
 
 ---
 
@@ -825,6 +825,37 @@
   - Method `.test_use_missing_item_fails()`
   - Method `.test_commodity_cannot_be_consumed()`
   - Method `.test_decoy_requires_active_combat()`
+
+---
+
+### [`tests/test_logbook.py`](tests/test_logbook.py)
+> *Flight-log windowing: galactic news must outlive routine AI-trade chatter.*
+
+**Size**: `140` lines (`5962` bytes)
+
+**Classes:**
+- `class SummarizeTradesTest`
+  - Method `.test_two_captain_lines_become_one_summary()`
+  - Method `.test_summary_keeps_the_position_of_the_first_trade_line()`
+  - Method `.test_lines_that_are_not_trades_pass_through()`
+- `class NotableNewsTest`
+  - Method `.test_war_news_is_notable()`
+  - Method `.test_routine_chatter_is_not_notable()`
+  - Method `.test_trade_spam_cannot_evict_a_capture()`
+  - Method `.test_the_newest_half_of_the_log_always_survives()`
+  - Method `.test_older_news_is_not_promoted_past_newer_news()`
+  - Method `.test_trim_keeps_the_newest_lines_when_nothing_is_notable()`
+  - Method `.test_short_logs_are_untouched()`
+- `class WarNewsEventsTest`
+  - Method `.test_capture_and_treaty_become_notifications()`
+  - Method `.test_declarations_stay_in_the_log_only()`
+  - Method `.test_at_most_two_events_per_tick()`
+  - Method `.test_an_undismissed_duplicate_is_not_repeated()`
+  - Method `.test_a_dismissed_event_may_be_announced_again()`
+- `class WarReachesThePlayerTest`
+  - Method `.test_a_simulated_campaign_shows_a_war_headline_to_the_player()`
+  - Method `.test_trade_chatter_is_summarized_once_per_tick()`
+  - Method `.test_log_never_exceeds_its_limit()`
 
 ---
 
@@ -1666,11 +1697,12 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7215` lines (`358900` bytes)
+**Size**: `7255` lines (`360805` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
   - Method `._stable_unit(*parts)` - *Deterministic [0,1) roll that does not disturb the live RNG stream.*
+  - Method `.war_news_events(lines, tick, existing)` - *Turn this tick's captures, treaties and eliminations into at most two events.*
   - Method `.__init__(seed, state)`
   - Method `._bootstrap_frontier()` - *Backfill frontier systems for legacy saves without changing the save schema.*
   - Method `._clone_ship(**kwargs)` - *Create a new ShipState preserving all unspecified telemetry and inventory attributes.*
@@ -1869,7 +1901,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `468` lines (`20988` bytes)
+**Size**: `470` lines (`21049` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -1998,6 +2030,18 @@
 - `def get_item_info(item_id)` - *Retrieve item metadata, falling back to a default commodity if unlisted.*
 - `def calculate_cargo_volume(cargo)` - *Total hold volume currently occupied by inventory cargo.*
 - `def get_inventory_manifest(cargo)` - *Compute detailed inventory manifest itemizing quantities, volume footprint, and usability.*
+
+---
+
+### [`voidfarer/logbook.py`](voidfarer/logbook.py)
+> *Flight-log windowing: notable galactic news must outlive routine chatter.*
+
+**Size**: `96` lines (`3288` bytes)
+
+**Functions:**
+- `def is_notable(line)` - *True when a log line carries galactic news rather than ambient chatter.*
+- `def summarize_trades(lines)` - *Collapse one trade line per captain into a single per-tick summary.*
+- `def trim_log(lines, limit)` - *Keep the newest half of the log plus the most recent galactic news.*
 
 ---
 

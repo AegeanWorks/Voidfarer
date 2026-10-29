@@ -962,3 +962,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Reject `--dpr` outside 1-3 with a `Why:`/`Fix:` pair instead of silently clamping.
   5. Pin the builder, the severity mapping and the summary text with unit tests.
 - **Consequences**: Audits at 1.25x, 1.5x and 2x all pass with zero errors, clipped text, tiny text, small targets or overlaps, and report `radar ok` with backing stores of 1630x1015, 2880x1620 and 2560x1440 for CSS boxes of 1280x720 and 1920x1080. Suite: 689 tests (38 suites).
+### ADR-081: Galactic War News That Survives the Flight Log
+- **Date**: 2026-10-29
+- **Status**: Accepted
+- **Context**: A 1,200-tick probe produced 1,432 WAR lines and 62 PEACE lines and ended 17 wars, yet the 20-line flight log retained none of them: `simulate_ai_trade` emitted one line per captain per tick, so within ten ticks the buffer held nothing but "AI TRADE: Captain Vega moved 4x fuel_cells to pulsar_psr." The cockpit was worse off, because its log panel only mirrors local player actions, so captures, treaties and faction eliminations never reached the player at all. Galaxy-wide politics was invisible outside the Factions tab.
+- **Decision**:
+  1. Add `logbook.py` with `LOG_LIMIT`, `is_notable`, `summarize_trades` and `trim_log`. Trade lines collapse to one per tick ("AI TRADE: 2 runs moved 8 crates (Captain Vega, Nyx the Broker)."), and trimming reserves the newest half of the buffer for local context while filling the rest from the most recent notable lines, so the oldest headline yields to newer ones and the panel never becomes an all-war feed.
+  2. Rate-limit the trade summary to one line per `AI_TRADE_LOG_TICKS` (5) so ambient trade cannot fill half the window every ten ticks.
+  3. Emit `GameEvent(kind="war")` for captures, treaties and eliminations through `war_news_events`, capped at two per tick and skipped when an identical undismissed event already exists; declarations stay in the log only, because they are the most frequent and least dramatic headline.
+  4. Use the faction's display name, not its id, in the elimination line, matching every other diplomatic message.
+- **Consequences**: After 1,200 ticks the log now mixes recent local context (month end, market shocks, galactic news, trade summaries) with eleven war/peace/elimination headlines, and the cockpit holds 27 `war` notifications with titles `System Captured`, `Peace Treaty Signed` and `Faction Eliminated`. A G-015 vision pass approved the two-card notification stack at 1280x720 and 1920x1080 with no clipping, overlap or button misalignment. Suite: 707 tests (39 suites).

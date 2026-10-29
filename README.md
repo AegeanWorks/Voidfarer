@@ -104,6 +104,7 @@ voidfarer/
 │   ├── exploration.py    <- derelict salvage, fuel scooping & crew drills
 │   ├── codex.py          <- discovery codex, career statistics & milestones
 │   ├── inventory.py      <- item catalog, consumables & cargo manifest
+│   ├── logbook.py        <- flight-log windowing that keeps galactic war news
 │   ├── storage.py        <- crash-safe atomic persistence & shadow backup
 │   ├── server.py         <- zero-dependency HTTP REST & cockpit server
 │   ├── cli.py            <- ANSI terminal interface & interactive REPL

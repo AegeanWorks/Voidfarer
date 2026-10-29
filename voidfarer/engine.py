@@ -171,6 +171,7 @@ from voidfarer.reactor import (
     vent_reactor,
 )
 from voidfarer.weapons import WEAPON_MAP, get_weapon, weapon_catalog
+from voidfarer.logbook import summarize_trades, trim_log
 from voidfarer.shipmods import (
     CATALOG_SHIP_MODS,
     SHIP_MOD_SLOTS,
@@ -339,6 +340,39 @@ class SimulationEngine:
         payload = "|".join(str(part) for part in parts).encode("utf-8")
         digest = hashlib.blake2b(payload, digest_size=8).digest()
         return int.from_bytes(digest, "big") / float(2**64)
+
+    # Only the dramatic headlines reach the cockpit as notifications; declarations stay
+    # in the flight log so a long war does not bury the player in toasts.
+    AI_TRADE_LOG_TICKS = 5
+    WAR_NEWS_TITLES = (
+        ("WAR: ", "System Captured"),
+        ("PEACE: ", "Peace Treaty Signed"),
+        ("FACTION ELIMINATED: ", "Faction Eliminated"),
+    )
+
+    @classmethod
+    def war_news_events(cls, lines: list[str], tick: int, existing: list[GameEvent]) -> list[GameEvent]:
+        """Turn this tick's captures, treaties and eliminations into at most two events."""
+        seen = {event.message for event in existing if not event.dismissed}
+        events: list[GameEvent] = []
+        for line in lines:
+            title = next((label for prefix, label in cls.WAR_NEWS_TITLES if line.startswith(prefix)), None)
+            if title is None or line in seen:
+                continue
+            seen.add(line)
+            events.append(
+                GameEvent(
+                    id=f"evt_{tick}_{len(existing) + len(events) + 1}",
+                    kind="war",
+                    title=title,
+                    message=line,
+                    tick=tick,
+                    dismissed=False,
+                )
+            )
+            if len(events) >= 2:
+                break
+        return events
 
     def __init__(self, seed: int = 42, state: GameState | None = None) -> None:
         self.lock = threading.RLock()
@@ -1662,7 +1696,7 @@ class SimulationEngine:
                     upgrades=new_ship.upgrades,
                     equipped_upgrades=new_ship.equipped_upgrades,
                     fleet_drones=new_ship.fleet_drones,
-                    flight_log=tuple(new_flight_log[-20:]),
+                    flight_log=tuple(trim_log(new_flight_log)),
                     streak=new_ship.streak,
                     relics=new_ship.relics,
                     mastery=new_ship.mastery,
@@ -6573,7 +6607,10 @@ class SimulationEngine:
             new_ai_captains, new_econ, ai_logs = simulate_ai_trade(
                 self.state.ai_captains, new_econ, self.state.systems, self.rng
             )
-            econ_logs.extend(ai_logs[-5:])
+            # Trade chatter is ambient, not news: one summarized line every few ticks keeps
+            # the recent half of the flight log free for arrivals, market shocks and war.
+            if new_tick % self.AI_TRADE_LOG_TICKS == 0:
+                econ_logs.extend(summarize_trades(ai_logs))
 
             # 6. Automated repair bay module passive hull healing
             new_hull = cur_ship.hull
@@ -7052,6 +7089,9 @@ class SimulationEngine:
             if new_flight_log_research:
                 new_flight_log.append(new_flight_log_research)
             new_flight_log.extend(faction_logs[-3:])
+            # A war the player never hears about is not a war. Captures, treaties and
+            # eliminations become dismissable cockpit notifications as well as log lines.
+            new_events.extend(self.war_news_events(faction_logs, new_tick, new_events))
             if month_rollover:
                 crew_logs.append(
                     f"MONTH END: crew payroll runs {crew_upkeep(new_crew)} cr/month; "
@@ -7080,7 +7120,7 @@ class SimulationEngine:
                 fleet_ships=new_fleet_ships,
                 faction_standings=new_standings,
                 active_contracts=new_contracts,
-                flight_log=tuple(new_flight_log[-20:]),
+                flight_log=tuple(trim_log(new_flight_log)),
             )
 
             self.state = self._clone_state(

@@ -381,7 +381,9 @@ def resolve_wars(
             if gone is not None:
                 if gone not in removed:
                     removed.add(gone)
-                    logs.append(f"FACTION ELIMINATED: {gone} has no remaining territory.")
+                    logs.append(
+                        f"FACTION ELIMINATED: {_faction_name(gone)} has no remaining territory."
+                    )
                 war = replace(war, active=False, ended_tick=step_tick)
                 break
             if len(captured) >= WAR_MAX_CAPTURES or step_tick - war.started_tick >= WAR_EXHAUSTION_TICKS:
