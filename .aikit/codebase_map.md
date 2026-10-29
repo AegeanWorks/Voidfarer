@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `90`
-- **Total Classes**: `237`
-- **Total Top-Level Functions**: `306`
-- **Total Class Methods**: `1381`
-- **Total Source Lines**: `38127`
+- **Total Python Modules**: `91`
+- **Total Classes**: `238`
+- **Total Top-Level Functions**: `308`
+- **Total Class Methods**: `1387`
+- **Total Source Lines**: `38293`
 
 ---
 
@@ -717,6 +717,24 @@
   - Method `.test_ship_state_faction_standings_migration()`
   - Method `.test_tactical_combat_shield_and_actions()`
   - Method `.test_combat_victory_faction_standing_shift()`
+
+---
+
+### [`tests/test_fleet_patrol.py`](tests/test_fleet_patrol.py)
+> *Fleet assignment: only local escorts fight, while remote patrols cut piracy.*
+
+**Size**: `122` lines (`4590` bytes)
+
+**Classes:**
+- `class FleetAssignmentTest`
+  - Method `.test_only_local_escorts_are_selected_for_battle()`
+  - Method `.test_remote_escort_takes_no_damage_and_adds_no_local_damage()`
+  - Method `.test_remote_escort_contributes_no_damage()`
+  - Method `.test_assigned_patrols_reduce_pirate_risk()`
+  - Method `.test_fleet_report_separates_local_and_total_damage()`
+
+**Functions:**
+- `def _escort(ship_id, system_id, hull, shield)`
 
 ---
 
@@ -1803,7 +1821,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3004` lines (`153728` bytes)
+**Size**: `3009` lines (`153950` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -1986,7 +2004,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7879` lines (`390887` bytes)
+**Size**: `7909` lines (`392620` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -1995,6 +2013,7 @@
   - Method `.__init__(seed, state)`
   - Method `._bootstrap_frontier()` - *Backfill frontier systems for legacy saves without changing the save schema.*
   - Method `._clone_ship(**kwargs)` - *Create a new ShipState preserving all unspecified telemetry and inventory attributes.*
+  - Method `._merge_fleet_ships(updated_local)` - *Apply local battle updates without dropping escorts on patrol elsewhere.*
   - Method `._clone_state(**kwargs)` - *Create a new GameState preserving time, stats, economy, and all unspecified universe fields.*
   - Method `._research_bonuses()`
   - Method `._skill(skill)`
@@ -2270,11 +2289,12 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `156` lines (`5259` bytes)
+**Size**: `161` lines (`5530` bytes)
 
 **Functions:**
 - `def get_escort_template(escort_type)`
 - `def build_fleet_ship(escort_type, system_id, count)`
+- `def fleet_ships_in_system(ships, system_id)` - *Escorts physically stationed in one system; remote patrols do not join a fight.*
 - `def escort_sale_value(ship)` - *Drydock resale value of an escort or prize, discounted for battle damage.*
 - `def fleet_damage(ships, formation)`
 - `def fleet_evasion_bonus(ships, formation)`
@@ -2598,13 +2618,13 @@
 ### [`voidfarer/pirates.py`](voidfarer/pirates.py)
 > *Pirate bands, toll encounters, and deterministic raid generation.*
 
-**Size**: `98` lines (`3097` bytes)
+**Size**: `102` lines (`3266` bytes)
 
 **Classes:**
 - `class PirateRisk`
 
 **Functions:**
-- `def pirate_risk(system, faction_standing, has_escort, evasion)` - *Risk of a pirate toll encounter in a system, before the engine RNG roll.*
+- `def pirate_risk(system, faction_standing, has_escort, evasion, patrol_escorts)` - *Risk of a pirate toll encounter in a system, before the engine RNG roll.*
 - `def generate_pirate_encounter(system, seed, threat_level, standing)` - *Build a deterministic pirate toll encounter for one jump or orbit.*
 
 ---

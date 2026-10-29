@@ -1082,3 +1082,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Track `ships_sold` and add the Shipbreaker commerce milestone (sell three escorts or prizes).
   4. Give the escort record explicit grid placement for head, stats, status and the three stacked actions so the name keeps the full body column.
 - **Consequences**: A captured prize can be kept as an escort or liquidated for a meaningful sum (a 100-hull, 6-damage frigate sells for 680 cr). The fleet row now reads as name/stats on the left and status/REPAIR/SELL/DISMISS on the right. A live Edge sale moved credits 1,000 -> 1,680 and removed the prize in one click. Suite: 805 tests (46 suites), 5/5 gates.
+
+### ADR-091: Local Fleet Deployment and System Patrols
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Escorts could be assigned to any system, but every escort in the fleet joined every battle and could be damaged or destroyed in a system where it was not stationed. The assignment control was therefore cosmetic, and remote ships did not provide any benefit where they patrolled.
+- **Decision**:
+  1. Add `fleet_ships_in_system` and use it to select combat participants: only escorts assigned to the flagship's current system add coordinated damage, screen evasion or take fleet casualties.
+  2. Merge local battle updates back into the full roster through `_merge_fleet_ships`, so remote patrols survive a local fight unchanged and a newly captured prize is still appended.
+  3. Expose `local_damage` / `local_evasion_bonus` beside the total figures in the fleet report and status snapshot; show `SYS <id>` and `LOCAL`/`PATROL` on each fleet card.
+  4. Let assigned escorts reduce piracy: `pirate_risk` accepts `patrol_escorts`, applying up to a 75% reduction, and the engine counts living escorts assigned to the target system.
+- **Consequences**: Assignment now changes combat outcomes and survival. A remote escort neither contributes damage nor takes local damage, while two patrol escorts lower pirate risk in their system. Suite: 810 tests (46 suites), 5/5 gates.
