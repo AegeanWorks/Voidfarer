@@ -1093,3 +1093,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Expose `local_damage` / `local_evasion_bonus` beside the total figures in the fleet report and status snapshot; show `SYS <id>` and `LOCAL`/`PATROL` on each fleet card.
   4. Let assigned escorts reduce piracy: `pirate_risk` accepts `patrol_escorts`, applying up to a 75% reduction, and the engine counts living escorts assigned to the target system.
 - **Consequences**: Assignment now changes combat outcomes and survival. A remote escort neither contributes damage nor takes local damage, while two patrol escorts lower pirate risk in their system. Suite: 810 tests (46 suites), 5/5 gates.
+
+### ADR-092: Outpost Production Modules
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: `OUTPOST_MODULE_CATALOG` and the outpost production multiplier existed, but no action, endpoint or control could install a module. Outposts only had a level upgrade, so the module catalog was dead content.
+- **Decision**:
+  1. Add `install_outpost_module(outpost_id, module_id)`: unknown modules and outposts are rejected, each module stacks up to three times, and each stack costs the catalog price times the next stack number.
+  2. Installing a stack updates the outpost modules in one state clone and immediately feeds `outpost_tick_production`.
+  3. Expose the catalog as `outpost_modules` in the static catalogs for the cockpit, add `POST /api/outpost/module`, `outpost module <outpost_id> <module_id>`, and a module picker/INSTALL MODULE control under every outpost row.
+- **Consequences**: Outposts grow horizontally as well as vertically; a second extractor stack costs 800 cr and raises production without requiring a level-up. The Empire tab now has a working module loop with credits spent, output raised and state persisted. Suite: 817 tests (47 suites), 5/5 gates.

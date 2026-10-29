@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "fleet-patrol",
+    "task_id": "outpost-modules",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793314922.4762473,
+    "updated_at": 1793315762.9054272,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793314932.0653267
+    "completed_at": 1793315773.8188467
   },
   "checkpoints": [
-    {
-      "task_id": "feature-batch-7",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'feature-batch-7' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793311759.2967496,
-      "timestamp_str": "2026-10-30 01:09:19",
-      "agent": "opencode:feature"
-    },
-    {
-      "task_id": "world-relief",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/5] Plan post-war reconstruction and relief: a repeatable rebuild/relief action for devastated inhabited worlds, relief-demand pricing, orphaned-war cleanup, REST/CLI/cockpit parity, and balance tests.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793312237.021264,
-      "timestamp_str": "2026-10-30 01:17:17",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "War devastation is currently permanent until a very slow passive recovery, and the only player response is to wait. The market also treats a bombed world like a healthy one, so relief cargo has no premium and collapsed wars can linger in state.",
-        "benefits": "Players get a meaningful post-war choice: spend credits to rebuild or spend medicines, hydroponics and fuel on relief. Devastated markets pay relief premiums, and wars against territory-less factions are closed instead of lingering.",
-        "risks": "contract: new endpoints and cockpit controls must stay discoverable by the click map and AI catalog; dependency: none, stdlib only; concurrency: rebuilding mutates systems, ship cargo/credits, standings and events in one clone, so no partial state may leak; state: new stats and event kinds must survive old saves and the reconstruction action must refuse mid-transit, in combat, or at a non-orbit body.",
-        "mitigation": "Add failing engine, market, API, CLI and layout tests first, keep old-save defaults, mutate through _clone_state once, document the endpoints in README/COCKPIT and add the action to the AI context catalog, then run the full suite, aikit gates and a real-browser target-card capture."
-      }
-    },
-    {
-      "task_id": "world-relief",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/5] Reconstruction and relief engine actions, relief market premiums, orphaned-war cleanup and codex metrics implemented with engine and market regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793312946.1167872,
-      "timestamp_str": "2026-10-30 01:29:06",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "world-relief",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[3/5] /api/reconstruct and reconstruct CLI/REPL parity added; server and CLI regressions pass.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793312946.2536404,
-      "timestamp_str": "2026-10-30 01:29:06",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "world-relief",
       "phase": "3",
@@ -249,6 +200,55 @@
       "status": "completed",
       "timestamp": 1793314932.0653281,
       "timestamp_str": "2026-10-30 02:02:12",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-modules",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan outpost production modules: install up to three stacks, scale cost by stack, expose the catalog, and wire engine/API/CLI/cockpit with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793315673.557972,
+      "timestamp_str": "2026-10-30 02:14:33",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "The outpost module catalog and production multiplier exist, but no action or control can install a module; outposts only level up.",
+        "benefits": "Outposts gain horizontal growth, module content becomes reachable, and the Empire tab gets a working credit-to-production loop.",
+        "risks": "contract: new endpoint must be AI-documented and click-map safe; dependency: none; concurrency: module install mutates outposts and credits in one clone; state: stack counts and catalog must survive saves and old outposts without modules.",
+        "mitigation": "Add engine, API, CLI and layout tests first; cap stacks at three; expose the catalog in static snapshots; verify a live Edge module install and refresh the knowledge base."
+      }
+    },
+    {
+      "task_id": "outpost-modules",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Outpost module installation, three-stack cap, escalating cost, API/CLI parity, static module catalog and regressions implemented.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793315762.6870522,
+      "timestamp_str": "2026-10-30 02:16:02",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-modules",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] Empire outpost module picker/install control, README/COCKPIT and ADR-092 recorded; live Edge install moved 5000 to 4200 cr and stacked extractor to 2. 817 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793315762.9054272,
+      "timestamp_str": "2026-10-30 02:16:02",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-modules",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'outpost-modules' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793315773.818849,
+      "timestamp_str": "2026-10-30 02:16:13",
       "agent": "opencode:mechanics"
     }
   ]

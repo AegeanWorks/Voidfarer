@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `91`
-- **Total Classes**: `238`
+- **Total Python Modules**: `92`
+- **Total Classes**: `240`
 - **Total Top-Level Functions**: `308`
-- **Total Class Methods**: `1387`
-- **Total Source Lines**: `38293`
+- **Total Class Methods**: `1397`
+- **Total Source Lines**: `38451`
 
 ---
 
@@ -202,7 +202,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `240` lines (`10357` bytes)
+**Size**: `246` lines (`10668` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -212,6 +212,7 @@
   - Method `.test_cli_status()`
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
+  - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
   - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
   - Method `.test_cli_combat_accepts_documented_actions()`
@@ -242,7 +243,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1254` lines (`57348` bytes)
+**Size**: `1267` lines (`57903` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -434,6 +435,9 @@
 - `class TestFleetPrizeCockpit` - *Captured prizes must be sellable from the fleet manager.*
   - Method `.setUpClass()`
   - Method `.test_fleet_manager_has_a_sell_control()`
+- `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
+  - Method `.setUpClass()`
+  - Method `.test_outpost_rows_offer_a_module_installer()`
 
 ---
 
@@ -1061,6 +1065,21 @@
 
 ---
 
+### [`tests/test_outpost_modules.py`](tests/test_outpost_modules.py)
+> *Outpost modules: spend credits to stack production modules on an installation.*
+
+**Size**: `67` lines (`2732` bytes)
+
+**Classes:**
+- `class OutpostModuleTest`
+  - Method `.setUp()`
+  - Method `.test_installing_a_module_adds_it_and_raises_production()`
+  - Method `.test_module_stacks_are_capped()`
+  - Method `.test_module_requires_credits_and_a_known_module()`
+  - Method `.test_report_exposes_module_catalog()`
+
+---
+
 ### [`tests/test_perks_relics_rep.py`](tests/test_perks_relics_rep.py)
 > *Regression tests for faction perks, enemy reputation rewards, and multi-stat relics.*
 
@@ -1209,7 +1228,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `487` lines (`21450` bytes)
+**Size**: `512` lines (`22431` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1248,6 +1267,7 @@
   - Method `.test_landing_and_depot_endpoints()`
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
+  - Method `.test_outpost_module_endpoint_installs_a_stack()`
   - Method `.test_save_load_delete_endpoints()`
   - Method `.test_multiple_save_slots_endpoints_and_listing()`
   - Method `.test_codex_claim_endpoint()`
@@ -1707,7 +1727,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `750` lines (`32351` bytes)
+**Size**: `751` lines (`32424` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1821,7 +1841,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3009` lines (`153950` bytes)
+**Size**: `3018` lines (`154338` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2004,7 +2024,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7909` lines (`392620` bytes)
+**Size**: `7938` lines (`394192` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2073,6 +2093,7 @@
   - Method `.choose_research(project_id)`
   - Method `.build_outpost(body_id, outpost_type_id)`
   - Method `.upgrade_outpost(outpost_id)`
+  - Method `.install_outpost_module(outpost_id, module_id)` - *Install a production module on an outpost; stacks are capped at three.*
   - Method `.get_character_report()`
   - Method `.get_research_report()`
   - Method `.get_outpost_report()`
@@ -2677,7 +2698,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1345` lines (`57310` bytes)
+**Size**: `1353` lines (`57673` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
