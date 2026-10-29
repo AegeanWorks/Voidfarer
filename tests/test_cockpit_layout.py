@@ -1252,3 +1252,16 @@ class TestFleetPrizeCockpit(unittest.TestCase):
         self.assertIn("sale_value", self.js)
         self.assertIn(".fleet-ship-card > div.fleet-head { grid-column: 2;", self.css)
         self.assertIn(".fleet-ship-card > div.ship-actions { grid-column: 3;", self.css)
+
+class TestOutpostModuleCockpit(unittest.TestCase):
+    """The Empire tab must expose outpost module installation."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_outpost_rows_offer_a_module_installer(self):
+        for marker in ("data-outpost-module-select", "data-outpost-module-install", '"/api/outpost/module"', "outpost_modules"):
+            self.assertIn(marker, self.js)
+        self.assertIn(".outpost-module-bar", self.css)

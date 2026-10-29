@@ -8601,3 +8601,8 @@ body.cockpit-theme .nav-panel > .panel-header {
 .fleet-ship-card > div.fleet-sub { grid-column: 2; grid-row: 2; }
 .fleet-ship-card > div.fleet-value { grid-column: 3; grid-row: 1; }
 .fleet-ship-card > div.ship-actions { grid-column: 3; grid-row: 2 / span 2; }
+
+/* Outpost module installer sits directly under its installation row. */
+.outpost-module-bar { display: flex; gap: 6px; align-items: center; margin-top: -3px; }
+.outpost-module-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
+.outpost-module-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }

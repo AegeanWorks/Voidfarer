@@ -288,6 +288,7 @@ STATIC_SNAPSHOT_KEYS = (
     "enemy_archetypes",
     "mercenary_catalog",
     "outpost_catalog",
+    "outpost_modules",
     "story_chapters",
     "story_chapters_map",
     "weapons",
@@ -309,6 +310,7 @@ def static_catalogs() -> dict[str, Any]:
         "enemy_archetypes": {aid: asdict(a) for aid, a in ENEMY_ARCHETYPES.items()},
         "mercenary_catalog": MERCENARY_CATALOG,
         "outpost_catalog": [t.to_dict() for t in OUTPOST_TYPES],
+        "outpost_modules": OUTPOST_MODULE_CATALOG,
         "story_chapters": [c.to_dict() for c in CAMPAIGN_CHAPTERS],
         "story_chapters_map": {c.id: c.to_dict() for c in CAMPAIGN_CHAPTERS},
         "weapons": weapon_catalog(),
@@ -2800,6 +2802,33 @@ class SimulationEngine:
             new_ship = self._clone_ship(credits=self.state.ship.credits - cost)
             self.state = self._clone_state(ship=new_ship, outposts=outposts)
             return True, msg
+
+    def install_outpost_module(self, outpost_id: str, module_id: str) -> tuple[bool, str]:
+        """Install a production module on an outpost; stacks are capped at three."""
+        with self.lock:
+            outpost = next((o for o in self.state.outposts if o.id == outpost_id), None)
+            if outpost is None:
+                return False, f"Unknown outpost '{outpost_id}'."
+            module = OUTPOST_MODULE_CATALOG.get(module_id)
+            if module is None:
+                return False, f"Unknown outpost module '{module_id}'."
+            count = int(outpost.modules.get(module_id, 0))
+            if count >= 3:
+                return False, f"{module['name']} has reached the maximum of three stacks."
+            cost = int(module["cost"]) * (count + 1)
+            if self.state.ship.credits < cost:
+                return False, f"Insufficient credits: {module['name']} costs {cost} cr."
+            modules = dict(outpost.modules)
+            modules[module_id] = count + 1
+            updated = replace(outpost, modules=modules)
+            outposts = tuple(updated if o.id == outpost_id else o for o in self.state.outposts)
+            new_ship = self._clone_ship(credits=self.state.ship.credits - cost)
+            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            return (
+                True,
+                f"Installed {module['name']} on {outpost.name} for {cost} cr "
+                f"(stack {modules[module_id]}/3).",
+            )
 
     def get_character_report(self) -> dict[str, Any]:
         with self.lock:

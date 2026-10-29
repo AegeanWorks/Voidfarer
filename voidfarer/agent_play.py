@@ -37,6 +37,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/shipyard/chassis": "needs a shipyard and a new hull purchase",
     "/api/shipyard/sell": "needs a spare hull in the shipyard",
     "/api/outpost/upgrade": "needs a founded outpost",
+    "/api/outpost/module": "needs a founded outpost and module credits",
     "/api/drone/collect": "needs a deployed drone",
     "/api/depot/sell": "needs stock sitting in a depot",
     "/api/depot/withdraw": "needs stock sitting in a depot",

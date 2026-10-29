@@ -1734,7 +1734,16 @@ def cmd_outpost(engine: SimulationEngine, storage: StorageManager, parts: list[s
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
-    print(f"{RED}Unknown outpost command '{sub}'. Options: list, build, upgrade.{RESET}")
+    if sub in ("module", "install"):
+        if len(parts) < 4:
+            print(f"{RED}Usage:{RESET} outpost module <outpost_id> <module_id>")
+            return 1
+        ok, msg = engine.install_outpost_module(parts[2], parts[3])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown outpost command '{sub}'. Options: list, build, upgrade, module.{RESET}")
     return 1
 
 
@@ -2654,7 +2663,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     research_p.add_argument("project_id", nargs="?", help="Research project id")
 
     outpost_p = subparsers.add_parser("outpost", help="Found and upgrade planetary outposts")
-    outpost_p.add_argument("action", nargs="?", default="list", choices=["list", "build", "upgrade"])
+    outpost_p.add_argument("action", nargs="?", default="list", choices=["list", "build", "upgrade", "module"])
     outpost_p.add_argument("outpost_type", nargs="?", help="Outpost type or outpost id")
     outpost_p.add_argument("body_id", nargs="?", help="Body id for construction")
 

@@ -3295,12 +3295,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ? `${outposts.length} outpost(s) producing each tick.`
             : "No outposts founded yet. Orbit a world and found one below.";
         this.renderOutpostBuild();
+        const moduleCatalog = this.state.outpost_modules || {};
+        const moduleOptions = Object.entries(moduleCatalog).map(([id, module]) =>
+            `<option value="${this.escapeHtml(id)}">${this.escapeHtml(module.name)} (${Number(module.cost || 0)} CR)</option>`
+        ).join("");
         this.outpostList.innerHTML = outposts.map(o => `
             <div class="outpost-row"><span>${this.escapeHtml(o.name)} — LVL ${o.level} — POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}</span>
             <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button></div>
+            <div class="outpost-module-bar">
+                <select data-outpost-module-select="${this.escapeHtml(o.id)}">${moduleOptions}</select>
+                <button class="btn-hud btn-green" data-outpost-module-install="${this.escapeHtml(o.id)}">INSTALL MODULE</button>
+            </div>
         `).join("");
         this.outpostList.querySelectorAll("[data-outpost-upgrade]").forEach(btn =>
             btn.addEventListener("click", () => this.postAction("/api/outpost/upgrade", { outpost_id: btn.getAttribute("data-outpost-upgrade") }, "empire"))
+        );
+        this.outpostList.querySelectorAll("[data-outpost-module-install]").forEach(btn =>
+            btn.addEventListener("click", () => {
+                const outpostId = btn.getAttribute("data-outpost-module-install");
+                const select = this.outpostList.querySelector(`[data-outpost-module-select="${outpostId}"]`);
+                this.postAction("/api/outpost/module", { outpost_id: outpostId, module_id: select ? select.value : "" }, "empire");
+            })
         );
 
         const leaders = this.state.faction_leaders || [];

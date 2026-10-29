@@ -10,7 +10,7 @@ from pathlib import Path
 
 from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
 from voidfarer.engine import SimulationEngine
-from voidfarer.models import FleetShip
+from voidfarer.models import FleetShip, Outpost
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
 
@@ -408,6 +408,31 @@ class TestServer(unittest.TestCase):
         self.assertGreater(payload["state"]["ship"]["credits"], 1000)
         self.assertEqual(payload["state"]["ship"]["fleet_ships"], [])
         self.assertEqual(payload["state"]["stats"]["ships_sold"], 1)
+
+    def test_outpost_module_endpoint_installs_a_stack(self):
+        engine = VoidFarerHandler.engine
+        outpost = Outpost(
+            id="http_outpost",
+            name="HTTP Outpost",
+            system_id="sol",
+            body_id="sol_body_2",
+            outpost_type="mining",
+            modules={"extractor": 1},
+            production={"credits": 3.0},
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(credits=5000),
+            outposts=(outpost,),
+        )
+        status, data = self._post(
+            "/api/outpost/module",
+            {"outpost_id": outpost.id, "module_id": "laboratory"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(payload["state"]["outposts"][0]["modules"]["laboratory"], 1)
+        self.assertEqual(payload["state"]["ship"]["credits"], 4500)
 
     def test_save_load_delete_endpoints(self):
         status, _ = self._post("/api/save", {})

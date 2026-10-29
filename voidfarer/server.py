@@ -834,6 +834,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/outpost/module":
+            ok, msg = self.engine.install_outpost_module(
+                str(body.get("outpost_id", "")), str(body.get("module_id", ""))
+            )
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/diplomacy":
             ok, msg = self.engine.faction_diplomacy(
                 str(body.get("faction_id", "")),
