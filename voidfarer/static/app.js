@@ -4438,6 +4438,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 }
             }
         } else if (this.selectedType === "captain") {
+            if (this.targetDevastation) this.targetDevastation.classList.remove("is-devastated");
+            this.transitPreviewBodyId = null;
+            this.transitPreviewAt = 0;
             const captain = (this.state.ai_captains || []).find(c => c.id === this.selectedTarget.id);
             if (!captain) {
                 this.selectedTarget = null;
@@ -4475,6 +4478,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
             if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
         } else if (this.selectedType === "point") {
+            if (this.targetDevastation) this.targetDevastation.classList.remove("is-devastated");
+            this.transitPreviewBodyId = null;
+            this.transitPreviewAt = 0;
             const p = this.selectedTarget;
             const orbBody = this.state.orbiting_body || (this.state.current_system?.bodies || []).find(x => x.id === this.state.ship?.orbiting_body_id) || null;
             // In open space the ship's anchor is the origin, not the star.
@@ -4520,6 +4526,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
             if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
         } else if (this.selectedType === "system") {
+            if (this.targetDevastation) this.targetDevastation.classList.remove("is-devastated");
+            this.transitPreviewBodyId = null;
+            this.transitPreviewAt = 0;
             this.transitPreviewToken += 1;
             this.transitPreviewData = null;
             this.transitPreviewBodyId = null;
@@ -5230,15 +5239,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         });
     }
 
-    drawGalaxyTraffic(ctx, transform, now) {
+    galaxyTrafficPositions(transform, now) {
         const captains = (this.state && this.state.ai_captains) || [];
-        if (!captains.length) return;
+        if (!captains.length) return [];
         const bySystem = new Map();
         captains.forEach(c => {
             if (!bySystem.has(c.system_id)) bySystem.set(c.system_id, []);
             bySystem.get(c.system_id).push(c);
         });
         const nodeScale = Math.max(0.8, transform.nodeScale);
+        const positions = [];
         bySystem.forEach((list, systemId) => {
             const system = this.galaxySystems[systemId];
             if (!system) return;
@@ -5247,15 +5257,29 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             list.slice(0, 4).forEach((captain, index) => {
                 const angle = now * 0.4 + index * 1.7;
                 const radius = 15 * nodeScale;
-                this.drawShipGlyph(
-                    ctx,
-                    sx + Math.cos(angle) * radius,
-                    sy + Math.sin(angle) * radius,
-                    angle + Math.PI / 2,
-                    this.captainColor(captain),
-                    3.4 * nodeScale,
-                );
+                positions.push({
+                    captain,
+                    x: sx + Math.cos(angle) * radius,
+                    y: sy + Math.sin(angle) * radius,
+                    angle,
+                    size: 3.4 * nodeScale,
+                    hitRadius: Math.max(6, 6 * nodeScale),
+                });
             });
+        });
+        return positions;
+    }
+
+    drawGalaxyTraffic(ctx, transform, now) {
+        this.galaxyTrafficPositions(transform, now).forEach(marker => {
+            this.drawShipGlyph(
+                ctx,
+                marker.x,
+                marker.y,
+                marker.angle + Math.PI / 2,
+                this.captainColor(marker.captain),
+                marker.size,
+            );
         });
     }
 
@@ -5471,8 +5495,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         } else if (this.viewMode === "GALAXY") {
             const transform = this.galaxyTransform(cx, cy);
+            for (const traffic of this.galaxyTrafficPositions(transform, Date.now() * 0.001)) {
+                if (Math.hypot(mx - traffic.x, my - traffic.y) < traffic.hitRadius) {
+                    hit = { item: traffic.captain, type: "captain" };
+                    break;
+                }
+            }
             const hitRadius = 18 * Math.max(1, transform.nodeScale);
-            for (const s of Object.values(this.galaxySystems)) {
+            if (!hit) for (const s of Object.values(this.galaxySystems)) {
                 const sx = transform.cx + s.x * transform.scale;
                 const sy = transform.cy + s.y * transform.scale;
                 if (Math.hypot(mx - sx, my - sy) < hitRadius) {
@@ -5538,6 +5568,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         } else if (this.viewMode === "GALAXY") {
             const transform = this.galaxyTransform(cx, cy);
+            for (const traffic of this.galaxyTrafficPositions(transform, Date.now() * 0.001)) {
+                if (Math.hypot(mx - traffic.x, my - traffic.y) < traffic.hitRadius) {
+                    this.selectedTarget = traffic.captain;
+                    this.selectedType = "captain";
+                    this.sound.playBeep(1000);
+                    this.updateTargetCard();
+                    hit = true;
+                    return;
+                }
+            }
             const hitRadius = 18 * Math.max(1, transform.nodeScale);
             for (const s of Object.values(this.galaxySystems)) {
                 const sx = transform.cx + s.x * transform.scale;
@@ -6517,7 +6557,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (element.id) {
             testId = `id-${element.id}`;
         } else if (identity) {
-            testId = `${identity[1]}-${element.dataset[identity[0]]}`;
+            // The index keeps repeated row controls (market BUY/SELL) addressable.
+            testId = `${identity[1]}-${element.dataset[identity[0]]}-${index}`;
         } else {
             const label = (element.textContent || element.getAttribute("aria-label") || element.value || "")
                 .trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);

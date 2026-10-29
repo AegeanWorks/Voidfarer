@@ -12,6 +12,7 @@ _FIELD_RES = (
     re.compile(r'body\.get\("([^"]+)"'),
     re.compile(r'_int_field\(body,\s*"([^"]+)"'),
     re.compile(r'_float_field\(body,\s*"([^"]+)"'),
+    re.compile(r'_bool_field\(body,\s*"([^"]+)"'),
 )
 
 

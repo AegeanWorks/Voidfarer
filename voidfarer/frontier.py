@@ -52,13 +52,21 @@ def generate_ai_captains(systems: dict[str, StarSystem], seed: int = 42) -> tupl
     """Create a deterministic roster of autonomous captains distributed across the galaxy."""
     rng = random.Random(seed + 9001)
     system_ids = sorted(systems)
-    # The home system always carries traffic: a captain in local space is the difference
-    # between an empty map and a living one on the first screen.
-    if "sol" in systems:
-        system_ids = ["sol"] + [sid for sid in system_ids if sid != "sol"]
+    # Home a *stationary* captain in Sol: traders roam, so a home trader would leave local
+    # space empty after one tick. Reassigning which seed sits where consumes no RNG.
+    home_index = next(
+        (i for i, (_, _, archetype) in enumerate(AI_CAPTAIN_SEEDS) if archetype != "trader"),
+        0,
+    )
+    non_home = [sid for sid in system_ids if sid != "sol"] or system_ids
+    cursor = 0
     captures: list[AICaptain] = []
     for index, (captain_id, name, archetype) in enumerate(AI_CAPTAIN_SEEDS):
-        system_id = system_ids[index % len(system_ids)] if system_ids else "sol"
+        if "sol" in systems and index == home_index:
+            system_id = "sol"
+        else:
+            system_id = non_home[cursor % len(non_home)] if non_home else "sol"
+            cursor += 1
         captures.append(
             AICaptain(
                 id=captain_id,
@@ -156,11 +164,17 @@ def simulate_ai_trade(
             continue
 
         commodity_id = max(origin_market.stockpiles, key=lambda cid: origin_market.stockpiles.get(cid, 0))
-        quantity = min(4, max(1, captain.credits // 120))
-        if origin_market.stockpiles.get(commodity_id, 0) <= quantity:
+        requested = min(4, max(1, captain.credits // 120))
+        stock = origin_market.stockpiles.get(commodity_id, 0)
+        # Never lift stock out of the reserve floor: the clamp would mint the difference.
+        movable = max(0, stock - MIN_STOCK)
+        quantity = min(requested, movable)
+        if quantity <= 0:
+            # Keep the shared RNG stream identical to the old trade path.
+            if stock > requested:
+                rng.randint(0, 20)
             updated.append(captain)
             continue
-
         markets[captain.system_id] = _adjust_stock(origin_market, commodity_id, -quantity)
         markets[target_id] = _adjust_stock(target_market, commodity_id, quantity)
         profit = max(10, quantity * (25 + rng.randint(0, 20)))

@@ -353,7 +353,7 @@ The captain docks, trades, scans, salvages, scoops, lands, runs surface and away
 operations, hires and trains crew, buys upgrades, escorts and drones, reads messages,
 claims codex rewards, petitions diplomacy, supports wars, vents and repairs the reactor,
 and cycles power, stance, time and decision settings. A 180-step run reaches 44
-mechanic families, succeeds on 43 endpoints, attempts 52 and reports **zero coverage
+mechanic families, succeeds on 40 endpoints, attempts 53 and reports **zero coverage
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or requires content the run
 cannot create). `tests/test_agent_play.py` fails if a new endpoint appears with neither.

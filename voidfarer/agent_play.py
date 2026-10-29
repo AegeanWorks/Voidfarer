@@ -82,13 +82,19 @@ class ApiClient:
     def _open(self, request: urllib.request.Request) -> tuple[int, dict[str, Any]]:
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                return response.status, json.loads(response.read().decode("utf-8"))
+                raw = response.read().decode("utf-8", "replace")
+                try:
+                    return response.status, json.loads(raw)
+                except json.JSONDecodeError:
+                    return response.status, {"ok": False, "message": raw[:200]}
         except urllib.error.HTTPError as exc:
             raw = exc.read().decode("utf-8", "replace")
             try:
                 return exc.code, json.loads(raw)
             except json.JSONDecodeError:
                 return exc.code, {"ok": False, "message": raw[:200]}
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            return 0, {"ok": False, "message": f"transport failure: {exc}"}
 
 
 class AiCaptain:
@@ -116,6 +122,8 @@ class AiCaptain:
         status, payload = self.client.get("/api/agent/actions")
         if status == 200:
             self.catalog_paths = [entry["path"] for entry in payload.get("actions") or []]
+        if not self.catalog_paths:
+            self.errors.append(f"GET /api/agent/actions -> {status}: no action catalog")
         status, payload = self.client.get("/api/state")
         if status != 200:
             self.errors.append(f"GET /api/state -> {status}")
@@ -127,13 +135,13 @@ class AiCaptain:
             path, body, family = self._choose(step)
             if path is None:
                 break
-            self.attempted.add(path)
             status, payload = self.client.post(path, body)
             if status == 409 and payload.get("state"):
-                # A blocking prompt appeared mid-step; adopt it and resolve next loop.
+                # A blocking prompt appeared mid-step; adopt it and retry this path later.
                 self.state = payload["state"]
                 self.refusals.append(f"{family}: blocked by prompt")
                 continue
+            self.attempted.add(path)
             if status != 200:
                 self.errors.append(f"POST {path} -> {status}: {payload.get('message', '')}")
                 if payload.get("state"):
@@ -191,6 +199,12 @@ class AiCaptain:
             if faction:
                 return "/api/diplomacy", {"faction_id": faction, "action": "improve"}, "diplomacy"
 
+        # Station services live at a dock; reach one before touring menu mechanics.
+        if not self._is_docked():
+            dock = self._dockable_body()
+            if dock and dock.get("id") != ship.get("orbiting_body_id"):
+                return "/api/travel", {"body_id": dock["id"], "mode": "sublight"}, "dock"
+
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
         if step % 2 == 0:
@@ -227,11 +241,6 @@ class AiCaptain:
 
         if body and body.get("landable") and not ship.get("landed_body_id") and step % 3 == 0:
             return "/api/land", {"target": body["id"]}, "land"
-
-        if step % 9 == 3 and not self._is_docked():
-            dock = self._dockable_body()
-            if dock and dock.get("id") != ship.get("orbiting_body_id"):
-                return "/api/travel", {"body_id": dock["id"], "mode": "sublight"}, "dock"
 
         if step % 20 == 5:
             system = (state.get("current_system") or {}).get("connections") or []
@@ -280,7 +289,8 @@ class AiCaptain:
             self._tour_events,
             self._tour_crew_train,
             self._tour_ability,
-            self._tour_drone,
+            self._tour_drone_buy,
+            self._tour_drone_deploy,
             self._tour_mercenary,
             self._tour_escort,
             self._tour_time_speed,
@@ -294,6 +304,9 @@ class AiCaptain:
             self._tour_time_pause,
             self._tour_time_resume,
             self._tour_shipmod_remove,
+            self._tour_orbit,
+            self._tour_salvage,
+            self._tour_scoop,
         )
         attempts = 0
         while attempts < len(builders):
@@ -396,10 +409,14 @@ class AiCaptain:
         option = options[0] if options and isinstance(options[0], dict) else {}
         body = self.state.get("orbiting_body") or {}
         body_id = option.get("body_id") or body.get("id")
-        catalog = self.state.get("outpost_catalog") or []
-        outpost_type = option.get("outpost_type") or option.get("id")
-        if not outpost_type and catalog and isinstance(catalog[0], dict):
-            outpost_type = catalog[0].get("id")
+        if options and isinstance(options[0], str):
+            outpost_type = options[0]
+        else:
+            outpost_type = option.get("outpost_type") or option.get("id")
+        if not outpost_type:
+            catalog = self.state.get("outpost_catalog") or []
+            if catalog and isinstance(catalog[0], dict):
+                outpost_type = catalog[0].get("id")
         if not body_id or not outpost_type:
             return None
         return "/api/outpost/build", {"body_id": body_id, "outpost_type": outpost_type}, "outpost"
@@ -409,14 +426,16 @@ class AiCaptain:
         if not report.get("landed"):
             return None
         for operation in report.get("operations") or []:
-            if isinstance(operation, dict) and operation.get("id"):
+            if (isinstance(operation, dict) and operation.get("id")
+                    and operation.get("available", True) and not operation.get("used")):
                 return "/api/surface/op", {"operation_id": operation["id"]}, "surface"
         return None
 
     def _tour_away(self):
         report = self.state.get("away_report") or {}
         for mission in report.get("available") or []:
-            if isinstance(mission, dict) and mission.get("id"):
+            if (isinstance(mission, dict) and mission.get("id")
+                    and mission.get("available", True) and not mission.get("worked")):
                 mission_type = mission.get("mission_type") or mission.get("type") or mission["id"]
                 return "/api/away/launch", {"mission_type": mission_type}, "away"
         return None
@@ -501,21 +520,46 @@ class AiCaptain:
                 return "/api/character/ability", {"ability_id": ability_id}, "ability"
         return None
 
-    def _tour_drone(self):
+    def _tour_drone_buy(self):
         if not self._is_docked():
             return None
-        drones = (self.state.get("fleet_manager") or {}).get("ships") or []
-        if drones:
-            return "/api/drone/deploy", {
-                "drone_id": str(drones[0].get("id", "")),
-                "system_id": (self.state.get("current_system") or {}).get("id", ""),
-            }, "drone"
         types = (self.state.get("catalog_drones") or {})
         drone_type = next(iter(types), "mining") if isinstance(types, dict) else "mining"
         return "/api/drone/buy", {
             "drone_type": drone_type,
             "system_id": (self.state.get("current_system") or {}).get("id", ""),
         }, "drone"
+
+    def _tour_drone_deploy(self):
+        if not self._is_docked():
+            return None
+        drones = (self.state.get("ship") or {}).get("fleet_drones") or []
+        if not drones:
+            return None
+        return "/api/drone/deploy", {
+            "drone_id": str(drones[0].get("id", "")),
+            "system_id": (self.state.get("current_system") or {}).get("id", ""),
+        }, "drone"
+
+    def _tour_orbit(self):
+        body = self.state.get("orbiting_body") or {}
+        target = body.get("id")
+        if not target:
+            candidate = next(
+                (b for b in (self.state.get("current_system") or {}).get("bodies") or []
+                 if isinstance(b, dict) and b.get("id")),
+                None,
+            )
+            target = candidate.get("id") if candidate else None
+        if not target:
+            return None
+        return "/api/orbit", {"target": target}, "orbit"
+
+    def _tour_salvage(self):
+        return "/api/salvage", {}, "salvage"
+
+    def _tour_scoop(self):
+        return "/api/scoop", {}, "scoop"
 
     def _tour_mercenary(self):
         if not self._is_docked():

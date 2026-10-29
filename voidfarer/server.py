@@ -1104,7 +1104,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             try:
                 waypoint_au = float(body.get("distance_au", 0.0))
                 waypoint_angle = float(body.get("angle", 0.0))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, OverflowError):
                 self._send_error_json("Waypoint needs numeric distance_au and angle (radians).")
                 return
             ok, msg = self.engine.start_travel_to_point(waypoint_au, waypoint_angle, mode=mode)

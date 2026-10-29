@@ -170,7 +170,7 @@ from voidfarer.reactor import (
     vent_reactor,
 )
 from voidfarer.weapons import WEAPON_MAP, get_weapon, weapon_catalog
-from voidfarer.logbook import summarize_trades, trim_log
+from voidfarer.logbook import is_notable, summarize_trades, trim_log
 from voidfarer.shipmods import (
     CATALOG_SHIP_MODS,
     SHIP_MOD_SLOTS,
@@ -346,6 +346,7 @@ class SimulationEngine:
     WAR_NEWS_TITLES = (
         ("WAR: ", "System Captured"),
         ("PEACE: ", "Peace Treaty Signed"),
+        ("BANKRUPT PEACE: ", "Peace Treaty Signed"),
         ("FACTION ELIMINATED: ", "Faction Eliminated"),
     )
 
@@ -379,9 +380,8 @@ class SimulationEngine:
         self.rng = random.Random(seed)
         self.allow_decision_events = False
         # Cadence is a preference, so it lives in the save's stats rather than only in RAM.
-        saved_cadence = str(state.stats.get("decision_cadence", "")) if state is not None else ""
         self.decision_cadence = (
-            saved_cadence if saved_cadence in self.DECISION_CADENCE else self.DEFAULT_DECISION_CADENCE
+            self._cadence_from_state(state) if state is not None else self.DEFAULT_DECISION_CADENCE
         )
 
         if state is not None:
@@ -948,6 +948,7 @@ class SimulationEngine:
             self.seed = int(seed)
             self.rng = random.Random(self.seed)
             self.state = self._create_initial_state(self.seed)
+            self.decision_cadence = self.DEFAULT_DECISION_CADENCE
             self._local_dock_purchases = {}
             if profile:
                 self._apply_commander_profile(profile)
@@ -1009,6 +1010,7 @@ class SimulationEngine:
             if st != state.ship.story:
                 self.state = self._clone_state(ship=self._clone_ship(story=st))
             self._local_dock_purchases = dict(state.local_dock_purchases)
+            self.decision_cadence = self._cadence_from_state(self.state)
             self._bootstrap_frontier()
             return True, f"Loaded save at {state.time.current_date} (tick #{state.time.tick})."
 
@@ -1719,6 +1721,7 @@ class SimulationEngine:
                     near_miss_scanner_bonus=new_ship.near_miss_scanner_bonus,
                     tutorial=new_ship.tutorial,
                     story=new_ship.story,
+                    crew=new_ship.crew,
                     faction_standings=new_ship.faction_standings,
                     corp_standings=new_ship.corp_standings,
                 )
@@ -1782,6 +1785,13 @@ class SimulationEngine:
 
             if not matched:
                 return False, f"Celestial body '{body_id}' not found in {cur_sys.name}."
+
+            active = self.state.ship.travel
+            if active is not None and active.origin_body_id != body_id:
+                return (
+                    False,
+                    "In transit: wait for arrival, or orbit the origin body to abort the trip.",
+                )
 
             distance_au = self.compute_body_distance_au(matched)
             log_entry = f"Orbital capture achieved around {matched.name} ({distance_au:.1f} AU)."
@@ -1914,7 +1924,7 @@ class SimulationEngine:
         try:
             target_au = float(waypoint_au)
             target_angle = float(waypoint_angle)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):
             return None, "Waypoint needs a numeric distance and bearing."
         if not self.EMPTY_SPACE_MIN_AU <= target_au <= self.EMPTY_SPACE_MAX_AU:
             return (
@@ -1922,8 +1932,8 @@ class SimulationEngine:
                 f"Waypoint {target_au:.2f} AU is outside the "
                 f"{self.EMPTY_SPACE_MIN_AU}-{self.EMPTY_SPACE_MAX_AU} AU transit envelope.",
             )
-        if not math.isfinite(target_angle):
-            return None, "Waypoint bearing must be a finite angle in radians."
+        if not math.isfinite(target_au) or not math.isfinite(target_angle):
+            return None, "Waypoint distance and bearing must be finite numbers."
 
         cur_sys = self.current_system
         origin = self.orbiting_body
@@ -2143,6 +2153,9 @@ class SimulationEngine:
             lock = self._action_lock_reason()
             if lock:
                 return False, lock, {}
+            transit = self._transit_lock_reason()
+            if transit:
+                return False, transit, {}
             body = self.orbiting_body
             if not body:
                 return False, "Cannot scan: ship must establish orbit around a celestial body first.", {}
@@ -6176,6 +6189,9 @@ class SimulationEngine:
             lock = self._action_lock_reason()
             if lock:
                 return False, lock
+            transit = self._transit_lock_reason()
+            if transit:
+                return False, transit
             body = next((b for b in self.current_system.bodies if b.id == body_id), None)
             if not body:
                 return False, f"Unknown body '{body_id}' in {self.current_system.name}."
@@ -6286,6 +6302,9 @@ class SimulationEngine:
             lock = self._action_lock_reason()
             if lock:
                 return False, lock, {}
+            transit = self._transit_lock_reason()
+            if transit:
+                return False, transit, {}
             body = self.orbiting_body
             if not body:
                 return False, "Cannot salvage: establish orbit around a body first.", {}
@@ -6372,6 +6391,9 @@ class SimulationEngine:
             lock = self._action_lock_reason()
             if lock:
                 return False, lock
+            transit = self._transit_lock_reason()
+            if transit:
+                return False, transit
             body = self.orbiting_body
             if not body:
                 return False, "Cannot scoop fuel: establish orbit around a scoopable body first."
@@ -6563,7 +6585,7 @@ class SimulationEngine:
         return ""
 
     def _action_lock_reason(self) -> str:
-        """Reason flight or exploration actions are frozen (decision or pirate toll)."""
+        """Reason flight or exploration actions are frozen (decision, pirate or void)."""
         reason = self._decision_lock_reason()
         if reason:
             return reason
@@ -6573,7 +6595,23 @@ class SimulationEngine:
                 f"Pirate intercept unresolved: {pirate.band_name} demands "
                 f"{pirate.toll_credits} cr. Pay, fight, or evade before continuing."
             )
+        if self.state.ship.void_traversal is not None:
+            return (
+                "Void traversal in progress: hold the hull steady, emerge, or wait for arrival "
+                "before other flight actions."
+            )
         return ""
+
+    def _transit_lock_reason(self) -> str:
+        """Body actions need a real orbit; mid-flight the ship has left the old body."""
+        active = self.state.ship.travel
+        if active is None:
+            return ""
+        destination = "open space" if active.destination_body_id is None else active.destination_body_id
+        return (
+            f"In transit to {destination}: wait for arrival or orbit the origin body "
+            "to abort the trip before using body services."
+        )
 
     # Quick-time prompts are a garnish, not a drumbeat: one decision per cadence window,
     # and the odds stay low so a normal session sees a handful of them.
@@ -6583,6 +6621,11 @@ class SimulationEngine:
         "frequent": (4, 1.6),
     }
     DEFAULT_DECISION_CADENCE = "normal"
+
+    def _cadence_from_state(self, state: GameState) -> str:
+        """Read the saved cadence, falling back to the default for unknown values."""
+        saved = str(state.stats.get("decision_cadence", ""))
+        return saved if saved in self.DECISION_CADENCE else self.DEFAULT_DECISION_CADENCE
 
     def _decision_cooldown(self) -> int:
         ticks, _ = self.DECISION_CADENCE.get(
@@ -6612,8 +6655,14 @@ class SimulationEngine:
         last = int(self.state.stats.get("last_decision_tick", -10**9))
         return max(0, self._decision_cooldown() - (self.state.time.tick - last))
 
-    def maybe_trigger_decision(self, trigger: str = "tick") -> dict[str, Any] | None:
-        """Evaluate conditional events and open at most one blocking decision."""
+    def maybe_trigger_decision(
+        self, trigger: str = "tick", elapsed_ticks: int = 1
+    ) -> dict[str, Any] | None:
+        """Evaluate conditional events and open at most one blocking decision.
+
+        A batched tick crosses several cadence windows at once, so the per-window odds
+        are compounded instead of rolling once at the final tick.
+        """
         with self.lock:
             if self.state.pending_decision is not None:
                 return None
@@ -6629,7 +6678,9 @@ class SimulationEngine:
                 self.state.galaxy_seed, "decision", trigger, self.state.time.tick, chosen.id
             )
             base = 0.45 if chosen.priority >= 85 else 0.10
-            threshold = min(0.95, max(chosen.chance, base) * self._decision_chance_multiplier())
+            per_window = min(0.95, max(chosen.chance, base) * self._decision_chance_multiplier())
+            windows = max(1, min(1000, int(elapsed_ticks) // self._decision_cooldown()))
+            threshold = min(0.999, 1.0 - (1.0 - per_window) ** windows)
             if roll > threshold:
                 return None
             event = make_decision_event(chosen, self.state.time.tick, trigger)
@@ -7376,6 +7427,8 @@ class SimulationEngine:
             if new_flight_log_research:
                 new_flight_log.append(new_flight_log_research)
             new_flight_log.extend(faction_logs[-3:])
+            # Preserve older notable war lines even when a busy tick overflows three.
+            new_flight_log.extend(line for line in faction_logs[:-3] if is_notable(line))
             # A war the player never hears about is not a war. Captures, treaties and
             # eliminations become dismissable cockpit notifications as well as log lines.
             new_events.extend(self.war_news_events(faction_logs, new_tick, new_events))
@@ -7432,7 +7485,9 @@ class SimulationEngine:
                 eliminated_factions=new_eliminated,
             )
 
-            decision = self.maybe_trigger_decision("tick") if self.allow_decision_events else None
+            decision = (
+                self.maybe_trigger_decision("tick", num_ticks) if self.allow_decision_events else None
+            )
             payload = {
                 "ticks_advanced": num_ticks,
                 "stardate": round(new_stardate, 2),

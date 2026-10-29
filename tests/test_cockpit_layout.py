@@ -989,6 +989,15 @@ class TestPostPushPolishLayout(unittest.TestCase):
         self.assertIn('data-testid="setting-decision-cadence"', self.html)
         self.assertIn('"/api/settings/decisions"', self.js)
 
+    def test_repeated_row_controls_get_unique_testids(self):
+        self.assertIn("element.dataset[identity[0]]}-${index}", self.js)
+        self.assertIn("market BUY/SELL", self.js)
+
+    def test_galaxy_traffic_is_selectable_and_target_card_state_is_reset(self):
+        self.assertGreaterEqual(self.js.count("galaxyTrafficPositions("), 3)
+        self.assertIn('classList.remove("is-devastated")', self.js)
+        self.assertIn("this.transitPreviewBodyId = null;", self.js)
+
     def test_browser_review_proves_every_click_has_a_unique_handle(self):
         self.assertIn("def _click_probe(", self.browser_tool)
         self.assertIn("window.voidfarerClickMap", self.browser_tool)

@@ -68,7 +68,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             f"Final: tick {final['tick']} // {final['credits']} cr // hull {final['hull']} "
             f"// fuel {final['fuel']} // orbiting {final['orbiting']}"
         )
-    return 0 if report["ok"] else 1
+    ok = report["ok"] and not report["coverage_gaps"]
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `87`
-- **Total Classes**: `222`
+- **Total Python Modules**: `88`
+- **Total Classes**: `227`
 - **Total Top-Level Functions**: `302`
-- **Total Class Methods**: `1302`
-- **Total Source Lines**: `36423`
+- **Total Class Methods**: `1322`
+- **Total Source Lines**: `36753`
 
 ---
 
@@ -240,7 +240,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1130` lines (`51156` bytes)
+**Size**: `1139` lines (`51635` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -390,6 +390,8 @@
   - Method `.test_factions_review_prepares_a_coalition_war_for_the_petition_control()`
   - Method `.test_every_click_has_a_stable_handle_for_automation()`
   - Method `.test_aikit_link_and_decision_cadence_are_visible()`
+  - Method `.test_repeated_row_controls_get_unique_testids()`
+  - Method `.test_galaxy_traffic_is_selectable_and_target_card_state_is_reset()`
   - Method `.test_browser_review_proves_every_click_has_a_unique_handle()`
   - Method `.test_every_static_button_can_be_identified_by_a_headless_driver()`
   - Method `.test_event_toasts_clear_the_left_terminal_at_720p()`
@@ -1105,6 +1107,32 @@
 
 ---
 
+### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
+> *Regressions pinned by the post-implementation review pass.*
+
+**Size**: `205` lines (`9084` bytes)
+
+**Classes:**
+- `class FlightSafetyTest`
+  - Method `.test_void_traversal_locks_flight_and_body_actions()`
+  - Method `.test_transit_blocks_body_services_until_arrival_or_origin_abort()`
+  - Method `.test_waypoint_extremes_are_rejected_without_raising()`
+  - Method `.test_home_traffic_survives_the_first_tick()`
+- `class EconomyIntegrityTest`
+  - Method `.test_ai_trade_cannot_mint_stock_at_the_floor()`
+- `class CadenceLifecycleTest`
+  - Method `.test_cadence_is_restored_on_load_and_reset_to_default()`
+  - Method `.test_a_batched_tick_compounds_the_decision_windows()`
+- `class WarNewsTest`
+  - Method `.test_bankrupt_peace_is_notable_and_becomes_a_headline()`
+  - Method `.test_jump_keeps_hostile_arrival_morale_even_with_economy_news()`
+- `class AgentTransportTest`
+  - Method `.test_transport_failure_returns_a_reportable_error()`
+  - Method `.test_blocked_actions_are_not_counted_as_attempted()`
+  - Method `.test_missing_catalog_is_an_error_not_silent_coverage()`
+
+---
+
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
@@ -1488,7 +1516,7 @@
 ### [`tools/ai_play.py`](tools/ai_play.py)
 > *Play VoidFarer headlessly through the public API and report mechanic coverage.*
 
-**Size**: `75` lines (`2939` bytes)
+**Size**: `76` lines (`2983` bytes)
 
 **Functions:**
 - `def main(argv)`
@@ -1566,7 +1594,7 @@
 ### [`voidfarer/agent_api.py`](voidfarer/agent_api.py)
 > *Discoverable action catalog so an AI can play every mechanic through the public API.*
 
-**Size**: `78` lines (`2653` bytes)
+**Size**: `79` lines (`2704` bytes)
 
 **Functions:**
 - `def _sections(source)` - *Split the handler source into the GET and POST halves.*
@@ -1579,7 +1607,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `683` lines (`29431` bytes)
+**Size**: `727` lines (`31163` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1617,7 +1645,11 @@
   - Method `._tour_events()`
   - Method `._tour_crew_train()`
   - Method `._tour_ability()`
-  - Method `._tour_drone()`
+  - Method `._tour_drone_buy()`
+  - Method `._tour_drone_deploy()`
+  - Method `._tour_orbit()`
+  - Method `._tour_salvage()`
+  - Method `._tour_scoop()`
   - Method `._tour_mercenary()`
   - Method `._tour_escort()`
   - Method `._tour_time_speed()`
@@ -1870,7 +1902,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `7544` lines (`374952` bytes)
+**Size**: `7599` lines (`377500` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2024,12 +2056,14 @@
   - Method `.refit_fleet_unit(drone_id)`
   - Method `.form_alliance(captain_id)`
   - Method `._decision_lock_reason()`
-  - Method `._action_lock_reason()` - *Reason flight or exploration actions are frozen (decision or pirate toll).*
+  - Method `._action_lock_reason()` - *Reason flight or exploration actions are frozen (decision, pirate or void).*
+  - Method `._transit_lock_reason()` - *Body actions need a real orbit; mid-flight the ship has left the old body.*
+  - Method `._cadence_from_state(state)` - *Read the saved cadence, falling back to the default for unknown values.*
   - Method `._decision_cooldown()`
   - Method `._decision_chance_multiplier()`
   - Method `.set_decision_cadence(cadence)` - *Choose how often blocking quick-time decisions may interrupt the flight.*
   - Method `.decisions_ready_in()` - *Ticks left before another blocking decision may open.*
-  - Method `.maybe_trigger_decision(trigger)` - *Evaluate conditional events and open at most one blocking decision.*
+  - Method `.maybe_trigger_decision(trigger, elapsed_ticks)` - *Evaluate conditional events and open at most one blocking decision.*
   - Method `.resolve_decision(choice_id)` - *Apply a decision choice; time and flight remain locked until this succeeds.*
   - Method `.tick(num_ticks)` - *Advance the simulation universe by num_ticks.*
   - Method `.emit_event(kind, title, message)` - *Create and append a cockpit popup GameEvent.*
@@ -2163,7 +2197,7 @@
 ### [`voidfarer/frontier.py`](voidfarer/frontier.py)
 > *Frontier systems: autonomous captains, depots, mercenaries, and quantum messages.*
 
-**Size**: `180` lines (`7193` bytes)
+**Size**: `194` lines (`7795` bytes)
 
 **Functions:**
 - `def generate_ai_captains(systems, seed)` - *Create a deterministic roster of autonomous captains distributed across the galaxy.*
@@ -2217,7 +2251,7 @@
 ### [`voidfarer/logbook.py`](voidfarer/logbook.py)
 > *Flight-log windowing: notable galactic news must outlive routine chatter.*
 
-**Size**: `96` lines (`3288` bytes)
+**Size**: `97` lines (`3311` bytes)
 
 **Functions:**
 - `def is_notable(line)` - *True when a log line carries galactic news rather than ambient chatter.*
@@ -2534,7 +2568,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1313` lines (`55984` bytes)
+**Size**: `1313` lines (`55999` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
