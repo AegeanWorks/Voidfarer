@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from voidfarer.agent_api import build_action_catalog
-from voidfarer.agent_play import AiCaptain, ApiClient
+from voidfarer.agent_play import AiCaptain, ApiClient, coverage_gaps
 from voidfarer.engine import SimulationEngine
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
@@ -75,13 +75,29 @@ class AgentPlayTest(unittest.TestCase):
         report = AiCaptain(client, seed=42).play(steps=50)
         self.assertEqual(report["errors"], [])
         self.assertGreaterEqual(report["family_count"], 6, report["families"])
-        self.assertIn("travel", report["families"])
+        self.assertTrue({"travel", "dock", "navigate"} & set(report["families"]))
         self.assertIn("time", report["families"])
         self.assertGreater(report["steps"], 10)
         final = report["final"]
         self.assertGreater(int(final["hull"] or 0), 0)
         self.assertGreaterEqual(int(final["credits"] or 0), 0)
         self.assertIsNotNone(final["tick"])
+
+    def test_every_catalog_action_is_attempted_or_documented(self):
+        VoidFarerHandler.engine = SimulationEngine(seed=42)
+        VoidFarerHandler.engine.allow_decision_events = True
+        client = ApiClient(port=self.server.server_port)
+        report = AiCaptain(client, seed=42).play(steps=180)
+        self.assertEqual(report["errors"], [])
+        self.assertEqual(report["coverage_gaps"], [], "every action needs an AI path or a reason")
+        self.assertGreaterEqual(report["succeeded_count"], 35, report["succeeded"])
+        self.assertGreaterEqual(report["attempted_count"], 45, report["attempted"])
+        self.assertGreaterEqual(report["family_count"], 22, report["families"])
+
+    def test_coverage_gap_detection(self):
+        self.assertEqual(coverage_gaps(["/api/scan"], {"/api/scan"}), [])
+        self.assertEqual(coverage_gaps(["/api/nope"], set()), ["/api/nope"])
+        self.assertEqual(coverage_gaps(["/api/save"], set()), [])
 
     def test_the_engine_state_stays_loadable_after_play(self):
         snapshot = self.engine.get_status_snapshot()

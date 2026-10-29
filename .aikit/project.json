@@ -48,5 +48,16 @@
     "aegean-game-license",
     "drm-free",
     "commercial-license"
-  ]
+  ],
+  "mechanics_required": true,
+  "mechanics": {
+    "core": [
+      "voidfarer/engine.py",
+      "voidfarer/agent_api.py",
+      "voidfarer/agent_play.py",
+      "voidfarer/server.py",
+      "tools/ai_play.py"
+    ],
+    "test": "python tools/ai_play.py --steps 180"
+  }
 }

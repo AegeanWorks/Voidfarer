@@ -344,10 +344,19 @@ enumerates every cockpit control with a stable `data-testid`, and the bundled ca
 plays a full campaign through the same HTTP API the UI uses.
 
 ```bash
-python tools/ai_play.py --steps 60            # human-readable mechanic coverage
-python tools/ai_play.py --steps 60 --json     # machine-readable report
+python tools/ai_play.py --steps 180           # human-readable mechanic coverage
+python tools/ai_play.py --steps 180 --json    # machine-readable report
 python tools/ui_browser.py --click-map --viewports desktop --out ui-review/clickmap
 ```
+
+The captain docks, trades, scans, salvages, scoops, lands, runs surface and away
+operations, hires and trains crew, buys upgrades, escorts and drones, reads messages,
+claims codex rewards, petitions diplomacy, supports wars, vents and repairs the reactor,
+and cycles power, stance, time and decision settings. A 180-step run reaches 44
+mechanic families, succeeds on 43 endpoints, attempts 52 and reports **zero coverage
+gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
+`CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or requires content the run
+cannot create). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
 The click-map run enumerates every rendered control through `window.voidfarerClickMap()`
 and fails if any control lacks a stable handle or two controls share one (desktop
@@ -510,3 +519,6 @@ Free for personal play under the Aegean Game License 1.1 (AGL-1.1); see [LICENSE
 
 *commit `1262ed9` · 2026-10-28*
 <!-- aegean:screenshots:end -->
+The project declares that contract in `.aikit/project.json` as `mechanics.core` and
+`mechanics.test`, so `python aikit.py check voidfarer` runs the 180-step captain as a
+gate and fails when a mechanic becomes unreachable.

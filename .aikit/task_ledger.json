@@ -1,67 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "review-fixes",
+    "task_id": "ai-coverage",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793283249.8444526,
+    "updated_at": 1793286868.1215818,
     "owner": "kilo:2",
     "started_by": "kilo:2",
     "continuations": [],
-    "completed_at": 1793283250.1080747
+    "completed_at": 1793286868.3821712
   },
   "checkpoints": [
-    {
-      "task_id": "ship-dossier-legibility",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/3] Slot codes FRM/CORE/THM/DRV/OPS now render in the silhouette cases (wrench glyph, aria-label, full label in tooltip), catalog names wrap, research cost/START use fixed columns, and the audit treats fixed layers at z>=50 as separate layers. Vision APPROVED all three fixes and quoted every slot code at 1280x720 and 1920x1080; 686 tests pass; 4/4 gates. checklists: passed (test, hygiene, guidelines, secrets).",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793253222.5267038,
-      "timestamp_str": "2026-10-29 08:53:42",
-      "agent": "kilo:1",
-      "handoff": {
-        "state": "verified, gates green",
-        "next": "commit then close the cockpit UI task",
-        "open": "UI contract warning",
-        "evidence": "ui-review/review-20261029c, unittest 686 OK"
-      }
-    },
-    {
-      "task_id": "ship-dossier-legibility",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ship-dossier-legibility' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793253305.1263118,
-      "timestamp_str": "2026-10-29 08:55:05",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "dpr-audit-coverage",
-      "phase": "phase 1",
-      "phase_num": 1,
-      "description": "[1/2] Add real display-scaling coverage: --dpr 1.25/1.5/2 emulation in tools/ui_audit.py, radar backing-store verification in every report, a radarDpr severe finding, and a DPR-aware timeout.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793255954.2259958,
-      "timestamp_str": "2026-10-29 09:39:14",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "G-011 requires a DPR-correct radar at 100-200% Windows scaling, but the audit hard-coded device scale 1, so the radar DPR path had never been exercised by any audit run.",
-        "benefits": "Any future cockpit change is checked at the scaling levels Windows actually uses, and a blurry radar now fails --check instead of passing silently at dpr 1.",
-        "risks": "contract: additive report keys (radar, dpr); dependency: Edge/Chrome flags only; concurrency: none; state: none; runtime: a 2x 1080p capture takes ~350s",
-        "mitigation": "Pure argument builder with unit tests, additive keys, measured timing, timeout scaled by 2*dpr^2 with the effective budget printed"
-      },
-      "handoff": {
-        "state": "implemented and verified at 1.25x/1.5x/2x",
-        "next": "gates then commit",
-        "open": "none",
-        "evidence": "ui-review/dpr-20261029"
-      }
-    },
     {
       "task_id": "dpr-audit-coverage",
       "phase": "phase 4",
@@ -308,6 +258,49 @@
       "status": "completed",
       "timestamp": 1793283250.1080759,
       "timestamp_str": "2026-10-29 17:14:10",
+      "agent": "kilo:2"
+    },
+    {
+      "task_id": "ai-coverage",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan a coverage contract: the headless captain must attempt every POST action or document why it cannot, and the mechanics gate must run it.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793286867.8565986,
+      "timestamp_str": "2026-10-29 18:14:27",
+      "agent": "kilo:2",
+      "impact_assessment": {
+        "why": "Nine families proved drivability, not playability; a mechanic could ship with no AI path.",
+        "benefits": "Every action exercised or justified; project check runs the captain as a gate.",
+        "risks": "contract: agent API report fields only; dependency: stdlib; concurrency: none; state: none",
+        "mitigation": "Deterministic 180-step run, explicit CONTEXT_ACTIONS, failing test on gaps"
+      }
+    },
+    {
+      "task_id": "ai-coverage",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Guided tour, attempted/succeeded ledger, coverage_gaps invariant, project.json mechanics contract (5/5 gates), README/COCKPIT/ADR-085. checklists: passed. 44 families, 43 succeeded, 52 attempted, 0 gaps, 748 tests.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793286868.1215818,
+      "timestamp_str": "2026-10-29 18:14:28",
+      "agent": "kilo:2",
+      "handoff": {
+        "state": "complete",
+        "next": "aikit check --strict and commit",
+        "evidence": "mechanics gate 7.5s pass"
+      }
+    },
+    {
+      "task_id": "ai-coverage",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-coverage' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793286868.3821726,
+      "timestamp_str": "2026-10-29 18:14:28",
       "agent": "kilo:2"
     }
   ]

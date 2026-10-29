@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `87`
 - **Total Classes**: `222`
-- **Total Top-Level Functions**: `301`
-- **Total Class Methods**: `1258`
-- **Total Source Lines**: `35957`
+- **Total Top-Level Functions**: `302`
+- **Total Class Methods**: `1302`
+- **Total Source Lines**: `36423`
 
 ---
 
@@ -61,7 +61,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `94` lines (`4025` bytes)
+**Size**: `110` lines (`5032` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -74,6 +74,8 @@
   - Method `.tearDownClass()`
   - Method `.test_catalog_is_served_over_rest()`
   - Method `.test_ai_captain_plays_without_a_human()`
+  - Method `.test_every_catalog_action_is_attempted_or_documented()`
+  - Method `.test_coverage_gap_detection()`
   - Method `.test_the_engine_state_stays_loadable_after_play()`
 
 ---
@@ -1486,7 +1488,7 @@
 ### [`tools/ai_play.py`](tools/ai_play.py)
 > *Play VoidFarer headlessly through the public API and report mechanic coverage.*
 
-**Size**: `69` lines (`2678` bytes)
+**Size**: `75` lines (`2939` bytes)
 
 **Functions:**
 - `def main(argv)`
@@ -1577,7 +1579,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `239` lines (`10128` bytes)
+**Size**: `683` lines (`29431` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1589,11 +1591,56 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
+  - Method `._next_tour_action()`
+  - Method `._tour_power()`
+  - Method `._tour_reactor()`
+  - Method `._tour_route()`
+  - Method `._tour_messages()`
+  - Method `._tour_contracts()`
+  - Method `._tour_refuel()`
+  - Method `._tour_repair()`
+  - Method `._tour_crew()`
+  - Method `._tour_upgrade()`
+  - Method `._tour_weapon()`
+  - Method `._tour_shipmod()`
+  - Method `._tour_outpost()`
+  - Method `._tour_surface()`
+  - Method `._tour_away()`
+  - Method `._tour_ai()`
+  - Method `._tour_codex()`
+  - Method `._tour_mastery()`
+  - Method `._tour_training()`
+  - Method `._tour_depot()`
+  - Method `._tour_preview()`
+  - Method `._tour_stance()`
+  - Method `._tour_weapon_set()`
+  - Method `._tour_events()`
+  - Method `._tour_crew_train()`
+  - Method `._tour_ability()`
+  - Method `._tour_drone()`
+  - Method `._tour_mercenary()`
+  - Method `._tour_escort()`
+  - Method `._tour_time_speed()`
+  - Method `._tour_navigate()`
+  - Method `._tour_war()`
+  - Method `._tour_dock()`
+  - Method `._tour_point()`
+  - Method `._tour_weapon_install()`
+  - Method `._tour_reactor_vent()`
+  - Method `._tour_reactor_repair()`
+  - Method `._tour_time_pause()`
+  - Method `._tour_time_resume()`
+  - Method `._tour_shipmod_remove()`
+  - Method `._is_docked()`
+  - Method `._dockable_body()`
   - Method `._current_faction_id()`
   - Method `._pick_body(prefer_unvisited)`
   - Method `._cheapest_quote(quotes)`
   - Method `._first_research_project()`
   - Method `.report()`
+
+**Functions:**
+- `def coverage_gaps(catalog_paths, covered)` - *Catalog endpoints with neither an AI attempt nor a documented reason.*
 
 ---
 

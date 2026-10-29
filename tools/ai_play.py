@@ -53,6 +53,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"AI captain: {report['steps']} steps, {report['family_count']} mechanic families")
         for family, count in report["families"].items():
             print(f"  {family:<12} {count}")
+        print(
+            f"  actions: {report['succeeded_count']} succeeded / "
+            f"{report['attempted_count']} attempted; gaps {len(report['coverage_gaps'])}"
+        )
+        for gap in report["coverage_gaps"]:
+            print(f"  GAP: {gap}")
         if report["refusals"]:
             print(f"  refusals: {len(report['refusals'])} (first: {report['refusals'][0]})")
         for error in report["errors"]:
