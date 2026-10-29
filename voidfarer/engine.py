@@ -1132,6 +1132,7 @@ class SimulationEngine:
                 "trades": 0,
                 "anomalies_resolved": 0,
                 "combat_victories": 0,
+                "ships_captured": 0,
                 "credits_earned": 0,
                 "contracts_completed": 0,
                 "away_missions": 0,
@@ -4479,6 +4480,7 @@ class SimulationEngine:
             enemy_shield_before = enemy_rem_shield
             fleet_ships = self.state.ship.fleet_ships
             fleet_volley = 0
+            boarding_crew = None
             battle_stance = self.state.ship.battle_stance
 
             if action == "fire_lasers":
@@ -4546,6 +4548,79 @@ class SimulationEngine:
                     shield_ion = max(1, int(40 * enemy_guard))
                     enemy_rem_shield = max(0, enemy_rem_shield - shield_ion)
                     strike_desc = f"Ion pulse targeted enemy shield generators! EMP cascade drained {shield_ion} MW shields!"
+
+            elif action in ("board_enemy", "board", "capture"):
+                if combat.enemy_shield > 0:
+                    return False, "Enemy shields are still up; collapse them before boarding."
+                crippled_at = max(1, int(combat.enemy_max_hull * 0.30))
+                if combat.enemy_hull > crippled_at:
+                    return (
+                        False,
+                        f"Enemy hull is still at {combat.enemy_hull}/{combat.enemy_max_hull}; "
+                        f"board only below {crippled_at} hull.",
+                    )
+                marines = [
+                    member for member in ship.crew
+                    if member.role == "marine" and member.status == "active"
+                ]
+                if not marines:
+                    return False, "No active marine boarding party aboard."
+                marine = max(marines, key=lambda member: member.skill)
+                hull_edge = 1.0 - combat.enemy_hull / max(1, combat.enemy_max_hull)
+                chance = min(0.92, 0.35 + hull_edge * 0.45 + marine.skill * 0.025)
+                if self.rng.random() < chance:
+                    prize = FleetShip(
+                        id=f"prize_{self.state.time.tick}_{len(fleet_ships) + 1}",
+                        name=f"Prize: {combat.enemy_name}",
+                        ship_class=combat.enemy_class,
+                        role="prize",
+                        hull=max(1, combat.enemy_hull),
+                        max_hull=max(1, combat.enemy_max_hull),
+                        shield=0,
+                        max_shield=max(0, combat.enemy_max_shield),
+                        damage=max(4, combat.enemy_damage // 2),
+                        evasion=0.08,
+                        assigned_system_id=self.current_system.id,
+                        status="escorting",
+                        experience=0,
+                    )
+                    new_fleet_ships = fleet_ships + (prize,)
+                    stats["ships_captured"] = int(stats.get("ships_captured", 0)) + 1
+                    stats["combat_victories"] = int(stats.get("combat_victories", 0)) + 1
+                    msg = (
+                        f"PRIZE CAPTURED: {marine.name}'s boarding party seized "
+                        f"{combat.enemy_name}. The crippled {combat.enemy_class} now flies as "
+                        f"a {prize.name} escort."
+                    )
+                    new_log = list(self.state.ship.flight_log[-19:]) + [msg]
+                    new_ship = self._clone_ship(
+                        fleet_ships=new_fleet_ships,
+                        tactical_combo=0,
+                        streak=new_streak,
+                        flight_log=tuple(new_log[-20:]),
+                    )
+                    self.state = self._clone_state(
+                        ship=new_ship,
+                        active_combat=None,
+                        stats=stats,
+                    )
+                    return True, msg
+
+                injured = tuple(
+                    replace(member, injury_ticks=max(4, member.injury_ticks + 4))
+                    if member.id == marine.id else member
+                    for member in ship.crew
+                )
+                boarding_crew, morale_log = apply_morale_event(
+                    injured, -3.0, "boarding action repelled"
+                )
+                strike_desc = (
+                    f"Boarding action repelled by {combat.enemy_name}; "
+                    f"{marine.name} was injured and the party fell back."
+                )
+                if morale_log:
+                    strike_desc += f" {morale_log}"
+                new_combo = 0
 
             elif action == "shield_absorb":
                 boost = 30 + (25 if "dreadnought_tactics" in self.state.ship.mastery.specializations else 0)
@@ -4642,7 +4717,7 @@ class SimulationEngine:
                 return True, msg
 
             else:
-                return False, f"Unknown combat action '{action}'. Choices: fire_lasers, drone_strike, target_subsystem, shield_absorb, evasive_burn, flee."
+                return False, f"Unknown combat action '{action}'. Choices: fire_lasers, drone_strike, target_subsystem, board_enemy, shield_absorb, evasive_burn, flee."
 
             if enemy_miss:
                 enemy_rem_hull = enemy_hull_before
@@ -4840,7 +4915,8 @@ class SimulationEngine:
             if new_hull <= 0:
                 return self._combat_defeat(
                     combat, note=breach_log, fleet_ships=fleet_ships,
-                    crew=breach_crew, streak=new_streak,
+                    crew=breach_crew if breach_crew is not None else boarding_crew,
+                    streak=new_streak,
                 )
 
             # AI selects the next maneuver from live hull, shield, combo, and profile state.
@@ -4889,7 +4965,11 @@ class SimulationEngine:
                 shield=new_shield,
                 tactical_combo=new_combo,
                 streak=new_streak,
-                crew=breach_crew if breach_crew is not None else self.state.ship.crew,
+                crew=(
+                    breach_crew if breach_crew is not None
+                    else boarding_crew if boarding_crew is not None
+                    else self.state.ship.crew
+                ),
                 fleet_ships=fleet_ships,
                 flight_log=tuple(new_log[-20:]),
             )

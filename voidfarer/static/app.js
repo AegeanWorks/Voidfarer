@@ -497,6 +497,7 @@ class CockpitApp {
         this.combatTelegraphText = document.getElementById("combatTelegraphText");
         this.btnCombatFire = document.getElementById("btnCombatFire");
         this.btnCombatDrone = document.getElementById("btnCombatDrone");
+        this.btnCombatBoard = document.getElementById("btnCombatBoard");
         this.btnCombatTarget = document.getElementById("btnCombatTarget");
         this.btnCombatAbsorb = document.getElementById("btnCombatAbsorb");
         this.btnCombatEvade = document.getElementById("btnCombatEvade");
@@ -1028,6 +1029,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         }.bind(this);
         this.btnCombatFire.addEventListener("click", () => this.handleCombat("fire_lasers"));
+        if (this.btnCombatBoard) {
+            this.btnCombatBoard.addEventListener("click", () => this.handleCombat("board_enemy"));
+        }
         if (this.btnCombatDrone) {
             this.btnCombatDrone.addEventListener("click", () => this.handleCombat("drone_strike"));
         }
@@ -1682,6 +1686,22 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 } else {
                     this.combatShieldContainer.style.display = "none";
                 }
+            }
+
+            if (this.btnCombatBoard) {
+                const hasMarine = (ship.crew || []).some(
+                    member => member.role === "marine" && member.status === "active"
+                );
+                const crippledAt = Math.max(1, Math.floor(c.enemy_max_hull * 0.30));
+                const boardable = c.enemy_shield <= 0 && c.enemy_hull <= crippledAt && hasMarine;
+                this.btnCombatBoard.disabled = !boardable;
+                this.btnCombatBoard.title = !hasMarine
+                    ? "Recruit a marine before boarding"
+                    : c.enemy_shield > 0
+                        ? "Collapse enemy shields first"
+                        : c.enemy_hull > crippledAt
+                            ? `Board only below ${crippledAt} hull`
+                            : "Send the marine party across";
             }
 
             if (this.combatTelegraphBanner) {

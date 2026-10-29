@@ -9,6 +9,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from voidfarer.cli import cmd_void
+from voidfarer.codex import metric_value
+from voidfarer.crew import recruit_crew_member
 from voidfarer.engine import SimulationEngine
 from voidfarer.enemies import ENEMY_ARCHETYPES, generate_system_enemy, threat_multiplier
 from voidfarer.models import CombatEncounter, VoidTraversalState
@@ -123,6 +125,76 @@ class TestEarlyCombatRisk(unittest.TestCase):
         self.assertIsNone(engine.state.active_combat)
         self.assertEqual(engine.state.ship.hull, 0)
         self.assertEqual(engine.state.ship.credits, 0)
+
+
+class TestBoardingAndPrizeCapture(unittest.TestCase):
+    def _engine_with_combat(self, *, shield=0, hull=20, marine=True):
+        engine = SimulationEngine(seed=42)
+        crew = engine.state.ship.crew
+        if marine:
+            crew = crew + (recruit_crew_member("marine", 42, len(crew)),)
+        combat = CombatEncounter(
+            id="board_test",
+            enemy_name="Crippled Marauder",
+            enemy_class="Assault Frigate",
+            enemy_hull=hull,
+            enemy_max_hull=100,
+            enemy_damage=12,
+            bounty_credits=500,
+            salvage_commodity="titanium",
+            enemy_shield=shield,
+            enemy_max_shield=40,
+            faction_id="outlaw_corsairs",
+            special_ability="none",
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(crew=crew, hull=100, shield=100),
+            active_combat=combat,
+        )
+        return engine
+
+    def test_a_crippled_enemy_can_be_captured_as_a_prize(self):
+        engine = self._engine_with_combat()
+        engine.rng.random = lambda: 0.0
+        ok, message = engine.combat_action("board_enemy")
+        self.assertTrue(ok, message)
+        self.assertIn("PRIZE", message.upper())
+        self.assertIsNone(engine.state.active_combat)
+        self.assertEqual(len(engine.state.ship.fleet_ships), 1)
+        prize = engine.state.ship.fleet_ships[0]
+        self.assertIn("Prize", prize.name)
+        self.assertGreater(prize.hull, 0)
+        self.assertEqual(engine.state.stats.get("ships_captured"), 1)
+        self.assertEqual(metric_value(engine.state, "ships_captured"), 1)
+        restored = type(engine.state).from_dict(engine.state.to_dict())
+        self.assertEqual(restored.ship.fleet_ships[0].name, prize.name)
+        self.assertEqual(restored.stats.get("ships_captured"), 1)
+
+    def test_a_failed_boarding_action_injures_the_marine_party(self):
+        engine = self._engine_with_combat()
+        engine.rng.random = lambda: 0.99
+        ok, message = engine.combat_action("board_enemy")
+        self.assertTrue(ok, message)
+        self.assertIsNotNone(engine.state.active_combat)
+        marine = next(member for member in engine.state.ship.crew if member.role == "marine")
+        self.assertGreater(marine.injury_ticks, 0)
+        self.assertIn("REPELLED", message.upper())
+
+    def test_boarding_requires_down_shields_low_hull_and_a_marine(self):
+        engine = self._engine_with_combat(shield=20)
+        ok, message = engine.combat_action("board_enemy")
+        self.assertFalse(ok)
+        self.assertIn("shield", message.lower())
+
+        engine = self._engine_with_combat(hull=80)
+        ok, message = engine.combat_action("board_enemy")
+        self.assertFalse(ok)
+        self.assertIn("hull", message.lower())
+
+        engine = self._engine_with_combat(marine=False)
+        ok, message = engine.combat_action("board_enemy")
+        self.assertFalse(ok)
+        self.assertIn("marine", message.lower())
 
 
 class TestEvasiveBurnDiscipline(unittest.TestCase):

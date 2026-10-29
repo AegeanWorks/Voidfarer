@@ -897,6 +897,7 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
         print(f"  {BOLD}combat fire{RESET}    - Fire laser battery strike")
         print(f"  {BOLD}combat drone{RESET}   - Launch kinetic drone strike / sensor burn")
         print(f"  {BOLD}combat target{RESET}  - Target subsystem (e.g. combat target weapons)")
+        print(f"  {BOLD}combat board{RESET}   - Board a crippled enemy with a marine party")
         print(f"  {BOLD}combat absorb{RESET}  - Overcharge shield capacitors")
         print(f"  {BOLD}combat evade{RESET}   - High-G thruster evasion")
         print(f"  {BOLD}combat flee{RESET}    - Emergency hyperspace jump (costs 8 fuel)")
@@ -912,6 +913,10 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
         "strike": "drone_strike",
         "target": "target_weapons" if len(parts) <= 2 else ("target_shields" if "shield" in parts[2].lower() else "target_weapons"),
         "subsystem": "target_weapons",
+        "board": "board_enemy",
+        "boarding": "board_enemy",
+        "capture": "board_enemy",
+        "prize": "board_enemy",
         "absorb": "shield_absorb",
         "shield": "shield_absorb",
         "defend": "shield_absorb",
@@ -2505,7 +2510,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     combat_p = subparsers.add_parser("combat", help="Execute tactical combat maneuver")
     combat_p.add_argument(
         "action",
-        choices=["fire", "laser", "attack", "drone", "strike", "target", "subsystem", "absorb", "shield", "defend", "evade", "dodge", "flee", "escape"],
+        choices=[
+            "fire", "laser", "attack", "drone", "strike", "target", "subsystem",
+            "board", "capture", "prize", "absorb", "shield", "defend", "evade",
+            "dodge", "flee", "escape",
+        ],
         help="Tactical maneuver",
     )
     combat_p.add_argument("target", nargs="?", help="Subsystem target for 'combat target' (weapons or shields)")

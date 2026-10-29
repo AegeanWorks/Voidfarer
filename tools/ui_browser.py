@@ -26,12 +26,14 @@ STATIC_DIR = PROJECT_DIR / "voidfarer" / "static"
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
+from voidfarer.crew import recruit_crew_member  # noqa: E402
 from voidfarer.engine import SimulationEngine  # noqa: E402
+from voidfarer.models import CombatEncounter  # noqa: E402
 from voidfarer.server import VoidFarerHandler, start_background_server  # noqa: E402
 from voidfarer.storage import StorageManager  # noqa: E402
 from tools.ui_audit import TABS, VIEWPORTS  # noqa: E402
 
-SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "galaxy", "death", "ability", "surface", "waypoint", "vector", "relief")
+SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "boarding", "galaxy", "death", "ability", "surface", "waypoint", "vector", "relief")
 TAB_IDS = {
     "player": "tabBtnPlayer",
     "skills": "tabBtnSkills",
@@ -184,6 +186,8 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
             }"""
         )
         page.wait_for_timeout(900)
+    elif scenario == "boarding":
+        page.wait_for_timeout(500)
     elif scenario == "combat":
         page.evaluate(
             """() => {
@@ -321,6 +325,33 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
     }
 
 
+def _prepare_boarding(engine: SimulationEngine) -> bool:
+    """Put a marine aboard and a crippled hostile in front of the flagship."""
+    crew = engine.state.ship.crew
+    if not any(member.role == "marine" and member.status == "active" for member in crew):
+        crew = crew + (recruit_crew_member("marine", 42, len(crew)),)
+    combat = CombatEncounter(
+        id="browser_boarding",
+        enemy_name="Crippled Corsair",
+        enemy_class="Assault Frigate",
+        enemy_hull=20,
+        enemy_max_hull=100,
+        enemy_damage=12,
+        bounty_credits=500,
+        salvage_commodity="titanium",
+        enemy_shield=0,
+        enemy_max_shield=0,
+        faction_id="outlaw_corsairs",
+        special_ability="none",
+    )
+    engine.state = engine._clone_state(
+        ship=engine._clone_ship(crew=crew),
+        active_combat=combat,
+    )
+    engine.pause_time()
+    return True
+
+
 def _prepare_relief(engine: SimulationEngine) -> Optional[str]:
     """Devastate an inhabited Sol world and put the flagship in orbit for the target card."""
     from dataclasses import replace
@@ -451,6 +482,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.scenario == "relief" and _prepare_relief(engine) is None:
             print("Why: no inhabited body was available for the relief scenario.")
             print("Fix: retry with a save that has a settled world in the current system.")
+            return 1
+        if args.scenario == "boarding" and not _prepare_boarding(engine):
+            print("Why: the boarding scenario could not prepare a hostile and a marine.")
+            print("Fix: retry with a fresh campaign.")
             return 1
         if args.tab == "factions" and not _prepare_factions(engine):
             print("Why: the Coalition was not at war within 400 ticks for the factions review.")

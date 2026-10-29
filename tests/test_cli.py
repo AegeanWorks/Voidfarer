@@ -62,7 +62,12 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertIn("not devastated", mock_out.getvalue().lower())
 
     def test_cli_combat_accepts_documented_actions(self):
-        for argv in (["combat", "drone"], ["combat", "target", "weapons"], ["combat", "target", "shields"]):
+        for argv in (
+            ["combat", "drone"],
+            ["combat", "board"],
+            ["combat", "target", "weapons"],
+            ["combat", "target", "shields"],
+        ):
             with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
                 code = main(argv)
                 self.assertEqual(code, 0)

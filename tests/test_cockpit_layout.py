@@ -1213,3 +1213,27 @@ class TestWorldReliefCockpit(unittest.TestCase):
         self.assertIn('"relief"', tool)
         self.assertIn("def _prepare_relief(", tool)
         self.assertIn("devastation=60.0", tool)
+
+class TestBoardingCockpit(unittest.TestCase):
+    """The combat card must expose a gated boarding action."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_combat_card_holds_a_board_button(self):
+        self.assertIn('id="btnCombatBoard"', self.html)
+        self.assertIn('data-testid="combat-board"', self.html)
+        self.assertIn('handleCombat("board_enemy")', self.js)
+        self.assertIn("btnCombatBoard", self.js)
+
+    def test_board_button_is_gated_by_shields_hull_and_marine(self):
+        for marker in ("enemy_shield <= 0", "enemy_hull <= crippledAt", 'member.role === "marine"'):
+            self.assertIn(marker, self.js)
+
+    def test_browser_review_prepares_a_boarding_action(self):
+        tool = (STATIC_DIR.parent.parent / "tools" / "ui_browser.py").read_text(encoding="utf-8")
+        self.assertIn('"boarding"', tool)
+        self.assertIn("def _prepare_boarding(", tool)
+        self.assertIn("enemy_hull=20", tool)
