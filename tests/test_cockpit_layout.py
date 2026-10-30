@@ -1289,6 +1289,12 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
             self.assertIn(marker, self.js)
         self.assertIn(".fleet-role", self.css)
 
+    def test_fleet_cards_show_service_records(self):
+        self.assertIn("fleet-service", self.js)
+        self.assertIn("patrol_contacts", self.js)
+        self.assertIn("patrol_credits", self.js)
+        self.assertIn(".fleet-service", self.css)
+
     def test_fleet_manager_shows_monthly_upkeep(self):
         html = INDEX_HTML.read_text(encoding="utf-8")
         self.assertIn('id="fleetUpkeepLine"', html)

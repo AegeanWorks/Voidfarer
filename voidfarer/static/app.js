@@ -3661,6 +3661,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         <span class="fleet-xp-bar" title="${xp}/${xpMax} XP"><span class="fleet-xp-fill" style="width:${rankPct}%"></span></span>
                         <span class="fleet-xp-label">${xp}/${xpMax} XP</span>
                     </div>
+                    <div class="fleet-service">SVC ${Number(ship.battles || 0)}B / ${Number(ship.kills || 0)}K / ${Number(ship.patrol_contacts || 0)}P / ${Number(ship.patrol_credits || 0)}CR</div>
                     <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())}<br>${ship.assigned_system_id === this.state.ship.current_system_id ? "LOCAL" : `PATROL ${patrolTicks}T`}</div>
                     <div class="ship-actions">
                         <button class="btn-hud btn-amber" data-escort-repair="${this.escapeHtml(ship.id)}">REPAIR</button>

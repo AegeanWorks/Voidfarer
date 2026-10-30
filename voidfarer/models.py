@@ -1377,6 +1377,11 @@ class FleetShip:
     status: str = "escorting"
     experience: int = 0
     tactical_role: str = "screen"
+    battles: int = 0
+    kills: int = 0
+    patrol_credits: int = 0
+    patrol_contacts: int = 0
+    training_sessions: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1403,6 +1408,11 @@ class FleetShip:
             status=str(data.get("status", "escorting")),
             experience=max(0, int(data.get("experience", 0))),
             tactical_role=tactical_role,
+            battles=max(0, int(data.get("battles", 0))),
+            kills=max(0, int(data.get("kills", 0))),
+            patrol_credits=max(0, int(data.get("patrol_credits", 0))),
+            patrol_contacts=max(0, int(data.get("patrol_contacts", 0))),
+            training_sessions=max(0, int(data.get("training_sessions", 0))),
         )
 
 

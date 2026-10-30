@@ -3272,7 +3272,11 @@ class SimulationEngine:
                 return False, f"Insufficient credits for fleet training ({cost} cr)."
             before = fleet_rank(target.experience)["name"]
             after_rank = fleet_rank(target.experience + gain)
-            trained = replace(target, experience=target.experience + gain)
+            trained = replace(
+                target,
+                experience=target.experience + gain,
+                training_sessions=target.training_sessions + 1,
+            )
             fleet_ships = tuple(
                 trained if ship.id == target.id else ship
                 for ship in self.state.ship.fleet_ships
@@ -5352,6 +5356,12 @@ class SimulationEngine:
                         ),
                         status="escorting" if escort.hull > 0 else "destroyed",
                     )
+                    if updated_escort.hull > 0:
+                        updated_escort = replace(
+                            updated_escort,
+                            battles=updated_escort.battles + 1,
+                            kills=updated_escort.kills + 1,
+                        )
                     after_rank = fleet_rank(updated_escort.experience)["name"]
                     if after_rank != before_rank:
                         rank_up_lines.append(
@@ -8333,6 +8343,10 @@ class SimulationEngine:
                                 FLEET_MAX_EXPERIENCE,
                                 escort.experience + sweep["experience"],
                             ),
+                            battles=escort.battles + (1 if sweep["contacted"] else 0),
+                            patrol_credits=escort.patrol_credits + sweep["credits"],
+                            patrol_contacts=escort.patrol_contacts
+                            + (1 if sweep["contacted"] else 0),
                         )
                     )
                     patrol_credits += sweep["credits"]

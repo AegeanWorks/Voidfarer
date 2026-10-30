@@ -597,6 +597,8 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
                 f"{CYAN}{ship.get('rank', 'Green'):<8}{RESET} "
                 f"{YELLOW}{ship.get('role_label', 'Screen'):<8}{RESET} "
                 f"XP {ship.get('experience', 0)}/{ship.get('experience_max', 300)} "
+                f"B{ship.get('battles', 0)} K{ship.get('kills', 0)} "
+                f"P{ship.get('patrol_contacts', 0)}/{ship.get('patrol_credits', 0)}cr "
                 f"SYS {ship['assigned_system_id']}"
             )
         print(

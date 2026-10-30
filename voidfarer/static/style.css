@@ -8682,3 +8682,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 .outpost-spec-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
 .outpost-spec-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }
 .outpost-spec-locked { color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+
+/* Escort service record: battles, kills, patrol contacts and patrol bounties. */
+.fleet-service { grid-column: 2; grid-row: 4; color: var(--console-muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.02em; }
