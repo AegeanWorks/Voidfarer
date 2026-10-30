@@ -1436,6 +1436,7 @@ class TestDiplomacyActionsCockpit(unittest.TestCase):
             "data-diplo-action",
             'data-diplo-action="gift"',
             'data-diplo-action="trade_pact"',
+            'data-diplo-action="research_pact"',
             'data-diplo-action="alliance"',
             'data-diplo-action="ceasefire"',
             "handleDiplomacyAction",
@@ -1445,6 +1446,8 @@ class TestDiplomacyActionsCockpit(unittest.TestCase):
         self.assertIn(".diplomacy-actions", self.css)
         self.assertIn("ALLIED", self.js)
         self.assertIn("PACT", self.js)
+        self.assertIn("R&D", self.js)
+        self.assertIn("research_pacts", self.js)
 
 class TestWarBondsCockpit(unittest.TestCase):
     """War cards must explain the bond payout terms."""

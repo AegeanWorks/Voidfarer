@@ -638,6 +638,7 @@ class SimulationEngine:
             corp_standings=kwargs.get("corp_standings", cur.corp_standings),
             allies=kwargs.get("allies", cur.allies),
             trade_pacts=kwargs.get("trade_pacts", cur.trade_pacts),
+            research_pacts=kwargs.get("research_pacts", cur.research_pacts),
             landed_body_id=kwargs["landed_body_id"] if "landed_body_id" in kwargs else cur.landed_body_id,
             travel=kwargs["travel"] if "travel" in kwargs else cur.travel,
             void_traversal=kwargs["void_traversal"] if "void_traversal" in kwargs else cur.void_traversal,
@@ -3166,6 +3167,11 @@ class SimulationEngine:
                 project = get_research_project(project_id)
                 if project is not None:
                     queued.append(project.to_dict())
+            active_pacts = sum(
+                1
+                for faction_id in self.state.ship.research_pacts
+                if self.research_pact_active(faction_id)
+            )
             return {
                 "points": research.points,
                 "progress": research.progress,
@@ -3173,6 +3179,9 @@ class SimulationEngine:
                 "active_project": active.to_dict() if active else None,
                 "queue": list(research.queue),
                 "queued": queued,
+                "research_pacts": list(self.state.ship.research_pacts),
+                "active_research_pacts": active_pacts,
+                "pact_bonus": round(0.05 * active_pacts, 2),
                 "completed": list(research.completed),
                 "bonuses": calculate_research_bonuses(research.completed),
                 "available": [p.to_dict() for p in available_projects(research.completed, research.active_project_id)],
@@ -3207,6 +3216,21 @@ class SimulationEngine:
         return bool(faction_id) and faction_id in self.state.ship.trade_pacts and not (
             self._faction_at_war_with_player(faction_id)
         )
+
+    def research_pact_active(self, faction_id: str) -> bool:
+        """A research accord pays only while the signatory is at peace with the player."""
+        return bool(faction_id) and faction_id in self.state.ship.research_pacts and not (
+            self._faction_at_war_with_player(faction_id)
+        )
+
+    def research_pact_multiplier(self) -> float:
+        """Passive research multiplier: +5% for each active research pact."""
+        active = sum(
+            1
+            for faction_id in self.state.ship.research_pacts
+            if self.research_pact_active(faction_id)
+        )
+        return 1.0 + 0.05 * active
 
     def faction_diplomacy(self, faction_id: str, action: str, amount: int = 0) -> tuple[bool, str]:
         with self.lock:
@@ -3255,6 +3279,30 @@ class SimulationEngine:
                 line = f"TRADE PACT: {faction_name} opens its markets to your flag."
                 new_ship = self._clone_ship(
                     trade_pacts=pacts,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+                )
+                self.state = self._clone_state(ship=new_ship)
+                return True, line
+            if act in ("research_pact", "science_pact"):
+                faction_name = CANONICAL_FACTIONS[faction_id].name
+                if faction_id in self.state.ship.research_pacts:
+                    return False, f"Already hold a research pact with {faction_name}."
+                if self._faction_at_war_with_player(faction_id):
+                    return False, f"Cannot sign a research pact with {faction_name} while at war."
+                if current < 60:
+                    return (
+                        False,
+                        f"Research pact requires standing >= 60 (current {current:+d}).",
+                    )
+                pacts = tuple(
+                    sorted(set(self.state.ship.research_pacts) | {faction_id})
+                )
+                line = (
+                    f"RESEARCH PACT: {faction_name} shares laboratory data "
+                    "(+5% passive research while at peace)."
+                )
+                new_ship = self._clone_ship(
+                    research_pacts=pacts,
                     flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
                 )
                 self.state = self._clone_state(ship=new_ship)
@@ -6635,6 +6683,13 @@ class SimulationEngine:
                         )
                         if project is not None
                     ],
+                    "research_pacts": list(self.state.ship.research_pacts),
+                    "active_research_pacts": sum(
+                        1
+                        for faction_id in self.state.ship.research_pacts
+                        if self.research_pact_active(faction_id)
+                    ),
+                    "pact_bonus": round(self.research_pact_multiplier() - 1.0, 2),
                     "available": [p.to_dict() for p in available_projects(self.state.research.completed, self.state.research.active_project_id)],
                     "catalog": [p.to_dict() for p in RESEARCH_PROJECTS],
                 },
@@ -8168,6 +8223,7 @@ class SimulationEngine:
                 ))
 
             research_gain += int(equipment.get("research_per_tick", 0.0) * num_ticks)
+            research_gain = int(research_gain * self.research_pact_multiplier())
             new_crew, wage_cost, crew_logs = tick_crew(
                 cur_ship.crew, num_ticks, cur_ship.credits + outpost_credits, rng=self.rng,
                 wage_due=wages_due(cur_ship.crew, cur_time.elapsed_days, new_days),
