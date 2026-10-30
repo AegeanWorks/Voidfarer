@@ -1367,3 +1367,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Show medal badges in the crew roster and CLI ledger, and add a `crew_medals` codex metric plus the Decorated Crew milestone.
   5. Persist all counters and medals through save/load.
 - **Consequences**: Dangerous service now produces visible career history, and medals give a small morale reward without adding a new control surface. Live Edge rendered a medal badge and the codex metric counted it. Suite: 1006 tests, 5/5 gates.
+
+### ADR-117: Megastructure Restoration
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Dyson swarms, ring worlds, quantum relays, solar collectors and wormholes were visible landmarks with no interaction. The late game also lacked a large credit sink and a permanent exploration payoff.
+- **Decision**:
+  1. Add persisted `CelestialBody.restoration_complete` with a legacy-safe default.
+  2. Add a restoration catalog with costs and permanent bonuses: Dyson +15% outpost credits, ring world +10% all output, quantum relay +15% research, solar collector +20% fuel cells, wormhole -1 jump fuel.
+  3. Add `restore_megastructure`: require orbit, a restorable body, sufficient credits and a one-time flag; deduct credits and increment `stats["megastructures_restored"]`.
+  4. Apply the additive bonus table to outpost production, reports and cash flow through one shared helper; apply the wormhole discount to jump fuel.
+  5. Expose the target-card RESTORE action, `megastructure status|restore`, `POST /api/megastructure/restore`, and the Ancient Engineer codex milestone.
+- **Consequences**: Megastructures now provide a large credit sink and permanent strategic bonuses. Bonuses stack additively, restoration is one-time and persists, and legacy saves load dormant. Live Edge restored the Helios Dyson Swarm for 12,000 cr and showed the ONLINE state with no console errors. Suite: 1015 tests, 5/5 gates.

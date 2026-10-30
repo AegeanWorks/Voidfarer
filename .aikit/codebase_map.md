@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `114`
-- **Total Classes**: `288`
-- **Total Top-Level Functions**: `329`
-- **Total Class Methods**: `1664`
-- **Total Source Lines**: `43949`
+- **Total Python Modules**: `116`
+- **Total Classes**: `290`
+- **Total Top-Level Functions**: `333`
+- **Total Class Methods**: `1680`
+- **Total Source Lines**: `44362`
 
 ---
 
@@ -255,7 +255,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `342` lines (`15499` bytes)
+**Size**: `354` lines (`16083` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -273,6 +273,8 @@
   - Method `.test_cli_outpost_crew_parses()`
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_outpost_link_parses()`
+  - Method `.test_cli_megastructure_status_parses()`
+  - Method `.test_cli_megastructure_restore_reports_unknown_body()`
   - Method `.test_cli_fleet_sell_escort_parses()`
   - Method `.test_cli_non_aggression_pact_reports_the_standing_gate()`
   - Method `.test_cli_research_pact_parses_and_reports_the_standing_gate()`
@@ -312,7 +314,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1550` lines (`68166` bytes)
+**Size**: `1568` lines (`68716` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -524,6 +526,9 @@
   - Method `.setUpClass()`
   - Method `.test_crew_rows_render_medals()`
   - Method `.test_medal_badges_are_styled()`
+- `class TestMegastructureCockpit` - *The target card must expose megastructure restoration.*
+  - Method `.setUpClass()`
+  - Method `.test_target_card_has_a_restore_button()`
 - `class TestOutpostSupplyCockpit` - *Outpost cards must expose supply hub linking and status.*
   - Method `.setUpClass()`
   - Method `.test_outpost_cards_offer_link_and_unlink()`
@@ -1233,6 +1238,23 @@
 
 ---
 
+### [`tests/test_megastructure_restoration.py`](tests/test_megastructure_restoration.py)
+> *Megastructure restoration: orbit/cost gates, bonuses and persistence.*
+
+**Size**: `125` lines (`4782` bytes)
+
+**Classes:**
+- `class MegastructureRestorationTest`
+  - Method `.setUp()`
+  - Method `._orbit_with(credits)`
+  - Method `.test_dyson_restoration_charges_once_and_sets_the_flag()`
+  - Method `.test_restoration_requires_orbit_and_credits()`
+  - Method `.test_bonus_math_and_outpost_application()`
+  - Method `.test_restoration_round_trips_and_legacy_defaults()`
+  - Method `.test_codex_metric_counts_restored_structures()`
+
+---
+
 ### [`tests/test_messaging_crew_quantum.py`](tests/test_messaging_crew_quantum.py)
 > *Regression tests for message trees, crew, portraits, weapons, quantum tech, and megastructures.*
 
@@ -1638,7 +1660,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `868` lines (`36895` bytes)
+**Size**: `899` lines (`38096` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1686,6 +1708,7 @@
   - Method `.test_combat_stance_endpoint_updates_the_fleet_report()`
   - Method `.test_captain_gambit_endpoint_spends_a_local_captain()`
   - Method `.test_outpost_supply_link_endpoint_links_and_unlinks()`
+  - Method `.test_megastructure_restore_endpoint_restores_the_body()`
   - Method `.test_quantum_automation_endpoints_configure_and_report()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
   - Method `.test_research_queue_endpoints_queue_and_cancel()`
@@ -2212,7 +2235,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `763` lines (`33323` bytes)
+**Size**: `764` lines (`33403` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2326,7 +2349,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3267` lines (`166428` bytes)
+**Size**: `3301` lines (`168035` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2371,6 +2394,7 @@
 - `def cmd_character(engine, storage, parts)`
 - `def cmd_research(engine, storage, parts)`
 - `def cmd_outpost(engine, storage, parts)`
+- `def cmd_megastructure(engine, storage, parts)` - *Inspect or restore the current system's ancient megastructure.*
 - `def cmd_diplomacy(engine, storage, parts)`
 - `def cmd_route(engine, target)`
 - `def cmd_crew(engine, storage, parts)`
@@ -2391,7 +2415,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `717` lines (`25210` bytes)
+**Size**: `727` lines (`25639` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -2511,7 +2535,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9382` lines (`459594` bytes)
+**Size**: `9477` lines (`463426` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2588,6 +2612,10 @@
   - Method `._outpost_supply_multiplier(outpost)`
   - Method `.link_outpost_supply(outpost_id, hub_id)` - *Route one outpost's surplus through a same-system hub.*
   - Method `.unlink_outpost_supply(outpost_id)` - *Sever one outpost's supply link.*
+  - Method `._megastructure_bonuses()`
+  - Method `._outpost_production(outpost, yield_mult, supply_mult)`
+  - Method `.get_megastructure_report()`
+  - Method `.restore_megastructure(body_id)` - *Restore one ancient structure while orbiting it.*
   - Method `._outpost_capture_damage(outpost, old_system, new_system, crew_by_id)` - *Damage a player outpost when its system falls to a non-player power.*
   - Method `.repair_outpost(outpost_id)` - *Restore an outpost to full integrity with a remote repair contract.*
   - Method `._crew_ship_id(crew_id)`
@@ -2938,6 +2966,18 @@
 
 ---
 
+### [`voidfarer/megastructures.py`](voidfarer/megastructures.py)
+> *Ancient megastructure restoration catalog and production bonuses.*
+
+**Size**: `79` lines (`2241` bytes)
+
+**Functions:**
+- `def get_restoration(body_type)`
+- `def restoration_bonuses(bodies)` - *Additive economy and jump bonuses from every restored megastructure.*
+- `def apply_output_bonus(production, bonuses)` - *Apply the shared restoration table to one outpost's per-tick yield.*
+
+---
+
 ### [`voidfarer/messaging.py`](voidfarer/messaging.py)
 > *Branching quantum message trees and their consequences.*
 
@@ -2959,7 +2999,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2270` lines (`84856` bytes)
+**Size**: `2272` lines (`84975` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -3242,7 +3282,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1469` lines (`63032` bytes)
+**Size**: `1475` lines (`63336` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
