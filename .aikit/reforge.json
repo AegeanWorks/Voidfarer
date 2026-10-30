@@ -8228,8 +8228,8 @@
       "start": 3,
       "step": 3,
       "stop": null,
-      "stage": 3,
-      "window": 9,
+      "stage": 4,
+      "window": 12,
       "audited_commits": [
         "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
         "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
@@ -8239,16 +8239,22 @@
         "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
         "a836faa310e84b2b88a87884ee61a0834c4f1528",
         "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
-        "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+        "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+        "213e132d2794e48ef244c510c56b3c4230172378",
+        "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+        "9b643bd5ba62c7b50f6d116abe95587f97b477fc"
       ],
       "status": "active",
       "created": "2026-10-30T19:42:29",
-      "updated": "2026-10-30T19:56:14",
+      "updated": "2026-10-30T20:03:11",
       "last_audit": {
         "run": "run-3",
-        "stage": 3,
-        "window": 9,
+        "stage": 4,
+        "window": 12,
         "commits": [
+          "213e132d2794e48ef244c510c56b3c4230172378",
+          "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+          "9b643bd5ba62c7b50f6d116abe95587f97b477fc",
           "a836faa310e84b2b88a87884ee61a0834c4f1528",
           "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
           "f0a836338acde507eba45dc3f6eef8531e3c522b",
@@ -8260,9 +8266,9 @@
           "5da24b5a8b7110d75a403b46f3319a1acf9541df"
         ],
         "new_commits": [
-          "a836faa310e84b2b88a87884ee61a0834c4f1528",
-          "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
-          "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+          "213e132d2794e48ef244c510c56b3c4230172378",
+          "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+          "9b643bd5ba62c7b50f6d116abe95587f97b477fc"
         ],
         "prior_commits": [
           "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
@@ -8270,76 +8276,36 @@
           "e81289a13401d25fa2422916c4027bf7a88faa69",
           "f0a836338acde507eba45dc3f6eef8531e3c522b",
           "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
-          "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+          "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+          "a836faa310e84b2b88a87884ee61a0834c4f1528",
+          "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+          "5da24b5a8b7110d75a403b46f3319a1acf9541df"
         ],
-        "findings": [
-          {
-            "code": "review-gambit-shared-once",
-            "category": "improvement",
-            "severity": "low",
-            "path": "README.md",
-            "line": 520,
-            "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
-            "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
-            "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
-            "hunk": "",
-            "symbol": "",
-            "introduced": true,
-            "reproducible": false,
-            "fixable": false,
-            "interaction": "",
-            "repaired": false,
-            "source": "review",
-            "patch_old": "",
-            "patch_new": ""
-          }
-        ],
+        "findings": [],
         "repairs": [],
-        "counts": {
-          "improvement": 1
-        },
-        "reviewed": 4,
+        "counts": {},
+        "reviewed": 1,
         "review": {
           "status": "reviewed",
-          "rejected": [
-            "README.md:520: suggestion dropped (the quoted text is outside the lines this stage added)"
-          ],
+          "rejected": [],
           "files": [
-            ".aikit/codebase_map.md",
-            ".aikit/decisions.md",
-            "README.md",
-            "docs/COCKPIT.md"
+            "README.md"
           ],
-          "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
+          "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-4-213e132d2794.md",
           "redacted": 0,
-          "reason": "",
-          "findings": [
-            {
-              "code": "review-gambit-shared-once",
-              "category": "improvement",
-              "severity": "low",
-              "path": "README.md",
-              "line": 520,
-              "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
-              "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
-              "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
-              "hunk": "",
-              "symbol": "",
-              "introduced": true,
-              "reproducible": false,
-              "fixable": false,
-              "interaction": "",
-              "repaired": false,
-              "source": "review",
-              "patch_old": "",
-              "patch_new": ""
-            }
-          ]
+          "reason": "the answer held no findings",
+          "coverage": {
+            "reported": 1,
+            "total": 1,
+            "missing": [],
+            "unknown": []
+          },
+          "findings": []
         },
         "skipped": [],
         "tests": {},
         "gates": {},
-        "timestamp": "2026-10-30T19:56:14"
+        "timestamp": "2026-10-30T20:03:11"
       },
       "history": [
         {
@@ -8647,12 +8613,72 @@
           "tests": {},
           "gates": {},
           "timestamp": "2026-10-30T19:56:14"
+        },
+        {
+          "run": "run-3",
+          "stage": 4,
+          "window": 12,
+          "commits": [
+            "213e132d2794e48ef244c510c56b3c4230172378",
+            "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+            "9b643bd5ba62c7b50f6d116abe95587f97b477fc",
+            "a836faa310e84b2b88a87884ee61a0834c4f1528",
+            "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+            "f0a836338acde507eba45dc3f6eef8531e3c522b",
+            "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+            "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+            "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+            "e81289a13401d25fa2422916c4027bf7a88faa69",
+            "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+            "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+          ],
+          "new_commits": [
+            "213e132d2794e48ef244c510c56b3c4230172378",
+            "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+            "9b643bd5ba62c7b50f6d116abe95587f97b477fc"
+          ],
+          "prior_commits": [
+            "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+            "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+            "e81289a13401d25fa2422916c4027bf7a88faa69",
+            "f0a836338acde507eba45dc3f6eef8531e3c522b",
+            "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+            "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+            "a836faa310e84b2b88a87884ee61a0834c4f1528",
+            "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+            "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+          ],
+          "findings": [],
+          "repairs": [],
+          "counts": {},
+          "reviewed": 1,
+          "review": {
+            "status": "reviewed",
+            "rejected": [],
+            "files": [
+              "README.md"
+            ],
+            "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-4-213e132d2794.md",
+            "redacted": 0,
+            "reason": "the answer held no findings",
+            "coverage": {
+              "reported": 1,
+              "total": 1,
+              "missing": [],
+              "unknown": []
+            },
+            "findings": []
+          },
+          "skipped": [],
+          "tests": {},
+          "gates": {},
+          "timestamp": "2026-10-30T20:03:11"
         }
       ]
     }
   ],
-  "stage": 3,
-  "window": 9,
+  "stage": 4,
+  "window": 12,
   "audited_commits": [
     "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
     "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
@@ -8662,13 +8688,19 @@
     "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
     "a836faa310e84b2b88a87884ee61a0834c4f1528",
     "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
-    "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+    "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+    "213e132d2794e48ef244c510c56b3c4230172378",
+    "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+    "9b643bd5ba62c7b50f6d116abe95587f97b477fc"
   ],
   "last_audit": {
     "run": "run-3",
-    "stage": 3,
-    "window": 9,
+    "stage": 4,
+    "window": 12,
     "commits": [
+      "213e132d2794e48ef244c510c56b3c4230172378",
+      "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+      "9b643bd5ba62c7b50f6d116abe95587f97b477fc",
       "a836faa310e84b2b88a87884ee61a0834c4f1528",
       "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
       "f0a836338acde507eba45dc3f6eef8531e3c522b",
@@ -8680,9 +8712,9 @@
       "5da24b5a8b7110d75a403b46f3319a1acf9541df"
     ],
     "new_commits": [
-      "a836faa310e84b2b88a87884ee61a0834c4f1528",
-      "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
-      "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+      "213e132d2794e48ef244c510c56b3c4230172378",
+      "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+      "9b643bd5ba62c7b50f6d116abe95587f97b477fc"
     ],
     "prior_commits": [
       "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
@@ -8690,22 +8722,22 @@
       "e81289a13401d25fa2422916c4027bf7a88faa69",
       "f0a836338acde507eba45dc3f6eef8531e3c522b",
       "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
-      "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+      "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+      "a836faa310e84b2b88a87884ee61a0834c4f1528",
+      "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+      "5da24b5a8b7110d75a403b46f3319a1acf9541df"
     ],
     "findings": [],
     "repairs": [],
     "counts": {},
-    "reviewed": 4,
+    "reviewed": 1,
     "review": {
       "status": "unreviewed",
       "rejected": [],
       "files": [
-        ".aikit/codebase_map.md",
-        ".aikit/decisions.md",
-        "README.md",
-        "docs/COCKPIT.md"
+        "README.md"
       ],
-      "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
+      "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-4-213e132d2794.md",
       "redacted": 0,
       "reason": "awaiting the reviewer's findings",
       "findings": []
@@ -8713,7 +8745,7 @@
     "skipped": [],
     "tests": {},
     "gates": {},
-    "timestamp": "2026-10-30T19:56:14"
+    "timestamp": "2026-10-30T20:03:11"
   },
   "history": [
     {
@@ -8953,13 +8985,38 @@
         "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
         "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
       ],
-      "findings": [],
+      "findings": [
+        {
+          "code": "review-gambit-shared-once",
+          "category": "improvement",
+          "severity": "low",
+          "path": "README.md",
+          "line": 520,
+          "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
+          "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
+          "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+          "hunk": "",
+          "symbol": "",
+          "introduced": true,
+          "reproducible": false,
+          "fixable": false,
+          "interaction": "",
+          "repaired": false,
+          "source": "review",
+          "patch_old": "",
+          "patch_new": ""
+        }
+      ],
       "repairs": [],
-      "counts": {},
+      "counts": {
+        "improvement": 1
+      },
       "reviewed": 4,
       "review": {
-        "status": "unreviewed",
-        "rejected": [],
+        "status": "reviewed",
+        "rejected": [
+          "README.md:520: suggestion dropped (the quoted text is outside the lines this stage added)"
+        ],
         "files": [
           ".aikit/codebase_map.md",
           ".aikit/decisions.md",
@@ -8968,13 +9025,88 @@
         ],
         "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
         "redacted": 0,
+        "reason": "",
+        "findings": [
+          {
+            "code": "review-gambit-shared-once",
+            "category": "improvement",
+            "severity": "low",
+            "path": "README.md",
+            "line": 520,
+            "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
+            "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
+            "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+            "hunk": "",
+            "symbol": "",
+            "introduced": true,
+            "reproducible": false,
+            "fixable": false,
+            "interaction": "",
+            "repaired": false,
+            "source": "review",
+            "patch_old": "",
+            "patch_new": ""
+          }
+        ]
+      },
+      "skipped": [],
+      "tests": {},
+      "gates": {},
+      "timestamp": "2026-10-30T19:56:14"
+    },
+    {
+      "run": "run-3",
+      "stage": 4,
+      "window": 12,
+      "commits": [
+        "213e132d2794e48ef244c510c56b3c4230172378",
+        "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+        "9b643bd5ba62c7b50f6d116abe95587f97b477fc",
+        "a836faa310e84b2b88a87884ee61a0834c4f1528",
+        "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+        "f0a836338acde507eba45dc3f6eef8531e3c522b",
+        "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+        "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+        "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+        "e81289a13401d25fa2422916c4027bf7a88faa69",
+        "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+        "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+      ],
+      "new_commits": [
+        "213e132d2794e48ef244c510c56b3c4230172378",
+        "1846111bb8b9934c16b492a3e42a7a5841fe57b0",
+        "9b643bd5ba62c7b50f6d116abe95587f97b477fc"
+      ],
+      "prior_commits": [
+        "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+        "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+        "e81289a13401d25fa2422916c4027bf7a88faa69",
+        "f0a836338acde507eba45dc3f6eef8531e3c522b",
+        "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+        "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+        "a836faa310e84b2b88a87884ee61a0834c4f1528",
+        "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+        "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+      ],
+      "findings": [],
+      "repairs": [],
+      "counts": {},
+      "reviewed": 1,
+      "review": {
+        "status": "unreviewed",
+        "rejected": [],
+        "files": [
+          "README.md"
+        ],
+        "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-4-213e132d2794.md",
+        "redacted": 0,
         "reason": "awaiting the reviewer's findings",
         "findings": []
       },
       "skipped": [],
       "tests": {},
       "gates": {},
-      "timestamp": "2026-10-30T19:56:14"
+      "timestamp": "2026-10-30T20:03:11"
     }
   ]
 }
