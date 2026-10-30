@@ -504,6 +504,7 @@ class CockpitApp {
         this.btnCombatFlee = document.getElementById("btnCombatFlee");
         this.combatComboBadge = document.getElementById("combatComboBadge");
         this.combatComboCount = document.getElementById("combatComboCount");
+        this.combatStanceLine = document.getElementById("combatStanceLine");
         this.critReadyText = document.getElementById("critReadyText");
 
         // Anomaly Card
@@ -641,6 +642,8 @@ class CockpitApp {
         this.marketTitle = document.getElementById("marketTitle");
         this.marketArch = document.getElementById("marketArch");
         this.fleetUpkeepLine = document.getElementById("fleetUpkeepLine");
+        this.fleetStanceRow = document.getElementById("fleetStanceRow");
+        this.fleetStanceHint = document.getElementById("fleetStanceHint");
         this.marketTableBody = document.getElementById("marketTableBody");
         this.autoTradeCommodity = document.getElementById("autoTradeCommodity");
         this.autoTradeBuy = document.getElementById("autoTradeBuy");
@@ -1732,6 +1735,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.critReadyText.style.display = (combo >= 2) ? "inline" : "none";
             } else {
                 this.combatComboBadge.style.display = "none";
+            }
+            if (this.combatStanceLine) {
+                this.combatStanceLine.textContent =
+                    `FLEET STANCE: ${String(ship.battle_stance || "balanced").toUpperCase()}`;
             }
         } else {
             this.combatCard.style.display = "none";
@@ -3711,6 +3718,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 o.outpost_type === "shipyard" && o.system_id === this.state.ship.current_system_id
             );
             this.fleetUpkeepLine.textContent = `${ships.length} escort(s) · upkeep ${Number(fleet.upkeep_per_month || 0)} cr/month${localShipyard ? " · SHIPYARD LINK" : ""}`;
+        }
+        const stance = String(fleet.battle_stance || this.state.ship.battle_stance || "balanced").toLowerCase();
+        const stanceHints = {
+            balanced: "Even damage and evasion.",
+            aggressive: "+20% damage, -30% evasion.",
+            defensive: "-30% damage, +35% evasion.",
+        };
+        if (this.fleetStanceHint) {
+            this.fleetStanceHint.textContent = stanceHints[stance] || stanceHints.balanced;
+        }
+        if (this.fleetStanceRow) {
+            this.fleetStanceRow.querySelectorAll("[data-fleet-stance]").forEach(btn => {
+                const active = btn.getAttribute("data-fleet-stance") === stance;
+                btn.classList.toggle("active", active);
+                btn.setAttribute("aria-pressed", active ? "true" : "false");
+                btn.onclick = () => this.postAction(
+                    "/api/combat/stance",
+                    { stance: btn.getAttribute("data-fleet-stance") },
+                    "fleet"
+                );
+            });
         }
         if (!ships.length) {
             this.fleetShipRoster.innerHTML = `<p class="panel-intro-text">No escort warships. Commission one below at a drydock.</p>`;

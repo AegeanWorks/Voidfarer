@@ -1626,6 +1626,17 @@ body.cockpit-theme {
     100% { transform: scale(1.02); filter: brightness(1.25); }
 }
 
+/* Battle stance readout in the combat card. */
+.combat-stance-line {
+    margin-top: 6px;
+    border-top: 1px solid rgba(111, 195, 215, 0.2);
+    padding-top: 6px;
+    color: var(--console-cyan);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+}
+
 .crit-ready-text {
     color: #c96b5a;
     font-size: 0.7rem;
@@ -8666,6 +8677,15 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* Escort wing upkeep summary above the roster. */
 .fleet-upkeep-line { margin: 2px 0 4px; color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+
+/* Fleet battle stance selector above the escort roster. */
+.fleet-stance-row { display: flex; flex-direction: column; gap: 4px; margin: 2px 0 8px; }
+.fleet-stance-label { color: var(--console-muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; }
+.fleet-stance-actions { display: flex; gap: 4px; }
+.fleet-stance-btn { flex: 1; min-height: 22px; padding: 2px 4px; border: 1px solid rgba(111, 195, 215, 0.28); background: transparent; color: var(--console-muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; cursor: pointer; }
+.fleet-stance-btn:hover { background: rgba(111, 195, 215, 0.10); color: var(--console-cyan); }
+.fleet-stance-btn.active { border-color: var(--console-cyan); background: rgba(111, 195, 215, 0.16); color: var(--console-cyan); }
+.fleet-stance-hint { color: var(--console-muted); font-family: var(--font-mono); font-size: 10px; }
 
 /* Squadron role badge and cycle control on each escort card. */
 .fleet-role { margin-left: 4px; padding: 0 4px; border: 1px solid rgba(111, 195, 215, 0.35); background: transparent; color: var(--console-cyan); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; cursor: pointer; }

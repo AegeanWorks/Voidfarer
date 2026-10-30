@@ -526,6 +526,15 @@
                         <div class="fleet-manager-box">
                             <h4 class="commission-title">FLEET MANAGER // ESCORT WING</h4>
                             <div class="fleet-upkeep-line" id="fleetUpkeepLine">Fleet upkeep: -- cr/month</div>
+                            <div class="fleet-stance-row" id="fleetStanceRow" role="group" aria-label="Fleet battle stance">
+                                <span class="fleet-stance-label">BATTLE STANCE</span>
+                                <div class="fleet-stance-actions">
+                                    <button class="btn-hud fleet-stance-btn" id="btnFleetStanceBalanced" data-fleet-stance="balanced" aria-pressed="true">BALANCED</button>
+                                    <button class="btn-hud fleet-stance-btn" id="btnFleetStanceAggressive" data-fleet-stance="aggressive" aria-pressed="false">AGGRESSIVE</button>
+                                    <button class="btn-hud fleet-stance-btn" id="btnFleetStanceDefensive" data-fleet-stance="defensive" aria-pressed="false">DEFENSIVE</button>
+                                </div>
+                                <span class="fleet-stance-hint" id="fleetStanceHint">Even damage and evasion.</span>
+                            </div>
                             <div class="fleet-ship-roster" id="fleetShipRoster"></div>
                             <div class="escort-shop-grid" id="escortShopGrid"></div>
                         </div>
@@ -887,6 +896,7 @@
                     <div class="combat-combo-badge" id="combatComboBadge" style="display: none;">
                         ⚡ TACTICAL COMBO: <span id="combatComboCount">0</span> <strong class="crit-ready-text" id="critReadyText">(CRITICAL OVERCHARGE READY!)</strong>
                     </div>
+                    <div class="combat-stance-line" id="combatStanceLine">FLEET STANCE: BALANCED</div>
                 </div>
 
                 <!-- Anomaly Modal / Card (Prominent when active) -->

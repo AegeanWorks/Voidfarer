@@ -3597,6 +3597,7 @@ class SimulationEngine:
                 "local_evasion_bonus": round(fleet_evasion_bonus(local), 3),
                 "patrol_sweep_ticks": PATROL_SWEEP_TICKS,
                 "upkeep_per_month": fleet_upkeep(ships),
+                "battle_stance": self.state.ship.battle_stance,
                 "formations": ["balanced", "aggressive", "defensive"],
             }
 
@@ -6764,6 +6765,7 @@ class SimulationEngine:
                     )), 3),
                     "patrol_sweep_ticks": PATROL_SWEEP_TICKS,
                     "upkeep_per_month": fleet_upkeep(self.state.ship.fleet_ships),
+                    "battle_stance": self.state.ship.battle_stance,
                 },
                 "ship_mods": {
                     "slots": list(SHIP_MOD_SLOTS),

@@ -1315,6 +1315,33 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
         self.assertIn(".fleet-upkeep-line", self.css)
 
 
+class TestFleetStanceCockpit(unittest.TestCase):
+    """Battle stance must be controllable and visible in the cockpit."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_cockpit_offers_three_stance_buttons(self):
+        for stance in ("balanced", "aggressive", "defensive"):
+            self.assertIn(f'data-fleet-stance="{stance}"', self.html)
+        self.assertIn("fleetStanceRow", self.html)
+        self.assertIn("fleetStanceHint", self.html)
+        self.assertIn("combatStanceLine", self.html)
+
+    def test_stance_controls_post_to_the_existing_endpoint(self):
+        self.assertIn('"/api/combat/stance"', self.js)
+        self.assertIn("battle_stance", self.js)
+        self.assertIn("FLEET STANCE:", self.js)
+
+    def test_stance_layout_and_active_state_are_styled(self):
+        self.assertIn(".fleet-stance-row", self.css)
+        self.assertIn(".fleet-stance-btn.active", self.css)
+        self.assertIn(".combat-stance-line", self.css)
+
+
 class TestResearchQueueCockpit(unittest.TestCase):
     """The Empire research list must expose queue and cancel controls."""
 

@@ -515,6 +515,16 @@ class TestServer(unittest.TestCase):
         self.assertEqual(trained["rank"], "Green")
         self.assertEqual(payload["state"]["ship"]["credits"], 800)
 
+    def test_combat_stance_endpoint_updates_the_fleet_report(self):
+        status, data = self._post("/api/combat/stance", {"stance": "defensive"})
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(payload["state"]["ship"]["battle_stance"], "defensive")
+        self.assertEqual(
+            payload["state"]["fleet_manager"]["battle_stance"], "defensive"
+        )
+
     def test_quantum_automation_endpoints_configure_and_report(self):
         status, data = self._post(
             "/api/trade/quantum/automation",

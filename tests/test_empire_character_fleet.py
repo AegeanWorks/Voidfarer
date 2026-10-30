@@ -296,6 +296,9 @@ class FleetAndNavigationTest(unittest.TestCase):
         ok, msg = self.engine.set_battle_stance("aggressive")
         self.assertTrue(ok, msg)
         self.assertEqual(self.engine.state.ship.battle_stance, "aggressive")
+        self.assertEqual(
+            self.engine.get_fleet_manager_report()["battle_stance"], "aggressive"
+        )
         self.assertFalse(self.engine.set_battle_stance("nonsense")[0])
         from voidfarer.upgrades import get_upgrade
         solar = get_upgrade("solar_panel_array")
