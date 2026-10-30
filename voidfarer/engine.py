@@ -644,6 +644,9 @@ class SimulationEngine:
             allies=kwargs.get("allies", cur.allies),
             trade_pacts=kwargs.get("trade_pacts", cur.trade_pacts),
             research_pacts=kwargs.get("research_pacts", cur.research_pacts),
+            non_aggression_until=kwargs.get(
+                "non_aggression_until", cur.non_aggression_until
+            ),
             landed_body_id=kwargs["landed_body_id"] if "landed_body_id" in kwargs else cur.landed_body_id,
             travel=kwargs["travel"] if "travel" in kwargs else cur.travel,
             void_traversal=kwargs["void_traversal"] if "void_traversal" in kwargs else cur.void_traversal,
@@ -3348,6 +3351,31 @@ class SimulationEngine:
         )
         return 1.0 + 0.05 * active
 
+    def non_aggression_active(self, faction_id: str) -> bool:
+        """A non-aggression pact protects against new wars until its expiry tick."""
+        return (
+            self.state.ship.non_aggression_until.get(faction_id, 0)
+            > self.state.time.tick
+        )
+
+    def non_aggression_remaining(self, faction_id: str) -> int:
+        return max(
+            0,
+            self.state.ship.non_aggression_until.get(faction_id, 0)
+            - self.state.time.tick,
+        )
+
+    def _active_non_aggression_pairs(
+        self, tick: int | None = None
+    ) -> frozenset[frozenset[str]]:
+        """Pairs involving the player's polity that active pacts keep out of war."""
+        now = self.state.time.tick if tick is None else int(tick)
+        return frozenset(
+            frozenset(("sol_coalition", faction_id))
+            for faction_id, until in self.state.ship.non_aggression_until.items()
+            if until > now and faction_id != "sol_coalition"
+        )
+
     def faction_diplomacy(self, faction_id: str, action: str, amount: int = 0) -> tuple[bool, str]:
         with self.lock:
             if faction_id not in CANONICAL_FACTIONS:
@@ -3419,6 +3447,40 @@ class SimulationEngine:
                 )
                 new_ship = self._clone_ship(
                     research_pacts=pacts,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+                )
+                self.state = self._clone_state(ship=new_ship)
+                return True, line
+            if act in ("non_aggression", "nap", "nonaggression"):
+                faction_name = CANONICAL_FACTIONS[faction_id].name
+                if faction_id == "sol_coalition":
+                    return False, "The Sol Coalition is your own polity."
+                if self.non_aggression_active(faction_id):
+                    remaining = self.non_aggression_remaining(faction_id)
+                    return (
+                        False,
+                        f"Already hold a non-aggression pact with {faction_name} "
+                        f"({remaining} ticks left).",
+                    )
+                if self._faction_at_war_with_player(faction_id):
+                    return (
+                        False,
+                        f"Cannot sign a non-aggression pact with {faction_name} while at war.",
+                    )
+                if current < 30:
+                    return (
+                        False,
+                        f"Non-aggression pact requires standing >= 30 (current {current:+d}).",
+                    )
+                until = self.state.time.tick + self.NON_AGGRESSION_TICKS
+                pacts = dict(self.state.ship.non_aggression_until)
+                pacts[faction_id] = until
+                line = (
+                    f"NON-AGGRESSION PACT: {faction_name} will not open a new war "
+                    f"with the Sol Coalition for {self.NON_AGGRESSION_TICKS} ticks."
+                )
+                new_ship = self._clone_ship(
+                    non_aggression_until=pacts,
                     flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
                 )
                 self.state = self._clone_state(ship=new_ship)
@@ -7149,6 +7211,7 @@ class SimulationEngine:
 
     # A captain can only petition: the envoy fee is paid when the other side agrees.
     CEASEFIRE_ENVOY_COST = 500
+    NON_AGGRESSION_TICKS = 90
 
     def _ceasefire_chance(self, faction_id: str, war: WarState) -> float:
         """Odds a petition is accepted: standing, diplomacy skill and how the war is going."""
@@ -8586,6 +8649,7 @@ class SimulationEngine:
                     for economy in self.state.faction_economies
                     if economy.treasury <= 0 and economy.net_income < 0
                 ),
+                non_aggression_pairs=self._active_non_aggression_pairs(new_tick),
             )
             new_trade_links = compute_trade_links(
                 updated_systems,

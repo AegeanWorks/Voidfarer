@@ -1979,19 +1979,21 @@ def cmd_diplomacy(engine: SimulationEngine, storage: StorageManager, parts: list
             eliminated = leader.faction_id in engine.state.eliminated_factions
             pact = " [PACT]" if leader.faction_id in engine.state.ship.trade_pacts else ""
             research = " [R&D]" if leader.faction_id in engine.state.ship.research_pacts else ""
+            nap_remaining = engine.non_aggression_remaining(leader.faction_id)
+            nap = f" [NAP {nap_remaining}T]" if nap_remaining else ""
             print(
                 f"{leader.faction_id:<20} {BOLD}{leader.name:<18}{RESET} {leader.title:<18} "
-                f"{CYAN}{leader.behavior:<13}{RESET} standing {standing:+4d}{pact}{research}"
+                f"{CYAN}{leader.behavior:<13}{RESET} standing {standing:+4d}{pact}{research}{nap}"
                 + (f" {RED}[ELIMINATED]{RESET}" if eliminated else "")
             )
         active_wars = [w for w in engine.state.wars if w.active]
         print(f"\nActive wars: {len(active_wars)}")
         for war in active_wars:
             print(f"  {war.attacker_id} vs {war.defender_id} | score {war.war_score:+.1f} | since tick {war.started_tick}")
-        print(f"\n{DIM}Actions: diplomacy improve|gift|trade_pact|research_pact|alliance|declare_war|peace <faction_id> [amount]{RESET}")
+        print(f"\n{DIM}Actions: diplomacy improve|gift|non_aggression|trade_pact|research_pact|alliance|declare_war|peace <faction_id> [amount]{RESET}")
         return 0
     if len(parts) < 3:
-        print(f"{RED}Usage:{RESET} diplomacy <improve|gift|trade_pact|research_pact|alliance|declare_war|peace> <faction_id> [amount]")
+        print(f"{RED}Usage:{RESET} diplomacy <improve|gift|non_aggression|trade_pact|research_pact|alliance|declare_war|peace> <faction_id> [amount]")
         return 1
     amount = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 0
     ok, msg = engine.faction_diplomacy(parts[2].lower(), sub, amount)
@@ -2901,7 +2903,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     outpost_p.add_argument("body_id", nargs="?", help="Body id for construction")
 
     diplomacy_p = subparsers.add_parser("diplomacy", help="Faction diplomacy, leaders, and wars")
-    diplomacy_p.add_argument("action", nargs="?", default="list", choices=["list", "improve", "gift", "trade_pact", "research_pact", "alliance", "ceasefire"])
+    diplomacy_p.add_argument("action", nargs="?", default="list", choices=["list", "improve", "gift", "non_aggression", "trade_pact", "research_pact", "alliance", "ceasefire"])
     diplomacy_p.add_argument("faction_id", nargs="?", help="Faction id")
     diplomacy_p.add_argument("amount", nargs="?", type=int, default=0, help="Aid amount")
 

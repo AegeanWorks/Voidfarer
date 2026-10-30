@@ -1502,6 +1502,7 @@ class TestDiplomacyActionsCockpit(unittest.TestCase):
         for marker in (
             "data-diplo-action",
             'data-diplo-action="gift"',
+            'data-diplo-action="non_aggression"',
             'data-diplo-action="trade_pact"',
             'data-diplo-action="research_pact"',
             'data-diplo-action="alliance"',
@@ -1515,6 +1516,8 @@ class TestDiplomacyActionsCockpit(unittest.TestCase):
         self.assertIn("PACT", self.js)
         self.assertIn("R&D", self.js)
         self.assertIn("research_pacts", self.js)
+        self.assertIn("non_aggression_until", self.js)
+        self.assertIn("NAP", self.js)
 
 class TestWarBondsCockpit(unittest.TestCase):
     """War cards must explain the bond payout terms."""

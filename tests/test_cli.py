@@ -109,6 +109,12 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertEqual(code, 1)
             self.assertIn("unknown escort", mock_out.getvalue().lower())
 
+    def test_cli_non_aggression_pact_reports_the_standing_gate(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["diplomacy", "non_aggression", "nebula_collective"])
+            self.assertEqual(code, 1)
+            self.assertIn("standing", mock_out.getvalue().lower())
+
     def test_cli_research_pact_parses_and_reports_the_standing_gate(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["diplomacy", "research_pact", "sol_coalition"])

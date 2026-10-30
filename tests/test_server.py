@@ -429,6 +429,30 @@ class TestServer(unittest.TestCase):
         self.assertTrue(payload["ok"], payload.get("message"))
         self.assertIn("sol_coalition", payload["state"]["ship"]["research_pacts"])
 
+    def test_non_aggression_pact_endpoint_forms_a_timed_pact(self):
+        engine = VoidFarerHandler.engine
+        standings = dict(engine.state.ship.faction_standings)
+        standings["nebula_collective"] = 30
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(
+                faction_standings=standings,
+                non_aggression_until={},
+            ),
+            wars=(),
+        )
+        status, data = self._post(
+            "/api/diplomacy",
+            {"faction_id": "nebula_collective", "action": "non_aggression"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        pacts = payload["state"]["ship"]["non_aggression_until"]
+        self.assertIn("nebula_collective", pacts)
+        self.assertGreater(
+            pacts["nebula_collective"], payload["state"]["time"]["tick"]
+        )
+
     def test_trade_pact_endpoint_forms_a_pact(self):
         engine = VoidFarerHandler.engine
         standings = dict(engine.state.ship.faction_standings)

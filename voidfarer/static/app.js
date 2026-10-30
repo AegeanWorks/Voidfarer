@@ -3597,6 +3597,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const allied = new Set(this.state.ship.allies || []);
         const tradePacts = new Set(this.state.ship.trade_pacts || []);
         const researchPacts = new Set(this.state.ship.research_pacts || []);
+        const napUntil = this.state.ship.non_aggression_until || {};
+        const currentTick = Number(this.state.time?.tick || 0);
         const eliminated = new Set(this.state.eliminated_factions || []);
         this.diplomacyList.innerHTML = leaders.map(l => {
             const standing = Number(standings[l.faction_id] || 0);
@@ -3604,6 +3606,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const isAllied = allied.has(l.faction_id);
             const isPact = tradePacts.has(l.faction_id);
             const isResearchPact = researchPacts.has(l.faction_id);
+            const napRemaining = Math.max(0, Number(napUntil[l.faction_id] || 0) - currentTick);
+            const isNap = napRemaining > 0;
             const ownWar = wars.find(w => w.active
                 && "sol_coalition" in (w.attacker_id, w.defender_id)
                 && l.faction_id in (w.attacker_id, w.defender_id));
@@ -3611,14 +3615,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const canAlly = !isEliminated && !isAllied && standing >= 70;
             const canPact = !isEliminated && !isPact && !ownWar && standing >= 40;
             const canResearchPact = !isEliminated && !isResearchPact && !ownWar && standing >= 60;
+            const canNap = !isEliminated && !isNap && !isAllied && !ownWar
+                && l.faction_id !== "sol_coalition" && standing >= 30;
             const petition = ownWar && Number(this.state.ship.credits || 0) >= 500;
             return `<div class="diplomacy-row ${isEliminated ? "eliminated" : ""}">
                 <span><strong>${this.escapeHtml(l.name)}</strong> (${this.escapeHtml(l.faction_id)})<br>
                 <small>${this.escapeHtml(l.title)} — <span class="leader-behavior">${this.escapeHtml(l.behavior)}</span></small></span>
-                <span>standing ${standing}${isAllied ? " | ALLIED" : ""}${isPact ? " | PACT" : ""}${isResearchPact ? " | R&D" : ""}${atWar ? " | WAR" : ""}</span>
+                <span>standing ${standing}${isAllied ? " | ALLIED" : ""}${isPact ? " | PACT" : ""}${isResearchPact ? " | R&D" : ""}${isNap ? ` | NAP ${napRemaining}T` : ""}${atWar ? " | WAR" : ""}</span>
                 <div class="diplomacy-actions">
                     <button class="btn-hud" data-diplo-action="improve" data-diplo-id="${this.escapeHtml(l.faction_id)}">IMPROVE</button>
                     <button class="btn-hud btn-green" data-diplo-action="gift" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${isEliminated || Number(this.state.ship.credits || 0) < 300 ? "disabled" : ""}>GIFT 300</button>
+                    <button class="btn-hud btn-amber" data-diplo-action="non_aggression" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${canNap ? "" : "disabled"} title="${isNap ? `Non-aggression pact active for ${napRemaining} ticks` : ownWar ? "Unavailable during war" : "Requires standing 30+; blocks new Sol Coalition wars for 90 ticks"}">NAP</button>
                     <button class="btn-hud btn-cyan" data-diplo-action="trade_pact" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${canPact ? "" : "disabled"} title="${isPact ? "Trade pact active" : ownWar ? "Unavailable during war" : "Requires standing 40+; improves buy and sell prices"}">PACT</button>
                     <button class="btn-hud btn-purple" data-diplo-action="research_pact" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${canResearchPact ? "" : "disabled"} title="${isResearchPact ? "Research pact active" : ownWar ? "Unavailable during war" : "Requires standing 60+; +5% passive research"}">R&D</button>
                     <button class="btn-hud btn-purple" data-diplo-action="alliance" data-diplo-id="${this.escapeHtml(l.faction_id)}" ${canAlly ? "" : "disabled"} title="${isAllied ? "Already allied" : "Requires standing 70+ during this campaign"}">ALLY</button>

@@ -406,6 +406,7 @@ def simulate_faction_behaviors(
     eliminated: tuple[str, ...],
     num_ticks: int = 1,
     broke_factions: frozenset[str] = frozenset(),
+    non_aggression_pairs: frozenset[frozenset[str]] = frozenset(),
 ) -> tuple[tuple[WarState, ...], dict[str, StarSystem], tuple[str, ...], list[str]]:
     """Apply leader archetypes: declare wars, then resolve active fronts."""
     logs: list[str] = []
@@ -439,6 +440,7 @@ def simulate_faction_behaviors(
                 fid for fid in living
                 if fid != leader.faction_id and fid not in defending
                 and frozenset((leader.faction_id, fid)) not in active_pairs
+                and frozenset((leader.faction_id, fid)) not in non_aggression_pairs
             ]
             if not targets:
                 continue
