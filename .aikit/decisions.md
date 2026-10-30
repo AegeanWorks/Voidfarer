@@ -1355,3 +1355,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Pass active Sol Coalition pairs into faction war simulation so those pairs cannot declare new wars; AI-to-AI wars are unchanged, and existing wars continue.
   4. Add the NAP button, `NAP nT` row label, CLI status/action text and remaining-tick helpers, with expiry evaluated against the current tick.
 - **Consequences**: Standing 30 now buys temporary security rather than only trade access. Pacts expire automatically without cleanup, and expired entries stop protecting on the next evaluation. Live Edge signed a Nebula Collective NAP and showed `NAP 88T` with no console errors. Suite: 996 tests, 5/5 gates.
+
+### ADR-116: Crew Service Medals
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Crew progression ended at skill and morale. Captains could command escorts through many victories and away teams could complete repeated expeditions without any persistent recognition or visible career history.
+- **Decision**:
+  1. Add `CrewMember.medals`, `battles` and `away_missions` with legacy-safe defaults.
+  2. Award **Combat Veteran** after three captain victories and **Deep Explorer** after five away missions through one pure `award_service_medals` helper; each medal grants +5 morale and cannot duplicate.
+  3. Increment battle credit only for living local captains on victory and away credit once per mission crew member on resolution.
+  4. Show medal badges in the crew roster and CLI ledger, and add a `crew_medals` codex metric plus the Decorated Crew milestone.
+  5. Persist all counters and medals through save/load.
+- **Consequences**: Dangerous service now produces visible career history, and medals give a small morale reward without adding a new control surface. Live Edge rendered a medal badge and the codex metric counted it. Suite: 1006 tests, 5/5 gates.

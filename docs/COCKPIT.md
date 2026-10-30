@@ -21,6 +21,7 @@ Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Reactor Matrix**: four sliders, presets, `Q/W/E/R`, heat, modes and VENT.
 - **Sector Map Modifiers**: radar chips alter fuel, scans, encounters, trade and reactor heat.
 - **Player, Skills & Crew Tabs**: PLAYER is a dossier; the combined bottom command panel holds reactor routing beside the six-power ability matrix (`SHIFT+1..6`), while SKILLS holds training, talents and relics. Crew splits into ROSTER (morale, XP, drills) and AWAY TEAMS (body expeditions, risk pills, deployment and recall).
+- **Crew Medals**: captains earn Combat Veteran after three victories; away teams earn Deep Explorer after five missions. Medals are permanent, grant +5 morale, and appear as badges in the crew roster.
 - **Ship Configuration Tab**: Fixed-height silhouette, compact stats, and a full-width module ledger; refits require a docked drydock or station.
 - **Commander Creation & Death**: creation and death overlay with run summary.
 - **Stellaris-Style HUD**: gold-on-navy, 720p-4K, density/HUD scale, DPR radar.

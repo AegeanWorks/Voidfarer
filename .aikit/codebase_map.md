@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `113`
-- **Total Classes**: `285`
-- **Total Top-Level Functions**: `328`
-- **Total Class Methods**: `1653`
-- **Total Source Lines**: `43716`
+- **Total Python Modules**: `114`
+- **Total Classes**: `288`
+- **Total Top-Level Functions**: `329`
+- **Total Class Methods**: `1664`
+- **Total Source Lines**: `43949`
 
 ---
 
@@ -312,7 +312,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1533` lines (`67631` bytes)
+**Size**: `1550` lines (`68166` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -520,6 +520,10 @@
 - `class TestCaptainGambitCockpit` - *The combat card must offer the once-per-battle captain action.*
   - Method `.setUpClass()`
   - Method `.test_combat_card_has_a_captain_gambit_button()`
+- `class TestCrewMedalsCockpit` - *Crew cards must show earned service medals.*
+  - Method `.setUpClass()`
+  - Method `.test_crew_rows_render_medals()`
+  - Method `.test_medal_badges_are_styled()`
 - `class TestOutpostSupplyCockpit` - *Outpost cards must expose supply hub linking and status.*
   - Method `.setUpClass()`
   - Method `.test_outpost_cards_offer_link_and_unlink()`
@@ -599,6 +603,25 @@
   - Method `.test_arrival_pays_resonance_credits_and_xp()`
   - Method `.test_emergency_emerge_pays_only_prorated_resonance()`
   - Method `.test_cli_and_cockpit_expose_resonance()`
+
+---
+
+### [`tests/test_crew_medals.py`](tests/test_crew_medals.py)
+> *Crew service medals: thresholds, morale, battle credit and persistence.*
+
+**Size**: `143` lines (`5365` bytes)
+
+**Classes:**
+- `class CrewMedalThresholdTest`
+  - Method `.test_battle_medal_is_awarded_once_and_lifts_morale()`
+  - Method `.test_away_medal_is_awarded_at_five_missions()`
+  - Method `.test_legacy_crew_defaults_to_no_medals()`
+- `class CrewMedalEngineTest`
+  - Method `._engine()`
+  - Method `._victory(engine)`
+  - Method `.test_three_victories_award_the_combat_medal()`
+  - Method `.test_away_mission_awards_the_explorer_medal()`
+  - Method `.test_codex_counts_all_crew_medals()`
 
 ---
 
@@ -2303,7 +2326,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3261` lines (`166199` bytes)
+**Size**: `3267` lines (`166428` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2368,7 +2391,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `707` lines (`24827` bytes)
+**Size**: `717` lines (`25210` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -2388,13 +2411,14 @@
 ### [`voidfarer/crew.py`](voidfarer/crew.py)
 > *Crew roles, recruiting, portraits, and crew-derived ship bonuses.*
 
-**Size**: `280` lines (`10336` bytes)
+**Size**: `302` lines (`11167` bytes)
 
 **Classes:**
 - `class CrewRole`
   - Method `.to_dict()`
 
 **Functions:**
+- `def award_service_medals(member)` - *Award persistent medals once the service counters cross their thresholds.*
 - `def get_crew_role(role_id)`
 - `def recruit_crew_member(role_id, seed, current_count)`
 - `def calculate_crew_bonuses(crew)`
@@ -2487,7 +2511,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9353` lines (`458266` bytes)
+**Size**: `9382` lines (`459594` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2935,7 +2959,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2264` lines (`84575` bytes)
+**Size**: `2270` lines (`84856` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

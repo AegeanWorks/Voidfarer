@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "non-aggression-pacts",
+    "task_id": "crew-medals",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793378390.086294,
+    "updated_at": 1793389883.6917236,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793378402.3135076
+    "completed_at": 1793389892.5939386
   },
   "checkpoints": [
-    {
-      "task_id": "non-aggression-pacts",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan non-aggression pacts: standing-30 timed treaties that block new Sol Coalition wars for 90 ticks, with cockpit, CLI and REST parity.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793378012.0875773,
-      "timestamp_str": "2026-10-30 19:33:32",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Diplomacy jumps from trade pacts at standing 40 to research pacts at 60 and alliances at 70; there is no low-cost way to buy temporary peace, so aggressive neighbours remain an unavoidable war risk.",
-        "benefits": "Standing 30 gains a defensive diplomatic tool, NAPs give players a way to stabilize one border, and the Empire tab shows remaining treaty time.",
-        "risks": "contract: ShipState gains a persisted non_aggression_until map with a legacy-safe default; dependency: faction war simulation must honor active pairs without changing AI-AI wars; concurrency: signing mutates standings and the treaty map under the engine lock; state: expired treaties must stop protecting without requiring cleanup.",
-        "mitigation": "Test signing, standing/war gates, expiry, persistence, war-pair exclusion and UI/CLI wiring first; pass only active Sol Coalition pairs into the war simulator; verify live Edge."
-      }
-    },
-    {
-      "task_id": "non-aggression-pacts",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Added persisted timed NAPs, standing/war gates, war-pair exclusion, expiry helpers, cockpit NAP action, CLI parity, REST reuse and 7 regressions; 996 tests pass.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793378389.9416797,
-      "timestamp_str": "2026-10-30 19:39:49",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "non-aggression-pacts",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-115 documented; live Edge signed a Nebula Collective NAP and showed NAP 88T with no console errors; 996 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793378390.086294,
-      "timestamp_str": "2026-10-30 19:39:50",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "non-aggression-pacts",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'non-aggression-pacts' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793378402.3135092,
-      "timestamp_str": "2026-10-30 19:40:02",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "reforge:run-3",
       "phase": "reforge stage 78",
@@ -246,6 +197,55 @@
       "timestamp": 1793388750.9818676,
       "timestamp_str": "2026-10-30 22:32:30",
       "agent": "opencode"
+    },
+    {
+      "task_id": "crew-medals",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan crew service medals: track captain victories and away missions, award persistent medals with morale, and surface them in the crew roster, CLI and codex.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793389014.613166,
+      "timestamp_str": "2026-10-30 22:36:54",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Crew progression stops at skill and morale; captains and away teams complete dangerous service without any lasting recognition or visible history.",
+        "benefits": "Dangerous service produces named medals, captains and explorers gain a morale reward, and the crew roster and codex show career history.",
+        "risks": "contract: CrewMember gains medals and two counters with legacy-safe defaults; dependency: battle victory and away resolution must increment counters exactly once; concurrency: both paths update crew inside existing engine-locked flows; state: medals must persist and never duplicate on reload.",
+        "mitigation": "Test medal thresholds, no duplication, battle and away increments, persistence, codex metric and UI/CLI wiring first; award through one pure helper; verify the live crew tab."
+      }
+    },
+    {
+      "task_id": "crew-medals",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Added persisted crew medals and service counters, battle/away increments, morale awards, crew roster badges, CLI status and codex metric; 1006 tests pass.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793389883.4091618,
+      "timestamp_str": "2026-10-30 22:51:23",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "crew-medals",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-116 documented; live Edge showed Combat Veteran and Deep Explorer badges with no console errors; 1006 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793389883.6917236,
+      "timestamp_str": "2026-10-30 22:51:23",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "crew-medals",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'crew-medals' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793389892.5939405,
+      "timestamp_str": "2026-10-30 22:51:32",
+      "agent": "opencode:mechanics"
     }
   ]
 }
