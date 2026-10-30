@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "outpost-defense",
+    "task_id": "war-bonds",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793364075.7409065,
+    "updated_at": 1793370223.060426,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793364083.8460538
+    "completed_at": 1793370229.8458238
   },
   "checkpoints": [
-    {
-      "task_id": "fleet-roles",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan escort squadron roles: persisted screen/strike/support orders with distinct damage, evasion and support-repair effects, a clickable role badge, API and CLI.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793359830.9962323,
-      "timestamp_str": "2026-10-30 14:30:30",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Every local escort used the same damage and screen formula, so individual hull orders had no tactical identity beyond the global formation stance.",
-        "benefits": "Fleet composition gains a second tactical axis, support hulls trade damage for endurance, and screen corvettes become harder to hit but hit softer.",
-        "risks": "contract: legacy saves must default to screen and every fleet damage/evasion path must read the role; dependency: support repair runs inside the combat exchange; concurrency: role changes mutate the fleet roster and flight log under the engine lock; state: roles persist and must be locked under fire.",
-        "mitigation": "Add role math, support repair, persistence, API/CLI and UI regressions first; normalize invalid roles; verify the badge cycle in live Edge."
-      }
-    },
-    {
-      "task_id": "fleet-roles",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted tactical_role with screen/strike/support multipliers, default roles by hull, support repair after incoming fire, role report fields, combat lock, /api/fleet/escort/role, fleet role CLI and clickable badge implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793359941.8723629,
-      "timestamp_str": "2026-10-30 14:32:21",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-roles",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-100 recorded; live Edge cycled a corvette from Screen to Strike with no console errors; 878 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793359942.266706,
-      "timestamp_str": "2026-10-30 14:32:22",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-roles",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'fleet-roles' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793359950.0528412,
-      "timestamp_str": "2026-10-30 14:32:30",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "shipyard-services",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793364083.8460555,
       "timestamp_str": "2026-10-30 15:41:23",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "war-bonds",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan war bonds: settle pledges once when a war ends, paying 1.5x on victory, 0.8x on stalemate and nothing on defeat, with UI terms and tick telemetry.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793370135.5218933,
+      "timestamp_str": "2026-10-30 17:22:15",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "War support let players pledge credits for standing and front momentum, but the pledge was a pure sink with no reason to care whether the backed side won.",
+        "benefits": "War pledges become a risk/reward investment, stalemates soften losses, and the war card explains the terms before committing.",
+        "risks": "contract: existing wars must default to unresolved bonds and payouts must never repeat across saves; dependency: settlement runs after faction simulation and before credits are cloned; concurrency: payouts mutate wars, credits, stats and the flight log under the engine lock; state: bonds_resolved must persist and loser pledges must pay zero.",
+        "mitigation": "Add active/winner/defender/stalemate/double-pay and persistence regressions first; clamp pledges; verify the live war-card terms."
+      }
+    },
+    {
+      "task_id": "war-bonds",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted bonds_resolved, one-time settlement helper, victory/defeat/stalemate payouts, credits/stats/payload integration, support_war terms and Factions war-card bond note implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793370222.9290502,
+      "timestamp_str": "2026-10-30 17:23:42",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "war-bonds",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-105 recorded; live Edge showed bond terms and a 500 cr pledge; 918 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793370223.060426,
+      "timestamp_str": "2026-10-30 17:23:43",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "war-bonds",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'war-bonds' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793370229.845825,
+      "timestamp_str": "2026-10-30 17:23:49",
       "agent": "opencode:mechanics"
     }
   ]

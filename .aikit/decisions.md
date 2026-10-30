@@ -1232,3 +1232,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Scale outpost production by `integrity / 100`; Sentry Grids do not count toward the production-module multiplier.
   4. Add `repair_outpost` (cost `max(100, (100-integrity) x 8)`), `/api/outpost/repair`, `outpost repair <id>`, and an integrity/defense readout plus REPAIR control on the outpost row.
 - **Consequences**: War now threatens frontier production, defense modules and marine crews have a concrete use, and damaged outposts can be restored for credits. Live Edge showed INT 41% / DEF 22 and repaired to 100% for 475 cr with no console errors. Suite: 909 tests (58 suites), 5/5 gates.
+
+### ADR-105: War Bonds
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: War support let the player pledge credits to a side for standing and front momentum, but the pledge was a pure sink. There was no reason to treat it as an investment or to care whether the backed side actually won.
+- **Decision**:
+  1. Add `WarState.bonds_resolved` so a settlement pays at most once, including across saves.
+  2. Resolve ended wars after faction simulation: score >= 25 pays the attacker's backers 1.5x, score <= -25 pays the defender's backers 1.5x, and a stalemate refunds both sides 0.8x; losing pledges pay nothing.
+  3. Add payouts to credits, stats (`war_bond_payouts`) and the tick payload, and log paid/lost lines.
+  4. Show the terms and current pledges on the Factions war card, and mention the terms in the `support_war` response.
+- **Consequences**: War pledges become a risk/reward decision, stalemates soften the loss, and defeated bets are real losses. Live Edge showed `Bonds: 1.5x victory / 0.8x stalemate / 0 defeat` with a 500 cr pledge. Suite: 918 tests (59 suites), 5/5 gates.

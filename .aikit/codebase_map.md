@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `103`
-- **Total Classes**: `264`
-- **Total Top-Level Functions**: `323`
-- **Total Class Methods**: `1524`
-- **Total Source Lines**: `41155`
+- **Total Python Modules**: `104`
+- **Total Classes**: `267`
+- **Total Top-Level Functions**: `324`
+- **Total Class Methods**: `1536`
+- **Total Source Lines**: `41322`
 
 ---
 
@@ -264,7 +264,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1397` lines (`62789` bytes)
+**Size**: `1410` lines (`63227` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -476,6 +476,9 @@
 - `class TestDiplomacyActionsCockpit` - *Faction rows must expose improve, gift, alliance and ceasefire actions.*
   - Method `.setUpClass()`
   - Method `.test_diplomacy_rows_offer_the_full_action_set()`
+- `class TestWarBondsCockpit` - *War cards must explain the bond payout terms.*
+  - Method `.setUpClass()`
+  - Method `.test_war_cards_show_bond_terms()`
 
 ---
 
@@ -1829,6 +1832,29 @@
 
 ---
 
+### [`tests/test_war_bonds.py`](tests/test_war_bonds.py)
+> *War bonds: pledges pay out on victory, partially on stalemate, never twice.*
+
+**Size**: `100` lines (`3570` bytes)
+
+**Classes:**
+- `class WarBondResolutionTest`
+  - Method `.setUp()`
+  - Method `.test_active_war_does_not_pay()`
+  - Method `.test_winner_pays_one_and_a_half()`
+  - Method `.test_defender_win_pays_the_defender()`
+  - Method `.test_stalemate_returns_eighty_percent_to_both()`
+  - Method `.test_already_resolved_war_never_pays_twice()`
+  - Method `.test_no_support_still_marks_the_war_resolved()`
+- `class WarBondPledgeTest`
+  - Method `.test_support_war_records_a_pledge_and_mentions_terms()`
+  - Method `.test_bond_state_round_trips()`
+
+**Functions:**
+- `def _war(score, active, support, resolved)`
+
+---
+
 ### [`tests/test_war_news_persistence.py`](tests/test_war_news_persistence.py)
 > *War news must survive a real save/load cycle, like every other game state.*
 
@@ -2263,7 +2289,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8641` lines (`425881` bytes)
+**Size**: `8693` lines (`428016` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2411,6 +2437,7 @@
   - Method `.reset_tutorial()` - *Reset Cadet Flight Academy to step 1 for revision or retraining.*
   - Property `.current_chassis_id` - *Id of the chassis matching the ship's commissioned class (falls back to the class name).*
   - Method `.get_status_snapshot(include_static)` - *Produce a JSON serializable telemetry snapshot for the HUD.*
+  - Method `._resolve_war_bonds(wars)` - *Settle pledged war bonds once a war ends; no double payouts.*
   - Method `.support_war(war_id, faction_id, credits)` - *Pledge credits to one side of an active war: shifts its score and your standings.*
   - Method `._ceasefire_chance(faction_id, war)` - *Odds a petition is accepted: standing, diplomacy skill and how the war is going.*
   - Method `.galactic_politics()` - *Territory, borders and war fronts for the strategic map and the factions panel.*
@@ -2690,7 +2717,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2203` lines (`82010` bytes)
+**Size**: `2205` lines (`82111` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
