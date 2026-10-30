@@ -3,7 +3,11 @@
 import unittest
 
 from voidfarer.engine import SimulationEngine
-from voidfarer.fleet import fleet_ships_in_system
+from voidfarer.fleet import (
+    PATROL_SWEEP_TICKS,
+    fleet_ships_in_system,
+    resolve_patrol_sweep,
+)
 from voidfarer.models import CombatEncounter, FleetShip
 from voidfarer.pirates import pirate_risk
 
@@ -116,6 +120,52 @@ class FleetAssignmentTest(unittest.TestCase):
         report = engine.get_fleet_manager_report()
         self.assertEqual(report["local_damage"], local.damage)
         self.assertGreater(report["total_damage"], report["local_damage"])
+        self.assertEqual(report["patrol_sweep_ticks"], PATROL_SWEEP_TICKS)
+
+
+class PatrolSweepTest(unittest.TestCase):
+    def test_patrol_sweep_is_deterministic_and_trains_quiet_tours(self):
+        engine = SimulationEngine(seed=42)
+        ship = _escort("patrol", "sol")
+        system = engine.state.systems["sol"]
+        first = resolve_patrol_sweep(ship, system, 6, engine.state.galaxy_seed)
+        second = resolve_patrol_sweep(ship, system, 6, engine.state.galaxy_seed)
+        self.assertEqual(first, second)
+        self.assertIn(first["experience"], (1, 3))
+        self.assertGreaterEqual(first["credits"], 0)
+        self.assertGreaterEqual(first["hull_damage"], 0)
+
+    def test_patrol_contact_pays_a_bounty_and_marks_the_log(self):
+        engine = SimulationEngine(seed=42)
+        ship = _escort("patrol", "cygnus_x1")
+        system = engine.state.systems["cygnus_x1"]
+        contact = None
+        for tick in range(1, 80):
+            sweep = resolve_patrol_sweep(ship, system, tick, engine.state.galaxy_seed)
+            if sweep["contacted"]:
+                contact = sweep
+                break
+        self.assertIsNotNone(contact, "a pirate haven must eventually produce contact")
+        self.assertGreater(contact["credits"], 0)
+        self.assertEqual(contact["experience"], 3)
+        self.assertGreater(contact["hull_damage"], 0)
+        self.assertIn("PATROL SWEEP", contact["text"])
+
+    def test_remote_patrol_gains_experience_on_the_sweep_tick(self):
+        engine = SimulationEngine(seed=42)
+        engine.allow_decision_events = False
+        remote_system = next(
+            system_id for system_id in engine.state.systems
+            if system_id != engine.state.ship.current_system_id
+        )
+        remote = _escort("remote", remote_system)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(credits=1000, fleet_ships=(remote,))
+        )
+        engine.tick(PATROL_SWEEP_TICKS)
+        updated = engine.state.ship.fleet_ships[0]
+        self.assertGreaterEqual(updated.experience, 1)
+        self.assertLessEqual(updated.experience, 3)
 
 
 if __name__ == "__main__":

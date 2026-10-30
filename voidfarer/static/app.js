@@ -3535,6 +3535,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.state || !this.fleetShipRoster) return;
         const fleet = this.state.fleet_manager || {};
         const ships = fleet.ships || this.state.ship.fleet_ships || [];
+        const patrolTicks = Number(fleet.patrol_sweep_ticks || 6);
         if (!ships.length) {
             this.fleetShipRoster.innerHTML = `<p class="panel-intro-text">No escort warships. Commission one below at a drydock.</p>`;
         } else {
@@ -3558,7 +3559,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         <span class="fleet-xp-bar" title="${xp}/${xpMax} XP"><span class="fleet-xp-fill" style="width:${rankPct}%"></span></span>
                         <span class="fleet-xp-label">${xp}/${xpMax} XP</span>
                     </div>
-                    <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())} // ${ship.assigned_system_id === this.state.ship.current_system_id ? "LOCAL" : "PATROL"}</div>
+                    <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())}<br>${ship.assigned_system_id === this.state.ship.current_system_id ? "LOCAL" : `PATROL ${patrolTicks}T`}</div>
                     <div class="ship-actions">
                         <button class="btn-hud btn-amber" data-escort-repair="${this.escapeHtml(ship.id)}">REPAIR</button>
                         <button class="btn-hud btn-amber" data-escort-train="${this.escapeHtml(ship.id)}" ${canTrain ? "" : "disabled"} title="${this.escapeHtml(trainTitle)}">TRAIN (${trainingCost} CR)</button>

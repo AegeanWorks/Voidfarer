@@ -97,6 +97,7 @@ from voidfarer.fleet import (
     ESCORT_CATALOG,
     FLEET_MAX_EXPERIENCE,
     FLEET_TRAINING_XP,
+    PATROL_SWEEP_TICKS,
     apply_fleet_casualties,
     build_fleet_ship,
     escort_sale_value,
@@ -108,6 +109,7 @@ from voidfarer.fleet import (
     fleet_victory_experience,
     get_escort_template,
     repair_fleet_ships,
+    resolve_patrol_sweep,
 )
 from voidfarer.navigation import (
     generate_void_lanes,
@@ -3146,6 +3148,7 @@ class SimulationEngine:
                 "local_damage": fleet_damage(local),
                 "evasion_bonus": round(fleet_evasion_bonus(ships), 3),
                 "local_evasion_bonus": round(fleet_evasion_bonus(local), 3),
+                "patrol_sweep_ticks": PATROL_SWEEP_TICKS,
                 "formations": ["balanced", "aggressive", "defensive"],
             }
 
@@ -6095,6 +6098,7 @@ class SimulationEngine:
                     "local_evasion_bonus": round(fleet_evasion_bonus(fleet_ships_in_system(
                         self.state.ship.fleet_ships, self.state.ship.current_system_id
                     )), 3),
+                    "patrol_sweep_ticks": PATROL_SWEEP_TICKS,
                 },
                 "ship_mods": {
                     "slots": list(SHIP_MOD_SLOTS),
@@ -7967,6 +7971,66 @@ class SimulationEngine:
                         )
                     )
 
+            # Remote patrols hunt pirates on a slow cycle. They earn bounty credits
+            # and a little XP, but can take return fire while the flagship is away.
+            patrol_credits = 0
+            patrol_contacts = 0
+            patrol_logs: list[str] = []
+            if new_tick % PATROL_SWEEP_TICKS == 0:
+                patrolled: list[FleetShip] = []
+                for escort in new_fleet_ships:
+                    system = updated_systems.get(escort.assigned_system_id)
+                    if (
+                        escort.assigned_system_id == new_current_system_id
+                        or escort.hull <= 0
+                        or system is None
+                    ):
+                        patrolled.append(escort)
+                        continue
+                    standing = new_standings.get(
+                        get_faction_id_from_name(system.faction), 0
+                    )
+                    sweep = resolve_patrol_sweep(
+                        escort,
+                        system,
+                        new_tick,
+                        self.state.galaxy_seed,
+                        standing,
+                    )
+                    new_hull = max(0, escort.hull - sweep["hull_damage"])
+                    patrolled.append(
+                        replace(
+                            escort,
+                            hull=new_hull,
+                            status=(
+                                "destroyed"
+                                if new_hull <= 0
+                                else (
+                                    "damaged"
+                                    if new_hull < escort.max_hull * 0.5
+                                    else "escorting"
+                                )
+                            ),
+                            experience=min(
+                                FLEET_MAX_EXPERIENCE,
+                                escort.experience + sweep["experience"],
+                            ),
+                        )
+                    )
+                    patrol_credits += sweep["credits"]
+                    if sweep["contacted"]:
+                        patrol_contacts += 1
+                        patrol_logs.append(sweep["text"])
+                new_fleet_ships = tuple(patrolled)
+            if patrol_credits:
+                new_stats_tick["credits_earned"] = (
+                    int(new_stats_tick.get("credits_earned", 0)) + patrol_credits
+                )
+                new_stats_tick["patrol_bounties"] = (
+                    int(new_stats_tick.get("patrol_bounties", 0)) + patrol_credits
+                )
+                new_flight_log.extend(patrol_logs[-2:])
+
             if new_flight_log_research:
                 new_flight_log.append(new_flight_log_research)
             new_flight_log.extend(faction_logs[-3:])
@@ -7978,7 +8042,7 @@ class SimulationEngine:
             if month_rollover:
                 crew_logs.append(
                     f"MONTH END: crew payroll runs {crew_upkeep(new_crew)} cr/month; "
-                    f"treasury {max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta)} cr."
+                    f"treasury {max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta + patrol_credits)} cr."
                 )
             new_flight_log.extend(crew_logs[-2:])
             new_flight_log.extend(away_logs[-6:])
@@ -7986,7 +8050,7 @@ class SimulationEngine:
             new_ship = self._clone_ship(
                 hull=new_hull,
                 shield=new_shield,
-                credits=max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta + away_credits + delivery_credits),
+                credits=max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta + away_credits + delivery_credits + patrol_credits),
                 cargo=new_cargo,
                 crew=new_crew,
                 reactor=new_reactor,
@@ -8041,6 +8105,8 @@ class SimulationEngine:
                 "shield_recharged": shield_recharged,
                 "drone_cargo_harvested": drone_cargo_harvested,
                 "drone_credits_harvested": drone_credits_harvested,
+                "patrol_credits": patrol_credits,
+                "patrol_contacts": patrol_contacts,
                 "reactor_heat": round(new_reactor.heat, 1),
                 "reactor_efficiency": round(reactor_output_efficiency(new_reactor, float(equipment.get("reactor_output", 0.0))), 3),
                 "reactor_hull_damage": reactor_hull_damage,

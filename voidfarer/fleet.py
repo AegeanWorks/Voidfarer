@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import random
 from typing import Any
 
-from voidfarer.models import FleetShip
+from voidfarer.models import FleetShip, StarSystem
+from voidfarer.pirates import pirate_risk
 
 
 ESCORT_CATALOG: dict[str, dict[str, Any]] = {
@@ -67,6 +69,7 @@ FLEET_RANKS: tuple[dict[str, Any], ...] = (
 )
 FLEET_MAX_EXPERIENCE = int(FLEET_RANKS[-1]["threshold"])
 FLEET_TRAINING_XP = 10
+PATROL_SWEEP_TICKS = 6
 
 
 def get_escort_template(escort_type: str) -> dict[str, Any] | None:
@@ -112,6 +115,47 @@ def fleet_training_cost(experience: int) -> int:
 def fleet_victory_experience(enemy_max_hull: int) -> int:
     """A tougher kill teaches more than farming a lone corsair."""
     return 3 + min(6, max(0, int(enemy_max_hull) // 40))
+
+
+def resolve_patrol_sweep(
+    ship: FleetShip,
+    system: StarSystem,
+    tick: int,
+    galaxy_seed: int,
+    faction_standing: int = 0,
+) -> dict[str, Any]:
+    """Resolve one remote patrol cycle; even a quiet tour trains the crew."""
+    risk = pirate_risk(system, faction_standing, patrol_escorts=0)
+    contact_chance = min(0.85, risk.chance * 2.0 + 0.10)
+    roll = random.Random(
+        f"{galaxy_seed}:patrol:{ship.id}:{tick}"
+    ).random()
+    contacted = roll < contact_chance
+    if contacted:
+        security = max(0.0, min(1.0, float(system.security)))
+        credits = 60 + int((1.0 - security) * 180)
+        experience = 3
+        hull_damage = max(1, int(2 + risk.chance * 14))
+        text = (
+            f"PATROL SWEEP: {ship.name} drove corsairs out of {system.name} "
+            f"(+{credits} cr, +{experience} XP, hull -{hull_damage})."
+        )
+    else:
+        credits = 0
+        experience = 1
+        hull_damage = 0
+        text = ""
+    return {
+        "ship_id": ship.id,
+        "ship_name": ship.name,
+        "system_id": system.id,
+        "system_name": system.name,
+        "contacted": contacted,
+        "credits": credits,
+        "experience": experience,
+        "hull_damage": hull_damage,
+        "text": text,
+    }
 
 
 def build_fleet_ship(escort_type: str, system_id: str, count: int) -> FleetShip:

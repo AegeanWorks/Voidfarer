@@ -597,7 +597,7 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             f"Screen evasion: +{report['evasion_bonus']*100:.0f}% total / "
             f"+{report.get('local_evasion_bonus', report['evasion_bonus'])*100:.0f}% local"
         )
-        print(f"{DIM}Catalog: {', '.join(ESCORT_CATALOG)}. Commands: fleet buy_escort <type> | fleet assign <id> <system> | fleet train <id> | fleet repair_escorts | fleet sell_escort <id> | fleet dismiss_escort <id>{RESET}")
+        print(f"{DIM}Remote patrols sweep every {report.get('patrol_sweep_ticks', 6)} ticks. Catalog: {', '.join(ESCORT_CATALOG)}. Commands: fleet buy_escort <type> | fleet assign <id> <system> | fleet train <id> | fleet repair_escorts | fleet sell_escort <id> | fleet dismiss_escort <id>{RESET}")
         return 0
     if sub in ("buy_escort", "recruit_escort"):
         if len(parts) < 3:

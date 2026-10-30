@@ -1274,6 +1274,10 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
         for selector in (".fleet-rank", ".fleet-xp-bar", ".fleet-xp-fill"):
             self.assertIn(selector, self.css)
 
+    def test_fleet_cards_show_patrol_cadence(self):
+        self.assertIn("patrol_sweep_ticks", self.js)
+        self.assertIn("PATROL ${patrolTicks}T", self.js)
+
 
 class TestOutpostModuleCockpit(unittest.TestCase):
     """The Empire tab must expose outpost module installation."""
