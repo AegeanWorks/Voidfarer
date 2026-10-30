@@ -3385,8 +3385,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 `<option value="${this.escapeHtml(id)}" ${id === specId ? "selected" : ""}>${this.escapeHtml(spec.label)} (${Number(spec.cost || 0)} CR)</option>`
             ).join("");
             return `
-            <div class="outpost-row"><span>${this.escapeHtml(o.name)} - LVL ${o.level} - POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}${localShipyard ? ` <span class="outpost-service-badge">SERVICES ONLINE</span>` : ""}</span>
-            <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button></div>
+            <div class="outpost-row"><span>${this.escapeHtml(o.name)} - LVL ${o.level} - POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)} <span class="outpost-integrity">INT ${Math.round(Number(o.integrity || 0))}% · DEF ${Number(o.defense || 10)}</span>${localShipyard ? ` <span class="outpost-service-badge">SERVICES ONLINE</span>` : ""}</span>
+            <span class="outpost-row-actions">
+                ${Number(o.integrity || 0) < 100 ? `<button class="btn-hud btn-amber" data-outpost-repair="${this.escapeHtml(o.id)}">REPAIR (${Number(o.repair_cost || 100)} CR)</button>` : ""}
+                <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button>
+            </span></div>
             <div class="outpost-module-bar">
                 <select data-outpost-module-select="${this.escapeHtml(o.id)}">${moduleOptions}</select>
                 <button class="btn-hud btn-green" data-outpost-module-install="${this.escapeHtml(o.id)}">INSTALL MODULE</button>
@@ -3416,6 +3419,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }).join("");
         this.outpostList.querySelectorAll("[data-outpost-upgrade]").forEach(btn =>
             btn.addEventListener("click", () => this.postAction("/api/outpost/upgrade", { outpost_id: btn.getAttribute("data-outpost-upgrade") }, "empire"))
+        );
+        this.outpostList.querySelectorAll("[data-outpost-repair]").forEach(btn =>
+            btn.addEventListener("click", () => this.postAction("/api/outpost/repair", {
+                outpost_id: btn.getAttribute("data-outpost-repair"),
+            }, "empire"))
         );
         this.outpostList.querySelectorAll("[data-outpost-module-install]").forEach(btn =>
             btn.addEventListener("click", () => {

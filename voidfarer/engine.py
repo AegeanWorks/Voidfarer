@@ -134,6 +134,8 @@ from voidfarer.outposts import (
     grow_outpost_population,
     outpost_crew_capacity,
     outpost_crew_multiplier,
+    outpost_defense,
+    outpost_repair_cost,
     outpost_tick_production,
     upgrade_outpost,
 )
@@ -2893,6 +2895,42 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship, outposts=outposts)
             return True, line
 
+    def _outpost_capture_damage(
+        self, outpost: Outpost, old_system: Any, new_system: Any, crew_by_id: dict[str, Any]
+    ) -> int:
+        """Damage a player outpost when its system falls to a non-player power."""
+        if (
+            old_system is None
+            or new_system is None
+            or old_system.faction == new_system.faction
+            or new_system.faction == CANONICAL_FACTIONS["sol_coalition"].name
+        ):
+            return 0
+        return max(0, 35 - outpost_defense(outpost, crew_by_id))
+
+    def repair_outpost(self, outpost_id: str) -> tuple[bool, str]:
+        """Restore an outpost to full integrity with a remote repair contract."""
+        with self.lock:
+            outpost = next((o for o in self.state.outposts if o.id == outpost_id), None)
+            if outpost is None:
+                return False, f"Unknown outpost '{outpost_id}'."
+            if outpost.integrity >= 100.0:
+                return False, f"{outpost.name} is already at full integrity."
+            cost = outpost_repair_cost(outpost)
+            if self.state.ship.credits < cost:
+                return False, f"Insufficient credits: repair costs {cost} cr."
+            updated = replace(outpost, integrity=100.0)
+            outposts = tuple(
+                updated if o.id == outpost_id else o for o in self.state.outposts
+            )
+            line = f"OUTPOST REPAIR: {outpost.name} restored to 100% integrity for {cost} cr."
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - cost,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            return True, line
+
     def _crew_outpost_id(self, crew_id: str) -> str | None:
         for outpost in self.state.outposts:
             if crew_id in outpost.assigned_crew:
@@ -2913,6 +2951,8 @@ class SimulationEngine:
             **outpost.to_dict(),
             "crew_multiplier": round(crew_mult, 3),
             "crew_capacity": outpost_crew_capacity(outpost),
+            "defense": outpost_defense(outpost, crew_by_id),
+            "repair_cost": outpost_repair_cost(outpost),
             "specialization_label": spec["label"] if spec else "",
             "specialization_cost": int(spec["cost"]) if spec else 600,
             "crew_names": [
@@ -7929,6 +7969,35 @@ class SimulationEngine:
             )
             faction_logs.extend(bankrupt_peace_logs)
 
+            # A conquered system damages the player's outposts there. Sentry Grids
+            # and stationed marines reduce the hit; repair contracts restore them.
+            outpost_raid_logs: list[str] = []
+            crew_by_id = {member.id: member for member in self.state.ship.crew}
+            for index, outpost in enumerate(updated_outposts):
+                old_system = self.state.systems.get(outpost.system_id)
+                new_system = updated_systems.get(outpost.system_id)
+                if (
+                    old_system is None
+                    or new_system is None
+                    or old_system.faction == new_system.faction
+                    or new_system.faction == CANONICAL_FACTIONS["sol_coalition"].name
+                ):
+                    continue
+                damage = self._outpost_capture_damage(
+                    outpost, old_system, new_system, crew_by_id
+                )
+                if damage <= 0:
+                    continue
+                integrity = max(0.0, outpost.integrity - damage)
+                updated_outposts[index] = replace(outpost, integrity=integrity)
+                new_stats_tick["outposts_raided"] = (
+                    int(new_stats_tick.get("outposts_raided", 0)) + 1
+                )
+                outpost_raid_logs.append(
+                    f"OUTPOST RAID: {outpost.name} hit during the fall of "
+                    f"{new_system.name} (integrity {integrity:.0f}%)."
+                )
+
             # Technology drift runs after the economy so today's breakthrough upgrades
             # the worlds that can support it, raising their carrying capacity.
             tech_by_name = {
@@ -7960,6 +8029,8 @@ class SimulationEngine:
             new_flight_log = list(cur_ship.flight_log)
             if econ_logs:
                 new_flight_log.extend(econ_logs)
+            if outpost_raid_logs:
+                new_flight_log.extend(outpost_raid_logs[-3:])
             if reactor_report["critical"]:
                 new_flight_log.append(
                     f"REACTOR CRITICAL: core heat {new_reactor.heat:.0f}/{new_reactor.max_heat:.0f}, "

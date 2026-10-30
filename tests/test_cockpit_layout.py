@@ -1328,6 +1328,17 @@ class TestOutpostModuleCockpit(unittest.TestCase):
         for selector in (".outpost-crew-bar", ".outpost-crew-chip", ".crew-outpost"):
             self.assertIn(selector, self.css)
 
+    def test_outpost_rows_offer_integrity_repair(self):
+        for marker in (
+            "data-outpost-repair",
+            '"/api/outpost/repair"',
+            "outpost-integrity",
+            "outpost-row-actions",
+        ):
+            self.assertIn(marker, self.js)
+        for selector in (".outpost-integrity", ".outpost-row-actions"):
+            self.assertIn(selector, self.css)
+
     def test_outpost_rows_offer_specialization(self):
         for marker in (
             "data-outpost-spec-select",

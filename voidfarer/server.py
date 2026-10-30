@@ -846,6 +846,12 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/outpost/repair":
+            ok, msg = self.engine.repair_outpost(str(body.get("outpost_id", "")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/outpost/specialize":
             ok, msg = self.engine.specialize_outpost(
                 str(body.get("outpost_id", "")), str(body.get("specialization", ""))

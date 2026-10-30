@@ -1787,6 +1787,7 @@ def cmd_outpost(engine: SimulationEngine, storage: StorageManager, parts: list[s
                 f"| Crew {len(o.get('assigned_crew', ()))}/{o.get('crew_capacity', 3)} "
                 f"({crew_names}) x{o.get('crew_multiplier', 1.0):.2f}"
                 f" | Spec {o.get('specialization_label') or 'none'}"
+                f" | INT {float(o.get('integrity', 100.0)):.0f}% DEF {o.get('defense', 10)}"
             )
         print(f"{BOLD}Available outpost types:{RESET}")
         for t in OUTPOST_TYPES:
@@ -1820,6 +1821,15 @@ def cmd_outpost(engine: SimulationEngine, storage: StorageManager, parts: list[s
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
+    if sub in ("repair", "fix"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} outpost repair <outpost_id>")
+            return 1
+        ok, msg = engine.repair_outpost(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
     if sub in ("specialize", "spec"):
         if len(parts) < 4:
             print(f"{RED}Usage:{RESET} outpost specialize <outpost_id> <industry|research|commerce|logistics>")
@@ -1847,7 +1857,7 @@ def cmd_outpost(engine: SimulationEngine, storage: StorageManager, parts: list[s
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
-    print(f"{RED}Unknown outpost command '{sub}'. Options: list, build, upgrade, module, specialize, crew, recall.{RESET}")
+    print(f"{RED}Unknown outpost command '{sub}'. Options: list, build, upgrade, repair, module, specialize, crew, recall.{RESET}")
     return 1
 
 
@@ -2777,7 +2787,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     research_p.add_argument("project_id", nargs="?", help="Research project id")
 
     outpost_p = subparsers.add_parser("outpost", help="Found and upgrade planetary outposts")
-    outpost_p.add_argument("action", nargs="?", default="list", choices=["list", "build", "upgrade", "module", "specialize", "crew", "recall"])
+    outpost_p.add_argument("action", nargs="?", default="list", choices=["list", "build", "upgrade", "repair", "module", "specialize", "crew", "recall"])
     outpost_p.add_argument("outpost_type", nargs="?", help="Outpost type or outpost id")
     outpost_p.add_argument("body_id", nargs="?", help="Body id for construction")
 

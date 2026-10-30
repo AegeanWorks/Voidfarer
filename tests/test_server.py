@@ -479,6 +479,28 @@ class TestServer(unittest.TestCase):
         self.assertEqual(automation["commodity_id"], "titanium")
         self.assertEqual(automation["quantity"], 2)
 
+    def test_outpost_repair_endpoint_restores_integrity(self):
+        engine = VoidFarerHandler.engine
+        outpost = Outpost(
+            id="http_repair_outpost",
+            name="Repair Test Outpost",
+            system_id="sol",
+            body_id="sol_body_1",
+            outpost_type="mining",
+            integrity=40.0,
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(credits=1000),
+            outposts=(outpost,),
+        )
+        status, data = self._post(
+            "/api/outpost/repair", {"outpost_id": outpost.id}
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(payload["state"]["outposts"][0]["integrity"], 100.0)
+
     def test_outpost_specialize_endpoint_sets_a_focus(self):
         engine = VoidFarerHandler.engine
         outpost = Outpost(

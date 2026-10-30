@@ -124,6 +124,7 @@ OUTPOST_MODULE_CATALOG: dict[str, dict[str, Any]] = {
     "solar_array": {"name": "Solar Panel Array", "cost": 300, "production": {"credits": 3.0, "fuel_cells": 1.0}},
     "drydock": {"name": "Drydock Bay", "cost": 700, "production": {"credits": 3.0}},
     "habitat": {"name": "Habitat Ring", "cost": 450, "production": {"credits": 2.0, "hydroponics": 1.0}},
+    "sentry_grid": {"name": "Sentry Grid", "cost": 650, "production": {}, "defense": 12},
 }
 
 
@@ -191,6 +192,26 @@ def build_outpost(
     )
 
 
+def outpost_defense(outpost: Outpost, crew_by_id: dict[str, Any]) -> int:
+    """Base hardening plus Sentry Grids and stationed marines."""
+    defense = 10
+    for module_id, count in outpost.modules.items():
+        template = OUTPOST_MODULE_CATALOG.get(module_id, {})
+        defense += int(template.get("defense", 0)) * max(0, int(count))
+    for crew_id in outpost.assigned_crew:
+        member = crew_by_id.get(crew_id)
+        if member is not None and getattr(member, "status", "active") == "active":
+            if getattr(member, "role", "") == "marine":
+                defense += 4
+    return defense
+
+
+def outpost_repair_cost(outpost: Outpost) -> int:
+    """Immediate repairs get dearer with the damage taken."""
+    integrity = max(0.0, min(100.0, float(outpost.integrity)))
+    return max(100, int((100.0 - integrity) * 8))
+
+
 def outpost_crew_capacity(outpost: Outpost) -> int:
     """Logistics specialization adds one specialist slot."""
     spec = OUTPOST_SPECIALIZATIONS.get(outpost.specialization)
@@ -222,9 +243,14 @@ def outpost_tick_production(
     template = OUTPOST_MAP.get(outpost.outpost_type)
     base = template.production if template else outpost.production
     level_mult = 1.25 ** max(0, outpost.level - 1)
-    modules = sum(outpost.modules.values())
-    module_mult = 1.0 + max(0, modules - 1) * 0.10
+    production_modules = sum(
+        max(0, int(count))
+        for module_id, count in outpost.modules.items()
+        if OUTPOST_MODULE_CATALOG.get(module_id, {}).get("production")
+    )
+    module_mult = 1.0 + max(0, production_modules - 1) * 0.10
     crew_mult = max(0.1, min(OUTPOST_CREW_MAX_MULTIPLIER, crew_multiplier))
+    integrity_mult = max(0.0, min(1.0, float(outpost.integrity) / 100.0))
     spec = OUTPOST_SPECIALIZATIONS.get(outpost.specialization)
     spec_outputs = spec["outputs"] if spec else {}
     return {
@@ -233,6 +259,7 @@ def outpost_tick_production(
             * level_mult
             * module_mult
             * crew_mult
+            * integrity_mult
             * max(0.1, yield_multiplier)
             * float(spec_outputs.get(key, spec_outputs.get("other", 1.0))),
             2,
