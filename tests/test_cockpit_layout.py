@@ -1374,6 +1374,24 @@ class TestCrewMedalsCockpit(unittest.TestCase):
         self.assertIn(".crew-medals span", self.css)
 
 
+class TestMegastructureCockpit(unittest.TestCase):
+    """The target card must expose megastructure restoration."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_target_card_has_a_restore_button(self):
+        for marker in (
+            'id="btnRestoreTarget"',
+            '"/api/megastructure/restore"',
+            "megastructure",
+            "RESTORE (",
+        ):
+            self.assertIn(marker, self.html + self.js)
+
+
 class TestOutpostSupplyCockpit(unittest.TestCase):
     """Outpost cards must expose supply hub linking and status."""
 

@@ -1969,6 +1969,31 @@ def cmd_outpost(engine: SimulationEngine, storage: StorageManager, parts: list[s
     return 1
 
 
+def cmd_megastructure(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """Inspect or restore the current system's ancient megastructure."""
+    report = engine.get_megastructure_report()
+    sub = parts[1].lower() if len(parts) > 1 else "status"
+    if sub in ("status", "list"):
+        if not report.get("restorable"):
+            print(f"{DIM}No restorable megastructure here. Orbit a Dyson sphere, ring world, relay, collector or wormhole.{RESET}")
+            return 0
+        state = "ONLINE" if report.get("complete") else "DORMANT"
+        print(
+            f"{BOLD}{report['body_name']}{RESET} [{state}] "
+            f"cost {report.get('cost', 0)} cr | {report.get('label', '')}"
+        )
+        return 0
+    if sub == "restore":
+        body_id = parts[2] if len(parts) > 2 else str(report.get("body_id", ""))
+        ok, msg = engine.restore_megastructure(body_id)
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Usage:{RESET} megastructure <status|restore> [body_id]")
+    return 1
+
+
 def cmd_diplomacy(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
     sub = parts[1].lower() if len(parts) > 1 else "list"
     if sub in ("list", "status"):
@@ -2908,6 +2933,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     outpost_p.add_argument("outpost_type", nargs="?", help="Outpost type or outpost id")
     outpost_p.add_argument("body_id", nargs="?", help="Body id for construction")
 
+    mega_p = subparsers.add_parser("megastructure", help="Inspect and restore ancient megastructures")
+    mega_p.add_argument("action", nargs="?", default="status", choices=["status", "restore"])
+    mega_p.add_argument("body_id", nargs="?", help="Body id")
+
     diplomacy_p = subparsers.add_parser("diplomacy", help="Faction diplomacy, leaders, and wars")
     diplomacy_p.add_argument("action", nargs="?", default="list", choices=["list", "improve", "gift", "non_aggression", "trade_pact", "research_pact", "alliance", "ceasefire"])
     diplomacy_p.add_argument("faction_id", nargs="?", help="Faction id")
@@ -3002,6 +3031,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.body_id:
             parts.append(args.body_id)
         return cmd_outpost(engine, storage, parts)
+    elif args.command == "megastructure":
+        parts = ["megastructure", args.action]
+        if args.body_id:
+            parts.append(args.body_id)
+        return cmd_megastructure(engine, storage, parts)
     elif args.command == "diplomacy":
         parts = ["diplomacy", args.action]
         if args.faction_id:

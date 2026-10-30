@@ -177,6 +177,12 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "megastructures_seen", 3, 1000, 300,
     ),
     CodexEntry(
+        "ancient_engineer", "exploration", "Ancient Engineer",
+        "Restore an ancient megastructure.",
+        "Orbit it and pay the restoration cost.",
+        "megastructures_restored", 1, 1500, 450,
+    ),
+    CodexEntry(
         "event_horizon", "exploration", "Event Horizon",
         "Visit a system containing a black hole.",
         "Plot a route toward a black-hole system.",
@@ -475,6 +481,7 @@ METRIC_LABELS: dict[str, str] = {
     "pilot_level": "Pilot mastery level",
     "body_types_seen": "Body types observed",
     "megastructures_seen": "Megastructure types",
+    "megastructures_restored": "Megastructures restored",
     "black_holes_visited": "Black-hole systems",
     "story_complete": "Campaign completed",
     "codex_claimed": "Codex rewards claimed",
@@ -519,6 +526,7 @@ STATS_ORDER: tuple[str, ...] = (
     "pilot_level",
     "body_types_seen",
     "megastructures_seen",
+    "megastructures_restored",
     "black_holes_visited",
     "story_complete",
     "codex_claimed",
@@ -636,6 +644,8 @@ def metric_value(state: GameState, metric: str) -> int:
         return len({body.body_type for body in bodies})
     if metric == "megastructures_seen":
         return len({body.body_type for body in bodies if body.body_type in MEGASTRUCTURE_TYPES})
+    if metric == "megastructures_restored":
+        return int(state.stats.get("megastructures_restored", 0))
     if metric == "black_holes_visited":
         system_ids = state.visited_systems or (ship.current_system_id,)
         return sum(

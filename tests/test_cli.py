@@ -103,6 +103,18 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertEqual(code, 1)
             self.assertIn("unknown outpost", mock_out.getvalue().lower())
 
+    def test_cli_megastructure_status_parses(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["megastructure", "status"])
+            self.assertEqual(code, 0)
+            self.assertTrue(mock_out.getvalue())
+
+    def test_cli_megastructure_restore_reports_unknown_body(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["megastructure", "restore", "missing_body"])
+            self.assertEqual(code, 1)
+            self.assertIn("unknown body", mock_out.getvalue().lower())
+
     def test_cli_fleet_sell_escort_parses(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["fleet", "sell_escort", "missing_prize"])

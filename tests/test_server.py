@@ -12,6 +12,7 @@ from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
 from voidfarer.engine import SimulationEngine
 from voidfarer.fleet import build_fleet_ship
 from voidfarer.models import CombatEncounter, CrewMember, FleetShip, Outpost
+from voidfarer.megastructures import MEGASTRUCTURE_RESTORATION
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
 
@@ -633,6 +634,36 @@ class TestServer(unittest.TestCase):
             if outpost["id"] == source.id
         )
         self.assertEqual(unlinked["supply_hub_id"], "")
+
+    def test_megastructure_restore_endpoint_restores_the_body(self):
+        engine = VoidFarerHandler.engine
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(current_system_id="sol", credits=20000)
+        )
+        body = next(
+            body
+            for body in engine.current_system.bodies
+            if body.body_type == "dyson_sphere"
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(orbiting_body_id=body.id)
+        )
+        status, data = self._post(
+            "/api/megastructure/restore", {"body_id": body.id}
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        restored = next(
+            item
+            for item in payload["state"]["current_system"]["bodies"]
+            if item["id"] == body.id
+        )
+        self.assertTrue(restored["restoration_complete"])
+        self.assertEqual(
+            payload["state"]["ship"]["credits"],
+            20000 - MEGASTRUCTURE_RESTORATION["dyson_sphere"]["cost"],
+        )
 
     def test_quantum_automation_endpoints_configure_and_report(self):
         status, data = self._post(

@@ -441,6 +441,7 @@ class CockpitApp {
         this.btnScoopFuel = document.getElementById("btnScoopFuel");
         this.btnRebuildTarget = document.getElementById("btnRebuildTarget");
         this.btnReliefTarget = document.getElementById("btnReliefTarget");
+        this.btnRestoreTarget = document.getElementById("btnRestoreTarget");
         this.salvageInfo = document.getElementById("salvageInfo");
         this.btnJumpTarget = document.getElementById("btnJumpTarget");
         this.btnHailTarget = document.getElementById("btnHailTarget");
@@ -780,6 +781,7 @@ class CockpitApp {
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
         this.btnRebuildTarget?.addEventListener("click", () => this.handleReconstructAction("credits"));
         this.btnReliefTarget?.addEventListener("click", () => this.handleReconstructAction("relief"));
+        this.btnRestoreTarget?.addEventListener("click", () => this.postAction("/api/megastructure/restore", { body_id: this.selectedTarget?.id }));
         this.btnJumpTarget.addEventListener("click", () => this.handleJumpAction());
         this.btnHailTarget?.addEventListener("click", () => {
             if (this.selectedType === "captain" && this.selectedTarget) {
@@ -4887,6 +4889,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.btnReliefTarget.title = missingRelief.length
                     ? "Load the missing relief supplies first"
                     : "Spend medicines, hydroponics and fuel to remove 40 devastation";
+            }
+            const mega = this.state.megastructure;
+            if (this.btnRestoreTarget) {
+                const applies = Boolean(mega && mega.restorable && mega.body_id === b.id);
+                this.btnRestoreTarget.style.display = applies ? "inline-block" : "none";
+                this.btnRestoreTarget.disabled = !applies || !mega.can_restore;
+                this.btnRestoreTarget.textContent = applies && mega.complete
+                    ? "MEGASTRUCTURE ONLINE"
+                    : applies
+                        ? `RESTORE (${Number(mega.cost || 0)} CR)`
+                        : "RESTORE MEGASTRUCTURE";
+                this.btnRestoreTarget.title = applies
+                    ? (mega.complete
+                        ? "This megastructure is already restored"
+                        : mega.can_restore
+                            ? mega.label
+                            : "Orbit the structure with enough credits")
+                    : "Select a restorable megastructure";
             }
             const salvage = inOrbitHere ? this.state.salvage_site : null;
             if (this.btnSalvageTarget) {

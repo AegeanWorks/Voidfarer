@@ -117,6 +117,11 @@ from voidfarer.fleet import (
     repair_fleet_ships,
     resolve_patrol_sweep,
 )
+from voidfarer.megastructures import (
+    apply_output_bonus,
+    get_restoration,
+    restoration_bonuses,
+)
 from voidfarer.navigation import (
     generate_void_lanes,
     route_plan,
@@ -1551,6 +1556,10 @@ class SimulationEngine:
             route_fuel_mult = (float(origin_map["fuel_mult"]) + float(target_map["fuel_mult"])) / 2.0
             research = self._research_bonuses()
             fuel_cost = max(1, int(fuel_cost * equipment["fuel_efficiency"] * passives["fuel_efficiency"] * research["fuel_efficiency"] * (1.0 - min(0.25, self._skill("piloting"))) * route_fuel_mult))
+            fuel_cost = max(
+                1,
+                fuel_cost - int(self._megastructure_bonuses()["jump_fuel"]),
+            )
 
             if self.state.ship.fuel < fuel_cost:
                 return False, f"Insufficient Quantum Fuel: {fuel_cost} units required, {self.state.ship.fuel} available."
@@ -3037,6 +3046,94 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship, outposts=outposts)
             return True, line
 
+    def _megastructure_bonuses(self) -> dict[str, float]:
+        bodies = (
+            body
+            for system in self.state.systems.values()
+            for body in system.bodies
+        )
+        return restoration_bonuses(bodies)
+
+    def _outpost_production(
+        self, outpost: Outpost, yield_mult: float, supply_mult: float
+    ) -> dict[str, float]:
+        production = outpost_tick_production(
+            outpost,
+            yield_mult,
+            self._outpost_crew_multiplier(outpost),
+            supply_mult,
+        )
+        return apply_output_bonus(production, self._megastructure_bonuses())
+
+    def get_megastructure_report(self) -> dict[str, Any]:
+        body = self.orbiting_body
+        if body is None:
+            return {"restorable": False, "body_id": "", "body_name": ""}
+        entry = get_restoration(body.body_type)
+        if entry is None:
+            return {"restorable": False, "body_id": body.id, "body_name": body.name}
+        return {
+            "restorable": True,
+            "body_id": body.id,
+            "body_name": body.name,
+            "body_type": body.body_type,
+            "complete": body.restoration_complete,
+            "cost": int(entry["cost"]),
+            "label": str(entry["label"]),
+            "orbiting": self.state.ship.orbiting_body_id == body.id,
+            "can_restore": (
+                not body.restoration_complete
+                and self.state.ship.orbiting_body_id == body.id
+                and self.state.ship.credits >= int(entry["cost"])
+            ),
+        }
+
+    def restore_megastructure(self, body_id: str) -> tuple[bool, str]:
+        """Restore one ancient structure while orbiting it."""
+        with self.lock:
+            system = self.current_system
+            body = next((b for b in system.bodies if b.id == body_id), None)
+            if body is None:
+                return False, f"Unknown body '{body_id}' in this system."
+            entry = get_restoration(body.body_type)
+            if entry is None:
+                return False, f"{body.name} is not a restorable megastructure."
+            if self.state.ship.orbiting_body_id != body.id:
+                return False, f"Orbit {body.name} before starting restoration."
+            if body.restoration_complete:
+                return False, f"{body.name} is already restored."
+            cost = int(entry["cost"])
+            if self.state.ship.credits < cost:
+                return False, (
+                    f"Insufficient credits: restoration of {body.name} costs {cost} cr."
+                )
+            updated_body = replace(body, restoration_complete=True)
+            updated_system = replace(
+                system,
+                bodies=tuple(
+                    updated_body if candidate.id == body.id else candidate
+                    for candidate in system.bodies
+                ),
+            )
+            systems = dict(self.state.systems)
+            systems[system.id] = updated_system
+            stats = dict(self.state.stats)
+            stats["megastructures_restored"] = (
+                int(stats.get("megastructures_restored", 0)) + 1
+            )
+            line = (
+                f"MEGASTRUCTURE RESTORED: {body.name} comes online "
+                f"({entry['label']}) for {cost} cr."
+            )
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - cost,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(
+                ship=new_ship, systems=systems, stats=stats
+            )
+            return True, line
+
     def _outpost_capture_damage(
         self, outpost: Outpost, old_system: Any, new_system: Any, crew_by_id: dict[str, Any]
     ) -> int:
@@ -3193,10 +3290,9 @@ class SimulationEngine:
             ],
         }
         if yield_mult is not None:
-            payload["production_effective"] = outpost_tick_production(
+            payload["production_effective"] = self._outpost_production(
                 outpost,
                 yield_mult,
-                crew_mult,
                 self._outpost_supply_multiplier(outpost),
             )
         return payload
@@ -4116,10 +4212,9 @@ class SimulationEngine:
             # Outposts produce credits each tick
             research_yield_mult = 1.0 + float(self._research_bonuses()["outpost_yield"]) + self._skill("trade")
             for outpost in self.state.outposts:
-                production = outpost_tick_production(
+                production = self._outpost_production(
                     outpost,
                     research_yield_mult,
-                    self._outpost_crew_multiplier(outpost),
                     self._outpost_supply_multiplier(outpost),
                 )
                 passive += float(production.get("credits", 0.0))
@@ -7041,6 +7136,7 @@ class SimulationEngine:
                     "catalog": [p.to_dict() for p in RESEARCH_PROJECTS],
                 },
                 "outposts": [self._outpost_payload(o) for o in self.state.outposts],
+                "megastructure": self.get_megastructure_report(),
                 "faction_leaders": [leader.to_dict() for leader in self.state.faction_leaders],
                 "wars": [war.to_dict() for war in self.state.wars],
                 "faction_economies": [e.to_dict() for e in self.state.faction_economies],
@@ -8556,10 +8652,9 @@ class SimulationEngine:
             updated_outposts = []
             updated_depots = list(self.state.depots)
             for outpost in self.state.outposts:
-                production = outpost_tick_production(
+                production = self._outpost_production(
                     outpost,
                     research_yield_mult,
-                    self._outpost_crew_multiplier(outpost),
                     self._outpost_supply_multiplier(outpost),
                 )
                 outpost_credits += int(production.get("credits", 0.0) * num_ticks)

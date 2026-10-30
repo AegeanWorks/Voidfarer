@@ -65,6 +65,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/trade/quantum/place": "needs a quantum-trade unlock",
     "/api/combat/gambit": "needs an active fight and a local escort captain",
     "/api/outpost/link": "needs two outposts in one system",
+    "/api/megastructure/restore": "needs orbit and a restorable megastructure",
 }
 
 

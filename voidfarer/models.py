@@ -68,6 +68,7 @@ class CelestialBody:
     salvage_claimed: bool = False
     volatile_tapped: int = 0
     volatile_recharge_tick: int = 0
+    restoration_complete: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -104,6 +105,7 @@ class CelestialBody:
             salvage_claimed=bool(data.get("salvage_claimed", False)),
             volatile_tapped=max(0, int(data.get("volatile_tapped", 0))),
             volatile_recharge_tick=max(0, int(data.get("volatile_recharge_tick", 0))),
+            restoration_complete=bool(data.get("restoration_complete", False)),
         )
 
 

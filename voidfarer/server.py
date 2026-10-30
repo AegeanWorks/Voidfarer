@@ -905,6 +905,12 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/megastructure/restore":
+            ok, msg = self.engine.restore_megastructure(str(body.get("body_id", "")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/diplomacy":
             ok, msg = self.engine.faction_diplomacy(
                 str(body.get("faction_id", "")),
