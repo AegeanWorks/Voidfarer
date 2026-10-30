@@ -1135,3 +1135,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Scale victory XP with enemy maximum hull (3-9 XP) and clamp casualty XP to the cap; promotions are appended to the victory log.
   4. Add `train_fleet_ship` (docked, 10 XP for 200 cr + 5 cr per current XP, stops at Ace), `POST /api/fleet/escort/train`, `fleet train <id>`, and a rank/XP/TRAIN card in the fleet manager.
 - **Consequences**: Veteran escorts are visibly stronger, promotions are announced, and credits now compete with repairs and procurement as a fleet investment. Suite: 840 tests (50 suites), 5/5 gates; live Edge training advanced a corvette from 0 to 10 XP for 200 cr with no console errors.
+
+### ADR-096: Remote Patrol Sweeps
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Remote escorts reduced piracy but earned no XP and no income, so stationing a hull away from the flagship was a pure sacrifice. Fleet veterancy only rewarded local battles, leaving patrol deployment without a progression loop.
+- **Decision**:
+  1. Resolve a deterministic patrol sweep every 6 ticks for each living escort assigned outside the flagship's system.
+  2. Derive contact chance from the system's base pirate risk; a quiet tour grants 1 XP, while contact grants 3 XP, a bounty scaled by insecurity (60-240 cr) and 1-10 hull damage.
+  3. Reuse the fleet rank cap, keep the sweep stateless (seed + ship id + tick), add patrol credits/contacts to the tick payload and stats, and expose the 6-tick cadence in the fleet report, card and CLI.
+- **Consequences**: Remote deployment is now a slower but real XP and credit path, with the risk of unattended damage or loss. No save fields were added, so existing fleets begin patrolling immediately. Suite: 844 tests (50 suites), 5/5 gates.

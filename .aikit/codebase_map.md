@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `95`
-- **Total Classes**: `249`
-- **Total Top-Level Functions**: `312`
-- **Total Class Methods**: `1433`
-- **Total Source Lines**: `39240`
+- **Total Classes**: `250`
+- **Total Top-Level Functions**: `313`
+- **Total Class Methods**: `1437`
+- **Total Source Lines**: `39404`
 
 ---
 
@@ -258,7 +258,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1328` lines (`60212` bytes)
+**Size**: `1332` lines (`60375` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -453,6 +453,7 @@
 - `class TestFleetVeterancyCockpit` - *Escort cards must show rank progress and a drydock training control.*
   - Method `.setUpClass()`
   - Method `.test_fleet_cards_show_rank_progress_and_training()`
+  - Method `.test_fleet_cards_show_patrol_cadence()`
 - `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
   - Method `.setUpClass()`
   - Method `.test_outpost_rows_offer_a_module_installer()`
@@ -751,7 +752,7 @@
 ### [`tests/test_fleet_patrol.py`](tests/test_fleet_patrol.py)
 > *Fleet assignment: only local escorts fight, while remote patrols cut piracy.*
 
-**Size**: `122` lines (`4590` bytes)
+**Size**: `172` lines (`6767` bytes)
 
 **Classes:**
 - `class FleetAssignmentTest`
@@ -760,6 +761,10 @@
   - Method `.test_remote_escort_contributes_no_damage()`
   - Method `.test_assigned_patrols_reduce_pirate_risk()`
   - Method `.test_fleet_report_separates_local_and_total_damage()`
+- `class PatrolSweepTest`
+  - Method `.test_patrol_sweep_is_deterministic_and_trains_quiet_tours()`
+  - Method `.test_patrol_contact_pays_a_bounty_and_marks_the_log()`
+  - Method `.test_remote_patrol_gains_experience_on_the_sweep_tick()`
 
 **Functions:**
 - `def _escort(ship_id, system_id, hull, shield)`
@@ -1905,7 +1910,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3087` lines (`157878` bytes)
+**Size**: `3087` lines (`157950` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2089,7 +2094,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8143` lines (`403457` bytes)
+**Size**: `8209` lines (`406466` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2380,13 +2385,14 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `227` lines (`8204` bytes)
+**Size**: `271` lines (`9567` bytes)
 
 **Functions:**
 - `def get_escort_template(escort_type)`
 - `def fleet_rank(experience)` - *Resolve veterancy rank, badge progress and cumulative combat bonuses.*
 - `def fleet_training_cost(experience)` - *Drydock instruction gets dearer as a crew approaches the next rank.*
 - `def fleet_victory_experience(enemy_max_hull)` - *A tougher kill teaches more than farming a lone corsair.*
+- `def resolve_patrol_sweep(ship, system, tick, galaxy_seed, faction_standing)` - *Resolve one remote patrol cycle; even a quiet tour trains the crew.*
 - `def build_fleet_ship(escort_type, system_id, count)`
 - `def fleet_ships_in_system(ships, system_id)` - *Escorts physically stationed in one system; remote patrols do not join a fight.*
 - `def escort_sale_value(ship)` - *Drydock resale value of an escort or prize, discounted for battle damage.*
