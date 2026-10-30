@@ -479,6 +479,29 @@ class TestServer(unittest.TestCase):
         self.assertEqual(automation["commodity_id"], "titanium")
         self.assertEqual(automation["quantity"], 2)
 
+    def test_research_queue_endpoints_queue_and_cancel(self):
+        engine = VoidFarerHandler.engine
+        engine.state = engine._clone_state(
+            research=replace(engine.state.research, queue=())
+        )
+        status, data = self._post(
+            "/api/research/queue", {"project_id": "advanced_cooling"}
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(
+            payload["state"]["research"]["queue"], ["advanced_cooling"]
+        )
+
+        status, data = self._post(
+            "/api/research/cancel", {"project_id": "advanced_cooling"}
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(payload["state"]["research"]["queue"], [])
+
     def test_outpost_repair_endpoint_restores_integrity(self):
         engine = VoidFarerHandler.engine
         outpost = Outpost(

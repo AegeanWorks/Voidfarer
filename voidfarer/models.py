@@ -1294,6 +1294,7 @@ class ResearchState:
     progress: int = 0
     active_project_id: str | None = None
     completed: tuple[str, ...] = ()
+    queue: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1301,6 +1302,7 @@ class ResearchState:
             "progress": self.progress,
             "active_project_id": self.active_project_id,
             "completed": list(self.completed),
+            "queue": list(self.queue),
         }
 
     @classmethod
@@ -1310,6 +1312,7 @@ class ResearchState:
             progress=max(0, int(data.get("progress", 0))),
             active_project_id=data.get("active_project_id"),
             completed=tuple(data.get("completed", ())),
+            queue=tuple(str(pid) for pid in data.get("queue", ())),
         )
 
 

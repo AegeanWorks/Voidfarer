@@ -3334,18 +3334,41 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.state || !this.researchSummary) return;
         const research = this.state.research || {};
         const active = research.active_project;
-        this.researchSummary.innerHTML = active
+        const queue = research.queue || [];
+        const queuedIds = new Set(queue);
+        const queued = research.queued || [];
+        this.researchSummary.innerHTML = (active
             ? `<strong>${this.escapeHtml(active.name)}</strong> — ${research.progress || 0}/${active.cost} points<br>Banked: ${research.points || 0}`
-            : `No active project. Banked points: ${research.points || 0}`;
+            : `No active project. Banked points: ${research.points || 0}`)
+            + (queue.length ? `<br>Queue: ${queue.map(id => {
+                const queuedProject = queued.find(project => project.id === id);
+                return this.escapeHtml(queuedProject ? queuedProject.name : id);
+            }).join(" → ")}` : "");
         this.researchProjects.innerHTML = (research.available || []).map(p => `
             <div class="research-row">
                 <span>${this.escapeHtml(p.name)}<br><small>${this.escapeHtml(p.description)}</small></span>
                 <span>${p.cost} pts</span>
                 <button class="btn-hud" data-research="${this.escapeHtml(p.id)}">START</button>
+                <button class="btn-hud btn-cyan" data-research-queue="${this.escapeHtml(p.id)}" ${queuedIds.has(p.id) ? "disabled" : ""}>${queuedIds.has(p.id) ? "QUEUED" : "QUEUE"}</button>
             </div>
-        `).join("");
+        `).join("") + (queued.length ? `
+            <div class="research-queue-header">QUEUED PROJECTS</div>
+            ${queued.map(p => `
+                <div class="research-row research-queue-row">
+                    <span>${this.escapeHtml(p.name)}<br><small>${this.escapeHtml(p.description)}</small></span>
+                    <span>${p.cost} pts</span>
+                    <button class="btn-hud btn-amber" data-research-cancel="${this.escapeHtml(p.id)}">CANCEL</button>
+                </div>
+            `).join("")}
+        ` : "");
         this.researchProjects.querySelectorAll("[data-research]").forEach(btn =>
             btn.addEventListener("click", () => this.postAction("/api/research/start", { project_id: btn.getAttribute("data-research") }, "empire"))
+        );
+        this.researchProjects.querySelectorAll("[data-research-queue]").forEach(btn =>
+            btn.addEventListener("click", () => this.postAction("/api/research/queue", { project_id: btn.getAttribute("data-research-queue") }, "empire"))
+        );
+        this.researchProjects.querySelectorAll("[data-research-cancel]").forEach(btn =>
+            btn.addEventListener("click", () => this.postAction("/api/research/cancel", { project_id: btn.getAttribute("data-research-cancel") }, "empire"))
         );
 
         const outposts = this.state.outposts || [];

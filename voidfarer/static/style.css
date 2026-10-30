@@ -8693,3 +8693,8 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* War bond terms in the faction war card. */
 .war-bond-note { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 11px; }
+
+/* Research queue: START/QUEUE share the row, queued projects get a cancel control. */
+.research-projects .research-row { grid-template-columns: minmax(0, 1fr) 54px auto auto; gap: 6px; }
+.research-queue-header { margin: 7px 0 2px; color: var(--console-cyan); font-family: var(--font-display); font-size: 11px; letter-spacing: 0.06em; }
+.research-projects .research-queue-row { border-left: 2px solid rgba(201, 163, 90, 0.5); }

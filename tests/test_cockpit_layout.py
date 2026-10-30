@@ -1303,6 +1303,26 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
         self.assertIn(".fleet-upkeep-line", self.css)
 
 
+class TestResearchQueueCockpit(unittest.TestCase):
+    """The Empire research list must expose queue and cancel controls."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_research_rows_offer_queue_and_cancel(self):
+        for marker in (
+            "data-research-queue",
+            "data-research-cancel",
+            '"/api/research/queue"',
+            '"/api/research/cancel"',
+            "research-queue-row",
+        ):
+            self.assertIn(marker, self.js)
+        self.assertIn(".research-queue-row", self.css)
+
+
 class TestOutpostModuleCockpit(unittest.TestCase):
     """The Empire tab must expose outpost module installation."""
 

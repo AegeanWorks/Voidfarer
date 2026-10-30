@@ -826,6 +826,18 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/research/queue":
+            ok, msg = self.engine.queue_research(str(body.get("project_id", "")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/research/cancel":
+            ok, msg = self.engine.cancel_queued_research(str(body.get("project_id", "")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/outpost/build":
             ok, msg = self.engine.build_outpost(str(body.get("body_id", "")), str(body.get("outpost_type", "")))
             self.storage.save(self.engine.state)

@@ -2787,9 +2787,48 @@ class SimulationEngine:
             missing = [p for p in project.prerequisites if p not in self.state.research.completed]
             if missing:
                 return False, f"Prerequisites incomplete: {', '.join(missing)}."
-            research = replace(self.state.research, active_project_id=project_id, progress=0)
+            research = replace(
+                self.state.research,
+                active_project_id=project_id,
+                progress=0,
+                queue=tuple(pid for pid in self.state.research.queue if pid != project_id),
+            )
             self.state = self._clone_state(research=research)
             return True, f"Research directed toward {project.name} ({project.cost} points)."
+
+    def queue_research(self, project_id: str) -> tuple[bool, str]:
+        """Append a project to the automatic research queue."""
+        with self.lock:
+            project = get_research_project(project_id)
+            if not project:
+                return False, f"Unknown research project '{project_id}'."
+            research = self.state.research
+            if project_id in research.completed:
+                return False, f"{project.name} is already completed."
+            if project_id == research.active_project_id:
+                return False, f"{project.name} is already the active project."
+            if project_id in research.queue:
+                return False, f"{project.name} is already queued."
+            missing = [p for p in project.prerequisites if p not in research.completed]
+            if missing:
+                return False, f"Prerequisites incomplete: {', '.join(missing)}."
+            updated = replace(research, queue=research.queue + (project_id,))
+            self.state = self._clone_state(research=updated)
+            return True, f"Queued {project.name} after the active project."
+
+    def cancel_queued_research(self, project_id: str) -> tuple[bool, str]:
+        """Remove a project from the research queue without touching the active project."""
+        with self.lock:
+            research = self.state.research
+            if project_id not in research.queue:
+                return False, f"{project_id} is not in the research queue."
+            updated = replace(
+                research, queue=tuple(pid for pid in research.queue if pid != project_id)
+            )
+            self.state = self._clone_state(research=updated)
+            project = get_research_project(project_id)
+            name = project.name if project else project_id
+            return True, f"Removed {name} from the research queue."
 
     def build_outpost(self, body_id: str, outpost_type_id: str) -> tuple[bool, str]:
         with self.lock:
@@ -3046,11 +3085,18 @@ class SimulationEngine:
         with self.lock:
             research = self.state.research
             active = get_research_project(research.active_project_id) if research.active_project_id else None
+            queued = []
+            for project_id in research.queue:
+                project = get_research_project(project_id)
+                if project is not None:
+                    queued.append(project.to_dict())
             return {
                 "points": research.points,
                 "progress": research.progress,
                 "active_project_id": research.active_project_id,
                 "active_project": active.to_dict() if active else None,
+                "queue": list(research.queue),
+                "queued": queued,
                 "completed": list(research.completed),
                 "bonuses": calculate_research_bonuses(research.completed),
                 "available": [p.to_dict() for p in available_projects(research.completed, research.active_project_id)],
@@ -6400,6 +6446,14 @@ class SimulationEngine:
                     **self.state.research.to_dict(),
                     "bonuses": self._research_bonuses(),
                     "active_project": (get_research_project(self.state.research.active_project_id).to_dict() if self.state.research.active_project_id and get_research_project(self.state.research.active_project_id) else None),
+                    "queued": [
+                        project.to_dict()
+                        for project in (
+                            get_research_project(pid)
+                            for pid in self.state.research.queue
+                        )
+                        if project is not None
+                    ],
                     "available": [p.to_dict() for p in available_projects(self.state.research.completed, self.state.research.active_project_id)],
                     "catalog": [p.to_dict() for p in RESEARCH_PROJECTS],
                 },
@@ -7204,6 +7258,7 @@ class SimulationEngine:
                     progress=research.progress + research_delta,
                     active_project_id=research.active_project_id,
                     completed=research.completed,
+                    queue=research.queue,
                 )
             new_credits = max(
                 0,
@@ -7711,6 +7766,7 @@ class SimulationEngine:
                     progress=research.progress + research_delta,
                     active_project_id=research.active_project_id,
                     completed=research.completed,
+                    queue=research.queue,
                 )
 
             credits = max(0, ship.credits + int(effects.get("credits", 0)))
@@ -7945,7 +8001,9 @@ class SimulationEngine:
             points = research_state.points + max(0, research_gain)
             progress = research_state.progress + max(0, research_gain)
             completed = list(research_state.completed)
+            queue = list(research_state.queue)
             active_id = research_state.active_project_id
+            new_flight_log_research = ""
             if active_id:
                 project = get_research_project(active_id)
                 if project and progress >= project.cost:
@@ -7953,15 +8011,29 @@ class SimulationEngine:
                     new_flight_log_research = f"RESEARCH COMPLETE: {project.name}."
                     active_id = None
                     progress = 0
-                else:
-                    new_flight_log_research = ""
-            else:
-                new_flight_log_research = ""
+            if active_id is None and queue:
+                while queue:
+                    next_id = queue.pop(0)
+                    next_project = get_research_project(next_id)
+                    if next_project is None or next_id in completed:
+                        continue
+                    if any(
+                        prerequisite not in completed
+                        for prerequisite in next_project.prerequisites
+                    ):
+                        continue
+                    active_id = next_id
+                    progress = 0
+                    new_flight_log_research += (
+                        f" RESEARCH STARTED: {next_project.name}."
+                    )
+                    break
             new_research = ResearchState(
                 points=points,
                 progress=progress,
                 active_project_id=active_id,
                 completed=tuple(dict.fromkeys(completed)),
+                queue=tuple(queue),
             )
             new_character, char_promoted, char_msg = award_character_xp(
                 new_character, num_ticks + len(self.state.outposts)
@@ -8390,6 +8462,7 @@ class SimulationEngine:
                         progress=new_research.progress + away_research,
                         active_project_id=new_research.active_project_id,
                         completed=new_research.completed,
+                        queue=new_research.queue,
                     )
                 new_stats_tick = away_stats
             else:

@@ -1754,10 +1754,11 @@ def cmd_research(engine: SimulationEngine, storage: StorageManager, parts: list[
             p = report["active_project"]
             print(f"  {p['name']}: {_bar(report['progress'], p['cost'], 24, CYAN)}")
         print(f"Completed: {', '.join(report['completed']) or 'none'}")
+        print(f"Queued: {', '.join(report.get('queue', ())) or 'none'}")
         print(f"{BOLD}Available projects:{RESET}")
         for p in report["available"]:
             print(f"  {p['id']:<26} {p['name']:<30} {YELLOW}{p['cost']} pts{RESET} {DIM}{p['description']}{RESET}")
-        print(f"\n{DIM}Start: research start <project_id>{RESET}")
+        print(f"\n{DIM}Start: research start <project_id> | Queue: research queue <project_id> | Cancel: research cancel <project_id>{RESET}")
         return 0
     if sub in ("start", "choose"):
         if len(parts) < 3:
@@ -1768,7 +1769,25 @@ def cmd_research(engine: SimulationEngine, storage: StorageManager, parts: list[
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
-    print(f"{RED}Unknown research command '{sub}'. Options: status, start.{RESET}")
+    if sub == "queue":
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} research queue <project_id>")
+            return 1
+        ok, msg = engine.queue_research(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub in ("cancel", "dequeue"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} research cancel <project_id>")
+            return 1
+        ok, msg = engine.cancel_queued_research(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown research command '{sub}'. Options: status, start, queue, cancel.{RESET}")
     return 1
 
 
@@ -2783,7 +2802,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     character_p.add_argument("target", nargs="?", help="Optional faction target")
 
     research_p = subparsers.add_parser("research", help="Research projects and technology bonuses")
-    research_p.add_argument("action", nargs="?", default="status", choices=["status", "start"])
+    research_p.add_argument("action", nargs="?", default="status", choices=["status", "start", "queue", "cancel"])
     research_p.add_argument("project_id", nargs="?", help="Research project id")
 
     outpost_p = subparsers.add_parser("outpost", help="Found and upgrade planetary outposts")
