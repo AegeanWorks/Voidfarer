@@ -8228,90 +8228,85 @@
       "start": 3,
       "step": 3,
       "stop": null,
-      "stage": 2,
-      "window": 6,
+      "stage": 3,
+      "window": 9,
       "audited_commits": [
         "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
         "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
         "e81289a13401d25fa2422916c4027bf7a88faa69",
         "f0a836338acde507eba45dc3f6eef8531e3c522b",
         "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
-        "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+        "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+        "a836faa310e84b2b88a87884ee61a0834c4f1528",
+        "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+        "5da24b5a8b7110d75a403b46f3319a1acf9541df"
       ],
       "status": "active",
       "created": "2026-10-30T19:42:29",
-      "updated": "2026-10-30T19:51:39",
+      "updated": "2026-10-30T19:56:14",
       "last_audit": {
         "run": "run-3",
-        "stage": 2,
-        "window": 6,
+        "stage": 3,
+        "window": 9,
         "commits": [
+          "a836faa310e84b2b88a87884ee61a0834c4f1528",
+          "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
           "f0a836338acde507eba45dc3f6eef8531e3c522b",
           "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
           "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
           "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
           "e81289a13401d25fa2422916c4027bf7a88faa69",
-          "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+          "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+          "5da24b5a8b7110d75a403b46f3319a1acf9541df"
         ],
         "new_commits": [
-          "f0a836338acde507eba45dc3f6eef8531e3c522b",
-          "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
-          "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+          "a836faa310e84b2b88a87884ee61a0834c4f1528",
+          "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+          "5da24b5a8b7110d75a403b46f3319a1acf9541df"
         ],
         "prior_commits": [
           "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
           "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
-          "e81289a13401d25fa2422916c4027bf7a88faa69"
+          "e81289a13401d25fa2422916c4027bf7a88faa69",
+          "f0a836338acde507eba45dc3f6eef8531e3c522b",
+          "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+          "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
         ],
         "findings": [],
         "repairs": [],
         "counts": {},
-        "reviewed": 14,
+        "reviewed": 4,
         "review": {
           "status": "reviewed",
-          "rejected": [],
+          "rejected": [
+            "README.md:520: the evidence is not in the current file (it may quote a removed line)"
+          ],
           "files": [
             ".aikit/codebase_map.md",
-            "tests/test_cli.py",
-            "tests/test_cockpit_layout.py",
-            "tests/test_non_aggression_pacts.py",
-            "tests/test_outpost_supply_links.py",
-            "tests/test_server.py",
-            "voidfarer/agent_play.py",
-            "voidfarer/cli.py",
-            "voidfarer/engine.py",
-            "voidfarer/models.py",
-            "voidfarer/outposts.py",
-            "voidfarer/server.py",
-            "voidfarer/static/app.js",
-            "voidfarer/static/style.css"
+            ".aikit/decisions.md",
+            "README.md",
+            "docs/COCKPIT.md"
           ],
-          "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-2-f0a836338acd.md",
+          "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
           "redacted": 0,
-          "reason": "the answer held no findings",
+          "reason": "",
           "coverage": {
-            "reported": 11,
-            "total": 30,
+            "reported": 4,
+            "total": 17,
             "missing": [
-              "7c049cb1b8d8:tests/test_non_aggression_pacts.py#1",
-              "9d3ba153aa75:tests/test_cli.py#1",
-              "9d3ba153aa75:tests/test_cockpit_layout.py#1",
-              "9d3ba153aa75:tests/test_server.py#1",
-              "9d3ba153aa75:voidfarer/agent_play.py#1",
-              "9d3ba153aa75:voidfarer/cli.py#1",
-              "9d3ba153aa75:voidfarer/cli.py#2",
-              "9d3ba153aa75:voidfarer/cli.py#3",
-              "9d3ba153aa75:voidfarer/engine.py#1",
-              "9d3ba153aa75:voidfarer/engine.py#2",
-              "9d3ba153aa75:voidfarer/engine.py#4",
-              "9d3ba153aa75:voidfarer/engine.py#5",
-              "9d3ba153aa75:voidfarer/engine.py#6",
-              "9d3ba153aa75:voidfarer/engine.py#7",
-              "9d3ba153aa75:voidfarer/engine.py#8",
-              "9d3ba153aa75:voidfarer/static/style.css#1",
-              "f0a836338acd:.aikit/codebase_map.md#1",
-              "f0a836338acd:.aikit/codebase_map.md#2",
-              "f0a836338acd:.aikit/codebase_map.md#3"
+              "5da24b5a8b71:.aikit/codebase_map.md#10",
+              "5da24b5a8b71:.aikit/codebase_map.md#11",
+              "5da24b5a8b71:.aikit/codebase_map.md#12",
+              "5da24b5a8b71:.aikit/codebase_map.md#13",
+              "5da24b5a8b71:.aikit/codebase_map.md#14",
+              "5da24b5a8b71:.aikit/codebase_map.md#2",
+              "5da24b5a8b71:.aikit/codebase_map.md#3",
+              "5da24b5a8b71:.aikit/codebase_map.md#4",
+              "5da24b5a8b71:.aikit/codebase_map.md#5",
+              "5da24b5a8b71:.aikit/codebase_map.md#6",
+              "5da24b5a8b71:.aikit/codebase_map.md#7",
+              "5da24b5a8b71:.aikit/codebase_map.md#8",
+              "5da24b5a8b71:.aikit/codebase_map.md#9"
             ],
             "unknown": []
           },
@@ -8320,7 +8315,7 @@
         "skipped": [],
         "tests": {},
         "gates": {},
-        "timestamp": "2026-10-30T19:51:39"
+        "timestamp": "2026-10-30T19:56:14"
       },
       "history": [
         {
@@ -8531,66 +8526,138 @@
           "tests": {},
           "gates": {},
           "timestamp": "2026-10-30T19:51:39"
+        },
+        {
+          "run": "run-3",
+          "stage": 3,
+          "window": 9,
+          "commits": [
+            "a836faa310e84b2b88a87884ee61a0834c4f1528",
+            "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+            "f0a836338acde507eba45dc3f6eef8531e3c522b",
+            "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+            "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+            "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+            "e81289a13401d25fa2422916c4027bf7a88faa69",
+            "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+            "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+          ],
+          "new_commits": [
+            "a836faa310e84b2b88a87884ee61a0834c4f1528",
+            "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+            "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+          ],
+          "prior_commits": [
+            "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+            "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+            "e81289a13401d25fa2422916c4027bf7a88faa69",
+            "f0a836338acde507eba45dc3f6eef8531e3c522b",
+            "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+            "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+          ],
+          "findings": [],
+          "repairs": [],
+          "counts": {},
+          "reviewed": 4,
+          "review": {
+            "status": "reviewed",
+            "rejected": [
+              "README.md:520: the evidence is not in the current file (it may quote a removed line)"
+            ],
+            "files": [
+              ".aikit/codebase_map.md",
+              ".aikit/decisions.md",
+              "README.md",
+              "docs/COCKPIT.md"
+            ],
+            "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
+            "redacted": 0,
+            "reason": "",
+            "coverage": {
+              "reported": 4,
+              "total": 17,
+              "missing": [
+                "5da24b5a8b71:.aikit/codebase_map.md#10",
+                "5da24b5a8b71:.aikit/codebase_map.md#11",
+                "5da24b5a8b71:.aikit/codebase_map.md#12",
+                "5da24b5a8b71:.aikit/codebase_map.md#13",
+                "5da24b5a8b71:.aikit/codebase_map.md#14",
+                "5da24b5a8b71:.aikit/codebase_map.md#2",
+                "5da24b5a8b71:.aikit/codebase_map.md#3",
+                "5da24b5a8b71:.aikit/codebase_map.md#4",
+                "5da24b5a8b71:.aikit/codebase_map.md#5",
+                "5da24b5a8b71:.aikit/codebase_map.md#6",
+                "5da24b5a8b71:.aikit/codebase_map.md#7",
+                "5da24b5a8b71:.aikit/codebase_map.md#8",
+                "5da24b5a8b71:.aikit/codebase_map.md#9"
+              ],
+              "unknown": []
+            },
+            "findings": []
+          },
+          "skipped": [],
+          "tests": {},
+          "gates": {},
+          "timestamp": "2026-10-30T19:56:14"
         }
       ]
     }
   ],
-  "stage": 2,
-  "window": 6,
+  "stage": 3,
+  "window": 9,
   "audited_commits": [
     "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
     "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
     "e81289a13401d25fa2422916c4027bf7a88faa69",
     "f0a836338acde507eba45dc3f6eef8531e3c522b",
     "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
-    "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+    "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+    "a836faa310e84b2b88a87884ee61a0834c4f1528",
+    "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+    "5da24b5a8b7110d75a403b46f3319a1acf9541df"
   ],
   "last_audit": {
     "run": "run-3",
-    "stage": 2,
-    "window": 6,
+    "stage": 3,
+    "window": 9,
     "commits": [
+      "a836faa310e84b2b88a87884ee61a0834c4f1528",
+      "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
       "f0a836338acde507eba45dc3f6eef8531e3c522b",
       "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
       "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
       "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
       "e81289a13401d25fa2422916c4027bf7a88faa69",
-      "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+      "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+      "5da24b5a8b7110d75a403b46f3319a1acf9541df"
     ],
     "new_commits": [
-      "f0a836338acde507eba45dc3f6eef8531e3c522b",
-      "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
-      "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+      "a836faa310e84b2b88a87884ee61a0834c4f1528",
+      "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+      "5da24b5a8b7110d75a403b46f3319a1acf9541df"
     ],
     "prior_commits": [
       "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
       "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
-      "e81289a13401d25fa2422916c4027bf7a88faa69"
+      "e81289a13401d25fa2422916c4027bf7a88faa69",
+      "f0a836338acde507eba45dc3f6eef8531e3c522b",
+      "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+      "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
     ],
     "findings": [],
     "repairs": [],
     "counts": {},
-    "reviewed": 14,
+    "reviewed": 4,
     "review": {
       "status": "unreviewed",
       "rejected": [],
       "files": [
         ".aikit/codebase_map.md",
-        "tests/test_cli.py",
-        "tests/test_cockpit_layout.py",
-        "tests/test_non_aggression_pacts.py",
-        "tests/test_outpost_supply_links.py",
-        "tests/test_server.py",
-        "voidfarer/agent_play.py",
-        "voidfarer/cli.py",
-        "voidfarer/engine.py",
-        "voidfarer/models.py",
-        "voidfarer/outposts.py",
-        "voidfarer/server.py",
-        "voidfarer/static/app.js",
-        "voidfarer/static/style.css"
+        ".aikit/decisions.md",
+        "README.md",
+        "docs/COCKPIT.md"
       ],
-      "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-2-f0a836338acd.md",
+      "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
       "redacted": 0,
       "reason": "awaiting the reviewer's findings",
       "findings": []
@@ -8598,7 +8665,7 @@
     "skipped": [],
     "tests": {},
     "gates": {},
-    "timestamp": "2026-10-30T19:51:39"
+    "timestamp": "2026-10-30T19:56:14"
   },
   "history": [
     {
@@ -8756,7 +8823,7 @@
       "counts": {},
       "reviewed": 14,
       "review": {
-        "status": "unreviewed",
+        "status": "reviewed",
         "rejected": [],
         "files": [
           ".aikit/codebase_map.md",
@@ -8776,13 +8843,90 @@
         ],
         "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-2-f0a836338acd.md",
         "redacted": 0,
-        "reason": "awaiting the reviewer's findings",
+        "reason": "the answer held no findings",
+        "coverage": {
+          "reported": 11,
+          "total": 30,
+          "missing": [
+            "7c049cb1b8d8:tests/test_non_aggression_pacts.py#1",
+            "9d3ba153aa75:tests/test_cli.py#1",
+            "9d3ba153aa75:tests/test_cockpit_layout.py#1",
+            "9d3ba153aa75:tests/test_server.py#1",
+            "9d3ba153aa75:voidfarer/agent_play.py#1",
+            "9d3ba153aa75:voidfarer/cli.py#1",
+            "9d3ba153aa75:voidfarer/cli.py#2",
+            "9d3ba153aa75:voidfarer/cli.py#3",
+            "9d3ba153aa75:voidfarer/engine.py#1",
+            "9d3ba153aa75:voidfarer/engine.py#2",
+            "9d3ba153aa75:voidfarer/engine.py#4",
+            "9d3ba153aa75:voidfarer/engine.py#5",
+            "9d3ba153aa75:voidfarer/engine.py#6",
+            "9d3ba153aa75:voidfarer/engine.py#7",
+            "9d3ba153aa75:voidfarer/engine.py#8",
+            "9d3ba153aa75:voidfarer/static/style.css#1",
+            "f0a836338acd:.aikit/codebase_map.md#1",
+            "f0a836338acd:.aikit/codebase_map.md#2",
+            "f0a836338acd:.aikit/codebase_map.md#3"
+          ],
+          "unknown": []
+        },
         "findings": []
       },
       "skipped": [],
       "tests": {},
       "gates": {},
       "timestamp": "2026-10-30T19:51:39"
+    },
+    {
+      "run": "run-3",
+      "stage": 3,
+      "window": 9,
+      "commits": [
+        "a836faa310e84b2b88a87884ee61a0834c4f1528",
+        "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+        "f0a836338acde507eba45dc3f6eef8531e3c522b",
+        "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+        "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+        "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+        "e81289a13401d25fa2422916c4027bf7a88faa69",
+        "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d",
+        "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+      ],
+      "new_commits": [
+        "a836faa310e84b2b88a87884ee61a0834c4f1528",
+        "75fa3000fb8ea79a267cd1df2eb6507db0d6e420",
+        "5da24b5a8b7110d75a403b46f3319a1acf9541df"
+      ],
+      "prior_commits": [
+        "c2f04938cd1158012d6b0a8158a5ea3a7178dabc",
+        "a42ec2e9502e00dbda4cdfceaffedc4af63d1d7d",
+        "e81289a13401d25fa2422916c4027bf7a88faa69",
+        "f0a836338acde507eba45dc3f6eef8531e3c522b",
+        "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
+        "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
+      ],
+      "findings": [],
+      "repairs": [],
+      "counts": {},
+      "reviewed": 4,
+      "review": {
+        "status": "unreviewed",
+        "rejected": [],
+        "files": [
+          ".aikit/codebase_map.md",
+          ".aikit/decisions.md",
+          "README.md",
+          "docs/COCKPIT.md"
+        ],
+        "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
+        "redacted": 0,
+        "reason": "awaiting the reviewer's findings",
+        "findings": []
+      },
+      "skipped": [],
+      "tests": {},
+      "gates": {},
+      "timestamp": "2026-10-30T19:56:14"
     }
   ]
 }
