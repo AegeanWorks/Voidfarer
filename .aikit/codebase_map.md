@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `101`
-- **Total Classes**: `261`
+- **Total Python Modules**: `102`
+- **Total Classes**: `262`
 - **Total Top-Level Functions**: `320`
-- **Total Class Methods**: `1505`
-- **Total Source Lines**: `40750`
+- **Total Class Methods**: `1511`
+- **Total Source Lines**: `40897`
 
 ---
 
@@ -263,7 +263,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1380` lines (`62145` bytes)
+**Size**: `1386` lines (`62396` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -460,6 +460,7 @@
   - Method `.test_fleet_cards_show_rank_progress_and_training()`
   - Method `.test_fleet_cards_show_patrol_cadence()`
   - Method `.test_fleet_cards_offer_squadron_roles()`
+  - Method `.test_fleet_cards_show_service_records()`
   - Method `.test_fleet_manager_shows_monthly_upkeep()`
 - `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
   - Method `.setUpClass()`
@@ -812,6 +813,21 @@
   - Method `.test_role_rejects_unknown_and_destroyed()`
   - Method `.test_role_change_is_blocked_in_combat()`
   - Method `.test_legacy_ship_defaults_to_screen()`
+
+---
+
+### [`tests/test_fleet_service_record.py`](tests/test_fleet_service_record.py)
+> *Fleet service records: battles, kills, patrol bounties and training counts.*
+
+**Size**: `115` lines (`4408` bytes)
+
+**Classes:**
+- `class FleetServiceRecordTest`
+  - Method `.test_legacy_ship_defaults_to_zero_service()`
+  - Method `.test_training_increments_the_session_count()`
+  - Method `.test_patrol_contact_records_bounty_and_battle()`
+  - Method `.test_combat_victory_counts_battle_and_kill_for_local_survivor()`
+  - Method `.test_save_round_trip_keeps_service()`
 
 ---
 
@@ -2038,7 +2054,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3138` lines (`160341` bytes)
+**Size**: `3140` lines (`160499` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2222,7 +2238,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8556` lines (`421662` bytes)
+**Size**: `8570` lines (`422368` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2647,7 +2663,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2193` lines (`81551` bytes)
+**Size**: `2203` lines (`82010` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

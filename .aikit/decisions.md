@@ -1211,3 +1211,13 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Apply the focus inside `outpost_tick_production`, expose it in the outpost payload/report, and use `outpost_crew_capacity` for assignment limits.
   4. Add `specialize_outpost`, `POST /api/outpost/specialize`, `outpost specialize <id> <focus>`, and a select/SET row on the Empire outpost card.
 - **Consequences**: Reaching level 3 now unlocks a real economic identity, Logistics deepens the crew-assignment loop, and switching remains possible for a fee. Live Edge set a level-3 mining outpost to Industry for 600 cr with no console errors. Suite: 893 tests (56 suites), 5/5 gates.
+
+### ADR-103: Escort Service Records
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Escorts tracked rank, XP and role but forgot everything they had done. Battles, kills, patrol bounties and training sessions were only visible as transient log lines, so a veteran hull had no history.
+- **Decision**:
+  1. Add persisted per-ship counters for battles, kills, patrol credits, patrol contacts and training sessions, defaulting to zero for legacy saves.
+  2. Increment battles/kills for local survivors of a combat victory, battles/contacts/bounty credits for patrol contacts, and training sessions for drydock instruction.
+  3. Expose the counters in the fleet payload, report and CLI, and show a compact `SVC 3B / 2K / 1P / 77CR` line on each fleet card.
+- **Consequences**: Escorts now carry a visible service history that rewards attachment and makes patrol/training activity legible without reading the log. No balance values changed. Live Edge rendered SVC 3B / 2K / 1P / 77CR with no console errors. Suite: 899 tests (57 suites), 5/5 gates.

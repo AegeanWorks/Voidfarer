@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "outpost-specialization",
+    "task_id": "fleet-service-records",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793362395.410078,
+    "updated_at": 1793363468.064293,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793362401.409219
+    "completed_at": 1793363474.2503407
   },
   "checkpoints": [
-    {
-      "task_id": "outpost-crew",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan outpost crew assignments: station up to three specialists per outpost for role-weighted output, exclude them from ship bonuses and away teams, and expose assign/recall in the Empire tab and CLI.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793357449.8425188,
-      "timestamp_str": "2026-10-30 13:50:49",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Outposts produced on their own while crew only affected the flagship, so there was no way to invest a specialist in an installation.",
-        "benefits": "Crew allocation becomes a real choice between ship bonuses and outpost output, and the Empire tab gains a direct management control.",
-        "risks": "contract: assigned_crew must default empty for legacy saves and production must share one multiplier across tick, cash flow and reports; dependency: outposts.py now reads crew roles and engine guards away/dismiss paths; concurrency: assignment mutates the outpost roster and flight log under the engine lock; state: stationed crew must persist and be excluded from ship bonuses until recalled.",
-        "mitigation": "Add multiplier, assignment, persistence and API/CLI/UI regressions first; cap three crew and x1.60 output; verify the live Empire assign and recall controls."
-      }
-    },
-    {
-      "task_id": "outpost-crew",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted Outpost.assigned_crew, three-slot cap, role-weighted x1.60 output bonus, ship-bonus/away/dismiss guards, /api/outpost/crew, outpost crew|recall CLI, Empire assign/recall controls and crew OUTPOST badge implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793357627.7882857,
-      "timestamp_str": "2026-10-30 13:53:47",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-crew",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-098 recorded; live Edge stationed Imani Vale for x1.20 output and recalled her; 861 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793357627.9670863,
-      "timestamp_str": "2026-10-30 13:53:47",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-crew",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'outpost-crew' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793357636.676672,
-      "timestamp_str": "2026-10-30 13:53:56",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "fleet-upkeep",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793362401.4092212,
       "timestamp_str": "2026-10-30 15:13:21",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "fleet-service-records",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan per-escort service records: battles, kills, patrol bounties/contacts and training sessions, with payload, CLI and fleet-card visibility.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793363387.5829794,
+      "timestamp_str": "2026-10-30 15:29:47",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Escorts tracked rank, XP and role but forgot their history; battles, kills, patrol bounties and training were only transient log lines.",
+        "benefits": "Veteran hulls gain a visible history, patrol/training activity becomes legible, and players can compare escorts beyond raw damage.",
+        "risks": "contract: legacy ships must default all counters to zero and payload serialization must stay backward compatible; dependency: combat, patrol and training paths all increment counters; concurrency: counters mutate inside the same fleet replaces as XP and hull; state: counters must persist and never go negative.",
+        "mitigation": "Add legacy-default, persistence, training, patrol-contact and combat-victory regressions first; clamp on load; verify the live service line."
+      }
+    },
+    {
+      "task_id": "fleet-service-records",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted battles/kills/patrol credits/patrol contacts/training sessions, incremented them on victories, patrol contacts and training, and surfaced SVC counters in the fleet card and CLI with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793363467.470501,
+      "timestamp_str": "2026-10-30 15:31:07",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "fleet-service-records",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-103 recorded; live Edge showed SVC 3B / 2K / 1P / 77CR; 899 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793363468.064293,
+      "timestamp_str": "2026-10-30 15:31:08",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "fleet-service-records",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'fleet-service-records' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793363474.2503436,
+      "timestamp_str": "2026-10-30 15:31:14",
       "agent": "opencode:mechanics"
     }
   ]
