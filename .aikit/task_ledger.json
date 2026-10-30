@@ -13,125 +13,6 @@
   },
   "checkpoints": [
     {
-      "task_id": "fleet-stance-controls",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-112 documented; live Edge switched to AGGRESSIVE with highlight, hint and report value, no console errors; 966 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793376242.7586913,
-      "timestamp_str": "2026-10-30 19:04:02",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-stance-controls",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'fleet-stance-controls' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793376252.1791124,
-      "timestamp_str": "2026-10-30 19:04:12",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "captain-gambit",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan Captain's Gambit: one role-scaled free command per battle from the highest-skill local escort captain, in cockpit, CLI and REST.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793376356.5541468,
-      "timestamp_str": "2026-10-30 19:05:56",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Captains now gain skill and XP but still act only through passive bonuses; combat offers no moment where the player calls on a captain's specialty.",
-        "benefits": "Captains become active tactical choices, skill growth has a visible payoff, and combat gains a once-per-battle decision without new random outcomes.",
-        "risks": "contract: CombatEncounter gains gambit fields with legacy defaults; dependency: combat, fleet reports and UI share the lead-captain and used flags; concurrency: the command mutates ship, fleet and combat under the engine lock; state: used/evasion fields must survive save-load and reset only when combat ends.",
-        "mitigation": "Test every role effect, the once-per-battle guard, no-captain refusal, persistence and UI wiring; keep effects non-lethal so victory resolution stays inside combat_action; verify live Edge."
-      }
-    },
-    {
-      "task_id": "captain-gambit",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Added gambit combat fields, engine role effects, REST endpoint, CLI action, combat-card button and 13 regressions; also made combat stance reachable from argparse; 979 tests pass.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793377225.179695,
-      "timestamp_str": "2026-10-30 19:20:25",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "captain-gambit",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-113 documented; live Edge spent an engineer gambit, raised hull 50 -> 77 and disabled the button with no console errors; 979 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793377225.7222352,
-      "timestamp_str": "2026-10-30 19:20:25",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "captain-gambit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'captain-gambit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793377237.3937588,
-      "timestamp_str": "2026-10-30 19:20:37",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-supply-links",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan outpost supply links: same-system hubs, per-link output bonuses, plus cockpit, CLI and REST controls.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793377414.7147074,
-      "timestamp_str": "2026-10-30 19:23:34",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Outposts produce in isolation; clustering them in one system has no economic payoff beyond separate yields, so the map's multi-outpost systems lack a logistics decision.",
-        "benefits": "Clustered outposts gain a deliberate supply-chain bonus, hub choice matters, and the outpost panel gains an economic decision alongside crew and specialization.",
-        "risks": "contract: Outpost gains a persisted supply_hub_id with a legacy-safe empty default; dependency: tick production and report payloads must use the same multiplier; concurrency: link changes mutate the outpost tuple under the engine lock; state: cycles, cross-system links and hub overload must be rejected.",
-        "mitigation": "Test link rules, multiplier math, tick output, persistence, CLI/API and UI wiring first; cap hubs at two links; reject chained hubs; verify live Edge."
-      }
-    },
-    {
-      "task_id": "outpost-supply-links",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Added persisted supply hubs, link/unlink rules, +5%/+8% multipliers in production and cash flow, REST/CLI/UI controls and 10 regressions; 989 tests pass.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793377875.2923386,
-      "timestamp_str": "2026-10-30 19:31:15",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-supply-links",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-114 documented; live Edge linked Supply Alpha through Supply Beta and showed x1.05 / x1.08 with no console errors; 989 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793377875.4253244,
-      "timestamp_str": "2026-10-30 19:31:15",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-supply-links",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'outpost-supply-links' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793377885.9639523,
-      "timestamp_str": "2026-10-30 19:31:25",
-      "agent": "opencode:mechanics"
-    },
-    {
       "task_id": "non-aggression-pacts",
       "phase": "2",
       "phase_num": 2,
@@ -182,68 +63,188 @@
     },
     {
       "task_id": "reforge:run-3",
-      "phase": "reforge run",
+      "phase": "reforge stage 78",
       "phase_num": 3,
-      "description": "run started (start=3, step=3, stop=None)",
+      "description": "Reforge stage 78: window 234, 3 commit(s), 14 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793378549.2274687,
-      "timestamp_str": "2026-10-30 19:42:29",
+      "timestamp": 1793387684.7030838,
+      "timestamp_str": "2026-10-30 22:14:44",
       "agent": "opencode"
     },
     {
       "task_id": "reforge:run-3",
-      "phase": "reforge stage 1",
+      "phase": "reforge stage 78",
       "phase_num": 3,
-      "description": "Reforge stage 1: window 3, 3 commit(s), 13 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "description": "Reforge stage 78: stage 78 host review reviewed; run active; coverage 89/89",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793378560.9022777,
-      "timestamp_str": "2026-10-30 19:42:40",
+      "timestamp": 1793387689.5998487,
+      "timestamp_str": "2026-10-30 22:14:49",
       "agent": "opencode"
     },
     {
       "task_id": "reforge:run-3",
-      "phase": "reforge stage 2",
+      "phase": "reforge stage 79",
       "phase_num": 3,
-      "description": "Reforge stage 2: window 6, 3 commit(s), 14 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
-      "files_affected": [],
+      "description": "Reforge stage 79: window 237, 3 commit(s), 19 file(s) reviewed (unreviewed), 2 finding(s), 0 repaired (regression=2)",
+      "files_affected": [
+        "voidfarer/storage.py"
+      ],
       "status": "in_progress",
-      "timestamp": 1793379099.9563804,
-      "timestamp_str": "2026-10-30 19:51:39",
+      "timestamp": 1793387811.6907039,
+      "timestamp_str": "2026-10-30 22:16:51",
       "agent": "opencode"
     },
     {
       "task_id": "reforge:run-3",
-      "phase": "reforge stage 3",
+      "phase": "reforge stage 79",
       "phase_num": 3,
-      "description": "Reforge stage 3: window 9, 3 commit(s), 4 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "description": "Reforge stage 79: stage 79 host review reviewed; run active; coverage 146/146",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793379374.0773933,
-      "timestamp_str": "2026-10-30 19:56:14",
+      "timestamp": 1793387852.3553653,
+      "timestamp_str": "2026-10-30 22:17:32",
       "agent": "opencode"
     },
     {
       "task_id": "reforge:run-3",
-      "phase": "reforge stage 4",
+      "phase": "reforge stage 80",
       "phase_num": 3,
-      "description": "Reforge stage 4: window 12, 3 commit(s), 1 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "description": "Reforge stage 80: window 240, 3 commit(s), 6 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793379791.946553,
-      "timestamp_str": "2026-10-30 20:03:11",
+      "timestamp": 1793387974.8044357,
+      "timestamp_str": "2026-10-30 22:19:34",
       "agent": "opencode"
     },
     {
       "task_id": "reforge:run-3",
-      "phase": "reforge stage 5",
+      "phase": "reforge stage 80",
       "phase_num": 3,
-      "description": "Reforge stage 5: window 15, 3 commit(s), 11 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "description": "Reforge stage 80: stage 80 host review reviewed; run active; coverage 31/31",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793380074.9136834,
-      "timestamp_str": "2026-10-30 20:07:54",
+      "timestamp": 1793387977.1280305,
+      "timestamp_str": "2026-10-30 22:19:37",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 81",
+      "phase_num": 3,
+      "description": "Reforge stage 81: window 243, 3 commit(s), 12 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793388099.439205,
+      "timestamp_str": "2026-10-30 22:21:39",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 81",
+      "phase_num": 3,
+      "description": "Reforge stage 81: stage 81 host review reviewed; run active; coverage 28/28",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793388103.4349084,
+      "timestamp_str": "2026-10-30 22:21:43",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 82",
+      "phase_num": 3,
+      "description": "Reforge stage 82: window 246, 3 commit(s), 18 file(s) reviewed (unreviewed), 5 finding(s), 0 repaired (regression=4, reliability=1)",
+      "files_affected": [
+        "voidfarer/server.py",
+        "voidfarer/cli.py"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793388232.1721907,
+      "timestamp_str": "2026-10-30 22:23:52",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 82",
+      "phase_num": 3,
+      "description": "Reforge stage 82: stage 82 host review reviewed; run active; coverage 97/97",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793388260.5271416,
+      "timestamp_str": "2026-10-30 22:24:20",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 83",
+      "phase_num": 3,
+      "description": "Reforge stage 83: window 249, 3 commit(s), 16 file(s) reviewed (unreviewed), 1 finding(s), 0 repaired (regression=1)",
+      "files_affected": [
+        "voidfarer/server.py"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793388406.1523247,
+      "timestamp_str": "2026-10-30 22:26:46",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 83",
+      "phase_num": 3,
+      "description": "Reforge stage 83: stage 83 host review reviewed; run active; coverage 102/102",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793388431.4780998,
+      "timestamp_str": "2026-10-30 22:27:11",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 84",
+      "phase_num": 3,
+      "description": "Reforge stage 84: window 252, 3 commit(s), 18 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793388591.2628212,
+      "timestamp_str": "2026-10-30 22:29:51",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 84",
+      "phase_num": 3,
+      "description": "Reforge stage 84: stage 84 host review reviewed; run active; coverage 149/149",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793388599.0319164,
+      "timestamp_str": "2026-10-30 22:29:59",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 85",
+      "phase_num": 3,
+      "description": "Reforge stage 85: window 255, 3 commit(s), 24 file(s) reviewed (unreviewed), 5 finding(s), 0 repaired (regression=3, reliability=2)",
+      "files_affected": [
+        "voidfarer/cli.py",
+        "voidfarer/storage.py"
+      ],
+      "status": "in_progress",
+      "timestamp": 1793388719.068844,
+      "timestamp_str": "2026-10-30 22:31:59",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 85",
+      "phase_num": 3,
+      "description": "Reforge stage 85: stage 85 host review reviewed; run completed; coverage 129/129",
+      "files_affected": [],
+      "status": "completed",
+      "timestamp": 1793388750.9818676,
+      "timestamp_str": "2026-10-30 22:32:30",
       "agent": "opencode"
     }
   ]
