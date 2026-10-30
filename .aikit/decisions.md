@@ -1200,3 +1200,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Keep depot cargo operations station-only. Remote shipyards do not service the current system.
   4. Show `SERVICES ONLINE` on the local shipyard outpost and `SHIPYARD LINK` in the fleet header.
 - **Consequences**: Frontier shipyards now fulfill their catalog role and extend the fleet's operating range; stations remain the fallback and depot logistics stay separate. Live Edge repaired an undocked hull from 50 to 60 and fuel from 10 to 20, with both headers visible and no console errors. Suite: 883 tests (55 suites), 5/5 gates.
+
+### ADR-102: Outpost Specializations
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Outposts could stack modules and host crew, but leveling past 2 gave only a flat production multiplier. There was no level-3 decision that changed what an installation was for.
+- **Decision**:
+  1. Add a persisted `specialization` field to `Outpost` with an empty legacy default.
+  2. Offer four level-3 focuses at 600 cr: Industry (credits x1.30), Research (research x1.40, credits x0.85), Commerce (credits x1.20, other x1.05) and Logistics (all x1.10, +1 crew slot).
+  3. Apply the focus inside `outpost_tick_production`, expose it in the outpost payload/report, and use `outpost_crew_capacity` for assignment limits.
+  4. Add `specialize_outpost`, `POST /api/outpost/specialize`, `outpost specialize <id> <focus>`, and a select/SET row on the Empire outpost card.
+- **Consequences**: Reaching level 3 now unlocks a real economic identity, Logistics deepens the crew-assignment loop, and switching remains possible for a fee. Live Edge set a level-3 mining outpost to Industry for 600 cr with no console errors. Suite: 893 tests (56 suites), 5/5 gates.

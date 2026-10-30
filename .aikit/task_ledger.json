@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "shipyard-services",
+    "task_id": "outpost-specialization",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793361870.9170146,
+    "updated_at": 1793362395.410078,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793361876.3406804
+    "completed_at": 1793362401.409219
   },
   "checkpoints": [
-    {
-      "task_id": "trade-pacts",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan faction trade pacts: a standing-40 agreement that improves buy and sell prices, persists per faction, is refused at war, and is surfaced in the Empire tab and CLI.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793348008.0278487,
-      "timestamp_str": "2026-10-30 11:13:28",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Standing 40 had no distinct reward between gifts and the standing-70 alliance, and war had no economic cost beyond severed trade links.",
-        "benefits": "Diplomacy gains a mid-tier commercial goal, trade routes gain a durable benefit, and war now suspends a valuable agreement.",
-        "risks": "contract: trade_pacts must default empty for legacy saves and every player-facing quote must use the same pact flag; dependency: the quote signature changes and six callers must pass the flag; concurrency: diplomacy mutates standings, pacts and the flight log in one locked transaction; state: pacts persist and must be suspended, not deleted, during war.",
-        "mitigation": "Add quote, standing-gate, war-suspension, persistence and UI/CLI regressions first; default the quote parameter false; verify the live Empire PACT click and market prices."
-      }
-    },
-    {
-      "task_id": "trade-pacts",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted trade_pacts, standing-40/war gates, 6% quote improvement across local trade, automation, quantum freight, depot sales and snapshots, Empire PACT control, CLI action/status and market header implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793348072.2216759,
-      "timestamp_str": "2026-10-30 11:14:32",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "trade-pacts",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-097 recorded; live Edge formed a Sol Coalition pact and moved titanium 208/164 to 195/173 buy/sell; 852 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793348072.3845332,
-      "timestamp_str": "2026-10-30 11:14:32",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "trade-pacts",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'trade-pacts' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793348077.4326725,
-      "timestamp_str": "2026-10-30 11:14:37",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "outpost-crew",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793361876.340682,
       "timestamp_str": "2026-10-30 15:04:36",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-specialization",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan level-3 outpost specializations: Industry/Research/Commerce/Logistics production focuses, a fourth crew slot for Logistics, 600 cr switching, and a select/SET control on the outpost card.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793362330.5699685,
+      "timestamp_str": "2026-10-30 15:12:10",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Outposts gained modules and crew but leveling past 2 only raised a flat multiplier, so there was no level-3 decision that changed what an installation was for.",
+        "benefits": "Reaching level 3 unlocks a real economic identity, Logistics deepens the crew loop, and switching lets players adapt to changing needs.",
+        "risks": "contract: specialization must default empty for legacy saves and production must share one multiplier across tick, cash flow and reports; dependency: crew capacity now depends on the focus; concurrency: specialization mutates credits, outpost state and the flight log under the engine lock; state: switching must be refused when credits are short and production must stay stable after reload.",
+        "mitigation": "Add production, level-gate, cost, capacity, persistence and API/CLI/UI regressions first; validate the focus id; verify the live Empire SET control."
+      }
+    },
+    {
+      "task_id": "outpost-specialization",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted Outpost.specialization, four level-3 focus multipliers, Logistics crew slot, 600 cr switching, production/report payload fields, /api/outpost/specialize, outpost specialize CLI and Empire select/SET control implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793362395.2855425,
+      "timestamp_str": "2026-10-30 15:13:15",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-specialization",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-102 recorded; live Edge set a level-3 outpost to Industry for 600 cr; 893 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793362395.410078,
+      "timestamp_str": "2026-10-30 15:13:15",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-specialization",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'outpost-specialization' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793362401.4092212,
+      "timestamp_str": "2026-10-30 15:13:21",
       "agent": "opencode:mechanics"
     }
   ]
