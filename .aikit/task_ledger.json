@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "research-queue",
+    "task_id": "escort-captains",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793371844.6485126,
+    "updated_at": 1793372519.4600427,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793371854.3418078
+    "completed_at": 1793372535.4188645
   },
   "checkpoints": [
-    {
-      "task_id": "outpost-specialization",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan level-3 outpost specializations: Industry/Research/Commerce/Logistics production focuses, a fourth crew slot for Logistics, 600 cr switching, and a select/SET control on the outpost card.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793362330.5699685,
-      "timestamp_str": "2026-10-30 15:12:10",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Outposts gained modules and crew but leveling past 2 only raised a flat multiplier, so there was no level-3 decision that changed what an installation was for.",
-        "benefits": "Reaching level 3 unlocks a real economic identity, Logistics deepens the crew loop, and switching lets players adapt to changing needs.",
-        "risks": "contract: specialization must default empty for legacy saves and production must share one multiplier across tick, cash flow and reports; dependency: crew capacity now depends on the focus; concurrency: specialization mutates credits, outpost state and the flight log under the engine lock; state: switching must be refused when credits are short and production must stay stable after reload.",
-        "mitigation": "Add production, level-gate, cost, capacity, persistence and API/CLI/UI regressions first; validate the focus id; verify the live Empire SET control."
-      }
-    },
-    {
-      "task_id": "outpost-specialization",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted Outpost.specialization, four level-3 focus multipliers, Logistics crew slot, 600 cr switching, production/report payload fields, /api/outpost/specialize, outpost specialize CLI and Empire select/SET control implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793362395.2855425,
-      "timestamp_str": "2026-10-30 15:13:15",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-specialization",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-102 recorded; live Edge set a level-3 outpost to Industry for 600 cr; 893 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793362395.410078,
-      "timestamp_str": "2026-10-30 15:13:15",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-specialization",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'outpost-specialization' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793362401.4092212,
-      "timestamp_str": "2026-10-30 15:13:21",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "fleet-service-records",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793371854.341809,
       "timestamp_str": "2026-10-30 17:50:54",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "escort-captains",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan escort captains: one available crew commander per fleet ship, role-based damage/evasion/upkeep bonuses, crew exclusion guards, and fleet-card/API/CLI controls.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793372444.9204865,
+      "timestamp_str": "2026-10-30 18:00:44",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Crew could serve the flagship, outposts or away teams, but escorts had no officer slot and no named commander.",
+        "benefits": "Escorts gain a legible role-based commander, crew allocation gains a fourth destination, and fleet cards become more personal.",
+        "risks": "contract: legacy ships must default to no captain and crew payloads must stay backward compatible; dependency: captain bonuses touch damage, evasion and upkeep; concurrency: assignment mutates fleet state and the flight log under the engine lock; state: captains must persist and be blocked from away, outpost and duplicate commands.",
+        "mitigation": "Add bonus, guard, persistence and API/CLI/UI regressions first; normalize missing captain role; verify the live assign and recall controls."
+      }
+    },
+    {
+      "task_id": "escort-captains",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted captain_id/captain_role, role bonuses in damage/evasion/upkeep, crew exclusion and away/outpost/dismiss guards, /api/fleet/escort/captain, fleet captain|recall_captain CLI and fleet-card captain row implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793372519.1715782,
+      "timestamp_str": "2026-10-30 18:01:59",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "escort-captains",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-107 recorded; live Edge assigned Imani Vale to a corvette and recalled her; 937 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793372519.4600427,
+      "timestamp_str": "2026-10-30 18:01:59",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "escort-captains",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'escort-captains' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793372535.4188657,
+      "timestamp_str": "2026-10-30 18:02:15",
       "agent": "opencode:mechanics"
     }
   ]

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `105`
-- **Total Classes**: `269`
+- **Total Python Modules**: `106`
+- **Total Classes**: `271`
 - **Total Top-Level Functions**: `324`
-- **Total Class Methods**: `1549`
-- **Total Source Lines**: `41559`
+- **Total Class Methods**: `1563`
+- **Total Source Lines**: `41869`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `300` lines (`13357` bytes)
+**Size**: `306` lines (`13666` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -233,6 +233,7 @@
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
   - Method `.test_cli_trade_pact_parses_and_reports_the_standing_gate()`
+  - Method `.test_cli_fleet_captain_parses()`
   - Method `.test_cli_fleet_role_parses()`
   - Method `.test_cli_fleet_train_parses()`
   - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
@@ -265,7 +266,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1430` lines (`63876` bytes)
+**Size**: `1441` lines (`64254` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -461,6 +462,7 @@
   - Method `.setUpClass()`
   - Method `.test_fleet_cards_show_rank_progress_and_training()`
   - Method `.test_fleet_cards_show_patrol_cadence()`
+  - Method `.test_fleet_cards_offer_captain_assignment()`
   - Method `.test_fleet_cards_offer_squadron_roles()`
   - Method `.test_fleet_cards_show_service_records()`
   - Method `.test_fleet_manager_shows_monthly_upkeep()`
@@ -766,6 +768,25 @@
   - Method `.test_ship_state_faction_standings_migration()`
   - Method `.test_tactical_combat_shield_and_actions()`
   - Method `.test_combat_victory_faction_standing_shift()`
+
+---
+
+### [`tests/test_fleet_captains.py`](tests/test_fleet_captains.py)
+> *Escort captains: assignment rules, role bonuses and persistence.*
+
+**Size**: `108` lines (`4536` bytes)
+
+**Classes:**
+- `class FleetCaptainMathTest`
+  - Method `.test_captain_roles_add_damage_evasion_or_upkeep_discount()`
+  - Method `.test_legacy_ship_defaults_to_no_captain()`
+- `class FleetCaptainEngineTest`
+  - Method `.setUp()`
+  - Method `.test_assign_and_recall_a_captain()`
+  - Method `.test_duplicate_and_destroyed_captains_are_refused()`
+  - Method `.test_outpost_and_away_crew_cannot_command()`
+  - Method `.test_captain_is_excluded_from_ship_bonuses()`
+  - Method `.test_captain_state_round_trips()`
 
 ---
 
@@ -1446,7 +1467,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `686` lines (`29702` bytes)
+**Size**: `715` lines (`30942` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1486,6 +1507,7 @@
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
   - Method `.test_trade_pact_endpoint_forms_a_pact()`
+  - Method `.test_fleet_captain_endpoint_assigns_and_recalls()`
   - Method `.test_fleet_role_endpoint_sets_squadron_role()`
   - Method `.test_fleet_train_endpoint_buys_experience()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
@@ -2013,7 +2035,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `759` lines (`33017` bytes)
+**Size**: `760` lines (`33104` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2127,7 +2149,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3169` lines (`161804` bytes)
+**Size**: `3187` lines (`162661` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2311,7 +2333,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8766` lines (`431526` bytes)
+**Size**: `8859` lines (`436119` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2386,6 +2408,9 @@
   - Method `.specialize_outpost(outpost_id, specialization)` - *Choose or switch an outpost's level-3 production focus.*
   - Method `._outpost_capture_damage(outpost, old_system, new_system, crew_by_id)` - *Damage a player outpost when its system falls to a non-player power.*
   - Method `.repair_outpost(outpost_id)` - *Restore an outpost to full integrity with a remote repair contract.*
+  - Method `._crew_ship_id(crew_id)`
+  - Method `.assign_fleet_captain(ship_id, crew_id)` - *Assign one active specialist as an escort captain.*
+  - Method `.recall_fleet_captain(ship_id)` - *Return an escort captain to the flagship roster.*
   - Method `._crew_outpost_id(crew_id)`
   - Method `._outpost_crew_multiplier(outpost)`
   - Method `._outpost_payload(outpost, yield_mult)`
@@ -2618,14 +2643,14 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `317` lines (`11177` bytes)
+**Size**: `345` lines (`11904` bytes)
 
 **Functions:**
 - `def normalize_fleet_role(role)`
 - `def get_escort_template(escort_type)`
 - `def fleet_rank(experience)` - *Resolve veterancy rank, badge progress and cumulative combat bonuses.*
 - `def fleet_training_cost(experience)` - *Drydock instruction gets dearer as a crew approaches the next rank.*
-- `def fleet_upkeep(ships)` - *Monthly payroll for living escorts; destroyed hulls cost nothing.*
+- `def fleet_upkeep(ships)` - *Monthly payroll for living escorts; a quartermaster captain trims 10%.*
 - `def fleet_support_repair(ships)` - *Integrity restored by living support-role escorts after an exchange.*
 - `def fleet_victory_experience(enemy_max_hull)` - *A tougher kill teaches more than farming a lone corsair.*
 - `def resolve_patrol_sweep(ship, system, tick, galaxy_seed, faction_standing)` - *Resolve one remote patrol cycle; even a quiet tour trains the crew.*
@@ -2741,7 +2766,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2208` lines (`82250` bytes)
+**Size**: `2212` lines (`82418` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -3020,7 +3045,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1423` lines (`60964` bytes)
+**Size**: `1435` lines (`61551` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

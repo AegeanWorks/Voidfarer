@@ -1254,3 +1254,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. On completion, start the next queued project that is not completed and whose prerequisites are met; keep the remaining queue.
   4. Expose `POST /api/research/queue` and `/api/research/cancel`, `research queue|cancel`, and START/QUEUE/CANCEL controls plus a QUEUED PROJECTS list in the Empire tab.
 - **Consequences**: Research can run unattended across multiple projects, queues survive saves, and invalid/stale entries are skipped rather than blocking progress. Live Edge queued Deep Survey Arrays behind Advanced Coolant Loops, showed the queued row, then cancelled it with no console errors. Suite: 927 tests (60 suites), 5/5 gates.
+
+### ADR-107: Escort Captains
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Crew could be stationed at outposts or deployed on away teams, but escorts had no officer slot. A veteran hull had rank, role and service history without a named commander.
+- **Decision**:
+  1. Add persisted `captain_id` and `captain_role` to `FleetShip`, defaulting empty for legacy saves.
+  2. Assign one active, uninjured, unassigned crew member per escort; refuse outpost, away-team and duplicate commands until recalled.
+  3. Apply captain role bonuses in `fleet_damage`, `fleet_evasion_bonus` and `fleet_upkeep`: pilot/medic +0.05 evasion, engineer/scientist +5% damage, marine +10% damage, quartermaster 10% lower upkeep.
+  4. Exclude captains from flagship crew bonuses and from outpost/away/dismiss paths; expose assign/recall through the engine, `/api/fleet/escort/captain`, `fleet captain|recall_captain`, and a captain row on the fleet card.
+- **Consequences**: Escorts gain a named commander with a legible role bonus, crew allocation gains a fourth destination (flagship, outpost, away team, escort), and captain state persists. Live Edge assigned Imani Vale to a corvette and recalled her with no console errors. Suite: 937 tests (61 suites), 5/5 gates.
