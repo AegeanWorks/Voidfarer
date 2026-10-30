@@ -81,6 +81,23 @@ class NonAggressionPactTest(unittest.TestCase):
         self.assertFalse(self.engine.non_aggression_active("nebula_collective"))
         self.assertEqual(self.engine.non_aggression_remaining("nebula_collective"), 0)
 
+    def test_active_pact_pair_reaches_the_war_simulator(self):
+        self.assertTrue(
+            self.engine.faction_diplomacy("nebula_collective", "non_aggression")[0]
+        )
+        self.assertIn(
+            frozenset(("sol_coalition", "nebula_collective")),
+            self.engine._active_non_aggression_pairs(self.engine.state.time.tick),
+        )
+        until = self.engine.state.ship.non_aggression_until["nebula_collective"]
+        self.engine.state = self.engine._clone_state(
+            time=replace(self.engine.state.time, tick=until)
+        )
+        self.assertNotIn(
+            frozenset(("sol_coalition", "nebula_collective")),
+            self.engine._active_non_aggression_pairs(until),
+        )
+
     def test_pacts_round_trip_and_legacy_default(self):
         self.assertTrue(
             self.engine.faction_diplomacy("nebula_collective", "non_aggression")[0]
