@@ -1385,6 +1385,8 @@ class FleetShip:
     patrol_credits: int = 0
     patrol_contacts: int = 0
     training_sessions: int = 0
+    captain_id: str = ""
+    captain_role: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1416,6 +1418,8 @@ class FleetShip:
             patrol_credits=max(0, int(data.get("patrol_credits", 0))),
             patrol_contacts=max(0, int(data.get("patrol_contacts", 0))),
             training_sessions=max(0, int(data.get("training_sessions", 0))),
+            captain_id=str(data.get("captain_id", "")),
+            captain_role=str(data.get("captain_role", "")),
         )
 
 

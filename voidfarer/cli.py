@@ -599,7 +599,7 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
                 f"XP {ship.get('experience', 0)}/{ship.get('experience_max', 300)} "
                 f"B{ship.get('battles', 0)} K{ship.get('kills', 0)} "
                 f"P{ship.get('patrol_contacts', 0)}/{ship.get('patrol_credits', 0)}cr "
-                f"SYS {ship['assigned_system_id']}"
+                f"CPT {ship.get('captain_name') or '--'} SYS {ship['assigned_system_id']}"
             )
         print(
             f"\nFormation damage: {report['total_damage']} total / "
@@ -607,7 +607,7 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             f"Screen evasion: +{report['evasion_bonus']*100:.0f}% total / "
             f"+{report.get('local_evasion_bonus', report['evasion_bonus'])*100:.0f}% local"
         )
-        print(f"{DIM}Upkeep {report.get('upkeep_per_month', 0)} cr/month. Remote patrols sweep every {report.get('patrol_sweep_ticks', 6)} ticks. Catalog: {', '.join(ESCORT_CATALOG)}. Commands: fleet buy_escort <type> | fleet assign <id> <system> | fleet train <id> | fleet role <id> <screen|strike|support> | fleet repair_escorts | fleet sell_escort <id> | fleet dismiss_escort <id>{RESET}")
+        print(f"{DIM}Upkeep {report.get('upkeep_per_month', 0)} cr/month. Remote patrols sweep every {report.get('patrol_sweep_ticks', 6)} ticks. Catalog: {', '.join(ESCORT_CATALOG)}. Commands: fleet buy_escort <type> | fleet assign <id> <system> | fleet train <id> | fleet role <id> <screen|strike|support> | fleet captain <id> <crew_id> | fleet recall_captain <id> | fleet repair_escorts | fleet sell_escort <id> | fleet dismiss_escort <id>{RESET}")
         return 0
     if sub in ("buy_escort", "recruit_escort"):
         if len(parts) < 3:
@@ -632,6 +632,24 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             print(f"{RED}Usage:{RESET} fleet train <escort_id>")
             return 1
         ok, msg = engine.train_fleet_ship(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub in ("captain", "assign_captain"):
+        if len(parts) < 4:
+            print(f"{RED}Usage:{RESET} fleet captain <escort_id> <crew_id>")
+            return 1
+        ok, msg = engine.assign_fleet_captain(parts[2], parts[3])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub in ("recall_captain", "recall"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} fleet recall_captain <escort_id>")
+            return 1
+        ok, msg = engine.recall_fleet_captain(parts[2])
         print((GREEN if ok else RED) + msg + RESET)
         if ok:
             storage.save(engine.state)
@@ -2629,7 +2647,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     subparsers.add_parser("repl", help="Launch interactive terminal cockpit")
 
     fleet_p = subparsers.add_parser("fleet", help="Autonomous fleet and drone operations")
-    fleet_p.add_argument("action", nargs="?", default="list", choices=["list", "harvest", "buy", "deploy", "ships", "buy_escort", "assign", "train", "role", "repair_escorts", "dismiss_escort", "sell_escort"])
+    fleet_p.add_argument("action", nargs="?", default="list", choices=["list", "harvest", "buy", "deploy", "ships", "buy_escort", "assign", "train", "role", "captain", "recall_captain", "repair_escorts", "dismiss_escort", "sell_escort"])
     fleet_p.add_argument("arg1", nargs="?", help="Drone type or drone ID")
     fleet_p.add_argument("arg2", nargs="?", help="Target star system ID")
 

@@ -53,6 +53,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/fleet/escort/repair": "needs a damaged escort",
     "/api/fleet/escort/train": "needs a docked escort, credits and spare experience",
     "/api/fleet/escort/role": "needs an owned escort outside combat",
+    "/api/fleet/escort/captain": "needs an owned escort and an available crew member",
     "/api/fleet/refit": "needs an owned escort",
     "/api/fleet/escort/sell": "needs a docked station and an owned escort",
     "/api/contract/claim": "needs a completed contract",

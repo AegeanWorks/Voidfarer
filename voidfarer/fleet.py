@@ -79,6 +79,17 @@ FLEET_UPKEEP_BY_ROLE: dict[str, int] = {
     "prize": 25,
 }
 
+FLEET_CAPTAIN_DAMAGE: dict[str, float] = {
+    "engineer": 0.05,
+    "marine": 0.10,
+    "scientist": 0.05,
+}
+FLEET_CAPTAIN_EVASION: dict[str, float] = {
+    "pilot": 0.05,
+    "medic": 0.05,
+}
+FLEET_CAPTAIN_UPKEEP: dict[str, float] = {"quartermaster": 0.90}
+
 FLEET_TACTICAL_ROLES: dict[str, dict[str, Any]] = {
     "screen": {"label": "Screen", "damage": 0.75, "evasion": 1.50, "repair": 0},
     "strike": {"label": "Strike", "damage": 1.25, "evasion": 0.75, "repair": 0},
@@ -133,12 +144,15 @@ def fleet_training_cost(experience: int) -> int:
 
 
 def fleet_upkeep(ships: tuple[FleetShip, ...]) -> int:
-    """Monthly payroll for living escorts; destroyed hulls cost nothing."""
-    return sum(
-        FLEET_UPKEEP_BY_ROLE.get(ship.role, 30)
-        for ship in ships
-        if ship.hull > 0
-    )
+    """Monthly payroll for living escorts; a quartermaster captain trims 10%."""
+    total = 0
+    for ship in ships:
+        if ship.hull <= 0:
+            continue
+        base = FLEET_UPKEEP_BY_ROLE.get(ship.role, 30)
+        discount = FLEET_CAPTAIN_UPKEEP.get(ship.captain_role, 1.0)
+        total += int(base * discount)
+    return total
 
 
 def fleet_support_repair(ships: tuple[FleetShip, ...]) -> int:
@@ -243,9 +257,19 @@ def fleet_damage(ships: tuple[FleetShip, ...], formation: str = "balanced") -> i
             continue
         rank = fleet_rank(ship.experience)
         role = FLEET_TACTICAL_ROLES[normalize_fleet_role(ship.tactical_role)]
+        captain_mult = 1.0 + FLEET_CAPTAIN_DAMAGE.get(ship.captain_role, 0.0)
         # Experience gives a shallow continuous edge; ranks add the visible jump.
         growth = 1.0 + min(0.50, ship.experience * 0.005) + rank["damage_bonus"]
-        total += max(1, int(ship.damage * growth * mult * float(role["damage"])))
+        total += max(
+            1,
+            int(
+                ship.damage
+                * growth
+                * mult
+                * float(role["damage"])
+                * captain_mult
+            ),
+        )
     return total
 
 
@@ -253,7 +277,11 @@ def fleet_evasion_bonus(ships: tuple[FleetShip, ...], formation: str = "balanced
     if not ships:
         return 0.0
     screen = sum(
-        (ship.evasion + fleet_rank(ship.experience)["evasion_bonus"])
+        (
+            ship.evasion
+            + fleet_rank(ship.experience)["evasion_bonus"]
+            + FLEET_CAPTAIN_EVASION.get(ship.captain_role, 0.0)
+        )
         * float(FLEET_TACTICAL_ROLES[normalize_fleet_role(ship.tactical_role)]["evasion"])
         for ship in ships
         if ship.status == "escorting" and ship.hull > 0

@@ -723,6 +723,9 @@ class SimulationEngine:
         assigned.update(
             cid for outpost in self.state.outposts for cid in outpost.assigned_crew
         )
+        assigned.update(
+            ship.captain_id for ship in target.fleet_ships if ship.captain_id
+        )
         return calculate_crew_bonuses(tuple(member for member in target.crew if member.id not in assigned))
 
     def _faction_stability(self) -> dict[str, float]:
@@ -2970,6 +2973,73 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship, outposts=outposts)
             return True, line
 
+    def _crew_ship_id(self, crew_id: str) -> str | None:
+        for ship in self.state.ship.fleet_ships:
+            if ship.captain_id == crew_id:
+                return ship.id
+        return None
+
+    def assign_fleet_captain(self, ship_id: str, crew_id: str) -> tuple[bool, str]:
+        """Assign one active specialist as an escort captain."""
+        with self.lock:
+            ship = next((s for s in self.state.ship.fleet_ships if s.id == ship_id), None)
+            if ship is None:
+                return False, f"Unknown escort '{ship_id}'."
+            if ship.hull <= 0:
+                return False, f"{ship.name} is destroyed; repair or dismiss it first."
+            if ship.captain_id:
+                return False, f"{ship.name} already has a captain; recall them first."
+            member = next((m for m in self.state.ship.crew if m.id == crew_id), None)
+            if member is None:
+                return False, f"Unknown crew member '{crew_id}'."
+            if member.status != "active" or member.injury_ticks > 0:
+                return False, f"{member.name} is not fit for command."
+            if self._crew_outpost_id(crew_id) is not None:
+                return False, f"{member.name} is stationed at an outpost."
+            if any(crew_id in mission.crew_ids for mission in self.state.ship.away_missions):
+                return False, f"{member.name} is deployed on an expedition."
+            if self._crew_ship_id(crew_id) is not None:
+                return False, f"{member.name} already commands another escort."
+            updated = replace(
+                ship, captain_id=member.id, captain_role=member.role
+            )
+            fleet_ships = tuple(
+                updated if candidate.id == ship.id else candidate
+                for candidate in self.state.ship.fleet_ships
+            )
+            line = f"ESCORT CAPTAIN: {member.name} takes command of {ship.name}."
+            new_ship = self._clone_ship(
+                fleet_ships=fleet_ships,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, line
+
+    def recall_fleet_captain(self, ship_id: str) -> tuple[bool, str]:
+        """Return an escort captain to the flagship roster."""
+        with self.lock:
+            ship = next((s for s in self.state.ship.fleet_ships if s.id == ship_id), None)
+            if ship is None:
+                return False, f"Unknown escort '{ship_id}'."
+            if not ship.captain_id:
+                return False, f"{ship.name} has no captain."
+            member = next(
+                (m for m in self.state.ship.crew if m.id == ship.captain_id), None
+            )
+            name = member.name if member else ship.captain_id
+            updated = replace(ship, captain_id="", captain_role="")
+            fleet_ships = tuple(
+                updated if candidate.id == ship.id else candidate
+                for candidate in self.state.ship.fleet_ships
+            )
+            line = f"ESCORT CAPTAIN: {name} recalled from {ship.name}."
+            new_ship = self._clone_ship(
+                fleet_ships=fleet_ships,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, line
+
     def _crew_outpost_id(self, crew_id: str) -> str | None:
         for outpost in self.state.outposts:
             if crew_id in outpost.assigned_crew:
@@ -3020,6 +3090,8 @@ class SimulationEngine:
             capacity = outpost_crew_capacity(outpost)
             if len(outpost.assigned_crew) >= capacity:
                 return False, f"{outpost.name} already has {capacity} specialists."
+            if self._crew_ship_id(crew_id) is not None:
+                return False, f"{member.name} commands an escort; recall them first."
             current_outpost = self._crew_outpost_id(crew_id)
             if current_outpost is not None:
                 return False, f"{member.name} is already stationed at {current_outpost}."
@@ -3389,9 +3461,15 @@ class SimulationEngine:
         rank = fleet_rank(ship.experience)
         role = normalize_fleet_role(ship.tactical_role)
         role_info = FLEET_TACTICAL_ROLES[role]
+        captain = next(
+            (member for member in self.state.ship.crew if member.id == ship.captain_id),
+            None,
+        )
         return {
             **ship.to_dict(),
             "sale_value": escort_sale_value(ship),
+            "captain_name": captain.name if captain else "",
+            "captain_role_label": ship.captain_role.replace("_", " ").title(),
             "tactical_role": role,
             "role_label": role_info["label"],
             "role_damage": role_info["damage"],
@@ -3506,6 +3584,9 @@ class SimulationEngine:
             outpost_id = self._crew_outpost_id(crew_id)
             if outpost_id is not None:
                 return False, f"{member.name} is stationed at {outpost_id}; recall them first."
+            ship_id = self._crew_ship_id(crew_id)
+            if ship_id is not None:
+                return False, f"{member.name} commands {ship_id}; recall them first."
             remaining = tuple(c for c in self.state.ship.crew if c.id != crew_id)
             self.state = self._clone_state(ship=self._clone_ship(crew=remaining))
             return True, f"Crew member {member.name} dismissed."
@@ -3519,10 +3600,20 @@ class SimulationEngine:
                 for outpost in self.state.outposts
                 for cid in outpost.assigned_crew
             }
+            ship_by_crew = {
+                ship.captain_id: ship.id
+                for ship in self.state.ship.fleet_ships
+                if ship.captain_id
+            }
             assigned.update(outpost_by_crew)
+            assigned.update(ship_by_crew)
             return {
                 "crew": [
-                    {**c.to_dict(), "outpost_id": outpost_by_crew.get(c.id)}
+                    {
+                        **c.to_dict(),
+                        "outpost_id": outpost_by_crew.get(c.id),
+                        "ship_id": ship_by_crew.get(c.id),
+                    }
                     for c in crew
                 ],
                 "roles": crew_catalog(),
@@ -3703,6 +3794,8 @@ class SimulationEngine:
                         return False, f"{member.name} is injured and cannot deploy."
                     if self._crew_outpost_id(member.id) is not None:
                         return False, f"{member.name} is stationed at an outpost."
+                    if self._crew_ship_id(member.id) is not None:
+                        return False, f"{member.name} commands an escort."
                     team_members.append(member)
                 team = tuple(team_members)
                 if len(team) != mission_type_def.team_size:

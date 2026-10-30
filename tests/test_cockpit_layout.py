@@ -1278,6 +1278,17 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
         self.assertIn("patrol_sweep_ticks", self.js)
         self.assertIn("PATROL ${patrolTicks}T", self.js)
 
+    def test_fleet_cards_offer_captain_assignment(self):
+        for marker in (
+            "data-escort-captain-assign",
+            "data-escort-captain-recall",
+            '"/api/fleet/escort/captain"',
+            "fleet-captain-row",
+            "captain_name",
+        ):
+            self.assertIn(marker, self.js)
+        self.assertIn(".fleet-captain-row", self.css)
+
     def test_fleet_cards_offer_squadron_roles(self):
         for marker in (
             "data-escort-role",

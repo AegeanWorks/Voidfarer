@@ -426,6 +426,35 @@ class TestServer(unittest.TestCase):
         self.assertTrue(payload["ok"], payload.get("message"))
         self.assertIn("sol_coalition", payload["state"]["ship"]["trade_pacts"])
 
+    def test_fleet_captain_endpoint_assigns_and_recalls(self):
+        engine = VoidFarerHandler.engine
+        ship = build_fleet_ship("corvette", "sol", 0)
+        crew = engine.state.ship.crew[0]
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(fleet_ships=(ship,), crew=engine.state.ship.crew),
+        )
+        status, data = self._post(
+            "/api/fleet/escort/captain",
+            {"ship_id": ship.id, "crew_id": crew.id, "action": "assign"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        updated = payload["state"]["fleet_manager"]["ships"][0]
+        self.assertEqual(updated["captain_id"], crew.id)
+        self.assertEqual(updated["captain_name"], crew.name)
+
+        status, data = self._post(
+            "/api/fleet/escort/captain",
+            {"ship_id": ship.id, "action": "recall"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(
+            payload["state"]["fleet_manager"]["ships"][0]["captain_id"], ""
+        )
+
     def test_fleet_role_endpoint_sets_squadron_role(self):
         engine = VoidFarerHandler.engine
         ship = build_fleet_ship("corvette", "sol", 0)

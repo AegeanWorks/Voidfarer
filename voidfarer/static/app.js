@@ -3078,11 +3078,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const xpToNext = Math.max(1, Number(m.skill || 1) * 40);
                 const away = (this.state.away_report?.active || []).find(mission => (mission.crew_ids || []).includes(m.id));
                 const outpost = (this.state.outposts || []).find(o => (o.assigned_crew || []).includes(m.id));
+                const captainShip = (this.state.fleet_manager?.ships || []).find(ship => ship.captain_id === m.id);
                 const statusNote = injury > 0
                     ? ` | <span class="crew-injury">INJURED ${injury}T</span>`
                     : outpost
                         ? ` | <span class="crew-outpost">OUTPOST: ${this.escapeHtml(outpost.name)}</span>`
-                        : (away ? ` | <span class="crew-away">AWAY: ${this.escapeHtml(away.name)}</span>` : "");
+                        : captainShip
+                            ? ` | <span class="crew-captain">CAPTAIN: ${this.escapeHtml(captainShip.name)}</span>`
+                            : (away ? ` | <span class="crew-away">AWAY: ${this.escapeHtml(away.name)}</span>` : "");
                 return `
                 <div class="crew-row">
                     <div class="crew-portrait">${this.portraitAvatar(m.portrait, m.name)}</div>
@@ -3655,6 +3658,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const fleet = this.state.fleet_manager || {};
         const ships = fleet.ships || this.state.ship.fleet_ships || [];
         const patrolTicks = Number(fleet.patrol_sweep_ticks || 6);
+        const crewList = this.state.crew || [];
+        const assignedCrew = new Set([
+            ...(this.state.outposts || []).flatMap(o => o.assigned_crew || []),
+            ...ships.map(ship => ship.captain_id).filter(Boolean),
+        ]);
+        const awayCrew = new Set(
+            (this.state.away_report?.active || []).flatMap(mission => mission.crew_ids || [])
+        );
+        const availableCaptains = crewList.filter(member =>
+            member.status === "active" && !assignedCrew.has(member.id) && !awayCrew.has(member.id)
+        );
+        const captainOptions = availableCaptains.map(member =>
+            `<option value="${this.escapeHtml(member.id)}">${this.escapeHtml(member.name)} (${this.escapeHtml(member.role)} S${member.skill})</option>`
+        ).join("");
         if (this.fleetUpkeepLine) {
             const localShipyard = (this.state.outposts || []).some(o =>
                 o.outpost_type === "shipyard" && o.system_id === this.state.ship.current_system_id
@@ -3693,6 +3710,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         <span class="fleet-xp-label">${xp}/${xpMax} XP</span>
                     </div>
                     <div class="fleet-service">SVC ${Number(ship.battles || 0)}B / ${Number(ship.kills || 0)}K / ${Number(ship.patrol_contacts || 0)}P / ${Number(ship.patrol_credits || 0)}CR</div>
+                    <div class="fleet-captain-row">
+                        <span>CPT ${this.escapeHtml(ship.captain_name || "NONE")}${ship.captain_role_label ? ` · ${this.escapeHtml(ship.captain_role_label.toUpperCase())}` : ""}</span>
+                        ${ship.captain_id
+                            ? `<button class="btn-hud btn-amber" data-escort-captain-recall="${this.escapeHtml(ship.id)}">RECALL</button>`
+                            : `<select data-escort-captain-select="${this.escapeHtml(ship.id)}">${captainOptions || `<option value="">No available crew</option>`}</select>
+                               <button class="btn-hud btn-cyan" data-escort-captain-assign="${this.escapeHtml(ship.id)}" ${availableCaptains.length ? "" : "disabled"}>ASSIGN</button>`}
+                    </div>
                     <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())}<br>${ship.assigned_system_id === this.state.ship.current_system_id ? "LOCAL" : `PATROL ${patrolTicks}T`}</div>
                     <div class="ship-actions">
                         <button class="btn-hud btn-amber" data-escort-repair="${this.escapeHtml(ship.id)}">REPAIR</button>
@@ -3713,6 +3737,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 btn.addEventListener("click", () => this.postAction("/api/fleet/escort/role", {
                     ship_id: btn.getAttribute("data-escort-role"),
                     role: btn.getAttribute("data-next-role"),
+                }, "fleet"))
+            );
+            this.fleetShipRoster.querySelectorAll("[data-escort-captain-assign]").forEach(btn =>
+                btn.addEventListener("click", () => {
+                    const shipId = btn.getAttribute("data-escort-captain-assign");
+                    const select = this.fleetShipRoster.querySelector(`[data-escort-captain-select="${shipId}"]`);
+                    if (!select || !select.value) return;
+                    this.postAction("/api/fleet/escort/captain", {
+                        ship_id: shipId,
+                        crew_id: select.value,
+                        action: "assign",
+                    }, "fleet");
+                })
+            );
+            this.fleetShipRoster.querySelectorAll("[data-escort-captain-recall]").forEach(btn =>
+                btn.addEventListener("click", () => this.postAction("/api/fleet/escort/captain", {
+                    ship_id: btn.getAttribute("data-escort-captain-recall"),
+                    action: "recall",
                 }, "fleet"))
             );
             this.fleetShipRoster.querySelectorAll("[data-escort-sell]").forEach(btn =>
