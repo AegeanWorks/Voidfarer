@@ -8272,14 +8272,37 @@
           "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
           "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
         ],
-        "findings": [],
+        "findings": [
+          {
+            "code": "review-gambit-shared-once",
+            "category": "improvement",
+            "severity": "low",
+            "path": "README.md",
+            "line": 520,
+            "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
+            "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
+            "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+            "hunk": "",
+            "symbol": "",
+            "introduced": true,
+            "reproducible": false,
+            "fixable": false,
+            "interaction": "",
+            "repaired": false,
+            "source": "review",
+            "patch_old": "",
+            "patch_new": ""
+          }
+        ],
         "repairs": [],
-        "counts": {},
+        "counts": {
+          "improvement": 1
+        },
         "reviewed": 4,
         "review": {
           "status": "reviewed",
           "rejected": [
-            "README.md:520: the evidence is not in the current file (it may quote a removed line)"
+            "README.md:520: suggestion dropped (the quoted text is outside the lines this stage added)"
           ],
           "files": [
             ".aikit/codebase_map.md",
@@ -8290,27 +8313,28 @@
           "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
           "redacted": 0,
           "reason": "",
-          "coverage": {
-            "reported": 4,
-            "total": 17,
-            "missing": [
-              "5da24b5a8b71:.aikit/codebase_map.md#10",
-              "5da24b5a8b71:.aikit/codebase_map.md#11",
-              "5da24b5a8b71:.aikit/codebase_map.md#12",
-              "5da24b5a8b71:.aikit/codebase_map.md#13",
-              "5da24b5a8b71:.aikit/codebase_map.md#14",
-              "5da24b5a8b71:.aikit/codebase_map.md#2",
-              "5da24b5a8b71:.aikit/codebase_map.md#3",
-              "5da24b5a8b71:.aikit/codebase_map.md#4",
-              "5da24b5a8b71:.aikit/codebase_map.md#5",
-              "5da24b5a8b71:.aikit/codebase_map.md#6",
-              "5da24b5a8b71:.aikit/codebase_map.md#7",
-              "5da24b5a8b71:.aikit/codebase_map.md#8",
-              "5da24b5a8b71:.aikit/codebase_map.md#9"
-            ],
-            "unknown": []
-          },
-          "findings": []
+          "findings": [
+            {
+              "code": "review-gambit-shared-once",
+              "category": "improvement",
+              "severity": "low",
+              "path": "README.md",
+              "line": 520,
+              "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
+              "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
+              "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+              "hunk": "",
+              "symbol": "",
+              "introduced": true,
+              "reproducible": false,
+              "fixable": false,
+              "interaction": "",
+              "repaired": false,
+              "source": "review",
+              "patch_old": "",
+              "patch_new": ""
+            }
+          ]
         },
         "skipped": [],
         "tests": {},
@@ -8555,14 +8579,37 @@
             "7c049cb1b8d86c84aa94a551d78192b35fce06b0",
             "9d3ba153aa7565b18c0d2cfd7fff527d27940f9d"
           ],
-          "findings": [],
+          "findings": [
+            {
+              "code": "review-gambit-shared-once",
+              "category": "improvement",
+              "severity": "low",
+              "path": "README.md",
+              "line": 520,
+              "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
+              "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
+              "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+              "hunk": "",
+              "symbol": "",
+              "introduced": true,
+              "reproducible": false,
+              "fixable": false,
+              "interaction": "",
+              "repaired": false,
+              "source": "review",
+              "patch_old": "",
+              "patch_new": ""
+            }
+          ],
           "repairs": [],
-          "counts": {},
+          "counts": {
+            "improvement": 1
+          },
           "reviewed": 4,
           "review": {
             "status": "reviewed",
             "rejected": [
-              "README.md:520: the evidence is not in the current file (it may quote a removed line)"
+              "README.md:520: suggestion dropped (the quoted text is outside the lines this stage added)"
             ],
             "files": [
               ".aikit/codebase_map.md",
@@ -8573,27 +8620,28 @@
             "packet": "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\.aikit\\reforge.reviews\\stage-run-3-3-a836faa310e8.md",
             "redacted": 0,
             "reason": "",
-            "coverage": {
-              "reported": 4,
-              "total": 17,
-              "missing": [
-                "5da24b5a8b71:.aikit/codebase_map.md#10",
-                "5da24b5a8b71:.aikit/codebase_map.md#11",
-                "5da24b5a8b71:.aikit/codebase_map.md#12",
-                "5da24b5a8b71:.aikit/codebase_map.md#13",
-                "5da24b5a8b71:.aikit/codebase_map.md#14",
-                "5da24b5a8b71:.aikit/codebase_map.md#2",
-                "5da24b5a8b71:.aikit/codebase_map.md#3",
-                "5da24b5a8b71:.aikit/codebase_map.md#4",
-                "5da24b5a8b71:.aikit/codebase_map.md#5",
-                "5da24b5a8b71:.aikit/codebase_map.md#6",
-                "5da24b5a8b71:.aikit/codebase_map.md#7",
-                "5da24b5a8b71:.aikit/codebase_map.md#8",
-                "5da24b5a8b71:.aikit/codebase_map.md#9"
-              ],
-              "unknown": []
-            },
-            "findings": []
+            "findings": [
+              {
+                "code": "review-gambit-shared-once",
+                "category": "improvement",
+                "severity": "low",
+                "path": "README.md",
+                "line": 520,
+                "message": "The fleet gains one gambit per battle, not one per captain, but the sentence reads as if every captain gets one. Clarify that the wing shares a single gambit so the docs match captain_gambit()'s once-per-battle guard.",
+                "evidence": "Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.",
+                "commit": "5da24b5a8b7110d75a403b46f3319a1acf9541df",
+                "hunk": "",
+                "symbol": "",
+                "introduced": true,
+                "reproducible": false,
+                "fixable": false,
+                "interaction": "",
+                "repaired": false,
+                "source": "review",
+                "patch_old": "",
+                "patch_new": ""
+              }
+            ]
           },
           "skipped": [],
           "tests": {},

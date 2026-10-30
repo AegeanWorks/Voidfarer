@@ -13,16 +13,6 @@
   },
   "checkpoints": [
     {
-      "task_id": "captain-progression",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'captain-progression' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793375188.4487977,
-      "timestamp_str": "2026-10-30 18:46:28",
-      "agent": "opencode:mechanics"
-    },
-    {
       "task_id": "fleet-stance-controls",
       "phase": "2",
       "phase_num": 2,
@@ -249,6 +239,17 @@
       "status": "in_progress",
       "timestamp": 1793379099.9563804,
       "timestamp_str": "2026-10-30 19:51:39",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 3",
+      "phase_num": 3,
+      "description": "Reforge stage 3: window 9, 3 commit(s), 4 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793379374.0773933,
+      "timestamp_str": "2026-10-30 19:56:14",
       "agent": "opencode"
     }
   ]
