@@ -14,17 +14,6 @@
   "checkpoints": [
     {
       "task_id": "captain-progression",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-111 documented; live Edge showed S3 and the crew drill raised the fleet card to S4 with no console errors; 962 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793375179.3587358,
-      "timestamp_str": "2026-10-30 18:46:19",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "captain-progression",
       "phase": "completed",
       "phase_num": 5,
       "description": "Task 'captain-progression' completed successfully.",
@@ -249,6 +238,17 @@
       "status": "in_progress",
       "timestamp": 1793378560.9022777,
       "timestamp_str": "2026-10-30 19:42:40",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 2",
+      "phase_num": 3,
+      "description": "Reforge stage 2: window 6, 3 commit(s), 14 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793379099.9563804,
+      "timestamp_str": "2026-10-30 19:51:39",
       "agent": "opencode"
     }
   ]
