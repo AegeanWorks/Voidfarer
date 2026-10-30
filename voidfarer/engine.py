@@ -94,6 +94,7 @@ from voidfarer.faction_state import (
     simulate_faction_behaviors,
 )
 from voidfarer.fleet import (
+    CAPTAIN_VICTORY_XP,
     ESCORT_CATALOG,
     FLEET_MAX_EXPERIENCE,
     FLEET_TACTICAL_ROLES,
@@ -3010,13 +3011,19 @@ class SimulationEngine:
             if self._crew_ship_id(crew_id) is not None:
                 return False, f"{member.name} already commands another escort."
             updated = replace(
-                ship, captain_id=member.id, captain_role=member.role
+                ship,
+                captain_id=member.id,
+                captain_role=member.role,
+                captain_skill=member.skill,
             )
             fleet_ships = tuple(
                 updated if candidate.id == ship.id else candidate
                 for candidate in self.state.ship.fleet_ships
             )
-            line = f"ESCORT CAPTAIN: {member.name} takes command of {ship.name}."
+            line = (
+                f"ESCORT CAPTAIN: {member.name} (skill {member.skill}) takes command "
+                f"of {ship.name}."
+            )
             new_ship = self._clone_ship(
                 fleet_ships=fleet_ships,
                 flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
@@ -3036,7 +3043,7 @@ class SimulationEngine:
                 (m for m in self.state.ship.crew if m.id == ship.captain_id), None
             )
             name = member.name if member else ship.captain_id
-            updated = replace(ship, captain_id="", captain_role="")
+            updated = replace(ship, captain_id="", captain_role="", captain_skill=0)
             fleet_ships = tuple(
                 updated if candidate.id == ship.id else candidate
                 for candidate in self.state.ship.fleet_ships
@@ -3526,6 +3533,9 @@ class SimulationEngine:
             "sale_value": escort_sale_value(ship),
             "captain_name": captain.name if captain else "",
             "captain_role_label": ship.captain_role.replace("_", " ").title(),
+            "captain_skill": (
+                captain.skill if captain is not None else ship.captain_skill
+            ),
             "tactical_role": role,
             "role_label": role_info["label"],
             "role_damage": role_info["damage"],
@@ -5661,6 +5671,28 @@ class SimulationEngine:
 
                 xp_gain = fleet_victory_experience(combat.enemy_max_hull)
                 local_fleet_ids = {local.id for local in fleet_ships}
+                captain_crew = list(self.state.ship.crew)
+                local_captains = {
+                    escort.captain_id
+                    for escort in self.state.ship.fleet_ships
+                    if escort.id in local_fleet_ids
+                    and escort.captain_id
+                    and escort.hull > 0
+                }
+                captain_promotions: list[str] = []
+                for index, member in enumerate(captain_crew):
+                    if member.id not in local_captains:
+                        continue
+                    promoted_member, promoted = award_crew_xp(
+                        member, CAPTAIN_VICTORY_XP
+                    )
+                    captain_crew[index] = promoted_member
+                    if promoted:
+                        captain_promotions.append(
+                            f"CAPTAIN PROMOTION: {promoted_member.name} reaches "
+                            f"skill {promoted_member.skill}."
+                        )
+                captain_by_id = {member.id: member for member in captain_crew}
                 fleet_updates: list[FleetShip] = []
                 rank_up_lines: list[str] = []
                 for escort in self.state.ship.fleet_ships:
@@ -5668,12 +5700,16 @@ class SimulationEngine:
                         fleet_updates.append(escort)
                         continue
                     before_rank = fleet_rank(escort.experience)["name"]
+                    captain = captain_by_id.get(escort.captain_id)
                     updated_escort = replace(
                         escort,
                         experience=min(
                             FLEET_MAX_EXPERIENCE, escort.experience + xp_gain
                         ),
                         status="escorting" if escort.hull > 0 else "destroyed",
+                        captain_skill=(
+                            captain.skill if captain is not None else escort.captain_skill
+                        ),
                     )
                     if updated_escort.hull > 0:
                         updated_escort = replace(
@@ -5693,10 +5729,11 @@ class SimulationEngine:
                     f"Collected {combat.bounty_credits} cr bounty, salvaged {salvage_granted}x {combat.salvage_commodity}"
                     f"{f' ({salvage_overflow} jettisoned: hold full)' if salvage_overflow else ''}.{relic_note}{rep_note}"
                     + (f" {' '.join(rank_up_lines)}" if rank_up_lines else "")
+                    + (f" {' '.join(captain_promotions)}" if captain_promotions else "")
                 )
                 log_entry = f"Combat outcome: {msg}"
                 new_log = list(self.state.ship.flight_log[-19:]) + [log_entry] + contract_logs + xp_logs
-                victory_crew, morale_log = apply_morale_event(self.state.ship.crew, 5.0, "combat victory celebrated")
+                victory_crew, morale_log = apply_morale_event(tuple(captain_crew), 5.0, "combat victory celebrated")
                 if morale_log:
                     new_log.append(morale_log)
                 systems_after = dict(self.state.systems)
@@ -7700,7 +7737,17 @@ class SimulationEngine:
                 morale=min(100.0, member.morale + 2.0),
             )
             crew = tuple(updated if c.id == crew_id else c for c in self.state.ship.crew)
-            new_ship = self._clone_ship(credits=self.state.ship.credits - cost, crew=crew)
+            fleet_ships = tuple(
+                replace(ship, captain_skill=updated.skill)
+                if ship.captain_id == crew_id
+                else ship
+                for ship in self.state.ship.fleet_ships
+            )
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - cost,
+                crew=crew,
+                fleet_ships=fleet_ships,
+            )
             self.state = self._clone_state(ship=new_ship)
             return True, f"{member.name} completed a training drill: skill {member.skill} -> {updated.skill} (-{cost} cr)."
 

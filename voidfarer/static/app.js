@@ -3745,7 +3745,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     </div>
                     <div class="fleet-service">SVC ${Number(ship.battles || 0)}B / ${Number(ship.kills || 0)}K / ${Number(ship.patrol_contacts || 0)}P / ${Number(ship.patrol_credits || 0)}CR</div>
                     <div class="fleet-captain-row">
-                        <span>CPT ${this.escapeHtml(ship.captain_name || "NONE")}${ship.captain_role_label ? ` · ${this.escapeHtml(ship.captain_role_label.toUpperCase())}` : ""}</span>
+                        <span>CPT ${this.escapeHtml(ship.captain_name || "NONE")}${ship.captain_role_label ? ` · ${this.escapeHtml(ship.captain_role_label.toUpperCase())}` : ""}${ship.captain_skill ? ` · S${Number(ship.captain_skill)}` : ""}</span>
                         ${ship.captain_id
                             ? `<button class="btn-hud btn-amber" data-escort-captain-recall="${this.escapeHtml(ship.id)}">RECALL</button>`
                             : `<select data-escort-captain-select="${this.escapeHtml(ship.id)}">${captainOptions || `<option value="">No available crew</option>`}</select>

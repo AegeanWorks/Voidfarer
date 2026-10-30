@@ -1285,6 +1285,7 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
             '"/api/fleet/escort/captain"',
             "fleet-captain-row",
             "captain_name",
+            "captain_skill",
         ):
             self.assertIn(marker, self.js)
         self.assertIn(".fleet-captain-row", self.css)

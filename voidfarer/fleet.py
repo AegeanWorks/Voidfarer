@@ -90,6 +90,21 @@ FLEET_CAPTAIN_EVASION: dict[str, float] = {
 }
 FLEET_CAPTAIN_UPKEEP: dict[str, float] = {"quartermaster": 0.90}
 
+CAPTAIN_SKILL_STEP = 0.05
+CAPTAIN_VICTORY_XP = 60
+
+
+def captain_skill_multiplier(skill: int) -> float:
+    """Role bonuses grow 5% per skill rank above 1; skill 0 is legacy-neutral."""
+    return 1.0 + CAPTAIN_SKILL_STEP * max(0, min(9, int(skill) - 1))
+
+
+def _captain_multiplier(ship: FleetShip) -> float:
+    if not ship.captain_role:
+        return 1.0
+    return captain_skill_multiplier(ship.captain_skill)
+
+
 FLEET_TACTICAL_ROLES: dict[str, dict[str, Any]] = {
     "screen": {"label": "Screen", "damage": 0.75, "evasion": 1.50, "repair": 0},
     "strike": {"label": "Strike", "damage": 1.25, "evasion": 0.75, "repair": 0},
@@ -150,7 +165,8 @@ def fleet_upkeep(ships: tuple[FleetShip, ...]) -> int:
         if ship.hull <= 0:
             continue
         base = FLEET_UPKEEP_BY_ROLE.get(ship.role, 30)
-        discount = FLEET_CAPTAIN_UPKEEP.get(ship.captain_role, 1.0)
+        base_discount = 1.0 - FLEET_CAPTAIN_UPKEEP.get(ship.captain_role, 1.0)
+        discount = 1.0 - base_discount * _captain_multiplier(ship)
         total += int(base * discount)
     return total
 
@@ -257,7 +273,7 @@ def fleet_damage(ships: tuple[FleetShip, ...], formation: str = "balanced") -> i
             continue
         rank = fleet_rank(ship.experience)
         role = FLEET_TACTICAL_ROLES[normalize_fleet_role(ship.tactical_role)]
-        captain_mult = 1.0 + FLEET_CAPTAIN_DAMAGE.get(ship.captain_role, 0.0)
+        captain_mult = 1.0 + FLEET_CAPTAIN_DAMAGE.get(ship.captain_role, 0.0) * _captain_multiplier(ship)
         # Experience gives a shallow continuous edge; ranks add the visible jump.
         growth = 1.0 + min(0.50, ship.experience * 0.005) + rank["damage_bonus"]
         total += max(
@@ -280,7 +296,7 @@ def fleet_evasion_bonus(ships: tuple[FleetShip, ...], formation: str = "balanced
         (
             ship.evasion
             + fleet_rank(ship.experience)["evasion_bonus"]
-            + FLEET_CAPTAIN_EVASION.get(ship.captain_role, 0.0)
+            + FLEET_CAPTAIN_EVASION.get(ship.captain_role, 0.0) * _captain_multiplier(ship)
         )
         * float(FLEET_TACTICAL_ROLES[normalize_fleet_role(ship.tactical_role)]["evasion"])
         for ship in ships

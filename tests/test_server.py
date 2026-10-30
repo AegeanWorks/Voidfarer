@@ -462,6 +462,7 @@ class TestServer(unittest.TestCase):
         updated = payload["state"]["fleet_manager"]["ships"][0]
         self.assertEqual(updated["captain_id"], crew.id)
         self.assertEqual(updated["captain_name"], crew.name)
+        self.assertEqual(updated["captain_skill"], crew.skill)
 
         status, data = self._post(
             "/api/fleet/escort/captain",
@@ -472,6 +473,9 @@ class TestServer(unittest.TestCase):
         self.assertTrue(payload["ok"], payload.get("message"))
         self.assertEqual(
             payload["state"]["fleet_manager"]["ships"][0]["captain_id"], ""
+        )
+        self.assertEqual(
+            payload["state"]["fleet_manager"]["ships"][0]["captain_skill"], 0
         )
 
     def test_fleet_role_endpoint_sets_squadron_role(self):

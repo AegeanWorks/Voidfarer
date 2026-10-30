@@ -621,6 +621,9 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             print(f"{DIM}No escort warships commissioned. Buy at a drydock: fleet buy_escort <type>{RESET}")
         for ship in report["ships"]:
             status_color = GREEN if ship["status"] == "escorting" else (YELLOW if ship["status"] == "damaged" else RED)
+            captain_skill = (
+                f" S{ship['captain_skill']}" if ship.get("captain_skill") else ""
+            )
             print(
                 f"{ship['id']:<16} {BOLD}{ship['name']:<28}{RESET} {ship['role']:<9} "
                 f"HULL {ship['hull']}/{ship['max_hull']} SHIELD {ship['shield']}/{ship['max_shield']} "
@@ -630,7 +633,8 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
                 f"XP {ship.get('experience', 0)}/{ship.get('experience_max', 300)} "
                 f"B{ship.get('battles', 0)} K{ship.get('kills', 0)} "
                 f"P{ship.get('patrol_contacts', 0)}/{ship.get('patrol_credits', 0)}cr "
-                f"CPT {ship.get('captain_name') or '--'} SYS {ship['assigned_system_id']}"
+                f"CPT {ship.get('captain_name') or '--'}{captain_skill} "
+                f"SYS {ship['assigned_system_id']}"
             )
         print(
             f"\nFormation damage: {report['total_damage']} total / "
