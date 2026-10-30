@@ -3357,6 +3357,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const moduleOptions = Object.entries(moduleCatalog).map(([id, module]) =>
             `<option value="${this.escapeHtml(id)}">${this.escapeHtml(module.name)} (${Number(module.cost || 0)} CR)</option>`
         ).join("");
+        const specCatalog = this.state.outpost_specializations || {};
         const crewList = this.state.crew || [];
         const crewById = new Map(crewList.map(member => [member.id, member]));
         const assignedCrew = new Set(outposts.flatMap(o => o.assigned_crew || []));
@@ -3377,6 +3378,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const capacity = Number(o.crew_capacity || 3);
             const canAssign = availableCrew.length > 0 && assigned.length < capacity;
             const localShipyard = o.outpost_type === "shipyard" && o.system_id === this.state.ship.current_system_id;
+            const specId = o.specialization || "";
+            const specLabel = o.specialization_label || "None";
+            const specUnlocked = Number(o.level) >= 3;
+            const specOptions = Object.entries(specCatalog).map(([id, spec]) =>
+                `<option value="${this.escapeHtml(id)}" ${id === specId ? "selected" : ""}>${this.escapeHtml(spec.label)} (${Number(spec.cost || 0)} CR)</option>`
+            ).join("");
             return `
             <div class="outpost-row"><span>${this.escapeHtml(o.name)} - LVL ${o.level} - POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}${localShipyard ? ` <span class="outpost-service-badge">SERVICES ONLINE</span>` : ""}</span>
             <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button></div>
@@ -3397,6 +3404,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         <button data-outpost-crew-recall="${this.escapeHtml(o.id)}" data-crew-id="${this.escapeHtml(member.id)}" title="Recall to ship">×</button>
                     </span>
                 `).join("") : `<span class="outpost-crew-empty">No specialists stationed.</span>`}
+            </div>
+            <div class="outpost-spec-bar">
+                <span class="outpost-spec-label">SPEC: ${this.escapeHtml(specLabel.toUpperCase())}</span>
+                ${specUnlocked
+                    ? `<select data-outpost-spec-select="${this.escapeHtml(o.id)}">${specOptions}</select>
+                       <button class="btn-hud btn-purple" data-outpost-spec-set="${this.escapeHtml(o.id)}">SET</button>`
+                    : `<span class="outpost-spec-locked">UNLOCKS AT LVL 3</span>`}
             </div>
         `;
         }).join("");
@@ -3428,6 +3442,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 crew_id: btn.getAttribute("data-crew-id"),
                 action: "recall",
             }, "empire"))
+        );
+        this.outpostList.querySelectorAll("[data-outpost-spec-set]").forEach(btn =>
+            btn.addEventListener("click", () => {
+                const outpostId = btn.getAttribute("data-outpost-spec-set");
+                const select = this.outpostList.querySelector(`[data-outpost-spec-select="${outpostId}"]`);
+                if (!select || !select.value) return;
+                this.postAction("/api/outpost/specialize", {
+                    outpost_id: outpostId,
+                    specialization: select.value,
+                }, "empire");
+            })
         );
 
         const leaders = this.state.faction_leaders || [];

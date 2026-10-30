@@ -1322,6 +1322,16 @@ class TestOutpostModuleCockpit(unittest.TestCase):
         for selector in (".outpost-crew-bar", ".outpost-crew-chip", ".crew-outpost"):
             self.assertIn(selector, self.css)
 
+    def test_outpost_rows_offer_specialization(self):
+        for marker in (
+            "data-outpost-spec-select",
+            "data-outpost-spec-set",
+            '"/api/outpost/specialize"',
+            "specialization_label",
+        ):
+            self.assertIn(marker, self.js)
+        self.assertIn(".outpost-spec-bar", self.css)
+
     def test_local_shipyard_shows_services_online(self):
         self.assertIn("SERVICES ONLINE", self.js)
         self.assertIn("outpost-service-badge", self.css)

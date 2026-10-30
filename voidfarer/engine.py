@@ -126,11 +126,13 @@ from voidfarer.outposts import (
     OUTPOST_CREW_CAPACITY,
     OUTPOST_MAP,
     OUTPOST_MODULE_CATALOG,
+    OUTPOST_SPECIALIZATIONS,
     OUTPOST_TYPES,
     build_outpost,
     can_build_on,
     get_outpost_type,
     grow_outpost_population,
+    outpost_crew_capacity,
     outpost_crew_multiplier,
     outpost_tick_production,
     upgrade_outpost,
@@ -302,6 +304,7 @@ STATIC_SNAPSHOT_KEYS = (
     "mercenary_catalog",
     "outpost_catalog",
     "outpost_modules",
+    "outpost_specializations",
     "story_chapters",
     "story_chapters_map",
     "weapons",
@@ -324,6 +327,7 @@ def static_catalogs() -> dict[str, Any]:
         "mercenary_catalog": MERCENARY_CATALOG,
         "outpost_catalog": [t.to_dict() for t in OUTPOST_TYPES],
         "outpost_modules": OUTPOST_MODULE_CATALOG,
+        "outpost_specializations": OUTPOST_SPECIALIZATIONS,
         "story_chapters": [c.to_dict() for c in CAMPAIGN_CHAPTERS],
         "story_chapters_map": {c.id: c.to_dict() for c in CAMPAIGN_CHAPTERS},
         "weapons": weapon_catalog(),
@@ -2854,6 +2858,41 @@ class SimulationEngine:
                 f"(stack {modules[module_id]}/3).",
             )
 
+    def specialize_outpost(self, outpost_id: str, specialization: str) -> tuple[bool, str]:
+        """Choose or switch an outpost's level-3 production focus."""
+        with self.lock:
+            outpost = next((o for o in self.state.outposts if o.id == outpost_id), None)
+            if outpost is None:
+                return False, f"Unknown outpost '{outpost_id}'."
+            if outpost.level < 3:
+                return False, "Outpost specialization unlocks at level 3."
+            spec_id = str(specialization).strip().lower()
+            spec = OUTPOST_SPECIALIZATIONS.get(spec_id)
+            if spec is None:
+                return (
+                    False,
+                    "Unknown specialization; use industry, research, commerce or logistics.",
+                )
+            if outpost.specialization == spec_id:
+                return False, f"{outpost.name} is already specialized in {spec['label']}."
+            cost = int(spec["cost"])
+            if self.state.ship.credits < cost:
+                return False, f"Insufficient credits: specialization costs {cost} cr."
+            updated = replace(outpost, specialization=spec_id)
+            outposts = tuple(
+                updated if o.id == outpost_id else o for o in self.state.outposts
+            )
+            line = (
+                f"OUTPOST SPECIALIZATION: {outpost.name} set to {spec['label']} "
+                f"for {cost} cr."
+            )
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - cost,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            return True, line
+
     def _crew_outpost_id(self, crew_id: str) -> str | None:
         for outpost in self.state.outposts:
             if crew_id in outpost.assigned_crew:
@@ -2869,10 +2908,13 @@ class SimulationEngine:
     ) -> dict[str, Any]:
         crew_by_id = {member.id: member for member in self.state.ship.crew}
         crew_mult = outpost_crew_multiplier(outpost, crew_by_id)
+        spec = OUTPOST_SPECIALIZATIONS.get(outpost.specialization)
         payload = {
             **outpost.to_dict(),
             "crew_multiplier": round(crew_mult, 3),
-            "crew_capacity": OUTPOST_CREW_CAPACITY,
+            "crew_capacity": outpost_crew_capacity(outpost),
+            "specialization_label": spec["label"] if spec else "",
+            "specialization_cost": int(spec["cost"]) if spec else 600,
             "crew_names": [
                 crew_by_id[cid].name
                 for cid in outpost.assigned_crew
@@ -2896,8 +2938,9 @@ class SimulationEngine:
                 return False, f"Unknown crew member '{crew_id}'."
             if member.status != "active" or member.injury_ticks > 0:
                 return False, f"{member.name} is not fit for outpost duty."
-            if len(outpost.assigned_crew) >= OUTPOST_CREW_CAPACITY:
-                return False, f"{outpost.name} already has {OUTPOST_CREW_CAPACITY} specialists."
+            capacity = outpost_crew_capacity(outpost)
+            if len(outpost.assigned_crew) >= capacity:
+                return False, f"{outpost.name} already has {capacity} specialists."
             current_outpost = self._crew_outpost_id(crew_id)
             if current_outpost is not None:
                 return False, f"{member.name} is already stationed at {current_outpost}."
@@ -2985,6 +3028,7 @@ class SimulationEngine:
                 ],
                 "catalog": [t.to_dict() for t in OUTPOST_TYPES],
                 "modules": OUTPOST_MODULE_CATALOG,
+                "specializations": OUTPOST_SPECIALIZATIONS,
             }
 
     def _faction_at_war_with_player(self, faction_id: str) -> bool:

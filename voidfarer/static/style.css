@@ -8675,3 +8675,10 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* Frontier shipyard service link shown on the outpost and fleet headers. */
 .outpost-service-badge { margin-left: 4px; padding: 0 4px; border: 1px solid rgba(143, 191, 159, 0.45); color: var(--console-green); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; }
+
+/* Outpost specialization: level-3 production focus and switch control. */
+.outpost-spec-bar { display: flex; gap: 5px; align-items: center; margin-top: 3px; }
+.outpost-spec-label { flex: 0 0 auto; color: var(--console-purple); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+.outpost-spec-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
+.outpost-spec-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }
+.outpost-spec-locked { color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }

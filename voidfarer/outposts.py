@@ -91,6 +91,33 @@ OUTPOST_PREFERRED_ROLES: dict[str, tuple[str, ...]] = {
 OUTPOST_CREW_CAPACITY = 3
 OUTPOST_CREW_MAX_MULTIPLIER = 1.60
 
+OUTPOST_SPECIALIZATIONS: dict[str, dict[str, Any]] = {
+    "industry": {
+        "label": "Industry",
+        "cost": 600,
+        "outputs": {"credits": 1.30, "other": 1.0},
+        "crew_capacity": 0,
+    },
+    "research": {
+        "label": "Research",
+        "cost": 600,
+        "outputs": {"research": 1.40, "credits": 0.85, "other": 1.0},
+        "crew_capacity": 0,
+    },
+    "commerce": {
+        "label": "Commerce",
+        "cost": 600,
+        "outputs": {"credits": 1.20, "other": 1.05},
+        "crew_capacity": 0,
+    },
+    "logistics": {
+        "label": "Logistics",
+        "cost": 600,
+        "outputs": {"credits": 1.10, "research": 1.10, "other": 1.10},
+        "crew_capacity": 1,
+    },
+}
+
 OUTPOST_MODULE_CATALOG: dict[str, dict[str, Any]] = {
     "extractor": {"name": "Ore Extractor", "cost": 400, "production": {"credits": 4.0}},
     "laboratory": {"name": "Research Laboratory", "cost": 500, "production": {"research": 3.0}},
@@ -164,6 +191,13 @@ def build_outpost(
     )
 
 
+def outpost_crew_capacity(outpost: Outpost) -> int:
+    """Logistics specialization adds one specialist slot."""
+    spec = OUTPOST_SPECIALIZATIONS.get(outpost.specialization)
+    bonus = int(spec["crew_capacity"]) if spec else 0
+    return OUTPOST_CREW_CAPACITY + bonus
+
+
 def outpost_crew_multiplier(outpost: Outpost, crew_by_id: dict[str, Any]) -> float:
     """Stationed specialists add a base lift plus a bonus in their preferred role."""
     multiplier = 1.0
@@ -191,9 +225,17 @@ def outpost_tick_production(
     modules = sum(outpost.modules.values())
     module_mult = 1.0 + max(0, modules - 1) * 0.10
     crew_mult = max(0.1, min(OUTPOST_CREW_MAX_MULTIPLIER, crew_multiplier))
+    spec = OUTPOST_SPECIALIZATIONS.get(outpost.specialization)
+    spec_outputs = spec["outputs"] if spec else {}
     return {
         key: round(
-            value * level_mult * module_mult * crew_mult * max(0.1, yield_multiplier), 2
+            value
+            * level_mult
+            * module_mult
+            * crew_mult
+            * max(0.1, yield_multiplier)
+            * float(spec_outputs.get(key, spec_outputs.get("other", 1.0))),
+            2,
         )
         for key, value in base.items()
     }

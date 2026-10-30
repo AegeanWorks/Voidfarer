@@ -1330,6 +1330,7 @@ class Outpost:
     integrity: float = 100.0
     founded_tick: int = 0
     assigned_crew: tuple[str, ...] = ()
+    specialization: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1354,6 +1355,7 @@ class Outpost:
             integrity=float(data.get("integrity", 100.0)),
             founded_tick=int(data.get("founded_tick", 0)),
             assigned_crew=tuple(str(cid) for cid in data.get("assigned_crew", ())),
+            specialization=str(data.get("specialization", "")),
         )
 
 

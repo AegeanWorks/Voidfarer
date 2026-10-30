@@ -61,6 +61,12 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertEqual(code, 0)
             self.assertIn("auto-trade broker", mock_out.getvalue().lower())
 
+    def test_cli_outpost_specialize_parses(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["outpost", "specialize", "missing_outpost", "industry"])
+            self.assertEqual(code, 1)
+            self.assertIn("unknown outpost", mock_out.getvalue().lower())
+
     def test_cli_outpost_crew_parses(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["outpost", "crew", "missing_outpost", "missing_crew"])
