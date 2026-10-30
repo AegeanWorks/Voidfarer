@@ -1309,3 +1309,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Award 60 crew XP to each living local captain on victory; a promotion syncs the ship's stored skill in the same atomic state update.
   4. Sync the stored skill when a captain completes a training drill; expose `captain_skill` in the fleet report and show `S<skill>` in the cockpit card and CLI ledger.
 - **Consequences**: Captains now progress through both drills and battles, and every fleet bonus has a visible skill behind it. Skill 0 keeps old saves neutral. Suite: 962 tests (65 suites), 5/5 gates.
+
+### ADR-112: Cockpit Fleet Stance Controls
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Battle stance changed fleet damage and evasion and was exposed through `combat stance` and `POST /api/combat/stance`, but the cockpit had neither a control nor a readout. Mouse players could not choose a doctrine or see the current one.
+- **Decision**:
+  1. Add `battle_stance` to both the fleet-manager report and the snapshot's `fleet_manager` block.
+  2. Add BALANCED/AGGRESSIVE/DEFENSIVE buttons to the fleet panel, with an active state and a short effect hint.
+  3. Post changes to the existing stance endpoint, reuse its validation and persistence, and show `FLEET STANCE: <name>` in the combat card.
+  4. Cover the report field, endpoint response, cockpit markup and styling with regressions.
+- **Consequences**: The cockpit now reaches parity with the CLI and REST API, and stance is visible before and during combat. No schema change was needed because `ShipState.battle_stance` already persists. Live Edge switched to AGGRESSIVE and showed the highlight, hint and report value with no console errors. Suite: 966 tests (66 suites), 5/5 gates.

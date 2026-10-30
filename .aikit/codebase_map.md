@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `110`
-- **Total Classes**: `278`
+- **Total Classes**: `279`
 - **Total Top-Level Functions**: `326`
-- **Total Class Methods**: `1602`
-- **Total Source Lines**: `42682`
+- **Total Class Methods**: `1607`
+- **Total Source Lines**: `42724`
 
 ---
 
@@ -287,7 +287,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1464` lines (`65039` bytes)
+**Size**: `1491` lines (`66167` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -487,6 +487,11 @@
   - Method `.test_fleet_cards_offer_squadron_roles()`
   - Method `.test_fleet_cards_show_service_records()`
   - Method `.test_fleet_manager_shows_monthly_upkeep()`
+- `class TestFleetStanceCockpit` - *Battle stance must be controllable and visible in the cockpit.*
+  - Method `.setUpClass()`
+  - Method `.test_cockpit_offers_three_stance_buttons()`
+  - Method `.test_stance_controls_post_to_the_existing_endpoint()`
+  - Method `.test_stance_layout_and_active_state_are_styled()`
 - `class TestResearchQueueCockpit` - *The Empire research list must expose queue and cancel controls.*
   - Method `.setUpClass()`
   - Method `.test_research_rows_offer_queue_and_cancel()`
@@ -600,7 +605,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `391` lines (`18610` bytes)
+**Size**: `394` lines (`18728` bytes)
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -1539,7 +1544,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `749` lines (`32402` bytes)
+**Size**: `759` lines (`32897` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1583,6 +1588,7 @@
   - Method `.test_fleet_captain_endpoint_assigns_and_recalls()`
   - Method `.test_fleet_role_endpoint_sets_squadron_role()`
   - Method `.test_fleet_train_endpoint_buys_experience()`
+  - Method `.test_combat_stance_endpoint_updates_the_fleet_report()`
   - Method `.test_quantum_automation_endpoints_configure_and_report()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
   - Method `.test_research_queue_endpoints_queue_and_cancel()`
@@ -2407,7 +2413,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9056` lines (`444696` bytes)
+**Size**: `9058` lines (`444828` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
