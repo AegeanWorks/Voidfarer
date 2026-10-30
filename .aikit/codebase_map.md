@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `110`
-- **Total Classes**: `279`
+- **Total Python Modules**: `111`
+- **Total Classes**: `281`
 - **Total Top-Level Functions**: `326`
-- **Total Class Methods**: `1607`
-- **Total Source Lines**: `42724`
+- **Total Class Methods**: `1623`
+- **Total Source Lines**: `43064`
 
 ---
 
@@ -176,6 +176,26 @@
 
 ---
 
+### [`tests/test_captain_gambit.py`](tests/test_captain_gambit.py)
+> *Captain's Gambit: once-per-battle role actions scaled by captain skill.*
+
+**Size**: `127` lines (`4563` bytes)
+
+**Classes:**
+- `class CaptainGambitTest`
+  - Method `._engine(role, skill)`
+  - Method `.test_engineer_repairs_the_flagship_hull()`
+  - Method `.test_medic_repairs_the_local_escort_wing()`
+  - Method `.test_quartermaster_restores_escort_shields()`
+  - Method `.test_pilot_adds_evasion_for_the_battle()`
+  - Method `.test_scientist_drains_enemy_shields()`
+  - Method `.test_marine_cuts_enemy_firepower()`
+  - Method `.test_gambit_is_once_per_battle()`
+  - Method `.test_gambit_requires_a_local_captain()`
+  - Method `.test_gambit_fields_round_trip_and_legacy_defaults()`
+
+---
+
 ### [`tests/test_captain_progression.py`](tests/test_captain_progression.py)
 > *Escort captain progression: stored skill, scaling bonuses and battle XP.*
 
@@ -234,7 +254,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `318` lines (`14298` bytes)
+**Size**: `330` lines (`14866` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -259,6 +279,8 @@
   - Method `.test_cli_fleet_train_parses()`
   - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
   - Method `.test_cli_combat_accepts_documented_actions()`
+  - Method `.test_cli_combat_gambit_reports_outside_combat()`
+  - Method `.test_cli_combat_stance_is_reachable()`
   - Method `.test_cli_shipyard_subcommands_parse()`
   - Method `.test_cli_corporations_alias()`
   - Method `.test_cli_repair_and_refuel_accept_positional_amounts()`
@@ -287,7 +309,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1491` lines (`66167` bytes)
+**Size**: `1506` lines (`66726` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -492,6 +514,9 @@
   - Method `.test_cockpit_offers_three_stance_buttons()`
   - Method `.test_stance_controls_post_to_the_existing_endpoint()`
   - Method `.test_stance_layout_and_active_state_are_styled()`
+- `class TestCaptainGambitCockpit` - *The combat card must offer the once-per-battle captain action.*
+  - Method `.setUpClass()`
+  - Method `.test_combat_card_has_a_captain_gambit_button()`
 - `class TestResearchQueueCockpit` - *The Empire research list must expose queue and cancel controls.*
   - Method `.setUpClass()`
   - Method `.test_research_rows_offer_queue_and_cancel()`
@@ -1544,7 +1569,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `759` lines (`32897` bytes)
+**Size**: `800` lines (`34368` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1589,6 +1614,7 @@
   - Method `.test_fleet_role_endpoint_sets_squadron_role()`
   - Method `.test_fleet_train_endpoint_buys_experience()`
   - Method `.test_combat_stance_endpoint_updates_the_fleet_report()`
+  - Method `.test_captain_gambit_endpoint_spends_a_local_captain()`
   - Method `.test_quantum_automation_endpoints_configure_and_report()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
   - Method `.test_research_queue_endpoints_queue_and_cancel()`
@@ -2115,7 +2141,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `761` lines (`33184` bytes)
+**Size**: `762` lines (`33262` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2229,7 +2255,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3223` lines (`164449` bytes)
+**Size**: `3231` lines (`164841` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2413,7 +2439,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9058` lines (`444828` bytes)
+**Size**: `9182` lines (`450455` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2554,6 +2580,7 @@
   - Method `.deploy_drone(drone_id, target_system_id)` - *Redeploy an autonomous fleet asset to a different star system.*
   - Method `.collect_drone_yield(drone_id)` - *Collect accumulated cargo and research credits from fleet drones.*
   - Method `.set_battle_stance(stance)` - *Set fleet battle doctrine: balanced, aggressive, or defensive.*
+  - Method `.captain_gambit()` - *Spend one captain's once-per-battle specialty action.*
   - Method `._combat_defeat(combat, note, fleet_ships, crew, streak, fuel)` - *End a fight at 0 hull, pausing time so a destroyed ship cannot recover by ticking.*
   - Method `.combat_action(action)` - *Execute a tactical combat maneuver against an active hostile intercept.*
   - Method `.resolve_anomaly(choice_id)` - *Resolve current deep-space anomaly encounter with power-check validation.*
@@ -2853,7 +2880,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2250` lines (`83888` bytes)
+**Size**: `2256` lines (`84175` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -3135,7 +3162,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1448` lines (`62130` bytes)
+**Size**: `1454` lines (`62391` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

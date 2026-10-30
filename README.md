@@ -520,7 +520,7 @@ Remote escorts are marked `PATROL` and fight only locally. Each cuts local pirat
 python -m voidfarer.cli fleet train <escort_id>
 python -m voidfarer.cli fleet ships
 ```
-Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Fleet cards show rank, progress, XP and TRAIN; promotions are logged. Captains earn victory XP; skill scales role bonuses.
+Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP. Cards show rank, XP and TRAIN; promotions are logged. Captains gain victory XP, scale role bonuses and get a gambit per battle.
 
 ### 19. Stellaris-Style Windows Cockpit
 

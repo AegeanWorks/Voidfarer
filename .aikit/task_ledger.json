@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "fleet-stance-controls",
+    "task_id": "captain-gambit",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793376242.7586913,
+    "updated_at": 1793377225.7222352,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793376252.1791103
+    "completed_at": 1793377237.3937566
   },
   "checkpoints": [
-    {
-      "task_id": "quantum-automation",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan quantum auto-freight: a docked policy that ships surplus cargo along the best net route every 6 ticks above a chosen minimum, with API, CLI and panel controls.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793373236.7091496,
-      "timestamp_str": "2026-10-30 18:13:56",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Quantum freight required manually checking routes and pressing SHIP for every surplus commodity, while the local broker already automated market trades.",
-        "benefits": "Long-haul arbitrage can run unattended, surplus cargo stops idling in the hold, and manual SHIP controls remain available for exceptions.",
-        "risks": "contract: existing saves must default to an off policy and the normal order path must still charge fees, cargo and slots; dependency: automation calls the route report and place-order path; concurrency: tick-time orders mutate cargo, credits, policy and the flight log; state: cooldown, order count and last net must persist.",
-        "mitigation": "Add policy, dock, best-route, cooldown, minimum and persistence regressions first; reuse place_quantum_order; verify the live toggle and auto order."
-      }
-    },
-    {
-      "task_id": "quantum-automation",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted QuantumAutomation, docked policy setup, best-route selection on a 6-tick cooldown through place_quantum_order, GET/POST automation endpoints, autotrade quantum CLI and AUTO-FREIGHT/MIN NET panel controls implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793373309.997672,
-      "timestamp_str": "2026-10-30 18:15:09",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "quantum-automation",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-108 recorded; live Edge enabled auto-freight at min net 0 and shipped 10 titanium for a 1,569 cr net route; 945 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793373310.130539,
-      "timestamp_str": "2026-10-30 18:15:10",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "quantum-automation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'quantum-automation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793373321.9504752,
-      "timestamp_str": "2026-10-30 18:15:21",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "research-pacts",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793376252.1791124,
       "timestamp_str": "2026-10-30 19:04:12",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "captain-gambit",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan Captain's Gambit: one role-scaled free command per battle from the highest-skill local escort captain, in cockpit, CLI and REST.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793376356.5541468,
+      "timestamp_str": "2026-10-30 19:05:56",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Captains now gain skill and XP but still act only through passive bonuses; combat offers no moment where the player calls on a captain's specialty.",
+        "benefits": "Captains become active tactical choices, skill growth has a visible payoff, and combat gains a once-per-battle decision without new random outcomes.",
+        "risks": "contract: CombatEncounter gains gambit fields with legacy defaults; dependency: combat, fleet reports and UI share the lead-captain and used flags; concurrency: the command mutates ship, fleet and combat under the engine lock; state: used/evasion fields must survive save-load and reset only when combat ends.",
+        "mitigation": "Test every role effect, the once-per-battle guard, no-captain refusal, persistence and UI wiring; keep effects non-lethal so victory resolution stays inside combat_action; verify live Edge."
+      }
+    },
+    {
+      "task_id": "captain-gambit",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Added gambit combat fields, engine role effects, REST endpoint, CLI action, combat-card button and 13 regressions; also made combat stance reachable from argparse; 979 tests pass.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793377225.179695,
+      "timestamp_str": "2026-10-30 19:20:25",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "captain-gambit",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-113 documented; live Edge spent an engineer gambit, raised hull 50 -> 77 and disabled the button with no console errors; 979 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793377225.7222352,
+      "timestamp_str": "2026-10-30 19:20:25",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "captain-gambit",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'captain-gambit' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793377237.3937588,
+      "timestamp_str": "2026-10-30 19:20:37",
       "agent": "opencode:mechanics"
     }
   ]

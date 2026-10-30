@@ -1320,3 +1320,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Post changes to the existing stance endpoint, reuse its validation and persistence, and show `FLEET STANCE: <name>` in the combat card.
   4. Cover the report field, endpoint response, cockpit markup and styling with regressions.
 - **Consequences**: The cockpit now reaches parity with the CLI and REST API, and stance is visible before and during combat. No schema change was needed because `ShipState.battle_stance` already persists. Live Edge switched to AGGRESSIVE and showed the highlight, hint and report value with no console errors. Suite: 966 tests (66 suites), 5/5 gates.
+
+### ADR-113: Captain's Gambit
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Captains gained skill, XP and passive role bonuses, but combat offered no active moment that called on a captain's specialty. Skill growth was visible only as a passive multiplier.
+- **Decision**:
+  1. Add `captain_gambit_used` and `captain_evasion_bonus` to `CombatEncounter` with legacy-safe defaults.
+  2. Add `captain_gambit()`: a free once-per-battle action led by the highest-skill living local escort captain.
+  3. Scale role effects by captain skill: engineer repairs hull, medic repairs escorts, quartermaster restores escort shields, pilot adds battle evasion, scientist drains enemy shields, marine cuts enemy firepower. Effects are non-lethal so combat victory still resolves through `combat_action`.
+  4. Expose `POST /api/combat/gambit`, `combat gambit`, and a combat-card button that disables after use or without a local captain.
+  5. Make `combat stance` reachable from argparse while touching the same action list.
+- **Consequences**: Captains now have an active tactical moment, and skill growth affects both passive and active value. Legacy combats load with the gambit unused and no evasion bonus. Live Edge verified the button in an active fight. Suite: 979 tests, 5/5 gates.
