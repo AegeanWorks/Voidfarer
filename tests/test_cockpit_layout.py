@@ -1278,6 +1278,13 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
         self.assertIn("patrol_sweep_ticks", self.js)
         self.assertIn("PATROL ${patrolTicks}T", self.js)
 
+    def test_fleet_manager_shows_monthly_upkeep(self):
+        html = INDEX_HTML.read_text(encoding="utf-8")
+        self.assertIn('id="fleetUpkeepLine"', html)
+        self.assertIn("fleetUpkeepLine", self.js)
+        self.assertIn("upkeep_per_month", self.js)
+        self.assertIn(".fleet-upkeep-line", self.css)
+
 
 class TestOutpostModuleCockpit(unittest.TestCase):
     """The Empire tab must expose outpost module installation."""

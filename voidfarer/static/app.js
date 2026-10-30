@@ -640,6 +640,7 @@ class CockpitApp {
         // Market
         this.marketTitle = document.getElementById("marketTitle");
         this.marketArch = document.getElementById("marketArch");
+        this.fleetUpkeepLine = document.getElementById("fleetUpkeepLine");
         this.marketTableBody = document.getElementById("marketTableBody");
         this.autoTradeCommodity = document.getElementById("autoTradeCommodity");
         this.autoTradeBuy = document.getElementById("autoTradeBuy");
@@ -1545,7 +1546,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const monthly = flow ? ` · ${flow.net_per_month >= 0 ? "+" : ""}${Math.round(flow.net_per_month)}/MO` : "";
         this.cargoSummary.textContent = `HOLD: ${totalCargo}/${ship.cargo_capacity}${monthly}`;
         this.cargoSummary.title = flow
-            ? `Monthly treasury: payroll -${flow.upkeep_per_month} cr, passive +${flow.passive_per_month} cr`
+            ? `Monthly treasury: crew+fleet -${flow.upkeep_per_month} cr (fleet ${flow.fleet_upkeep_per_month || 0}), passive +${flow.passive_per_month} cr`
             : "";
         this.cargoDetailed.textContent = `${totalCargo} / ${ship.cargo_capacity} VOLUME`;
         this.cargoMeterFill.style.width = `${Math.min(100, Math.round((totalCargo / ship.cargo_capacity) * 100))}%`;
@@ -3028,7 +3029,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const netColor = net >= 0 ? "var(--neon-green, #00f088)" : "var(--neon-red, #c96b5a)";
             this.crewCashFlow.innerHTML = `
                 <span class="cashflow-label">CASH FLOW / MONTH</span>
-                <span class="cashflow-value">PAYROLL <strong>-${cashFlow.upkeep_per_month}</strong> CR</span>
+                <span class="cashflow-value">PAYROLL <strong>-${cashFlow.crew_upkeep_per_month ?? cashFlow.upkeep_per_month}</strong> CR</span>
+                <span class="cashflow-value">FLEET <strong>-${cashFlow.fleet_upkeep_per_month || 0}</strong> CR</span>
                 <span class="cashflow-value">PASSIVE <strong>+${cashFlow.passive_per_month}</strong> CR</span>
                 <span class="cashflow-value">NET <strong style="color:${netColor}">${net >= 0 ? "+" : ""}${net}</strong> CR</span>
             `;
@@ -3596,6 +3598,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const fleet = this.state.fleet_manager || {};
         const ships = fleet.ships || this.state.ship.fleet_ships || [];
         const patrolTicks = Number(fleet.patrol_sweep_ticks || 6);
+        if (this.fleetUpkeepLine) {
+            this.fleetUpkeepLine.textContent = `${ships.length} escort(s) · upkeep ${Number(fleet.upkeep_per_month || 0)} cr/month`;
+        }
         if (!ships.length) {
             this.fleetShipRoster.innerHTML = `<p class="panel-intro-text">No escort warships. Commission one below at a drydock.</p>`;
         } else {

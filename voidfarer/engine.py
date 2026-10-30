@@ -106,6 +106,7 @@ from voidfarer.fleet import (
     fleet_ships_in_system,
     fleet_evasion_bonus,
     fleet_training_cost,
+    fleet_upkeep,
     fleet_victory_experience,
     get_escort_template,
     repair_fleet_ships,
@@ -3274,6 +3275,7 @@ class SimulationEngine:
                 "evasion_bonus": round(fleet_evasion_bonus(ships), 3),
                 "local_evasion_bonus": round(fleet_evasion_bonus(local), 3),
                 "patrol_sweep_ticks": PATROL_SWEEP_TICKS,
+                "upkeep_per_month": fleet_upkeep(ships),
                 "formations": ["balanced", "aggressive", "defensive"],
             }
 
@@ -3592,7 +3594,9 @@ class SimulationEngine:
     def cash_flow(self) -> dict[str, Any]:
         """Monthly credit flow: crew payroll against passive income (drones, outposts)."""
         with self.lock:
-            upkeep = crew_upkeep(self.state.ship.crew)
+            crew_cost = crew_upkeep(self.state.ship.crew)
+            fleet_cost = fleet_upkeep(self.state.ship.fleet_ships)
+            upkeep = crew_cost + fleet_cost
             passive = 0.0
             # Scout drones bank credits once per 4-tick harvest cycle
             for drone in self.state.ship.fleet_drones:
@@ -3617,6 +3621,8 @@ class SimulationEngine:
             passive_month = passive * DAYS_PER_MONTH / 0.25
             return {
                 "upkeep_per_month": upkeep,
+                "crew_upkeep_per_month": crew_cost,
+                "fleet_upkeep_per_month": fleet_cost,
                 "passive_per_month": round(passive_month, 1),
                 "net_per_month": round(passive_month - upkeep, 1),
             }
@@ -6279,6 +6285,7 @@ class SimulationEngine:
                         self.state.ship.fleet_ships, self.state.ship.current_system_id
                     )), 3),
                     "patrol_sweep_ticks": PATROL_SWEEP_TICKS,
+                    "upkeep_per_month": fleet_upkeep(self.state.ship.fleet_ships),
                 },
                 "ship_mods": {
                     "slots": list(SHIP_MOD_SLOTS),
@@ -8220,6 +8227,33 @@ class SimulationEngine:
                 )
                 new_flight_log.extend(patrol_logs[-2:])
 
+            fleet_upkeep_cost = (
+                fleet_upkeep(new_fleet_ships) if month_rollover else 0
+            )
+            gross_credits = (
+                cur_ship.credits
+                + outpost_credits
+                - wage_cost
+                + new_credits_delta
+                + away_credits
+                + delivery_credits
+                + patrol_credits
+            )
+            fleet_paid = gross_credits >= fleet_upkeep_cost
+            if month_rollover and fleet_upkeep_cost and not fleet_paid:
+                new_fleet_ships = tuple(
+                    replace(
+                        ship,
+                        status="damaged" if ship.hull > 0 else ship.status,
+                    )
+                    for ship in new_fleet_ships
+                )
+                crew_logs.append(
+                    f"FLEET PAY SHORTFALL: {fleet_upkeep_cost} cr due; "
+                    "escorts stand down to damaged readiness."
+                )
+            new_credits = max(0, gross_credits - fleet_upkeep_cost)
+
             if new_flight_log_research:
                 new_flight_log.append(new_flight_log_research)
             new_flight_log.extend(faction_logs[-3:])
@@ -8230,8 +8264,8 @@ class SimulationEngine:
             new_events.extend(self.war_news_events(faction_logs, new_tick, new_events))
             if month_rollover:
                 crew_logs.append(
-                    f"MONTH END: crew payroll runs {crew_upkeep(new_crew)} cr/month; "
-                    f"treasury {max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta + patrol_credits)} cr."
+                    f"MONTH END: crew payroll runs {crew_upkeep(new_crew)} cr/month, "
+                    f"fleet upkeep {fleet_upkeep_cost} cr/month; treasury {new_credits} cr."
                 )
             new_flight_log.extend(crew_logs[-2:])
             new_flight_log.extend(away_logs[-6:])
@@ -8239,7 +8273,7 @@ class SimulationEngine:
             new_ship = self._clone_ship(
                 hull=new_hull,
                 shield=new_shield,
-                credits=max(0, cur_ship.credits + outpost_credits - wage_cost + new_credits_delta + away_credits + delivery_credits + patrol_credits),
+                credits=new_credits,
                 cargo=new_cargo,
                 crew=new_crew,
                 reactor=new_reactor,
@@ -8296,6 +8330,8 @@ class SimulationEngine:
                 "drone_credits_harvested": drone_credits_harvested,
                 "patrol_credits": patrol_credits,
                 "patrol_contacts": patrol_contacts,
+                "fleet_upkeep_cost": fleet_upkeep_cost,
+                "fleet_upkeep_paid": fleet_paid,
                 "reactor_heat": round(new_reactor.heat, 1),
                 "reactor_efficiency": round(reactor_output_efficiency(new_reactor, float(equipment.get("reactor_output", 0.0))), 3),
                 "reactor_hull_damage": reactor_hull_damage,

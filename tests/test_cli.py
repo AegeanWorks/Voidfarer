@@ -135,6 +135,12 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertEqual(code, 0)
             self.assertIn("FLEET COMMAND", mock_out.getvalue())
 
+    def test_cli_fleet_ships_shows_upkeep(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["fleet", "ships"])
+            self.assertEqual(code, 0)
+            self.assertIn("upkeep", mock_out.getvalue().lower())
+
     def test_cli_upgrades_list(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["upgrades", "list"])

@@ -8663,3 +8663,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 .outpost-crew-chip button { border: 0; background: transparent; color: var(--console-gold-bright); cursor: pointer; padding: 0 2px; font-size: 13px; line-height: 1; }
 .outpost-crew-empty { color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
 .crew-outpost { color: var(--console-cyan); }
+
+/* Escort wing upkeep summary above the roster. */
+.fleet-upkeep-line { margin: 2px 0 4px; color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }

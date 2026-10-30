@@ -71,6 +71,14 @@ FLEET_MAX_EXPERIENCE = int(FLEET_RANKS[-1]["threshold"])
 FLEET_TRAINING_XP = 10
 PATROL_SWEEP_TICKS = 6
 
+FLEET_UPKEEP_BY_ROLE: dict[str, int] = {
+    "escort": 30,
+    "frigate": 55,
+    "cruiser": 90,
+    "carrier": 110,
+    "prize": 25,
+}
+
 
 def get_escort_template(escort_type: str) -> dict[str, Any] | None:
     return ESCORT_CATALOG.get(escort_type)
@@ -110,6 +118,15 @@ def fleet_training_cost(experience: int) -> int:
     """Drydock instruction gets dearer as a crew approaches the next rank."""
     xp = max(0, min(FLEET_MAX_EXPERIENCE, int(experience)))
     return 200 + xp * 5
+
+
+def fleet_upkeep(ships: tuple[FleetShip, ...]) -> int:
+    """Monthly payroll for living escorts; destroyed hulls cost nothing."""
+    return sum(
+        FLEET_UPKEEP_BY_ROLE.get(ship.role, 30)
+        for ship in ships
+        if ship.hull > 0
+    )
 
 
 def fleet_victory_experience(enemy_max_hull: int) -> int:
