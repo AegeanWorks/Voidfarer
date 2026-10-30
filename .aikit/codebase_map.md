@@ -9,8 +9,8 @@
 - **Total Python Modules**: `113`
 - **Total Classes**: `285`
 - **Total Top-Level Functions**: `328`
-- **Total Class Methods**: `1652`
-- **Total Source Lines**: `43709`
+- **Total Class Methods**: `1653`
+- **Total Source Lines**: `43716`
 
 ---
 
@@ -179,11 +179,12 @@
 ### [`tests/test_captain_gambit.py`](tests/test_captain_gambit.py)
 > *Captain's Gambit: once-per-battle role actions scaled by captain skill.*
 
-**Size**: `127` lines (`4563` bytes)
+**Size**: `134` lines (`4890` bytes)
 
 **Classes:**
 - `class CaptainGambitTest`
   - Method `._engine(role, skill)`
+  - Method `.test_gambit_effects_scale_with_captain_skill()`
   - Method `.test_engineer_repairs_the_flagship_hull()`
   - Method `.test_medic_repairs_the_local_escort_wing()`
   - Method `.test_quartermaster_restores_escort_shields()`

@@ -14,17 +14,6 @@
   "checkpoints": [
     {
       "task_id": "fleet-stance-controls",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Added battle_stance to both fleet report surfaces, cockpit stance buttons with active state and hint, combat-card stance label, CSS, and 4 regressions; 966 tests pass.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793376242.5488193,
-      "timestamp_str": "2026-10-30 19:04:02",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-stance-controls",
       "phase": "4",
       "phase_num": 4,
       "description": "[3/3] README, COCKPIT and ADR-112 documented; live Edge switched to AGGRESSIVE with highlight, hint and report value, no console errors; 966 tests and 5/5 gates pass. checklists: passed",
@@ -244,6 +233,17 @@
       "status": "in_progress",
       "timestamp": 1793379791.946553,
       "timestamp_str": "2026-10-30 20:03:11",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-3",
+      "phase": "reforge stage 5",
+      "phase_num": 3,
+      "description": "Reforge stage 5: window 15, 3 commit(s), 11 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793380074.9136834,
+      "timestamp_str": "2026-10-30 20:07:54",
       "agent": "opencode"
     }
   ]
