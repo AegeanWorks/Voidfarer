@@ -1221,3 +1221,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Increment battles/kills for local survivors of a combat victory, battles/contacts/bounty credits for patrol contacts, and training sessions for drydock instruction.
   3. Expose the counters in the fleet payload, report and CLI, and show a compact `SVC 3B / 2K / 1P / 77CR` line on each fleet card.
 - **Consequences**: Escorts now carry a visible service history that rewards attachment and makes patrol/training activity legible without reading the log. No balance values changed. Live Edge rendered SVC 3B / 2K / 1P / 77CR with no console errors. Suite: 899 tests (57 suites), 5/5 gates.
+
+### ADR-104: Outpost Integrity and Defense
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Outposts had an `integrity` field that only regenerated upward; nothing could damage it, so defense had no meaning and conquest never threatened frontier industry.
+- **Decision**:
+  1. Add a Sentry Grid module (650 cr, +12 defense per stack) and `outpost_defense`: base 10 plus grids plus 4 per stationed marine.
+  2. When a system changes hands to a non-player power, damage each player outpost there by `max(0, 35 - defense)`; friendly liberation causes no damage. Log `OUTPOST RAID` and increment `outposts_raided`.
+  3. Scale outpost production by `integrity / 100`; Sentry Grids do not count toward the production-module multiplier.
+  4. Add `repair_outpost` (cost `max(100, (100-integrity) x 8)`), `/api/outpost/repair`, `outpost repair <id>`, and an integrity/defense readout plus REPAIR control on the outpost row.
+- **Consequences**: War now threatens frontier production, defense modules and marine crews have a concrete use, and damaged outposts can be restored for credits. Live Edge showed INT 41% / DEF 22 and repaired to 100% for 475 cr with no console errors. Suite: 909 tests (58 suites), 5/5 gates.

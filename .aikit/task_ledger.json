@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "fleet-service-records",
+    "task_id": "outpost-defense",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793363468.064293,
+    "updated_at": 1793364075.7409065,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793363474.2503407
+    "completed_at": 1793364083.8460538
   },
   "checkpoints": [
-    {
-      "task_id": "fleet-upkeep",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan monthly fleet upkeep: role-based cost for living escorts, separate crew/fleet cash-flow lines, month-end charge, and a damaged-readiness penalty when unpaid.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793358306.7124448,
-      "timestamp_str": "2026-10-30 14:05:06",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Escorts had purchase, repair and training costs but no recurring upkeep, while patrol sweeps and outpost crew now generate steady income, so a large fleet was nearly free to hold.",
-        "benefits": "Fleet size gains a real monthly cost, patrol income becomes partly self-funding, and unpaid upkeep is a recoverable readiness penalty rather than permanent loss.",
-        "risks": "contract: cash flow must keep crew and fleet totals separate and legacy callers must still read upkeep_per_month; dependency: month-end credits and readiness now depend on fleet composition; concurrency: the tick charges credits and rewrites fleet statuses together; state: destroyed hulls must not cost upkeep and shortfall status must be repairable.",
-        "mitigation": "Add pure upkeep, cash-flow, month-charge and shortfall regressions first; exclude destroyed hulls; verify the fleet header and crew cash-flow lines in live Edge."
-      }
-    },
-    {
-      "task_id": "fleet-upkeep",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Role-based fleet upkeep, separate crew/fleet cash-flow fields, month-end charge with shortfall readiness penalty, fleet-header line, crew cash-flow line, report/CLI upkeep and tick payload fields implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793358487.7231588,
-      "timestamp_str": "2026-10-30 14:08:07",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-upkeep",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-099 recorded; live Edge showed 1 escort at 30 cr/month and a 65+30=95 cr/month cash flow; 868 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793358488.1496308,
-      "timestamp_str": "2026-10-30 14:08:08",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-upkeep",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'fleet-upkeep' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793358494.2769096,
-      "timestamp_str": "2026-10-30 14:08:14",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "fleet-roles",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793363474.2503436,
       "timestamp_str": "2026-10-30 15:31:14",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-defense",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan outpost integrity and defense: conquest damage, Sentry Grid/marine defense, integrity-scaled production, and a credit repair contract with UI/CLI/API.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793364015.6918194,
+      "timestamp_str": "2026-10-30 15:40:15",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Outpost integrity only regenerated upward and nothing could damage it, so defense had no meaning and conquest never threatened frontier industry.",
+        "benefits": "War threatens frontier production, defense modules and marine crews gain a concrete use, and damaged outposts can be restored for credits.",
+        "risks": "contract: existing outposts must keep full production at 100 integrity and Sentry Grids must not inflate the module multiplier; dependency: capture detection runs after faction simulation and uses crew defense; concurrency: damage and repair mutate outpost state, credits and the flight log under the engine lock; state: integrity must persist, scale production, and never go negative.",
+        "mitigation": "Add defense, production-scaling, capture-damage, repair and API/CLI/UI regressions first; clamp integrity; verify the live repair control."
+      }
+    },
+    {
+      "task_id": "outpost-defense",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Sentry Grid module, defense math, capture damage on hostile system changes, integrity-scaled production, repair_outpost, /api/outpost/repair, outpost repair CLI and INT/DEF/REPAIR UI implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793364075.6179402,
+      "timestamp_str": "2026-10-30 15:41:15",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-defense",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-104 recorded; live Edge showed INT 41%/DEF 22 and repaired to 100% for 475 cr; 909 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793364075.7409065,
+      "timestamp_str": "2026-10-30 15:41:15",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-defense",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'outpost-defense' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793364083.8460555,
+      "timestamp_str": "2026-10-30 15:41:23",
       "agent": "opencode:mechanics"
     }
   ]
