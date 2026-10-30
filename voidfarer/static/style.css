@@ -8704,3 +8704,9 @@ body.cockpit-theme .nav-panel > .panel-header {
 .fleet-captain-row select { flex: 1 1 auto; min-width: 0; height: 24px; font-size: 11px; }
 .fleet-captain-row .btn-hud { flex: 0 0 auto; min-height: 24px; padding: 1px 5px; font-size: 11px; }
 .crew-captain { color: var(--console-gold-bright); }
+
+/* Quantum auto-freight policy row above the manual route list. */
+.quantum-auto { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 6px; padding: 4px 6px; border: 1px solid rgba(169, 139, 189, 0.28); color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.quantum-auto label { display: flex; align-items: center; gap: 4px; }
+.quantum-auto input[type="number"] { width: 64px; height: 24px; font-size: 11px; }
+.quantum-auto input[type="checkbox"] { accent-color: var(--console-purple); }

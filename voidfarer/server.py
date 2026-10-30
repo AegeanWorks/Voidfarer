@@ -260,6 +260,10 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, "quantum": self.engine.get_quantum_trade_report()})
             return
 
+        if path == "/api/trade/quantum/automation":
+            self._send_json({"ok": True, "automation": self.engine.get_quantum_automation_report()})
+            return
+
         if path == "/api/trade/automation":
             self._send_json({"ok": True, "automation": self.engine.get_trade_automation_report()})
             return
@@ -985,6 +989,15 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
                 _int_field(body, "sell_above", 0, minimum=0),
                 _int_field(body, "quantity", 1, minimum=1),
                 _bool_field(body, "enabled", True),
+            )
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/trade/quantum/automation":
+            ok, msg = self.engine.set_quantum_automation(
+                _bool_field(body, "enabled", True),
+                _int_field(body, "min_net", 100, minimum=0),
             )
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})

@@ -2487,15 +2487,28 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             </div>`;
         }).join("") : `<p class="panel-intro-text">No profitable lanes from the current hold.</p>`;
 
+        const auto = this.state?.quantum_automation || {};
         this.quantumFreight.innerHTML = `
             <div class="quantum-header">
                 <h3 class="subpanel-title">QUANTUM FREIGHT</h3>
                 <span>${orders.length}/${data?.max_orders || 4} IN TRANSIT</span>
             </div>
+            <div class="quantum-auto">
+                <label><input type="checkbox" id="quantumAutoEnabled" ${auto.enabled ? "checked" : ""}> AUTO-FREIGHT</label>
+                <label>MIN NET <input type="number" id="quantumAutoMin" min="0" step="10" value="${Number(auto.min_net ?? 100)}"></label>
+                <span>${Number(auto.orders || 0)} orders · last ${Number(auto.last_net || 0) >= 0 ? "+" : ""}${Number(auto.last_net || 0)} CR</span>
+            </div>
             <div class="quantum-orders">${orderRows}</div>
             <div class="quantum-routes">${routeRows}</div>
             <p class="quantum-note">Cargo leaves immediately; the destination pays on arrival. Fees are charged now.</p>
         `;
+        const autoEnabled = this.quantumFreight.querySelector("#quantumAutoEnabled");
+        const autoMin = this.quantumFreight.querySelector("#quantumAutoMin");
+        const applyAuto = () => this.handleQuantumAutomation(
+            Boolean(autoEnabled?.checked), Number(autoMin?.value || 0)
+        );
+        autoEnabled?.addEventListener("change", applyAuto);
+        autoMin?.addEventListener("change", applyAuto);
         this.quantumFreight.querySelectorAll("[data-q-comm]").forEach(button => {
             button.addEventListener("click", () => this.handleQuantumOrder(
                 button.getAttribute("data-q-comm"),
@@ -2503,6 +2516,23 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 button.getAttribute("data-q-dest")
             ));
         });
+    }
+
+    async handleQuantumAutomation(enabled, minNet) {
+        try {
+            const res = await apiFetch("/api/trade/quantum/automation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ enabled: Boolean(enabled), min_net: Number(minNet || 0) }),
+            });
+            const json = await res.json();
+            if (json.state) this.state = json.state;
+            if (json.message) this.appendLog(json.message, json.ok ? "reward" : "hazard");
+            this.renderHUD();
+            this.renderQuantumFreight();
+        } catch (e) {
+            this.appendLog(`[ERROR] Quantum automation failed: ${e.message}`, "hazard");
+        }
     }
 
     async handleQuantumOrder(commodityId, quantity, destinationSystemId) {

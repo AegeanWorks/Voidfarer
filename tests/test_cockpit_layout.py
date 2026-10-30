@@ -1385,6 +1385,25 @@ class TestOutpostModuleCockpit(unittest.TestCase):
         self.assertIn("outpost-service-badge", self.css)
         self.assertIn("SHIPYARD LINK", self.js)
 
+class TestQuantumAutomationCockpit(unittest.TestCase):
+    """The quantum freight panel must expose the auto-freight policy."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_quantum_panel_offers_automation_controls(self):
+        for marker in (
+            "quantumAutoEnabled",
+            "quantumAutoMin",
+            '"/api/trade/quantum/automation"',
+            "handleQuantumAutomation",
+        ):
+            self.assertIn(marker, self.js)
+        self.assertIn(".quantum-auto", self.css)
+
+
 class TestTradeAutomationCockpit(unittest.TestCase):
     """The Commerce tab must expose the docked auto-trade broker."""
 

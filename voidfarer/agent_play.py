@@ -44,6 +44,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/drone/collect": "needs a deployed drone",
     "/api/depot/sell": "needs stock sitting in a depot",
     "/api/trade/automation": "needs a docked market and configured thresholds",
+    "/api/trade/quantum/automation": "needs a docked market and surplus cargo",
     "/api/research/queue": "needs a valid, incomplete research project",
     "/api/research/cancel": "needs a project already in the research queue",
     "/api/depot/withdraw": "needs stock sitting in a depot",

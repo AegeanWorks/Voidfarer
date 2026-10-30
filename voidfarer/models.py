@@ -1654,6 +1654,34 @@ class TradeAutomation:
 
 
 @dataclass(frozen=True)
+class QuantumAutomation:
+    """Docked policy: ship surplus cargo along the best net freight route."""
+
+    enabled: bool = False
+    min_net: int = 100
+    last_order_tick: int = -10**9
+    orders: int = 0
+    last_net: int = 0
+    last_commodity: str = ""
+    last_destination: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> QuantumAutomation:
+        return cls(
+            enabled=bool(data.get("enabled", False)),
+            min_net=max(0, int(data.get("min_net", 100))),
+            last_order_tick=int(data.get("last_order_tick", -10**9)),
+            orders=max(0, int(data.get("orders", 0))),
+            last_net=int(data.get("last_net", 0)),
+            last_commodity=str(data.get("last_commodity", "")),
+            last_destination=str(data.get("last_destination", "")),
+        )
+
+
+@dataclass(frozen=True)
 class AwayMission:
     """An away-team expedition assigned to a celestial body for a finite duration."""
 
@@ -2095,6 +2123,7 @@ class GameState:
     codex: CodexState = field(default_factory=CodexState)
     local_dock_purchases: dict[tuple[str, str, str], tuple[int, int]] = field(default_factory=dict)
     trade_automation: TradeAutomation = field(default_factory=TradeAutomation)
+    quantum_automation: QuantumAutomation = field(default_factory=QuantumAutomation)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -2129,6 +2158,7 @@ class GameState:
                 for tag, (quantity, cost) in self.local_dock_purchases.items()
             },
             "trade_automation": self.trade_automation.to_dict(),
+            "quantum_automation": self.quantum_automation.to_dict(),
         }
 
     @classmethod
@@ -2208,5 +2238,8 @@ class GameState:
             codex=CodexState.from_dict(data.get("codex", {})),
             local_dock_purchases=dock_purchases,
             trade_automation=TradeAutomation.from_dict(data.get("trade_automation", {})),
+            quantum_automation=QuantumAutomation.from_dict(
+                data.get("quantum_automation", {})
+            ),
         )
 

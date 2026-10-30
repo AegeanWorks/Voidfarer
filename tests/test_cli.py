@@ -55,6 +55,12 @@ class TestCLI(_IsolatedCliTestCase):
             code = main(["power", "25", "25", "25", "25"])
             self.assertEqual(code, 0)
 
+    def test_cli_quantum_autotrade_status_parses(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["autotrade", "quantum", "status"])
+            self.assertEqual(code, 0)
+            self.assertIn("quantum auto-freight", mock_out.getvalue().lower())
+
     def test_cli_autotrade_status_parses(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["autotrade", "status"])

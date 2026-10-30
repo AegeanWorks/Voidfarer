@@ -329,6 +329,37 @@ def cmd_chart(engine: SimulationEngine) -> int:
 def cmd_autotrade(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
     """Inspect or configure the docked buy-low/sell-high broker."""
     action = parts[1].lower() if len(parts) > 1 else "status"
+    if action == "quantum":
+        sub = parts[2].lower() if len(parts) > 2 else "status"
+        report = engine.get_quantum_automation_report()
+        auto = report["automation"]
+        if sub in ("status", "show"):
+            state = "ON" if auto["enabled"] else "OFF"
+            print(f"\n{BOLD}{CYAN}=== QUANTUM AUTO-FREIGHT ==={RESET}")
+            print(
+                f"Status: {state} | Min net: {auto['min_net']} cr | "
+                f"Orders: {auto['orders']} | Last net: {auto['last_net']:+d} cr"
+            )
+            print(f"Docked: {'yes' if report['docked'] else 'no'}")
+            return 0
+        if sub in ("off", "disable", "stop"):
+            ok, msg = engine.set_quantum_automation(False, auto["min_net"])
+            print((GREEN if ok else RED) + msg + RESET)
+            storage.save(engine.state)
+            return 0 if ok else 1
+        if sub in ("on", "enable", "start"):
+            try:
+                min_net = int(parts[3]) if len(parts) > 3 else 100
+            except ValueError:
+                print(f"{RED}Usage:{RESET} autotrade quantum on [min_net]")
+                return 1
+            ok, msg = engine.set_quantum_automation(True, min_net)
+            print((GREEN if ok else RED) + msg + RESET)
+            if ok:
+                storage.save(engine.state)
+            return 0 if ok else 1
+        print(f"{RED}Unknown quantum action '{sub}'. Use status, on, or off.{RESET}")
+        return 1
     if action in ("status", "show"):
         report = engine.get_trade_automation_report()
         auto = report["automation"]
@@ -362,7 +393,7 @@ def cmd_autotrade(engine: SimulationEngine, storage: StorageManager, parts: list
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
-    print(f"{RED}Unknown autotrade action '{action}'. Use status, on, or off.{RESET}")
+    print(f"{RED}Unknown autotrade action '{action}'. Use status, on, off, or quantum.{RESET}")
     return 1
 
 
@@ -2631,7 +2662,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     subparsers.add_parser("market", help="Display local commodity exchange quotes")
     subparsers.add_parser("economy", help="Display galactic economy shocks and trade routes")
     autotrade_p = subparsers.add_parser("autotrade", help="Configure the docked buy-low/sell-high broker")
-    autotrade_p.add_argument("action", nargs="?", default="status", choices=["status", "on", "off"])
+    autotrade_p.add_argument("action", nargs="?", default="status", choices=["status", "on", "off", "quantum"])
     autotrade_p.add_argument("commodity_id", nargs="?", help="Commodity id")
     autotrade_p.add_argument("buy_below", nargs="?", type=int, help="Buy at or below this price")
     autotrade_p.add_argument("sell_above", nargs="?", type=int, help="Sell at or above this price")

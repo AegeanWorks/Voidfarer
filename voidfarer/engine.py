@@ -367,6 +367,7 @@ class SimulationEngine:
     # in the flight log so a long war does not bury the player in toasts.
     AI_TRADE_LOG_TICKS = 5
     TRADE_AUTOMATION_COOLDOWN = 3
+    QUANTUM_AUTOMATION_COOLDOWN = 6
     WAR_NEWS_COOLDOWN_TICKS = 12
     RECONSTRUCTION_CREDIT_COST = 600
     RECONSTRUCTION_CREDIT_DEVASTATION = 20.0
@@ -690,6 +691,9 @@ class SimulationEngine:
             codex=kwargs.get("codex", cur.codex),
             local_dock_purchases=kwargs.get("local_dock_purchases", cur.local_dock_purchases),
             trade_automation=kwargs.get("trade_automation", cur.trade_automation),
+            quantum_automation=kwargs.get(
+                "quantum_automation", cur.quantum_automation
+            ),
         )
 
     def _research_bonuses(self) -> dict[str, float]:
@@ -4251,6 +4255,88 @@ class SimulationEngine:
         )
         self.state = self._clone_state(trade_automation=updated)
 
+    def set_quantum_automation(
+        self, enabled: bool = True, min_net: int = 100
+    ) -> tuple[bool, str]:
+        """Configure automatic quantum freight while docked."""
+        with self.lock:
+            if enabled:
+                body = self.docked_body
+                if body is None or not body.station_dockable:
+                    return False, "Dock at a station or colony to configure quantum auto-freight."
+            automation = replace(
+                self.state.quantum_automation,
+                enabled=bool(enabled),
+                min_net=max(0, int(min_net)),
+                last_order_tick=-10**9 if enabled else self.state.quantum_automation.last_order_tick,
+            )
+            self.state = self._clone_state(quantum_automation=automation)
+            if enabled:
+                return (
+                    True,
+                    f"Quantum auto-freight armed for routes netting at least {automation.min_net} cr.",
+                )
+            return True, "Quantum auto-freight disabled."
+
+    def get_quantum_automation_report(self) -> dict[str, Any]:
+        with self.lock:
+            return {
+                "automation": self.state.quantum_automation.to_dict(),
+                "docked": self.docked_body is not None,
+            }
+
+    def _run_quantum_automation(self) -> None:
+        """Ship surplus cargo along the best qualifying route on a cooldown."""
+        automation = self.state.quantum_automation
+        if not automation.enabled:
+            return
+        tick = self.state.time.tick
+        if tick - automation.last_order_tick < self.QUANTUM_AUTOMATION_COOLDOWN:
+            return
+        body = self.docked_body
+        if body is None or not body.station_dockable:
+            return
+        if len(self.state.ship.trade_orders) >= self.QUANTUM_MAX_ORDERS:
+            return
+        report = self.get_quantum_trade_report()
+        if not report.get("docked"):
+            return
+        route = next(
+            (
+                candidate
+                for candidate in report.get("routes", ())
+                if candidate["net"] >= automation.min_net and candidate["net"] > 0
+            ),
+            None,
+        )
+        if route is None:
+            return
+        ok, _ = self.place_quantum_order(
+            route["commodity_id"],
+            route["quantity"],
+            route["destination_system_id"],
+        )
+        if not ok:
+            return
+        updated = replace(
+            automation,
+            last_order_tick=tick,
+            orders=automation.orders + 1,
+            last_net=int(route["net"]),
+            last_commodity=str(route["commodity_id"]),
+            last_destination=str(route["destination_system_id"]),
+        )
+        line = (
+            f"QUANTUM AUTO-FREIGHT: {route['commodity_name']} x{route['quantity']} "
+            f"to {route['destination_name']} (net +{route['net']} cr)."
+        )
+        self.state = self._clone_state(
+            quantum_automation=updated,
+            ship=self._clone_ship(
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line])
+            ),
+        )
+
     def trade(self, commodity_id: str, quantity: int, is_buy: bool) -> tuple[bool, str]:
         """Execute buy or sell commodity order at orbiting market."""
         with self.lock:
@@ -4510,6 +4596,7 @@ class SimulationEngine:
                     "routes": [],
                     "orders": [order.to_dict() for order in self.state.ship.trade_orders],
                     "max_orders": self.QUANTUM_MAX_ORDERS,
+                    "automation": self.state.quantum_automation.to_dict(),
                 }
             origin = self.current_system
             routes: list[dict[str, Any]] = []
@@ -4559,6 +4646,7 @@ class SimulationEngine:
                 "routes": routes[:6],
                 "orders": [order.to_dict() for order in self.state.ship.trade_orders],
                 "max_orders": self.QUANTUM_MAX_ORDERS,
+                "automation": self.state.quantum_automation.to_dict(),
             }
 
     def place_quantum_order(
@@ -6563,6 +6651,7 @@ class SimulationEngine:
                 "surface_report": self.get_surface_report(),
                 "primary_weapon": self.state.ship.primary_weapon,
                 "trade_automation": self.state.trade_automation.to_dict(),
+                "quantum_automation": self.state.quantum_automation.to_dict(),
                 "fleet_manager": {
                     "ships": [
                         self._fleet_ship_payload(ship)
@@ -8740,6 +8829,7 @@ class SimulationEngine:
             )
 
             self._run_trade_automation()
+            self._run_quantum_automation()
             decision = (
                 self.maybe_trigger_decision("tick", num_ticks) if self.allow_decision_events else None
             )
