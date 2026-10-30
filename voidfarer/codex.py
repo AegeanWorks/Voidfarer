@@ -220,6 +220,18 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "escorts", 3, 1200, 350,
     ),
     CodexEntry(
+        "fleet_captain", "command", "Fleet Captain",
+        "Give an escort a crew captain.",
+        "Assign a specialist from the fleet card.",
+        "escort_captains", 1, 600, 180,
+    ),
+    CodexEntry(
+        "captain_corps", "command", "Captain Corps",
+        "Field three escort captains.",
+        "Give every warship a named commander.",
+        "escort_captains", 3, 1400, 380,
+    ),
+    CodexEntry(
         "outpost", "command", "Foothold",
         "Found your first planetary outpost.",
         "Run `outpost build <type> <body_id>`.",
@@ -230,6 +242,18 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "Operate three outposts.",
         "Expand production across visited systems.",
         "outposts", 3, 1500, 450,
+    ),
+    CodexEntry(
+        "outpost_specialist", "command", "Outpost Specialist",
+        "Choose a level-3 outpost specialization.",
+        "Level an outpost to 3 and pick a focus.",
+        "outposts_specialized", 1, 700, 200,
+    ),
+    CodexEntry(
+        "outpost_warden", "command", "Outpost Warden",
+        "Repair a damaged outpost.",
+        "Let an outpost take damage, then pay for repairs.",
+        "outposts_repaired", 1, 700, 200,
     ),
     CodexEntry(
         "scholar", "command", "Scholar",
@@ -273,6 +297,12 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "Sell three escorts or captured prizes at a drydock.",
         "Board a crippled hostile, then sell the prize at a station.",
         "ships_sold", 3, 800, 220,
+    ),
+    CodexEntry(
+        "quantum_broker", "commerce", "Quantum Broker",
+        "Complete five automated quantum freight orders.",
+        "Enable AUTO-FREIGHT in the Quantum Freight panel.",
+        "quantum_auto_orders", 5, 1000, 280,
     ),
     # Combat
     CodexEntry(
@@ -329,6 +359,18 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "Hold alliances with three captains.",
         "Turn the frontier into a stable coalition.",
         "allies", 3, 1200, 320,
+    ),
+    CodexEntry(
+        "trade_envoy", "diplomacy", "Trade Envoy",
+        "Sign your first faction trade pact.",
+        "Reach standing 40 and open the Empire tab.",
+        "trade_pacts", 1, 600, 180,
+    ),
+    CodexEntry(
+        "science_envoy", "diplomacy", "Science Envoy",
+        "Sign your first faction research pact.",
+        "Reach standing 60 and press R&D.",
+        "research_pacts", 1, 800, 220,
     ),
     # Reconstruction & relief
     CodexEntry(
@@ -415,6 +457,12 @@ METRIC_LABELS: dict[str, str] = {
     "outposts": "Outposts",
     "research": "Research projects",
     "allies": "Captain alliances",
+    "trade_pacts": "Trade pacts signed",
+    "research_pacts": "Research pacts signed",
+    "escort_captains": "Escort captains",
+    "outposts_specialized": "Outposts specialized",
+    "outposts_repaired": "Outposts repaired",
+    "quantum_auto_orders": "Quantum auto-freight orders",
     "ai_contacts": "AI first contacts",
     "faction_standing_max": "Peak faction standing",
     "pilot_level": "Pilot mastery level",
@@ -550,6 +598,18 @@ def metric_value(state: GameState, metric: str) -> int:
         return len(state.research.completed)
     if metric == "allies":
         return len(ship.allies)
+    if metric == "trade_pacts":
+        return len(ship.trade_pacts)
+    if metric == "research_pacts":
+        return len(ship.research_pacts)
+    if metric == "escort_captains":
+        return sum(1 for escort in ship.fleet_ships if escort.captain_id)
+    if metric == "outposts_specialized":
+        return sum(1 for outpost in state.outposts if outpost.specialization)
+    if metric == "outposts_repaired":
+        return int(state.stats.get("outposts_repaired", 0))
+    if metric == "quantum_auto_orders":
+        return int(state.quantum_automation.orders)
     if metric == "ai_contacts":
         return sum(1 for captain in state.ai_captains if captain.ally or captain.hired or captain.trust > 0)
     if metric == "faction_standing_max":

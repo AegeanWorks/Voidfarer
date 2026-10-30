@@ -2975,7 +2975,11 @@ class SimulationEngine:
                 credits=self.state.ship.credits - cost,
                 flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
             )
-            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            stats = dict(self.state.stats)
+            stats["outposts_repaired"] = int(stats.get("outposts_repaired", 0)) + 1
+            self.state = self._clone_state(
+                ship=new_ship, outposts=outposts, stats=stats
+            )
             return True, line
 
     def _crew_ship_id(self, crew_id: str) -> str | None:
