@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "research-pacts",
+    "task_id": "codex-progression",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793374036.8643184,
+    "updated_at": 1793374594.6250625,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793374049.8628635
+    "completed_at": 1793374599.8652463
   },
   "checkpoints": [
-    {
-      "task_id": "war-bonds",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan war bonds: settle pledges once when a war ends, paying 1.5x on victory, 0.8x on stalemate and nothing on defeat, with UI terms and tick telemetry.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793370135.5218933,
-      "timestamp_str": "2026-10-30 17:22:15",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "War support let players pledge credits for standing and front momentum, but the pledge was a pure sink with no reason to care whether the backed side won.",
-        "benefits": "War pledges become a risk/reward investment, stalemates soften losses, and the war card explains the terms before committing.",
-        "risks": "contract: existing wars must default to unresolved bonds and payouts must never repeat across saves; dependency: settlement runs after faction simulation and before credits are cloned; concurrency: payouts mutate wars, credits, stats and the flight log under the engine lock; state: bonds_resolved must persist and loser pledges must pay zero.",
-        "mitigation": "Add active/winner/defender/stalemate/double-pay and persistence regressions first; clamp pledges; verify the live war-card terms."
-      }
-    },
-    {
-      "task_id": "war-bonds",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted bonds_resolved, one-time settlement helper, victory/defeat/stalemate payouts, credits/stats/payload integration, support_war terms and Factions war-card bond note implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793370222.9290502,
-      "timestamp_str": "2026-10-30 17:23:42",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "war-bonds",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-105 recorded; live Edge showed bond terms and a 500 cr pledge; 918 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793370223.060426,
-      "timestamp_str": "2026-10-30 17:23:43",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "war-bonds",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'war-bonds' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793370229.845825,
-      "timestamp_str": "2026-10-30 17:23:49",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "research-queue",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793374049.862865,
       "timestamp_str": "2026-10-30 18:27:29",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "codex-progression",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan codex milestones for trade and research pacts, escort captains, outpost specialization and repair, and quantum auto-freight, derived from existing persisted state.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793374428.3098145,
+      "timestamp_str": "2026-10-30 18:33:48",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Recent diplomacy, command, outpost and automation systems shipped without codex goals, so players had no long-term milestone for them.",
+        "benefits": "Each recent system gains a visible progression goal, rewards stay paced with existing milestones, and legacy saves unlock retroactively.",
+        "risks": "contract: the codex report shape and metric labels must stay backward compatible; dependency: metrics read persisted pacts, captains, specializations, automation orders and stats; concurrency: repair_outpost now writes a stat under the engine lock; state: outposts_repaired needs legacy default zero and save round-trip coverage.",
+        "mitigation": "Add metric, report and repair regressions first; derive six metrics from existing state; default the new stat to zero; verify the live codex tab and full gates."
+      }
+    },
+    {
+      "task_id": "codex-progression",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Added seven codex milestones and six reading metrics, incremented outposts_repaired on repair, and covered metrics, report completion and the repair stat with tests; 956 tests pass.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793374594.4373038,
+      "timestamp_str": "2026-10-30 18:36:34",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "codex-progression",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-110 documented; live Edge rendered all six checked milestones with no console errors; 956 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793374594.6250625,
+      "timestamp_str": "2026-10-30 18:36:34",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "codex-progression",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'codex-progression' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793374599.865248,
+      "timestamp_str": "2026-10-30 18:36:39",
       "agent": "opencode:mechanics"
     }
   ]

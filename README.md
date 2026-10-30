@@ -538,7 +538,7 @@ python -m voidfarer.cli codex
 # Claim credits and pilot XP for a completed milestone
 python -m voidfarer.cli codex claim first_light
 ```
-New System Surveyor and Sector Cartographer milestones track full-system sweeps, and the log reports `systems_surveyed`.
+New System Surveyor and Sector Cartographer milestones track full-system sweeps. Pacts, captains, outposts and auto-freight now have milestones too.
 
 ### 21. UI Guard & Visual Audit
 `.aikit/ui.json` bounds cockpit work to `voidfarer/static/**` and `voidfarer/server.py`.

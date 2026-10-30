@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `108`
-- **Total Classes**: `275`
+- **Total Python Modules**: `109`
+- **Total Classes**: `276`
 - **Total Top-Level Functions**: `324`
-- **Total Class Methods**: `1590`
-- **Total Source Lines**: `42341`
+- **Total Class Methods**: `1594`
+- **Total Source Lines**: `42488`
 
 ---
 
@@ -490,6 +490,20 @@
 - `class TestWarBondsCockpit` - *War cards must explain the bond payout terms.*
   - Method `.setUpClass()`
   - Method `.test_war_cards_show_bond_terms()`
+
+---
+
+### [`tests/test_codex_progression.py`](tests/test_codex_progression.py)
+> *Codex milestones for pacts, captains, outposts and auto-freight.*
+
+**Size**: `83` lines (`2923` bytes)
+
+**Classes:**
+- `class CodexProgressionTest`
+  - Method `._state()`
+  - Method `.test_new_metrics_read_state()`
+  - Method `.test_new_milestones_complete_and_are_listed()`
+  - Method `.test_repair_outpost_increments_the_codex_stat()`
 
 ---
 
@@ -2255,7 +2269,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `647` lines (`22444` bytes)
+**Size**: `707` lines (`24827` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -2374,7 +2388,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9005` lines (`442501` bytes)
+**Size**: `9009` lines (`442671` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

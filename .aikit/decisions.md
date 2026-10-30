@@ -1287,3 +1287,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Grant +5% passive research per active pact via `research_pact_multiplier`, applied to the tick's research gain; expose active count and bonus in the research report/snapshot.
   4. Add an R&D action and `R&D` label to the Empire faction row, plus CLI status/action text.
 - **Consequences**: Standing 60 gains a distinct scientific reward, research pacts reward peace, and the research queue benefits from faster passive intake. Live Edge formed a Sol Coalition research pact and logged the +5% bonus with no console errors. Suite: 953 tests (63 suites), 5/5 gates.
+
+### ADR-110: Codex Progression Milestones
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Recent mechanics shipped without codex representation: trade and research pacts, escort captains, outpost specialization and repair, and quantum auto-freight. Players had no long-term milestones for those systems, and the codex still ended at earlier diplomacy, command and commerce beats.
+- **Decision**:
+  1. Add seven milestones: Trade Envoy and Science Envoy (diplomacy), Fleet Captain and Captain Corps (command), Outpost Specialist and Outpost Warden (command), Quantum Broker (commerce).
+  2. Derive each metric from existing persisted state: `trade_pacts`, `research_pacts`, escort `captain_id`, level-3 `specialization`, `quantum_automation.orders`, and a new `outposts_repaired` stat incremented by `repair_outpost`.
+  3. Keep every other entry retroactive: no new tracking loop and no RNG use, so legacy saves unlock completed milestones on load.
+  4. Expose the new metrics through the existing codex report, CLI and cockpit tab without new endpoints.
+- **Consequences**: All recent systems now have visible progression goals and reward pacing. Only outpost repair needed new bookkeeping; everything else reads state that already persists. Live Edge rendered all six newly checked entries with no console errors. Suite: 956 tests (64 suites), 5/5 gates.
