@@ -73,6 +73,12 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertEqual(code, 1)
             self.assertIn("unknown escort", mock_out.getvalue().lower())
 
+    def test_cli_fleet_train_parses(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["fleet", "train", "missing_escort"])
+            self.assertEqual(code, 1)
+            self.assertIn("unknown escort", mock_out.getvalue().lower())
+
     def test_cli_reconstruct_parses_and_refuses_an_intact_world(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["reconstruct", "sol_body_1"])

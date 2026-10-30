@@ -56,8 +56,62 @@ ESCORT_CATALOG: dict[str, dict[str, Any]] = {
 }
 
 
+# Veterans earn their rank in battle; each rank is a legible power spike rather than a
+# hidden percentage. Thresholds and bonuses are data so reports and tests share one table.
+FLEET_RANKS: tuple[dict[str, Any], ...] = (
+    {"name": "Green", "threshold": 0, "damage": 0.00, "evasion": 0.00},
+    {"name": "Regular", "threshold": 25, "damage": 0.02, "evasion": 0.01},
+    {"name": "Veteran", "threshold": 75, "damage": 0.06, "evasion": 0.02},
+    {"name": "Elite", "threshold": 150, "damage": 0.12, "evasion": 0.03},
+    {"name": "Ace", "threshold": 300, "damage": 0.20, "evasion": 0.05},
+)
+FLEET_MAX_EXPERIENCE = int(FLEET_RANKS[-1]["threshold"])
+FLEET_TRAINING_XP = 10
+
+
 def get_escort_template(escort_type: str) -> dict[str, Any] | None:
     return ESCORT_CATALOG.get(escort_type)
+
+
+def fleet_rank(experience: int) -> dict[str, Any]:
+    """Resolve veterancy rank, badge progress and cumulative combat bonuses."""
+    xp = max(0, min(FLEET_MAX_EXPERIENCE, int(experience)))
+    index = 0
+    for candidate, rank in enumerate(FLEET_RANKS):
+        if xp >= int(rank["threshold"]):
+            index = candidate
+    current = FLEET_RANKS[index]
+    following = FLEET_RANKS[index + 1] if index + 1 < len(FLEET_RANKS) else None
+    if following is None:
+        progress = 1.0
+        next_threshold = FLEET_MAX_EXPERIENCE
+    else:
+        span = int(following["threshold"]) - int(current["threshold"])
+        progress = (xp - int(current["threshold"])) / span if span > 0 else 1.0
+        next_threshold = int(following["threshold"])
+    return {
+        "name": str(current["name"]),
+        "index": index,
+        "threshold": int(current["threshold"]),
+        "next_threshold": next_threshold,
+        "next_rank": str(following["name"]) if following else "",
+        "progress": round(max(0.0, min(1.0, progress)), 3),
+        "damage_bonus": float(current["damage"]),
+        "evasion_bonus": float(current["evasion"]),
+        "experience": xp,
+        "max_experience": FLEET_MAX_EXPERIENCE,
+    }
+
+
+def fleet_training_cost(experience: int) -> int:
+    """Drydock instruction gets dearer as a crew approaches the next rank."""
+    xp = max(0, min(FLEET_MAX_EXPERIENCE, int(experience)))
+    return 200 + xp * 5
+
+
+def fleet_victory_experience(enemy_max_hull: int) -> int:
+    """A tougher kill teaches more than farming a lone corsair."""
+    return 3 + min(6, max(0, int(enemy_max_hull) // 40))
 
 
 def build_fleet_ship(escort_type: str, system_id: str, count: int) -> FleetShip:
@@ -95,13 +149,25 @@ def fleet_damage(ships: tuple[FleetShip, ...], formation: str = "balanced") -> i
     if not ships:
         return 0
     mult = {"aggressive": 1.20, "defensive": 0.70, "balanced": 1.0}.get(formation, 1.0)
-    return sum(max(1, int(s.damage * (1.0 + s.experience * 0.01) * mult)) for s in ships if s.hull > 0)
+    total = 0
+    for ship in ships:
+        if ship.hull <= 0:
+            continue
+        rank = fleet_rank(ship.experience)
+        # Experience gives a shallow continuous edge; ranks add the visible jump.
+        growth = 1.0 + min(0.50, ship.experience * 0.005) + rank["damage_bonus"]
+        total += max(1, int(ship.damage * growth * mult))
+    return total
 
 
 def fleet_evasion_bonus(ships: tuple[FleetShip, ...], formation: str = "balanced") -> float:
     if not ships:
         return 0.0
-    screen = sum(s.evasion for s in ships if s.status == "escorting" and s.hull > 0)
+    screen = sum(
+        ship.evasion + fleet_rank(ship.experience)["evasion_bonus"]
+        for ship in ships
+        if ship.status == "escorting" and ship.hull > 0
+    )
     mult = 1.35 if formation == "defensive" else 1.0
     return min(0.30, screen * 0.35 * mult)
 
@@ -133,7 +199,7 @@ def apply_fleet_casualties(ships: tuple[FleetShip, ...], damage: int) -> tuple[t
             hull=new_hull,
             shield=new_shield,
             status="destroyed" if new_hull <= 0 else ("damaged" if new_hull < ship.max_hull * 0.5 else "escorting"),
-            experience=ship.experience + (2 if new_hull > 0 else 0),
+            experience=min(FLEET_MAX_EXPERIENCE, ship.experience + (2 if new_hull > 0 else 0)),
         ))
     return tuple(updated), absorbed
 

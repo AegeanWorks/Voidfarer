@@ -3538,20 +3538,41 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!ships.length) {
             this.fleetShipRoster.innerHTML = `<p class="panel-intro-text">No escort warships. Commission one below at a drydock.</p>`;
         } else {
-            this.fleetShipRoster.innerHTML = ships.map(ship => `
+            this.fleetShipRoster.innerHTML = ships.map(ship => {
+                const rank = ship.rank || "Green";
+                const xp = Number(ship.experience || 0);
+                const xpMax = Number(ship.experience_max || 300);
+                const rankPct = Math.round(Number(ship.rank_progress ?? (xpMax ? xp / xpMax : 0)) * 100);
+                const atAce = xp >= xpMax;
+                const trainingCost = Number(ship.training_cost || 0);
+                const canTrain = !atAce && Number(this.state.ship.credits || 0) >= trainingCost;
+                const trainTitle = atAce
+                    ? "Already an Ace"
+                    : `Train +${ship.training_gain || 0} XP for ${trainingCost} cr`;
+                return `
                 <div class="fleet-ship-card">
                     <div class="fleet-head"><strong>${this.escapeHtml(ship.name)}</strong> <span class="ship-role">${this.escapeHtml(ship.role.toUpperCase())}</span></div>
                     <div class="fleet-sub">HULL ${ship.hull}/${ship.max_hull} | SHIELD ${ship.shield}/${ship.max_shield} | DMG ${ship.damage} | SYS ${this.escapeHtml(ship.assigned_system_id || "?")}</div>
+                    <div class="fleet-veterancy">
+                        <span class="fleet-rank rank-${this.escapeHtml(rank.toLowerCase())}">${this.escapeHtml(rank.toUpperCase())}</span>
+                        <span class="fleet-xp-bar" title="${xp}/${xpMax} XP"><span class="fleet-xp-fill" style="width:${rankPct}%"></span></span>
+                        <span class="fleet-xp-label">${xp}/${xpMax} XP</span>
+                    </div>
                     <div class="fleet-value">${this.escapeHtml(String(ship.status || "").toUpperCase())} // ${ship.assigned_system_id === this.state.ship.current_system_id ? "LOCAL" : "PATROL"}</div>
                     <div class="ship-actions">
                         <button class="btn-hud btn-amber" data-escort-repair="${this.escapeHtml(ship.id)}">REPAIR</button>
+                        <button class="btn-hud btn-amber" data-escort-train="${this.escapeHtml(ship.id)}" ${canTrain ? "" : "disabled"} title="${this.escapeHtml(trainTitle)}">TRAIN (${trainingCost} CR)</button>
                         <button class="btn-hud btn-green" data-escort-sell="${this.escapeHtml(ship.id)}">SELL (${Number(ship.sale_value || 0)} CR)</button>
                         <button class="btn-hud" data-escort-dismiss="${this.escapeHtml(ship.id)}">DISMISS</button>
                     </div>
                 </div>
-            `).join("");
+            `;
+            }).join("");
             this.fleetShipRoster.querySelectorAll("[data-escort-repair]").forEach(btn =>
                 btn.addEventListener("click", () => this.postAction("/api/fleet/escort/repair", { amount: 60 }, "fleet"))
+            );
+            this.fleetShipRoster.querySelectorAll("[data-escort-train]").forEach(btn =>
+                btn.addEventListener("click", () => this.postAction("/api/fleet/escort/train", { ship_id: btn.getAttribute("data-escort-train") }, "fleet"))
             );
             this.fleetShipRoster.querySelectorAll("[data-escort-sell]").forEach(btn =>
                 btn.addEventListener("click", () => this.postAction("/api/fleet/escort/sell", { ship_id: btn.getAttribute("data-escort-sell") }, "fleet"))

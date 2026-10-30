@@ -8620,3 +8620,35 @@ body.cockpit-theme .nav-panel > .panel-header {
 .diplomacy-row { align-items: flex-start; }
 .diplomacy-actions { display: flex; flex-wrap: wrap; gap: 3px; justify-content: flex-end; max-width: 220px; }
 .diplomacy-actions .btn-hud { min-height: 24px; padding: 2px 6px; font-size: 12px; }
+
+/* Escort veterancy: rank badge, progress to the next rank, and a training control. */
+.fleet-ship-card { grid-template-rows: auto auto auto; }
+.fleet-ship-card > .fleet-veterancy {
+    grid-column: 2;
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+.fleet-rank {
+    flex: 0 0 auto;
+    padding: 0 4px;
+    border: 1px solid rgba(111, 195, 215, 0.35);
+    color: var(--console-cyan);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+}
+.fleet-rank.rank-regular { border-color: rgba(143, 191, 159, 0.5); color: var(--console-green); }
+.fleet-rank.rank-veteran { border-color: rgba(201, 163, 90, 0.55); color: var(--console-gold-bright); }
+.fleet-rank.rank-elite { border-color: rgba(169, 139, 189, 0.6); color: var(--console-purple); }
+.fleet-rank.rank-ace { border-color: rgba(255, 120, 90, 0.65); color: #ff8a6a; }
+.fleet-xp-bar {
+    flex: 1 1 auto;
+    min-width: 28px;
+    height: 6px;
+    border: 1px solid rgba(111, 195, 215, 0.22);
+    background: rgba(111, 195, 215, 0.08);
+}
+.fleet-xp-fill { display: block; height: 100%; background: linear-gradient(90deg, #6fc3d7, #c9a35a); }
+.fleet-xp-label { flex: 0 0 auto; color: var(--console-muted); font-size: 11px; }

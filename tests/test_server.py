@@ -10,6 +10,7 @@ from pathlib import Path
 
 from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
 from voidfarer.engine import SimulationEngine
+from voidfarer.fleet import build_fleet_ship
 from voidfarer.models import FleetShip, Outpost
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
@@ -408,6 +409,25 @@ class TestServer(unittest.TestCase):
         self.assertGreater(payload["state"]["ship"]["credits"], 1000)
         self.assertEqual(payload["state"]["ship"]["fleet_ships"], [])
         self.assertEqual(payload["state"]["stats"]["ships_sold"], 1)
+
+    def test_fleet_train_endpoint_buys_experience(self):
+        engine = VoidFarerHandler.engine
+        ship = build_fleet_ship("corvette", "sol", 0)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(
+                fleet_ships=(ship,),
+                credits=1000,
+                orbiting_body_id="sol_body_1",
+            ),
+        )
+        status, data = self._post("/api/fleet/escort/train", {"ship_id": ship.id})
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        trained = payload["state"]["fleet_manager"]["ships"][0]
+        self.assertEqual(trained["experience"], 10)
+        self.assertEqual(trained["rank"], "Green")
+        self.assertEqual(payload["state"]["ship"]["credits"], 800)
 
     def test_trade_automation_endpoints_configure_and_report(self):
         status, data = self._get("/api/trade/automation")

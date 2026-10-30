@@ -1253,6 +1253,28 @@ class TestFleetPrizeCockpit(unittest.TestCase):
         self.assertIn(".fleet-ship-card > div.fleet-head { grid-column: 2;", self.css)
         self.assertIn(".fleet-ship-card > div.ship-actions { grid-column: 3;", self.css)
 
+class TestFleetVeterancyCockpit(unittest.TestCase):
+    """Escort cards must show rank progress and a drydock training control."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_fleet_cards_show_rank_progress_and_training(self):
+        for marker in (
+            "fleet-veterancy",
+            "fleet-rank",
+            "fleet-xp-fill",
+            "data-escort-train",
+            '"/api/fleet/escort/train"',
+            "training_cost",
+        ):
+            self.assertIn(marker, self.js)
+        for selector in (".fleet-rank", ".fleet-xp-bar", ".fleet-xp-fill"):
+            self.assertIn(selector, self.css)
+
+
 class TestOutpostModuleCockpit(unittest.TestCase):
     """The Empire tab must expose outpost module installation."""
 

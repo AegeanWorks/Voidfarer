@@ -95,12 +95,17 @@ from voidfarer.faction_state import (
 )
 from voidfarer.fleet import (
     ESCORT_CATALOG,
+    FLEET_MAX_EXPERIENCE,
+    FLEET_TRAINING_XP,
     apply_fleet_casualties,
     build_fleet_ship,
     escort_sale_value,
     fleet_damage,
+    fleet_rank,
     fleet_ships_in_system,
     fleet_evasion_bonus,
+    fleet_training_cost,
+    fleet_victory_experience,
     get_escort_template,
     repair_fleet_ships,
 )
@@ -3040,6 +3045,65 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship)
             return True, f"Escort repair crews restored {spent} integrity for {cost} cr."
 
+    def train_fleet_ship(self, ship_id: str) -> tuple[bool, str]:
+        """Buy a block of drydock instruction for one escort, capped at Ace."""
+        with self.lock:
+            ok, msg = self._require_docked()
+            if not ok:
+                return False, msg
+            target = next((s for s in self.state.ship.fleet_ships if s.id == ship_id), None)
+            if target is None:
+                return False, f"Unknown escort '{ship_id}'."
+            if target.hull <= 0:
+                return False, f"{target.name} is destroyed; repair or dismiss it first."
+            if target.experience >= FLEET_MAX_EXPERIENCE:
+                return False, f"{target.name} is already an Ace ({FLEET_MAX_EXPERIENCE} XP)."
+            gain = min(FLEET_TRAINING_XP, FLEET_MAX_EXPERIENCE - target.experience)
+            cost = fleet_training_cost(target.experience)
+            if self.state.ship.credits < cost:
+                return False, f"Insufficient credits for fleet training ({cost} cr)."
+            before = fleet_rank(target.experience)["name"]
+            after_rank = fleet_rank(target.experience + gain)
+            trained = replace(target, experience=target.experience + gain)
+            fleet_ships = tuple(
+                trained if ship.id == target.id else ship
+                for ship in self.state.ship.fleet_ships
+            )
+            promotion = (
+                f" Promoted {before} -> {after_rank['name']}."
+                if after_rank["name"] != before
+                else f" Progress {after_rank['progress']:.0%} to {after_rank['next_rank']}."
+            )
+            line = (
+                f"FLEET TRAINING: {target.name} +{gain} XP for {cost} cr."
+                f"{promotion}"
+            )
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - cost,
+                fleet_ships=fleet_ships,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, line
+
+    def _fleet_ship_payload(self, ship: FleetShip) -> dict[str, Any]:
+        """One escort row with the rank fields the cockpit and CLI both consume."""
+        rank = fleet_rank(ship.experience)
+        return {
+            **ship.to_dict(),
+            "sale_value": escort_sale_value(ship),
+            "rank": rank["name"],
+            "rank_index": rank["index"],
+            "rank_progress": rank["progress"],
+            "next_rank": rank["next_rank"],
+            "next_threshold": rank["next_threshold"],
+            "experience_max": FLEET_MAX_EXPERIENCE,
+            "training_cost": fleet_training_cost(ship.experience),
+            "training_gain": max(
+                0, min(FLEET_TRAINING_XP, FLEET_MAX_EXPERIENCE - ship.experience)
+            ),
+        }
+
     def dismiss_escort(self, ship_id: str) -> tuple[bool, str]:
         with self.lock:
             target = next((s for s in self.state.ship.fleet_ships if s.id == ship_id), None)
@@ -3076,10 +3140,7 @@ class SimulationEngine:
             ships = self.state.ship.fleet_ships
             local = fleet_ships_in_system(ships, self.state.ship.current_system_id)
             return {
-                "ships": [
-                    {**ship.to_dict(), "sale_value": escort_sale_value(ship)}
-                    for ship in ships
-                ],
+                "ships": [self._fleet_ship_payload(ship) for ship in ships],
                 "catalog": ESCORT_CATALOG,
                 "total_damage": fleet_damage(ships),
                 "local_damage": fleet_damage(local),
@@ -5002,19 +5063,37 @@ class SimulationEngine:
                     new_faction_standings["precursor_watch"] = min(100, new_faction_standings.get("precursor_watch", 0) + 8)
                     rep_note = " [Faction Standing: Precursor Watch (+8)]"
 
+                xp_gain = fleet_victory_experience(combat.enemy_max_hull)
+                local_fleet_ids = {local.id for local in fleet_ships}
+                fleet_updates: list[FleetShip] = []
+                rank_up_lines: list[str] = []
+                for escort in self.state.ship.fleet_ships:
+                    if escort.id not in local_fleet_ids:
+                        fleet_updates.append(escort)
+                        continue
+                    before_rank = fleet_rank(escort.experience)["name"]
+                    updated_escort = replace(
+                        escort,
+                        experience=min(
+                            FLEET_MAX_EXPERIENCE, escort.experience + xp_gain
+                        ),
+                        status="escorting" if escort.hull > 0 else "destroyed",
+                    )
+                    after_rank = fleet_rank(updated_escort.experience)["name"]
+                    if after_rank != before_rank:
+                        rank_up_lines.append(
+                            f"{escort.name} promoted to {after_rank}."
+                        )
+                    fleet_updates.append(updated_escort)
+                new_fleet_ships = tuple(fleet_updates)
                 msg = (
                     f"VICTORY: {combat.enemy_name} neutralized! "
                     f"Collected {combat.bounty_credits} cr bounty, salvaged {salvage_granted}x {combat.salvage_commodity}"
                     f"{f' ({salvage_overflow} jettisoned: hold full)' if salvage_overflow else ''}.{relic_note}{rep_note}"
+                    + (f" {' '.join(rank_up_lines)}" if rank_up_lines else "")
                 )
                 log_entry = f"Combat outcome: {msg}"
                 new_log = list(self.state.ship.flight_log[-19:]) + [log_entry] + contract_logs + xp_logs
-
-                new_fleet_ships = tuple(
-                    replace(s, experience=s.experience + 3, status="escorting" if s.hull > 0 else "destroyed")
-                    if s.id in {local.id for local in fleet_ships} else s
-                    for s in self.state.ship.fleet_ships
-                )
                 victory_crew, morale_log = apply_morale_event(self.state.ship.crew, 5.0, "combat victory celebrated")
                 if morale_log:
                     new_log.append(morale_log)
@@ -6004,7 +6083,7 @@ class SimulationEngine:
                 "trade_automation": self.state.trade_automation.to_dict(),
                 "fleet_manager": {
                     "ships": [
-                        {**ship.to_dict(), "sale_value": escort_sale_value(ship)}
+                        self._fleet_ship_payload(ship)
                         for ship in self.state.ship.fleet_ships
                     ],
                     "catalog": ESCORT_CATALOG,
