@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `94`
-- **Total Classes**: `246`
-- **Total Top-Level Functions**: `309`
-- **Total Class Methods**: `1418`
-- **Total Source Lines**: `38896`
+- **Total Python Modules**: `95`
+- **Total Classes**: `249`
+- **Total Top-Level Functions**: `312`
+- **Total Class Methods**: `1433`
+- **Total Source Lines**: `39240`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `252` lines (`10952` bytes)
+**Size**: `258` lines (`11241` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -228,6 +228,7 @@
   - Method `.test_cli_autotrade_status_parses()`
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
+  - Method `.test_cli_fleet_train_parses()`
   - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
   - Method `.test_cli_combat_accepts_documented_actions()`
   - Method `.test_cli_shipyard_subcommands_parse()`
@@ -257,7 +258,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1306` lines (`59474` bytes)
+**Size**: `1328` lines (`60212` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -449,6 +450,9 @@
 - `class TestFleetPrizeCockpit` - *Captured prizes must be sellable from the fleet manager.*
   - Method `.setUpClass()`
   - Method `.test_fleet_manager_has_a_sell_control()`
+- `class TestFleetVeterancyCockpit` - *Escort cards must show rank progress and a drydock training control.*
+  - Method `.setUpClass()`
+  - Method `.test_fleet_cards_show_rank_progress_and_training()`
 - `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
   - Method `.setUpClass()`
   - Method `.test_outpost_rows_offer_a_module_installer()`
@@ -774,6 +778,26 @@
   - Method `.test_sale_requires_a_docked_station()`
   - Method `.test_sale_rejects_an_unknown_escort()`
   - Method `.test_fleet_report_exposes_sale_values()`
+
+---
+
+### [`tests/test_fleet_veterancy.py`](tests/test_fleet_veterancy.py)
+> *Fleet veterancy: rank thresholds, combat scaling and drydock training.*
+
+**Size**: `132` lines (`5366` bytes)
+
+**Classes:**
+- `class FleetRankTest`
+  - Method `.test_rank_thresholds_and_progress()`
+  - Method `.test_ranks_raise_damage_and_screen_evasion()`
+  - Method `.test_training_cost_and_victory_experience_scale()`
+- `class FleetTrainingTest`
+  - Method `.setUp()`
+  - Method `.test_training_buys_xp_and_promotes()`
+  - Method `.test_training_requires_a_dock_and_a_live_ship()`
+  - Method `.test_training_refuses_a_destroyed_or_maxed_escort()`
+  - Method `.test_training_refuses_when_credits_are_short()`
+  - Method `.test_report_exposes_rank_fields()`
 
 ---
 
@@ -1248,7 +1272,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `528` lines (`23225` bytes)
+**Size**: `548` lines (`24112` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1287,6 +1311,7 @@
   - Method `.test_landing_and_depot_endpoints()`
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
+  - Method `.test_fleet_train_endpoint_buys_experience()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
   - Method `.test_outpost_module_endpoint_installs_a_stack()`
   - Method `.test_save_load_delete_endpoints()`
@@ -1766,7 +1791,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `752` lines (`32504` bytes)
+**Size**: `753` lines (`32590` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1880,7 +1905,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3075` lines (`157339` bytes)
+**Size**: `3087` lines (`157878` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2064,7 +2089,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8064` lines (`399599` bytes)
+**Size**: `8143` lines (`403457` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2141,6 +2166,8 @@
   - Method `.buy_escort(escort_type, system_id)`
   - Method `.assign_escort(ship_id, system_id)`
   - Method `.repair_escorts(amount)`
+  - Method `.train_fleet_ship(ship_id)` - *Buy a block of drydock instruction for one escort, capped at Ace.*
+  - Method `._fleet_ship_payload(ship)` - *One escort row with the rank fields the cockpit and CLI both consume.*
   - Method `.dismiss_escort(ship_id)`
   - Method `.sell_escort(ship_id)` - *Sell an escort or captured prize at a docked station.*
   - Method `.get_fleet_manager_report()`
@@ -2353,10 +2380,13 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `161` lines (`5530` bytes)
+**Size**: `227` lines (`8204` bytes)
 
 **Functions:**
 - `def get_escort_template(escort_type)`
+- `def fleet_rank(experience)` - *Resolve veterancy rank, badge progress and cumulative combat bonuses.*
+- `def fleet_training_cost(experience)` - *Drydock instruction gets dearer as a crew approaches the next rank.*
+- `def fleet_victory_experience(enemy_max_hull)` - *A tougher kill teaches more than farming a lone corsair.*
 - `def build_fleet_ship(escort_type, system_id, count)`
 - `def fleet_ships_in_system(ships, system_id)` - *Escorts physically stationed in one system; remote patrols do not join a fight.*
 - `def escort_sale_value(ship)` - *Drydock resale value of an escort or prize, discounted for battle damage.*
@@ -2744,7 +2774,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1369` lines (`58405` bytes)
+**Size**: `1375` lines (`58701` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

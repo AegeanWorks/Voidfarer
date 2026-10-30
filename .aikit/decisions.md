@@ -1124,3 +1124,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Add IMPROVE, GIFT 300, ALLY and conditional PETITION 500 controls to every faction row, with disabled reasons and an `ALLIED` / `WAR` status label.
   3. Make allied territory reduce pirate risk by 28% with an `allied patrol` reason, alongside the existing patrol-escort reduction.
 - **Consequences**: Faction alliances are discoverable from the cockpit, cannot be accidentally duplicated, and grant a concrete patrol benefit in allied space. The generic +5% trade margin and +3 combat damage from allied captains remain unchanged. Suite: 829 tests (50 suites), 5/5 gates.
+
+### ADR-095: Fleet Veterancy and Drydock Training
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Escorts already stored an `experience` counter and gained a flat +3 XP per victory, but nothing surfaced it, the damage bonus was an invisible 1% per point, and there was no way to invest credits in a favourite hull. Fleet progression was therefore neither legible nor a meaningful credit sink.
+- **Decision**:
+  1. Define five ranks (Green/Regular/Veteran/Elite/Ace at 0/25/75/150/300 XP) with explicit damage and screen-evasion bonuses in `fleet.py`.
+  2. Keep a shallow continuous XP edge, add the rank bonus on top, and cap XP at 300 so veteran fleets cannot runaway-scale.
+  3. Scale victory XP with enemy maximum hull (3-9 XP) and clamp casualty XP to the cap; promotions are appended to the victory log.
+  4. Add `train_fleet_ship` (docked, 10 XP for 200 cr + 5 cr per current XP, stops at Ace), `POST /api/fleet/escort/train`, `fleet train <id>`, and a rank/XP/TRAIN card in the fleet manager.
+- **Consequences**: Veteran escorts are visibly stronger, promotions are announced, and credits now compete with repairs and procurement as a fleet investment. Suite: 840 tests (50 suites), 5/5 gates; live Edge training advanced a corvette from 0 to 10 XP for 200 cr with no console errors.

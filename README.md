@@ -511,6 +511,13 @@ python -m voidfarer.cli fleet ships
 ```
 Escorts assigned elsewhere are marked `PATROL` and do not add damage, screen fire or take casualties in the flagship's current system. They still provide a local anti-piracy screen: each living patrol escort reduces pirate risk in its assigned system, stacking up to a 75% reduction. Fleet cards show the assigned system and `LOCAL`/`PATROL` status. Populations scale with world surface, habitability, and tech level, and outposts grow only to their housing ceiling; peaceful neighbours trade along shared hyperlanes and war severs those routes; every faction pays taxes, upkeep, and a wartime burden from its own treasury, and a broke faction sues for peace instead of opening new fronts; faction research slowly raises its technology and the carrying capacity of its worlds. The Sol megastructure is a Dyson swarm of collectors and maintenance habitats, not a solid shell.
 
+### 18f. Fleet Veterancy & Training
+```bash
+python -m voidfarer.cli fleet train <escort_id>
+python -m voidfarer.cli fleet ships
+```
+Escorts earn XP from hits and victories; tough kills pay more. Ranks Green/Regular/Veteran/Elite/Ace (0/25/75/150/300 XP) add damage and screen evasion. Training costs 200 cr + 5 cr/XP, capped at Ace. Fleet cards show rank, progress, XP and TRAIN; promotions are logged.
+
 ### 19. Stellaris-Style Windows Cockpit
 
 The Stellaris-style Windows cockpit, its panels, controls and launch options are documented in
