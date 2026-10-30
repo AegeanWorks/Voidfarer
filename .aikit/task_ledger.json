@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "captain-gambit",
+    "task_id": "outpost-supply-links",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793377225.7222352,
+    "updated_at": 1793377875.4253244,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793377237.3937566
+    "completed_at": 1793377885.9639506
   },
   "checkpoints": [
-    {
-      "task_id": "research-pacts",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan research pacts: standing-60 scientific agreements that persist per faction, add 5% passive research while at peace, and appear in the Empire tab and CLI.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793373960.894719,
-      "timestamp_str": "2026-10-30 18:26:00",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Trade pacts unlock at 40 and alliances at 70, leaving no mid-tier scientific agreement and no diplomatic acceleration for research.",
-        "benefits": "Standing 60 gains a distinct scientific reward, pacts reward peace, and the research queue benefits from faster passive intake.",
-        "risks": "contract: research_pacts must default empty for legacy saves and every clone must preserve it; dependency: the tick research gain now multiplies by active pacts; concurrency: diplomacy mutates standings, pacts and the flight log under the engine lock; state: war must suspend rather than delete a pact.",
-        "mitigation": "Add standing, war, multiplier, report, persistence and UI/CLI regressions first; keep the multiplier additive and capped by pact count; verify the live R&D action."
-      }
-    },
-    {
-      "task_id": "research-pacts",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted research_pacts, standing-60/war gates, +5% passive research multiplier, report/snapshot pact fields, R&D Empire action, CLI status/action and regressions implemented.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793374036.7247264,
-      "timestamp_str": "2026-10-30 18:27:16",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "research-pacts",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-109 recorded; live Edge formed a Sol Coalition research pact and showed +5% bonus; 953 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793374036.8643184,
-      "timestamp_str": "2026-10-30 18:27:16",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "research-pacts",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'research-pacts' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793374049.862865,
-      "timestamp_str": "2026-10-30 18:27:29",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "codex-progression",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793377237.3937588,
       "timestamp_str": "2026-10-30 19:20:37",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-supply-links",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan outpost supply links: same-system hubs, per-link output bonuses, plus cockpit, CLI and REST controls.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793377414.7147074,
+      "timestamp_str": "2026-10-30 19:23:34",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Outposts produce in isolation; clustering them in one system has no economic payoff beyond separate yields, so the map's multi-outpost systems lack a logistics decision.",
+        "benefits": "Clustered outposts gain a deliberate supply-chain bonus, hub choice matters, and the outpost panel gains an economic decision alongside crew and specialization.",
+        "risks": "contract: Outpost gains a persisted supply_hub_id with a legacy-safe empty default; dependency: tick production and report payloads must use the same multiplier; concurrency: link changes mutate the outpost tuple under the engine lock; state: cycles, cross-system links and hub overload must be rejected.",
+        "mitigation": "Test link rules, multiplier math, tick output, persistence, CLI/API and UI wiring first; cap hubs at two links; reject chained hubs; verify live Edge."
+      }
+    },
+    {
+      "task_id": "outpost-supply-links",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Added persisted supply hubs, link/unlink rules, +5%/+8% multipliers in production and cash flow, REST/CLI/UI controls and 10 regressions; 989 tests pass.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793377875.2923386,
+      "timestamp_str": "2026-10-30 19:31:15",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-supply-links",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-114 documented; live Edge linked Supply Alpha through Supply Beta and showed x1.05 / x1.08 with no console errors; 989 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793377875.4253244,
+      "timestamp_str": "2026-10-30 19:31:15",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-supply-links",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'outpost-supply-links' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793377885.9639523,
+      "timestamp_str": "2026-10-30 19:31:25",
       "agent": "opencode:mechanics"
     }
   ]

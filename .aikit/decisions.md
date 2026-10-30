@@ -1332,3 +1332,15 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Expose `POST /api/combat/gambit`, `combat gambit`, and a combat-card button that disables after use or without a local captain.
   5. Make `combat stance` reachable from argparse while touching the same action list.
 - **Consequences**: Captains now have an active tactical moment, and skill growth affects both passive and active value. Legacy combats load with the gambit unused and no evasion bonus. Live Edge verified the button in an active fight. Suite: 979 tests, 5/5 gates.
+
+### ADR-114: Outpost Supply Links
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Outposts produced independently. Building several in one system had no logistical payoff, even though the map offers 7-8 planets per system and outpost specialization already rewards clustering.
+- **Decision**:
+  1. Add persisted `Outpost.supply_hub_id` with a legacy-safe empty default.
+  2. Allow one same-system hub per outpost; hubs host at most two links, cannot link upward, and linked outposts cannot host their own links.
+  3. Grant linked outposts +5% output and hubs +8% per link (max +16%), applied in tick production, cash-flow estimates and report payloads.
+  4. Expose `POST /api/outpost/link`, `outpost link|unlink`, and a SUPPLY row with LINK/UNLINK controls and live multiplier.
+  5. Show hub name, link count and multiplier in the outpost payload and CLI ledger.
+- **Consequences**: Multi-outpost systems now reward deliberate hub placement and specialization combinations. Cycles, cross-system routes and overloaded hubs are rejected. Live Edge linked Supply Alpha through Supply Beta and showed x1.05 / x1.08 with no console errors. Suite: 989 tests, 5/5 gates.
