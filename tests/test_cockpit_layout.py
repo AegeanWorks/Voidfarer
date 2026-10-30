@@ -1342,6 +1342,21 @@ class TestFleetStanceCockpit(unittest.TestCase):
         self.assertIn(".combat-stance-line", self.css)
 
 
+class TestCaptainGambitCockpit(unittest.TestCase):
+    """The combat card must offer the once-per-battle captain action."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_combat_card_has_a_captain_gambit_button(self):
+        self.assertIn('id="btnCombatGambit"', self.html)
+        self.assertIn("CAPTAIN'S GAMBIT", self.html)
+        self.assertIn('"/api/combat/gambit"', self.js)
+        self.assertIn("captain_gambit_used", self.js)
+
+
 class TestResearchQueueCockpit(unittest.TestCase):
     """The Empire research list must expose queue and cancel controls."""
 

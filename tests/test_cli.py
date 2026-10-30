@@ -151,6 +151,18 @@ class TestCLI(_IsolatedCliTestCase):
                 self.assertEqual(code, 0)
                 self.assertIn("No active combat", mock_out.getvalue())
 
+    def test_cli_combat_gambit_reports_outside_combat(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["combat", "gambit"])
+            self.assertEqual(code, 1)
+            self.assertIn("No active combat", mock_out.getvalue())
+
+    def test_cli_combat_stance_is_reachable(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["combat", "stance", "aggressive"])
+            self.assertEqual(code, 0)
+            self.assertIn("AGGRESSIVE", mock_out.getvalue())
+
     def test_cli_shipyard_subcommands_parse(self):
         for argv in (["shipyard", "chassis", "orion_hauler"], ["shipyard", "sell", "shields"]):
             with patch("sys.stdout", new_callable=io.StringIO) as mock_out:

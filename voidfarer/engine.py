@@ -5273,6 +5273,126 @@ class SimulationEngine:
             self.state = self._clone_state(ship=self._clone_ship(battle_stance=normalized))
             return True, f"Fleet battle stance set to {normalized.upper()}."
 
+    def captain_gambit(self) -> tuple[bool, str]:
+        """Spend one captain's once-per-battle specialty action."""
+        with self.lock:
+            combat = self.state.active_combat
+            if combat is None:
+                return False, "No active combat intercept to command."
+            if combat.captain_gambit_used:
+                return False, "The captain's gambit is already spent this battle."
+            ship = self.state.ship
+            local = fleet_ships_in_system(
+                ship.fleet_ships, ship.current_system_id
+            )
+            candidates = [
+                escort for escort in local
+                if escort.hull > 0 and escort.captain_id
+            ]
+            if not candidates:
+                return False, "No living escort captain is in this system."
+            lead = max(
+                candidates,
+                key=lambda escort: (escort.captain_skill, escort.experience),
+            )
+            captain = next(
+                (member for member in ship.crew if member.id == lead.captain_id),
+                None,
+            )
+            if captain is None:
+                return False, f"{lead.name}'s captain record is missing."
+            role = captain.role
+            skill = max(1, captain.skill)
+            new_hull = ship.hull
+            new_shield = ship.shield
+            new_fleet = ship.fleet_ships
+            new_combat = replace(combat, captain_gambit_used=True)
+            if role == "engineer":
+                repair = 12 + 3 * skill
+                if ship.hull >= ship.max_hull:
+                    return False, "Hull is already at full integrity; hold the gambit."
+                new_hull = min(ship.max_hull, ship.hull + repair)
+                detail = f"patches the hull (+{new_hull - ship.hull} integrity)"
+            elif role == "medic":
+                heal = 6 + 2 * skill
+                damaged = [escort for escort in local if escort.hull < escort.max_hull]
+                if not damaged:
+                    return False, "The local escort wing is undamaged; hold the gambit."
+                updated = tuple(
+                    replace(
+                        escort,
+                        hull=min(escort.max_hull, escort.hull + heal),
+                        status="escorting",
+                    )
+                    if escort.id in {ship.id for ship in damaged}
+                    else escort
+                    for escort in local
+                )
+                new_fleet = self._merge_fleet_ships(updated)
+                detail = f"stabilizes the escort wing (+{heal} hull each)"
+            elif role == "quartermaster":
+                boost = 10 + 2 * skill
+                drained = [escort for escort in local if escort.shield < escort.max_shield]
+                if not drained:
+                    return False, "The local escort shields are full; hold the gambit."
+                updated = tuple(
+                    replace(
+                        escort,
+                        shield=min(escort.max_shield, escort.shield + boost),
+                    )
+                    if escort.id in {ship.id for ship in drained}
+                    else escort
+                    for escort in local
+                )
+                new_fleet = self._merge_fleet_ships(updated)
+                detail = f"pushes reserve cells to the screen (+{boost} shield each)"
+            elif role == "pilot":
+                if combat.captain_evasion_bonus >= 0.35:
+                    return False, "The wing is already at maximum evasive posture."
+                gained = 0.08 + 0.015 * skill
+                new_combat = replace(
+                    new_combat,
+                    captain_evasion_bonus=min(
+                        0.35, combat.captain_evasion_bonus + gained
+                    ),
+                )
+                detail = f"runs the wing through a tightening evasive pattern (+{int(gained * 100)}% evasion)"
+            elif role == "scientist":
+                if combat.enemy_shield <= 0:
+                    return False, "Enemy shields are already down; hold the gambit."
+                drained = min(combat.enemy_shield, 15 + 4 * skill)
+                new_combat = replace(
+                    new_combat,
+                    enemy_shield=combat.enemy_shield - drained,
+                )
+                detail = f"maps the deflector harmonics and drains {drained} MW"
+            elif role == "marine":
+                if combat.enemy_damage <= 1:
+                    return False, "Enemy weapons are already suppressed; hold the gambit."
+                cut = min(combat.enemy_damage - 1, 8 + 2 * skill)
+                new_combat = replace(
+                    new_combat,
+                    enemy_damage=combat.enemy_damage - cut,
+                )
+                detail = f"cuts enemy fire-control (-{cut} hostile damage)"
+            else:
+                return False, f"{captain.name} has no combat gambit."
+
+            line = (
+                f"CAPTAIN'S GAMBIT ({role.title()}): {captain.name} {detail}. "
+                "Once per battle."
+            )
+            new_ship = self._clone_ship(
+                hull=new_hull,
+                shield=new_shield,
+                fleet_ships=new_fleet,
+                flight_log=tuple((list(ship.flight_log[-19:]) + [line])[-20:]),
+            )
+            self.state = self._clone_state(
+                ship=new_ship, active_combat=new_combat
+            )
+            return True, line
+
     def _combat_defeat(self, combat: CombatEncounter, note: str = "",
                        fleet_ships: tuple | None = None, crew: tuple | None = None,
                        streak: int | None = None, fuel: int | None = None) -> tuple[bool, str]:
@@ -5812,7 +5932,11 @@ class SimulationEngine:
             # Standard counter-battery
             inbound = int(enemy_rem_damage * (1.5 if intent == "execute" else 1.0))
             evasion_note = ""
-            fleet_evasion = fleet_evasion_bonus(fleet_ships, battle_stance)
+            fleet_evasion = min(
+                0.45,
+                fleet_evasion_bonus(fleet_ships, battle_stance)
+                + combat.captain_evasion_bonus,
+            )
             if inbound > 0 and (equipment["evasion"] + mercenary_evasion + fleet_evasion) > 0.0 and self.rng.random() < (equipment["evasion"] + mercenary_evasion + fleet_evasion):
                 inbound = 0
                 evasion_note = " [Ion afterburners and escort screen evaded incoming fire!]"

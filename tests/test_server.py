@@ -11,7 +11,7 @@ from pathlib import Path
 from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
 from voidfarer.engine import SimulationEngine
 from voidfarer.fleet import build_fleet_ship
-from voidfarer.models import FleetShip, Outpost
+from voidfarer.models import CombatEncounter, CrewMember, FleetShip, Outpost
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
 
@@ -524,6 +524,47 @@ class TestServer(unittest.TestCase):
         self.assertEqual(
             payload["state"]["fleet_manager"]["battle_stance"], "defensive"
         )
+
+    def test_captain_gambit_endpoint_spends_a_local_captain(self):
+        engine = VoidFarerHandler.engine
+        captain = CrewMember(
+            id="server_captain",
+            name="Server Captain",
+            role="engineer",
+            skill=5,
+            specialty="engineering",
+            status="active",
+        )
+        escort = replace(
+            build_fleet_ship("corvette", "sol", 0),
+            captain_id=captain.id,
+            captain_role=captain.role,
+            captain_skill=captain.skill,
+        )
+        combat = CombatEncounter(
+            id="server_gambit",
+            enemy_name="Server Target",
+            enemy_class="Corvette",
+            enemy_hull=100,
+            enemy_max_hull=100,
+            enemy_damage=20,
+            bounty_credits=0,
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(
+                hull=50,
+                crew=(captain,),
+                fleet_ships=(escort,),
+                current_system_id="sol",
+            ),
+            active_combat=combat,
+        )
+        status, data = self._post("/api/combat/gambit", {})
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(payload["state"]["ship"]["hull"], 77)
+        self.assertTrue(payload["state"]["active_combat"]["captain_gambit_used"])
 
     def test_quantum_automation_endpoints_configure_and_report(self):
         status, data = self._post(

@@ -519,6 +519,8 @@ class CombatEncounter:
     ai_profile: str = "aggressive"
     enemy_intent: str = "fire"
     archetype_id: str = ""
+    captain_gambit_used: bool = False
+    captain_evasion_bonus: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -543,6 +545,10 @@ class CombatEncounter:
             ai_profile=str(data.get("ai_profile", "aggressive")),
             enemy_intent=str(data.get("enemy_intent", "fire")),
             archetype_id=str(data.get("archetype_id", "")),
+            captain_gambit_used=bool(data.get("captain_gambit_used", False)),
+            captain_evasion_bonus=max(
+                0.0, min(0.35, float(data.get("captain_evasion_bonus", 0.0)))
+            ),
         )
 
 

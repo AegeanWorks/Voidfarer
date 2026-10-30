@@ -498,6 +498,7 @@ class CockpitApp {
         this.btnCombatFire = document.getElementById("btnCombatFire");
         this.btnCombatDrone = document.getElementById("btnCombatDrone");
         this.btnCombatBoard = document.getElementById("btnCombatBoard");
+        this.btnCombatGambit = document.getElementById("btnCombatGambit");
         this.btnCombatTarget = document.getElementById("btnCombatTarget");
         this.btnCombatAbsorb = document.getElementById("btnCombatAbsorb");
         this.btnCombatEvade = document.getElementById("btnCombatEvade");
@@ -1045,6 +1046,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.btnCombatFire.addEventListener("click", () => this.handleCombat("fire_lasers"));
         if (this.btnCombatBoard) {
             this.btnCombatBoard.addEventListener("click", () => this.handleCombat("board_enemy"));
+        }
+        if (this.btnCombatGambit) {
+            this.btnCombatGambit.addEventListener("click", () => this.postAction("/api/combat/gambit", {}));
         }
         if (this.btnCombatDrone) {
             this.btnCombatDrone.addEventListener("click", () => this.handleCombat("drone_strike"));
@@ -1716,6 +1720,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         : c.enemy_hull > crippledAt
                             ? `Board only below ${crippledAt} hull`
                             : "Send the marine party across";
+            }
+            if (this.btnCombatGambit) {
+                const localCaptains = (ship.fleet_ships || []).filter(escort =>
+                    escort.assigned_system_id === ship.current_system_id
+                    && Number(escort.hull) > 0
+                    && Boolean(escort.captain_id)
+                );
+                const gambitReady = !c.captain_gambit_used && localCaptains.length > 0;
+                this.btnCombatGambit.disabled = !gambitReady;
+                this.btnCombatGambit.title = c.captain_gambit_used
+                    ? "The captain's gambit is already spent this battle"
+                    : localCaptains.length
+                        ? "Spend the lead captain's once-per-battle specialty"
+                        : "No living escort captain in this system";
             }
 
             if (this.combatTelegraphBanner) {

@@ -63,6 +63,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/crew/dismiss": "would erase the only crew roster in the run",
     "/api/story/choice": "needs an active story choice",
     "/api/trade/quantum/place": "needs a quantum-trade unlock",
+    "/api/combat/gambit": "needs an active fight and a local escort captain",
 }
 
 

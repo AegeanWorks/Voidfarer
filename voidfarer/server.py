@@ -1086,6 +1086,12 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/combat/gambit":
+            ok, msg = self.engine.captain_gambit()
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/combat":
             action = str(body.get("action", "fire_lasers"))
             ok, msg = self.engine.combat_action(action)

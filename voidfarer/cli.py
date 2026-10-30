@@ -1016,6 +1016,13 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
             storage.save(engine.state)
         return 0 if ok else 1
 
+    if len(parts) > 1 and parts[1].lower() in ("gambit", "captain"):
+        ok, msg = engine.captain_gambit()
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+
     if not engine.state.active_combat:
         print(f"{YELLOW}No active combat intercept detected in this sector.{RESET}")
         return 0
@@ -1036,6 +1043,7 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
         print(f"  {BOLD}combat drone{RESET}   - Launch kinetic drone strike / sensor burn")
         print(f"  {BOLD}combat target{RESET}  - Target subsystem (e.g. combat target weapons)")
         print(f"  {BOLD}combat board{RESET}   - Board a crippled enemy with a marine party")
+        print(f"  {BOLD}combat gambit{RESET}  - Spend a local captain's once-per-battle specialty")
         print(f"  {BOLD}combat absorb{RESET}  - Overcharge shield capacitors")
         print(f"  {BOLD}combat evade{RESET}   - High-G thruster evasion")
         print(f"  {BOLD}combat flee{RESET}    - Emergency hyperspace jump (costs 8 fuel)")
@@ -2733,7 +2741,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         choices=[
             "fire", "laser", "attack", "drone", "strike", "target", "subsystem",
             "board", "capture", "prize", "absorb", "shield", "defend", "evade",
-            "dodge", "flee", "escape",
+            "dodge", "flee", "escape", "stance", "formation", "gambit", "captain",
         ],
         help="Tactical maneuver",
     )
