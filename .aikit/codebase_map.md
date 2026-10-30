@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `107`
-- **Total Classes**: `274`
+- **Total Python Modules**: `108`
+- **Total Classes**: `275`
 - **Total Top-Level Functions**: `324`
-- **Total Class Methods**: `1578`
-- **Total Source Lines**: `42167`
+- **Total Class Methods**: `1590`
+- **Total Source Lines**: `42341`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `312` lines (`13972` bytes)
+**Size**: `318` lines (`14298` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -233,6 +233,7 @@
   - Method `.test_cli_outpost_crew_parses()`
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
+  - Method `.test_cli_research_pact_parses_and_reports_the_standing_gate()`
   - Method `.test_cli_trade_pact_parses_and_reports_the_standing_gate()`
   - Method `.test_cli_fleet_captain_parses()`
   - Method `.test_cli_fleet_role_parses()`
@@ -267,7 +268,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1460` lines (`64874` bytes)
+**Size**: `1463` lines (`65010` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1436,6 +1437,24 @@
 
 ---
 
+### [`tests/test_research_pacts.py`](tests/test_research_pacts.py)
+> *Research pacts: standing gate, war suspension and passive research bonus.*
+
+**Size**: `86` lines (`3637` bytes)
+
+**Classes:**
+- `class ResearchPactTest`
+  - Method `.setUp()`
+  - Method `._set_standing(faction_id, standing)`
+  - Method `.test_pact_requires_standing_60_and_forms_once()`
+  - Method `.test_war_blocks_and_suspends_the_pact()`
+  - Method `.test_multiplier_scales_with_active_pacts()`
+  - Method `.test_report_and_snapshot_expose_pacts()`
+  - Method `.test_save_round_trip_keeps_pacts()`
+  - Method `.test_legacy_payload_defaults_to_no_pacts()`
+
+---
+
 ### [`tests/test_research_queue.py`](tests/test_research_queue.py)
 > *Research queue: validation, ordering, auto-start and persistence.*
 
@@ -1487,7 +1506,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `726` lines (`31458` bytes)
+**Size**: `745` lines (`32225` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1526,6 +1545,7 @@
   - Method `.test_landing_and_depot_endpoints()`
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
+  - Method `.test_research_pact_endpoint_forms_a_pact()`
   - Method `.test_trade_pact_endpoint_forms_a_pact()`
   - Method `.test_fleet_captain_endpoint_assigns_and_recalls()`
   - Method `.test_fleet_role_endpoint_sets_squadron_role()`
@@ -2170,7 +2190,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3218` lines (`164136` bytes)
+**Size**: `3219` lines (`164288` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2354,7 +2374,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8949` lines (`439697` bytes)
+**Size**: `9005` lines (`442501` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2442,6 +2462,8 @@
   - Method `.get_outpost_report()`
   - Method `._faction_at_war_with_player(faction_id)` - *True when the faction is a belligerent in a war involving the player's polity.*
   - Method `.trade_pact_active(faction_id)` - *A pact pays only while the signatory is not at war with the player.*
+  - Method `.research_pact_active(faction_id)` - *A research accord pays only while the signatory is at peace with the player.*
+  - Method `.research_pact_multiplier()` - *Passive research multiplier: +5% for each active research pact.*
   - Method `.faction_diplomacy(faction_id, action, amount)`
   - Method `.buy_escort(escort_type, system_id)`
   - Method `.assign_escort(ship_id, system_id)`
@@ -2790,7 +2812,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2245` lines (`83619` bytes)
+**Size**: `2248` lines (`83783` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

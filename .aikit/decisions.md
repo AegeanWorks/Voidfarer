@@ -1276,3 +1276,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Expose `GET/POST /api/trade/quantum/automation`, `autotrade quantum status|on|off`, and AUTO-FREIGHT/MIN NET controls in the Quantum Freight panel.
   4. Persist order count and last net for cockpit status; manual SHIP buttons remain available.
 - **Consequences**: Long-haul arbitrage can run unattended without bypassing fees, cargo volume, trade pacts or order slots. Live Edge enabled auto-freight at min net 0 and shipped 10 titanium for a 1,569 cr net route with no console errors. Suite: 945 tests (62 suites), 5/5 gates.
+
+### ADR-109: Research Pacts
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Trade pacts unlocked at standing 40 and alliances at 70, leaving no mid-tier scientific agreement. Research could be queued but had no diplomatic acceleration.
+- **Decision**:
+  1. Add a persisted `research_pacts` tuple with a legacy-safe empty default.
+  2. Add `diplomacy research_pact`: standing 60, one pact per faction, refused during war with the player, suspended rather than deleted if war begins.
+  3. Grant +5% passive research per active pact via `research_pact_multiplier`, applied to the tick's research gain; expose active count and bonus in the research report/snapshot.
+  4. Add an R&D action and `R&D` label to the Empire faction row, plus CLI status/action text.
+- **Consequences**: Standing 60 gains a distinct scientific reward, research pacts reward peace, and the research queue benefits from faster passive intake. Live Edge formed a Sol Coalition research pact and logged the +5% bonus with no console errors. Suite: 953 tests (63 suites), 5/5 gates.
