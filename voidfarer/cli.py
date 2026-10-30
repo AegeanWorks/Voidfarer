@@ -376,15 +376,22 @@ def cmd_market(engine: SimulationEngine) -> int:
 
     sys_faction_id = get_faction_id_from_name(engine.current_system.faction)
     standing = engine.state.ship.faction_standings.get(sys_faction_id, 0)
+    pact = engine.trade_pact_active(sys_faction_id)
     quotes = [
         calculate_dynamic_market_quote(
-            engine.current_system, body, comm, engine.state.economy, faction_standing=standing
+            engine.current_system,
+            body,
+            comm,
+            engine.state.economy,
+            faction_standing=standing,
+            trade_pact=pact,
         )
         for comm in COMMODITY_MAP.values()
     ]
     standing_factor = faction_standing_price_factor(standing)
     print(f"\n{BOLD}{CYAN}=== LOCAL COMMODITY EXCHANGE: {body.name.upper()} ==={RESET}")
-    print(f"Market Archetype: {BOLD}{body.market_archetype.upper()}{RESET} | Credits: {YELLOW}{engine.state.ship.credits} cr{RESET} | Standing: {BOLD}x{standing_factor:.2f}{RESET}")
+    print(f"Market Archetype: {BOLD}{body.market_archetype.upper()}{RESET} | Credits: {YELLOW}{engine.state.ship.credits} cr{RESET} | Standing: {BOLD}x{standing_factor:.2f}{RESET}"
+          + (f" | {GREEN}TRADE PACT{RESET}" if pact else ""))
     print(f"{'-' * 70}")
     print(f"{'COMMODITY':<22} {'BUY':>8} {'SELL':>8} {'SUPPLY':>8} {'DEMAND':>8} {'HOLD':>8}")
     print(f"{'-' * 70}")
@@ -1807,19 +1814,20 @@ def cmd_diplomacy(engine: SimulationEngine, storage: StorageManager, parts: list
             faction = CANONICAL_FACTIONS.get(leader.faction_id)
             standing = engine.state.ship.faction_standings.get(leader.faction_id, 0)
             eliminated = leader.faction_id in engine.state.eliminated_factions
+            pact = " [PACT]" if leader.faction_id in engine.state.ship.trade_pacts else ""
             print(
                 f"{leader.faction_id:<20} {BOLD}{leader.name:<18}{RESET} {leader.title:<18} "
-                f"{CYAN}{leader.behavior:<13}{RESET} standing {standing:+4d}"
+                f"{CYAN}{leader.behavior:<13}{RESET} standing {standing:+4d}{pact}"
                 + (f" {RED}[ELIMINATED]{RESET}" if eliminated else "")
             )
         active_wars = [w for w in engine.state.wars if w.active]
         print(f"\nActive wars: {len(active_wars)}")
         for war in active_wars:
             print(f"  {war.attacker_id} vs {war.defender_id} | score {war.war_score:+.1f} | since tick {war.started_tick}")
-        print(f"\n{DIM}Actions: diplomacy improve|gift|alliance|declare_war|peace <faction_id> [amount]{RESET}")
+        print(f"\n{DIM}Actions: diplomacy improve|gift|trade_pact|alliance|declare_war|peace <faction_id> [amount]{RESET}")
         return 0
     if len(parts) < 3:
-        print(f"{RED}Usage:{RESET} diplomacy <improve|gift|alliance|declare_war|peace> <faction_id> [amount]")
+        print(f"{RED}Usage:{RESET} diplomacy <improve|gift|trade_pact|alliance|declare_war|peace> <faction_id> [amount]")
         return 1
     amount = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 0
     ok, msg = engine.faction_diplomacy(parts[2].lower(), sub, amount)
@@ -2729,7 +2737,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     outpost_p.add_argument("body_id", nargs="?", help="Body id for construction")
 
     diplomacy_p = subparsers.add_parser("diplomacy", help="Faction diplomacy, leaders, and wars")
-    diplomacy_p.add_argument("action", nargs="?", default="list", choices=["list", "improve", "gift", "alliance", "ceasefire"])
+    diplomacy_p.add_argument("action", nargs="?", default="list", choices=["list", "improve", "gift", "trade_pact", "alliance", "ceasefire"])
     diplomacy_p.add_argument("faction_id", nargs="?", help="Faction id")
     diplomacy_p.add_argument("amount", nargs="?", type=int, default=0, help="Aid amount")
 

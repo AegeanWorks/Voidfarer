@@ -1323,10 +1323,13 @@ class TestDiplomacyActionsCockpit(unittest.TestCase):
         for marker in (
             "data-diplo-action",
             'data-diplo-action="gift"',
+            'data-diplo-action="trade_pact"',
             'data-diplo-action="alliance"',
             'data-diplo-action="ceasefire"',
             "handleDiplomacyAction",
+            "trade_pacts",
         ):
             self.assertIn(marker, self.js)
         self.assertIn(".diplomacy-actions", self.css)
         self.assertIn("ALLIED", self.js)
+        self.assertIn("PACT", self.js)

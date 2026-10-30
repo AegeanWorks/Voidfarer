@@ -410,6 +410,22 @@ class TestServer(unittest.TestCase):
         self.assertEqual(payload["state"]["ship"]["fleet_ships"], [])
         self.assertEqual(payload["state"]["stats"]["ships_sold"], 1)
 
+    def test_trade_pact_endpoint_forms_a_pact(self):
+        engine = VoidFarerHandler.engine
+        standings = dict(engine.state.ship.faction_standings)
+        standings["sol_coalition"] = 50
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(faction_standings=standings)
+        )
+        status, data = self._post(
+            "/api/diplomacy",
+            {"faction_id": "sol_coalition", "action": "trade_pact"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertIn("sol_coalition", payload["state"]["ship"]["trade_pacts"])
+
     def test_fleet_train_endpoint_buys_experience(self):
         engine = VoidFarerHandler.engine
         ship = build_fleet_ship("corvette", "sol", 0)

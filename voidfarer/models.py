@@ -1709,6 +1709,7 @@ class ShipState:
     faction_standings: dict[str, int] = field(default_factory=dict)
     corp_standings: dict[str, int] = field(default_factory=dict)
     allies: tuple[str, ...] = ()
+    trade_pacts: tuple[str, ...] = ()
     landed_body_id: str | None = None
     travel: TravelState | None = None
     void_traversal: VoidTraversalState | None = None
@@ -1764,6 +1765,7 @@ class ShipState:
             "faction_standings": dict(self.faction_standings),
             "corp_standings": dict(self.corp_standings),
             "allies": list(self.allies),
+            "trade_pacts": list(self.trade_pacts),
             "landed_body_id": self.landed_body_id,
             "travel": self.travel.to_dict() if self.travel else None,
             "void_traversal": self.void_traversal.to_dict() if self.void_traversal else None,
@@ -1837,6 +1839,7 @@ class ShipState:
             faction_standings=faction_standings,
             corp_standings=corp_standings,
             allies=tuple(data.get("allies", ())),
+            trade_pacts=tuple(data.get("trade_pacts", ())),
             landed_body_id=data.get("landed_body_id"),
             travel=TravelState.from_dict(data["travel"]) if data.get("travel") else None,
             void_traversal=VoidTraversalState.from_dict(data["void_traversal"]) if data.get("void_traversal") else None,

@@ -261,6 +261,7 @@ def calculate_dynamic_market_quote(
     commodity: Commodity,
     economy: GlobalEconomyState,
     faction_standing: int = 0,
+    trade_pact: bool = False,
 ) -> MarketQuote:
     """Compute precision localized pricing reflecting global stockpile supply/demand and macroeconomic events."""
     base = commodity.base_price
@@ -355,6 +356,12 @@ def calculate_dynamic_market_quote(
     spread = max(2, int(base * 0.12))
     buy_price = max(2, base + spread)
     sell_price = max(1, base - spread)
+
+    # 5a. A trade pact improves both sides of the exchange, unlike raw standing,
+    # which shifts the base price. War suspends the pact before it reaches here.
+    if trade_pact:
+        buy_price = max(2, int(buy_price * 0.94))
+        sell_price = max(1, int(sell_price * 1.06))
 
     return MarketQuote(
         commodity_id=commodity.id,

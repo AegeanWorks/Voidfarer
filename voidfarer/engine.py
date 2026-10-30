@@ -624,6 +624,7 @@ class SimulationEngine:
             faction_standings=kwargs.get("faction_standings", cur.faction_standings),
             corp_standings=kwargs.get("corp_standings", cur.corp_standings),
             allies=kwargs.get("allies", cur.allies),
+            trade_pacts=kwargs.get("trade_pacts", cur.trade_pacts),
             landed_body_id=kwargs["landed_body_id"] if "landed_body_id" in kwargs else cur.landed_body_id,
             travel=kwargs["travel"] if "travel" in kwargs else cur.travel,
             void_traversal=kwargs["void_traversal"] if "void_traversal" in kwargs else cur.void_traversal,
@@ -2892,6 +2893,21 @@ class SimulationEngine:
                 "modules": OUTPOST_MODULE_CATALOG,
             }
 
+    def _faction_at_war_with_player(self, faction_id: str) -> bool:
+        """True when the faction is a belligerent in a war involving the player's polity."""
+        return any(
+            war.active
+            and "sol_coalition" in (war.attacker_id, war.defender_id)
+            and faction_id in (war.attacker_id, war.defender_id)
+            for war in self.state.wars
+        )
+
+    def trade_pact_active(self, faction_id: str) -> bool:
+        """A pact pays only while the signatory is not at war with the player."""
+        return bool(faction_id) and faction_id in self.state.ship.trade_pacts and not (
+            self._faction_at_war_with_player(faction_id)
+        )
+
     def faction_diplomacy(self, faction_id: str, action: str, amount: int = 0) -> tuple[bool, str]:
         with self.lock:
             if faction_id not in CANONICAL_FACTIONS:
@@ -2924,6 +2940,25 @@ class SimulationEngine:
                 )
                 self.state = self._clone_state(ship=new_ship)
                 return True, f"Aid package delivered to {CANONICAL_FACTIONS[faction_id].name} ({cost} cr, +{gain} standing)." + (" " + " ".join(contract_logs) if contract_logs else "")
+            if act in ("trade_pact", "pact"):
+                faction_name = CANONICAL_FACTIONS[faction_id].name
+                if faction_id in self.state.ship.trade_pacts:
+                    return False, f"Already hold a trade pact with {faction_name}."
+                if self._faction_at_war_with_player(faction_id):
+                    return False, f"Cannot sign a trade pact with {faction_name} while at war."
+                if current < 40:
+                    return (
+                        False,
+                        f"Trade pact requires standing >= 40 (current {current:+d}).",
+                    )
+                pacts = tuple(sorted(set(self.state.ship.trade_pacts) | {faction_id}))
+                line = f"TRADE PACT: {faction_name} opens its markets to your flag."
+                new_ship = self._clone_ship(
+                    trade_pacts=pacts,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+                )
+                self.state = self._clone_state(ship=new_ship)
+                return True, line
             if act == "alliance":
                 if faction_id in self.state.ship.allies:
                     return False, f"Already allied with {CANONICAL_FACTIONS[faction_id].name}."
@@ -3625,7 +3660,13 @@ class SimulationEngine:
             }
 
     def _bulk_buy_cost(
-        self, body: CelestialBody, comm: Commodity, quantity: int, standing: int, unit_price: int
+        self,
+        body: CelestialBody,
+        comm: Commodity,
+        quantity: int,
+        standing: int,
+        unit_price: int,
+        trade_pact: bool = False,
     ) -> tuple[int, dict[str, int] | None]:
         """Price a buy order by walking the local stockpile, so bulk orders move the price they pay."""
         market = self.state.economy.markets.get(self.current_system.id)
@@ -3650,6 +3691,7 @@ class SimulationEngine:
                     last_updated_tick=self.state.economy.last_updated_tick,
                 ),
                 faction_standing=standing,
+                trade_pact=trade_pact,
             )
             total_cost += slice_quote.buy_price * slice_qty
             stocks[commodity_id] = max(MIN_STOCK, stocks.get(commodity_id, 50) - slice_qty)
@@ -3667,16 +3709,23 @@ class SimulationEngine:
                 return 0
             ship = self.state.ship
             free_volume = ship.cargo_capacity - calculate_cargo_volume(ship.cargo)
-            standing = ship.faction_standings.get(get_faction_id_from_name(self.current_system.faction), 0)
+            sys_faction_id = get_faction_id_from_name(self.current_system.faction)
+            standing = ship.faction_standings.get(sys_faction_id, 0)
+            pact = self.trade_pact_active(sys_faction_id)
             unit_price = calculate_dynamic_market_quote(
-                self.current_system, body, comm, self.state.economy, faction_standing=standing
+                self.current_system,
+                body,
+                comm,
+                self.state.economy,
+                faction_standing=standing,
+                trade_pact=pact,
             ).buy_price
             high = min(free_volume // max(1, comm.volume), ship.credits // max(1, unit_price))
             low = 0
             # Slice pricing only rises with quantity, so the affordable set is a prefix.
             while low < high:
                 mid = (low + high + 1) // 2
-                if self._bulk_buy_cost(body, comm, mid, standing, unit_price)[0] <= ship.credits:
+                if self._bulk_buy_cost(body, comm, mid, standing, unit_price, pact)[0] <= ship.credits:
                     low = mid
                 else:
                     high = mid - 1
@@ -3778,11 +3827,15 @@ class SimulationEngine:
         commodity = COMMODITY_MAP.get(automation.commodity_id)
         if commodity is None:
             return
-        standing = self.state.ship.faction_standings.get(
-            get_faction_id_from_name(self.current_system.faction), 0
-        )
+        sys_faction_id = get_faction_id_from_name(self.current_system.faction)
+        standing = self.state.ship.faction_standings.get(sys_faction_id, 0)
         quote = calculate_dynamic_market_quote(
-            self.current_system, body, commodity, self.state.economy, faction_standing=standing
+            self.current_system,
+            body,
+            commodity,
+            self.state.economy,
+            faction_standing=standing,
+            trade_pact=self.trade_pact_active(sys_faction_id),
         )
         ship = self.state.ship
         is_sell = (
@@ -3830,10 +3883,17 @@ class SimulationEngine:
 
             sys_faction_id = get_faction_id_from_name(self.current_system.faction)
             standing = self.state.ship.faction_standings.get(sys_faction_id, 0)
+            pact = self.trade_pact_active(sys_faction_id)
             quote = calculate_dynamic_market_quote(
-                self.current_system, body, comm, self.state.economy, faction_standing=standing
+                self.current_system,
+                body,
+                comm,
+                self.state.economy,
+                faction_standing=standing,
+                trade_pact=pact,
             )
             standing_factor = faction_standing_price_factor(standing)
+            pact_note = " [trade pact]" if pact else ""
             vol_per_unit = comm.volume
 
             cargo = dict(self.state.ship.cargo)
@@ -3850,7 +3910,9 @@ class SimulationEngine:
 
             if is_buy:
                 unit_price = quote.buy_price
-                total_cost, simulated_stocks = self._bulk_buy_cost(body, comm, quantity, standing, unit_price)
+                total_cost, simulated_stocks = self._bulk_buy_cost(
+                    body, comm, quantity, standing, unit_price, pact
+                )
                 if self.state.ship.credits < total_cost:
                     return False, f"Insufficient credits: {total_cost} cr required, {self.state.ship.credits} cr available."
 
@@ -3877,7 +3939,7 @@ class SimulationEngine:
                     impact_pct = round(((total_cost / quantity) / unit_price - 1.0) * 100.0)
                     if impact_pct >= 1:
                         impact_note = f" (avg {total_cost // quantity}/unit, market impact +{impact_pct}%)"
-                msg = f"Purchased {quantity}x {quote.name} for {total_cost} cr{tariff_note}{impact_note}."
+                msg = f"Purchased {quantity}x {quote.name} for {total_cost} cr{tariff_note}{impact_note}{pact_note}."
             else:
                 owned = cargo.get(commodity_id, 0)
                 if owned < quantity:
@@ -3931,6 +3993,7 @@ class SimulationEngine:
                                 last_updated_tick=self.state.economy.last_updated_tick,
                             ),
                             faction_standing=standing,
+                            trade_pact=pact,
                         )
                         base_revenue += slice_quote.sell_price * slice_qty
                         stocks[commodity_id] = min(MAX_STOCK, stocks.get(commodity_id, 50) + slice_qty)
@@ -3969,7 +4032,7 @@ class SimulationEngine:
                     impact_pct = round((1.0 - (avg_base_sell / quote.sell_price)) * 100.0)
                     if impact_pct >= 1:
                         impact_note = f" (base avg {avg_base_sell:.0f}/unit, market impact -{impact_pct}%)"
-                msg = f"Sold {quantity}x {quote.name} for {revenue} cr (trade margin: x{margin_mult:.2f}){corp_note}{impact_note}."
+                msg = f"Sold {quantity}x {quote.name} for {revenue} cr (trade margin: x{margin_mult:.2f}){corp_note}{impact_note}{pact_note}."
                 if released_cost > 0:
                     msg += f" P/L {revenue - released_cost:+d} cr."
 
@@ -4083,6 +4146,7 @@ class SimulationEngine:
                         commodity,
                         self.state.economy,
                         faction_standing=self.state.ship.faction_standings.get(faction_id, 0),
+                        trade_pact=self.trade_pact_active(faction_id),
                     )
                     fee = self._quantum_fee(commodity, quantity, int(plan["jumps"]))
                     payout = int(quote.sell_price * quantity * 0.97)
@@ -4159,6 +4223,7 @@ class SimulationEngine:
                 commodity,
                 self.state.economy,
                 faction_standing=self.state.ship.faction_standings.get(faction_id, 0),
+                trade_pact=self.trade_pact_active(faction_id),
             )
             cargo = dict(self.state.ship.cargo)
             remaining = held - quantity
@@ -4234,6 +4299,7 @@ class SimulationEngine:
                 commodity,
                 economy,
                 faction_standing=self.state.ship.faction_standings.get(faction_id, 0),
+                trade_pact=self.trade_pact_active(faction_id),
             )
             revenue = int(quote.sell_price * order.quantity * 0.97)
             credits += revenue
@@ -5947,6 +6013,9 @@ class SimulationEngine:
                         faction_standing=self.state.ship.faction_standings.get(
                             get_faction_id_from_name(cur_sys.faction), 0
                         ),
+                        trade_pact=self.trade_pact_active(
+                            get_faction_id_from_name(cur_sys.faction)
+                        ),
                     )
                     for c in CANONICAL_COMMODITIES
                 ]
@@ -6535,7 +6604,12 @@ class SimulationEngine:
             sys_faction_id = get_faction_id_from_name(self.current_system.faction)
             standing = self.state.ship.faction_standings.get(sys_faction_id, 0)
             quote = calculate_dynamic_market_quote(
-                self.current_system, body, comm, self.state.economy, faction_standing=standing
+                self.current_system,
+                body,
+                comm,
+                self.state.economy,
+                faction_standing=standing,
+                trade_pact=self.trade_pact_active(sys_faction_id),
             )
             passives = calculate_passive_multipliers(self.state.ship)
             equipment = self._combined_equipment()
