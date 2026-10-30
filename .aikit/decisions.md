@@ -1243,3 +1243,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Add payouts to credits, stats (`war_bond_payouts`) and the tick payload, and log paid/lost lines.
   4. Show the terms and current pledges on the Factions war card, and mention the terms in the `support_war` response.
 - **Consequences**: War pledges become a risk/reward decision, stalemates soften the loss, and defeated bets are real losses. Live Edge showed `Bonds: 1.5x victory / 0.8x stalemate / 0 defeat` with a 500 cr pledge. Suite: 918 tests (59 suites), 5/5 gates.
+
+### ADR-106: Research Queue
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Research had one active project and no way to line up the next one. Every completion required the player to return to the Empire tab or CLI and start another project manually.
+- **Decision**:
+  1. Add a persisted `ResearchState.queue` tuple with an empty legacy default.
+  2. Add `queue_research` and `cancel_queued_research`: validate unknown/completed/active/duplicate projects and prerequisites; starting a queued project removes it from the queue.
+  3. On completion, start the next queued project that is not completed and whose prerequisites are met; keep the remaining queue.
+  4. Expose `POST /api/research/queue` and `/api/research/cancel`, `research queue|cancel`, and START/QUEUE/CANCEL controls plus a QUEUED PROJECTS list in the Empire tab.
+- **Consequences**: Research can run unattended across multiple projects, queues survive saves, and invalid/stale entries are skipped rather than blocking progress. Live Edge queued Deep Survey Arrays behind Advanced Coolant Loops, showed the queued row, then cancelled it with no console errors. Suite: 927 tests (60 suites), 5/5 gates.

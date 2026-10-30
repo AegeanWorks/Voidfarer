@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `104`
-- **Total Classes**: `267`
+- **Total Python Modules**: `105`
+- **Total Classes**: `269`
 - **Total Top-Level Functions**: `324`
-- **Total Class Methods**: `1536`
-- **Total Source Lines**: `41322`
+- **Total Class Methods**: `1549`
+- **Total Source Lines**: `41559`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `294` lines (`13051` bytes)
+**Size**: `300` lines (`13357` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -226,6 +226,7 @@
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
   - Method `.test_cli_autotrade_status_parses()`
+  - Method `.test_cli_research_queue_parses()`
   - Method `.test_cli_outpost_repair_parses()`
   - Method `.test_cli_outpost_specialize_parses()`
   - Method `.test_cli_outpost_crew_parses()`
@@ -264,7 +265,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1410` lines (`63227` bytes)
+**Size**: `1430` lines (`63876` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -463,6 +464,9 @@
   - Method `.test_fleet_cards_offer_squadron_roles()`
   - Method `.test_fleet_cards_show_service_records()`
   - Method `.test_fleet_manager_shows_monthly_upkeep()`
+- `class TestResearchQueueCockpit` - *The Empire research list must expose queue and cancel controls.*
+  - Method `.setUpClass()`
+  - Method `.test_research_rows_offer_queue_and_cancel()`
 - `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
   - Method `.setUpClass()`
   - Method `.test_outpost_rows_offer_a_module_installer()`
@@ -1391,6 +1395,23 @@
 
 ---
 
+### [`tests/test_research_queue.py`](tests/test_research_queue.py)
+> *Research queue: validation, ordering, auto-start and persistence.*
+
+**Size**: `79` lines (`3223` bytes)
+
+**Classes:**
+- `class ResearchQueueEngineTest`
+  - Method `.setUp()`
+  - Method `.test_queue_validates_and_orders_projects()`
+  - Method `.test_cancel_removes_only_the_named_project()`
+  - Method `.test_starting_a_queued_project_removes_it_from_the_queue()`
+  - Method `.test_completion_starts_the_next_queued_project()`
+  - Method `.test_queue_persists_across_saves()`
+  - Method `.test_legacy_research_defaults_to_empty_queue()`
+
+---
+
 ### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
 > *Regressions pinned by the post-implementation review pass.*
 
@@ -1425,7 +1446,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `663` lines (`28770` bytes)
+**Size**: `686` lines (`29702` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1468,6 +1489,7 @@
   - Method `.test_fleet_role_endpoint_sets_squadron_role()`
   - Method `.test_fleet_train_endpoint_buys_experience()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
+  - Method `.test_research_queue_endpoints_queue_and_cancel()`
   - Method `.test_outpost_repair_endpoint_restores_integrity()`
   - Method `.test_outpost_specialize_endpoint_sets_a_focus()`
   - Method `.test_outpost_crew_endpoint_assigns_and_recalls()`
@@ -1991,7 +2013,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `757` lines (`32867` bytes)
+**Size**: `759` lines (`33017` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2105,7 +2127,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3150` lines (`160946` bytes)
+**Size**: `3169` lines (`161804` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2289,7 +2311,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8693` lines (`428016` bytes)
+**Size**: `8766` lines (`431526` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2356,6 +2378,8 @@
   - Method `.train_character_skill(skill)`
   - Method `.use_character_ability(ability_id, target_faction_id)`
   - Method `.choose_research(project_id)`
+  - Method `.queue_research(project_id)` - *Append a project to the automatic research queue.*
+  - Method `.cancel_queued_research(project_id)` - *Remove a project from the research queue without touching the active project.*
   - Method `.build_outpost(body_id, outpost_type_id)`
   - Method `.upgrade_outpost(outpost_id)`
   - Method `.install_outpost_module(outpost_id, module_id)` - *Install a production module on an outpost; stacks are capped at three.*
@@ -2717,7 +2741,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2205` lines (`82111` bytes)
+**Size**: `2208` lines (`82250` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -2996,7 +3020,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1411` lines (`60369` bytes)
+**Size**: `1423` lines (`60964` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
