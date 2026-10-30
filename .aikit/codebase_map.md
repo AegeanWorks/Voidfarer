@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `97`
-- **Total Classes**: `254`
-- **Total Top-Level Functions**: `315`
-- **Total Class Methods**: `1464`
-- **Total Source Lines**: `39998`
+- **Total Python Modules**: `98`
+- **Total Classes**: `256`
+- **Total Top-Level Functions**: `316`
+- **Total Class Methods**: `1472`
+- **Total Source Lines**: `40133`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `270` lines (`11870` bytes)
+**Size**: `276` lines (`12139` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -237,6 +237,7 @@
   - Method `.test_cli_corporations_alias()`
   - Method `.test_cli_repair_and_refuel_accept_positional_amounts()`
   - Method `.test_cli_fleet_list()`
+  - Method `.test_cli_fleet_ships_shows_upkeep()`
   - Method `.test_cli_upgrades_list()`
   - Method `.test_cli_contracts_list()`
   - Method `.test_cli_mastery_status()`
@@ -260,7 +261,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1347` lines (`60939` bytes)
+**Size**: `1354` lines (`61256` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -456,6 +457,7 @@
   - Method `.setUpClass()`
   - Method `.test_fleet_cards_show_rank_progress_and_training()`
   - Method `.test_fleet_cards_show_patrol_cadence()`
+  - Method `.test_fleet_manager_shows_monthly_upkeep()`
 - `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
   - Method `.setUpClass()`
   - Method `.test_outpost_rows_offer_a_module_installer()`
@@ -786,6 +788,23 @@
   - Method `.test_sale_requires_a_docked_station()`
   - Method `.test_sale_rejects_an_unknown_escort()`
   - Method `.test_fleet_report_exposes_sale_values()`
+
+---
+
+### [`tests/test_fleet_upkeep.py`](tests/test_fleet_upkeep.py)
+> *Fleet upkeep: monthly escort payroll, cash flow and shortfall readiness.*
+
+**Size**: `69` lines (`2807` bytes)
+
+**Classes:**
+- `class FleetUpkeepMathTest`
+  - Method `.test_upkeep_scales_with_living_roles()`
+- `class FleetUpkeepEngineTest`
+  - Method `.setUp()`
+  - Method `.test_cash_flow_separates_crew_and_fleet_upkeep()`
+  - Method `.test_month_rollover_charges_fleet_upkeep()`
+  - Method `.test_shortfall_marks_living_escorts_damaged()`
+  - Method `.test_report_exposes_upkeep()`
 
 ---
 
@@ -1955,7 +1974,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3118` lines (`159301` bytes)
+**Size**: `3118` lines (`159357` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2139,7 +2158,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8398` lines (`414896` bytes)
+**Size**: `8434` lines (`416274` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2437,12 +2456,13 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `271` lines (`9567` bytes)
+**Size**: `288` lines (`9958` bytes)
 
 **Functions:**
 - `def get_escort_template(escort_type)`
 - `def fleet_rank(experience)` - *Resolve veterancy rank, badge progress and cumulative combat bonuses.*
 - `def fleet_training_cost(experience)` - *Drydock instruction gets dearer as a crew approaches the next rank.*
+- `def fleet_upkeep(ships)` - *Monthly payroll for living escorts; destroyed hulls cost nothing.*
 - `def fleet_victory_experience(enemy_max_hull)` - *A tougher kill teaches more than farming a lone corsair.*
 - `def resolve_patrol_sweep(ship, system, tick, galaxy_seed, faction_standing)` - *Resolve one remote patrol cycle; even a quiet tour trains the crew.*
 - `def build_fleet_ship(escort_type, system_id, count)`

@@ -1167,3 +1167,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Exclude stationed crew from ship bonuses and away-team selection, refuse dismissal until recall, and expose assignment/recall through the engine, `/api/outpost/crew`, `outpost crew|recall`, and the Empire outpost row.
   4. Show `CREW n/3 - BONUS xN`, assigned chips and a recall control; the crew roster marks `OUTPOST: <name>`.
 - **Consequences**: Crew allocation becomes a real choice between flagship bonuses and outpost output, and every production path (tick, cash flow, report) shares the same multiplier. Live Edge stationed Imani Vale at a shipyard for x1.20, then recalled her, with no console errors. Suite: 861 tests (52 suites), 5/5 gates.
+
+### ADR-099: Fleet Upkeep and Readiness Shortfall
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Escorts had purchase, repair and training costs but no recurring upkeep, while patrol sweeps and outpost crew now generate steady income. A large fleet was therefore nearly free to hold.
+- **Decision**:
+  1. Add role-based monthly upkeep: 30 cr escort, 55 frigate, 90 cruiser, 110 carrier and 25 prize; destroyed hulls cost nothing.
+  2. Include fleet upkeep in cash flow with separate `crew_upkeep_per_month` and `fleet_upkeep_per_month` fields, so the UI and CLI can show payroll and fleet lines separately.
+  3. Charge the total at month rollover. If gross credits cannot cover it, set every living escort to `damaged` (reduced screen evasion) and log `FLEET PAY SHORTFALL`; docking and repairing restores readiness.
+  4. Show the monthly total in the fleet manager header, crew cash-flow panel, fleet report and CLI; expose `fleet_upkeep_cost` and `fleet_upkeep_paid` in the tick payload.
+- **Consequences**: Fleet size now has a real monthly cost, patrol income is partly self-funding, and unpaid upkeep is a recoverable readiness penalty rather than permanent loss. Live Edge showed one escort at 30 cr/month and a combined 95 cr/month cash flow. Suite: 868 tests (53 suites), 5/5 gates.
