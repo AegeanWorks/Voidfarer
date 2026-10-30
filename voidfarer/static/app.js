@@ -3376,8 +3376,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const crewMult = Number(o.crew_multiplier || 1);
             const capacity = Number(o.crew_capacity || 3);
             const canAssign = availableCrew.length > 0 && assigned.length < capacity;
+            const localShipyard = o.outpost_type === "shipyard" && o.system_id === this.state.ship.current_system_id;
             return `
-            <div class="outpost-row"><span>${this.escapeHtml(o.name)} - LVL ${o.level} - POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}</span>
+            <div class="outpost-row"><span>${this.escapeHtml(o.name)} - LVL ${o.level} - POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}${localShipyard ? ` <span class="outpost-service-badge">SERVICES ONLINE</span>` : ""}</span>
             <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button></div>
             <div class="outpost-module-bar">
                 <select data-outpost-module-select="${this.escapeHtml(o.id)}">${moduleOptions}</select>
@@ -3599,7 +3600,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const ships = fleet.ships || this.state.ship.fleet_ships || [];
         const patrolTicks = Number(fleet.patrol_sweep_ticks || 6);
         if (this.fleetUpkeepLine) {
-            this.fleetUpkeepLine.textContent = `${ships.length} escort(s) · upkeep ${Number(fleet.upkeep_per_month || 0)} cr/month`;
+            const localShipyard = (this.state.outposts || []).some(o =>
+                o.outpost_type === "shipyard" && o.system_id === this.state.ship.current_system_id
+            );
+            this.fleetUpkeepLine.textContent = `${ships.length} escort(s) · upkeep ${Number(fleet.upkeep_per_month || 0)} cr/month${localShipyard ? " · SHIPYARD LINK" : ""}`;
         }
         if (!ships.length) {
             this.fleetShipRoster.innerHTML = `<p class="panel-intro-text">No escort warships. Commission one below at a drydock.</p>`;

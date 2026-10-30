@@ -1322,6 +1322,11 @@ class TestOutpostModuleCockpit(unittest.TestCase):
         for selector in (".outpost-crew-bar", ".outpost-crew-chip", ".crew-outpost"):
             self.assertIn(selector, self.css)
 
+    def test_local_shipyard_shows_services_online(self):
+        self.assertIn("SERVICES ONLINE", self.js)
+        self.assertIn("outpost-service-badge", self.css)
+        self.assertIn("SHIPYARD LINK", self.js)
+
 class TestTradeAutomationCockpit(unittest.TestCase):
     """The Commerce tab must expose the docked auto-trade broker."""
 

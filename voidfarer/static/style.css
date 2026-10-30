@@ -8672,3 +8672,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 .fleet-role:hover { background: rgba(111, 195, 215, 0.12); }
 .fleet-role.role-strike { border-color: rgba(201, 163, 90, 0.55); color: var(--console-gold-bright); }
 .fleet-role.role-support { border-color: rgba(143, 191, 159, 0.55); color: var(--console-green); }
+
+/* Frontier shipyard service link shown on the outpost and fleet headers. */
+.outpost-service-badge { margin-left: 4px; padding: 0 4px; border: 1px solid rgba(143, 191, 159, 0.45); color: var(--console-green); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; }

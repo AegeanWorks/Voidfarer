@@ -2458,7 +2458,7 @@ class SimulationEngine:
     def repair_reactor(self) -> tuple[bool, str]:
         """Repair reactor core integrity at an orbital drydock."""
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             reactor = self.state.ship.reactor
@@ -2520,7 +2520,7 @@ class SimulationEngine:
     def install_ship_mod(self, mod_id: str) -> tuple[bool, str]:
         """Install a structural ship modification at an orbital drydock."""
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             mod = get_ship_mod(mod_id)
@@ -2562,7 +2562,7 @@ class SimulationEngine:
     def remove_ship_mod(self, slot: str, expected_mod_id: str | None = None) -> tuple[bool, str]:
         """Remove a structural modification and recover part of its cost."""
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             installed = dict(self.state.ship.ship_mods)
@@ -3124,7 +3124,7 @@ class SimulationEngine:
 
     def buy_escort(self, escort_type: str, system_id: str | None = None) -> tuple[bool, str]:
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             template = get_escort_template(escort_type)
@@ -3195,7 +3195,7 @@ class SimulationEngine:
 
     def repair_escorts(self, amount: int = 60) -> tuple[bool, str]:
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             cost = max(50, int(amount) * 2)
@@ -3212,7 +3212,7 @@ class SimulationEngine:
     def train_fleet_ship(self, ship_id: str) -> tuple[bool, str]:
         """Buy a block of drydock instruction for one escort, capped at Ace."""
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             target = next((s for s in self.state.ship.fleet_ships if s.id == ship_id), None)
@@ -3672,7 +3672,7 @@ class SimulationEngine:
 
     def install_weapon(self, weapon_id: str) -> tuple[bool, str]:
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             weapon = get_weapon(weapon_id)
@@ -4478,9 +4478,9 @@ class SimulationEngine:
     def buy_upgrade(self, upgrade_id: str) -> tuple[bool, str]:
         """Purchase and install a hardware upgrade module at an orbital station."""
         with self.lock:
-            body = self.docked_body
-            if not body or not body.station_dockable:
-                return False, "Upgrade bay drydock requires docking at a station or colony."
+            ok, msg = self._require_service_dock()
+            if not ok:
+                return False, msg
 
             upgrade = get_upgrade(upgrade_id)
             if not upgrade:
@@ -4584,9 +4584,9 @@ class SimulationEngine:
     def buy_ship_chassis(self, chassis_id: str) -> tuple[bool, str]:
         """Purchase and commission a new spacecraft hull chassis at an orbital shipyard."""
         with self.lock:
-            body = self.docked_body
-            if not body or not body.station_dockable:
-                return False, "Shipyard drydock authorization required: dock at a station or colony to commission a new chassis."
+            ok, msg = self._require_service_dock()
+            if not ok:
+                return False, msg
 
             chassis = get_chassis(chassis_id)
             if not chassis:
@@ -5656,9 +5656,11 @@ class SimulationEngine:
         with self.lock:
             if not isinstance(amount, int) or isinstance(amount, bool) or amount <= 0:
                 return False, "Repair amount must be a positive integer."
-            body = self.docked_body
-            if not body or not body.station_dockable:
-                return False, "Repair drydocks available at orbital stations or colonies only."
+            ok, msg = self._require_service_dock()
+            if not ok:
+                return False, (
+                    "Repair drydocks require a station or a Frontier Shipyard in this system."
+                )
 
             needed = self.state.ship.max_hull - self.state.ship.hull
             if needed <= 0:
@@ -5685,9 +5687,11 @@ class SimulationEngine:
         with self.lock:
             if not isinstance(amount, int) or isinstance(amount, bool) or amount <= 0:
                 return False, "Refuel amount must be a positive integer."
-            body = self.docked_body
-            if not body or not body.station_dockable:
-                return False, "Fuel refinery available at orbital stations or colonies only."
+            ok, msg = self._require_service_dock()
+            if not ok:
+                return False, (
+                    "Fuel refinery requires a station or a Frontier Shipyard in this system."
+                )
 
             needed = self.state.ship.max_fuel - self.state.ship.fuel
             if needed <= 0:
@@ -6686,6 +6690,32 @@ class SimulationEngine:
     def _depot_for_current_system(self) -> Depot | None:
         return next((d for d in self.state.depots if d.system_id == self.state.ship.current_system_id), None)
 
+    def _shipyard_outpost(self) -> Outpost | None:
+        """A player shipyard in the current system can service ships without a station dock."""
+        return next(
+            (
+                outpost
+                for outpost in self.state.outposts
+                if outpost.outpost_type == "shipyard"
+                and outpost.system_id == self.state.ship.current_system_id
+            ),
+            None,
+        )
+
+    def _require_service_dock(self) -> tuple[bool, str]:
+        if self.state.active_combat is not None:
+            return False, "Shipyard services are unavailable during combat."
+        body = self.docked_body
+        if body and body.station_dockable:
+            return True, ""
+        shipyard = self._shipyard_outpost()
+        if shipyard is not None:
+            return True, ""
+        return (
+            False,
+            "Dock at a station or build a Frontier Shipyard in this system for hull services.",
+        )
+
     def _require_docked(self) -> tuple[bool, str]:
         if self.state.active_combat is not None:
             return False, "Depot operations are unavailable during combat."
@@ -7285,7 +7315,7 @@ class SimulationEngine:
             merc = MERCENARY_CATALOG.get(merc_id)
             if not merc:
                 return False, f"Unknown mercenary '{merc_id}'."
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             if any(d.specialty == merc["specialty"] and d.drone_type == "mercenary" for d in self.state.ship.fleet_drones):
@@ -7321,7 +7351,7 @@ class SimulationEngine:
 
     def refit_fleet_unit(self, drone_id: str) -> tuple[bool, str]:
         with self.lock:
-            ok, msg = self._require_docked()
+            ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
             drone = next((d for d in self.state.ship.fleet_drones if d.id == drone_id), None)
