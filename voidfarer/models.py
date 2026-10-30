@@ -1460,6 +1460,7 @@ class WarState:
     ended_tick: int | None = None
     # Credits the player pledged to each side, by faction id.
     support: dict[str, int] = field(default_factory=dict)
+    bonds_resolved: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {**asdict(self), "captured_systems": list(self.captured_systems)}
@@ -1477,6 +1478,7 @@ class WarState:
             captured_systems=tuple(str(sid) for sid in data.get("captured_systems", ())),
             ended_tick=int(ended) if ended is not None else None,
             support={str(k): int(v) for k, v in data.get("support", {}).items()},
+            bonds_resolved=bool(data.get("bonds_resolved", False)),
         )
 
 

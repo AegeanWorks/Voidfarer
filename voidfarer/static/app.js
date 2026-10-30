@@ -5974,6 +5974,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         <button class="btn-hud" data-petition-ceasefire="${this.escapeHtml(enemy)}" ${canAffordEnvoy ? "" : "disabled"} title="${canAffordEnvoy ? "Send a 500 cr envoy to petition the enemy leadership for a ceasefire; they may refuse" : "An envoy costs 500 cr"}">PETITION CEASEFIRE / 500</button>
                     </div>` : `<div class="war-meta">Sovereign war: only the powers themselves can end it.</div>`}
                     ${pledge(w.attacker_id) || pledge(w.defender_id) ? `<div class="war-meta">Your pledges: ${pledge(w.attacker_id)} / ${pledge(w.defender_id)} cr</div>` : ""}
+                    <div class="war-meta war-bond-note">Bonds: 1.5x victory · 0.8x stalemate · 0 defeat.</div>
                 </div>`;
         }).join("");
         host.querySelectorAll("[data-war]").forEach(btn => btn.addEventListener("click", () =>

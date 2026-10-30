@@ -1395,3 +1395,16 @@ class TestDiplomacyActionsCockpit(unittest.TestCase):
         self.assertIn(".diplomacy-actions", self.css)
         self.assertIn("ALLIED", self.js)
         self.assertIn("PACT", self.js)
+
+class TestWarBondsCockpit(unittest.TestCase):
+    """War cards must explain the bond payout terms."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_war_cards_show_bond_terms(self):
+        self.assertIn("war-bond-note", self.js)
+        self.assertIn("1.5x", self.js)
+        self.assertIn(".war-bond-note", self.css)

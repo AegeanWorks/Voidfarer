@@ -6504,6 +6504,47 @@ class SimulationEngine:
     WAR_SUPPORT_MIN_CREDITS = 100
     WAR_SUPPORT_MAX_SHIFT = 6.0
 
+    def _resolve_war_bonds(
+        self, wars: tuple[WarState, ...]
+    ) -> tuple[tuple[WarState, ...], int, list[str]]:
+        """Settle pledged war bonds once a war ends; no double payouts."""
+        credits = 0
+        logs: list[str] = []
+        updated: list[WarState] = []
+        for war in wars:
+            if war.active or war.bonds_resolved:
+                updated.append(war)
+                continue
+            winner = None
+            if war.war_score >= 25:
+                winner = war.attacker_id
+            elif war.war_score <= -25:
+                winner = war.defender_id
+            for faction_id, pledged in war.support.items():
+                pledged = max(0, int(pledged))
+                if pledged <= 0:
+                    continue
+                faction = CANONICAL_FACTIONS.get(faction_id)
+                name = faction.name if faction else faction_id
+                if winner is None:
+                    payout = int(pledged * 0.8)
+                elif faction_id == winner:
+                    payout = int(pledged * 1.5)
+                else:
+                    payout = 0
+                credits += payout
+                if payout:
+                    logs.append(
+                        f"WAR BONDS: {name} paid {payout} cr on the {war.id} settlement "
+                        f"(pledged {pledged})."
+                    )
+                else:
+                    logs.append(
+                        f"WAR BONDS LOST: {name} pledge of {pledged} cr on {war.id}."
+                    )
+            updated.append(replace(war, bonds_resolved=True))
+        return tuple(updated), credits, logs
+
     def support_war(self, war_id: str, faction_id: str, credits: int) -> tuple[bool, str]:
         """Pledge credits to one side of an active war: shifts its score and your standings."""
         with self.lock:
@@ -6528,7 +6569,10 @@ class SimulationEngine:
             support[faction_id] = support.get(faction_id, 0) + credits
             new_war = replace(war, war_score=round(score, 2), support=support)
             side = CANONICAL_FACTIONS[faction_id].name if faction_id in CANONICAL_FACTIONS else faction_id
-            msg = f"War pledge: {credits} cr to {side} (front shifts {shift:.1f}; standing +{gain})."
+            msg = (
+                f"War pledge: {credits} cr to {side} (front shifts {shift:.1f}; "
+                f"standing +{gain}). Bonds pay 1.5x on victory, 0.8x on stalemate."
+            )
             self.state = self._clone_state(
                 wars=tuple(new_war if w.id == war_id else w for w in self.state.wars),
                 ship=self._clone_ship(
@@ -7968,6 +8012,12 @@ class SimulationEngine:
                 new_wars, new_faction_economies, new_tick
             )
             faction_logs.extend(bankrupt_peace_logs)
+            new_wars, bond_credits, bond_logs = self._resolve_war_bonds(new_wars)
+            faction_logs.extend(bond_logs)
+            if bond_credits:
+                new_stats_tick["war_bond_payouts"] = (
+                    int(new_stats_tick.get("war_bond_payouts", 0)) + bond_credits
+                )
 
             # A conquered system damages the player's outposts there. Sentry Grids
             # and stationed marines reduce the hit; repair contracts restore them.
@@ -8445,6 +8495,7 @@ class SimulationEngine:
                 + away_credits
                 + delivery_credits
                 + patrol_credits
+                + bond_credits
             )
             fleet_paid = gross_credits >= fleet_upkeep_cost
             if month_rollover and fleet_upkeep_cost and not fleet_paid:
@@ -8539,6 +8590,7 @@ class SimulationEngine:
                 "patrol_contacts": patrol_contacts,
                 "fleet_upkeep_cost": fleet_upkeep_cost,
                 "fleet_upkeep_paid": fleet_paid,
+                "war_bond_payouts": bond_credits,
                 "reactor_heat": round(new_reactor.heat, 1),
                 "reactor_efficiency": round(reactor_output_efficiency(new_reactor, float(equipment.get("reactor_output", 0.0))), 3),
                 "reactor_hull_damage": reactor_hull_damage,

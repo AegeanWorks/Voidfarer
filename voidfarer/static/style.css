@@ -8690,3 +8690,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 .outpost-integrity { margin-left: 4px; color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
 .outpost-row-actions { display: flex; gap: 4px; align-items: center; }
 .outpost-row-actions .btn-hud { min-height: 26px; padding: 2px 6px; font-size: 12px; }
+
+/* War bond terms in the faction war card. */
+.war-bond-note { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 11px; }
