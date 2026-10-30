@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "fleet-upkeep",
+    "task_id": "fleet-roles",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793358488.1496308,
+    "updated_at": 1793359942.266706,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793358494.276907
+    "completed_at": 1793359950.0528386
   },
   "checkpoints": [
-    {
-      "task_id": "fleet-veterancy",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan legible fleet veterancy: rank thresholds and combat bonuses, scaled battle XP, docked training, fleet-card rank/XP/TRAIN UI, API, CLI and regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793320736.173738,
-      "timestamp_str": "2026-10-30 03:38:56",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Escort experience existed but was invisible, its damage bonus was an opaque 1% per point, and there was no way to invest credits in a favourite hull.",
-        "benefits": "Veteran escorts become a visible progression goal, promotions are announced, and drydock training gives the mid-game economy a meaningful credit sink.",
-        "risks": "contract: existing saves and fleet reports must keep working and XP must cap at 300; dependency: fleet damage and evasion formulas change for every battle; concurrency: training mutates credits, fleet roster and flight log in one locked transaction; state: experience is already persisted, but training must refuse at the cap and for destroyed hulls.",
-        "mitigation": "Add rank, damage, evasion, training and API/CLI/UI tests first; clamp XP everywhere; default the new payload fields; verify a live Edge TRAIN click."
-      }
-    },
-    {
-      "task_id": "fleet-veterancy",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Five-rank fleet veterancy table, rank-scaled damage/evasion, scaled victory XP with promotion logs, docked train_fleet_ship, /api/fleet/escort/train, fleet train CLI and rank/XP/TRAIN fleet cards implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793320744.572301,
-      "timestamp_str": "2026-10-30 03:39:04",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-veterancy",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-095 recorded; live Edge trained a corvette from 0 to 10 XP for 200 cr; 840 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793320744.7822037,
-      "timestamp_str": "2026-10-30 03:39:04",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "fleet-veterancy",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'fleet-veterancy' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793320749.8957865,
-      "timestamp_str": "2026-10-30 03:39:09",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "patrol-sweeps",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793358494.2769096,
       "timestamp_str": "2026-10-30 14:08:14",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "fleet-roles",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan escort squadron roles: persisted screen/strike/support orders with distinct damage, evasion and support-repair effects, a clickable role badge, API and CLI.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793359830.9962323,
+      "timestamp_str": "2026-10-30 14:30:30",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Every local escort used the same damage and screen formula, so individual hull orders had no tactical identity beyond the global formation stance.",
+        "benefits": "Fleet composition gains a second tactical axis, support hulls trade damage for endurance, and screen corvettes become harder to hit but hit softer.",
+        "risks": "contract: legacy saves must default to screen and every fleet damage/evasion path must read the role; dependency: support repair runs inside the combat exchange; concurrency: role changes mutate the fleet roster and flight log under the engine lock; state: roles persist and must be locked under fire.",
+        "mitigation": "Add role math, support repair, persistence, API/CLI and UI regressions first; normalize invalid roles; verify the badge cycle in live Edge."
+      }
+    },
+    {
+      "task_id": "fleet-roles",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted tactical_role with screen/strike/support multipliers, default roles by hull, support repair after incoming fire, role report fields, combat lock, /api/fleet/escort/role, fleet role CLI and clickable badge implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793359941.8723629,
+      "timestamp_str": "2026-10-30 14:32:21",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "fleet-roles",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-100 recorded; live Edge cycled a corvette from Screen to Strike with no console errors; 878 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793359942.266706,
+      "timestamp_str": "2026-10-30 14:32:22",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "fleet-roles",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'fleet-roles' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793359950.0528412,
+      "timestamp_str": "2026-10-30 14:32:30",
       "agent": "opencode:mechanics"
     }
   ]

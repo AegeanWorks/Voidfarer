@@ -1178,3 +1178,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Charge the total at month rollover. If gross credits cannot cover it, set every living escort to `damaged` (reduced screen evasion) and log `FLEET PAY SHORTFALL`; docking and repairing restores readiness.
   4. Show the monthly total in the fleet manager header, crew cash-flow panel, fleet report and CLI; expose `fleet_upkeep_cost` and `fleet_upkeep_paid` in the tick payload.
 - **Consequences**: Fleet size now has a real monthly cost, patrol income is partly self-funding, and unpaid upkeep is a recoverable readiness penalty rather than permanent loss. Live Edge showed one escort at 30 cr/month and a combined 95 cr/month cash flow. Suite: 868 tests (53 suites), 5/5 gates.
+
+### ADR-100: Escort Squadron Roles
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Every local escort used the same damage and screen formula, so fleet composition mattered but individual hull orders did not. The fleet manager could train and repair a ship but not give it a tactical job.
+- **Decision**:
+  1. Add a persisted `tactical_role` to `FleetShip` with `screen`, `strike` and `support`; legacy saves default to screen and invalid values normalize to screen.
+  2. Default roles by hull: corvette screen, frigate/cruiser strike, carrier support. Screen deals 75% damage and contributes 150% evasion; strike deals 125% damage and contributes 75% evasion; support deals 55% damage and repairs 4 integrity per exchange.
+  3. Apply the role in `fleet_damage`, `fleet_evasion_bonus` and `fleet_support_repair`, and restore support integrity after incoming fire.
+  4. Add `set_fleet_role` (blocked under fire), `POST /api/fleet/escort/role`, `fleet role <id> <role>`, and a clickable role badge that cycles the three roles.
+- **Consequences**: Fleet composition gains a second tactical axis beyond formation stance, support hulls trade damage for endurance, and screen corvettes are harder to hit but hit softer. Live Edge cycled a corvette from Screen to Strike with no console errors. Suite: 878 tests (54 suites), 5/5 gates.
