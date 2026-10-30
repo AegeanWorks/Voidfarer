@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `112`
-- **Total Classes**: `283`
+- **Total Python Modules**: `113`
+- **Total Classes**: `285`
 - **Total Top-Level Functions**: `328`
-- **Total Class Methods**: `1639`
-- **Total Source Lines**: `43446`
+- **Total Class Methods**: `1651`
+- **Total Source Lines**: `43692`
 
 ---
 
@@ -254,7 +254,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `336` lines (`15173` bytes)
+**Size**: `342` lines (`15499` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -273,6 +273,7 @@
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_outpost_link_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
+  - Method `.test_cli_non_aggression_pact_reports_the_standing_gate()`
   - Method `.test_cli_research_pact_parses_and_reports_the_standing_gate()`
   - Method `.test_cli_trade_pact_parses_and_reports_the_standing_gate()`
   - Method `.test_cli_fleet_captain_parses()`
@@ -310,7 +311,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1530` lines (`67488` bytes)
+**Size**: `1533` lines (`67631` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1295,6 +1296,24 @@
 
 ---
 
+### [`tests/test_non_aggression_pacts.py`](tests/test_non_aggression_pacts.py)
+> *Non-aggression pacts: standing gate, expiry and war exclusion.*
+
+**Size**: `139` lines (`5561` bytes)
+
+**Classes:**
+- `class NonAggressionPactTest`
+  - Method `.setUp()`
+  - Method `.test_pact_requires_standing_30_and_forms_once()`
+  - Method `.test_own_faction_and_war_are_rejected()`
+  - Method `.test_expiry_removes_protection()`
+  - Method `.test_pacts_round_trip_and_legacy_default()`
+- `class NonAggressionWarTest`
+  - Method `._systems_and_leaders()`
+  - Method `.test_active_pact_blocks_a_new_sol_coalition_war()`
+
+---
+
 ### [`tests/test_outpost_crew.py`](tests/test_outpost_crew.py)
 > *Outpost crew: specialist bonuses, assignment rules and persistence.*
 
@@ -1594,7 +1613,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `844` lines (`35936` bytes)
+**Size**: `868` lines (`36895` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1634,6 +1653,7 @@
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
   - Method `.test_research_pact_endpoint_forms_a_pact()`
+  - Method `.test_non_aggression_pact_endpoint_forms_a_timed_pact()`
   - Method `.test_trade_pact_endpoint_forms_a_pact()`
   - Method `.test_fleet_captain_endpoint_assigns_and_recalls()`
   - Method `.test_fleet_role_endpoint_sets_squadron_role()`
@@ -2281,7 +2301,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3259` lines (`165997` bytes)
+**Size**: `3261` lines (`166199` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2465,7 +2485,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9289` lines (`455290` bytes)
+**Size**: `9353` lines (`458266` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2559,6 +2579,9 @@
   - Method `.trade_pact_active(faction_id)` - *A pact pays only while the signatory is not at war with the player.*
   - Method `.research_pact_active(faction_id)` - *A research accord pays only while the signatory is at peace with the player.*
   - Method `.research_pact_multiplier()` - *Passive research multiplier: +5% for each active research pact.*
+  - Method `.non_aggression_active(faction_id)` - *A non-aggression pact protects against new wars until its expiry tick.*
+  - Method `.non_aggression_remaining(faction_id)`
+  - Method `._active_non_aggression_pairs(tick)` - *Pairs involving the player's polity that active pacts keep out of war.*
   - Method `.faction_diplomacy(faction_id, action, amount)`
   - Method `.buy_escort(escort_type, system_id)`
   - Method `.assign_escort(ship_id, system_id)`
@@ -2719,7 +2742,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `496` lines (`22067` bytes)
+**Size**: `498` lines (`22218` bytes)
 
 **Functions:**
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
@@ -2736,7 +2759,7 @@
 - `def force_peace_for_broke_factions(wars, economies, current_tick)` - *A faction that cannot pay its upkeep sues for peace instead of fighting on.*
 - `def _apply_owner_technology(system, owner_name)` - *A conquered world adopts its new owner's flag, government, tech and capacity.*
 - `def resolve_wars(wars, systems, rng, current_tick, eliminated, num_ticks)` - *Advance wars toward resolution: strength drives momentum, captures follow fronts.*
-- `def simulate_faction_behaviors(leaders, wars, systems, rng, current_tick, eliminated, num_ticks, broke_factions)` - *Apply leader archetypes: declare wars, then resolve active fronts.*
+- `def simulate_faction_behaviors(leaders, wars, systems, rng, current_tick, eliminated, num_ticks, broke_factions, non_aggression_pairs)` - *Apply leader archetypes: declare wars, then resolve active fronts.*
 - `def leader_for(leaders, faction_id)`
 
 ---
@@ -2910,7 +2933,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2258` lines (`84265` bytes)
+**Size**: `2264` lines (`84575` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

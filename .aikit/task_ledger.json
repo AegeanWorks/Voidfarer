@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "outpost-supply-links",
+    "task_id": "non-aggression-pacts",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793377875.4253244,
+    "updated_at": 1793378390.086294,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793377885.9639506
+    "completed_at": 1793378402.3135076
   },
   "checkpoints": [
-    {
-      "task_id": "codex-progression",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan codex milestones for trade and research pacts, escort captains, outpost specialization and repair, and quantum auto-freight, derived from existing persisted state.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793374428.3098145,
-      "timestamp_str": "2026-10-30 18:33:48",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Recent diplomacy, command, outpost and automation systems shipped without codex goals, so players had no long-term milestone for them.",
-        "benefits": "Each recent system gains a visible progression goal, rewards stay paced with existing milestones, and legacy saves unlock retroactively.",
-        "risks": "contract: the codex report shape and metric labels must stay backward compatible; dependency: metrics read persisted pacts, captains, specializations, automation orders and stats; concurrency: repair_outpost now writes a stat under the engine lock; state: outposts_repaired needs legacy default zero and save round-trip coverage.",
-        "mitigation": "Add metric, report and repair regressions first; derive six metrics from existing state; default the new stat to zero; verify the live codex tab and full gates."
-      }
-    },
-    {
-      "task_id": "codex-progression",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Added seven codex milestones and six reading metrics, incremented outposts_repaired on repair, and covered metrics, report completion and the repair stat with tests; 956 tests pass.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793374594.4373038,
-      "timestamp_str": "2026-10-30 18:36:34",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "codex-progression",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-110 documented; live Edge rendered all six checked milestones with no console errors; 956 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793374594.6250625,
-      "timestamp_str": "2026-10-30 18:36:34",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "codex-progression",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'codex-progression' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793374599.865248,
-      "timestamp_str": "2026-10-30 18:36:39",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "captain-progression",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793377885.9639523,
       "timestamp_str": "2026-10-30 19:31:25",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "non-aggression-pacts",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan non-aggression pacts: standing-30 timed treaties that block new Sol Coalition wars for 90 ticks, with cockpit, CLI and REST parity.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793378012.0875773,
+      "timestamp_str": "2026-10-30 19:33:32",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Diplomacy jumps from trade pacts at standing 40 to research pacts at 60 and alliances at 70; there is no low-cost way to buy temporary peace, so aggressive neighbours remain an unavoidable war risk.",
+        "benefits": "Standing 30 gains a defensive diplomatic tool, NAPs give players a way to stabilize one border, and the Empire tab shows remaining treaty time.",
+        "risks": "contract: ShipState gains a persisted non_aggression_until map with a legacy-safe default; dependency: faction war simulation must honor active pairs without changing AI-AI wars; concurrency: signing mutates standings and the treaty map under the engine lock; state: expired treaties must stop protecting without requiring cleanup.",
+        "mitigation": "Test signing, standing/war gates, expiry, persistence, war-pair exclusion and UI/CLI wiring first; pass only active Sol Coalition pairs into the war simulator; verify live Edge."
+      }
+    },
+    {
+      "task_id": "non-aggression-pacts",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Added persisted timed NAPs, standing/war gates, war-pair exclusion, expiry helpers, cockpit NAP action, CLI parity, REST reuse and 7 regressions; 996 tests pass.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793378389.9416797,
+      "timestamp_str": "2026-10-30 19:39:49",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "non-aggression-pacts",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-115 documented; live Edge signed a Nebula Collective NAP and showed NAP 88T with no console errors; 996 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793378390.086294,
+      "timestamp_str": "2026-10-30 19:39:50",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "non-aggression-pacts",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'non-aggression-pacts' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793378402.3135092,
+      "timestamp_str": "2026-10-30 19:40:02",
       "agent": "opencode:mechanics"
     }
   ]

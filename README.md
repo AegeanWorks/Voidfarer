@@ -323,13 +323,10 @@ python -m voidfarer.cli war list
 python -m voidfarer.cli war support w_1 vanguard_syndicate 800
 ```
 
-A captain cannot start the Coalition's wars or end others'. If your own polity is at war,
-you can send an envoy to petition the enemy leadership
-(`diplomacy ceasefire <faction_id>`, 500 cr only if they accept). Wars end by exhaustion,
-capture or bankruptcy.
-
-At standing 40, `diplomacy trade_pact <faction_id>` improves buy/sell prices 6% there; war
-suspends it.
+A captain cannot start or end the Coalition's wars. An envoy can petition an enemy
+(`diplomacy ceasefire <faction_id>`, 500 cr only if accepted); wars end by exhaustion,
+capture or bankruptcy. At standing 30, `non_aggression` blocks new Sol Coalition wars for
+90 ticks; at 40, `trade_pact` lifts prices 6%; war suspends both.
 
 ### 14b. Empty-Space Vectors, NPC Traffic & Decision Cadence
 

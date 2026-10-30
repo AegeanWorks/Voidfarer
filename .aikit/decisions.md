@@ -1344,3 +1344,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Expose `POST /api/outpost/link`, `outpost link|unlink`, and a SUPPLY row with LINK/UNLINK controls and live multiplier.
   5. Show hub name, link count and multiplier in the outpost payload and CLI ledger.
 - **Consequences**: Multi-outpost systems now reward deliberate hub placement and specialization combinations. Cycles, cross-system routes and overloaded hubs are rejected. Live Edge linked Supply Alpha through Supply Beta and showed x1.05 / x1.08 with no console errors. Suite: 989 tests, 5/5 gates.
+
+### ADR-115: Non-Aggression Pacts
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Diplomacy moved from trade pacts at standing 40 to research pacts at 60 and alliances at 70. There was no low-cost way to stabilize a border, and factions could still open new wars against the Sol Coalition regardless of standing.
+- **Decision**:
+  1. Add persisted `ShipState.non_aggression_until` (faction -> expiry tick) with a legacy-safe empty default.
+  2. Add `diplomacy non_aggression`: standing 30, one active pact per faction, refused during an existing war and against the player's own polity, lasting 90 ticks.
+  3. Pass active Sol Coalition pairs into faction war simulation so those pairs cannot declare new wars; AI-to-AI wars are unchanged, and existing wars continue.
+  4. Add the NAP button, `NAP nT` row label, CLI status/action text and remaining-tick helpers, with expiry evaluated against the current tick.
+- **Consequences**: Standing 30 now buys temporary security rather than only trade access. Pacts expire automatically without cleanup, and expired entries stop protecting on the next evaluation. Live Edge signed a Nebula Collective NAP and showed `NAP 88T` with no console errors. Suite: 996 tests, 5/5 gates.
