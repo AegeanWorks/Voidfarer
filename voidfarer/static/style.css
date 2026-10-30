@@ -8652,3 +8652,14 @@ body.cockpit-theme .nav-panel > .panel-header {
 }
 .fleet-xp-fill { display: block; height: 100%; background: linear-gradient(90deg, #6fc3d7, #c9a35a); }
 .fleet-xp-label { flex: 0 0 auto; color: var(--console-muted); font-size: 11px; }
+
+/* Outpost specialists: crew selection, output multiplier and recall chips. */
+.outpost-crew-bar { display: flex; gap: 5px; align-items: center; margin-top: 3px; }
+.outpost-crew-mult { flex: 0 0 auto; color: var(--console-cyan); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+.outpost-crew-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
+.outpost-crew-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }
+.outpost-crew-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.outpost-crew-chip { display: inline-flex; align-items: center; gap: 3px; padding: 1px 4px; border: 1px solid rgba(143, 191, 159, 0.35); color: var(--console-green); font-family: var(--font-mono); font-size: 11px; }
+.outpost-crew-chip button { border: 0; background: transparent; color: var(--console-gold-bright); cursor: pointer; padding: 0 2px; font-size: 13px; line-height: 1; }
+.outpost-crew-empty { color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.crew-outpost { color: var(--console-cyan); }

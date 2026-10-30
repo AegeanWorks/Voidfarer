@@ -1292,6 +1292,18 @@ class TestOutpostModuleCockpit(unittest.TestCase):
             self.assertIn(marker, self.js)
         self.assertIn(".outpost-module-bar", self.css)
 
+    def test_outpost_rows_offer_crew_assignment(self):
+        for marker in (
+            "data-outpost-crew-select",
+            "data-outpost-crew-assign",
+            "data-outpost-crew-recall",
+            '"/api/outpost/crew"',
+            "crew_multiplier",
+        ):
+            self.assertIn(marker, self.js)
+        for selector in (".outpost-crew-bar", ".outpost-crew-chip", ".crew-outpost"):
+            self.assertIn(selector, self.css)
+
 class TestTradeAutomationCockpit(unittest.TestCase):
     """The Commerce tab must expose the docked auto-trade broker."""
 

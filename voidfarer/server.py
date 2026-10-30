@@ -846,6 +846,20 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/outpost/crew":
+            action = str(body.get("action", "assign")).strip().lower()
+            if action == "recall":
+                ok, msg = self.engine.recall_outpost_crew(
+                    str(body.get("outpost_id", "")), str(body.get("crew_id", ""))
+                )
+            else:
+                ok, msg = self.engine.assign_outpost_crew(
+                    str(body.get("outpost_id", "")), str(body.get("crew_id", ""))
+                )
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/diplomacy":
             ok, msg = self.engine.faction_diplomacy(
                 str(body.get("faction_id", "")),

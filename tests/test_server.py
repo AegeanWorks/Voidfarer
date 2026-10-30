@@ -461,6 +461,40 @@ class TestServer(unittest.TestCase):
         self.assertEqual(automation["commodity_id"], "titanium")
         self.assertEqual(automation["quantity"], 2)
 
+    def test_outpost_crew_endpoint_assigns_and_recalls(self):
+        engine = VoidFarerHandler.engine
+        outpost = Outpost(
+            id="http_crew_outpost",
+            name="Crew Test Outpost",
+            system_id="sol",
+            body_id="sol_body_1",
+            outpost_type="mining",
+            assigned_crew=(),
+        )
+        crew = engine.state.ship.crew[0]
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(crew=engine.state.ship.crew),
+            outposts=(outpost,),
+        )
+        status, data = self._post(
+            "/api/outpost/crew",
+            {"outpost_id": outpost.id, "crew_id": crew.id, "action": "assign"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertIn(crew.id, payload["state"]["outposts"][0]["assigned_crew"])
+        self.assertGreater(payload["state"]["outposts"][0]["crew_multiplier"], 1.0)
+
+        status, data = self._post(
+            "/api/outpost/crew",
+            {"outpost_id": outpost.id, "crew_id": crew.id, "action": "recall"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        self.assertEqual(payload["state"]["outposts"][0]["assigned_crew"], [])
+
     def test_outpost_module_endpoint_installs_a_stack(self):
         engine = VoidFarerHandler.engine
         outpost = Outpost(

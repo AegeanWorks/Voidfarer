@@ -80,6 +80,17 @@ OUTPOST_TYPES: tuple[OutpostType, ...] = (
 
 OUTPOST_MAP: dict[str, OutpostType] = {o.id: o for o in OUTPOST_TYPES}
 
+OUTPOST_PREFERRED_ROLES: dict[str, tuple[str, ...]] = {
+    "mining": ("engineer", "quartermaster"),
+    "research": ("scientist", "engineer"),
+    "solar": ("engineer", "scientist"),
+    "shipyard": ("engineer", "quartermaster"),
+    "colony": ("medic", "quartermaster"),
+}
+
+OUTPOST_CREW_CAPACITY = 3
+OUTPOST_CREW_MAX_MULTIPLIER = 1.60
+
 OUTPOST_MODULE_CATALOG: dict[str, dict[str, Any]] = {
     "extractor": {"name": "Ore Extractor", "cost": 400, "production": {"credits": 4.0}},
     "laboratory": {"name": "Research Laboratory", "cost": 500, "production": {"research": 3.0}},
@@ -153,15 +164,37 @@ def build_outpost(
     )
 
 
-def outpost_tick_production(outpost: Outpost, yield_multiplier: float = 1.0) -> dict[str, float]:
-    """Effective per-tick yield: catalog base, level growth, then modules and map multipliers."""
+def outpost_crew_multiplier(outpost: Outpost, crew_by_id: dict[str, Any]) -> float:
+    """Stationed specialists add a base lift plus a bonus in their preferred role."""
+    multiplier = 1.0
+    preferred = OUTPOST_PREFERRED_ROLES.get(outpost.outpost_type, ())
+    for crew_id in outpost.assigned_crew:
+        member = crew_by_id.get(crew_id)
+        if member is None or getattr(member, "status", "active") != "active":
+            continue
+        skill = max(0, int(getattr(member, "skill", 1)))
+        multiplier += 0.08 + skill * 0.02
+        if getattr(member, "role", "") in preferred:
+            multiplier += 0.06
+    return min(OUTPOST_CREW_MAX_MULTIPLIER, multiplier)
+
+
+def outpost_tick_production(
+    outpost: Outpost,
+    yield_multiplier: float = 1.0,
+    crew_multiplier: float = 1.0,
+) -> dict[str, float]:
+    """Effective per-tick yield: catalog base, level growth, modules, crew and map multipliers."""
     template = OUTPOST_MAP.get(outpost.outpost_type)
     base = template.production if template else outpost.production
     level_mult = 1.25 ** max(0, outpost.level - 1)
     modules = sum(outpost.modules.values())
     module_mult = 1.0 + max(0, modules - 1) * 0.10
+    crew_mult = max(0.1, min(OUTPOST_CREW_MAX_MULTIPLIER, crew_multiplier))
     return {
-        key: round(value * level_mult * module_mult * max(0.1, yield_multiplier), 2)
+        key: round(
+            value * level_mult * module_mult * crew_mult * max(0.1, yield_multiplier), 2
+        )
         for key, value in base.items()
     }
 

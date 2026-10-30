@@ -119,6 +119,7 @@ from voidfarer.navigation import (
     void_route_plan,
 )
 from voidfarer.outposts import (
+    OUTPOST_CREW_CAPACITY,
     OUTPOST_MAP,
     OUTPOST_MODULE_CATALOG,
     OUTPOST_TYPES,
@@ -126,6 +127,7 @@ from voidfarer.outposts import (
     can_build_on,
     get_outpost_type,
     grow_outpost_population,
+    outpost_crew_multiplier,
     outpost_tick_production,
     upgrade_outpost,
 )
@@ -708,6 +710,9 @@ class SimulationEngine:
     def _crew_bonuses(self, ship: ShipState | None = None) -> dict[str, float]:
         target = ship if ship is not None else self.state.ship
         assigned = {cid for mission in target.away_missions for cid in mission.crew_ids}
+        assigned.update(
+            cid for outpost in self.state.outposts for cid in outpost.assigned_crew
+        )
         return calculate_crew_bonuses(tuple(member for member in target.crew if member.id not in assigned))
 
     def _faction_stability(self) -> dict[str, float]:
@@ -2845,6 +2850,94 @@ class SimulationEngine:
                 f"(stack {modules[module_id]}/3).",
             )
 
+    def _crew_outpost_id(self, crew_id: str) -> str | None:
+        for outpost in self.state.outposts:
+            if crew_id in outpost.assigned_crew:
+                return outpost.id
+        return None
+
+    def _outpost_crew_multiplier(self, outpost: Outpost) -> float:
+        crew_by_id = {member.id: member for member in self.state.ship.crew}
+        return outpost_crew_multiplier(outpost, crew_by_id)
+
+    def _outpost_payload(
+        self, outpost: Outpost, yield_mult: float | None = None
+    ) -> dict[str, Any]:
+        crew_by_id = {member.id: member for member in self.state.ship.crew}
+        crew_mult = outpost_crew_multiplier(outpost, crew_by_id)
+        payload = {
+            **outpost.to_dict(),
+            "crew_multiplier": round(crew_mult, 3),
+            "crew_capacity": OUTPOST_CREW_CAPACITY,
+            "crew_names": [
+                crew_by_id[cid].name
+                for cid in outpost.assigned_crew
+                if cid in crew_by_id
+            ],
+        }
+        if yield_mult is not None:
+            payload["production_effective"] = outpost_tick_production(
+                outpost, yield_mult, crew_mult
+            )
+        return payload
+
+    def assign_outpost_crew(self, outpost_id: str, crew_id: str) -> tuple[bool, str]:
+        """Station one active specialist at an outpost; three can work one site."""
+        with self.lock:
+            outpost = next((o for o in self.state.outposts if o.id == outpost_id), None)
+            if outpost is None:
+                return False, f"Unknown outpost '{outpost_id}'."
+            member = next((m for m in self.state.ship.crew if m.id == crew_id), None)
+            if member is None:
+                return False, f"Unknown crew member '{crew_id}'."
+            if member.status != "active" or member.injury_ticks > 0:
+                return False, f"{member.name} is not fit for outpost duty."
+            if len(outpost.assigned_crew) >= OUTPOST_CREW_CAPACITY:
+                return False, f"{outpost.name} already has {OUTPOST_CREW_CAPACITY} specialists."
+            current_outpost = self._crew_outpost_id(crew_id)
+            if current_outpost is not None:
+                return False, f"{member.name} is already stationed at {current_outpost}."
+            updated = replace(
+                outpost, assigned_crew=outpost.assigned_crew + (crew_id,)
+            )
+            outposts = tuple(
+                updated if o.id == outpost_id else o for o in self.state.outposts
+            )
+            multiplier = self._outpost_crew_multiplier(updated)
+            line = (
+                f"OUTPOST CREW: {member.name} assigned to {outpost.name} "
+                f"(output x{multiplier:.2f})."
+            )
+            new_ship = self._clone_ship(
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line])
+            )
+            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            return True, line
+
+    def recall_outpost_crew(self, outpost_id: str, crew_id: str) -> tuple[bool, str]:
+        """Return a stationed specialist to the flagship roster."""
+        with self.lock:
+            outpost = next((o for o in self.state.outposts if o.id == outpost_id), None)
+            if outpost is None:
+                return False, f"Unknown outpost '{outpost_id}'."
+            if crew_id not in outpost.assigned_crew:
+                return False, f"Crew member '{crew_id}' is not stationed at {outpost.name}."
+            member = next((m for m in self.state.ship.crew if m.id == crew_id), None)
+            name = member.name if member else crew_id
+            updated = replace(
+                outpost,
+                assigned_crew=tuple(cid for cid in outpost.assigned_crew if cid != crew_id),
+            )
+            outposts = tuple(
+                updated if o.id == outpost_id else o for o in self.state.outposts
+            )
+            line = f"OUTPOST CREW: {name} recalled from {outpost.name}."
+            new_ship = self._clone_ship(
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line])
+            )
+            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            return True, line
+
     def get_character_report(self) -> dict[str, Any]:
         with self.lock:
             character = self.state.character
@@ -2883,10 +2976,7 @@ class SimulationEngine:
             yield_mult = 1.0 + float(research_bonus["outpost_yield"]) + self._skill("trade")
             return {
                 "outposts": [
-                    {
-                        **o.to_dict(),
-                        "production_effective": outpost_tick_production(o, yield_mult),
-                    }
+                    self._outpost_payload(o, yield_mult)
                     for o in self.state.outposts
                 ],
                 "catalog": [t.to_dict() for t in OUTPOST_TYPES],
@@ -3234,6 +3324,9 @@ class SimulationEngine:
             member = next((c for c in self.state.ship.crew if c.id == crew_id), None)
             if not member:
                 return False, f"Unknown crew member '{crew_id}'."
+            outpost_id = self._crew_outpost_id(crew_id)
+            if outpost_id is not None:
+                return False, f"{member.name} is stationed at {outpost_id}; recall them first."
             remaining = tuple(c for c in self.state.ship.crew if c.id != crew_id)
             self.state = self._clone_state(ship=self._clone_ship(crew=remaining))
             return True, f"Crew member {member.name} dismissed."
@@ -3242,8 +3335,17 @@ class SimulationEngine:
         with self.lock:
             crew = self.state.ship.crew
             assigned = {cid for mission in self.state.ship.away_missions for cid in mission.crew_ids}
+            outpost_by_crew = {
+                cid: outpost.id
+                for outpost in self.state.outposts
+                for cid in outpost.assigned_crew
+            }
+            assigned.update(outpost_by_crew)
             return {
-                "crew": [c.to_dict() for c in crew],
+                "crew": [
+                    {**c.to_dict(), "outpost_id": outpost_by_crew.get(c.id)}
+                    for c in crew
+                ],
                 "roles": crew_catalog(),
                 "bonuses": calculate_crew_bonuses(tuple(c for c in crew if c.id not in assigned)),
                 "upkeep": crew_upkeep(crew),
@@ -3403,6 +3505,9 @@ class SimulationEngine:
                 return False, f"{mission_type_def.name} site at {body.name} is already worked; move to a fresh body."
 
             assigned = self._away_assigned_ids(ship)
+            assigned.update(
+                cid for outpost in self.state.outposts for cid in outpost.assigned_crew
+            )
             if crew_ids is not None:
                 requested = list(dict.fromkeys(str(cid) for cid in crew_ids))
                 by_id = {member.id: member for member in ship.crew}
@@ -3417,6 +3522,8 @@ class SimulationEngine:
                         return False, f"{member.name} is not on active duty."
                     if member.injury_ticks > 0:
                         return False, f"{member.name} is injured and cannot deploy."
+                    if self._crew_outpost_id(member.id) is not None:
+                        return False, f"{member.name} is stationed at an outpost."
                     team_members.append(member)
                 team = tuple(team_members)
                 if len(team) != mission_type_def.team_size:
@@ -3500,7 +3607,11 @@ class SimulationEngine:
             # Outposts produce credits each tick
             research_yield_mult = 1.0 + float(self._research_bonuses()["outpost_yield"]) + self._skill("trade")
             for outpost in self.state.outposts:
-                production = outpost_tick_production(outpost, research_yield_mult)
+                production = outpost_tick_production(
+                    outpost,
+                    research_yield_mult,
+                    self._outpost_crew_multiplier(outpost),
+                )
                 passive += float(production.get("credits", 0.0))
             # Passive sources pay per tick; a month is DAYS_PER_MONTH days of 0.25-day ticks.
             passive_month = passive * DAYS_PER_MONTH / 0.25
@@ -6140,7 +6251,7 @@ class SimulationEngine:
                     "available": [p.to_dict() for p in available_projects(self.state.research.completed, self.state.research.active_project_id)],
                     "catalog": [p.to_dict() for p in RESEARCH_PROJECTS],
                 },
-                "outposts": [o.to_dict() for o in self.state.outposts],
+                "outposts": [self._outpost_payload(o) for o in self.state.outposts],
                 "faction_leaders": [leader.to_dict() for leader in self.state.faction_leaders],
                 "wars": [war.to_dict() for war in self.state.wars],
                 "faction_economies": [e.to_dict() for e in self.state.faction_economies],
@@ -7570,7 +7681,11 @@ class SimulationEngine:
             updated_outposts = []
             updated_depots = list(self.state.depots)
             for outpost in self.state.outposts:
-                production = outpost_tick_production(outpost, research_yield_mult)
+                production = outpost_tick_production(
+                    outpost,
+                    research_yield_mult,
+                    self._outpost_crew_multiplier(outpost),
+                )
                 outpost_credits += int(production.get("credits", 0.0) * num_ticks)
                 research_gain += int(production.get("research", 0.0) * num_ticks)
                 for commodity, quantity in production.items():

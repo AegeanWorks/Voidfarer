@@ -3075,9 +3075,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const injury = Number(m.injury_ticks || 0);
                 const xpToNext = Math.max(1, Number(m.skill || 1) * 40);
                 const away = (this.state.away_report?.active || []).find(mission => (mission.crew_ids || []).includes(m.id));
+                const outpost = (this.state.outposts || []).find(o => (o.assigned_crew || []).includes(m.id));
                 const statusNote = injury > 0
                     ? ` | <span class="crew-injury">INJURED ${injury}T</span>`
-                    : (away ? ` | <span class="crew-away">AWAY: ${this.escapeHtml(away.name)}</span>` : "");
+                    : outpost
+                        ? ` | <span class="crew-outpost">OUTPOST: ${this.escapeHtml(outpost.name)}</span>`
+                        : (away ? ` | <span class="crew-away">AWAY: ${this.escapeHtml(away.name)}</span>` : "");
                 return `
                 <div class="crew-row">
                     <div class="crew-portrait">${this.portraitAvatar(m.portrait, m.name)}</div>
@@ -3091,7 +3094,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     </div>
                     <div class="crew-actions">
                         <button class="btn-hud btn-amber" data-train-crew="${this.escapeHtml(m.id)}" ${m.skill >= 10 || injury > 0 ? "disabled" : ""}>DRILL</button>
-                        <button class="btn-hud" data-dismiss-crew="${this.escapeHtml(m.id)}" ${away ? "disabled" : ""}>DISMISS</button>
+                        <button class="btn-hud" data-dismiss-crew="${this.escapeHtml(m.id)}" ${away || outpost ? "disabled" : ""}>DISMISS</button>
                     </div>
                 </div>
                 `;
@@ -3352,14 +3355,48 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const moduleOptions = Object.entries(moduleCatalog).map(([id, module]) =>
             `<option value="${this.escapeHtml(id)}">${this.escapeHtml(module.name)} (${Number(module.cost || 0)} CR)</option>`
         ).join("");
-        this.outpostList.innerHTML = outposts.map(o => `
-            <div class="outpost-row"><span>${this.escapeHtml(o.name)} — LVL ${o.level} — POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}</span>
+        const crewList = this.state.crew || [];
+        const crewById = new Map(crewList.map(member => [member.id, member]));
+        const assignedCrew = new Set(outposts.flatMap(o => o.assigned_crew || []));
+        const awayCrew = new Set(
+            (this.state.away_report?.active || []).flatMap(mission => mission.crew_ids || [])
+        );
+        const availableCrew = crewList.filter(member =>
+            member.status === "active" && !assignedCrew.has(member.id) && !awayCrew.has(member.id)
+        );
+        const crewOptions = availableCrew.map(member =>
+            `<option value="${this.escapeHtml(member.id)}">${this.escapeHtml(member.name)} (${this.escapeHtml(member.role)} S${member.skill})</option>`
+        ).join("");
+        this.outpostList.innerHTML = outposts.map(o => {
+            const assigned = (o.assigned_crew || [])
+                .map(crewId => crewById.get(crewId))
+                .filter(Boolean);
+            const crewMult = Number(o.crew_multiplier || 1);
+            const capacity = Number(o.crew_capacity || 3);
+            const canAssign = availableCrew.length > 0 && assigned.length < capacity;
+            return `
+            <div class="outpost-row"><span>${this.escapeHtml(o.name)} - LVL ${o.level} - POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)}</span>
             <button class="btn-hud btn-amber" data-outpost-upgrade="${this.escapeHtml(o.id)}">UPGRADE</button></div>
             <div class="outpost-module-bar">
                 <select data-outpost-module-select="${this.escapeHtml(o.id)}">${moduleOptions}</select>
                 <button class="btn-hud btn-green" data-outpost-module-install="${this.escapeHtml(o.id)}">INSTALL MODULE</button>
             </div>
-        `).join("");
+            <div class="outpost-crew-bar">
+                <span class="outpost-crew-mult">CREW ${assigned.length}/${capacity} · BONUS x${crewMult.toFixed(2)}</span>
+                <select data-outpost-crew-select="${this.escapeHtml(o.id)}" ${canAssign ? "" : "disabled"}>
+                    ${crewOptions || `<option value="">No available crew</option>`}
+                </select>
+                <button class="btn-hud btn-cyan" data-outpost-crew-assign="${this.escapeHtml(o.id)}" ${canAssign ? "" : "disabled"}>ASSIGN</button>
+            </div>
+            <div class="outpost-crew-list">
+                ${assigned.length ? assigned.map(member => `
+                    <span class="outpost-crew-chip">${this.escapeHtml(member.name)}
+                        <button data-outpost-crew-recall="${this.escapeHtml(o.id)}" data-crew-id="${this.escapeHtml(member.id)}" title="Recall to ship">×</button>
+                    </span>
+                `).join("") : `<span class="outpost-crew-empty">No specialists stationed.</span>`}
+            </div>
+        `;
+        }).join("");
         this.outpostList.querySelectorAll("[data-outpost-upgrade]").forEach(btn =>
             btn.addEventListener("click", () => this.postAction("/api/outpost/upgrade", { outpost_id: btn.getAttribute("data-outpost-upgrade") }, "empire"))
         );
@@ -3369,6 +3406,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const select = this.outpostList.querySelector(`[data-outpost-module-select="${outpostId}"]`);
                 this.postAction("/api/outpost/module", { outpost_id: outpostId, module_id: select ? select.value : "" }, "empire");
             })
+        );
+        this.outpostList.querySelectorAll("[data-outpost-crew-assign]").forEach(btn =>
+            btn.addEventListener("click", () => {
+                const outpostId = btn.getAttribute("data-outpost-crew-assign");
+                const select = this.outpostList.querySelector(`[data-outpost-crew-select="${outpostId}"]`);
+                if (!select || !select.value) return;
+                this.postAction("/api/outpost/crew", {
+                    outpost_id: outpostId,
+                    crew_id: select.value,
+                    action: "assign",
+                }, "empire");
+            })
+        );
+        this.outpostList.querySelectorAll("[data-outpost-crew-recall]").forEach(btn =>
+            btn.addEventListener("click", () => this.postAction("/api/outpost/crew", {
+                outpost_id: btn.getAttribute("data-outpost-crew-recall"),
+                crew_id: btn.getAttribute("data-crew-id"),
+                action: "recall",
+            }, "empire"))
         );
 
         const leaders = this.state.faction_leaders || [];
