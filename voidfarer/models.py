@@ -1374,6 +1374,7 @@ class FleetShip:
     assigned_system_id: str = "sol"
     status: str = "escorting"
     experience: int = 0
+    tactical_role: str = "screen"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1382,6 +1383,9 @@ class FleetShip:
     def from_dict(cls, data: dict[str, Any]) -> FleetShip:
         max_hull = max(1, int(data.get("max_hull", 120)))
         max_shield = max(0, int(data.get("max_shield", 60)))
+        tactical_role = str(data.get("tactical_role", "screen")).strip().lower()
+        if tactical_role not in ("screen", "strike", "support"):
+            tactical_role = "screen"
         return cls(
             id=str(data["id"]),
             name=str(data.get("name", "Escort")),
@@ -1396,6 +1400,7 @@ class FleetShip:
             assigned_system_id=str(data.get("assigned_system_id", "sol")),
             status=str(data.get("status", "escorting")),
             experience=max(0, int(data.get("experience", 0))),
+            tactical_role=tactical_role,
         )
 
 

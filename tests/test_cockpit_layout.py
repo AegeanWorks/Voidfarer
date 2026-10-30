@@ -1278,6 +1278,17 @@ class TestFleetVeterancyCockpit(unittest.TestCase):
         self.assertIn("patrol_sweep_ticks", self.js)
         self.assertIn("PATROL ${patrolTicks}T", self.js)
 
+    def test_fleet_cards_offer_squadron_roles(self):
+        for marker in (
+            "data-escort-role",
+            "data-next-role",
+            '"/api/fleet/escort/role"',
+            "fleet-role",
+            "tactical_role",
+        ):
+            self.assertIn(marker, self.js)
+        self.assertIn(".fleet-role", self.css)
+
     def test_fleet_manager_shows_monthly_upkeep(self):
         html = INDEX_HTML.read_text(encoding="utf-8")
         self.assertIn('id="fleetUpkeepLine"', html)

@@ -79,6 +79,18 @@ FLEET_UPKEEP_BY_ROLE: dict[str, int] = {
     "prize": 25,
 }
 
+FLEET_TACTICAL_ROLES: dict[str, dict[str, Any]] = {
+    "screen": {"label": "Screen", "damage": 0.75, "evasion": 1.50, "repair": 0},
+    "strike": {"label": "Strike", "damage": 1.25, "evasion": 0.75, "repair": 0},
+    "support": {"label": "Support", "damage": 0.55, "evasion": 1.00, "repair": 4},
+}
+DEFAULT_TACTICAL_ROLE = "screen"
+
+
+def normalize_fleet_role(role: str) -> str:
+    candidate = str(role or "").strip().lower()
+    return candidate if candidate in FLEET_TACTICAL_ROLES else DEFAULT_TACTICAL_ROLE
+
 
 def get_escort_template(escort_type: str) -> dict[str, Any] | None:
     return ESCORT_CATALOG.get(escort_type)
@@ -124,6 +136,15 @@ def fleet_upkeep(ships: tuple[FleetShip, ...]) -> int:
     """Monthly payroll for living escorts; destroyed hulls cost nothing."""
     return sum(
         FLEET_UPKEEP_BY_ROLE.get(ship.role, 30)
+        for ship in ships
+        if ship.hull > 0
+    )
+
+
+def fleet_support_repair(ships: tuple[FleetShip, ...]) -> int:
+    """Integrity restored by living support-role escorts after an exchange."""
+    return sum(
+        int(FLEET_TACTICAL_ROLES[normalize_fleet_role(ship.tactical_role)]["repair"])
         for ship in ships
         if ship.hull > 0
     )
@@ -191,6 +212,12 @@ def build_fleet_ship(escort_type: str, system_id: str, count: int) -> FleetShip:
         assigned_system_id=system_id,
         status="escorting",
         experience=0,
+        tactical_role={
+            "corvette": "screen",
+            "frigate": "strike",
+            "cruiser": "strike",
+            "carrier": "support",
+        }.get(escort_type, DEFAULT_TACTICAL_ROLE),
     )
 
 
@@ -215,9 +242,10 @@ def fleet_damage(ships: tuple[FleetShip, ...], formation: str = "balanced") -> i
         if ship.hull <= 0:
             continue
         rank = fleet_rank(ship.experience)
+        role = FLEET_TACTICAL_ROLES[normalize_fleet_role(ship.tactical_role)]
         # Experience gives a shallow continuous edge; ranks add the visible jump.
         growth = 1.0 + min(0.50, ship.experience * 0.005) + rank["damage_bonus"]
-        total += max(1, int(ship.damage * growth * mult))
+        total += max(1, int(ship.damage * growth * mult * float(role["damage"])))
     return total
 
 
@@ -225,7 +253,8 @@ def fleet_evasion_bonus(ships: tuple[FleetShip, ...], formation: str = "balanced
     if not ships:
         return 0.0
     screen = sum(
-        ship.evasion + fleet_rank(ship.experience)["evasion_bonus"]
+        (ship.evasion + fleet_rank(ship.experience)["evasion_bonus"])
+        * float(FLEET_TACTICAL_ROLES[normalize_fleet_role(ship.tactical_role)]["evasion"])
         for ship in ships
         if ship.status == "escorting" and ship.hull > 0
     )

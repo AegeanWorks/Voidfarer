@@ -426,6 +426,24 @@ class TestServer(unittest.TestCase):
         self.assertTrue(payload["ok"], payload.get("message"))
         self.assertIn("sol_coalition", payload["state"]["ship"]["trade_pacts"])
 
+    def test_fleet_role_endpoint_sets_squadron_role(self):
+        engine = VoidFarerHandler.engine
+        ship = build_fleet_ship("corvette", "sol", 0)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(fleet_ships=(ship,)),
+            active_combat=None,
+        )
+        status, data = self._post(
+            "/api/fleet/escort/role",
+            {"ship_id": ship.id, "role": "support"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        updated = payload["state"]["fleet_manager"]["ships"][0]
+        self.assertEqual(updated["tactical_role"], "support")
+        self.assertEqual(updated["role_label"], "Support")
+
     def test_fleet_train_endpoint_buys_experience(self):
         engine = VoidFarerHandler.engine
         ship = build_fleet_ship("corvette", "sol", 0)

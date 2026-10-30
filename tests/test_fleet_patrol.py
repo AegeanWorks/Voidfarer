@@ -5,6 +5,7 @@ import unittest
 from voidfarer.engine import SimulationEngine
 from voidfarer.fleet import (
     PATROL_SWEEP_TICKS,
+    fleet_damage,
     fleet_ships_in_system,
     resolve_patrol_sweep,
 )
@@ -118,7 +119,7 @@ class FleetAssignmentTest(unittest.TestCase):
             ship=engine._clone_ship(fleet_ships=(local, remote))
         )
         report = engine.get_fleet_manager_report()
-        self.assertEqual(report["local_damage"], local.damage)
+        self.assertEqual(report["local_damage"], fleet_damage((local,)))
         self.assertGreater(report["total_damage"], report["local_damage"])
         self.assertEqual(report["patrol_sweep_ticks"], PATROL_SWEEP_TICKS)
 

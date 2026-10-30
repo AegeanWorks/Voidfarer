@@ -85,6 +85,12 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertEqual(code, 1)
             self.assertIn("standing", mock_out.getvalue().lower())
 
+    def test_cli_fleet_role_parses(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["fleet", "role", "missing_escort", "support"])
+            self.assertEqual(code, 1)
+            self.assertIn("unknown escort", mock_out.getvalue().lower())
+
     def test_cli_fleet_train_parses(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["fleet", "train", "missing_escort"])

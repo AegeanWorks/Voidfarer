@@ -96,6 +96,7 @@ from voidfarer.faction_state import (
 from voidfarer.fleet import (
     ESCORT_CATALOG,
     FLEET_MAX_EXPERIENCE,
+    FLEET_TACTICAL_ROLES,
     FLEET_TRAINING_XP,
     PATROL_SWEEP_TICKS,
     apply_fleet_casualties,
@@ -105,10 +106,12 @@ from voidfarer.fleet import (
     fleet_rank,
     fleet_ships_in_system,
     fleet_evasion_bonus,
+    fleet_support_repair,
     fleet_training_cost,
     fleet_upkeep,
     fleet_victory_experience,
     get_escort_template,
+    normalize_fleet_role,
     repair_fleet_ships,
     resolve_patrol_sweep,
 )
@@ -3157,6 +3160,39 @@ class SimulationEngine:
             self.state = self._clone_state(ship=self._clone_ship(fleet_ships=tuple(updated)))
             return True, f"Escort {ship_id} reassigned to {system_id}."
 
+    def set_fleet_role(self, ship_id: str, role: str) -> tuple[bool, str]:
+        """Change an escort's squadron role outside combat."""
+        with self.lock:
+            if self.state.active_combat is not None:
+                return False, "Cannot change squadron roles under fire."
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+            target = next((s for s in self.state.ship.fleet_ships if s.id == ship_id), None)
+            if target is None:
+                return False, f"Unknown escort '{ship_id}'."
+            if target.hull <= 0:
+                return False, f"{target.name} is destroyed; repair or dismiss it first."
+            normalized = normalize_fleet_role(role)
+            if str(role).strip().lower() not in FLEET_TACTICAL_ROLES:
+                return (
+                    False,
+                    "Unknown squadron role; use screen, strike or support.",
+                )
+            updated = replace(target, tactical_role=normalized)
+            fleet_ships = tuple(
+                updated if ship.id == target.id else ship
+                for ship in self.state.ship.fleet_ships
+            )
+            label = FLEET_TACTICAL_ROLES[normalized]["label"]
+            line = f"SQUADRON ROLE: {target.name} set to {label}."
+            new_ship = self._clone_ship(
+                fleet_ships=fleet_ships,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, line
+
     def repair_escorts(self, amount: int = 60) -> tuple[bool, str]:
         with self.lock:
             ok, msg = self._require_docked()
@@ -3217,9 +3253,16 @@ class SimulationEngine:
     def _fleet_ship_payload(self, ship: FleetShip) -> dict[str, Any]:
         """One escort row with the rank fields the cockpit and CLI both consume."""
         rank = fleet_rank(ship.experience)
+        role = normalize_fleet_role(ship.tactical_role)
+        role_info = FLEET_TACTICAL_ROLES[role]
         return {
             **ship.to_dict(),
             "sale_value": escort_sale_value(ship),
+            "tactical_role": role,
+            "role_label": role_info["label"],
+            "role_damage": role_info["damage"],
+            "role_evasion": role_info["evasion"],
+            "role_repair": role_info["repair"],
             "rank": rank["name"],
             "rank_index": rank["index"],
             "rank_progress": rank["progress"],
@@ -5367,6 +5410,11 @@ class SimulationEngine:
                 if absorbed > 0:
                     inbound = max(0, inbound - absorbed)
                     evasion_note += f" Escort screen absorbed {absorbed} damage."
+            support_repair = fleet_support_repair(fleet_ships)
+            if support_repair > 0:
+                fleet_ships, repaired = repair_fleet_ships(fleet_ships, support_repair)
+                if repaired > 0:
+                    evasion_note += f" Support wing restored {repaired} integrity."
             breach_crew = None
             breach_log = ""
             if new_shield >= inbound:

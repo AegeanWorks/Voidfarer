@@ -595,6 +595,7 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
                 f"HULL {ship['hull']}/{ship['max_hull']} SHIELD {ship['shield']}/{ship['max_shield']} "
                 f"DMG {ship['damage']} {status_color}{ship['status']:<10}{RESET} "
                 f"{CYAN}{ship.get('rank', 'Green'):<8}{RESET} "
+                f"{YELLOW}{ship.get('role_label', 'Screen'):<8}{RESET} "
                 f"XP {ship.get('experience', 0)}/{ship.get('experience_max', 300)} "
                 f"SYS {ship['assigned_system_id']}"
             )
@@ -604,7 +605,7 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             f"Screen evasion: +{report['evasion_bonus']*100:.0f}% total / "
             f"+{report.get('local_evasion_bonus', report['evasion_bonus'])*100:.0f}% local"
         )
-        print(f"{DIM}Upkeep {report.get('upkeep_per_month', 0)} cr/month. Remote patrols sweep every {report.get('patrol_sweep_ticks', 6)} ticks. Catalog: {', '.join(ESCORT_CATALOG)}. Commands: fleet buy_escort <type> | fleet assign <id> <system> | fleet train <id> | fleet repair_escorts | fleet sell_escort <id> | fleet dismiss_escort <id>{RESET}")
+        print(f"{DIM}Upkeep {report.get('upkeep_per_month', 0)} cr/month. Remote patrols sweep every {report.get('patrol_sweep_ticks', 6)} ticks. Catalog: {', '.join(ESCORT_CATALOG)}. Commands: fleet buy_escort <type> | fleet assign <id> <system> | fleet train <id> | fleet role <id> <screen|strike|support> | fleet repair_escorts | fleet sell_escort <id> | fleet dismiss_escort <id>{RESET}")
         return 0
     if sub in ("buy_escort", "recruit_escort"):
         if len(parts) < 3:
@@ -629,6 +630,15 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             print(f"{RED}Usage:{RESET} fleet train <escort_id>")
             return 1
         ok, msg = engine.train_fleet_ship(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub in ("role", "squadron"):
+        if len(parts) < 4:
+            print(f"{RED}Usage:{RESET} fleet role <escort_id> <screen|strike|support>")
+            return 1
+        ok, msg = engine.set_fleet_role(parts[2], parts[3])
         print((GREEN if ok else RED) + msg + RESET)
         if ok:
             storage.save(engine.state)
@@ -2578,7 +2588,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     subparsers.add_parser("repl", help="Launch interactive terminal cockpit")
 
     fleet_p = subparsers.add_parser("fleet", help="Autonomous fleet and drone operations")
-    fleet_p.add_argument("action", nargs="?", default="list", choices=["list", "harvest", "buy", "deploy", "ships", "buy_escort", "assign", "train", "repair_escorts", "dismiss_escort", "sell_escort"])
+    fleet_p.add_argument("action", nargs="?", default="list", choices=["list", "harvest", "buy", "deploy", "ships", "buy_escort", "assign", "train", "role", "repair_escorts", "dismiss_escort", "sell_escort"])
     fleet_p.add_argument("arg1", nargs="?", help="Drone type or drone ID")
     fleet_p.add_argument("arg2", nargs="?", help="Target star system ID")
 

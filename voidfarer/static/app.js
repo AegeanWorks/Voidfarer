@@ -3615,9 +3615,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const trainTitle = atAce
                     ? "Already an Ace"
                     : `Train +${ship.training_gain || 0} XP for ${trainingCost} cr`;
+                const tacticalRole = String(ship.tactical_role || "screen").toLowerCase();
+                const roleLabel = tacticalRole.toUpperCase();
+                const nextRole = { screen: "strike", strike: "support", support: "screen" }[tacticalRole] || "screen";
+                const roleTitle = {
+                    screen: "Screen: +50% evasion, -25% damage",
+                    strike: "Strike: +25% damage, -25% evasion",
+                    support: "Support: repairs 4 integrity per exchange, -45% damage",
+                }[tacticalRole] || "Squadron role";
                 return `
                 <div class="fleet-ship-card">
-                    <div class="fleet-head"><strong>${this.escapeHtml(ship.name)}</strong> <span class="ship-role">${this.escapeHtml(ship.role.toUpperCase())}</span></div>
+                    <div class="fleet-head"><strong>${this.escapeHtml(ship.name)}</strong> <span class="ship-role">${this.escapeHtml(ship.role.toUpperCase())}</span> <button type="button" class="fleet-role role-${this.escapeHtml(tacticalRole)}" data-escort-role="${this.escapeHtml(ship.id)}" data-next-role="${nextRole}" title="${this.escapeHtml(roleTitle)}">${this.escapeHtml(roleLabel)}</button></div>
                     <div class="fleet-sub">HULL ${ship.hull}/${ship.max_hull} | SHIELD ${ship.shield}/${ship.max_shield} | DMG ${ship.damage} | SYS ${this.escapeHtml(ship.assigned_system_id || "?")}</div>
                     <div class="fleet-veterancy">
                         <span class="fleet-rank rank-${this.escapeHtml(rank.toLowerCase())}">${this.escapeHtml(rank.toUpperCase())}</span>
@@ -3639,6 +3647,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             );
             this.fleetShipRoster.querySelectorAll("[data-escort-train]").forEach(btn =>
                 btn.addEventListener("click", () => this.postAction("/api/fleet/escort/train", { ship_id: btn.getAttribute("data-escort-train") }, "fleet"))
+            );
+            this.fleetShipRoster.querySelectorAll("[data-escort-role]").forEach(btn =>
+                btn.addEventListener("click", () => this.postAction("/api/fleet/escort/role", {
+                    ship_id: btn.getAttribute("data-escort-role"),
+                    role: btn.getAttribute("data-next-role"),
+                }, "fleet"))
             );
             this.fleetShipRoster.querySelectorAll("[data-escort-sell]").forEach(btn =>
                 btn.addEventListener("click", () => this.postAction("/api/fleet/escort/sell", { ship_id: btn.getAttribute("data-escort-sell") }, "fleet"))

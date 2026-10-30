@@ -8666,3 +8666,9 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* Escort wing upkeep summary above the roster. */
 .fleet-upkeep-line { margin: 2px 0 4px; color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+
+/* Squadron role badge and cycle control on each escort card. */
+.fleet-role { margin-left: 4px; padding: 0 4px; border: 1px solid rgba(111, 195, 215, 0.35); background: transparent; color: var(--console-cyan); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; cursor: pointer; }
+.fleet-role:hover { background: rgba(111, 195, 215, 0.12); }
+.fleet-role.role-strike { border-color: rgba(201, 163, 90, 0.55); color: var(--console-gold-bright); }
+.fleet-role.role-support { border-color: rgba(143, 191, 159, 0.55); color: var(--console-green); }

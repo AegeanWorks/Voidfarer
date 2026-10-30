@@ -897,6 +897,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/fleet/escort/role":
+            ok, msg = self.engine.set_fleet_role(
+                str(body.get("ship_id", "")), str(body.get("role", "screen"))
+            )
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/fleet/escort/sell":
             ok, msg = self.engine.sell_escort(str(body.get("ship_id", "")))
             self.storage.save(self.engine.state)
