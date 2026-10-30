@@ -9,8 +9,8 @@
 - **Total Python Modules**: `113`
 - **Total Classes**: `285`
 - **Total Top-Level Functions**: `328`
-- **Total Class Methods**: `1651`
-- **Total Source Lines**: `43692`
+- **Total Class Methods**: `1652`
+- **Total Source Lines**: `43709`
 
 ---
 
@@ -1299,7 +1299,7 @@
 ### [`tests/test_non_aggression_pacts.py`](tests/test_non_aggression_pacts.py)
 > *Non-aggression pacts: standing gate, expiry and war exclusion.*
 
-**Size**: `139` lines (`5561` bytes)
+**Size**: `156` lines (`6289` bytes)
 
 **Classes:**
 - `class NonAggressionPactTest`
@@ -1307,6 +1307,7 @@
   - Method `.test_pact_requires_standing_30_and_forms_once()`
   - Method `.test_own_faction_and_war_are_rejected()`
   - Method `.test_expiry_removes_protection()`
+  - Method `.test_active_pact_pair_reaches_the_war_simulator()`
   - Method `.test_pacts_round_trip_and_legacy_default()`
 - `class NonAggressionWarTest`
   - Method `._systems_and_leaders()`
