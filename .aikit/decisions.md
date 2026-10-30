@@ -1189,3 +1189,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Apply the role in `fleet_damage`, `fleet_evasion_bonus` and `fleet_support_repair`, and restore support integrity after incoming fire.
   4. Add `set_fleet_role` (blocked under fire), `POST /api/fleet/escort/role`, `fleet role <id> <role>`, and a clickable role badge that cycles the three roles.
 - **Consequences**: Fleet composition gains a second tactical axis beyond formation stance, support hulls trade damage for endurance, and screen corvettes are harder to hit but hit softer. Live Edge cycled a corvette from Screen to Strike with no console errors. Suite: 878 tests (54 suites), 5/5 gates.
+
+### ADR-101: Frontier Shipyard Services
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: The Frontier Shipyard outpost advertised escort construction and hull servicing but only produced credits. Every repair, refuel, escort purchase, training session and refit still required a station or colony dock.
+- **Decision**:
+  1. Add `_shipyard_outpost` and `_require_service_dock`: a station dock or a player shipyard in the current system satisfies service checks, and combat still blocks them.
+  2. Route hull repair, refueling, reactor repair, ship mods, weapons, escorts, escort repair/training, upgrades, chassis, mercenaries and fleet refits through the service check.
+  3. Keep depot cargo operations station-only. Remote shipyards do not service the current system.
+  4. Show `SERVICES ONLINE` on the local shipyard outpost and `SHIPYARD LINK` in the fleet header.
+- **Consequences**: Frontier shipyards now fulfill their catalog role and extend the fleet's operating range; stations remain the fallback and depot logistics stay separate. Live Edge repaired an undocked hull from 50 to 60 and fuel from 10 to 20, with both headers visible and no console errors. Suite: 883 tests (55 suites), 5/5 gates.

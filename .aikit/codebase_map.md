@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `99`
-- **Total Classes**: `258`
+- **Total Python Modules**: `100`
+- **Total Classes**: `259`
 - **Total Top-Level Functions**: `318`
-- **Total Class Methods**: `1484`
-- **Total Source Lines**: `40374`
+- **Total Class Methods**: `1493`
+- **Total Source Lines**: `40498`
 
 ---
 
@@ -262,7 +262,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1365` lines (`61592` bytes)
+**Size**: `1370` lines (`61805` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -464,6 +464,7 @@
   - Method `.setUpClass()`
   - Method `.test_outpost_rows_offer_a_module_installer()`
   - Method `.test_outpost_rows_offer_crew_assignment()`
+  - Method `.test_local_shipyard_shows_services_online()`
 - `class TestTradeAutomationCockpit` - *The Commerce tab must expose the docked auto-trade broker.*
   - Method `.setUpClass()`
   - Method `.test_market_tab_holds_the_broker_controls()`
@@ -898,6 +899,22 @@
 - `class PirateLockTest`
   - Method `.test_active_pirate_blocks_tick_flight_and_trade_until_resolved()`
   - Method `.test_surface_cargo_reports_display_names()`
+
+---
+
+### [`tests/test_frontier_shipyard.py`](tests/test_frontier_shipyard.py)
+> *Frontier shipyards service hulls, escorts and weapons without a station dock.*
+
+**Size**: `89` lines (`3262` bytes)
+
+**Classes:**
+- `class FrontierShipyardTest`
+  - Method `.setUp()`
+  - Method `._shipyard(system_id)`
+  - Method `.test_local_shipyard_services_hull_fuel_and_escorts()`
+  - Method `.test_without_a_shipyard_undocked_services_are_refused()`
+  - Method `.test_remote_shipyard_does_not_service_the_current_system()`
+  - Method `.test_report_marks_the_local_shipyard()`
 
 ---
 
@@ -2180,7 +2197,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8482` lines (`418573` bytes)
+**Size**: `8512` lines (`419471` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2335,6 +2352,8 @@
   - Method `.send_quantum_message(recipient, subject, body)` - *Send an intergalactic quantum-encrypted message.*
   - Method `.mark_message_read(message_id)`
   - Method `._depot_for_current_system()`
+  - Method `._shipyard_outpost()` - *A player shipyard in the current system can service ships without a station dock.*
+  - Method `._require_service_dock()`
   - Method `._require_docked()`
   - Method `.deposit_cargo(item_id, quantity)`
   - Method `.withdraw_cargo(item_id, quantity)`

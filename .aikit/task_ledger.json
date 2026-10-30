@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "fleet-roles",
+    "task_id": "shipyard-services",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793359942.266706,
+    "updated_at": 1793361870.9170146,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793359950.0528386
+    "completed_at": 1793361876.3406804
   },
   "checkpoints": [
-    {
-      "task_id": "patrol-sweeps",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan remote patrol sweeps: every 6 ticks each remote escort hunts pirates for scaled bounty credits, XP and return-fire damage, surfaced in the fleet report, card and CLI.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793346034.163586,
-      "timestamp_str": "2026-10-30 10:40:34",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Remote escorts reduced piracy but earned no XP or income, so deployment away from the flagship was a pure sacrifice and the new rank system only rewarded local battles.",
-        "benefits": "Stationing a hull on patrol becomes a slower but real progression and income path, and fleet deployment gains a risk/reward choice.",
-        "risks": "contract: patrol results must stay deterministic and existing saves must not need new fields; dependency: fleet.py now reads pirate risk and the tick consumes patrol credits; concurrency: the tick mutates fleet hulls, XP, credits, stats and the flight log together; state: unattended patrols can be damaged or destroyed, and the 6-tick cadence must not double-run.",
-        "mitigation": "Add pure sweep, contact, XP and tick-integration regressions first; cap XP at Ace; use seed + ship id + tick for determinism; verify the cockpit label and a live sweep."
-      }
-    },
-    {
-      "task_id": "patrol-sweeps",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Deterministic 6-tick patrol sweeps with pirate-risk contact chance, scaled bounties, 1/3 XP, return-fire damage, patrol credits in tick payload/stats, fleet-report cadence, cockpit label and CLI footer implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793346263.5376463,
-      "timestamp_str": "2026-10-30 10:44:23",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "patrol-sweeps",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-096 recorded; live Edge showed PATROL 6T and a sweep paying 77 cr/+3 XP/-2 hull; 844 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793346263.9708803,
-      "timestamp_str": "2026-10-30 10:44:23",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "patrol-sweeps",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'patrol-sweeps' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793346272.613383,
-      "timestamp_str": "2026-10-30 10:44:32",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "trade-pacts",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793359950.0528412,
       "timestamp_str": "2026-10-30 14:32:30",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "shipyard-services",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan Frontier Shipyard services: a local shipyard outpost satisfies hull, fuel, escort, weapon and refit service checks, with SERVICES ONLINE and SHIPYARD LINK visibility.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793361812.0364354,
+      "timestamp_str": "2026-10-30 15:03:32",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "The Frontier Shipyard outpost advertised construction and hull servicing but only produced credits; every service still required a station or colony dock.",
+        "benefits": "Shipyard outposts fulfill their catalog role, extend fleet operating range, and make remote frontier bases strategically useful.",
+        "risks": "contract: station-only depot cargo must stay separate and error text must keep fuel/repair context; dependency: many service methods share the new check; concurrency: service calls mutate credits and ship/outpost state under the engine lock; state: remote shipyards must not service the current system and combat must still block services.",
+        "mitigation": "Add local, remote and no-shipyard regressions first; keep depot operations station-only; verify undocked repair/refuel and both UI markers in live Edge."
+      }
+    },
+    {
+      "task_id": "shipyard-services",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Local shipyard service check across hull, fuel, reactor, mods, weapons, escorts, training, upgrades, chassis, mercenaries and refits; station-only depots preserved; SERVICES ONLINE and SHIPYARD LINK UI implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793361870.7912166,
+      "timestamp_str": "2026-10-30 15:04:30",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "shipyard-services",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-101 recorded; live Edge repaired an undocked hull 50->60 and fuel 10->20, with SERVICES ONLINE and SHIPYARD LINK; 883 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793361870.9170146,
+      "timestamp_str": "2026-10-30 15:04:30",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "shipyard-services",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'shipyard-services' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793361876.340682,
+      "timestamp_str": "2026-10-30 15:04:36",
       "agent": "opencode:mechanics"
     }
   ]
