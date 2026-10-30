@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `95`
-- **Total Classes**: `250`
+- **Total Python Modules**: `96`
+- **Total Classes**: `252`
 - **Total Top-Level Functions**: `313`
-- **Total Class Methods**: `1437`
-- **Total Source Lines**: `39404`
+- **Total Class Methods**: `1449`
+- **Total Source Lines**: `39625`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `258` lines (`11241` bytes)
+**Size**: `264` lines (`11561` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -228,6 +228,7 @@
   - Method `.test_cli_autotrade_status_parses()`
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
+  - Method `.test_cli_trade_pact_parses_and_reports_the_standing_gate()`
   - Method `.test_cli_fleet_train_parses()`
   - Method `.test_cli_reconstruct_parses_and_refuses_an_intact_world()`
   - Method `.test_cli_combat_accepts_documented_actions()`
@@ -258,7 +259,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1332` lines (`60375` bytes)
+**Size**: `1335` lines (`60487` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1277,7 +1278,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `548` lines (`24112` bytes)
+**Size**: `564` lines (`24804` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1316,6 +1317,7 @@
   - Method `.test_landing_and_depot_endpoints()`
   - Method `.test_reconstruct_endpoint_restores_a_devastated_world()`
   - Method `.test_fleet_sell_endpoint_converts_a_prize_to_credits()`
+  - Method `.test_trade_pact_endpoint_forms_a_pact()`
   - Method `.test_fleet_train_endpoint_buys_experience()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
   - Method `.test_outpost_module_endpoint_installs_a_stack()`
@@ -1551,6 +1553,25 @@
 
 **Functions:**
 - `def _docked_engine(credits, cargo)`
+
+---
+
+### [`tests/test_trade_pacts.py`](tests/test_trade_pacts.py)
+> *Faction trade pacts: standing gate, war suspension and market benefit.*
+
+**Size**: `104` lines (`4123` bytes)
+
+**Classes:**
+- `class TradePactTest`
+  - Method `.setUp()`
+  - Method `._set_standing(standing)`
+  - Method `.test_pact_requires_standing_and_forms_once()`
+  - Method `.test_pact_is_refused_during_war_and_suspended_if_signed()`
+  - Method `.test_pact_improves_both_sides_of_the_quote()`
+  - Method `.test_trade_uses_the_pact_and_reports_it()`
+  - Method `.test_snapshot_and_save_round_trip_keep_pacts()`
+- `class TradePactLegacyTest`
+  - Method `.test_legacy_payload_defaults_to_no_pacts()`
 
 ---
 
@@ -1910,7 +1931,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3087` lines (`157950` bytes)
+**Size**: `3095` lines (`158274` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2065,13 +2086,13 @@
 ### [`voidfarer/economy.py`](voidfarer/economy.py)
 > *Dynamic Global Economy, supply/demand simulation, economic events, and galactic trade network.*
 
-**Size**: `427` lines (`16366` bytes)
+**Size**: `434` lines (`16680` bytes)
 
 **Functions:**
 - `def generate_initial_economy(systems, rng)` - *Construct baseline economy state with localized stockpiles and initial macroeconomic conditions.*
 - `def tick_global_economy(state, num_ticks, systems, rng)` - *Advance economic simulation: update stockpiles, decrement event clocks, spawn emergent news.*
 - `def faction_standing_price_factor(faction_standing)` - *Return the single diplomatic price multiplier for a faction standing value.*
-- `def calculate_dynamic_market_quote(system, body, commodity, economy, faction_standing)` - *Compute precision localized pricing reflecting global stockpile supply/demand and macroeconomic events.*
+- `def calculate_dynamic_market_quote(system, body, commodity, economy, faction_standing, trade_pact)` - *Compute precision localized pricing reflecting global stockpile supply/demand and macroeconomic events.*
 - `def get_galactic_trade_routes(systems, economy)` - *Compute the most profitable interstellar trade routes across all explored star systems.*
 
 ---
@@ -2094,7 +2115,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8209` lines (`406466` bytes)
+**Size**: `8283` lines (`409556` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2167,6 +2188,8 @@
   - Method `.get_character_report()`
   - Method `.get_research_report()`
   - Method `.get_outpost_report()`
+  - Method `._faction_at_war_with_player(faction_id)` - *True when the faction is a belligerent in a war involving the player's polity.*
+  - Method `.trade_pact_active(faction_id)` - *A pact pays only while the signatory is not at war with the player.*
   - Method `.faction_diplomacy(faction_id, action, amount)`
   - Method `.buy_escort(escort_type, system_id)`
   - Method `.assign_escort(ship_id, system_id)`
@@ -2192,7 +2215,7 @@
   - Method `.get_weapon_report()`
   - Method `.resolve_message_choice(message_id, choice_id)`
   - Method `.get_message_tree_report()`
-  - Method `._bulk_buy_cost(body, comm, quantity, standing, unit_price)` - *Price a buy order by walking the local stockpile, so bulk orders move the price they pay.*
+  - Method `._bulk_buy_cost(body, comm, quantity, standing, unit_price, trade_pact)` - *Price a buy order by walking the local stockpile, so bulk orders move the price they pay.*
   - Method `.max_trade_quantity(commodity_id, is_buy)` - *Largest order that would succeed now: affordable and in-hold for buys, all held units for sells.*
   - Method `.trade_max(commodity_id, is_buy)` - *Buy as many units as credits and hold allow, or sell every unit held.*
   - Method `.set_trade_automation(commodity_id, buy_below, sell_above, quantity, enabled)` - *Configure the docked broker that buys low and sells high on a cooldown.*
@@ -2505,7 +2528,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2181` lines (`80927` bytes)
+**Size**: `2184` lines (`81076` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

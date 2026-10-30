@@ -1145,3 +1145,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   2. Derive contact chance from the system's base pirate risk; a quiet tour grants 1 XP, while contact grants 3 XP, a bounty scaled by insecurity (60-240 cr) and 1-10 hull damage.
   3. Reuse the fleet rank cap, keep the sweep stateless (seed + ship id + tick), add patrol credits/contacts to the tick payload and stats, and expose the 6-tick cadence in the fleet report, card and CLI.
 - **Consequences**: Remote deployment is now a slower but real XP and credit path, with the risk of unattended damage or loss. No save fields were added, so existing fleets begin patrolling immediately. Suite: 844 tests (50 suites), 5/5 gates.
+
+### ADR-097: Faction Trade Pacts
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Standing 40 had no distinct reward between the gift loop and the standing-70 alliance, and war had no economic cost beyond severed trade links. Diplomacy offered no mid-tier commercial agreement.
+- **Decision**:
+  1. Add a persisted `trade_pacts` tuple to `ShipState` with a legacy-safe empty default.
+  2. Add `diplomacy trade_pact <faction_id>`: standing 40, one pact per faction, refused while at war with the player's polity, and suspended rather than deleted if war later begins.
+  3. Extend `calculate_dynamic_market_quote` with `trade_pact`, improving buy prices 6% and sell prices 6%; route the local trade, bulk pricing, trade automation, quantum freight, depot sales and market snapshot through it.
+  4. Expose PACT in the Empire faction row with an `ALLIED`/`PACT`/`WAR` status, and add the CLI action, status marker and market header.
+- **Consequences**: Standing 40 now unlocks a durable commercial relationship, war has an economic cost, and every player-facing trade path shares the same pact pricing. Live Edge formed a Sol Coalition pact and moved titanium from 208/164 to 195/173 buy/sell with no console errors. Suite: 852 tests (51 suites), 5/5 gates.

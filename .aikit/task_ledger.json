@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "patrol-sweeps",
+    "task_id": "trade-pacts",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793346263.9708803,
+    "updated_at": 1793348072.3845332,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793346272.6133788
+    "completed_at": 1793348077.4326708
   },
   "checkpoints": [
-    {
-      "task_id": "outpost-modules",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan outpost production modules: install up to three stacks, scale cost by stack, expose the catalog, and wire engine/API/CLI/cockpit with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793315673.557972,
-      "timestamp_str": "2026-10-30 02:14:33",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "The outpost module catalog and production multiplier exist, but no action or control can install a module; outposts only level up.",
-        "benefits": "Outposts gain horizontal growth, module content becomes reachable, and the Empire tab gets a working credit-to-production loop.",
-        "risks": "contract: new endpoint must be AI-documented and click-map safe; dependency: none; concurrency: module install mutates outposts and credits in one clone; state: stack counts and catalog must survive saves and old outposts without modules.",
-        "mitigation": "Add engine, API, CLI and layout tests first; cap stacks at three; expose the catalog in static snapshots; verify a live Edge module install and refresh the knowledge base."
-      }
-    },
-    {
-      "task_id": "outpost-modules",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Outpost module installation, three-stack cap, escalating cost, API/CLI parity, static module catalog and regressions implemented.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793315762.6870522,
-      "timestamp_str": "2026-10-30 02:16:02",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-modules",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] Empire outpost module picker/install control, README/COCKPIT and ADR-092 recorded; live Edge install moved 5000 to 4200 cr and stacked extractor to 2. 817 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793315762.9054272,
-      "timestamp_str": "2026-10-30 02:16:02",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "outpost-modules",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'outpost-modules' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793315773.818849,
-      "timestamp_str": "2026-10-30 02:16:13",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "trade-automation",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793346272.613383,
       "timestamp_str": "2026-10-30 10:44:32",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "trade-pacts",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan faction trade pacts: a standing-40 agreement that improves buy and sell prices, persists per faction, is refused at war, and is surfaced in the Empire tab and CLI.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793348008.0278487,
+      "timestamp_str": "2026-10-30 11:13:28",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Standing 40 had no distinct reward between gifts and the standing-70 alliance, and war had no economic cost beyond severed trade links.",
+        "benefits": "Diplomacy gains a mid-tier commercial goal, trade routes gain a durable benefit, and war now suspends a valuable agreement.",
+        "risks": "contract: trade_pacts must default empty for legacy saves and every player-facing quote must use the same pact flag; dependency: the quote signature changes and six callers must pass the flag; concurrency: diplomacy mutates standings, pacts and the flight log in one locked transaction; state: pacts persist and must be suspended, not deleted, during war.",
+        "mitigation": "Add quote, standing-gate, war-suspension, persistence and UI/CLI regressions first; default the quote parameter false; verify the live Empire PACT click and market prices."
+      }
+    },
+    {
+      "task_id": "trade-pacts",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted trade_pacts, standing-40/war gates, 6% quote improvement across local trade, automation, quantum freight, depot sales and snapshots, Empire PACT control, CLI action/status and market header implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793348072.2216759,
+      "timestamp_str": "2026-10-30 11:14:32",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "trade-pacts",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-097 recorded; live Edge formed a Sol Coalition pact and moved titanium 208/164 to 195/173 buy/sell; 852 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793348072.3845332,
+      "timestamp_str": "2026-10-30 11:14:32",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "trade-pacts",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'trade-pacts' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793348077.4326725,
+      "timestamp_str": "2026-10-30 11:14:37",
       "agent": "opencode:mechanics"
     }
   ]

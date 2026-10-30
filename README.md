@@ -323,10 +323,13 @@ python -m voidfarer.cli war list
 python -m voidfarer.cli war support w_1 vanguard_syndicate 800
 ```
 
-A ship's captain commands no sovereign power: the Coalition's wars are not yours to start,
-and third-party wars are not yours to end. If your own polity is at war, you can send an
-envoy to petition the enemy leadership (`diplomacy ceasefire <faction_id>`, 500 cr only if
-they accept). Everything else ends by exhaustion, capture or a bankrupt treasury.
+A captain cannot start the Coalition's wars or end others'. If your own polity is at war,
+you can send an envoy to petition the enemy leadership
+(`diplomacy ceasefire <faction_id>`, 500 cr only if they accept). Wars end by exhaustion,
+capture or bankruptcy.
+
+At standing 40, `diplomacy trade_pact <faction_id>` improves buy/sell prices 6% there; war
+suspends it.
 
 ### 14b. Empty-Space Vectors, NPC Traffic & Decision Cadence
 
