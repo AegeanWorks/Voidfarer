@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `106`
-- **Total Classes**: `271`
+- **Total Python Modules**: `107`
+- **Total Classes**: `274`
 - **Total Top-Level Functions**: `324`
-- **Total Class Methods**: `1563`
-- **Total Source Lines**: `41869`
+- **Total Class Methods**: `1578`
+- **Total Source Lines**: `42167`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `306` lines (`13666` bytes)
+**Size**: `312` lines (`13972` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -225,6 +225,7 @@
   - Method `.test_cli_status()`
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
+  - Method `.test_cli_quantum_autotrade_status_parses()`
   - Method `.test_cli_autotrade_status_parses()`
   - Method `.test_cli_research_queue_parses()`
   - Method `.test_cli_outpost_repair_parses()`
@@ -266,7 +267,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1441` lines (`64254` bytes)
+**Size**: `1460` lines (`64874` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -476,6 +477,9 @@
   - Method `.test_outpost_rows_offer_integrity_repair()`
   - Method `.test_outpost_rows_offer_specialization()`
   - Method `.test_local_shipyard_shows_services_online()`
+- `class TestQuantumAutomationCockpit` - *The quantum freight panel must expose the auto-freight policy.*
+  - Method `.setUpClass()`
+  - Method `.test_quantum_panel_offers_automation_controls()`
 - `class TestTradeAutomationCockpit` - *The Commerce tab must expose the docked auto-trade broker.*
   - Method `.setUpClass()`
   - Method `.test_market_tab_holds_the_broker_controls()`
@@ -1369,6 +1373,22 @@
 
 ---
 
+### [`tests/test_quantum_automation.py`](tests/test_quantum_automation.py)
+> *Quantum auto-freight: policy, route selection, cooldown and persistence.*
+
+**Size**: `94` lines (`3877` bytes)
+
+**Classes:**
+- `class QuantumAutomationTest`
+  - Method `.setUp()`
+  - Method `.test_policy_requires_a_dock_and_valid_minimum()`
+  - Method `.test_auto_freight_places_the_best_route()`
+  - Method `.test_cooldown_and_minimum_block_orders()`
+  - Method `.test_policy_round_trips()`
+  - Method `.test_legacy_payload_defaults_to_off()`
+
+---
+
 ### [`tests/test_reactor_map_shipmods.py`](tests/test_reactor_map_shipmods.py)
 > *Regression tests for reactor simulation, sector map modifiers, and ship modifications.*
 
@@ -1467,7 +1487,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `715` lines (`30942` bytes)
+**Size**: `726` lines (`31458` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1510,6 +1530,7 @@
   - Method `.test_fleet_captain_endpoint_assigns_and_recalls()`
   - Method `.test_fleet_role_endpoint_sets_squadron_role()`
   - Method `.test_fleet_train_endpoint_buys_experience()`
+  - Method `.test_quantum_automation_endpoints_configure_and_report()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
   - Method `.test_research_queue_endpoints_queue_and_cancel()`
   - Method `.test_outpost_repair_endpoint_restores_integrity()`
@@ -2035,7 +2056,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `760` lines (`33104` bytes)
+**Size**: `761` lines (`33184` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2149,7 +2170,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3187` lines (`162661` bytes)
+**Size**: `3218` lines (`164136` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2333,7 +2354,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8859` lines (`436119` bytes)
+**Size**: `8949` lines (`439697` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2453,6 +2474,9 @@
   - Method `.set_trade_automation(commodity_id, buy_below, sell_above, quantity, enabled)` - *Configure the docked broker that buys low and sells high on a cooldown.*
   - Method `.get_trade_automation_report()`
   - Method `._run_trade_automation()` - *Execute at most one automated trade per cooldown while docked.*
+  - Method `.set_quantum_automation(enabled, min_net)` - *Configure automatic quantum freight while docked.*
+  - Method `.get_quantum_automation_report()`
+  - Method `._run_quantum_automation()` - *Ship surplus cargo along the best qualifying route on a cooldown.*
   - Method `.trade(commodity_id, quantity, is_buy)` - *Execute buy or sell commodity order at orbiting market.*
   - Method `._destination_market_body(system)`
   - Method `._quantum_fee(commodity, quantity, jumps)`
@@ -2766,7 +2790,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2212` lines (`82418` bytes)
+**Size**: `2245` lines (`83619` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -2911,6 +2935,9 @@
 - `class TradeAutomation` - *Docked broker policy: buy one commodity below a price and sell it above another.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
+- `class QuantumAutomation` - *Docked policy: ship surplus cargo along the best net freight route.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
 - `class AwayMission` - *An away-team expedition assigned to a celestial body for a finite duration.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
@@ -3045,7 +3072,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1435` lines (`61551` bytes)
+**Size**: `1448` lines (`62130` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

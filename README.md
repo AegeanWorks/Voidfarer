@@ -272,7 +272,7 @@ python -m voidfarer.cli autotrade on fuel_cells 55 85 1
 python -m voidfarer.cli autotrade status
 python -m voidfarer.cli autotrade off
 ```
-The auto-trade broker executes at most one qualifying buy or sell every 3 ticks while docked. It sells first when the sell threshold is met, otherwise buys below the buy threshold, and respects cargo volume, credits, stock and faction pricing. The Commerce tab exposes the same commodity, thresholds, quantity and ENABLE/DISABLE controls.
+Auto-trade buys below its threshold or sells above it once per 3 ticks while docked, respecting cargo, credits, stock and faction pricing. Quantum auto-freight ships surplus cargo on the best net route every 6 ticks above a chosen minimum. The Commerce tab exposes both policies.
 
 ### 12. Cadet Flight Academy (Situated Scaffolding)
 ```bash

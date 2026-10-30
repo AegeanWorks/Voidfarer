@@ -1265,3 +1265,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Apply captain role bonuses in `fleet_damage`, `fleet_evasion_bonus` and `fleet_upkeep`: pilot/medic +0.05 evasion, engineer/scientist +5% damage, marine +10% damage, quartermaster 10% lower upkeep.
   4. Exclude captains from flagship crew bonuses and from outpost/away/dismiss paths; expose assign/recall through the engine, `/api/fleet/escort/captain`, `fleet captain|recall_captain`, and a captain row on the fleet card.
 - **Consequences**: Escorts gain a named commander with a legible role bonus, crew allocation gains a fourth destination (flagship, outpost, away team, escort), and captain state persists. Live Edge assigned Imani Vale to a corvette and recalled her with no console errors. Suite: 937 tests (61 suites), 5/5 gates.
+
+### ADR-108: Quantum Freight Automation
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Quantum freight required manually checking the route list and pressing SHIP for every surplus commodity. The local broker automated market trades, but long-haul arbitrage still demanded repeated visits to the Commerce tab.
+- **Decision**:
+  1. Add a persisted `QuantumAutomation` policy (`enabled`, `min_net`, `last_order_tick`, `orders`, `last_net`, last commodity/destination) with a legacy-safe default.
+  2. Add `set_quantum_automation` and `_run_quantum_automation`: while docked, every 6 ticks, pick the best route at or above the minimum net and place a normal quantum order.
+  3. Expose `GET/POST /api/trade/quantum/automation`, `autotrade quantum status|on|off`, and AUTO-FREIGHT/MIN NET controls in the Quantum Freight panel.
+  4. Persist order count and last net for cockpit status; manual SHIP buttons remain available.
+- **Consequences**: Long-haul arbitrage can run unattended without bypassing fees, cargo volume, trade pacts or order slots. Live Edge enabled auto-freight at min net 0 and shipped 10 titanium for a 1,569 cr net route with no console errors. Suite: 945 tests (62 suites), 5/5 gates.
