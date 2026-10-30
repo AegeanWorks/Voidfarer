@@ -50,6 +50,13 @@ class CaptainGambitTest(unittest.TestCase):
         )
         return engine
 
+    def test_gambit_effects_scale_with_captain_skill(self):
+        low = self._engine("engineer", skill=2)
+        high = self._engine("engineer", skill=8)
+        self.assertTrue(low.captain_gambit()[0])
+        self.assertTrue(high.captain_gambit()[0])
+        self.assertGreater(high.state.ship.hull, low.state.ship.hull)
+
     def test_engineer_repairs_the_flagship_hull(self):
         engine = self._engine("engineer")
         ok, message = engine.captain_gambit()
