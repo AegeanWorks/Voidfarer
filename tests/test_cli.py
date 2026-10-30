@@ -97,6 +97,12 @@ class TestCLI(_IsolatedCliTestCase):
             self.assertEqual(code, 1)
             self.assertIn("unknown outpost", mock_out.getvalue().lower())
 
+    def test_cli_outpost_link_parses(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["outpost", "link", "missing_source", "missing_hub"])
+            self.assertEqual(code, 1)
+            self.assertIn("unknown outpost", mock_out.getvalue().lower())
+
     def test_cli_fleet_sell_escort_parses(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["fleet", "sell_escort", "missing_prize"])

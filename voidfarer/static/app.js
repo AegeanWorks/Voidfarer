@@ -3465,6 +3465,32 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const specOptions = Object.entries(specCatalog).map(([id, spec]) =>
                 `<option value="${this.escapeHtml(id)}" ${id === specId ? "selected" : ""}>${this.escapeHtml(spec.label)} (${Number(spec.cost || 0)} CR)</option>`
             ).join("");
+            const sameSystem = outposts.filter(candidate =>
+                candidate.id !== o.id && candidate.system_id === o.system_id
+            );
+            const linkCap = Number(o.supply_capacity || 2);
+            const sourceCanLink = !o.supply_hub_id && Number(o.supply_link_count || 0) === 0;
+            const hubCandidates = sameSystem.filter(candidate =>
+                sourceCanLink
+                && !candidate.supply_hub_id
+                && Number(candidate.supply_link_count || 0) < Number(candidate.supply_capacity || linkCap)
+            );
+            const hubOptions = hubCandidates.map(candidate =>
+                `<option value="${this.escapeHtml(candidate.id)}">${this.escapeHtml(candidate.name)}</option>`
+            ).join("");
+            const supplyStatus = o.supply_hub_name
+                ? `HUB: ${this.escapeHtml(o.supply_hub_name)} · x${Number(o.supply_multiplier || 1).toFixed(2)}`
+                : Number(o.supply_link_count || 0)
+                    ? `LINKS ${Number(o.supply_link_count)}/${linkCap} · x${Number(o.supply_multiplier || 1).toFixed(2)}`
+                    : "LOCAL · x1.00";
+            const supplyControls = o.supply_hub_name
+                ? `<button class="btn-hud btn-amber" data-outpost-unlink="${this.escapeHtml(o.id)}">UNLINK</button>`
+                : Number(o.supply_link_count || 0) > 0
+                    ? `<span class="outpost-supply-status">${this.escapeHtml((o.supply_link_names || []).join(", "))}</span>`
+                    : hubOptions
+                        ? `<select data-outpost-hub-select="${this.escapeHtml(o.id)}">${hubOptions}</select>
+                           <button class="btn-hud btn-cyan" data-outpost-link="${this.escapeHtml(o.id)}">LINK</button>`
+                        : `<span class="outpost-supply-status">NO ELIGIBLE HUB</span>`;
             return `
             <div class="outpost-row"><span>${this.escapeHtml(o.name)} - LVL ${o.level} - POP ${this.compactCount(o.population)} / ${this.compactCount(o.population_capacity)} <span class="outpost-integrity">INT ${Math.round(Number(o.integrity || 0))}% · DEF ${Number(o.defense || 10)}</span>${localShipyard ? ` <span class="outpost-service-badge">SERVICES ONLINE</span>` : ""}</span>
             <span class="outpost-row-actions">
@@ -3495,6 +3521,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     ? `<select data-outpost-spec-select="${this.escapeHtml(o.id)}">${specOptions}</select>
                        <button class="btn-hud btn-purple" data-outpost-spec-set="${this.escapeHtml(o.id)}">SET</button>`
                     : `<span class="outpost-spec-locked">UNLOCKS AT LVL 3</span>`}
+            </div>
+            <div class="outpost-supply-bar">
+                <span class="outpost-supply-label">SUPPLY: ${supplyStatus}</span>
+                ${supplyControls}
             </div>
         `;
         }).join("");
@@ -3542,6 +3572,23 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     specialization: select.value,
                 }, "empire");
             })
+        );
+        this.outpostList.querySelectorAll("[data-outpost-link]").forEach(btn =>
+            btn.addEventListener("click", () => {
+                const outpostId = btn.getAttribute("data-outpost-link");
+                const select = this.outpostList.querySelector(`[data-outpost-hub-select="${outpostId}"]`);
+                if (!select || !select.value) return;
+                this.postAction("/api/outpost/link", {
+                    outpost_id: outpostId,
+                    hub_id: select.value,
+                }, "empire");
+            })
+        );
+        this.outpostList.querySelectorAll("[data-outpost-unlink]").forEach(btn =>
+            btn.addEventListener("click", () => this.postAction("/api/outpost/link", {
+                outpost_id: btn.getAttribute("data-outpost-unlink"),
+                action: "unlink",
+            }, "empire"))
         );
 
         const leaders = this.state.faction_leaders || [];

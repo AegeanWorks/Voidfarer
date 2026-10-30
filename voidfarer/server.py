@@ -890,6 +890,21 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/outpost/link":
+            action = str(body.get("action", "link")).strip().lower()
+            if action == "unlink":
+                ok, msg = self.engine.unlink_outpost_supply(
+                    str(body.get("outpost_id", ""))
+                )
+            else:
+                ok, msg = self.engine.link_outpost_supply(
+                    str(body.get("outpost_id", "")),
+                    str(body.get("hub_id", "")),
+                )
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/diplomacy":
             ok, msg = self.engine.faction_diplomacy(
                 str(body.get("faction_id", "")),

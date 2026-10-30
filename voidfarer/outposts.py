@@ -127,6 +127,36 @@ OUTPOST_MODULE_CATALOG: dict[str, dict[str, Any]] = {
     "sentry_grid": {"name": "Sentry Grid", "cost": 650, "production": {}, "defense": 12},
 }
 
+OUTPOST_SUPPLY_MAX_LINKS = 2
+OUTPOST_SUPPLY_LINK_BONUS = 0.05
+OUTPOST_SUPPLY_HUB_BONUS = 0.08
+
+
+def outpost_supply_multiplier(
+    outpost: Outpost, outposts: tuple[Outpost, ...]
+) -> float:
+    """Linked outposts gain 5%; a hub gains 8% per attached outpost (max 2)."""
+    by_id = {candidate.id: candidate for candidate in outposts}
+    if outpost.supply_hub_id:
+        hub = by_id.get(outpost.supply_hub_id)
+        if (
+            hub is not None
+            and hub.system_id == outpost.system_id
+            and not hub.supply_hub_id
+        ):
+            return 1.0 + OUTPOST_SUPPLY_LINK_BONUS
+        return 1.0
+    linked = sum(
+        1
+        for candidate in outposts
+        if candidate.supply_hub_id == outpost.id
+        and candidate.system_id == outpost.system_id
+    )
+    return 1.0 + OUTPOST_SUPPLY_HUB_BONUS * min(
+        OUTPOST_SUPPLY_MAX_LINKS, linked
+    )
+
+
 
 def get_outpost_type(outpost_type: str) -> OutpostType | None:
     return OUTPOST_MAP.get(outpost_type)
@@ -238,6 +268,7 @@ def outpost_tick_production(
     outpost: Outpost,
     yield_multiplier: float = 1.0,
     crew_multiplier: float = 1.0,
+    supply_multiplier: float = 1.0,
 ) -> dict[str, float]:
     """Effective per-tick yield: catalog base, level growth, modules, crew and map multipliers."""
     template = OUTPOST_MAP.get(outpost.outpost_type)
@@ -261,6 +292,7 @@ def outpost_tick_production(
             * crew_mult
             * integrity_mult
             * max(0.1, yield_multiplier)
+            * max(0.1, supply_multiplier)
             * float(spec_outputs.get(key, spec_outputs.get("other", 1.0))),
             2,
         )

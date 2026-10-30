@@ -1862,11 +1862,21 @@ def cmd_outpost(engine: SimulationEngine, storage: StorageManager, parts: list[s
         for o in report["outposts"]:
             print(f"{o['id']:<34} {BOLD}{o['name']:<34}{RESET} LVL {o['level']} POP {o['population']:,} [{o['system_id']}]")
             crew_names = ", ".join(o.get("crew_names", ())) or "none"
+            supply = (
+                f"HUB {o.get('supply_hub_name')}"
+                if o.get("supply_hub_name")
+                else (
+                    f"LINKS {o.get('supply_link_count', 0)}/{o.get('supply_capacity', 2)}"
+                    if o.get("supply_link_count")
+                    else "LOCAL"
+                )
+            )
             print(
                 f"  Production/tick: {CYAN}{o['production_effective']}{RESET} "
                 f"| Crew {len(o.get('assigned_crew', ()))}/{o.get('crew_capacity', 3)} "
                 f"({crew_names}) x{o.get('crew_multiplier', 1.0):.2f}"
                 f" | Spec {o.get('specialization_label') or 'none'}"
+                f" | Supply {supply} x{o.get('supply_multiplier', 1.0):.2f}"
                 f" | INT {float(o.get('integrity', 100.0)):.0f}% DEF {o.get('defense', 10)}"
             )
         print(f"{BOLD}Available outpost types:{RESET}")
@@ -1937,7 +1947,25 @@ def cmd_outpost(engine: SimulationEngine, storage: StorageManager, parts: list[s
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
-    print(f"{RED}Unknown outpost command '{sub}'. Options: list, build, upgrade, repair, module, specialize, crew, recall.{RESET}")
+    if sub in ("link", "supply"):
+        if len(parts) < 4:
+            print(f"{RED}Usage:{RESET} outpost link <outpost_id> <hub_outpost_id>")
+            return 1
+        ok, msg = engine.link_outpost_supply(parts[2], parts[3])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub == "unlink":
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} outpost unlink <outpost_id>")
+            return 1
+        ok, msg = engine.unlink_outpost_supply(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(f"{RED}Unknown outpost command '{sub}'. Options: list, build, upgrade, repair, module, specialize, crew, recall, link, unlink.{RESET}")
     return 1
 
 
@@ -2868,7 +2896,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     research_p.add_argument("project_id", nargs="?", help="Research project id")
 
     outpost_p = subparsers.add_parser("outpost", help="Found and upgrade planetary outposts")
-    outpost_p.add_argument("action", nargs="?", default="list", choices=["list", "build", "upgrade", "repair", "module", "specialize", "crew", "recall"])
+    outpost_p.add_argument("action", nargs="?", default="list", choices=["list", "build", "upgrade", "repair", "module", "specialize", "crew", "recall", "link", "unlink"])
     outpost_p.add_argument("outpost_type", nargs="?", help="Outpost type or outpost id")
     outpost_p.add_argument("body_id", nargs="?", help="Body id for construction")
 

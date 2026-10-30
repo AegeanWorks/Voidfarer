@@ -566,6 +566,50 @@ class TestServer(unittest.TestCase):
         self.assertEqual(payload["state"]["ship"]["hull"], 77)
         self.assertTrue(payload["state"]["active_combat"]["captain_gambit_used"])
 
+    def test_outpost_supply_link_endpoint_links_and_unlinks(self):
+        engine = VoidFarerHandler.engine
+        source = Outpost(
+            id="server_supply_a",
+            name="Server Supply A",
+            system_id="sol",
+            body_id="sol_body_1",
+        )
+        hub = Outpost(
+            id="server_supply_b",
+            name="Server Supply B",
+            system_id="sol",
+            body_id="sol_body_2",
+        )
+        engine.state = engine._clone_state(outposts=(source, hub))
+        status, data = self._post(
+            "/api/outpost/link",
+            {"outpost_id": source.id, "hub_id": hub.id},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        linked = next(
+            outpost
+            for outpost in payload["state"]["outposts"]
+            if outpost["id"] == source.id
+        )
+        self.assertEqual(linked["supply_hub_id"], hub.id)
+        self.assertEqual(linked["supply_hub_name"], hub.name)
+
+        status, data = self._post(
+            "/api/outpost/link",
+            {"outpost_id": source.id, "action": "unlink"},
+        )
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"], payload.get("message"))
+        unlinked = next(
+            outpost
+            for outpost in payload["state"]["outposts"]
+            if outpost["id"] == source.id
+        )
+        self.assertEqual(unlinked["supply_hub_id"], "")
+
     def test_quantum_automation_endpoints_configure_and_report(self):
         status, data = self._post(
             "/api/trade/quantum/automation",

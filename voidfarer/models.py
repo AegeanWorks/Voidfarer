@@ -1340,6 +1340,7 @@ class Outpost:
     founded_tick: int = 0
     assigned_crew: tuple[str, ...] = ()
     specialization: str = ""
+    supply_hub_id: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1365,6 +1366,7 @@ class Outpost:
             founded_tick=int(data.get("founded_tick", 0)),
             assigned_crew=tuple(str(cid) for cid in data.get("assigned_crew", ())),
             specialization=str(data.get("specialization", "")),
+            supply_hub_id=str(data.get("supply_hub_id", "")),
         )
 
 

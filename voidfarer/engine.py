@@ -128,6 +128,9 @@ from voidfarer.outposts import (
     OUTPOST_MAP,
     OUTPOST_MODULE_CATALOG,
     OUTPOST_SPECIALIZATIONS,
+    OUTPOST_SUPPLY_HUB_BONUS,
+    OUTPOST_SUPPLY_LINK_BONUS,
+    OUTPOST_SUPPLY_MAX_LINKS,
     OUTPOST_TYPES,
     build_outpost,
     can_build_on,
@@ -137,6 +140,7 @@ from voidfarer.outposts import (
     outpost_crew_multiplier,
     outpost_defense,
     outpost_repair_cost,
+    outpost_supply_multiplier,
     outpost_tick_production,
     upgrade_outpost,
 )
@@ -2943,6 +2947,92 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship, outposts=outposts)
             return True, line
 
+    def _outpost_links(self, outpost_id: str) -> tuple[Outpost, ...]:
+        """Outposts currently routing their surplus through one hub."""
+        return tuple(
+            outpost
+            for outpost in self.state.outposts
+            if outpost.supply_hub_id == outpost_id
+        )
+
+    def _outpost_supply_multiplier(self, outpost: Outpost) -> float:
+        return outpost_supply_multiplier(outpost, self.state.outposts)
+
+    def link_outpost_supply(
+        self, outpost_id: str, hub_id: str
+    ) -> tuple[bool, str]:
+        """Route one outpost's surplus through a same-system hub."""
+        with self.lock:
+            source = next(
+                (o for o in self.state.outposts if o.id == outpost_id), None
+            )
+            if source is None:
+                return False, f"Unknown outpost '{outpost_id}'."
+            hub = next((o for o in self.state.outposts if o.id == hub_id), None)
+            if hub is None:
+                return False, f"Unknown supply hub '{hub_id}'."
+            if source.id == hub.id:
+                return False, "An outpost cannot supply itself."
+            if source.system_id != hub.system_id:
+                return False, "Supply links must stay inside one star system."
+            if source.supply_hub_id == hub.id:
+                return False, f"{source.name} already supplies through {hub.name}."
+            if source.supply_hub_id:
+                return False, (
+                    f"{source.name} already supplies through another hub; "
+                    "unlink it first."
+                )
+            if hub.supply_hub_id:
+                return False, (
+                    f"{hub.name} is itself linked to a hub and cannot host links."
+                )
+            if self._outpost_links(source.id):
+                return False, (
+                    f"{source.name} hosts its own supply links and cannot "
+                    "link upward."
+                )
+            existing = self._outpost_links(hub.id)
+            if len(existing) >= OUTPOST_SUPPLY_MAX_LINKS:
+                return False, (
+                    f"{hub.name} already hosts {OUTPOST_SUPPLY_MAX_LINKS} links."
+                )
+            updated = replace(source, supply_hub_id=hub.id)
+            outposts = tuple(
+                updated if outpost.id == source.id else outpost
+                for outpost in self.state.outposts
+            )
+            line = (
+                f"SUPPLY LINK: {source.name} now routes through {hub.name} "
+                f"(+{int(OUTPOST_SUPPLY_LINK_BONUS * 100)}% output)."
+            )
+            new_ship = self._clone_ship(
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            return True, line
+
+    def unlink_outpost_supply(self, outpost_id: str) -> tuple[bool, str]:
+        """Sever one outpost's supply link."""
+        with self.lock:
+            outpost = next(
+                (o for o in self.state.outposts if o.id == outpost_id), None
+            )
+            if outpost is None:
+                return False, f"Unknown outpost '{outpost_id}'."
+            if not outpost.supply_hub_id:
+                return False, f"{outpost.name} has no supply link to sever."
+            updated = replace(outpost, supply_hub_id="")
+            outposts = tuple(
+                updated if candidate.id == outpost.id else candidate
+                for candidate in self.state.outposts
+            )
+            line = f"SUPPLY LINK SEVERED: {outpost.name} is back on local reserves."
+            new_ship = self._clone_ship(
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
+            )
+            self.state = self._clone_state(ship=new_ship, outposts=outposts)
+            return True, line
+
     def _outpost_capture_damage(
         self, outpost: Outpost, old_system: Any, new_system: Any, crew_by_id: dict[str, Any]
     ) -> int:
@@ -3072,6 +3162,11 @@ class SimulationEngine:
         crew_by_id = {member.id: member for member in self.state.ship.crew}
         crew_mult = outpost_crew_multiplier(outpost, crew_by_id)
         spec = OUTPOST_SPECIALIZATIONS.get(outpost.specialization)
+        hub = next(
+            (o for o in self.state.outposts if o.id == outpost.supply_hub_id),
+            None,
+        )
+        linked = self._outpost_links(outpost.id)
         payload = {
             **outpost.to_dict(),
             "crew_multiplier": round(crew_mult, 3),
@@ -3080,6 +3175,13 @@ class SimulationEngine:
             "repair_cost": outpost_repair_cost(outpost),
             "specialization_label": spec["label"] if spec else "",
             "specialization_cost": int(spec["cost"]) if spec else 600,
+            "supply_hub_name": hub.name if hub is not None else "",
+            "supply_link_count": len(linked),
+            "supply_link_names": [candidate.name for candidate in linked],
+            "supply_capacity": OUTPOST_SUPPLY_MAX_LINKS,
+            "supply_multiplier": round(self._outpost_supply_multiplier(outpost), 3),
+            "supply_link_bonus": OUTPOST_SUPPLY_LINK_BONUS,
+            "supply_hub_bonus": OUTPOST_SUPPLY_HUB_BONUS,
             "crew_names": [
                 crew_by_id[cid].name
                 for cid in outpost.assigned_crew
@@ -3088,7 +3190,10 @@ class SimulationEngine:
         }
         if yield_mult is not None:
             payload["production_effective"] = outpost_tick_production(
-                outpost, yield_mult, crew_mult
+                outpost,
+                yield_mult,
+                crew_mult,
+                self._outpost_supply_multiplier(outpost),
             )
         return payload
 
@@ -3952,6 +4057,7 @@ class SimulationEngine:
                     outpost,
                     research_yield_mult,
                     self._outpost_crew_multiplier(outpost),
+                    self._outpost_supply_multiplier(outpost),
                 )
                 passive += float(production.get("credits", 0.0))
             # Passive sources pay per tick; a month is DAYS_PER_MONTH days of 0.25-day ticks.
@@ -8378,6 +8484,7 @@ class SimulationEngine:
                     outpost,
                     research_yield_mult,
                     self._outpost_crew_multiplier(outpost),
+                    self._outpost_supply_multiplier(outpost),
                 )
                 outpost_credits += int(production.get("credits", 0.0) * num_ticks)
                 research_gain += int(production.get("research", 0.0) * num_ticks)

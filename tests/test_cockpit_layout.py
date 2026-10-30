@@ -1357,6 +1357,30 @@ class TestCaptainGambitCockpit(unittest.TestCase):
         self.assertIn("captain_gambit_used", self.js)
 
 
+class TestOutpostSupplyCockpit(unittest.TestCase):
+    """Outpost cards must expose supply hub linking and status."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_outpost_cards_offer_link_and_unlink(self):
+        for marker in (
+            "data-outpost-link",
+            "data-outpost-unlink",
+            '"/api/outpost/link"',
+            "supply_hub_name",
+            "supply_link_count",
+            "outpost-supply-bar",
+        ):
+            self.assertIn(marker, self.js)
+
+    def test_supply_bar_is_styled(self):
+        self.assertIn(".outpost-supply-bar", self.css)
+        self.assertIn(".outpost-supply-status", self.css)
+
+
 class TestResearchQueueCockpit(unittest.TestCase):
     """The Empire research list must expose queue and cancel controls."""
 
