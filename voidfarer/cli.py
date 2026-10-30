@@ -2027,9 +2027,15 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
             morale_note = f"{RED}!! NEAR DESERTION{RESET}" if member["morale"] < 20 else (f"{YELLOW}LOW{RESET}" if member["morale"] < 35 else f"{GREEN}OK{RESET}")
             injury_note = f" {RED}INJURED {member.get('injury_ticks', 0)}t{RESET}" if member.get("injury_ticks", 0) else ""
             xp_note = f"{CYAN}XP {member.get('xp', 0)}/{max(1, member['skill'] * 40)}{RESET}"
+            medals = member.get("medals") or ()
+            medal_note = (
+                f" {YELLOW}MEDALS {len(medals)} ({', '.join(medals)}){RESET}"
+                if medals
+                else ""
+            )
             print(
                 f"{member['id']:<18} {BOLD}{member['name']:<18}{RESET} {member['role']:<12} "
-                f"SKILL {member['skill']} {xp_note} MORALE {member['morale']:.0f} [{morale_note}] WAGE {member['wage']} PORTRAIT {member['portrait']}{injury_note}"
+                f"SKILL {member['skill']} {xp_note} MORALE {member['morale']:.0f} [{morale_note}] WAGE {member['wage']} PORTRAIT {member['portrait']}{injury_note}{medal_note}"
             )
         print(f"\n{DIM}Recruit: crew recruit <{'|'.join(r.id for r in CREW_ROLES)}> | Drill: crew train <id> | Dismiss: crew dismiss <id> | Shore leave: crew shore{RESET}")
         print(f"{DIM}Away teams: away | away launch <mission_type> [crew_ids...] | away recall <mission_id>{RESET}")

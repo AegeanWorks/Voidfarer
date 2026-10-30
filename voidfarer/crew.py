@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Sequence
 
 from voidfarer.models import CrewMember
@@ -39,6 +39,28 @@ CREW_ROLES: tuple[CrewRole, ...] = (
 )
 
 CREW_ROLE_MAP: dict[str, CrewRole] = {r.id: r for r in CREW_ROLES}
+
+COMBAT_VETERAN_MEDAL = "Combat Veteran"
+DEEP_EXPLORER_MEDAL = "Deep Explorer"
+CREW_MEDAL_MORALE = 5.0
+
+
+def award_service_medals(member: CrewMember) -> tuple[CrewMember, tuple[str, ...]]:
+    """Award persistent medals once the service counters cross their thresholds."""
+    earned: list[str] = []
+    if member.battles >= 3 and COMBAT_VETERAN_MEDAL not in member.medals:
+        earned.append(COMBAT_VETERAN_MEDAL)
+    if member.away_missions >= 5 and DEEP_EXPLORER_MEDAL not in member.medals:
+        earned.append(DEEP_EXPLORER_MEDAL)
+    if not earned:
+        return member, ()
+    morale = min(100.0, member.morale + CREW_MEDAL_MORALE * len(earned))
+    updated = replace(
+        member,
+        medals=tuple(list(member.medals) + earned),
+        morale=round(morale, 1),
+    )
+    return updated, tuple(earned)
 
 CREW_NAMES: tuple[str, ...] = (
     "Imani Vale", "Rook Calder", "Sera Nwosu", "Dax Mercer", "Liora Venn",

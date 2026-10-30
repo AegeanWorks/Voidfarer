@@ -3147,6 +3147,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <div class="crew-info-block">
                         <strong>${this.escapeHtml(m.name)}</strong>
                         <small>${this.escapeHtml(m.role)} · SKILL ${m.skill} · XP ${m.xp || 0}/${xpToNext}${statusNote}</small>
+                        ${(m.medals || []).length ? `<div class="crew-medals">${m.medals.map(medal => `<span>★ ${this.escapeHtml(medal)}</span>`).join("")}</div>` : ""}
                     </div>
                     <div class="crew-morale-bar" title="Morale ${morale}${moraleNote}">
                         <div class="crew-morale-fill ${moraleClass}" style="width:${morale}%"></div>

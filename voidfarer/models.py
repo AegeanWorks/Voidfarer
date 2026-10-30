@@ -1576,6 +1576,9 @@ class CrewMember:
     status: str = "active"
     xp: int = 0
     injury_ticks: int = 0
+    battles: int = 0
+    away_missions: int = 0
+    medals: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1594,6 +1597,9 @@ class CrewMember:
             status=str(data.get("status", "active")),
             xp=max(0, int(data.get("xp", 0))),
             injury_ticks=max(0, int(data.get("injury_ticks", 0))),
+            battles=max(0, int(data.get("battles", 0))),
+            away_missions=max(0, int(data.get("away_missions", 0))),
+            medals=tuple(str(medal) for medal in data.get("medals", ())),
         )
 
 

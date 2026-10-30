@@ -29,6 +29,7 @@ from voidfarer.crew import (
     DAYS_PER_MONTH,
     apply_morale_event,
     award_crew_xp,
+    award_service_medals,
     calculate_crew_bonuses,
     crew_catalog,
     crew_upkeep,
@@ -5975,11 +5976,23 @@ class SimulationEngine:
                     promoted_member, promoted = award_crew_xp(
                         member, CAPTAIN_VICTORY_XP
                     )
+                    promoted_member = replace(
+                        promoted_member,
+                        battles=promoted_member.battles + 1,
+                    )
+                    promoted_member, earned_medals = award_service_medals(
+                        promoted_member
+                    )
                     captain_crew[index] = promoted_member
                     if promoted:
                         captain_promotions.append(
                             f"CAPTAIN PROMOTION: {promoted_member.name} reaches "
                             f"skill {promoted_member.skill}."
+                        )
+                    if earned_medals:
+                        captain_promotions.append(
+                            f"SERVICE MEDAL: {promoted_member.name} awarded "
+                            f"{', '.join(earned_medals)}."
                         )
                 captain_by_id = {member.id: member for member in captain_crew}
                 fleet_updates: list[FleetShip] = []
@@ -8970,6 +8983,22 @@ class SimulationEngine:
                     if promoted:
                         away_logs.append(
                             f"CREW PROMOTION: {updated_member.name} reached skill {updated_member.skill} in the field."
+                        )
+                for crew_id in mission.crew_ids:
+                    member = away_crew_by_id.get(crew_id)
+                    if member is None:
+                        continue
+                    updated_member, earned_medals = award_service_medals(
+                        replace(
+                            member,
+                            away_missions=member.away_missions + 1,
+                        )
+                    )
+                    away_crew_by_id[crew_id] = updated_member
+                    if earned_medals:
+                        away_logs.append(
+                            f"SERVICE MEDAL: {updated_member.name} awarded "
+                            f"{', '.join(earned_medals)}."
                         )
                 for crew_id, injury_ticks in outcome["injuries"].items():
                     member = away_crew_by_id.get(crew_id)

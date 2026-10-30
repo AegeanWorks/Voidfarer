@@ -208,6 +208,12 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "crew_max_skill", 5, 600, 200,
     ),
     CodexEntry(
+        "decorated_crew", "command", "Decorated Crew",
+        "Earn two service medals across your crew.",
+        "Command escorts through victories and launch away teams.",
+        "crew_medals", 2, 900, 260,
+    ),
+    CodexEntry(
         "escort", "command", "Escort Duty",
         "Commission your first escort warship.",
         "Run `fleet buy_escort <class>` at a drydock.",
@@ -452,6 +458,7 @@ METRIC_LABELS: dict[str, str] = {
     "relics": "Precursor relics",
     "crew": "Crew members",
     "crew_max_skill": "Best crew skill",
+    "crew_medals": "Crew medals",
     "escorts": "Escort warships",
     "drones": "Fleet drones",
     "outposts": "Outposts",
@@ -501,6 +508,7 @@ STATS_ORDER: tuple[str, ...] = (
     "relics",
     "crew",
     "crew_max_skill",
+    "crew_medals",
     "escorts",
     "drones",
     "outposts",
@@ -588,6 +596,8 @@ def metric_value(state: GameState, metric: str) -> int:
         return len(ship.crew)
     if metric == "crew_max_skill":
         return max((member.skill for member in ship.crew), default=0)
+    if metric == "crew_medals":
+        return sum(len(member.medals) for member in ship.crew)
     if metric == "escorts":
         return len(ship.fleet_ships)
     if metric == "drones":

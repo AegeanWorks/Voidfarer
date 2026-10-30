@@ -1357,6 +1357,23 @@ class TestCaptainGambitCockpit(unittest.TestCase):
         self.assertIn("captain_gambit_used", self.js)
 
 
+class TestCrewMedalsCockpit(unittest.TestCase):
+    """Crew cards must show earned service medals."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_crew_rows_render_medals(self):
+        self.assertIn("crew-medals", self.js)
+        self.assertIn("m.medals", self.js)
+
+    def test_medal_badges_are_styled(self):
+        self.assertIn(".crew-medals", self.css)
+        self.assertIn(".crew-medals span", self.css)
+
+
 class TestOutpostSupplyCockpit(unittest.TestCase):
     """Outpost cards must expose supply hub linking and status."""
 
