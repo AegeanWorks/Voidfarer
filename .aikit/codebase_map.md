@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `109`
-- **Total Classes**: `276`
-- **Total Top-Level Functions**: `324`
-- **Total Class Methods**: `1594`
-- **Total Source Lines**: `42488`
+- **Total Python Modules**: `110`
+- **Total Classes**: `278`
+- **Total Top-Level Functions**: `326`
+- **Total Class Methods**: `1602`
+- **Total Source Lines**: `42682`
 
 ---
 
@@ -176,6 +176,25 @@
 
 ---
 
+### [`tests/test_captain_progression.py`](tests/test_captain_progression.py)
+> *Escort captain progression: stored skill, scaling bonuses and battle XP.*
+
+**Size**: `120` lines (`4720` bytes)
+
+**Classes:**
+- `class CaptainSkillMathTest`
+  - Method `.test_skill_zero_is_legacy_neutral_and_ten_is_capped()`
+  - Method `.test_skill_scales_damage_evasion_and_upkeep_discount()`
+  - Method `.test_legacy_ship_defaults_to_zero_captain_skill()`
+- `class CaptainProgressionEngineTest`
+  - Method `.setUp()`
+  - Method `._assign()`
+  - Method `.test_assignment_records_skill_in_state_and_report()`
+  - Method `.test_training_a_captain_updates_the_ship_bonus()`
+  - Method `.test_rewarded_victory_awards_captain_xp_and_syncs_promotion()`
+
+---
+
 ### [`tests/test_captains_log_codex.py`](tests/test_captains_log_codex.py)
 > *Regression tests for the captain's log, discovery codex, statistics, and rewards.*
 
@@ -268,7 +287,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1463` lines (`65010` bytes)
+**Size**: `1464` lines (`65039` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1520,7 +1539,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `745` lines (`32225` bytes)
+**Size**: `749` lines (`32402` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -2204,7 +2223,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3219` lines (`164288` bytes)
+**Size**: `3223` lines (`164449` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2388,7 +2407,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9009` lines (`442671` bytes)
+**Size**: `9056` lines (`444696` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2703,9 +2722,11 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `345` lines (`11904` bytes)
+**Size**: `361` lines (`12452` bytes)
 
 **Functions:**
+- `def captain_skill_multiplier(skill)` - *Role bonuses grow 5% per skill rank above 1; skill 0 is legacy-neutral.*
+- `def _captain_multiplier(ship)`
 - `def normalize_fleet_role(role)`
 - `def get_escort_template(escort_type)`
 - `def fleet_rank(experience)` - *Resolve veterancy rank, badge progress and cumulative combat bonuses.*
@@ -2826,7 +2847,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2248` lines (`83783` bytes)
+**Size**: `2250` lines (`83888` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

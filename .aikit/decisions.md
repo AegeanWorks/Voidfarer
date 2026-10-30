@@ -1298,3 +1298,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Keep every other entry retroactive: no new tracking loop and no RNG use, so legacy saves unlock completed milestones on load.
   4. Expose the new metrics through the existing codex report, CLI and cockpit tab without new endpoints.
 - **Consequences**: All recent systems now have visible progression goals and reward pacing. Only outpost repair needed new bookkeeping; everything else reads state that already persists. Live Edge rendered all six newly checked entries with no console errors. Suite: 956 tests (64 suites), 5/5 gates.
+
+### ADR-111: Escort Captain Progression
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Assigned crew captains gave a flat role bonus forever. Their skill was hidden, training never changed the ship bonus, and captains could not grow through combat because they are excluded from away teams and flagship crew bonuses.
+- **Decision**:
+  1. Persist `FleetShip.captain_skill` (0-10, legacy default 0 and neutral) and record the crew member's skill on assignment; recall clears it.
+  2. Scale role bonuses by 5% per skill rank above 1 (`captain_skill_multiplier`, capped at +45%), applied to damage, evasion and quartermaster upkeep discounts.
+  3. Award 60 crew XP to each living local captain on victory; a promotion syncs the ship's stored skill in the same atomic state update.
+  4. Sync the stored skill when a captain completes a training drill; expose `captain_skill` in the fleet report and show `S<skill>` in the cockpit card and CLI ledger.
+- **Consequences**: Captains now progress through both drills and battles, and every fleet bonus has a visible skill behind it. Skill 0 keeps old saves neutral. Suite: 962 tests (65 suites), 5/5 gates.

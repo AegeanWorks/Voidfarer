@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "codex-progression",
+    "task_id": "captain-progression",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793374594.6250625,
+    "updated_at": 1793375179.3587358,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793374599.8652463
+    "completed_at": 1793375188.4487963
   },
   "checkpoints": [
-    {
-      "task_id": "research-queue",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan research queue: persisted project order, queue/cancel actions, automatic start of the next valid project, and START/QUEUE/CANCEL controls with API and CLI.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793371778.9094017,
-      "timestamp_str": "2026-10-30 17:49:38",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Research had one active project and no way to line up the next one, so every completion required a manual return to the Empire tab or CLI.",
-        "benefits": "Research can run unattended across multiple projects, queues survive saves, and stale or invalid entries are skipped instead of blocking progress.",
-        "risks": "contract: legacy research must default to an empty queue and every ResearchState clone must preserve it; dependency: completion logic must respect prerequisites and completed projects; concurrency: queue edits mutate research state under the engine lock; state: queues must persist and active projects must still be manually replaceable.",
-        "mitigation": "Add validation, ordering, cancel, auto-start, legacy and persistence regressions first; skip invalid queue entries; verify the live queue and cancel controls."
-      }
-    },
-    {
-      "task_id": "research-queue",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] Persisted ResearchState.queue, queue/cancel validation, auto-start of the next valid project, snapshot queued details, /api/research/queue|cancel, research queue|cancel CLI and START/QUEUE/CANCEL UI implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793371844.5141633,
-      "timestamp_str": "2026-10-30 17:50:44",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "research-queue",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] README, COCKPIT and ADR-106 recorded; live Edge queued Deep Survey Arrays behind Advanced Coolant Loops and cancelled it; 927 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793371844.6485126,
-      "timestamp_str": "2026-10-30 17:50:44",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "research-queue",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'research-queue' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793371854.341809,
-      "timestamp_str": "2026-10-30 17:50:54",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "escort-captains",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793374599.865248,
       "timestamp_str": "2026-10-30 18:36:39",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "captain-progression",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan escort captain progression: persist captain skill on the ship, scale role bonuses with it, and award captain XP in battles and drills.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793374893.3312714,
+      "timestamp_str": "2026-10-30 18:41:33",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Captains provide a flat role bonus forever; their skill is invisible and never improves through combat, so the captain system has no progression after assignment.",
+        "benefits": "Captains grow into their roles, training and battles both matter, and the fleet card shows the skill behind its bonus.",
+        "risks": "contract: FleetShip gains a persisted captain_skill that must default safely; dependency: fleet damage, evasion and upkeep now read it; concurrency: battle victory rewrites crew, fleet ships and stats under the engine lock; state: promotions must sync the stored captain skill.",
+        "mitigation": "Add legacy, assignment, scaling, training and victory regressions first; clamp skill 0-10; keep skill 0 neutral for old saves; verify the cockpit captain row and full gates."
+      }
+    },
+    {
+      "task_id": "captain-progression",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted captain_skill, added skill scaling for damage/evasion/upkeep, victory captain XP with promotion sync, drill sync, report/UI/CLI skill display and 6 regressions; 962 tests pass.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793375179.2265244,
+      "timestamp_str": "2026-10-30 18:46:19",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "captain-progression",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-111 documented; live Edge showed S3 and the crew drill raised the fleet card to S4 with no console errors; 962 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793375179.3587358,
+      "timestamp_str": "2026-10-30 18:46:19",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "captain-progression",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'captain-progression' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793375188.4487977,
+      "timestamp_str": "2026-10-30 18:46:28",
       "agent": "opencode:mechanics"
     }
   ]
