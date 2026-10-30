@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `96`
-- **Total Classes**: `252`
-- **Total Top-Level Functions**: `313`
-- **Total Class Methods**: `1449`
-- **Total Source Lines**: `39625`
+- **Total Python Modules**: `97`
+- **Total Classes**: `254`
+- **Total Top-Level Functions**: `315`
+- **Total Class Methods**: `1464`
+- **Total Source Lines**: `39998`
 
 ---
 
@@ -215,7 +215,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `264` lines (`11561` bytes)
+**Size**: `270` lines (`11870` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -226,6 +226,7 @@
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
   - Method `.test_cli_autotrade_status_parses()`
+  - Method `.test_cli_outpost_crew_parses()`
   - Method `.test_cli_outpost_module_parses()`
   - Method `.test_cli_fleet_sell_escort_parses()`
   - Method `.test_cli_trade_pact_parses_and_reports_the_standing_gate()`
@@ -259,7 +260,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1335` lines (`60487` bytes)
+**Size**: `1347` lines (`60939` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -458,6 +459,7 @@
 - `class TestOutpostModuleCockpit` - *The Empire tab must expose outpost module installation.*
   - Method `.setUpClass()`
   - Method `.test_outpost_rows_offer_a_module_installer()`
+  - Method `.test_outpost_rows_offer_crew_assignment()`
 - `class TestTradeAutomationCockpit` - *The Commerce tab must expose the docked auto-trade broker.*
   - Method `.setUpClass()`
   - Method `.test_market_tab_holds_the_broker_controls()`
@@ -1115,6 +1117,27 @@
 
 ---
 
+### [`tests/test_outpost_crew.py`](tests/test_outpost_crew.py)
+> *Outpost crew: specialist bonuses, assignment rules and persistence.*
+
+**Size**: `133` lines (`5367` bytes)
+
+**Classes:**
+- `class OutpostCrewMathTest`
+  - Method `.test_preferred_specialists_lift_output_and_cap()`
+  - Method `.test_non_preferred_and_inactive_crew_are_weaker_or_ignored()`
+  - Method `.test_production_uses_the_crew_multiplier()`
+- `class OutpostCrewEngineTest`
+  - Method `.setUp()`
+  - Method `.test_assign_and_recall_a_specialist()`
+  - Method `.test_duplicate_capacity_and_dismissal_rules()`
+  - Method `.test_save_round_trip_keeps_assigned_crew()`
+
+**Functions:**
+- `def _crew(crew_id, role, skill, status)`
+
+---
+
 ### [`tests/test_outpost_modules.py`](tests/test_outpost_modules.py)
 > *Outpost modules: spend credits to stack production modules on an installation.*
 
@@ -1278,7 +1301,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `564` lines (`24804` bytes)
+**Size**: `598` lines (`26206` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1320,6 +1343,7 @@
   - Method `.test_trade_pact_endpoint_forms_a_pact()`
   - Method `.test_fleet_train_endpoint_buys_experience()`
   - Method `.test_trade_automation_endpoints_configure_and_report()`
+  - Method `.test_outpost_crew_endpoint_assigns_and_recalls()`
   - Method `.test_outpost_module_endpoint_installs_a_stack()`
   - Method `.test_save_load_delete_endpoints()`
   - Method `.test_multiple_save_slots_endpoints_and_listing()`
@@ -1817,7 +1841,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `753` lines (`32590` bytes)
+**Size**: `754` lines (`32661` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -1931,7 +1955,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3095` lines (`158274` bytes)
+**Size**: `3118` lines (`159301` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2115,7 +2139,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `8283` lines (`409556` bytes)
+**Size**: `8398` lines (`414896` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2185,6 +2209,11 @@
   - Method `.build_outpost(body_id, outpost_type_id)`
   - Method `.upgrade_outpost(outpost_id)`
   - Method `.install_outpost_module(outpost_id, module_id)` - *Install a production module on an outpost; stacks are capped at three.*
+  - Method `._crew_outpost_id(crew_id)`
+  - Method `._outpost_crew_multiplier(outpost)`
+  - Method `._outpost_payload(outpost, yield_mult)`
+  - Method `.assign_outpost_crew(outpost_id, crew_id)` - *Station one active specialist at an outpost; three can work one site.*
+  - Method `.recall_outpost_crew(outpost_id, crew_id)` - *Return a stationed specialist to the flagship roster.*
   - Method `.get_character_report()`
   - Method `.get_research_report()`
   - Method `.get_outpost_report()`
@@ -2528,7 +2557,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2184` lines (`81076` bytes)
+**Size**: `2186` lines (`81200` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -2723,7 +2752,7 @@
 ### [`voidfarer/outposts.py`](voidfarer/outposts.py)
 > *Outpost construction and production catalogs.*
 
-**Size**: `185` lines (`6852` bytes)
+**Size**: `218` lines (`8030` bytes)
 
 **Classes:**
 - `class OutpostType`
@@ -2736,7 +2765,8 @@
 - `def outpost_capacity_for(outpost)` - *Stored housing ceiling, falling back to the catalog for older saves.*
 - `def grow_outpost_population(outpost, num_ticks)` - *Logistic settlement growth toward the housing ceiling, never past it.*
 - `def build_outpost(outpost_type, system_id, body, current_tick, existing_count)`
-- `def outpost_tick_production(outpost, yield_multiplier)` - *Effective per-tick yield: catalog base, level growth, then modules and map multipliers.*
+- `def outpost_crew_multiplier(outpost, crew_by_id)` - *Stationed specialists add a base lift plus a bonus in their preferred role.*
+- `def outpost_tick_production(outpost, yield_multiplier, crew_multiplier)` - *Effective per-tick yield: catalog base, level growth, modules, crew and map multipliers.*
 - `def upgrade_outpost(outpost, cost_scale)`
 
 ---
@@ -2803,7 +2833,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1375` lines (`58701` bytes)
+**Size**: `1389` lines (`59352` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

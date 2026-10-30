@@ -1156,3 +1156,14 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   3. Extend `calculate_dynamic_market_quote` with `trade_pact`, improving buy prices 6% and sell prices 6%; route the local trade, bulk pricing, trade automation, quantum freight, depot sales and market snapshot through it.
   4. Expose PACT in the Empire faction row with an `ALLIED`/`PACT`/`WAR` status, and add the CLI action, status marker and market header.
 - **Consequences**: Standing 40 now unlocks a durable commercial relationship, war has an economic cost, and every player-facing trade path shares the same pact pricing. Live Edge formed a Sol Coalition pact and moved titanium from 208/164 to 195/173 buy/sell with no console errors. Suite: 852 tests (51 suites), 5/5 gates.
+
+### ADR-098: Outpost Crew Assignments
+- **Date**: 2026-10-30
+- **Status**: Accepted
+- **Context**: Outposts produced credits and research on their own, while crew only contributed ship bonuses. There was no way to invest a specialist in an installation, and the crew roster had no outpost role.
+- **Decision**:
+  1. Add a persisted `assigned_crew` tuple to `Outpost`, capped at three specialists per site and defaulting empty for legacy saves.
+  2. Each stationed specialist adds 8% + 2% per skill; a role preferred by the outpost type adds another 6%, capped at x1.60 output.
+  3. Exclude stationed crew from ship bonuses and away-team selection, refuse dismissal until recall, and expose assignment/recall through the engine, `/api/outpost/crew`, `outpost crew|recall`, and the Empire outpost row.
+  4. Show `CREW n/3 - BONUS xN`, assigned chips and a recall control; the crew roster marks `OUTPOST: <name>`.
+- **Consequences**: Crew allocation becomes a real choice between flagship bonuses and outpost output, and every production path (tick, cash flow, report) shares the same multiplier. Live Edge stationed Imani Vale at a shipyard for x1.20, then recalled her, with no console errors. Suite: 861 tests (52 suites), 5/5 gates.

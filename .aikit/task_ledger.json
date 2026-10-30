@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "trade-pacts",
+    "task_id": "outpost-crew",
     "last_phase": "4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793348072.3845332,
+    "updated_at": 1793357627.9670863,
     "owner": "opencode:mechanics",
     "started_by": "opencode:mechanics",
     "continuations": [],
-    "completed_at": 1793348077.4326708
+    "completed_at": 1793357636.6766706
   },
   "checkpoints": [
-    {
-      "task_id": "trade-automation",
-      "phase": "2",
-      "phase_num": 2,
-      "description": "[1/3] Plan docked trade automation: persist a buy-low/sell-high broker policy, execute on a safe cooldown, and wire API/CLI/cockpit with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793316639.2572703,
-      "timestamp_str": "2026-10-30 02:30:39",
-      "agent": "opencode:mechanics",
-      "impact_assessment": {
-        "why": "Trading requires repeated manual clicks; there is no way to leave a standing price policy running while handling navigation, combat or diplomacy.",
-        "benefits": "A docked captain can automate a local market strategy, realized results are visible, and trade progression continues between other actions.",
-        "risks": "contract: new state field must default for legacy saves and the broker must not trade in transit/combat/decision/void; dependency: reuses the normal trade path; concurrency: tick-time trade mutates state, stats, cargo and credits, so the automation record updates after the trade clone; state: cooldown and realized totals must persist.",
-        "mitigation": "Add engine, persistence, API, CLI and layout tests first; clamp quantity and thresholds; route through normal trade; verify a live Edge enable and multiple automated buys."
-      }
-    },
-    {
-      "task_id": "trade-automation",
-      "phase": "3",
-      "phase_num": 3,
-      "description": "[2/3] TradeAutomation model, docked broker with 3-tick cooldown, safe-action guards, realized-credit tracking, /api/trade/automation and autotrade CLI implemented with regressions.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793316712.6610315,
-      "timestamp_str": "2026-10-30 02:31:52",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "trade-automation",
-      "phase": "4",
-      "phase_num": 4,
-      "description": "[3/3] Commerce broker panel, README/COCKPIT and ADR-093 recorded; live Edge enabled a fuel-cell buy and executed three trades by tick 15. 826 tests and 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793316712.7889514,
-      "timestamp_str": "2026-10-30 02:31:52",
-      "agent": "opencode:mechanics"
-    },
-    {
-      "task_id": "trade-automation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'trade-automation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793316722.465937,
-      "timestamp_str": "2026-10-30 02:32:02",
-      "agent": "opencode:mechanics"
-    },
     {
       "task_id": "faction-alliances",
       "phase": "2",
@@ -255,6 +206,55 @@
       "status": "completed",
       "timestamp": 1793348077.4326725,
       "timestamp_str": "2026-10-30 11:14:37",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-crew",
+      "phase": "2",
+      "phase_num": 2,
+      "description": "[1/3] Plan outpost crew assignments: station up to three specialists per outpost for role-weighted output, exclude them from ship bonuses and away teams, and expose assign/recall in the Empire tab and CLI.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793357449.8425188,
+      "timestamp_str": "2026-10-30 13:50:49",
+      "agent": "opencode:mechanics",
+      "impact_assessment": {
+        "why": "Outposts produced on their own while crew only affected the flagship, so there was no way to invest a specialist in an installation.",
+        "benefits": "Crew allocation becomes a real choice between ship bonuses and outpost output, and the Empire tab gains a direct management control.",
+        "risks": "contract: assigned_crew must default empty for legacy saves and production must share one multiplier across tick, cash flow and reports; dependency: outposts.py now reads crew roles and engine guards away/dismiss paths; concurrency: assignment mutates the outpost roster and flight log under the engine lock; state: stationed crew must persist and be excluded from ship bonuses until recalled.",
+        "mitigation": "Add multiplier, assignment, persistence and API/CLI/UI regressions first; cap three crew and x1.60 output; verify the live Empire assign and recall controls."
+      }
+    },
+    {
+      "task_id": "outpost-crew",
+      "phase": "3",
+      "phase_num": 3,
+      "description": "[2/3] Persisted Outpost.assigned_crew, three-slot cap, role-weighted x1.60 output bonus, ship-bonus/away/dismiss guards, /api/outpost/crew, outpost crew|recall CLI, Empire assign/recall controls and crew OUTPOST badge implemented with regressions.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793357627.7882857,
+      "timestamp_str": "2026-10-30 13:53:47",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-crew",
+      "phase": "4",
+      "phase_num": 4,
+      "description": "[3/3] README, COCKPIT and ADR-098 recorded; live Edge stationed Imani Vale for x1.20 output and recalled her; 861 tests and 5/5 gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793357627.9670863,
+      "timestamp_str": "2026-10-30 13:53:47",
+      "agent": "opencode:mechanics"
+    },
+    {
+      "task_id": "outpost-crew",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'outpost-crew' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793357636.676672,
+      "timestamp_str": "2026-10-30 13:53:56",
       "agent": "opencode:mechanics"
     }
   ]
