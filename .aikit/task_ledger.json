@@ -1,0 +1,245 @@
+{
+  "version": 1,
+  "active_task": {
+    "task_id": "review-hardening",
+    "last_phase": "phase 4",
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1793296351.7598171,
+    "owner": "kilo:2",
+    "started_by": "kilo:2",
+    "continuations": []
+  },
+  "checkpoints": [
+    {
+      "task_id": "review-hardening",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan hardening from the read-only audit: flight locks, transit guards, jump crew retention, cadence lifecycle, batched decision compounding, bankrupt-peace news, AI-trade conservation, waypoint overflow, agent transport/coverage, duplicate click handles, galaxy traffic selection, target-card resets.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793296302.8556564,
+      "timestamp_str": "2026-10-29 20:51:42",
+      "agent": "kilo:2",
+      "impact_assessment": {
+        "why": "Happy-path tests missed impossible states and contract drift.",
+        "benefits": "No impossible saves, conserved economy, honest AI coverage, addressable clicks.",
+        "risks": "contract: engine/API/UI behaviour; dependency: stdlib; concurrency: engine lock; state: backward-compatible",
+        "mitigation": "Failing-first regressions in tests/test_review_fixes.py, real-browser click map and audit, full gates"
+      }
+    },
+    {
+      "task_id": "review-hardening",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'review-hardening' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793296303.5772812,
+      "timestamp_str": "2026-10-29 20:51:43",
+      "agent": "kilo:2"
+    },
+    {
+      "task_id": "review-hardening",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[3/3] Implemented 17 fixes with 14 regressions; suite 762 (43 suites); 5/5 gates; market click map 151/0 dup; galaxy capture clean; AI 40 successes/53 attempted/0 gaps. checklists: passed.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793296351.7598171,
+      "timestamp_str": "2026-10-29 20:52:31",
+      "agent": "kilo:2",
+      "handoff": {
+        "state": "verified",
+        "next": "commit and push",
+        "evidence": "strict gates pending commit"
+      }
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 38",
+      "phase_num": 3,
+      "description": "Reforge stage 38: window 114, 3 commit(s), 14 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793304173.826379,
+      "timestamp_str": "2026-10-29 23:02:53",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 39",
+      "phase_num": 3,
+      "description": "Reforge stage 39: window 117, 3 commit(s), 10 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793304309.1937232,
+      "timestamp_str": "2026-10-29 23:05:09",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 40",
+      "phase_num": 3,
+      "description": "Reforge stage 40: window 120, 3 commit(s), 12 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793304357.2913907,
+      "timestamp_str": "2026-10-29 23:05:57",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 41",
+      "phase_num": 3,
+      "description": "Reforge stage 41: window 123, 3 commit(s), 19 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793304440.2794845,
+      "timestamp_str": "2026-10-29 23:07:20",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 42",
+      "phase_num": 3,
+      "description": "Reforge stage 42: window 126, 3 commit(s), 1 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793306977.4322946,
+      "timestamp_str": "2026-10-29 23:49:37",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 43",
+      "phase_num": 3,
+      "description": "Reforge stage 43: window 129, 3 commit(s), 25 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793307026.1012568,
+      "timestamp_str": "2026-10-29 23:50:26",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 44",
+      "phase_num": 3,
+      "description": "Reforge stage 44: window 132, 3 commit(s), 20 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793307186.7150419,
+      "timestamp_str": "2026-10-29 23:53:06",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 45",
+      "phase_num": 3,
+      "description": "Reforge stage 45: window 135, 3 commit(s), 35 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793307415.672784,
+      "timestamp_str": "2026-10-29 23:56:55",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 46",
+      "phase_num": 3,
+      "description": "Reforge stage 46: window 138, 3 commit(s), 10 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793308835.8328943,
+      "timestamp_str": "2026-10-30 00:20:35",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 47",
+      "phase_num": 3,
+      "description": "Reforge stage 47: window 141, 3 commit(s), 8 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309006.9902875,
+      "timestamp_str": "2026-10-30 00:23:26",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 48",
+      "phase_num": 3,
+      "description": "Reforge stage 48: window 144, 3 commit(s), 9 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309063.754484,
+      "timestamp_str": "2026-10-30 00:24:23",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 49",
+      "phase_num": 3,
+      "description": "Reforge stage 49: window 147, 3 commit(s), 12 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309143.3019676,
+      "timestamp_str": "2026-10-30 00:25:43",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 50",
+      "phase_num": 3,
+      "description": "Reforge stage 50: window 150, 3 commit(s), 3 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309384.8223102,
+      "timestamp_str": "2026-10-30 00:29:44",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 51",
+      "phase_num": 3,
+      "description": "Reforge stage 51: window 153, 3 commit(s), 5 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309440.0230126,
+      "timestamp_str": "2026-10-30 00:30:40",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 52",
+      "phase_num": 3,
+      "description": "Reforge stage 52: window 156, 3 commit(s), 10 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309497.4670515,
+      "timestamp_str": "2026-10-30 00:31:37",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 53",
+      "phase_num": 3,
+      "description": "Reforge stage 53: window 159, 3 commit(s), 14 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309590.2835584,
+      "timestamp_str": "2026-10-30 00:33:10",
+      "agent": "opencode"
+    },
+    {
+      "task_id": "reforge:run-2",
+      "phase": "reforge stage 54",
+      "phase_num": 3,
+      "description": "Reforge stage 54: window 162, 3 commit(s), 17 file(s) reviewed (unreviewed), 0 finding(s), 0 repaired",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793309663.5034318,
+      "timestamp_str": "2026-10-30 00:34:23",
+      "agent": "opencode"
+    }
+  ]
+}

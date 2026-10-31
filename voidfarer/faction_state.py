@@ -1,0 +1,470 @@
+"""Dynamic faction leaders, behaviors, war resolution, and elimination."""
+
+from __future__ import annotations
+
+import math
+import random
+from dataclasses import replace
+from typing import Any, Sequence
+
+from voidfarer.demographics import compute_population_capacity, world_tech_level
+from voidfarer.factions import CANONICAL_FACTIONS, government_for
+from voidfarer.models import FactionLeader, StarSystem, WarState
+
+LEADER_ARCHETYPES: dict[str, dict[str, Any]] = {
+    "militarist": {"aggression": 0.85, "diplomacy": 0.25, "ambition": 0.75},
+    "merchant": {"aggression": 0.30, "diplomacy": 0.75, "ambition": 0.55},
+    "isolationist": {"aggression": 0.20, "diplomacy": 0.45, "ambition": 0.25},
+    "opportunist": {"aggression": 0.60, "diplomacy": 0.55, "ambition": 0.85},
+    "visionary": {"aggression": 0.35, "diplomacy": 0.70, "ambition": 0.65},
+}
+
+LEADER_NAMES: tuple[str, ...] = (
+    "Admiral Vance", "Director Sable", "Archon Ilsa", "Warlord Kaez", "Magister Orun",
+    "Consul Mira", "Captain Voss", "Prime HALCYON", "Prefect Dain", "Envoy Tessa",
+)
+
+LEADER_TITLES: tuple[str, ...] = (
+    "High Admiral", "Trade Director", "Archon", "Warlord", "Magister",
+    "First Consul", "Fleet Marshal", "Prime Intelligence", "Prefect", "Chief Envoy",
+)
+
+
+def generate_faction_leaders(seed: int) -> tuple[FactionLeader, ...]:
+    """Create one deterministic leader per canonical sovereign faction."""
+    rng = random.Random(int(seed) * 104_729 + 17)
+    archetypes = list(LEADER_ARCHETYPES)
+    leaders: list[FactionLeader] = []
+    for index, (faction_id, faction) in enumerate(CANONICAL_FACTIONS.items()):
+        archetype = archetypes[index % len(archetypes)]
+        profile = LEADER_ARCHETYPES[archetype]
+        leaders.append(FactionLeader(
+            id=f"leader_{faction_id}",
+            faction_id=faction_id,
+            name=LEADER_NAMES[index % len(LEADER_NAMES)],
+            title=LEADER_TITLES[index % len(LEADER_TITLES)],
+            behavior=archetype,
+            aggression=profile["aggression"],
+            diplomacy=profile["diplomacy"],
+            ambition=profile["ambition"],
+        ))
+    return tuple(leaders)
+
+
+def _faction_systems(faction_id: str, systems: dict[str, StarSystem]) -> list[str]:
+    target = CANONICAL_FACTIONS.get(faction_id)
+    name = target.name if target else faction_id
+    return [sid for sid, system in systems.items() if system.faction == name]
+
+
+def faction_strength(faction_id: str, systems: dict[str, StarSystem]) -> float:
+    owned = _faction_systems(faction_id, systems)
+    population = sum(
+        body.population
+        for sid in owned
+        for body in systems[sid].bodies
+    )
+    return len(owned) * 100.0 + population / 1_000_000.0
+
+
+# A side converts this much war score into one captured front system, then spends it.
+WAR_CAPTURE_THRESHOLD = 12.0
+# Wars end in a treaty after this many ticks, or once this many systems changed hands.
+WAR_EXHAUSTION_TICKS = 240
+WAR_MAX_CAPTURES = 3
+# Strength advantage moves the score by up to this much per resolution step.
+WAR_MOMENTUM = 3.0
+WAR_NOISE = 2.5
+# Every system beyond the core dilutes a faction's war effort (administrative overextension).
+WAR_CORE_SIZE = 3
+WAR_OVEREXTENSION = 0.35
+# Attrition pulls the score back toward a stalemate each step, so only a sustained edge
+# (steady state = momentum / attrition) reaches the capture threshold.
+WAR_ATTRITION = 0.05
+# A faction holding this share of the galaxy faces a containment coalition.
+WAR_HEGEMON_SHARE = 0.4
+WAR_CONTAINMENT_EDGE = 1.2
+# Realms below their core size fight a last stand: this edge per missing core system.
+WAR_LAST_STAND_EDGE = 0.6
+# After a treaty the same two factions keep the peace this long.
+WAR_TRUCE_TICKS = 600
+# Chance per tick that aggressive leaders consider a new war (capped per batch).
+WAR_DECLARATION_RATE = 0.025
+# Continuous front bombardment: every contested world bleeds people and gains
+# devastation while the war lasts, not only on the tick it is captured.
+WAR_FRONT_POP_LOSS = 0.0015
+WAR_FRONT_DEVASTATION = 0.22
+WAR_FRONT_CHANCE = 0.45
+
+
+def _faction_name(faction_id: str) -> str:
+    return CANONICAL_FACTIONS[faction_id].name if faction_id in CANONICAL_FACTIONS else faction_id
+
+
+def war_effort(faction_id: str, systems: dict[str, StarSystem]) -> float:
+    """Strength a faction can actually project at the front.
+
+    Territory dominates; population adds a logarithmic industrial base so a populous capital
+    helps without deciding wars alone. Large realms pay an overextension penalty.
+    """
+    owned = _faction_systems(faction_id, systems)
+    population_millions = sum(body.population for sid in owned for body in systems[sid].bodies) / 1_000_000.0
+    base = len(owned) * 100.0 + 60.0 * math.log10(1.0 + population_millions)
+    return base / (1.0 + WAR_OVEREXTENSION * max(0, len(owned) - WAR_CORE_SIZE))
+
+
+def war_momentum(attacker_id: str, defender_id: str, systems: dict[str, StarSystem]) -> float:
+    """Per-step score drift before noise: effort ratio, defender edge and hegemon containment."""
+    attack, defend = war_effort(attacker_id, systems), war_effort(defender_id, systems)
+    momentum = WAR_MOMENTUM * (attack - defend) / max(1.0, attack + defend)
+    total = max(1, len(systems))
+    attacker_owned = len(_faction_systems(attacker_id, systems))
+    defender_owned = len(_faction_systems(defender_id, systems))
+    if attacker_owned / total >= WAR_HEGEMON_SHARE:
+        momentum -= WAR_CONTAINMENT_EDGE
+    if defender_owned / total >= WAR_HEGEMON_SHARE:
+        momentum += WAR_CONTAINMENT_EDGE
+    momentum -= WAR_LAST_STAND_EDGE * max(0, WAR_CORE_SIZE - defender_owned)
+    return momentum
+
+
+def _capture_target(front: list[str], loser_id: str, loser_name: str, score: float,
+                    systems: dict[str, StarSystem], rng: random.Random) -> str | None:
+    """Front worlds fall first; a capital only falls to double the capture score."""
+    capital = CANONICAL_FACTIONS[loser_id].headquarters_system if loser_id in CANONICAL_FACTIONS else None
+    outer = [sid for sid in front if sid != capital]
+    if outer:
+        return rng.choice(outer)
+    if not front:
+        return None
+    if len(_faction_systems(loser_id, systems)) > 1:
+        return None
+    return front[0] if abs(score) >= 2 * WAR_CAPTURE_THRESHOLD else None
+
+
+def _devastate_system(
+    system: StarSystem,
+    rng: random.Random,
+    severity: float = 1.0,
+) -> tuple[StarSystem, int]:
+    """A captured front loses civilians and gains persistent devastation."""
+    bodies = []
+    lost_total = 0
+    for body in system.bodies:
+        if body.population <= 0:
+            bodies.append(body)
+            continue
+        loss_rate = rng.uniform(0.018, 0.052) * max(0.4, severity)
+        lost = max(1, int(body.population * loss_rate))
+        lost_total += lost
+        bodies.append(
+            replace(
+                body,
+                population=max(0, body.population - lost),
+                devastation=min(100.0, (body.devastation or 0.0) + rng.uniform(14.0, 28.0) * severity),
+            )
+        )
+    return replace(system, bodies=tuple(bodies)), lost_total
+
+
+def frontier_systems(winner_name: str, loser_name: str, systems: dict[str, StarSystem]) -> list[str]:
+    """Loser-held systems with a hyperlane into winner territory, sorted for determinism."""
+    return sorted(
+        sid for sid, system in systems.items()
+        if system.faction == loser_name
+        and any(systems[n].faction == winner_name for n in system.connections if n in systems)
+    )
+
+
+def apply_war_devastation(
+    wars: Sequence[WarState],
+    systems: dict[str, StarSystem],
+    rng: random.Random,
+    num_ticks: int = 1,
+) -> tuple[dict[str, StarSystem], list[str]]:
+    """Bombard both sides of every active front: civilians die and devastation accumulates."""
+    updated = dict(systems)
+    total_lost = 0
+    total_devastation = 0.0
+    ticks = max(1, int(num_ticks))
+    for war in wars:
+        if not war.active:
+            continue
+        attacker = _faction_name(war.attacker_id)
+        defender = _faction_name(war.defender_id)
+        fronts = sorted(set(
+            frontier_systems(attacker, defender, updated)
+            + frontier_systems(defender, attacker, updated)
+        ))
+        severity = 1.0 + min(1.5, abs(war.war_score) / max(1.0, WAR_CAPTURE_THRESHOLD))
+        # A batched tick represents many bombardments: convert the per-tick chance and
+        # loss into their compounded equivalents instead of multiplying one linear roll.
+        strike_chance = min(0.95, 1.0 - (1.0 - WAR_FRONT_CHANCE) ** ticks)
+        loss_fraction = 1.0 - (1.0 - WAR_FRONT_POP_LOSS * severity) ** ticks
+        for sid in fronts:
+            if rng.random() > strike_chance:
+                continue
+            system = updated[sid]
+            bodies = []
+            for body in system.bodies:
+                if body.population <= 0:
+                    if body.landable and body.devastation < 100.0:
+                        bodies.append(replace(
+                            body,
+                            devastation=min(100.0, body.devastation + WAR_FRONT_DEVASTATION * 0.35 * severity * ticks),
+                        ))
+                    else:
+                        bodies.append(body)
+                    continue
+                loss = max(1, int(body.population * loss_fraction))
+                gain = WAR_FRONT_DEVASTATION * severity * ticks
+                total_lost += loss
+                total_devastation += gain
+                bodies.append(replace(
+                    body,
+                    population=max(0, body.population - loss),
+                    devastation=min(100.0, (body.devastation or 0.0) + gain),
+                ))
+            updated[sid] = replace(system, bodies=tuple(bodies))
+
+    logs: list[str] = []
+    if total_lost > 0 and total_devastation >= 2.5:
+        logs.append(
+            f"WAR ATTRITION: {total_lost:,} civilians lost and {total_devastation:.1f}% "
+            f"devastation added across active fronts."
+        )
+    return updated, logs
+
+
+def _end_war(war: WarState, score: float, current_tick: int, logs: list[str]) -> WarState:
+    attacker, defender = _faction_name(war.attacker_id), _faction_name(war.defender_id)
+    if not war.captured_systems:
+        outcome = "status quo restored"
+    else:
+        outcome = f"{len(war.captured_systems)} system(s) changed hands"
+    logs.append(f"PEACE: {attacker} and {defender} sign a treaty; {outcome}.")
+    return replace(war, war_score=round(score, 2), active=False, ended_tick=current_tick)
+
+
+def force_peace_for_broke_factions(
+    wars: Sequence[WarState],
+    economies: Sequence[Any],
+    current_tick: int,
+) -> tuple[tuple[WarState, ...], list[str]]:
+    """A faction that cannot pay its upkeep sues for peace instead of fighting on."""
+    broke = {
+        economy.faction_id
+        for economy in economies
+        if economy.treasury <= 0 and economy.net_income < 0
+    }
+    if not broke:
+        return tuple(wars), []
+    logs: list[str] = []
+    updated: list[WarState] = []
+    for war in wars:
+        if war.active and (war.attacker_id in broke or war.defender_id in broke):
+            broke_id = war.attacker_id if war.attacker_id in broke else war.defender_id
+            faction = CANONICAL_FACTIONS.get(broke_id)
+            attacker, defender = _faction_name(war.attacker_id), _faction_name(war.defender_id)
+            logs.append(
+                f"BANKRUPT PEACE: {faction.name if faction else broke_id} cannot pay its fleets, "
+                f"and {attacker} and {defender} sign a treaty."
+            )
+            updated.append(
+                replace(war, war_score=round(war.war_score, 2), active=False, ended_tick=current_tick)
+            )
+            continue
+        updated.append(war)
+    return tuple(updated), logs
+
+
+def _apply_owner_technology(system: StarSystem, owner_name: str) -> StarSystem:
+    """A conquered world adopts its new owner's flag, government, tech and capacity."""
+    bodies = []
+    for body in system.bodies:
+        if body.body_type in ("star", "black_hole", "wormhole"):
+            bodies.append(body)
+            continue
+        tech = world_tech_level(owner_name, body.body_type, body.market_archetype)
+        capacity = compute_population_capacity(
+            body.body_type, body.radius_km, body.habitability, tech
+        )
+        inhabited = body.population > 0 or body.station_dockable
+        bodies.append(
+            replace(
+                body,
+                # Inhabited sites fly the winner's flag; empty rocks are unclaimed here,
+                # exactly as generation leaves them in an owned system.
+                faction=owner_name if inhabited else "Unclaimed",
+                government=(
+                    government_for(owner_name, body.body_type)
+                    if inhabited
+                    else "None"
+                ),
+                tech_level=tech,
+                population_capacity=capacity,
+                population=min(body.population, capacity) if capacity > 0 else 0,
+            )
+        )
+    return replace(system, bodies=tuple(bodies))
+
+
+def resolve_wars(
+    wars: Sequence[WarState],
+    systems: dict[str, StarSystem],
+    rng: random.Random,
+    current_tick: int,
+    eliminated: tuple[str, ...],
+    num_ticks: int = 1,
+) -> tuple[tuple[WarState, ...], dict[str, StarSystem], tuple[str, ...], list[str]]:
+    """Advance wars toward resolution: strength drives momentum, captures follow fronts.
+
+    Positive score favours the attacker. Reaching the threshold captures one front system
+    and spends the threshold; with no shared border the advance stalls at half. Wars end in
+    a treaty after WAR_EXHAUSTION_TICKS or WAR_MAX_CAPTURES captures, or when a side is gone.
+    A batched tick resolves the same number of steps as the ticks it stands for, so a
+    fast-forward is not a single strategic turn.
+    """
+    logs: list[str] = []
+    updated_wars: list[WarState] = []
+    updated_systems = dict(systems)
+    removed = set(eliminated)
+    steps = max(1, min(int(num_ticks), WAR_EXHAUSTION_TICKS))
+    first_tick = current_tick - steps + 1
+    for war in wars:
+        if not war.active:
+            updated_wars.append(war)
+            continue
+        # A war declared during this batch has not been fighting since the batch started.
+        war_first_tick = max(first_tick, war.started_tick)
+        war_steps = max(1, min(steps, current_tick - war_first_tick + 1))
+        for offset in range(war_steps):
+            step_tick = war_first_tick + offset
+            attacker_name, defender_name = _faction_name(war.attacker_id), _faction_name(war.defender_id)
+            momentum = war_momentum(war.attacker_id, war.defender_id, updated_systems)
+            score = war.war_score * (1.0 - WAR_ATTRITION) + momentum + rng.uniform(-WAR_NOISE, WAR_NOISE)
+            captured = war.captured_systems
+            if abs(score) >= WAR_CAPTURE_THRESHOLD:
+                sign = 1.0 if score > 0 else -1.0
+                winner_name, loser_name = (attacker_name, defender_name) if sign > 0 else (defender_name, attacker_name)
+                loser_id = war.defender_id if sign > 0 else war.attacker_id
+                front = frontier_systems(winner_name, loser_name, updated_systems)
+                target = _capture_target(front, loser_id, loser_name, score, updated_systems, rng)
+                if target is not None:
+                    updated_systems[target] = replace(updated_systems[target], faction=winner_name)
+                    severity = 2.0 if abs(score) >= 2 * WAR_CAPTURE_THRESHOLD else 1.0
+                    updated_systems[target], civilians_lost = _devastate_system(
+                        updated_systems[target], rng, severity
+                    )
+                    updated_systems[target] = _apply_owner_technology(
+                        updated_systems[target], winner_name
+                    )
+                    captured = captured + (target,)
+                    score -= sign * WAR_CAPTURE_THRESHOLD
+                    logs.append(
+                        f"WAR: {winner_name} captured {updated_systems[target].name} from {loser_name}; "
+                        f"{civilians_lost:,} civilians displaced and the world left devastated."
+                    )
+                elif not front:
+                    # No shared border: the offensive stalls until a front opens.
+                    score = sign * WAR_CAPTURE_THRESHOLD / 2
+                else:
+                    # Only a defended capital faces the attacker: the siege holds below double score.
+                    score = sign * min(abs(score), 2 * WAR_CAPTURE_THRESHOLD - 0.01)
+            war = replace(war, war_score=round(score, 2), captured_systems=captured)
+
+            gone = next(
+                (fid for fid in (war.attacker_id, war.defender_id)
+                 if not _faction_systems(fid, updated_systems)),
+                None,
+            )
+            if gone is not None:
+                if gone not in removed:
+                    removed.add(gone)
+                    logs.append(
+                        f"FACTION ELIMINATED: {_faction_name(gone)} has no remaining territory."
+                    )
+                war = replace(war, active=False, ended_tick=step_tick)
+                break
+            if len(captured) >= WAR_MAX_CAPTURES or step_tick - war.started_tick >= WAR_EXHAUSTION_TICKS:
+                war = _end_war(war, war.war_score, step_tick, logs)
+                break
+
+        updated_wars.append(war)
+    return tuple(updated_wars), updated_systems, tuple(sorted(removed)), logs
+
+
+def simulate_faction_behaviors(
+    leaders: Sequence[FactionLeader],
+    wars: Sequence[WarState],
+    systems: dict[str, StarSystem],
+    rng: random.Random,
+    current_tick: int,
+    eliminated: tuple[str, ...],
+    num_ticks: int = 1,
+    broke_factions: frozenset[str] = frozenset(),
+) -> tuple[tuple[WarState, ...], dict[str, StarSystem], tuple[str, ...], list[str]]:
+    """Apply leader archetypes: declare wars, then resolve active fronts."""
+    logs: list[str] = []
+    # Active wars and recent treaties both block a new declaration between the same pair.
+    active_pairs = {
+        frozenset((w.attacker_id, w.defender_id)) for w in wars
+        if w.active or (w.ended_tick is not None and current_tick - w.ended_tick < WAR_TRUCE_TICKS)
+    }
+    new_wars = list(wars)
+    living = [
+        fid for fid in CANONICAL_FACTIONS
+        if fid not in eliminated and _faction_systems(fid, systems)
+    ]
+    if len(living) >= 2:
+        # One roll covers the whole batch, so compound the per-tick chance; a single
+        # linear roll would make tick(2000) as peaceful as tick(1).
+        ticks = max(1, int(num_ticks))
+        declaration_chance = 1.0 - (1.0 - WAR_DECLARATION_RATE) ** ticks
+    else:
+        declaration_chance = 0.0
+    if declaration_chance > 0.0 and rng.random() < declaration_chance:
+        for leader in leaders:
+            if leader.faction_id not in living or leader.aggression < 0.55:
+                continue
+            # An empty treasury cannot fund an offensive, so a broke fleet stays home.
+            if leader.faction_id in broke_factions:
+                continue
+            # No dogpiling: a faction already defending one war cannot be attacked again.
+            defending = {w.defender_id for w in new_wars if w.active}
+            targets = [
+                fid for fid in living
+                if fid != leader.faction_id and fid not in defending
+                and frozenset((leader.faction_id, fid)) not in active_pairs
+            ]
+            if not targets:
+                continue
+            weakest = min(targets, key=lambda fid: faction_strength(fid, systems))
+            pair = frozenset((leader.faction_id, weakest))
+            if rng.random() > leader.aggression * 0.45:
+                continue
+            war = WarState(
+                id=f"war_{current_tick}_{leader.faction_id}_{weakest}",
+                attacker_id=leader.faction_id,
+                defender_id=weakest,
+                started_tick=current_tick,
+            )
+            new_wars.append(war)
+            active_pairs.add(pair)
+            attacker_name = CANONICAL_FACTIONS[leader.faction_id].name
+            defender_name = CANONICAL_FACTIONS[weakest].name if weakest in CANONICAL_FACTIONS else weakest
+            logs.append(f"WAR DECLARED: {attacker_name} ({leader.name}) moves against {defender_name}.")
+            break
+
+    systems, attrition_logs = apply_war_devastation(new_wars, systems, rng, num_ticks)
+    logs.extend(attrition_logs)
+
+    resolved_wars, systems, eliminated_now, war_logs = resolve_wars(
+        new_wars, systems, rng, current_tick, eliminated, num_ticks
+    )
+    logs.extend(war_logs)
+    return resolved_wars, systems, eliminated_now, logs
+
+
+def leader_for(leaders: Sequence[FactionLeader], faction_id: str) -> FactionLeader | None:
+    return next((l for l in leaders if l.faction_id == faction_id), None)

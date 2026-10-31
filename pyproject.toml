@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voidfarer"
+version = "0.2.0"
+description = "A deep-space fleet, procedural galaxy, and holographic cockpit simulation engine"
+readme = "README.md"
+license = "LicenseRef-AGL-1.1"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "AI Assistant" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Games/Entertainment :: Simulation",
+]
+
+[project.scripts]
+voidfarer = "voidfarer.cli:main"
+
+[project.optional-dependencies]
+dev = ["playwright>=1.40"]

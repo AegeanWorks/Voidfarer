@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "surfaces": {
+    "cockpit": {
+      "paths": [
+        "voidfarer/static/**",
+        "voidfarer/server.py"
+      ]
+    }
+  },
+  "protected": [
+    "tests/**",
+    "tools/**",
+    ".aikit/**",
+    "docs/**",
+    "README.md",
+    "play.bat",
+    "voidfarer.bat",
+    "pyproject.toml",
+    "voidfarer/engine.py",
+    "voidfarer/models.py",
+    "voidfarer/cli.py",
+    "voidfarer/storage.py"
+  ],
+  "commands": {
+    "fast": "python -m unittest discover",
+    "snapshot": "python tools/ui_inventory.py"
+  },
+  "style": {
+    "theme_paths": [
+      "voidfarer/static/style.css",
+      "voidfarer/static/app.js",
+      "voidfarer/static/cursor-default.svg",
+      "voidfarer/static/cursor-pointer.svg",
+      "voidfarer/static/cursor-crosshair.svg"
+    ]
+  },
+  "limits": {
+    "max_files": 12,
+    "max_lines": 300
+  }
+}

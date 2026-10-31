@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "name": "voidfarer",
+  "test_command": null,
+  "gates": {},
+  "ui_required": true,
+  "created": "2026-10-18",
+  "has_ui": true,
+  "ui_kind": "web",
+  "ui_evidence": [
+    "voidfarer/static/index.html"
+  ],
+  "ui_checked_at": "2026-10-29",
+  "ui_source": "detected",
+  "topics": [
+    "aikit",
+    "aikit-integrated",
+    "source-available",
+    "aegean-game-license",
+    "drm-free",
+    "commercial-license",
+    "fleet-management",
+    "game",
+    "html5-canvas",
+    "local-first",
+    "procedural-generation",
+    "python",
+    "sci-fi",
+    "simulation",
+    "space-game",
+    "space-simulation",
+    "terminal-game",
+    "zero-dependency",
+    "aegeanworks",
+    "sci-fi-game"
+  ],
+  "topics_source": "ai:kilo:2026-10-27",
+  "topics_reviewed_at": "2026-10-28",
+  "topics_choice": [
+    "aegeanworks",
+    "software",
+    "web-app",
+    "user-interface",
+    "sci-fi-game"
+  ],
+  "license_topics": [
+    "source-available",
+    "aegean-game-license",
+    "drm-free",
+    "commercial-license"
+  ],
+  "mechanics_required": true,
+  "mechanics": {
+    "core": [
+      "voidfarer/engine.py",
+      "voidfarer/agent_api.py",
+      "voidfarer/agent_play.py",
+      "voidfarer/server.py",
+      "tools/ai_play.py"
+    ],
+    "test": "python tools/ai_play.py --steps 180"
+  }
+}
