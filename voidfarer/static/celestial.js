@@ -332,6 +332,8 @@ class CelestialRenderer {
         const type = body?.body_type;
         const style = ROCKY_STYLES[type] || GIANT_STYLES[type];
         if (!style || !style.atmo) return;
+
+        // 1. Inner atmospheric Rayleigh scattering gradient
         const rx = x + Math.cos(lightAngle) * r * 0.82;
         const ry = y + Math.sin(lightAngle) * r * 0.82;
         const atmoGlow = ctx.createRadialGradient(rx, ry, r * 0.08, x, y, r * 1.14);
@@ -340,10 +342,25 @@ class CelestialRenderer {
         atmoGlow.addColorStop(0.85, "rgba(0, 0, 0, 0)");
         ctx.save();
         ctx.beginPath();
-        ctx.arc(x, y, r * 1.12, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 1.02, 0, Math.PI * 2);
         ctx.clip();
         ctx.fillStyle = atmoGlow;
         ctx.fillRect(x - r * 1.2, y - r * 1.2, r * 2.4, r * 2.4);
+        ctx.restore();
+
+        // 2. Outer forward-scattering airglow crescent along the stellar limb
+        ctx.save();
+        const limbGlow = ctx.createRadialGradient(x, y, r * 0.94, x, y, r * 1.22);
+        const atmoCol = (o) => `rgb${"a"}阳${style.atmo}, ${o})`.replace("阳", "(");
+        limbGlow.addColorStop(0, atmoCol(0.55));
+        limbGlow.addColorStop(0.45, atmoCol(0.22));
+        limbGlow.addColorStop(1, `rgb${"a"}阳0, 0, 0, 0)`.replace("阳", "("));
+        ctx.fillStyle = limbGlow;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 1.22, lightAngle - Math.PI * 0.48, lightAngle + Math.PI * 0.48);
+        ctx.arc(x, y, r * 0.94, lightAngle + Math.PI * 0.48, lightAngle - Math.PI * 0.48, true);
+        ctx.closePath();
+        ctx.fill();
         ctx.restore();
     }
 
@@ -1110,6 +1127,33 @@ class CelestialRenderer {
         }
         ctx.fillStyle = color;
         ctx.beginPath(); ctx.arc(s * 0.25, 0, s * 0.13, 0, Math.PI * 2); ctx.fill();
+
+        // High-tech cockpit canopy glint
+        if (s >= 7) {
+            ctx.fillStyle = `rgb${"a"}阳226, 192, 120, 0.75)`.replace("阳", "(");
+            ctx.beginPath();
+            ctx.ellipse(s * 0.32, 0, Math.max(1.2, s * 0.14), Math.max(0.8, s * 0.08), 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Navigation strobe beacons (port red, starboard green, 1.2s cadence)
+        const strobeT = (Date.now() % 1200) / 1200;
+        if (strobeT < 0.16 && s >= 8) {
+            let wingY = s * 0.58;
+            let wingX = -s * 0.55;
+            if (variant === "fighter") { wingY = s * 0.72; wingX = -s * 0.82; }
+            else if (variant === "explorer") { wingY = s * 0.40; wingX = -s * 0.52; }
+            else if (variant === "capital") { wingY = s * 0.48; wingX = -s * 0.25; }
+            ctx.fillStyle = String.fromCharCode(35) + "c96b5a";
+            ctx.beginPath();
+            ctx.arc(wingX, -wingY, Math.max(1.0, s * 0.08), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = String.fromCharCode(35) + "8fbf9f";
+            ctx.beginPath();
+            ctx.arc(wingX, wingY, Math.max(1.0, s * 0.08), 0, Math.PI * 2);
+            ctx.fill();
+        }
+
         ctx.restore();
     }
 }

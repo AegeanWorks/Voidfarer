@@ -7076,6 +7076,13 @@ input[type="text"], input[type="number"], select, textarea { min-height: 30px; b
 .log-line .log-tag.tag-nav { color: var(--console-gold); border-color: rgba(201, 163, 90, 0.4); background: rgba(201, 163, 90, 0.08); }
 .log-line .log-tag.tag-war { color: var(--console-red); border-color: rgba(201, 107, 90, 0.4); background: rgba(201, 107, 90, 0.08); }
 .log-line .log-tag.tag-reward { color: var(--console-green); border-color: rgba(143, 191, 159, 0.4); background: rgba(143, 191, 159, 0.08); }
+.log-line .log-tag.tag-combat { color: var(--console-red); border-color: rgba(201, 107, 90, 0.5); background: rgba(201, 107, 90, 0.12); }
+.log-line .log-tag.tag-market { color: var(--console-gold-bright); border-color: rgba(226, 192, 120, 0.4); background: rgba(226, 192, 120, 0.08); }
+.log-line .log-tag.tag-transit { color: var(--console-cyan); border-color: rgba(127, 183, 201, 0.5); background: rgba(127, 183, 201, 0.1); }
+.log-line .log-tag.tag-hazard { color: var(--console-gold); border-color: rgba(201, 163, 90, 0.5); background: rgba(201, 163, 90, 0.12); }
+.log-line .log-tag.tag-outpost { color: var(--console-purple); border-color: rgba(169, 139, 189, 0.4); background: rgba(169, 139, 189, 0.08); }
+.log-line .log-tag.tag-data { color: var(--console-cyan); border-color: rgba(127, 183, 201, 0.4); background: rgba(127, 183, 201, 0.08); }
+.log-line .log-tag.tag-warn { color: var(--console-red); border-color: rgba(201, 107, 90, 0.4); background: rgba(201, 107, 90, 0.08); }
 .power-action-row { gap: 4px; }
 .power-action-row .btn-hud { min-height: 28px; padding: 4px 6px; font-size: 12px; }
 .skills-quick-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }

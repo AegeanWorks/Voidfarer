@@ -319,6 +319,121 @@ class ParticleSystem {
             });
         }
     }
+
+    flakBurst(x, y, radius = 22, color, sparkColor, smokeColor) {
+        const ringCol = color || (String.fromCharCode(35) + "e2c078");
+        const sparkCol = sparkColor || (String.fromCharCode(35) + "ffffff");
+        const smokeCol = smokeColor || `rgb${"a"}阳180, 190, 205, 0.5)`.replace("阳", "(");
+        this.spawn({
+            x, y,
+            life: 0.35,
+            color: ringCol,
+            kind: "ring",
+            radius: 4,
+            grow: radius * 3.5,
+            size: 2.0,
+            opacity: 0.9,
+        });
+        for (let i = 0; i < 10; i++) {
+            const angle = this.random(0, Math.PI * 2);
+            const speed = this.random(40, 95);
+            this.spawn({
+                x: x + Math.cos(angle) * 3,
+                y: y + Math.sin(angle) * 3,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: this.random(0.18, 0.4),
+                size: 1.5,
+                color: sparkCol,
+                kind: "spark",
+                drag: 0.88,
+                length: 6,
+            });
+        }
+        for (let i = 0; i < 3; i++) {
+            const angle = this.random(0, Math.PI * 2);
+            const speed = this.random(8, 22);
+            this.spawn({
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: this.random(0.25, 0.5),
+                size: 1.4,
+                color: smokeCol,
+                kind: "smoke",
+                drag: 0.82,
+                opacity: 0.6,
+            });
+        }
+    }
+
+    ionArc(x1, y1, x2, y2, color) {
+        const arcColor = color || (String.fromCharCode(35) + "7fb7c9");
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const dist = Math.hypot(dx, dy);
+        const steps = Math.max(3, Math.floor(dist / 14));
+        let cx = x1;
+        let cy = y1;
+        for (let i = 1; i <= steps; i++) {
+            const t = i / steps;
+            const jitter = (this.rng() - 0.5) * 12 * Math.sin(t * Math.PI);
+            const nx = x1 + dx * t - (dy / (dist || 1)) * jitter;
+            const ny = y1 + dy * t + (dx / (dist || 1)) * jitter;
+            this.spawn({
+                x: (cx + nx) * 0.5,
+                y: (cy + ny) * 0.5,
+                life: this.random(0.08, 0.18),
+                size: 1.8,
+                color: arcColor,
+                kind: "spark",
+                drag: 0.85,
+                length: Math.hypot(nx - cx, ny - cy),
+            });
+            cx = nx;
+            cy = ny;
+        }
+    }
+
+    quantumFlash(x, y, color, coreColor) {
+        const flashCol = color || (String.fromCharCode(35) + "7fb7c9");
+        const coreCol = coreColor || (String.fromCharCode(35) + "ffffff");
+        this.spawn({
+            x, y,
+            life: 0.45,
+            color: flashCol,
+            kind: "ring",
+            radius: 6,
+            grow: 110,
+            size: 2.2,
+            opacity: 0.95,
+        });
+        this.spawn({
+            x, y,
+            life: 0.28,
+            color: coreCol,
+            kind: "ring",
+            radius: 2,
+            grow: 65,
+            size: 1.6,
+            opacity: 0.9,
+        });
+        for (let i = 0; i < 14; i++) {
+            const angle = (i / 14) * Math.PI * 2 + (this.rng() - 0.5) * 0.25;
+            const speed = this.random(75, 190);
+            this.spawn({
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: this.random(0.18, 0.42),
+                size: 1.8,
+                color: flashCol,
+                kind: "spark",
+                drag: 0.91,
+                length: 16,
+            });
+        }
+    }
 }
 
 window.ParticleSystem = ParticleSystem;

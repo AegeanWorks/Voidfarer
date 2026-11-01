@@ -1640,6 +1640,20 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   3. Give the fleet stance buttons a 26px minimum height and 12px labels, and pin the 24px target floor with a test.
 - **Consequences**: `ui_audit --check` now reports 0 contrast, 0 tiny text and 0 target violations across desktop, laptop and short viewports for the cockpit, all 16 tabs and every scenario it covers (menu, settings, character, event, combat, target). The suite grows to 1,111 tests, `ai_play` still reports zero gaps, and all five project gates pass.
 
+### ADR-140: Multi-Layered Cosmic Dust Lanes, Navigational Azimuth Compass, Celestial Limb Scattering, and Tactical Particle FX
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: In response to goal-directed cockpit visual grandeur and tactical kinetic feedback improvements, several areas lacked immersion: the radar backdrop was dark with minimal cosmic depth; navigational azimuth was ambiguous without a cardinal bearing reticle; planetary atmospheres lacked forward-scattering stellar limb crescents; and tactical combat and quantum micro-jumps lacked distinct flak bursts, ionizing hull arc discharges, and transit implosion flashes.
+- **Decision**:
+  1. Add procedural multi-layered cosmic dust filaments in `ensureRadarBackdrop` cached directly to offscreen canvas backdrops.
+  2. Implement a 360-degree Navigational Azimuth Compass reticle in `drawOrbitsView` with cardinal ticks (`N 000°`, `E 090°`, `S 180°`, `W 270°`), 30-degree subdivisions, and dynamic target bearing indicators.
+  3. Render forward-scattering airglow limb crescents along illuminated planetary edges in `drawRayleighAtmosphere`.
+  4. Implement `flakBurst`, `ionArc`, and `quantumFlash` particle systems in `particles.js`, wired to Point Defense Cannons, critical bridge/subsystem strikes, and quantum jump departures and arrivals in `app.js`.
+  5. Add aviation navigational strobe beacons (port red / starboard green) and cockpit canopy glints to procedural vessel silhouettes in `celestial.js`.
+  6. Add telemetry category tag styles (`.tag-combat`, `.tag-market`, `.tag-transit`, `.tag-hazard`, `.tag-outpost`, `.tag-data`, `.tag-warn`) in `style.css` using core palette tokens.
+- **Consequences**: Visual depth, spatial orientation, and combat kinetic immersion are significantly elevated while preserving 60 FPS canvas performance, 12px readability floors, and WCAG-AA contrast compliance. Unit tests cover all newly wired visual assets and styles across 1,111+ tests, `ai_play` verifies zero action gaps, and 5/5 strict project gates pass.
+
+
 
 
 

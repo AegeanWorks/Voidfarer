@@ -4662,11 +4662,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const at = this.lastShipPosition || this.mapCenter();
                 const color = action === "target_bridge" ? "#c96b5a" : (action === "target_engines" ? "#e2c078" : (action === "fire_lasers" ? "#ffd166" : "#7fb7c9"));
                 const count = action === "target_bridge" ? 28 : (action === "fire_lasers" ? 20 : 12);
-                this.particles?.burst(at.x, at.y, count, color, 190);
-                this.particles?.ring(at.x, at.y, color, 75, 0.55);
+                if (action === "point_defense") {
+                    this.particles?.flakBurst?.(at.x, at.y, 28, "#e2c078");
+                } else {
+                    this.particles?.burst?.(at.x, at.y, count, color, 190);
+                    this.particles?.ring?.(at.x, at.y, color, 75, 0.55);
+                }
+                if (action === "target_bridge" || currentCombo >= 2) {
+                    this.particles?.ionArc?.(at.x - 24, at.y - 12, at.x + 24, at.y + 12, "#7fb7c9");
+                }
                 this.combatBeamUntil = performance.now() + 180;
                 this.combatFlash = {
-                    target: (action === "shield_absorb" || action === "evasive_burn" || action === "flee")
+                    action: action,
+                    target: (action === "shield_absorb" || action === "evasive_burn" || action === "flee" || action === "point_defense")
                         ? "player" : "enemy",
                     color: action === "flee" ? "#a98bbd" : color,
                     fired: false,
@@ -5898,6 +5906,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         dust.addColorStop(1, "rgba(0, 0, 0, 0)");
         ctx.fillStyle = dust;
         ctx.fillRect(0, 0, w, h);
+        const dustFilament = ctx.createRadialGradient(w * 0.35, h * 0.45, 0, w * 0.35, h * 0.45, Math.max(w, h) * 0.55);
+        dustFilament.addColorStop(0, "rgba(169, 139, 189, 0.04)");
+        dustFilament.addColorStop(0.5, "rgba(127, 183, 201, 0.025)");
+        dustFilament.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = dustFilament;
+        ctx.fillRect(0, 0, w, h);
         ctx.save();
         ctx.translate(w * 0.72, h * 0.3);
         ctx.rotate(-0.35);
@@ -6118,10 +6132,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.combatFlash && !this.combatFlash.fired) {
             this.combatFlash.fired = true;
             const target = this.combatFlash.target === "player" ? player : enemy;
-            this.combatFx?.burst(target.x, target.y, 18, this.combatFlash.color || "#ffd166", 190);
-            this.combatFx?.ring(target.x, target.y, this.combatFlash.color || "#ffd166", 42, 0.5);
+            if (this.combatFlash.action === "point_defense") {
+                this.combatFx?.flakBurst?.(player.x + 18, player.y - 6, 26, "#e2c078");
+                this.combatFx?.flakBurst?.(player.x + 22, player.y + 8, 22, "#ffffff");
+            } else if (this.combatFlash.action === "drone_strike") {
+                this.combatFx?.flakBurst?.(enemy.x, enemy.y, 24, "#ffd166");
+            } else {
+                this.combatFx?.burst?.(target.x, target.y, 18, this.combatFlash.color || "#ffd166", 190);
+                this.combatFx?.ring?.(target.x, target.y, this.combatFlash.color || "#ffd166", 42, 0.5);
+            }
+            if (this.combatFlash.action === "target_bridge" || this.combatFlash.action === "target_weapons") {
+                this.combatFx?.ionArc?.(player.x + 12, player.y, enemy.x - 8, enemy.y, "#7fb7c9");
+            }
             if (target === enemy && Number(this.state.active_combat?.enemy_shield || 0) > 0) {
-                this.combatFx?.hexShieldImpact(target.x - 4, target.y, cssH * 0.28, "rgba(111, 195, 215, 0.85)");
+                this.combatFx?.hexShieldImpact?.(target.x - 4, target.y, cssH * 0.28, "rgba(111, 195, 215, 0.85)");
             }
         }
         this.combatFx?.update();
@@ -6178,6 +6202,61 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
             for (let y = 0; y < this.viewH; y += 60) {
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(this.viewW, y); ctx.stroke();
+            }
+
+            // Navigational Azimuth Compass Reticle
+            const compassR = Math.min(this.viewW, this.viewH) * 0.46;
+            if (compassR > 120) {
+                ctx.save();
+                ctx.strokeStyle = "rgba(127, 183, 201, 0.12)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(cx, cy, compassR, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
+                ctx.fillStyle = "rgba(127, 183, 201, 0.38)";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                const cardinals = [
+                    { label: "N 000°", angle: -Math.PI / 2 },
+                    { label: "E 090°", angle: 0 },
+                    { label: "S 180°", angle: Math.PI / 2 },
+                    { label: "W 270°", angle: Math.PI }
+                ];
+                for (const c of cardinals) {
+                    const lx = cx + Math.cos(c.angle) * (compassR + 14);
+                    const ly = cy + Math.sin(c.angle) * (compassR + 14);
+                    ctx.fillText(c.label, lx, ly);
+                    ctx.beginPath();
+                    ctx.moveTo(cx + Math.cos(c.angle) * (compassR - 6), cy + Math.sin(c.angle) * (compassR - 6));
+                    ctx.lineTo(cx + Math.cos(c.angle) * (compassR + 6), cy + Math.sin(c.angle) * (compassR + 6));
+                    ctx.stroke();
+                }
+                for (let deg = 0; deg < 360; deg += 30) {
+                    if (deg % 90 === 0) continue;
+                    const rad = (deg * Math.PI) / 180 - Math.PI / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(cx + Math.cos(rad) * (compassR - 3), cy + Math.sin(rad) * (compassR - 3));
+                    ctx.lineTo(cx + Math.cos(rad) * (compassR + 3), cy + Math.sin(rad) * (compassR + 3));
+                    ctx.stroke();
+                }
+                if (this.selectedTarget) {
+                    const tX = this.selectedType === "point"
+                        ? (cx + Math.cos(this.selectedTarget.angle) * (this.selectedTarget.au * auScale))
+                        : (cx + Math.cos(this.selectedTarget.current_angle || 0) * (this.selectedTarget.orbit_radius * auScale));
+                    const tY = this.selectedType === "point"
+                        ? (cy + Math.sin(this.selectedTarget.angle) * (this.selectedTarget.au * auScale))
+                        : (cy + Math.sin(this.selectedTarget.current_angle || 0) * (this.selectedTarget.orbit_radius * auScale));
+                    const tAngle = Math.atan2(tY - cy, tX - cx);
+                    const hX = cx + Math.cos(tAngle) * compassR;
+                    const hY = cy + Math.sin(tAngle) * compassR;
+                    ctx.fillStyle = "#c9a35a";
+                    ctx.beginPath();
+                    ctx.arc(hX, hY, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
             }
         }
 
@@ -8129,6 +8208,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             completionStart: null,
             duration: activeTravel ? (totalTicks * 1000) / (speed * TICKS_PER_SECOND) : 1300,
         };
+        if (activeTravel?.mode === "quantum" && this.lastShipPosition) {
+            this.particles?.quantumFlash?.(this.lastShipPosition.x, this.lastShipPosition.y, "#7fb7c9");
+        }
     }
 
     drawPointSelection(ctx, cx, cy, auScale, ship) {
@@ -8293,6 +8375,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         ctx.restore();
 
         if (!activeTravel && progress >= 1) {
+            if (anim.mode === "quantum") {
+                this.particles?.quantumFlash?.(tx, ty, "#7fb7c9");
+            }
             this.travelAnimation = null;
         }
     }

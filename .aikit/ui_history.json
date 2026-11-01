@@ -390,5 +390,19 @@
     "final_snapshot_digest": "40cf5ee8230eec208ed0119bcbb7823e526cbc770f22658e003ca07e11e07fd1",
     "final_snapshot_entries": 1119,
     "surface_digest": "244ec76aca2c67b5236c5078b89b34ee5637097fdedfb7767ecd8237d284fd09"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "2bf5a5d2fd7a77aaf9b1eb90d8d836008ff095d8",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793534031.9783452,
+    "finished_at": 1793535416.7021997,
+    "strikes": 2,
+    "reviewer": "User (reviewed via Playwright screenshot)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "d99ad3697264ddb6519dccb505d0c37b7e79893cd6b17033ba6168b1d785d101",
+    "final_snapshot_entries": 1122,
+    "surface_digest": "14c526a499e7bf3853fd2db991c58ecc58a0008fef46f4b92f790fb106b16baf"
   }
 ]

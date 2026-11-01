@@ -188,15 +188,24 @@ class StellarDepthAndOfficerTest(unittest.TestCase):
         particles_js = (static_dir / "particles.js").read_text(encoding="utf-8")
         index_html = (static_dir / "index.html").read_text(encoding="utf-8")
         app_js = (static_dir / "app.js").read_text(encoding="utf-8")
+        style_css = (static_dir / "style.css").read_text(encoding="utf-8")
 
         self.assertIn("drawComet", celestial_js)
+        self.assertIn("limbGlow", celestial_js)
         self.assertIn("rcsPuff", particles_js)
+        self.assertIn("flakBurst", particles_js)
+        self.assertIn("ionArc", particles_js)
+        self.assertIn("quantumFlash", particles_js)
         self.assertIn("cadetStepPips", index_html)
         self.assertIn("cadetStepPips", app_js)
         self.assertIn("commsOscilloscope", index_html)
         self.assertIn("drawCommsOscilloscope", app_js)
+        self.assertIn("dustFilament", app_js)
+        self.assertIn("compassR", app_js)
         self.assertIn("marketCategoryFilters", index_html)
         self.assertIn("syncMarketCategoryFilters", app_js)
+        self.assertIn(".log-line .log-tag.tag-combat", style_css)
+        self.assertIn(".log-line .log-tag.tag-transit", style_css)
 
 
 if __name__ == "__main__":
