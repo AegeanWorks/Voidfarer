@@ -1700,6 +1700,18 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   4. Add unit test coverage in `tests/test_stellar_depth_ui.py` asserting scale parity and star targeting.
 - **Consequences**: Exact 1:1 hit-testing precision across all system configurations, seamless targeting of central stars for solar operations, perfectly aligned course vectors, and full verification via Playwright across target, waypoint, and vector scenarios (0 errors, 0 hscroll, 0 tiny text, 162 controls verified).
 
+### ADR-145: Open-Space Transit Parity, Trajectory Plotting, and Ticker Loop Resilience
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: When the flagship was holding station at an open-space waypoint, `calculateBodyDistanceAu` in `voidfarer/static/app.js` fell back to `(0, 0)` (the central star) instead of using `ship.waypoint_au` and `ship.waypoint_angle`, resulting in inaccurate transit time estimates and disabling the dashed course plot trajectory in `drawOrbitsView`. Additionally, `start_background_server` in `voidfarer/server.py` lacked a `try...except` wrapper around `engine.tick(1)` in its `_ticker_loop`, causing background ticker threads to crash if an unexpected engine exception arose.
+- **Decision**:
+  1. Update `calculateBodyDistanceAu` in `app.js` to compute Euclidean origin `(ox, oy)` from `ship.waypoint_au` and `ship.waypoint_angle` when `fromBody` is null, matching the Python engine's `compute_body_distance_au`.
+  2. Extend `drawOrbitsView` to render dynamic course plot lines (`COURSE PLOT // X.XX AU`) from open-space coordinates `(fromX, fromY)` to any selected target body.
+  3. Wrap `engine.tick(1)` in `start_background_server` with `try...except Exception as exc:` to catch and log errors to `sys.stderr` without terminating the temporal ticker thread.
+  4. Add unit test assertions in `tests/test_stellar_depth_ui.py`.
+- **Consequences**: Accurate 1:1 polar Euclidean travel estimates from open-space holding stations, visual trajectory course lines connecting vectors to planets, resilient temporal ticker execution across background servers, and 0 errors / 0 hscroll / 0 tiny elements across Playwright browser scenarios.
+
+
 
 
 

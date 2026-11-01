@@ -1431,7 +1431,14 @@ def start_background_server(
             if not time_obj.is_paused and time_obj.speed > 0:
                 if stop_event.wait(tick_interval(time_obj.speed)):
                     break
-                engine.tick(1)
+                try:
+                    engine.tick(1)
+                except Exception as exc:
+                    import traceback
+                    sys.stderr.write(f"[ERROR] Engine tick failed: {exc}\n")
+                    traceback.print_exc()
+                    if stop_event.wait(1.0):
+                        break
                 if time.monotonic() - last_save >= AUTOSAVE_SECONDS:
                     try:
                         storage.save(engine.state)

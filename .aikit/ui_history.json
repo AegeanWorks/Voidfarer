@@ -460,5 +460,19 @@
     "final_snapshot_digest": "bf20da340ce48dc2f8444300950485679b1e3774fcc0720363ea1ecd7763d92b",
     "final_snapshot_entries": 1128,
     "surface_digest": "9514f300d4c19bc7c41c15fcf46c8dde0362a7a99391b4e7090f1fb09de89cd0"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "364aab842de6c98bedcca593b5a6f0b2f7dbe12a",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793548506.6648521,
+    "finished_at": 1793548679.8055604,
+    "strikes": 0,
+    "reviewer": "Playwright Headless Browser (verified open space distance and trajectory)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "bf20da340ce48dc2f8444300950485679b1e3774fcc0720363ea1ecd7763d92b",
+    "final_snapshot_entries": 1128,
+    "surface_digest": "810f76bd3d1835036d7aca66a0f0a96f7c3f6884eb419ddc4c4d009be3dd2ee2"
   }
 ]

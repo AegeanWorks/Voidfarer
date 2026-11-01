@@ -9,8 +9,8 @@
 - **Total Python Modules**: `122`
 - **Total Classes**: `307`
 - **Total Top-Level Functions**: `344`
-- **Total Class Methods**: `1803`
-- **Total Source Lines**: `47145`
+- **Total Class Methods**: `1804`
+- **Total Source Lines**: `47166`
 
 ---
 
@@ -1955,7 +1955,7 @@
 ### [`tests/test_stellar_depth_ui.py`](tests/test_stellar_depth_ui.py)
 > *Unit tests for Stellar Depth, Officer Station Assignments, and Distress Beacons.*
 
-**Size**: `239` lines (`10561` bytes)
+**Size**: `253` lines (`11418` bytes)
 
 **Classes:**
 - `class StellarDepthAndOfficerTest`
@@ -1969,6 +1969,7 @@
   - Method `.test_combat_reactor_vent_heat()`
   - Method `.test_cockpit_advanced_telemetry_and_oscilloscope()`
   - Method `.test_radar_hit_test_scale_alignment()`
+  - Method `.test_open_space_travel_parity_and_ticker_resilience()`
 
 ---
 
@@ -3474,7 +3475,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1547` lines (`66687` bytes)
+**Size**: `1554` lines (`66984` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

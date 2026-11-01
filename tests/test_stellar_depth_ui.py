@@ -234,6 +234,20 @@ class StellarDepthAndOfficerTest(unittest.TestCase):
 
 
 
+    def test_open_space_travel_parity_and_ticker_resilience(self):
+        root_dir = Path(__file__).resolve().parent.parent / "voidfarer"
+        app_js = (root_dir / "static" / "app.js").read_text(encoding="utf-8")
+        server_py = (root_dir / "server.py").read_text(encoding="utf-8")
+        # Ensure open-space waypoint coordinates are used in distance calculation and course plotting
+        self.assertIn("ox = wAu * Math.cos(wAng);", app_js)
+        self.assertIn("oy = wAu * Math.sin(wAng);", app_js)
+        self.assertIn("const inOpenSpace = !originBody && Number(ship.waypoint_au) > 0;", app_js)
+        # Ensure background server ticker loop catches unexpected engine exceptions
+        self.assertIn("def start_background_server", server_py)
+        self.assertIn("sys.stderr.write(f\"[ERROR] Engine tick failed: {exc}\\n\")", server_py)
+
+
 if __name__ == "__main__":
     unittest.main()
+
 

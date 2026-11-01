@@ -5426,8 +5426,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     calculateBodyDistanceAu(fromBody, toBody) {
         if (!toBody) return 0;
-        const ox = fromBody ? (fromBody.orbit_radius || 0) * Math.cos(fromBody.current_angle || 0) : 0;
-        const oy = fromBody ? (fromBody.orbit_radius || 0) * Math.sin(fromBody.current_angle || 0) : 0;
+        let ox = 0;
+        let oy = 0;
+        if (fromBody) {
+            ox = (fromBody.orbit_radius || 0) * Math.cos(fromBody.current_angle || 0);
+            oy = (fromBody.orbit_radius || 0) * Math.sin(fromBody.current_angle || 0);
+        } else if (this.state?.ship?.waypoint_au) {
+            const wAu = Number(this.state.ship.waypoint_au);
+            const wAng = Number(this.state.ship.waypoint_angle || 0);
+            ox = wAu * Math.cos(wAng);
+            oy = wAu * Math.sin(wAng);
+        }
         const tx = (toBody.orbit_radius || 0) * Math.cos(toBody.current_angle || 0);
         const ty = (toBody.orbit_radius || 0) * Math.sin(toBody.current_angle || 0);
         return Math.max(0.25, Math.hypot(tx - ox, ty - oy));
@@ -6620,11 +6629,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const targetBody = this.selectedTarget && this.selectedType === "body"
             ? bodies.find(b => b.id === this.selectedTarget.id)
             : null;
-        if (!activeCourseTravel && originBody && targetBody && targetBody.id !== originBody.id) {
-            const fromAngle = originBody.current_angle || 0;
+        const inOpenSpace = !originBody && Number(ship.waypoint_au) > 0;
+        if (!activeCourseTravel && (originBody || inOpenSpace) && targetBody && targetBody.id !== originBody?.id) {
+            const fromAngle = originBody ? (originBody.current_angle || 0) : Number(ship.waypoint_angle || 0);
+            const fromRadius = originBody ? originBody.orbit_radius : Number(ship.waypoint_au || 0);
             const toAngle = targetBody.current_angle || 0;
-            const fromX = cx + Math.cos(fromAngle) * originBody.orbit_radius * auScale;
-            const fromY = cy + Math.sin(fromAngle) * originBody.orbit_radius * auScale;
+            const fromX = cx + Math.cos(fromAngle) * fromRadius * auScale;
+            const fromY = cy + Math.sin(fromAngle) * fromRadius * auScale;
             const toX = cx + Math.cos(toAngle) * targetBody.orbit_radius * auScale;
             const toY = cy + Math.sin(toAngle) * targetBody.orbit_radius * auScale;
             ctx.save();
