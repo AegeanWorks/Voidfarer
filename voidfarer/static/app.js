@@ -7437,9 +7437,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         let hit = null;
 
         if (this.viewMode === "ORBITS" && this.state) {
-            const auScale = 45 * this.zoom * this.radarScale();
-            for (const b of this.state.current_system.bodies) {
-                if (b.body_type === "star") continue;
+            const bodies = this.state.current_system?.bodies || [];
+            const auScale = this.orbitFitScale(bodies);
+            for (const b of bodies) {
+                if (b.body_type === "star") {
+                    const starR = Math.max(22, 13 * Math.max(0.8, this.zoom) * Math.min(1.6, this.radarScale()) + 6);
+                    if (Math.hypot(mx - cx, my - cy) < starR) {
+                        hit = { item: b, type: "body" };
+                        break;
+                    }
+                    continue;
+                }
                 const orbitR = b.orbit_radius * auScale;
                 const angle = b.current_angle || 0;
                 const bx = b.body_type === "dyson_sphere" ? cx : cx + Math.cos(angle) * orbitR;
@@ -7494,9 +7502,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         let hit = false;
 
         if (this.viewMode === "ORBITS" && this.state) {
-            const auScale = 45 * this.zoom * this.radarScale();
-            for (const b of this.state.current_system.bodies) {
-                if (b.body_type === "star") continue;
+            const bodies = this.state.current_system?.bodies || [];
+            const auScale = this.orbitFitScale(bodies);
+            for (const b of bodies) {
+                if (b.body_type === "star") {
+                    const starR = Math.max(22, 13 * Math.max(0.8, this.zoom) * Math.min(1.6, this.radarScale()) + 6);
+                    if (Math.hypot(mx - cx, my - cy) < starR) {
+                        this.selectedTarget = b;
+                        this.selectedType = "body";
+                        this.sound.playBeep(1000);
+                        this.updateTargetCard();
+                        hit = true;
+                        return;
+                    }
+                    continue;
+                }
                 const orbitR = b.orbit_radius * auScale;
                 const angle = b.current_angle || 0;
                 const bx = b.body_type === "dyson_sphere" ? cx : cx + Math.cos(angle) * orbitR;

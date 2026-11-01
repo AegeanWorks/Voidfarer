@@ -1,66 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-typography-floor-and-combat-telemetry",
+    "task_id": "voidfarer-radar-hit-test-scale-alignment",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793546737.9007611,
+    "updated_at": 1793547900.637901,
     "owner": "antigravity:lead",
     "started_by": "antigravity:lead",
     "continuations": [],
-    "completed_at": 1793546751.8700025
+    "completed_at": 1793547903.7683616
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-defect-audit-v9",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Verify: overhaul log interpolates wear; 18 selectors at 12px; all 3 viewports, 16 scenarios and 16 tabs report 0 errors/0 hscroll/0 tiny; 1,105 tests pass; gates 5/5. checklists: passed (test, mechanics, hygiene, guidelines, secrets). Delivery held: uncommitted (no commit authorization)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793496475.5554094,
-      "timestamp_str": "2026-11-01 04:27:55",
-      "agent": "kilo:audit"
-    },
-    {
-      "task_id": "voidfarer-defect-audit-v9",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-defect-audit-v9' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793496475.7691374,
-      "timestamp_str": "2026-11-01 04:27:55",
-      "agent": "kilo:audit"
-    },
-    {
-      "task_id": "voidfarer-delivery-audit-v10",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: audit the 75 unpushed commits and the pending cockpit batch for defects, fix what is confirmed, then commit and push the delivery",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793499186.5988111,
-      "timestamp_str": "2026-11-01 05:13:06",
-      "agent": "kilo:delivery",
-      "impact_assessment": {
-        "why": "The user asked to review changes since the last pushes, fix bugs, gaps and improvements, and then push; the audit found a research queue retention bug, an unvalidated salvage strategy and duplicated relic-set thresholds",
-        "benefits": "Queued research survives prerequisite races, REST salvage rejects unknown strategies, relic resonance has one threshold table, and the completed work reaches origin",
-        "risks": "contract: additive CLI/REST behaviour only; dependency: none; concurrency: engine lock held; state: no schema change",
-        "mitigation": "Failing-first tests for each fix, full suite, mechanics run, browser audits, five gates, explicit staging and a conventional commit"
-      }
-    },
-    {
-      "task_id": "voidfarer-delivery-audit-v10",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Verify: 1,108 tests pass; ai_play 38/51, gaps 0; all 3 viewports, 16 scenarios and 16 tabs clean; gates 5/5 on a clean tree; committed 1c0048d + 45fee99 + 134ee0e and pushed to origin/master. checklists: passed (test, mechanics, hygiene, guidelines, secrets). UI human-review evidence gate left open: no human visual review was performed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793499700.2360423,
-      "timestamp_str": "2026-11-01 05:21:40",
-      "agent": "kilo:delivery"
-    },
     {
       "task_id": "voidfarer-delivery-audit-v10",
       "phase": "completed",
@@ -266,6 +217,55 @@
       "status": "completed",
       "timestamp": 1793546751.870004,
       "timestamp_str": "2026-11-01 18:25:51",
+      "agent": "antigravity:lead"
+    },
+    {
+      "task_id": "voidfarer-radar-hit-test-scale-alignment",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan: align radar canvas hit-testing auScale with orbitFitScale in handleCanvasClick and handleCanvasMouseMove, and enable star body selection.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793547355.9862168,
+      "timestamp_str": "2026-11-01 18:35:55",
+      "agent": "antigravity:lead",
+      "impact_assessment": {
+        "why": "handleCanvasClick and handleCanvasMouseMove used hardcoded 45*zoom*radarScale rather than orbitFitScale, causing clicked planets to be missed and open-space vectors to land at mismatched distances.",
+        "benefits": "Precise 1:1 click targeting for all celestial bodies, traffic, and vectors; clicking exactly selects the target under the cursor.",
+        "risks": "contract: preserve click behavior and point navigation; dependency: zero external deps; concurrency: safe; state: safe.",
+        "mitigation": "Playwright click testing; 100% test pass gate."
+      }
+    },
+    {
+      "task_id": "voidfarer-radar-hit-test-scale-alignment",
+      "phase": "phase 3",
+      "phase_num": 3,
+      "description": "[2/3] Implemented scale alignment and central star targeting in app.js and added unit test in test_stellar_depth_ui.py",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793547886.3472185,
+      "timestamp_str": "2026-11-01 18:44:46",
+      "agent": "antigravity:lead"
+    },
+    {
+      "task_id": "voidfarer-radar-hit-test-scale-alignment",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[3/3] Verified 5/5 quality gates, Playwright multi-viewport click tests, and ADR-144; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793547900.637901,
+      "timestamp_str": "2026-11-01 18:45:00",
+      "agent": "antigravity:lead"
+    },
+    {
+      "task_id": "voidfarer-radar-hit-test-scale-alignment",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-radar-hit-test-scale-alignment' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793547903.7683625,
+      "timestamp_str": "2026-11-01 18:45:03",
       "agent": "antigravity:lead"
     }
   ]

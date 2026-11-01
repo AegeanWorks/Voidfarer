@@ -9,8 +9,8 @@
 - **Total Python Modules**: `122`
 - **Total Classes**: `307`
 - **Total Top-Level Functions**: `344`
-- **Total Class Methods**: `1802`
-- **Total Source Lines**: `47132`
+- **Total Class Methods**: `1803`
+- **Total Source Lines**: `47145`
 
 ---
 
@@ -1955,7 +1955,7 @@
 ### [`tests/test_stellar_depth_ui.py`](tests/test_stellar_depth_ui.py)
 > *Unit tests for Stellar Depth, Officer Station Assignments, and Distress Beacons.*
 
-**Size**: `226` lines (`9810` bytes)
+**Size**: `239` lines (`10561` bytes)
 
 **Classes:**
 - `class StellarDepthAndOfficerTest`
@@ -1968,6 +1968,7 @@
   - Method `.test_point_defense_cannon_countermeasure()`
   - Method `.test_combat_reactor_vent_heat()`
   - Method `.test_cockpit_advanced_telemetry_and_oscilloscope()`
+  - Method `.test_radar_hit_test_scale_alignment()`
 
 ---
 

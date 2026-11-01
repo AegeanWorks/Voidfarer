@@ -219,6 +219,19 @@ class StellarDepthAndOfficerTest(unittest.TestCase):
         self.assertIn("solar array", celestial_js)
         self.assertIn(".war-bond-note { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 12px; }", style_css)
         self.assertIn("LOCK: TGT-01", app_js)
+        self.assertIn("const auScale = this.orbitFitScale(bodies);", app_js)
+
+    def test_radar_hit_test_scale_alignment(self):
+        static_dir = Path(__file__).resolve().parent.parent / "voidfarer" / "static"
+        app_js = (static_dir / "app.js").read_text(encoding="utf-8")
+        # Ensure hit test scale matches orbitFitScale across mouse move and click handlers
+        self.assertIn("handleCanvasMouseMove", app_js)
+        self.assertIn("handleCanvasClick", app_js)
+        self.assertIn("const bodies = this.state.current_system?.bodies || [];", app_js)
+        self.assertIn("const auScale = this.orbitFitScale(bodies);", app_js)
+        # Ensure stars can be hit tested
+        self.assertIn('if (b.body_type === "star") {', app_js)
+
 
 
 if __name__ == "__main__":

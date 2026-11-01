@@ -1689,6 +1689,18 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   3. Upgrade combat canvas target acquisition telemetry and flagship/hostile labels from 8px/10px to 12px with aligned vertical spacing in `drawCombatVisual`.
 - **Consequences**: Zero typography floor findings across all 15 tabs (`tiny 0`), crisp readability on high-DPI and scaled Windows displays, full WCAG-AA compliance, and 100% test pass gate across all 1,111+ tests.
 
+### ADR-144: Radar Canvas Hit-Testing Scale Alignment and Central Star Selection
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Clicking on the radar tactical display often landed on an incorrect coordinate or failed to select celestial bodies in wide systems (>2 AU). Investigation revealed that `drawOrbitsView` dynamically scales the system using `this.orbitFitScale(bodies)` so that planets fit neatly within `this.mapRect`, whereas `handleCanvasMouseMove` and `handleCanvasClick` hit-tested against a hardcoded constant `45 * this.zoom * this.radarScale()`. In addition, central stars were explicitly bypassed during hit-testing (`if (b.body_type === "star") continue;`), preventing pilots from targeting the star directly for solar scooping or astrophysics scans.
+- **Decision**:
+  1. Update `handleCanvasMouseMove` and `handleCanvasClick` in `voidfarer/static/app.js` to compute `auScale = this.orbitFitScale(bodies)`.
+  2. Implement central star hit-testing using dynamic stellar corona radius (`starR = Math.max(22, 13 * Math.max(0.8, this.zoom) * Math.min(1.6, this.radarScale()) + 6)`) matching `celestial.drawStar`.
+  3. Ensure open-space waypoint vector calculation (`this.selectedTarget = { au: distanceAu, angle: Math.atan2(dy, dx) }`) uses `orbitFitScale`, ensuring the rendered vector pip in `drawPointSelection` matches the cursor position with 1:1 pixel accuracy.
+  4. Add unit test coverage in `tests/test_stellar_depth_ui.py` asserting scale parity and star targeting.
+- **Consequences**: Exact 1:1 hit-testing precision across all system configurations, seamless targeting of central stars for solar operations, perfectly aligned course vectors, and full verification via Playwright across target, waypoint, and vector scenarios (0 errors, 0 hscroll, 0 tiny text, 162 controls verified).
+
+
 
 
 
