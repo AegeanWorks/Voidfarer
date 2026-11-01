@@ -95,6 +95,7 @@ voidfarer/
 │   ├── away.py           <- away-team expeditions, injuries & crew XP
 │   ├── decisions.py      <- blocking conditional events
 │   ├── pirates.py        <- pirate bands & toll encounters
+│   ├── smuggling.py      <- customs scans, contraband risk & patrol interdiction
 │   ├── surface.py        <- landing-party operations
 │   ├── weapons.py        <- weapon types & combat modifiers
 │   ├── retention.py      <- relics, dynamic contracts & pilot mastery
@@ -103,6 +104,7 @@ voidfarer/
 │   ├── economy.py        <- dynamic galactic economy, stockpiles & trade routes
 │   ├── frontier.py       <- AI captains, depots, mercenaries & quantum messages
 │   ├── exploration.py    <- derelict salvage, fuel scooping & crew drills
+│   ├── megastructures.py <- restorable Dyson swarms, ring worlds & relays
 │   ├── codex.py          <- discovery codex, career statistics & milestones
 │   ├── inventory.py      <- item catalog, consumables & cargo manifest
 │   ├── logbook.py        <- flight-log windowing that keeps galactic war news
@@ -116,6 +118,7 @@ voidfarer/
 │       ├── style.css     <- sci-fi glassmorphism design system
 │       ├── app.js        <- radar math, Web Audio synth & REST link
 │       ├── celestial.js  <- procedural planet, station & ship models
+│       ├── particles.js  <- pooled FX layer; surfacemap.js <- landing tile map
 │       ├── cursor-default.svg <- themed default cockpit cursor
 │       ├── cursor-pointer.svg <- themed pointer cursor for controls
 │       └── cursor-crosshair.svg <- themed radar crosshair cursor
@@ -125,7 +128,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (42 suites)
+└── tests/                <- unit & integration test suite (75 suites)
 ```
 
 ---
@@ -238,7 +241,11 @@ python -m voidfarer.cli mastery unlock dreadnought_tactics
 ```bash
 # Inspect recovered alien artifacts and active passive fleet modifiers
 python -m voidfarer.cli relics
+
+# Fuse three relics of one rarity into one relic of the next tier
+python -m voidfarer.cli relics fuse common
 ```
+The cockpit forge matches it.
 
 ### 10. Expedition Jump Streaks (Loss Aversion)
 ```bash
@@ -255,9 +262,11 @@ python -m voidfarer.cli market
 python -m voidfarer.cli buy fuel_cells max
 python -m voidfarer.cli sell titanium all
 
-# Repair hull damage and refuel
+# Repair hull damage and refuel, scrub hyperlane wear, field-fabricate repairs
 python -m voidfarer.cli repair --amount 25
 python -m voidfarer.cli refuel --amount 20
+python -m voidfarer.cli overhaul
+python -m voidfarer.cli fabricate patch_kit
 
 # Inspect the living galactic economy: stockpiles, market shocks, and best trade routes
 python -m voidfarer.cli economy
@@ -359,18 +368,14 @@ python tools/ai_play.py --steps 180 --json    # machine-readable report
 python tools/ui_browser.py --click-map --viewports desktop --out ui-review/clickmap
 ```
 
-The captain docks, trades, scans, salvages, scoops, lands, runs surface and away
-operations, hires and trains crew, buys upgrades, escorts and drones, reads messages,
-claims codex rewards, petitions diplomacy, supports wars, vents and repairs the reactor,
-and cycles power, stance, time and decision settings. A 180-step run reaches 44
-mechanic families, succeeds on 40 endpoints, attempts 53 and reports **zero coverage
+The captain exercises the full mechanic surface through the same HTTP API. A 180-step run reaches 37
+mechanic families, succeeds on 38 endpoints, attempts 51 and reports **zero coverage
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
-`CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or requires content the run
-cannot create). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
+`CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
-The click-map run enumerates every rendered control through `window.voidfarerClickMap()`
-and fails if any control lacks a stable handle or two controls share one (desktop
-cockpit: 133 controls, 63 visible, 0 missing, 0 duplicates).
+The click-map enumerates every rendered control via `window.voidfarerClickMap()` and fails
+on a missing or duplicate handle (desktop: 162 controls, 0 missing, 0 duplicates).
+Scenario and tab audits (16 tabs) report 0 errors, hscroll and tiny text.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -462,23 +467,26 @@ python -m voidfarer.cli messages choose <message_id> <choice_id>
 python -m voidfarer.cli crew recruit scientist
 python -m voidfarer.cli crew train <crew_id>
 python -m voidfarer.cli crew shore
+python -m voidfarer.cli crew station <crew_id> helm
 python -m voidfarer.cli away
 python -m voidfarer.cli away launch salvage_sweep
 python -m voidfarer.cli away recall <mission_id>
 python -m voidfarer.cli weapons install railgun
 ```
-The commander ages and trains six skills; SHIFT+1..6 fires abilities. Research unlocks reactor, scan, combat, outpost, repair and fuel tech; outposts repay in 4-9 months, stack three modules, and at level 3 pick a specialization (Logistics adds a crew slot). Outposts link to system hubs: links +5%, hubs +8%/link. Frontier Shipyards service hull, fuel, escorts and weapons. Outposts have integrity; conquest damages them, grids/marines reduce the hit, and repairs cost credits. Wars capture fronts; pledges pay 1.5x/0.8x; escorts coordinate volleys and stances; message trees branch. Alliances require standing 70 and cut pirate risk 28%; research pacts at 60 add 5% research; the Empire tab exposes improve, gift, both pacts, alliance and ceasefire. Crew morale, wages and portraits react to service; unpaid crews below morale 20 risk resignation. Crew earn medals after three victories or five away missions (+5 morale). Away teams deploy for 5-10 ticks; surveys, salvage, xenobiology, relief and distress pay credits, research, cargo, standing and XP; failures injure specialists. Research queues; bulk orders walk prices.
+The commander ages and trains six skills; SHIFT+1..6 fires abilities. Research unlocks reactor, scan, combat, outpost, repair and fuel tech; outposts repay in 4-9 months, stack three modules, and at level 3 pick a specialization (Logistics adds a crew slot). Outposts link to system hubs: links +5%, hubs +8%/link. Frontier Shipyards service hull, fuel, escorts and weapons. Outposts have integrity; conquest damages them, grids/marines reduce the hit, and repairs cost credits. Wars capture fronts; pledges pay 1.5x/0.8x; escorts coordinate volleys; message trees branch. Alliances need standing 70 and cut pirate risk 28%; research pacts at 60 add 5% research. Crew morale, wages and portraits react to service; unpaid crews below morale 20 risk resignation. Medals follow three victories or five away missions (+5 morale). Away teams deploy for 5-10 ticks; surveys, salvage, xenobiology, relief and distress pay credits, research, cargo, standing and XP; failures injure specialists. Research queues; bulk orders walk prices.
 
 ### 18b. Frontier Depth: Pirates, Decisions, Freight & Surface Ops
 ```bash
 python -m voidfarer.cli pirate
+python -m voidfarer.cli customs
+python -m voidfarer.cli salvage aggressive
 python -m voidfarer.cli decision
 python -m voidfarer.cli quantum routes
 python -m voidfarer.cli quantum ship titanium 2 kepler
 python -m voidfarer.cli surface
 python -m voidfarer.cli contracts refresh
 ```
-32 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. 35 decisions block time, but the default relaxed cadence rolls only once per 36-tick window. Quantum freight ships cargo for a fee, paying on arrival. Landed teams choose from 13 operations: survey, core-sample, explore ruins, salvage, rest, tap geothermal heat, bio-prospect, recover a crash site, drill ice, tap magma, harvest reefs, scoop gas clouds, or deep-mine; environment-specific operations are offered only on matching worlds. War captures displace civilians and leave scars.
+32 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. Customs cutters scan contraband in high-security systems: bribe, jettison, submit or flee. 35 decisions block time; relaxed cadence rolls once per 36-tick window. Quantum freight ships cargo for a fee. Landed teams choose from 13 operations: survey, core-sample, explore ruins, salvage, rest, tap geothermal heat, bio-prospect, recover a crash site, drill ice, tap magma, harvest reefs, scoop gas clouds, or deep-mine; environment-specific operations are offered only on matching worlds. War captures displace civilians and leave scars.
 
 ### 18c. Post-War Reconstruction & Relief
 ```bash
@@ -490,17 +498,22 @@ python -m voidfarer.cli reconstruct sol_body_1 --relief
 
 # The same actions are on the target card and POST /api/reconstruct
 ```
-Rebuilding earns standing with the world's owner and feeds the Rebuilder / Relief Runner codex milestones. Devastated markets pay a relief premium for medicines, food, fuel and construction goods, so running supplies into a war zone is a real trade. Wars whose belligerent has no territory left are closed and reported instead of lingering as phantom fronts.
+Rebuilding earns standing with the world's owner and feeds the Rebuilder / Relief Runner codex milestones. Devastated markets pay a relief premium for medicines, food, fuel and construction goods, so running supplies into a war zone is a real trade.
 
 ### 18d. Boarding & Prize Capture
 ```bash
 # Collapse the enemy shield first, then cripple its hull below 30%
 python -m voidfarer.cli combat fire
 
+# New maneuvers: subsystem strikes, flak screen and coolant purge
+python -m voidfarer.cli combat target engines
+python -m voidfarer.cli combat pdc
+python -m voidfarer.cli combat vent
+
 # With an active marine aboard, send the boarding party across
 python -m voidfarer.cli combat board
 ```
-A successful boarding ends the fight and takes the crippled hull as a fleet prize: it keeps its remaining hull, half its weapon damage and 8% evasion, but pays no full bounty or salvage. A failed boarding injures the lead marine, costs crew morale, resets the tactical combo and lets the enemy counter-attack. The combat card gates `BOARD & CAPTURE` on shields down, hull below 30% and an active marine; the Privateer codex milestone tracks the first prize. At a drydock, the fleet manager shows each escort's resale value and offers `fleet sell_escort <id>`; the Shipbreaker milestone tracks liquidated hulls.
+A successful boarding ends the fight and takes the crippled hull as a fleet prize: it keeps its remaining hull, half its weapon damage and 8% evasion, but pays no full bounty or salvage. A failed boarding injures the lead marine, costs crew morale, resets the tactical combo and lets the enemy counter-attack. The combat card gates `BOARD & CAPTURE` on shields down, hull below 30% and an active marine; the Privateer codex milestone tracks the first prize. At a drydock, `fleet sell_escort <id>` sells escorts; the Shipbreaker milestone tracks sales.
 
 ### 18e. Fleet Deployment & Patrols
 ```bash
@@ -510,7 +523,7 @@ python -m voidfarer.cli fleet assign <escort_id> <system_id>
 # See total versus local formation damage and screen evasion
 python -m voidfarer.cli fleet ships
 ```
-Remote escorts are marked `PATROL` and fight only locally. Each cuts local pirate risk up to 75%. Patrols sweep every 6 ticks for XP or a bounty and return fire. Cards show deployment and service records. Escorts cost 30-110 cr/month; unpaid upkeep leaves them damaged. Roles cycle SCREEN/STRIKE/SUPPORT and lock under fire. Crew captains add scaling role bonuses. Fleet stance (balanced/aggressive/defensive) trades damage against evasion; the fleet panel sets it and the combat card shows it. Populations scale with surface, habitability and tech; outposts grow only to their housing cap. Peaceful neighbours trade along shared hyperlanes and war severs those routes; factions pay taxes, upkeep and war burden from their treasury, and a broke faction sues for peace; faction research raises technology and world capacity. Restore ancient megastructures for permanent bonuses.
+Remote escorts are marked `PATROL` and fight only locally. Each cuts local pirate risk up to 75%. Escorts cost 30-110 cr/month; unpaid upkeep leaves them damaged. Roles cycle SCREEN/STRIKE/SUPPORT. Crew captains add scaling role bonuses. Fleet stance trades damage for evasion. Populations scale with surface and habitability; outposts stop at their housing cap. Shared hyperlanes carry trade until war severs them; factions run treasuries, sue for peace when broke, and research raises capacity.
 
 ### 18f. Fleet Veterancy & Training
 ```bash
@@ -522,7 +535,7 @@ Escorts earn XP from hits and victories. Ranks Green/Regular/Veteran/Elite/Ace (
 ### 19. Stellaris-Style Windows Cockpit
 
 The Stellaris-style Windows cockpit, its panels, controls and launch options are documented in
-[docs/COCKPIT.md](docs/COCKPIT.md).
+[docs/COCKPIT.md](docs/COCKPIT.md). Radar fitting, worlds, particles, the landing tile map and the combat view are covered there.
 
 ### 20. Captain's Log & Discovery Codex
 ```bash
@@ -535,21 +548,19 @@ python -m voidfarer.cli codex
 # Claim credits and pilot XP for a completed milestone
 python -m voidfarer.cli codex claim first_light
 ```
-New System Surveyor and Sector Cartographer milestones track full-system sweeps. Pacts, captains, outposts and auto-freight now have milestones too.
+New System Surveyor and Sector Cartographer milestones track full-system sweeps. Pacts, captains, outposts and auto-freight have milestones. Claimed contracts enter a 50-entry reward ledger.
 
 ### 21. UI Guard & Visual Audit
 `.aikit/ui.json` bounds cockpit work to `voidfarer/static/**` and `voidfarer/server.py`.
-`ui_required` is true: tests are the fast proof, `tools/ui_inventory.py` is the snapshot,
-`tools/ui_audit.py` measures layout, and `tools/ui_browser.py` drives real Edge screenshots.
-See ADR-041 and ADR-047.
+Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tools/ui_browser.py` audit controls, layout and Edge rendering (ADR-041/047).
 
 ---
 
 ## 🛡️ Architecture & Resilience Guarantees
 
-1. **Zero External Dependencies**: Built entirely on standard Python modules (`math`, `random`, `dataclasses`, `http.server`, `json`, `pathlib`).
+1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 676-test suite runs in about 13 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,108-test suite runs in about 41 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

@@ -8,9 +8,14 @@
   "has_ui": true,
   "ui_kind": "web",
   "ui_evidence": [
+    "ui-review/cloud-proof.html",
+    "ui-review/model-proof.html",
+    "ui-review/particles-proof.html",
+    "ui-review/ship-proof.html",
+    "ui-review/surface-spin-proof.html",
     "voidfarer/static/index.html"
   ],
-  "ui_checked_at": "2026-10-29",
+  "ui_checked_at": "2026-10-31",
   "ui_source": "detected",
   "topics": [
     "aikit",

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `116`
-- **Total Classes**: `290`
-- **Total Top-Level Functions**: `333`
-- **Total Class Methods**: `1680`
-- **Total Source Lines**: `44362`
+- **Total Python Modules**: `122`
+- **Total Classes**: `307`
+- **Total Top-Level Functions**: `344`
+- **Total Class Methods**: `1799`
+- **Total Source Lines**: `47087`
 
 ---
 
@@ -26,7 +26,7 @@
 ### [`tests/test_adaptive_ui_salvage.py`](tests/test_adaptive_ui_salvage.py)
 > *Regression tests for the Windows high-DPI cockpit, derelict salvage,*
 
-**Size**: `207` lines (`9144` bytes)
+**Size**: `213` lines (`9398` bytes)
 
 **Classes:**
 - `class TestAdaptiveCockpitAssets`
@@ -45,6 +45,7 @@
   - Method `._derelict_body()`
   - Method `.test_salvage_rewards_cargo_and_claims_site()`
   - Method `.test_salvage_requires_a_derelict()`
+  - Method `.test_unknown_salvage_strategy_is_rejected()`
   - Method `.test_fuel_scoop_refuels_and_heats_reactor()`
   - Method `.test_fuel_scoop_requires_a_scoopable_body()`
   - Method `.test_scoop_yield_scales_with_science_skill()`
@@ -255,7 +256,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `354` lines (`16083` bytes)
+**Size**: `512` lines (`23422` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -304,17 +305,29 @@
   - Method `.test_repl_repair_and_refuel_reject_non_numeric_amounts()`
 - `class TestCLIRelicsWithRecoveredRelics` - *A save that already has relics must render the vault and modifiers (regression).*
   - Method `.test_relics_command_with_recovered_relics()`
+  - Method `.test_relics_fuse_persists_the_fused_relic()`
+  - Method `.test_cli_runs_as_module_and_reaches_the_fuse_handler()`
   - Method `.test_cli_frontier_commands()`
 - `class TestCLIMaxTrades` - *`buy <id> max` and `sell <id> all` match the REST max flag and the REPL.*
   - Method `.test_sell_all_and_buy_max()`
   - Method `.test_non_numeric_quantity_is_rejected()`
+- `class TestCLINewMechanicsParity` - *Smuggling, overhaul, fabrication and salvage strategies need CLI parity with REST.*
+  - Method `._saved(engine)`
+  - Method `.test_customs_status_and_jettison()`
+  - Method `.test_overhaul_command_scrubs_wear_and_persists()`
+  - Method `.test_fabricate_command_consumes_titanium()`
+  - Method `.test_salvage_strategy_is_forwarded_to_the_engine()`
+- `class TestCLICombatAndCrewParity` - *New combat subsystems and bridge stations must be reachable from the terminal.*
+  - Method `._combat_action_for(argv)`
+  - Method `.test_new_combat_maneuvers_map_to_engine_actions()`
+  - Method `.test_crew_station_assignment_persists()`
 
 ---
 
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1568` lines (`68716` bytes)
+**Size**: `1856` lines (`81721` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -391,6 +404,11 @@
   - Method `.test_vital_cards_match_chrono_box_height()`
   - Method `.test_orbit_button_uses_timed_transit()`
   - Method `.test_radar_backdrop_is_cached()`
+  - Method `.test_idle_radar_frames_are_throttled()`
+  - Method `.test_orbits_fit_the_visible_radar()`
+  - Method `.test_radar_labels_are_collision_placed_inside_the_map()`
+  - Method `.test_canvas_labels_use_a_loaded_console_font()`
+  - Method `.test_diplomacy_war_lookup_compares_ids_instead_of_using_in()`
 - `class TestArsenalParityAndBulkDepotUI`
   - Method `.setUpClass()`
   - Method `.test_arsenal_contains_shipyard_and_weapons_containers()`
@@ -440,11 +458,53 @@
   - Method `.setUpClass()`
   - Method `.test_map_views_share_one_visible_area_centre()`
   - Method `.test_territory_is_cached_and_drawn_from_politics()`
+  - Method `.test_galaxy_has_a_nebula_layer_and_seeded_star_rays()`
 - `class TestCelestialModels` - *Procedural celestial models: their own module, loaded before the cockpit, sprites cached.*
   - Method `.setUpClass()`
   - Method `.test_renderer_loads_before_the_cockpit()`
   - Method `.test_every_generated_body_type_has_a_model()`
   - Method `.test_surface_sprites_are_cached()`
+  - Method `.test_body_limb_follows_the_star()`
+  - Method `.test_ship_models_cover_hull_classes()`
+  - Method `.test_cloud_bands_drift_over_time()`
+  - Method `.test_rocky_worlds_turn_slowly()`
+- `class TestGraphicsAssets` - *Browser identity and galaxy texture assets.*
+  - Method `.setUpClass()`
+  - Method `.test_favicon_is_linked_and_present()`
+  - Method `.test_territory_has_a_cached_hatch_pattern()`
+  - Method `.test_no_color_emoji_remain_in_the_cockpit()`
+  - Method `.test_territory_raster_uses_finer_cells()`
+  - Method `.test_badge_dot_colors_are_all_styled()`
+  - Method `.test_hud_text_meets_the_twelve_pixel_readability_floor()`
+  - Method `.test_legacy_theme_tokens_alias_the_console_palette()`
+  - Method `.test_core_palette_is_declared_once()`
+- `class TestDrydockServiceQuotes` - *The service deck must quote the engine's live prices, not a client estimate.*
+  - Method `.setUpClass()`
+  - Method `.test_service_labels_read_the_engine_quote()`
+- `class TestRelicFusionCockpit` - *Relic fusion needs a cockpit path beside the CLI and REST endpoint.*
+  - Method `.setUpClass()`
+  - Method `.test_relic_panel_offers_fusion_controls()`
+- `class TestParticleFX` - *Visual-only particle layer: pooled, frame-updated and wired to world actions.*
+  - Method `.setUpClass()`
+  - Method `.test_particle_system_loads_before_the_cockpit()`
+  - Method `.test_particle_pool_is_capped()`
+  - Method `.test_frame_updates_and_draws_the_layer()`
+  - Method `.test_ship_transit_scan_and_combat_emit_particles()`
+- `class TestCombatVisual` - *Tactical combat viewport: two hulls, a firing beam and impact particles.*
+  - Method `.setUpClass()`
+  - Method `.test_combat_card_has_a_tactical_canvas()`
+  - Method `.test_combat_visual_draws_two_ships_and_fx()`
+  - Method `.test_combat_action_arms_a_beam_or_burst()`
+  - Method `.test_ship_and_enemy_variants_are_resolved_on_the_map()`
+  - Method `.test_combat_stance_and_ability_hint_are_not_tiny()`
+  - Method `.test_combat_reports_shield_deflection_and_hull_damage_audio()`
+- `class TestSurfaceTileMap` - *Seeded surface tiles: biome coverage, canvas wiring and site selection.*
+  - Method `.setUpClass()`
+  - Method `.test_surface_renderer_loads_before_the_cockpit()`
+  - Method `.test_biome_palettes_cover_landable_types()`
+  - Method `.test_surface_card_embeds_the_map_canvas()`
+  - Method `.test_clicking_a_site_selects_the_operation()`
+  - Method `.test_map_is_seeded_by_body_and_operations()`
 - `class TestStrategyPanels` - *Strategy actions in the cockpit: war pledges, outpost founding and the monthly treasury.*
   - Method `.setUpClass()`
   - Method `.test_wars_panel_sits_in_the_factions_tab_and_pledges()`
@@ -572,6 +632,28 @@
 
 ---
 
+### [`tests/test_combat_tactics.py`](tests/test_combat_tactics.py)
+> *Comprehensive unit tests for Tactical Subsystem Targeting, Combat Heat, and Field Munition Fabrication.*
+
+**Size**: `235` lines (`9644` bytes)
+
+**Classes:**
+- `class WeatherTestEngine`
+  - Method `._stable_unit(*args, **kwargs)`
+- `class CombatTacticsAndMunitionsTest`
+  - Method `._engine(wep_power, reactor_mode)`
+  - Method `.test_target_engines_cripples_drive_manifolds()`
+  - Method `.test_target_bridge_requires_sufficient_weapon_power()`
+  - Method `.test_target_bridge_critical_strike_and_command_panic()`
+  - Method `.test_point_defense_reports_the_intercepted_counter_battery()`
+  - Method `.test_combat_reactor_thermal_curve()`
+  - Method `.test_fabricate_patch_kit_success_and_guards()`
+  - Method `.test_fabricate_fuel_cell_success_and_guards()`
+  - Method `.test_solar_weather_telemetry_and_hazard()`
+  - Method `.test_solar_weather_jump_deflection_and_surge()`
+
+---
+
 ### [`tests/test_combat_void_depth.py`](tests/test_combat_void_depth.py)
 > *Regression tests for progression-scaled combat and Hollow resonance risk/reward.*
 
@@ -662,6 +744,21 @@
 
 ---
 
+### [`tests/test_economy_rebalance.py`](tests/test_economy_rebalance.py)
+> *Unit tests for economic volatility events, faction trade margins, and drydock wear overhaul.*
+
+**Size**: `113` lines (`4938` bytes)
+
+**Classes:**
+- `class TestEconomyRebalance`
+  - Method `.setUp()`
+  - Method `.test_new_dynamic_event_templates_registered()`
+  - Method `.test_spread_widens_in_crisis_and_narrows_in_boom()`
+  - Method `.test_allied_faction_margin_bonus()`
+  - Method `.test_overhaul_ship_drydock_wear()`
+
+---
+
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
@@ -712,7 +809,7 @@
 ### [`tests/test_engine.py`](tests/test_engine.py)
 > *Unit tests for simulation engine state transitions, flight, upgrades, fleet, and combat.*
 
-**Size**: `428` lines (`17988` bytes)
+**Size**: `476` lines (`20424` bytes)
 
 **Classes:**
 - `class TestEngine`
@@ -738,6 +835,7 @@
   - Method `.test_sell_upgrade_rejects_if_cargo_exceeds_reduced_capacity()`
   - Method `.test_remove_ship_mod_rejects_if_cargo_exceeds_reduced_capacity()`
   - Method `.test_quantum_travel_fuel_cost_applies_fuel_efficiency_bonuses()`
+  - Method `.test_drydock_quote_matches_every_service_charge()`
 
 ---
 
@@ -1464,9 +1562,18 @@
 ### [`tests/test_perks_relics_rep.py`](tests/test_perks_relics_rep.py)
 > *Regression tests for faction perks, enemy reputation rewards, and multi-stat relics.*
 
-**Size**: `135` lines (`5862` bytes)
+**Size**: `196` lines (`8386` bytes)
 
 **Classes:**
+- `class RelicSetBonusTest`
+  - Method `._relic(rid, rarity)`
+  - Method `.test_no_set_bonus_below_threshold()`
+  - Method `.test_common_set_grants_scan_bonus()`
+  - Method `.test_rare_set_grants_scan_and_trade()`
+  - Method `.test_epic_set_grants_combat_and_shield()`
+  - Method `.test_legendary_set_grants_all()`
+  - Method `.test_set_bonus_applied_in_passive_multipliers()`
+  - Method `.test_completed_sets_follow_the_shared_thresholds()`
 - `class FactionPerkTest`
   - Method `.setUp()`
   - Method `._set_standing(faction_id, standing)`
@@ -1547,7 +1654,7 @@
 ### [`tests/test_reactor_map_shipmods.py`](tests/test_reactor_map_shipmods.py)
 > *Regression tests for reactor simulation, sector map modifiers, and ship modifications.*
 
-**Size**: `330` lines (`14316` bytes)
+**Size**: `330` lines (`14315` bytes)
 
 **Classes:**
 - `class ReactorSimulationTest`
@@ -1612,7 +1719,7 @@
 ### [`tests/test_research_queue.py`](tests/test_research_queue.py)
 > *Research queue: validation, ordering, auto-start and persistence.*
 
-**Size**: `79` lines (`3223` bytes)
+**Size**: `110` lines (`4501` bytes)
 
 **Classes:**
 - `class ResearchQueueEngineTest`
@@ -1621,6 +1728,7 @@
   - Method `.test_cancel_removes_only_the_named_project()`
   - Method `.test_starting_a_queued_project_removes_it_from_the_queue()`
   - Method `.test_completion_starts_the_next_queued_project()`
+  - Method `.test_blocked_queued_projects_are_kept_until_their_prerequisite_finishes()`
   - Method `.test_queue_persists_across_saves()`
   - Method `.test_legacy_research_defaults_to_empty_queue()`
 
@@ -1660,7 +1768,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `899` lines (`38096` bytes)
+**Size**: `957` lines (`40863` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1719,6 +1827,26 @@
   - Method `.test_save_load_delete_endpoints()`
   - Method `.test_multiple_save_slots_endpoints_and_listing()`
   - Method `.test_codex_claim_endpoint()`
+  - Method `.test_customs_resolve_endpoint()`
+  - Method `.test_overhaul_endpoint()`
+  - Method `.test_relic_fuse_endpoint()`
+
+---
+
+### [`tests/test_ship_wear.py`](tests/test_ship_wear.py)
+> *Tests for ship wear and drydock repair mechanics.*
+
+**Size**: `67` lines (`2507` bytes)
+
+**Classes:**
+- `class TestShipWear`
+  - Method `.setUp()`
+  - Method `.test_wear_starts_at_zero()`
+  - Method `.test_jump_increases_wear()`
+  - Method `.test_wear_caps_at_100()`
+  - Method `.test_wear_reduces_passive_efficiency()`
+  - Method `.test_repair_reduces_wear_at_station()`
+  - Method `.test_wear_persists_roundtrip()`
 
 ---
 
@@ -1778,6 +1906,26 @@
 
 ---
 
+### [`tests/test_smuggling_security.py`](tests/test_smuggling_security.py)
+> *Unit tests for contraband smuggling, security scans, and customs interdiction.*
+
+**Size**: `166` lines (`7430` bytes)
+
+**Classes:**
+- `class TestSmugglingSecurity`
+  - Method `.setUp()`
+  - Method `.test_contraband_classification()`
+  - Method `.test_get_contraband_in_cargo()`
+  - Method `.test_customs_scan_risk_clean_or_low_security()`
+  - Method `.test_customs_scan_risk_with_contraband_and_evasion()`
+  - Method `.test_generate_customs_encounter()`
+  - Method `.test_resolve_customs_bribe()`
+  - Method `.test_resolve_customs_jettison()`
+  - Method `.test_resolve_customs_confiscate()`
+  - Method `.test_resolve_customs_flee()`
+
+---
+
 ### [`tests/test_snapshot_catalogs.py`](tests/test_snapshot_catalogs.py)
 > *Static catalogs: built once, served by /api/catalogs, and left out of polls that cache them.*
 
@@ -1798,6 +1946,25 @@
   - Method `.test_catalog_endpoint_ignores_the_cache_header()`
   - Method `.test_state_poll_is_full_by_default_and_lite_when_cached()`
   - Method `.test_action_responses_honour_the_cache_header()`
+
+---
+
+### [`tests/test_stellar_depth_ui.py`](tests/test_stellar_depth_ui.py)
+> *Unit tests for Stellar Depth, Officer Station Assignments, and Distress Beacons.*
+
+**Size**: `204` lines (`8580` bytes)
+
+**Classes:**
+- `class StellarDepthAndOfficerTest`
+  - Method `.setUp()`
+  - Method `.test_crew_member_station_property_and_serialization()`
+  - Method `.test_assign_crew_station_lifecycle()`
+  - Method `.test_station_department_synergy_multipliers()`
+  - Method `.test_distress_beacon_and_precursor_crypt_in_catalog()`
+  - Method `.test_celestial_and_particle_js_enhancements()`
+  - Method `.test_point_defense_cannon_countermeasure()`
+  - Method `.test_combat_reactor_vent_heat()`
+  - Method `.test_cockpit_advanced_telemetry_and_oscilloscope()`
 
 ---
 
@@ -2079,7 +2246,7 @@
 ### [`tests/test_war_bonds.py`](tests/test_war_bonds.py)
 > *War bonds: pledges pay out on victory, partially on stalemate, never twice.*
 
-**Size**: `100` lines (`3570` bytes)
+**Size**: `108` lines (`4001` bytes)
 
 **Classes:**
 - `class WarBondResolutionTest`
@@ -2093,6 +2260,7 @@
 - `class WarBondPledgeTest`
   - Method `.test_support_war_records_a_pledge_and_mentions_terms()`
   - Method `.test_bond_state_round_trips()`
+  - Method `.test_tick_with_resolving_war_bonds_updates_stats_without_error()`
 
 **Functions:**
 - `def _war(score, active, support, resolved)`
@@ -2172,7 +2340,7 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `551` lines (`24278` bytes)
+**Size**: `590` lines (`26336` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
@@ -2235,7 +2403,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `764` lines (`33403` bytes)
+**Size**: `774` lines (`33956` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2349,7 +2517,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3301` lines (`168035` bytes)
+**Size**: `3452` lines (`174757` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2400,6 +2568,9 @@
 - `def cmd_crew(engine, storage, parts)`
 - `def cmd_away(engine, storage, parts)`
 - `def cmd_pirate(engine, storage, parts)`
+- `def cmd_customs(engine, storage, parts)`
+- `def cmd_overhaul(engine, storage)`
+- `def cmd_fabricate(engine, storage, blueprint)`
 - `def cmd_decision(engine, storage, parts)`
 - `def cmd_quantum(engine, storage, parts)`
 - `def cmd_surface(engine, storage, parts)`
@@ -2408,6 +2579,7 @@
 - `def cmd_events(engine, storage, parts)` - *List or dismiss cockpit popup events.*
 - `def _trade_quantity(value)` - *argparse type for trade orders: a positive count, or `max`/`all` for the largest possible order.*
 - `def _run_trade(engine, commodity_id, quantity, is_buy)`
+- `def cmd_relics_fuse(engine, source_rarity)`
 - `def main(argv)` - *Main CLI entrypoint.*
 
 ---
@@ -2415,7 +2587,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `727` lines (`25639` bytes)
+**Size**: `744` lines (`26263` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -2435,7 +2607,7 @@
 ### [`voidfarer/crew.py`](voidfarer/crew.py)
 > *Crew roles, recruiting, portraits, and crew-derived ship bonuses.*
 
-**Size**: `302` lines (`11167` bytes)
+**Size**: `310` lines (`11703` bytes)
 
 **Classes:**
 - `class CrewRole`
@@ -2506,7 +2678,7 @@
 ### [`voidfarer/economy.py`](voidfarer/economy.py)
 > *Dynamic Global Economy, supply/demand simulation, economic events, and galactic trade network.*
 
-**Size**: `434` lines (`16680` bytes)
+**Size**: `486` lines (`19039` bytes)
 
 **Functions:**
 - `def generate_initial_economy(systems, rng)` - *Construct baseline economy state with localized stockpiles and initial macroeconomic conditions.*
@@ -2535,7 +2707,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `9477` lines (`463426` bytes)
+**Size**: `10024` lines (`493587` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2650,6 +2822,7 @@
   - Method `.navigate_to(target_system_id)`
   - Method `.recruit_crew(role_id)`
   - Method `.dismiss_crew(crew_id)`
+  - Method `.assign_crew_station(crew_id, station)` - *Assign an active crew specialist to a flagship bridge/departmental station.*
   - Method `.get_crew_report()`
   - Method `._away_assigned_ids(ship)`
   - Method `._away_reward_preview(mission_type)`
@@ -2688,12 +2861,18 @@
   - Method `.collect_drone_yield(drone_id)` - *Collect accumulated cargo and research credits from fleet drones.*
   - Method `.set_battle_stance(stance)` - *Set fleet battle doctrine: balanced, aggressive, or defensive.*
   - Method `.captain_gambit()` - *Spend one captain's once-per-battle specialty action.*
+  - Method `.fuse_relics(source_rarity)` - *Fuse three relics of one rarity into a single relic of the next rarity.*
   - Method `._combat_defeat(combat, note, fleet_ships, crew, streak, fuel)` - *End a fight at 0 hull, pausing time so a destroyed ship cannot recover by ticking.*
   - Method `.combat_action(action)` - *Execute a tactical combat maneuver against an active hostile intercept.*
   - Method `.resolve_anomaly(choice_id)` - *Resolve current deep-space anomaly encounter with power-check validation.*
   - Method `.resolve_pirate_encounter(action)` - *Resolve a pirate toll: pay, fight, or burn clear. Flight resumes afterward.*
+  - Method `.resolve_customs(action)` - *Resolve a customs interdiction: bribe, jettison, confiscate, or flee.*
+  - Method `.overhaul_ship()` - *Overhaul structural frame and hyperlane wear at orbital drydock.*
+  - Method `.drydock_quote()` - *Live drydock service prices for the cockpit service deck.*
   - Method `.repair_hull(amount)` - *Repair ship hull integrity at orbital station.*
   - Method `.refuel(amount)` - *Refuel quantum drive at orbital station.*
+  - Method `.fabricate_munitions(munitions_type)` - *Field-fabricate emergency hull patch kits or fuel packs from raw titanium alloy.*
+  - Method `.check_solar_weather(system)` - *Telemetry check for space weather and coronal radiation risk in the specified or current system.*
   - Method `.step_orbits(delta_time)` - *Advance celestial bodies along orbital mechanics paths and cycle fleet drones.*
   - Method `.refresh_contracts()` - *Reroll the mission board across every category for a broker fee.*
   - Method `.claim_contract(contract_id)` - *Claim rewards for a fulfilled contract and immediately draw a new assignment.*
@@ -2726,7 +2905,7 @@
   - Method `.reconstruct_world(body_id, mode)` - *Rebuild a devastated inhabited world with credits or relief cargo.*
   - Method `.get_surface_report()` - *Landing-party operations available on the currently landed body.*
   - Method `.perform_surface_operation(operation_id)` - *Run one surface operation, then mark the site branch as worked.*
-  - Method `.salvage_derelict()` - *Board the current body's derelict hulk for cargo, credits, and hazard risk.*
+  - Method `.salvage_derelict(strategy)` - *Board the current body's derelict hulk for cargo, credits, and hazard risk.*
   - Method `.scoop_fuel()` - *Recover fuel from a star, gas giant, or ice body currently in orbit.*
   - Method `.train_crew_member(crew_id)` - *Run a paid training drill that raises one crew member's skill rank.*
   - Method `.shore_leave()` - *Grant fleet-wide shore leave at a docked station, restoring crew morale for credits.*
@@ -2902,7 +3081,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1303` lines (`58620` bytes)
+**Size**: `1385` lines (`62320` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -2999,7 +3178,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2272` lines (`84975` bytes)
+**Size**: `2366` lines (`88226` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -3048,6 +3227,9 @@
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class BountyContract` - *Dynamic mission contract leveraging Zeigarnik task completion tension.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+- `class CompletedQuest` - *A finished contract kept in the Captain's Log quest ledger.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class PrecursorRelic` - *Ancient artifact dropped via variable ratio schedule with passive multipliers.*
@@ -3103,6 +3285,9 @@
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class PirateEncounter` - *A pirate toll encounter that must be resolved before flight continues.*
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+- `class CustomsEncounter` - *A customs security inspection for contraband in high-security systems.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class GameEvent` - *Realtime popup event delivered to the cockpit.*
@@ -3269,20 +3454,23 @@
 ### [`voidfarer/retention.py`](voidfarer/retention.py)
 > *Psychological retention mechanics, Precursor relics, dynamic contracts, and pilot mastery.*
 
-**Size**: `437` lines (`15358` bytes)
+**Size**: `494` lines (`17680` bytes)
 
 **Functions:**
 - `def generate_contract(rng, category)` - *Procedurally instantiate a fresh BountyContract following Zeigarnik task loops.*
 - `def generate_initial_contracts(rng)` - *Generate the starter trio of active contracts across distinct categories.*
 - `def roll_relic_drop(rng, bonus_prob, forced_tier, current_system)` - *Execute a Variable Ratio drop roll for Precursor Relics.*
 - `def calculate_passive_multipliers(ship)` - *Calculate aggregate multipliers across streak, installed relics, and pilot talents.*
+- `def relic_count_by_rarity(relics)`
+- `def relic_completed_sets(relics)` - *How many rarity sets are complete at their threshold.*
+- `def relic_set_bonuses(relics)` - *Compute set bonuses from collecting relics of the same rarity.*
 
 ---
 
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1475` lines (`63336` bytes)
+**Size**: `1547` lines (`66687` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -3328,6 +3516,19 @@
 - `def calculate_ship_mod_bonuses(ship_mods)` - *Aggregate structural modification effects into the common bonus keyspace.*
 - `def slot_label(slot)`
 - `def slot_code(slot)` - *Short, always-fitting code for the 48px silhouette case.*
+
+---
+
+### [`voidfarer/smuggling.py`](voidfarer/smuggling.py)
+> *Contraband smuggling mechanics, customs scanner risks, and security interdiction.*
+
+**Size**: `153` lines (`5154` bytes)
+
+**Functions:**
+- `def is_contraband(commodity_id)` - *Return True if the commodity is classed as illicit contraband.*
+- `def get_contraband_in_cargo(cargo)` - *Extract all contraband goods and counts currently in the ship hold.*
+- `def calculate_customs_scan_risk(system, cargo, ship, power, equipment)` - *Compute detection probability and explanatory tactical factors.*
+- `def generate_customs_encounter(system, cargo, ship, seed)` - *Generate a deterministic customs inspection encounter.*
 
 ---
 

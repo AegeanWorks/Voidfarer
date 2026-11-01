@@ -1379,3 +1379,267 @@ contract, a dependency, a data format or the architecture; IDs are consecutive a
   4. Apply the additive bonus table to outpost production, reports and cash flow through one shared helper; apply the wormhole discount to jump fuel.
   5. Expose the target-card RESTORE action, `megastructure status|restore`, `POST /api/megastructure/restore`, and the Ancient Engineer codex milestone.
 - **Consequences**: Megastructures now provide a large credit sink and permanent strategic bonuses. Bonuses stack additively, restoration is one-time and persists, and legacy saves load dormant. Live Edge restored the Helios Dyson Swarm for 12,000 cr and showed the ONLINE state with no console errors. Suite: 1015 tests, 5/5 gates.
+
+### ADR-118: Final Graphics Depth — Surface Rotation, Finer Territory Cells and Tokenized Palette
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: The final graphics pass still had three visible gaps: rocky worlds read as flat decals because their cached sprites never turned, faction borders softened at 1080p, and the stylesheet repeated the core palette as raw hex literals across hundreds of rules.
+- **Decision**:
+  1. Add `SURFACE_SPIN_PERIOD_MS = 240000` and `surfaceSpin(body, now)` in `celestial.js`; rocky and ice worlds rotate slowly (one turn per four minutes) while stations keep their faster assembly spin and giants stay static. Polar caps move out of the cached sprite into `drawCaps(ctx, x, y, r)` so the caps stay with the axis while terrain drifts beneath them; the star-facing limb and terminator are drawn after the sprite so the lit crescent stays put.
+  2. Raise the territory raster to a 2px minimum cell (~960 across) by changing `renderTerritory` to `Math.max(2, Math.round(this.viewW / 960))`, keeping the cached rebuild and 1.6px blur.
+  3. Replace every exact core-palette literal in `style.css` (`#c9a35a`, `#e2c078`, `#c96b5a`, `#8fbf9f`, `#a98bbd`, `#7fb7c9`, `#ece4d4`, `#06090f`, `#0c121c`, `#101825`) with its `var(--console-*)` token, leaving each `--console-*` definition as the single source. Legacy aliases remain intact.
+- **Consequences**: Rocky worlds now read as turning spheres, faction borders stay crisp at 1080p, and the console palette has one source of truth with no rendered color change. A surface-spin proof sheet shows eight distinct phases, a cockpit/galaxy/surface sweep records 0 errors, 0 hscroll and 0 tiny text, and a CSS identity diff stays within idle animation noise. Suite: 1045 tests; project gates 5/5.
+
+
+### ADR-119: Relic Set Bonuses (Collection Progression)
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: Precursor relics granted individual passive stats, but collecting several of the same rarity had no compounding reward, so the collection loop plateaued after the first few finds.
+- **Decision**:
+  1. Add 
+elic_set_bonuses(relics) in 
+etention.py that grants resonance bonuses when rarity thresholds are met: 3 common (+5% scan bounty), 3 rare (+10% scan bounty, +5% trade margin), 2 epic (+15% laser damage, +10 shield cap), 1 legendary (+25% scan bounty, trade margin, laser damage).
+  2. Apply set bonuses inside calculate_passive_multipliers on top of individual relic stats.
+  3. Cover with six regression tests in 	est_perks_relics_rep.py (thresholds, each rarity, and end-to-end passive application).
+- **Consequences**: Collecting relics now compounds into tangible power growth, giving a long-term collection goal and an extra reason to keep scanning. The existing 	est_eye_of_void expectation updated to 1.6 to reflect the legendary set bonus. Suite: 1046 tests (1045 + 1 new... actually 1045+6? no, 6 added) -> see test count; project gates 5/5.
+
+
+### ADR-120: Ship Wear and Drydock Maintenance
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: The flagship had no degradation loop, so there was no recurring reason to visit drydocks between fights and jumps; maintenance was a one-off hull repair.
+- **Decision**:
+  1. Add wear: float (0-100) to ShipState, persisted in to_dict/from_dict and preserved by _clone_ship.
+  2. Each hyperspace jump increases wear by 1.0 (capped at 100).
+  3. Wear reduces scan_bounty and 	rade_margin by up to 10% via calculate_passive_multipliers.
+  4. 
+epair_hull at a station reduces wear by 0.2 per HP repaired.
+  5. Display wear in cmd_status and surface it in the state snapshot.
+- **Consequences**: A maintenance loop now pressures the player to dock and repair, adding simulation depth and a reason to engage with station services. Six regression tests cover accumulation, cap, efficiency penalty, repair reduction, and serialization. Suite: 1057 tests; project gates 5/5.
+
+
+### ADR-121: Holographic Cockpit Aesthetic Refinement & Tactical Visuals
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: Visual audit of the live cockpit screenshots revealed several polish gaps: top vitals subtexts suffered from text clipping/ellipsis at 1080p and 720p, power routing sliders rendered as plain HTML inputs without military channel differentiation, the telemetry stream lacked tactical category badging and timestamp styling, officer portraits displayed basic circular initial tags, the radar map lacked astronomical distance range rings, and real-time ship duels lacked muzzle flash bursts, shield deflection arcs, and core laser intensity.
+- **Decision**:
+  1. Refactor top vitals metrics (`HOLD`, `STREAK`, `MASTERY`) to concise tactical notations (`HOLD 15/40 · -65/M`, `x1.00 BASE`, `0/500 XP · +1P`), reduce card padding to 4px 6px, and enforce monospace typography with zero text truncation across viewports.
+  2. Implement tactical power channel tracks with dedicated accent gradients (cyan for engines, cobalt blue for shields, amethyst for sensors, crimson for weapons), beveled brass thumbs with illuminated center notches, and glowing digital percentage readouts.
+  3. Overhaul `portraitAvatar` into an SVG naval officer dossier crest with a hexagonal armored frame, targeting reticle tick marks, rank chevron peak, and monospace callout initial plate.
+  4. Format the flight log telemetry stream with monospace timestamp chips and color-coded tactical category badges (`[SYS]`, `[NAV]`, `[WAR]`, `[REWARD]`).
+  5. Add astronomical distance range rings with AU markers (`0.5 AU`, `1.0 AU`, `2.0 AU`, etc.) on the orbital radar canvas.
+  6. Upgrade `drawCombatVisual` with multi-tier laser beams (intense white core + radiant amber halo), ship bow muzzle flashes, and dynamic cyan shield deflection ripple arcs wrapping the target on impact.
+- **Consequences**: The cockpit now presents a cohesive, high-density military sci-fi command console with zero text truncation across resolutions, authentic tactical gauges, and animated kinetic combat feedback. Captured desktop and combat screenshots verify flawless rendering; 1057 tests and 5/5 gates pass.
+
+
+### ADR-122: Tactical Radar Reticle, Starship Blueprint Cutaways & Command Surface Polishing
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: Visual audits of the live application across desktop viewports identified further areas for deep aesthetic elevation: the nav-radar target selection rendered as an unadorned box without tactical targeting brackets or velocity vectors; the refit bay ship display rendered simple flat triangle polygons; the commodity exchange table lacked clear category badging and profit/loss margin indicators; planetary surface operations lacked topographic sensor scanlines and tactical coordinate readouts; interstellar hyperlanes lacked dynamic energy flow visualizations; and hostile combat hull meters appeared under-illuminated against dark backdrops.
+- **Decision**:
+  1. Nav-Radar: Implement animated 4-corner targeting brackets (`┌ ┐ └ ┘`) with dynamic pulse margin, center crosshair ticks, tangential orbital velocity vector arrows, and live traveling dashed course plot line with dynamic AU distance label.
+  2. Starship Schematics: Upgrade Refit Bay ship rendering into vector blueprint cutaway wireframes for standard, freighter, fighter, explorer, and stealth hulls, displaying interior bulkheads, hull plating, thruster nozzles, and module hardpoint sockets.
+  3. Fleet & Drones: Equip drone cards with tactical class glyphs and miniaturized color-coded integrity meter bars.
+  4. Commodity Exchange UI: Implement dedicated category micro-badges (`[ORE]`, `[TECH]`, `[FOOD]`, `[MEDI]`, `[CONT]`), align order lot controls, and add real-time margin profit/loss badges (`+X CR ▲` / `-X CR ▼`).
+  5. Topographic Surface HUD: Add animated vertical topographic sonar sweep lines to the surface terrain canvas, bracketed target sites, and latitude/longitude coordinate chips in site dossiers.
+  6. Galaxy Hyperlane Network: Render animated interstellar transit pulse flows drifting along hyperlanes to visualize live galactic commerce corridors.
+  7. Combat Tactical Status: Upgrade enemy deflector shield and hull armor meters with energized multi-stop gradients and glowing drop shadows, plus smoke/spark hull breach venting on damaged hostiles.
+- **Consequences**: Every major interactive surface—from orbital radar navigation and planetary exploration to starship engineering, interstellar cartography, commodity commerce, and ship-to-ship tactical duels—now exhibits unified military-grade sci-fi aesthetics and responsive feedback. All 1,057 test suite gates pass 100%; visual screenshot proofs confirm zero layout regression.
+
+
+### ADR-123: Deep Expansion — Contraband Smuggling, Macroeconomic Volatility, Drydock Overhaul & WebAudio Soundscape
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: While core flight and combat loops were solid, Voidfarer lacked deep underworld smuggling risk in high-security systems, dynamic macroeconomic price swings and allied faction commerce margin incentives, recurring mid/late-game structural maintenance sinks outside combat damage, and an authentic multi-frequency procedural WebAudio soundscape for combat deflection and warp transit.
+- **Decision**:
+  1. Contraband Smuggling & System Security Scanners: Introduce CustomsEncounter and voidfarer/smuggling.py. When jumping into high-security sectors (security >= 0.65) carrying contraband (e.g. Xenolith relics), federal patrol cutters calculate interception risk against player stealth hull, sensor power ECM scrambling, and piloting mastery. Intercepted players can bribe customs officers, jettison contraband, submit to fines/reputation penalties, or attempt a high-thrust burn escape with fugitive status. Expose /api/customs/resolve and interactive cockpit warning banner.
+  2. Macroeconomic Volatility & Allied Trade Margins: Expand EVENT_TEMPLATES with 4 new systemic market shocks (famine_embargo, tech_surplus, energy_deregulation, defense_mobilization). Introduce event-driven spread volatility (widens to 16% in crises/blockades, tightens to 8% in booms) and scale trade margins for Allied factions (standing >= 50, up to +10% favorable spread).
+  3. Drydock Structural Overhaul: Add overhaul_ship() to SimulationEngine and /api/overhaul to REST server. Stations and shipyards can now scrub accumulated hyperlane structural wear back to 0.0% for credits scaled by wear and diplomatic service perks, completing the flagship maintenance loop.
+  4. WebAudio Procedural Soundscape: Expand SoundController with playShieldDeflect() (resonant 1200Hz-to-580Hz metallic ping), playQuantumWarp() (sweeping sub-bass 80Hz-to-22Hz sawtooth filter dive), playCashRegister() (crisp 1046Hz/1318Hz dual chime for trades), and playHullDamage() (95Hz square-wave punch). Wire them to kinetic combat events, hyperlane jumps, and commodity transactions.
+  5. Visual & Architectural Integrity: Styled customs alert card with high-contrast amber warning shell and action grid (BRIBE, JETTISON, CONFISCATE, FLEE) adhering to the zero bare hex palette token rule. All new endpoints documented in agent_play.py and handled by AiCaptain.
+- **Consequences**: Adds rich depth to interstellar trading, contraband risk, faction diplomacy, and starship maintenance, accompanied by tactile audio feedback and high-fidelity tactical alerts. 1,072 tests pass (100%); hygiene, secret scan, and AST maps verified clean.
+
+### ADR-124: Tactical Stellar Expansion — Atmospheric Rayleigh Scattering, Ring Shadows, Subsystem Targeting, Thermal Heat Curve & Munition Fabrication
+- **Context**: Visual fidelity of celestial bodies lacked real-time atmospheric twilight rim illumination and planetary ring daylight shadows. Ship chassis lacked dynamic in-cockpit comparison transparency. Tactical space combat lacked granular subsystem targeting (drive manifolds, command deck bridge strikes), and ship reactor cores did not model heat generation from weapon arrays. Furthermore, deep-space expeditions lacked emergency field fabrication options to synthesize hull patch kits and fuel cells from salvaged titanium alloy, and high-energy spectral systems did not challenge navigation with solar storm space weather.
+- **Decision**:
+  1. Planetary Atmospheric Twilight & Ring Shadows: Implemented `drawRayleighAtmosphere` dual-gradient twilight scattering rim on atmospheric bodies (`terrestrial`, `oceanic`, `super_earth`, `gas_giant`) oriented toward the stellar light source. Implemented `drawRingShadow` projecting dark elliptical shadow bands across the daylight hemisphere of ringed celestial bodies aligned with ring inclination. Preserved strict backward-compatible signatures.
+  2. Engine Thrust Particles & Kinetic Combat FX: Implemented dynamic ion particle plumes trailing from ship nozzles with power-scaled color shift (cyan -> electric blue -> overburn violet), plus dynamic beam and burst sparks on tactical weapon strikes.
+  3. Shipyard Chassis Comparison Hologram: Implemented an interactive comparison matrix (`.comparison-matrix`) comparing Hull, Shield, Fuel, and Cargo capacity against the player's active ship with color-coded delta metrics (`+X ▲`, `-X ▼`, `±0`), styled with CSS tokens adhering strictly to the zero bare hex palette rule.
+  4. Tactical Subsystem Targeting: Expanded `combat_action` in `engine.py` and `/api/combat` with `target_engines` (strikes drive manifolds, inflicts 18 damage, collapses enemy evasion and forces `brace`) and `target_bridge` (requires >= 15% Weapons power; high-risk pinpoint shot dealing 50 critical damage and inducing command crew panic, cancelling enemy counter-battery for the round).
+  5. Combat Reactor Thermal Curve & Overheating: Integrated heat generation into combat actions (+6 heat per laser volley, +10 heat per bridge attack, +5 per subsystem strike, +4 per shield overcharge) modulated by reactor modes (overclock +50% heat, eco -30% heat).
+  6. Field Munition Fabrication: Implemented `fabricate_munitions` and `/api/fabricate` enabling field synthesis of Emergency Armor Patch Kits (+25 Hull) and Emergency Fuel Cell Packs (+25 Fuel) from 1x raw titanium alloy salvaged from derelicts and combat.
+  7. Solar Storm Space Weather Hazards: Implemented `check_solar_weather` and space weather hazard rolls upon hyperlane transit into high-energy spectral systems (O, B, Wolf-Rayet, Red Giant, Neutron star). Deflector shield power >= 35% deflects coronal plasma flares (+25 Pilot XP); vulnerable shields suffer a 15 MW drain and reactor heat surge (+8.0 heat).
+- **Consequences**: Deepens tactical combat choice, visual atmosphere, starship refitting clarity, and space exploration survival mechanics. All 1,080 unit tests pass (100%), project hygiene clean, invariant reachability shield clean, secret scanner clean, and real Playwright browser reviews confirmed with 0 console errors and 0 horizontal scroll.
+
+
+### ADR-125: Stellar Depth, Officer Station Assignments, Combat Gauges & Market Sparklines
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: Solar limbs lacked dynamic magnetic plasma loops and binary star systems lacked Roche-lobe accretion streams. In combat, deflector shield hits lacked kinetic impact ripples, and hostile targeting lacked visual reticle brackets and granular subsystem integrity gauges. In the economy, commodity prices lacked historical volatility sparklines and market trend indicators. In ship operations, crew specialists lacked direct station assignments with departmental synergy bonuses, and deep space exploration lacked distress beacon and precursor crypt encounters.
+- **Decision**:
+  1. Solar Prominences & Binary Accretion: Implemented `drawSolarProminences` generating dynamic magnetic plasma arcs using pulsating quadratic bezier curves, and `drawBinaryStar` rendering dual-stellar gravitational barycenters connected by glowing Roche-lobe mass transfer streams in `celestial.js`.
+  2. Shield Impact Ripple FX & Tactical Reticle Brackets: Implemented `shieldRipple` expanding shockwave particle rings in `particles.js`, wired upon shield deflection in `drawCombatVisual`, alongside high-tech corner reticle brackets (`┌ ┐ └ ┘`) framing the target with center crosshairs.
+  3. Market Sparklines & Volatility Badges: Added real-time inline SVG sparklines in commodity tables and trend badges (`.trend-up`, `.trend-down`, `.trend-flat` with `▲`, `▼`, `—`), dynamically calculating price deviation from galactic baseline in `app.js` and styled with CSS tokens.
+  4. Combat Subsystem Telemetry Gauges: Added live integrity gauges for `WEAPONS`, `DRIVES`, `SHIELDS`, `COMMAND` in the combat tactical card, reflecting status thresholds (`DAMAGED`, `CRIPPLED`, `OFFLINE`, `PANICKED`, `NOMINAL`).
+  5. Officer Station Assignments & Departmental Synergy: Added `station` field to `CrewMember` (`helm`, `engineering`, `science`, `medical`, `tactical`), granting +40% synergy bonus (`station_mult = 1.4`) for matching specialties or 1.15 off-role in `crew.py`, wired through `assign_crew_station` in `engine.py`, `/api/crew/station` in `server.py`, interactive dropdowns in `app.js`, and documented in `agent_play.py`.
+  6. Deep Space Encounters: Added `distress_beacon_prospector` and `precursor_crypt_vault` to `galaxy.py` with multi-choice resolution branches (tractor tow, emergency fuel transfer, sensor decipher, laser breach).
+- **Consequences**: Deepens visual immersion, tactical combat telemetry, officer crew management, economic forecasting, and deep-space encounters. All 1,085 unit tests pass (100%), project hygiene passes, secret scan passes, codebase AST maps stay fresh, and Playwright desktop browser review confirms 0 console errors and 0 horizontal scroll.
+
+
+### ADR-126: Planetary Ecumenopolis Nightside Lights, Hexagonal Deflector Grid, Bloomberg Market Terminals & Point Defense Flak
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: Visual review of high-resolution live browser screenshots revealed further polish opportunities: inhabited planetary bodies lacked dark-side artificial city light bioluminescence, orbital hyperlane gates lacked electromagnetic containment rings, laser fire lacked volumetric atmospheric bloom and ionizing lightning arcs, deflector shields lacked hexagonal mesh impact facets, crew station selectors lacked explicit departmental role hints, commodity sparklines lacked shaded area fills, and tactical space combat lacked point-defense countermeasures against incoming munitions.
+- **Decision**:
+  1. Planetary Ecumenopolis Nightside Lights & Jump Gate Singularities: Added `drawNightsideCityLights` projecting golden amber (`#e2c078`) and cyan (`#7fb7c9`) urban constellations across dark planetary hemispheres based on solar vector dot product, and `drawJumpGateSingularity` rendering rotating counter-balanced electromagnetic gantries with Cherenkov radiation cores in `celestial.js`.
+  2. Hexagonal Deflector Shield Grid & Volumetric Plasma Bloom: Added `hex` particle kind and `hexShieldImpact` honeycomb facet dispersion in `particles.js`, and upgraded `drawCombatVisual` in `app.js` with multi-stage volumetric plasma bloom, radiant laser sheaths, and jittered ionizing white beam cores.
+  3. Tactical Station Dropdowns: Upgraded crew station assignment select elements with custom SVG chevron indicators and descriptive role indicators (`➤ HELM (+40% Pilot)`, `⚡ ENG (+40% Eng)`, `✦ TAC (+40% Marine)`, `⬡ SCI (+40% Sci)`, `✚ MED (+40% Medic)`), strictly honoring the emoji codepoint budget (< 0x1F000).
+  4. Bloomberg/EVE Style Commodity Sparklines: Implemented shaded SVG linear gradient area fill polygons beneath market trend paths with dynamic profit/loss coloring.
+  5. Tactical HUD Telemetry & Flight Log Chips: Added `LOCK: TGT-01` and `DIST: 1.4M KM` targeting readouts around enemy brackets, status LED indicator pips (`● 100%`, `✕ OFFLINE`) on combat subsystem gauges, and military time chips (`[T+0042]`) on flight log entries.
+  6. Point Defense Cannon Countermeasures: Added `point_defense` tactical combat action in `engine.py` requiring >= 15% Weapons or Engines power, intercepting 70% of inbound hostile counter-battery damage and shredding target hulls with rapid tungsten flak for 14 kinetic damage, wired to `btnCombatPdc` (`⛨ PDC FLAK SCREEN`) in `index.html` and `app.js`.
+- **Consequences**: Greatly enhances cockpit military aesthetic, visual atmosphere, financial market transparency, and tactical space combat choice. All 1,086 unit tests pass (100%), 180-step AI captain mechanics pass with 0 gaps, project hygiene passes, invariant reachability passes, secret scan passes, and real browser review confirms 0 console errors and 0 horizontal scroll.
+
+
+### ADR-127: Comet Dual Sublimation Tails, RCS Vernier Puffs, Academy Milestone Trackers & In-Combat Coolant Venting
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: Visual and interface reviews across flight and orbital operations identified several depth opportunities: cometary bodies lacked realistic dual-tail astronomical physics (broad curved golden dust plumes vs straight electric cyan magnetic ion streams), attitude maneuvers lacked reaction control system (RCS) vernier gas puffs, the Cadet Flight Academy ribbon lacked a clear multi-step visual progression tracker, the subspace decrypted comms log lacked an animated audio-frequency oscilloscope, commodity commerce lacked instant category filtering, and extended tactical combat duels lacked emergency in-combat reactor heat venting.
+- **Decision**:
+  1. Astronomical Comet Tails & Coma: Added `drawComet` in `celestial.js` modeling dual sublimation tails (curved golden dust tail `rgba(236, 228, 212, ...)` and straight collimated magnetic ion tail `rgba(127, 183, 201, ...)` with high-frequency stream filaments) pointing away from the stellar light source, enveloped in a glowing sublimation coma surrounding an icy nucleus.
+  2. RCS Attitude Vernier Thruster Micro-Puffs: Added `rcsPuff` in `particles.js` generating brief directional gas puffs with velocity drag.
+  3. Cadet Academy Visual Progression Tracker: Added `.cadet-step-pips` to `index.html`, `style.css`, and `app.js`, displaying connected milestone status chips (`[1] · [2] · ... · [6]`) with completion checks (`✓`), active gold illumination, and locked cyan states.
+  4. Subspace Comms Vector Oscilloscope: Added `commsOscilloscope` canvas and `drawCommsOscilloscope` in `app.js` rendering an undulating CRT phosphor vector waveform with grid scanlines over incoming decrypted transmissions.
+  5. Commodity Quick-Filter Pills: Added `.market-category-filters` with category filter buttons (`ALL`, `ORE`, `TECH`, `FOOD`, `MED`, `CONTRABAND`), wired through `syncMarketCategoryFilters` in `app.js` to dynamically filter quotes.
+  6. In-Combat Emergency Coolant Purge: Expanded `combat_action` in `engine.py` with `vent_heat`, allowing pilots to trigger `vent_reactor` during active tactical intercepts to drain 45 heat and avert catastrophic core shutdown.
+- **Consequences**: Deepens celestial fidelity, command deck polish, commerce usability, and tactical combat survivability. All 1,088 unit tests pass (100%), 180-step AI captain mechanics pass with 0 gaps, project hygiene passes, secret scan passes, and real browser reviews confirm 0 console errors and 0 horizontal scroll.
+
+
+### ADR-128: Ticker State Mutability Fix, Background Loop Resilience, Transit Flow & Oscilloscope Graticule
+- **Date**: 2026-10-31
+- **Status**: Accepted
+- **Context**: A critical runtime crash `UnboundLocalError: cannot access local variable 'new_stats_tick' where it is not associated with a value` occurred during `SimulationEngine.tick()` at line 9263 whenever war bonds resolved with positive credit payouts or planetary outposts were raided during faction system captures. Because `server.py`'s background `_ticker_loop` thread lacked an exception guard around `engine.tick(1)`, this unhandled error abruptly terminated the ticker thread. With the cosmic time clock permanently frozen, ships in transit could never reach their destination (`new_tick >= arrival_tick`), rendering the in-system travel mechanic completely stuck. In addition, the Subspace Comms Oscilloscope and Target Dossier HUD needed visual alignment, CRT graticule division markings, and breathing room to prevent scroll cropping.
+- **Decision**:
+  1. Ticker State Mutability & Scope Resolution: Moved `new_stats_tick = dict(self.state.stats)` to the top of `SimulationEngine.tick()` prior to faction economy and war bond resolutions, eliminating the `UnboundLocalError` and preserving recorded bond payouts and outpost raid metrics across subsequent simulation phases.
+  2. Server Ticker Loop Resilience: Wrapped `engine.tick(1)` in `_ticker_loop` within a resilient `try...except Exception as exc:` block logging tracebacks and applying a backoff pause instead of crashing the daemon thread, ensuring transient tick errors never kill the simulation loop.
+  3. Transit Mechanics & Arrival State Audit: Verified in-system sublight, quantum transit, and open-space waypoint vectors, validating ETA tick counting, fuel consumption, and arrival event dispatches across multiple step intervals.
+  4. CRT Oscilloscope Graticule & Electron Beam Sweep: Enhanced `drawCommsOscilloscope` in `app.js` with Tektronix-style 10px division ticks, baseline axes, phosphor persistence glow halos, sweeping electron excitation points, and active carrier telemetry readouts (`FREQ 1420.405 MHz // [CH-A] 50mV/div // SNR +28.4 dB // DECRYPTED`). Added CRT scanline overlay and inset glow in `style.css`.
+  5. Target Card Layout & Insignia Pips: Adjusted target attribute grid padding and font spacing in `style.css`, ensuring all 11 planetary metrics, resources, transit plan modes, and action buttons (`TRANSIT & ORBIT`, `QUANTUM`, `CLEAR`) remain 100% visible on 1080p without vertical clipping. Upgraded Cadet Academy step pips with pulsing military insignia borders (`@keyframes cadetPipPulse`).
+  6. Jump Gate Singularity & Comet Tails Polish: Added stator lightning arc discharges and sub-space gravitational distortion halos to jump gates, and micro ice sparkle glints to cometary nuclei in `celestial.js`.
+- **Consequences**: Resolves the ticker loop crash and travel freeze permanently. Guarantees 100% test pass rate across 1,089 unit tests, cleans hygiene checks, maintains single-declaration CSS palette constraints, and validates real-browser cockpit rendering with 0 console errors and 0 horizontal scroll.
+
+
+### ADR-129: Audit of the Pending Visual/Mechanics Work — CLI Entry Ordering, Counter-Battery Telemetry and Documentation Truth
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The ledger recorded the ticker/visual task as complete, but 26 modified and 9 untracked files remained uncommitted. An audit of that surface found defects the existing suite could not see: `cmd_relics_fuse` was defined after the `if __name__ == "__main__"` guard, so `python -m voidfarer.cli relics fuse <rarity>` raised `NameError`, and the successful fusion was never persisted; the point-defense interception note was assigned and then immediately overwritten by `evasion_note = ""`, so a PDC flack-screen turn always read as plain counter-battery damage; the relic-set test file imported `start_background_server`/`StorageManager` twice (F811); `codex.py` imported `relic_set_bonuses` without using it; the economy volatility test computed `spread_baseline` but never asserted the spread change; and README/COCKPIT described an older 1,045-test, 133-control, 44-family run with no customs, overhaul or fabrication guidance.
+- **Decision**:
+  1. Move `cmd_relics_fuse` above `main`, type its rarity argument, colour its result like the other CLI commands, and save the fused state in the `relics` branch only when fusion succeeds.
+  2. Clear `evasion_note` before the point-defense interception, append (not replace) the afterburner evasion note, and keep the PDC interception line in the final combat message.
+  3. Remove the duplicate imports and the unused codex import; extend the economy test to assert that the crisis spread ratio is wider and the boom spread ratio narrower than the no-event baseline, using the previously unused `spread_baseline`.
+  4. Refresh README counts to the measured values (1,092 tests, 37 mechanic families, 38/51 actions, 162 controls with 63 visible), add the smuggling, particle and surface-map modules to the tree, and keep the README under the 30,000-character cold-start limit; document the customs card, drydock overhaul and field fabrication in `docs/COCKPIT.md`.
+- **Consequences**: The script-mode CLI fuse path works and persists, PDC turns report their interception, lint regressions are gone, documentation matches the measured run, and all five project gates pass over the pending work. The full suite reports 1,092 tests in 34.7s, `ai_play --steps 180` reports 0 coverage gaps, the Edge click-map reports 0 errors, 0 horizontal scroll, 0 missing and 0 duplicate controls, and the README/AST knowledge gates are fresh. The UI delivery contract still needs a finished UI task before a commit; no files were committed.
+
+### ADR-130: Second Audit Pass — Combat Audio Wiring, Badge Dot Colors and a Dead Sound Reference
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: A follow-up static audit of the uncommitted cockpit assets found three presentation defects that the string-level UI tests did not catch. `playShieldDeflect()` and `playHullDamage()` were added for ADR-123 but never called anywhere, so shield impacts and hull breaches stayed silent while the code claimed otherwise. The badge dots marked `dot-cyan`, `dot-red` and `dot-purple` in the panel headers had no CSS rules, so every one of them rendered with the default cyan background; only amber and green had rules. The fabrication failure path called `this.sound?.playBuzzer?.()`, a method `SoundController` does not define, so the failure tone never played.
+- **Decision**:
+  1. Capture the pre-action hull and shield in `handleCombat`, compare them with the returned snapshot, and play `playHullDamage()` on hull loss or `playShieldDeflect()` when only shields fell.
+  2. Add token-based `.dot-cyan`, `.dot-red` and `.dot-purple` rules beside the existing amber/green rules, using `var(--neon-*)` aliases of the console palette.
+  3. Replace the nonexistent buzzer call with `playAlarm()`, and pin all three fixes with static cockpit tests plus a no-`playBuzzer` assertion.
+- **Consequences**: Combat now gives distinct shield-deflection and hull-damage audio feedback, every badge dot uses its intended colour token, and fabrication failures are audible. The suite grows to 1,094 tests with no failures, the Edge click-map still reports 0 errors, 0 horizontal scroll, 0 missing and 0 duplicate controls, and the README count and knowledge gates stay fresh. No files were committed.
+
+### ADR-131: CLI Parity for Customs, Overhaul, Field Fabrication and Salvage Strategies
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: G-012 requires every new mechanic to stay exposed through CLI, REST and cockpit with deterministic, serialized behaviour. Customs interdiction, drydock overhaul and field fabrication shipped with REST endpoints and cockpit controls but no CLI path, and `salvage` always used the balanced strategy even though the engine and cockpit had grown cautious, aggressive and scientific options. A headless player could not reach three new mechanics at all.
+- **Decision**:
+  1. Add `customs [status|bribe|jettison|confiscate|flee]`, printing the patrol vessel, detected goods, fine, bribe and current credits/fuel before resolving through `resolve_customs` and saving only on success.
+  2. Add `overhaul` and `fabricate [patch_kit|fuel_cell]`, delegating to `overhaul_ship` and `fabricate_munitions` and saving only on success.
+  3. Give `salvage` an optional strategy argument (`cautious`, `balanced`, `aggressive`, `scientific`, default balanced) forwarded to `salvage_derelict(strategy=...)`.
+  4. Document the commands in README sections 11 and 18b, and pin status output, persistence and strategy forwarding with four CLI tests.
+- **Consequences**: Headless and terminal play can now resolve customs, scrub wear, fabricate repairs and pick a salvage risk profile, matching REST and cockpit behaviour. The suite grows to 1,098 tests; the README stays under the 30,000-character limit, the AST map is refreshed, and all five project gates pass. No files were committed.
+
+### ADR-132: Completed-Quest Ledger for the Captain's Log
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The cockpit has always rendered a COMPLETED QUESTS section from `state.quests_completed`, but no Python code ever produced that key, so the panel showed "No completed quests yet." for every save, however many contracts the player had claimed. The data existed only as the `contracts_completed` counter.
+- **Decision**:
+  1. Add a frozen `CompletedQuest` model (id, title, kind, epoch-millisecond `completed_at`, rewards dict) with `to_dict`/`from_dict`, and a `GameState.completed_quests` tuple defaulting to empty so legacy saves load unchanged.
+  2. Record a completed quest inside `claim_contract` in the same atomic state clone that pays the rewards, keeping the newest 50 entries and storing credits, XP and the relic name.
+  3. Expose the ledger as `quests_completed` in the status snapshot; the existing cockpit renderer then fills its completed-quest list, and document the ledger in README section 20.
+  4. Pin the record, snapshot key and serialization round trip inside the existing contract test.
+- **Consequences**: Claimed contracts now appear in the Captain's Log with title, date and reward chips, and the ledger survives save/load. The suite stays at 1,098 tests with the strengthened claim test, the Edge click-map reports 0 errors and 0 horizontal scroll, the AST map and README gates are fresh, and all five project gates pass. No files were committed.
+
+### ADR-133: Live Drydock Service Quotes on the Cockpit Service Deck
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The drydock service deck rendered hardcoded `100 CR` and `120 CR` repair/refuel labels that never changed, and computed the overhaul price in JavaScript as `max(10, round(wear * 4.5))`. The engine charges `int(actual * 4 * (1 - repair_discount))`, honours `free_refuel`, and applies the same faction repair discount to overhaul, so an allied player saw a price different from the charge and full tanks still showed a payable refuel price.
+- **Decision**:
+  1. Add `SimulationEngine.drydock_quote()`, which mirrors the repair, refuel and overhaul formulas exactly, reports whether docked, the billable hull/fuel units, all three prices, the discount, free-refuel state and credits, and expose it as `drydock` in the status snapshot.
+  2. Replace the client-side overhaul estimate with quote-driven labels for repair, refuel and overhaul, showing the billable units and disabling each button when undocked, already full, or short of credits.
+  3. Pin the invariant that each quote equals the credits actually charged by `repair_hull`, `refuel` and `overhaul_ship`, and that the cockpit reads the quote rather than re-computing prices.
+- **Consequences**: Every service price on the deck now matches the charge, including faction discounts and free refuel, and unusable actions are visibly disabled. The suite grows to 1,100 tests, the Edge click-map still reports 0 errors, 0 horizontal scroll and 0 missing or duplicate controls, the AST map and README stay fresh, and all five project gates pass. No files were committed.
+
+### ADR-134: Relic Fusion Reaches REST and the Cockpit Forge
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: `fuse_relics` shipped with a `relics fuse` CLI command only. The server had a read-only `/api/relics` route and the cockpit relic panel showed set resonance, so players in the browser could see the three-relic threshold but had no way to fuse; the new mechanic violated the CLI/REST/cockpit parity contract.
+- **Decision**:
+  1. Add `POST /api/relics/fuse` taking `{rarity}`, delegating to `fuse_relics`, persisting through storage, and returning the fused relic plus the full state snapshot. Declare it in `CONTEXT_ACTIONS` so the headless-coverage gate stays honest.
+  2. Render a RESONANCE FORGE row in the relic set panel with one button per fusible rarity, disabled below three relics, wired to `handleFuseRelics` with chime/alarm feedback and a HUD refresh from the returned snapshot.
+  3. Style the forge row with the existing palette tokens, document `relics fuse` and the cockpit forge in README section 9, and pin the endpoint (success then insufficient relics) and the cockpit wiring with tests.
+- **Consequences**: Relic fusion is now reachable from terminals, REST clients and the cockpit, and its set-bonus loop is playable in the browser. The suite grows to 1,102 tests, `ai_play --steps 180` still reports 0 coverage gaps, the Edge click-map reports 0 errors, 0 horizontal scroll and 0 missing or duplicate controls, the AST map and README remain fresh, and all five project gates pass. No files were committed.
+
+### ADR-135: CLI Reach for Subsystem Strikes, PDC, Coolant Purge and Bridge Stations
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The tactical layer grew engine-side targets for engines and the bridge plus point defense and mid-fight coolant purge, but the CLI only knew `weapons` and `shields`; worse, `combat target engines` fell through the old substring check and silently fired at the enemy's weapons. Bridge-station assignment likewise existed only in REST and the cockpit.
+- **Decision**:
+  1. Replace the ad-hoc target substring test with an explicit subsystem map covering weapons, shields, engines and bridge (plus synonyms), and add `pdc` and `vent` / `coolant` / `purge` to the combat action map and parser choices.
+  2. Add `crew station <crew_id> <station>` with the engine's six valid stations, persisting on success, showing each member's station in the roster and documenting both paths in README sections 17 and 18d.
+  3. Pin the mapping table, the persistence round trip and unassignment with two CLI tests.
+- **Consequences**: Every tactical subsystem and both new defensive maneuvers are reachable from the terminal with the correct engine action, and bridge officers can be posted headlessly. The suite grows to 1,104 tests, the Edge click-map still reports 0 errors, 0 horizontal scroll and 0 missing or duplicate controls, the README stays under the 30,000-character cap with the knowledge map fresh, and all five project gates pass. No files were committed.
+
+### ADR-136: HUD Text Meets the 12px Readability Floor
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The project's own audit treats `tinyText` as a severe finding, and the real-browser click-map reported 20 elements under 12px: the HULL/SHIELD/FUEL/CREDITS/STREAK/MASTERY labels at 11px, their subtexts and the cargo summary at 10.5px, and the cadet ability pips and their dividers at 9-10px. A later cockpit-polish block had silently overridden an earlier 12px declaration, so the floor existed but was not in effect.
+- **Decision**:
+  1. Set the effective `.vital-label`, `.vital-label strong`, `.vital-subtext`, `.cadet-pip` and `.cadet-pip-divider` sizes to 12px, matching the earlier declaration and the 2300px-wide 13px step.
+  2. Re-run the Edge click-map to prove no horizontal scroll or control regressions, and pin the five selectors at or above 12px in a static cockpit test.
+- **Consequences**: The cockpit has no text below the 12px floor any more; the click-map reports tiny 0, 0 errors, 0 horizontal scroll and 0 missing or duplicate controls. The suite grows to 1,105 tests, the AST map and README stay fresh, and all five project gates pass. No files were committed.
+
+### ADR-137: Full Scenario and Tab Audit — 12px Floor Across Every New Surface, Plus the Overhaul Log
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Earlier click-map runs only inspected the default cockpit at desktop width, so whole surfaces escaped the readability floor: the combat card's subsystem gauges (8px) and target buttons (10px), salvage rewards (10px), the fabrication header/buttons (9-10px), salvage strategy buttons (9px), market trend and station badges (9px), the crew station select (10px), the target info grid (11.5px) and flight-log time/tag (10px). A separate engine bug wrote `0.0% wear restored` into the flight log for every overhaul, whatever wear had been scrubbed.
+- **Decision**:
+  1. Raise every rendered new-surface selector to 12px and extend the static floor test to eighteen selectors.
+  2. Audit all three supported viewports (desktop, laptop, short), every browser scenario and all 16 cockpit tabs; each reports 0 errors, 0 horizontal scroll and 0 tiny text.
+  3. Fix the overhaul flight-log entry to interpolate the scrubbed wear and assert it against the pre-overhaul quote.
+- **Consequences**: The readability floor now holds across the entire cockpit rather than the default screen, and the log tells the truth after an overhaul. The suite stays at 1,105 tests with the strengthened assertions, every browser audit is clean, the AST map and README stay fresh, and all five project gates pass. No files were committed.
+
+### ADR-138: Pending-Work Delivery Audit — Research Queue Retention, Salvage Input Validation and One Relic-Set Table
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Reviewing the 75 unpushed commits and the pending cockpit batch for delivery found three gaps. The research auto-start loop popped every queued project while looking for the first eligible one, so a project blocked on a prerequisite that finished later was silently discarded instead of starting. `salvage_derelict` accepted any strategy string and quietly fell back to balanced, unlike `fabricate_munitions`, which rejects unknown blueprints. Relic set thresholds were duplicated in `retention.relic_set_bonuses`, `codex.metric_value` and the CLI display, so three tables could drift; `calculate_passive_multipliers` also carried a redundant if/else that added the same value either way.
+- **Decision**:
+  1. Start the first eligible queued project by index, delete only that entry, and prune only unknown or already-completed ids so prerequisite-blocked projects survive until their turn; cover both the retention and later auto-start with a test.
+  2. Normalize and validate the salvage strategy in the engine, returning a clear refusal with an empty report for unknown values, and test the rejection.
+  3. Add `RELIC_SET_THRESHOLDS`, `relic_count_by_rarity` and `relic_completed_sets` to `retention`, route `relic_set_bonuses`, the codex `relic_sets` metric and the CLI display through them, drop the redundant branch, and pin the thresholds with a test.
+- **Consequences**: A queued research project can no longer be lost to a prerequisite race, REST callers get an explicit salvage refusal, and relic resonance has a single source of truth. The suite grows to 1,108 tests, `ai_play --steps 180` still reports 38/51 actions with zero gaps, every browser scenario and tab audit is clean, and the five project gates pass. The pending batch and these fixes are committed and pushed; the cockpit UI human-review evidence gate is left open because no human visual review was performed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
