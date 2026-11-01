@@ -4,6 +4,8 @@
  */
 
 const TICKS_PER_SECOND = 2.0;
+// A paused, empty cockpit still needs orbit and star motion, but not 60 full redraws/s.
+const IDLE_FRAME_MS = 1000 / 30;
 
 // Must match voidfarer/demographics.py DEVASTATION_CAPACITY_LOSS.
 const DEVASTATION_CAPACITY_LOSS = 0.65;
@@ -42,21 +44,21 @@ const BODY_TYPE_LABELS = {
 const SKILL_META = {
     piloting: { name: "Piloting", icon: "✈", desc: "Improves sublight maneuverability, warp efficiency, and evasion." },
     engineering: { name: "Engineering", icon: "⚙", desc: "Boosts repair speed, shield recharge, and module efficiency." },
-    science: { name: "Science", icon: "🔬", desc: "Increases scan range, research speed, and anomaly rewards." },
+    science: { name: "Science", icon: "⌬", desc: "Increases scan range, research speed, and anomaly rewards." },
     combat: { name: "Combat", icon: "⚔", desc: "Enhances weapon damage, targeting, and combat abilities." },
     diplomacy: { name: "Diplomacy", icon: "⚖", desc: "Improves standing gains, trade prices, and crew morale." },
-    trade: { name: "Trade", icon: "💱", desc: "Increases cargo capacity, buy/sell margins, and depot efficiency." }
+    trade: { name: "Trade", icon: "¤", desc: "Increases cargo capacity, buy/sell margins, and depot efficiency." }
 };
 const SKILL_HOTKEYS = ["⇧1", "⇧2", "⇧3", "⇧4", "⇧5", "⇧6"];
 // Activatable commander powers, in hotkey order (SHIFT+1..6).
 const ABILITY_ORDER = ["overclock", "emergency_repair", "battle_focus", "charm_offensive", "science_burst", "trade_instinct"];
 const ABILITY_META = {
-    overclock: { icon: "⚡", name: "Reactor Overclock", label: "Overclock" },
-    emergency_repair: { icon: "🛠", name: "Emergency Repair", label: "Repair" },
-    battle_focus: { icon: "🎯", name: "Battle Focus", label: "Battle Focus" },
+    overclock: { icon: "↯", name: "Reactor Overclock", label: "Overclock" },
+    emergency_repair: { icon: "✚", name: "Emergency Repair", label: "Repair" },
+    battle_focus: { icon: "◎", name: "Battle Focus", label: "Battle Focus" },
     charm_offensive: { icon: "⚖", name: "Diplomatic Offensive", label: "Diplomacy" },
-    science_burst: { icon: "🔬", name: "Science Burst", label: "Science" },
-    trade_instinct: { icon: "💱", name: "Trade Instinct", label: "Trade" },
+    science_burst: { icon: "⌬", name: "Science Burst", label: "Science" },
+    trade_instinct: { icon: "¤", name: "Trade Instinct", label: "Trade" },
 };
 const ABILITY_UNLOCK_RANK = { charm_offensive: 7, trade_instinct: 7 };
 // Left terminal rail order, top to bottom; [ and ] cycle through it.
@@ -325,6 +327,79 @@ class SoundController {
             osc.stop(now + 0.52);
         } catch (e) {}
     }
+
+    playShieldDeflect() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(1200, now);
+            osc.frequency.exponentialRampToValueAtTime(580, now + 0.22);
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            osc.connect(gain);
+            gain.connect(this.master);
+            osc.start(now);
+            osc.stop(now + 0.26);
+        } catch (e) {}
+    }
+
+    playQuantumWarp() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(80, now);
+            osc.frequency.exponentialRampToValueAtTime(22, now + 0.85);
+            gain.gain.setValueAtTime(0.28, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.90);
+            osc.connect(gain);
+            gain.connect(this.master);
+            osc.start(now);
+            osc.stop(now + 0.92);
+        } catch (e) {}
+    }
+
+    playCashRegister() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            [1046.50, 1318.51].forEach((freq, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = "triangle";
+                osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                gain.gain.setValueAtTime(0.18, now + idx * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.28);
+                osc.connect(gain);
+                gain.connect(this.master);
+                osc.start(now + idx * 0.08);
+                osc.stop(now + idx * 0.08 + 0.30);
+            });
+        } catch (e) {}
+    }
+
+    playHullDamage() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = "square";
+            osc.frequency.setValueAtTime(95, now);
+            osc.frequency.exponentialRampToValueAtTime(30, now + 0.32);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.connect(gain);
+            gain.connect(this.master);
+            osc.start(now);
+            osc.stop(now + 0.38);
+        } catch (e) {}
+    }
 }
 
 class CockpitApp {
@@ -339,6 +414,15 @@ class CockpitApp {
     constructor() {
         this.sound = new SoundController();
         this.celestial = window.CelestialRenderer ? new window.CelestialRenderer() : null;
+        this.particles = window.ParticleSystem ? new window.ParticleSystem() : null;
+        this.surfaceMap = window.SurfaceMapRenderer ? new window.SurfaceMapRenderer() : null;
+        this.surfaceSelectedOp = null;
+        this.combatFx = window.ParticleSystem ? new window.ParticleSystem(240) : null;
+        this.combatCanvas = document.getElementById("combatVisual");
+        this.combatScene = null;
+        this.combatBeamUntil = 0;
+        this.combatFlash = null;
+        this.lastShipPosition = null;
         this.state = null;
         this.galaxySystems = {};
         this.viewMode = "ORBITS"; // "ORBITS" or "GALAXY"
@@ -501,6 +585,13 @@ class CockpitApp {
         this.btnCombatBoard = document.getElementById("btnCombatBoard");
         this.btnCombatGambit = document.getElementById("btnCombatGambit");
         this.btnCombatTarget = document.getElementById("btnCombatTarget");
+        this.btnCombatPdc = document.getElementById("btnCombatPdc");
+        this.btnSubsystemWeapons = document.getElementById("btnSubsystemWeapons");
+        this.btnSubsystemShields = document.getElementById("btnSubsystemShields");
+        this.btnSubsystemEngines = document.getElementById("btnSubsystemEngines");
+        this.btnSubsystemBridge = document.getElementById("btnSubsystemBridge");
+        this.btnFabricatePatch = document.getElementById("btnFabricatePatch");
+        this.btnFabricateFuel = document.getElementById("btnFabricateFuel");
         this.btnCombatAbsorb = document.getElementById("btnCombatAbsorb");
         this.btnCombatEvade = document.getElementById("btnCombatEvade");
         this.btnCombatFlee = document.getElementById("btnCombatFlee");
@@ -521,6 +612,18 @@ class CockpitApp {
         this.btnPiratePay = document.getElementById("btnPiratePay");
         this.btnPirateFight = document.getElementById("btnPirateFight");
         this.btnPirateEvade = document.getElementById("btnPirateEvade");
+        this.customsCard = document.getElementById("customsCard");
+        this.customsTitle = document.getElementById("customsTitle");
+        this.customsDesc = document.getElementById("customsDesc");
+        this.customsManifest = document.getElementById("customsManifest");
+        this.btnCustomsBribe = document.getElementById("btnCustomsBribe");
+        this.btnCustomsJettison = document.getElementById("btnCustomsJettison");
+        this.btnCustomsConfiscate = document.getElementById("btnCustomsConfiscate");
+        this.btnCustomsFlee = document.getElementById("btnCustomsFlee");
+        this.btnDrydockOverhaul = document.getElementById("btnDrydockOverhaul");
+        this.overhaulCostLabel = document.getElementById("overhaulCostLabel");
+        this.repairCostLabel = document.getElementById("repairCostLabel");
+        this.refuelCostLabel = document.getElementById("refuelCostLabel");
         this.decisionOverlay = document.getElementById("decisionOverlay");
         this.decisionSeverity = document.getElementById("decisionSeverity");
         this.decisionTitle = document.getElementById("decisionTitle");
@@ -729,7 +832,7 @@ class CockpitApp {
         this.audioToggleBtn.addEventListener("click", () => {
             this.sound.init();
             const on = this.sound.toggle();
-            this.audioIcon.textContent = on ? "🔊" : "🔇";
+            this.audioIcon.textContent = on ? "◉" : "◌";
             this.audioToggleBtn.style.opacity = on ? "1" : "0.5";
             if (on) this.sound.playBeep(900);
         });
@@ -833,6 +936,11 @@ class CockpitApp {
 
         // Station Services
         this.btnDrydockRepair.addEventListener("click", () => this.handleRepair());
+        if (this.btnDrydockOverhaul) this.btnDrydockOverhaul.addEventListener("click", () => this.handleOverhaul());
+        if (this.btnCustomsBribe) this.btnCustomsBribe.addEventListener("click", () => this.handleCustomsResolve("bribe"));
+        if (this.btnCustomsJettison) this.btnCustomsJettison.addEventListener("click", () => this.handleCustomsResolve("jettison"));
+        if (this.btnCustomsConfiscate) this.btnCustomsConfiscate.addEventListener("click", () => this.handleCustomsResolve("confiscate"));
+        if (this.btnCustomsFlee) this.btnCustomsFlee.addEventListener("click", () => this.handleCustomsResolve("flee"));
         this.btnRefuelTanks.addEventListener("click", () => this.handleRefuel());
 
         // Right Deck Tabs
@@ -1057,6 +1165,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
         if (this.btnCombatTarget) {
             this.btnCombatTarget.addEventListener("click", () => this.handleCombat("target_subsystem"));
+        }
+        if (this.btnCombatPdc) {
+            this.btnCombatPdc.addEventListener("click", () => this.handleCombat("point_defense"));
+        }
+        if (this.btnSubsystemWeapons) {
+            this.btnSubsystemWeapons.addEventListener("click", () => this.handleCombat("target_weapons"));
+        }
+        if (this.btnSubsystemShields) {
+            this.btnSubsystemShields.addEventListener("click", () => this.handleCombat("target_shields"));
+        }
+        if (this.btnSubsystemEngines) {
+            this.btnSubsystemEngines.addEventListener("click", () => this.handleCombat("target_engines"));
+        }
+        if (this.btnSubsystemBridge) {
+            this.btnSubsystemBridge.addEventListener("click", () => this.handleCombat("target_bridge"));
+        }
+        if (this.btnFabricatePatch) {
+            this.btnFabricatePatch.addEventListener("click", () => this.handleFabricate("patch_kit"));
+        }
+        if (this.btnFabricateFuel) {
+            this.btnFabricateFuel.addEventListener("click", () => this.handleFabricate("fuel_cell"));
         }
         this.btnCombatAbsorb.addEventListener("click", () => this.handleCombat("shield_absorb"));
         this.btnCombatEvade.addEventListener("click", () => this.handleCombat("evasive_burn"));
@@ -1552,8 +1681,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ? manifest.reduce((sum, item) => sum + (item.total_volume || 0), 0)
             : Object.values(ship.cargo).reduce((a, b) => a + b, 0);
         const flow = this.state.cash_flow;
-        const monthly = flow ? ` · ${flow.net_per_month >= 0 ? "+" : ""}${Math.round(flow.net_per_month)}/MO` : "";
-        this.cargoSummary.textContent = `HOLD: ${totalCargo}/${ship.cargo_capacity}${monthly}`;
+        const monthly = flow ? ` · ${flow.net_per_month >= 0 ? "+" : ""}${Math.round(flow.net_per_month)}/M` : "";
+        this.cargoSummary.textContent = `HOLD ${totalCargo}/${ship.cargo_capacity}${monthly}`;
         this.cargoSummary.title = flow
             ? `Monthly treasury: crew+fleet -${flow.upkeep_per_month} cr (fleet ${flow.fleet_upkeep_per_month || 0}), passive +${flow.passive_per_month} cr`
             : "";
@@ -1598,19 +1727,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const streak = ship.streak || 1;
         const streakMult = 1.0 + Math.min(1.5, (streak - 1) * 0.15);
         // The equal-width card shows the count; the payout multiplier leads the subline.
-        this.streakVal.textContent = `🔥 ${streak}`;
+        this.streakVal.textContent = `✧ ${streak}`;
         this.streakVal.title = `${streak} jump${streak > 1 ? "s" : ""} streak, x${streakMult.toFixed(2)} payouts`;
         this.vitalStreakCard.classList.toggle("high-streak", streak >= 3);
         this.streakSubtext.textContent = streak > 1
-            ? `x${streakMult.toFixed(2)} REWARDS // FLEE RESETS`
-            : "x1.00 // FLEE RESETS";
+            ? `x${streakMult.toFixed(2)} PAYOUT`
+            : "x1.00 BASE";
 
         // Mastery render
         const mastery = ship.mastery || { level: 1, xp: 0, next_level_xp: 500, talent_points: 0 };
         this.masteryLevelVal.textContent = `★ LVL ${mastery.level}`;
         const xpPct = Math.min(100, Math.round((mastery.xp / mastery.next_level_xp) * 100));
         this.masteryBar.style.width = `${xpPct}%`;
-        this.masterySubtext.textContent = `${mastery.xp}/${mastery.next_level_xp} XP // ${mastery.talent_points} PERK${mastery.talent_points !== 1 ? 'S' : ''}`;
+        this.masterySubtext.textContent = `${mastery.xp}/${mastery.next_level_xp} XP${mastery.talent_points ? ' · +' + mastery.talent_points + 'P' : ''}`;
 
         // Contract ready notification badge
         const contracts = ship.active_contracts || [];
@@ -1696,6 +1825,36 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.combatEnemyHp.textContent = `${c.enemy_hull} / ${c.enemy_max_hull}`;
             const pct = Math.round((c.enemy_hull / c.enemy_max_hull) * 100);
             this.combatEnemyBar.style.width = `${pct}%`;
+
+            // Subsystem Status Telemetry
+            const wepFill = document.getElementById("subsystemFillWep");
+            const wepVal = document.getElementById("subsystemValWep");
+            const engFill = document.getElementById("subsystemFillEng");
+            const engVal = document.getElementById("subsystemValEng");
+            const shdFill = document.getElementById("subsystemFillShd");
+            const shdVal = document.getElementById("subsystemValShd");
+            const brdgFill = document.getElementById("subsystemFillBrdg");
+            const brdgVal = document.getElementById("subsystemValBrdg");
+
+            if (wepFill && wepVal) {
+                const wepPct = Math.min(100, Math.round((c.enemy_damage / Math.max(1, c.enemy_damage >= 25 ? c.enemy_damage : 30)) * 100));
+                wepFill.style.width = `${wepPct}%`;
+                wepVal.textContent = wepPct < 80 ? "▲ DAMAGED" : "● 100%";
+            }
+            if (engFill && engVal) {
+                const isBraced = c.enemy_intent === "brace";
+                engFill.style.width = isBraced ? "25%" : "100%";
+                engVal.textContent = isBraced ? "✕ CRIPPLED" : "● NOMINAL";
+            }
+            if (shdFill && shdVal) {
+                const hasShield = (c.enemy_shield || 0) > 0;
+                shdFill.style.width = hasShield ? "100%" : "0%";
+                shdVal.textContent = hasShield ? "● ACTIVE" : "✕ OFFLINE";
+            }
+            if (brdgFill && brdgVal) {
+                brdgFill.style.width = `${pct}%`;
+                brdgVal.textContent = pct < 40 ? "▲ PANICKED" : "● ALERT";
+            }
 
             if (this.combatShieldContainer) {
                 if (c.enemy_max_shield > 0) {
@@ -1799,6 +1958,72 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.pirateCard.style.display = "none";
         }
 
+        if (this.state.active_customs && !this.state.active_combat) {
+            const customs = this.state.active_customs;
+            this.sound.playAlarm();
+            if (this.customsCard) {
+                this.customsCard.style.display = "flex";
+                this.customsTitle.textContent = `${customs.patrol_vessel}`;
+                this.customsDesc.textContent = customs.description;
+                const itemsList = Object.entries(customs.contraband_found || {})
+                    .map(([cid, qty]) => `${qty}x ${cid.toUpperCase()}`).join(", ");
+                if (this.customsManifest) {
+                    this.customsManifest.textContent = `ILLICIT GOODS: ${itemsList || "UNREGISTERED CARGO"}`;
+                }
+                if (this.btnCustomsBribe) {
+                    this.btnCustomsBribe.textContent = `BRIBE PATROL (${customs.bribe_amount} CR)`;
+                    this.btnCustomsBribe.disabled = (ship.credits || 0) < customs.bribe_amount;
+                }
+                if (this.btnCustomsJettison) {
+                    this.btnCustomsJettison.textContent = `JETTISON ALL CONTRABAND`;
+                }
+                if (this.btnCustomsConfiscate) {
+                    this.btnCustomsConfiscate.textContent = `SUBMIT (FINE: ${customs.fine_amount} CR)`;
+                }
+                if (this.btnCustomsFlee) {
+                    this.btnCustomsFlee.textContent = `BURN ENGINES (-5 FUEL)`;
+                    this.btnCustomsFlee.disabled = (ship.fuel || 0) < 5;
+                }
+            }
+        } else if (this.customsCard) {
+            this.customsCard.style.display = "none";
+        }
+
+        const drydock = this.state.drydock || null;
+        if (drydock) {
+            // Prices come from the engine quote so a faction repair discount can never
+            // make the label disagree with the charge.
+            const canService = Boolean(drydock.docked);
+            const credits = Number(drydock.credits || 0);
+            if (this.repairCostLabel) {
+                this.repairCostLabel.textContent = drydock.repair_hp > 0
+                    ? `${drydock.repair_hp} HP · ${drydock.repair_cost} CR`
+                    : "FULL";
+            }
+            if (this.btnDrydockRepair) {
+                this.btnDrydockRepair.disabled = !canService || drydock.repair_hp <= 0
+                    || credits < Number(drydock.repair_cost || 0);
+            }
+            if (this.refuelCostLabel) {
+                this.refuelCostLabel.textContent = drydock.fuel_units > 0
+                    ? `${drydock.fuel_units} FUEL · ${drydock.free_refuel ? "FREE" : drydock.refuel_cost + " CR"}`
+                    : "FULL";
+            }
+            if (this.btnRefuelTanks) {
+                this.btnRefuelTanks.disabled = !canService || drydock.fuel_units <= 0
+                    || (!drydock.free_refuel && credits < Number(drydock.refuel_cost || 0));
+            }
+            if (this.overhaulCostLabel) {
+                this.overhaulCostLabel.textContent = drydock.wear > 0
+                    ? `${Number(drydock.wear).toFixed(1)}% WEAR (${drydock.overhaul_cost} CR)`
+                    : "0.0% WEAR";
+            }
+            if (this.btnDrydockOverhaul) {
+                this.btnDrydockOverhaul.disabled = !canService || drydock.wear <= 0
+                    || credits < Number(drydock.overhaul_cost || 0);
+            }
+        }
+
         const pendingDecision = this.state.pending_decision;
         if (pendingDecision && this.decisionOverlay) {
             this.decisionOverlay.style.display = "flex";
@@ -1823,16 +2048,23 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const tut = ship.tutorial;
         if (tut && !tut.completed && !tut.skipped && tut.steps && tut.steps.length > 0) {
             const step = tut.steps[tut.current_step_index] || tut.steps[0];
+            const curIdx = tut.current_step_index || 0;
             this.cadetBanner.style.display = "flex";
-            this.cadetMilestoneTitle.textContent = `Milestone ${tut.current_step_index + 1}/${tut.steps.length}: ${step.title}`;
+            this.cadetMilestoneTitle.textContent = `Milestone ${curIdx + 1}/${tut.steps.length}: ${step.title}`;
             this.cadetMilestoneDesc.textContent = step.description;
             this.cadetMilestoneHint.textContent = step.hint;
             this.cadetMilestoneReward.textContent = `+${step.reward_credits} CR / +${step.reward_xp} XP`;
+            const pipsEl = document.getElementById("cadetStepPips");
+            if (pipsEl && tut.steps) {
+                pipsEl.innerHTML = tut.steps.map((_, i) =>
+                    `<span class="cadet-pip ${i < curIdx ? "pip-done" : (i === curIdx ? "pip-active" : "pip-locked")}">${i < curIdx ? "✓" : i + 1}</span>`
+                ).join('<span class="cadet-pip-divider">·</span>');
+            }
             this.btnSkipCadet.textContent = "SKIP TUTORIAL";
             this.btnSkipCadet.style.display = "inline-block";
         } else if (tut && tut.completed && !this.cadetGraduationDismissed) {
             this.cadetBanner.style.display = "flex";
-            this.cadetMilestoneTitle.textContent = "🎓 ACADEMY GRADUATION: Flight Wings Conferred!";
+            this.cadetMilestoneTitle.textContent = "△ ACADEMY GRADUATION: Flight Wings Conferred!";
             this.cadetMilestoneDesc.textContent = "Congratulations Commander Astraea! Full flight credentials unlocked. Cadet Honor Wings active.";
             this.cadetMilestoneHint.textContent = "+1,500 CR, +400 XP, and Cadet Honor Wings Precursor Relic awarded.";
             this.cadetMilestoneReward.textContent = "GRADUATED";
@@ -2035,6 +2267,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     renderStory() {
         if (!this.state || !this.state.ship || !this.state.ship.story) return;
+        this.drawCommsOscilloscope();
         const story = this.state.ship.story;
         const status = this.state.story_status || null;
 
@@ -2053,7 +2286,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.storyChapterTitle.textContent = ending
                 ? `CAMPAIGN CONCLUDED: ${ending.title.toUpperCase()}`
                 : "CAMPAIGN CONCLUDED: THE PRECURSOR CIPHER";
-            this.storyTargetBadge.textContent = "⭐ ALL ACTS RESOLVED";
+            this.storyTargetBadge.textContent = "★ ALL ACTS RESOLVED";
             this.storySynopsisText.textContent = ending
                 ? ending.epilogue
                 : "The mysteries of the ancient Precursor network have been unveiled. Your legacy echoes across the hyperlane corridors as First VoidFarer of the New Age.";
@@ -2081,7 +2314,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     card.className = locked ? "story-choice-card story-choice-locked" : "story-choice-card";
                     if (locked) card.disabled = true;
                     const costBadge = c.cost_credits > 0 ? `<span class="choice-cost-badge">COST: ${c.cost_credits} CR</span>` : "";
-                    const lockBadge = locked ? `<span class="choice-lock-badge">🔒 LOCKED</span>` : "";
+                    const lockBadge = locked ? `<span class="choice-lock-badge">⚿ LOCKED</span>` : "";
                     const consequence = locked
                         ? `<span class="choice-lock-reason">${this.escapeHtml(st.lock_reason || "Requirements unmet.")}</span>`
                         : this.escapeHtml(c.consequence_summary || c.outcome_text);
@@ -2165,6 +2398,96 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             stream.scrollTop = stream.scrollHeight;
         }
         this.storyTransmissionCount = logs.length;
+    }
+
+    drawCommsOscilloscope() {
+        const canvas = document.getElementById("commsOscilloscope");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.fillStyle = "rgba(6, 11, 15, 0.96)";
+        ctx.fillRect(0, 0, w, h);
+
+        // 1. Tektronix laboratory CRT graticule
+        ctx.strokeStyle = "rgba(127, 183, 201, 0.12)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        // Major axes
+        ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
+        ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+        // Vertical graticule lines
+        for (let x = 40; x < w; x += 40) {
+            ctx.moveTo(x, 0); ctx.lineTo(x, h);
+        }
+        ctx.stroke();
+
+        // Sub-division micro tick marks along center baseline
+        ctx.strokeStyle = "rgba(127, 183, 201, 0.22)";
+        ctx.beginPath();
+        for (let x = 10; x < w; x += 10) {
+            const tickH = (x % 40 === 0) ? 4 : 2;
+            ctx.moveTo(x, (h / 2) - tickH);
+            ctx.lineTo(x, (h / 2) + tickH);
+        }
+        ctx.stroke();
+
+        // 2. Modulated RF voice waveform
+        const now = performance.now() * 0.003;
+        const wavePoints = [];
+        for (let x = 0; x < w; x++) {
+            const freq = 0.045;
+            const carrier = Math.sin(x * freq + now * 3.2) * (h * 0.26);
+            const envelope = Math.cos(x * 0.012 - now * 1.6);
+            const harmonic = Math.sin(x * 0.12 + now * 5.8) * 2.5;
+            const microNoise = Math.sin(x * 0.28 + now * 9.4) * 0.9;
+            const y = (h / 2) + (carrier * envelope) + harmonic + microNoise;
+            wavePoints.push({ x, y });
+        }
+
+        // Trace A: Wide phosphor glow halo
+        ctx.strokeStyle = "rgba(143, 191, 159, 0.28)";
+        ctx.lineWidth = 3.2;
+        ctx.beginPath();
+        wavePoints.forEach((pt, i) => {
+            if (i === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.stroke();
+
+        // Trace B: Crisp core electron beam
+        ctx.strokeStyle = "#8fbf9f";
+        ctx.shadowColor = "#8fbf9f";
+        ctx.shadowBlur = 5;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        wavePoints.forEach((pt, i) => {
+            if (i === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // 3. Sweeping electron beam excitation spot
+        const sweepX = Math.floor((performance.now() * 0.11) % w);
+        const sweepPt = wavePoints[sweepX] || wavePoints[0];
+        if (sweepPt) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+            ctx.beginPath();
+            ctx.arc(sweepPt.x, sweepPt.y, 2.0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "rgba(143, 191, 159, 0.4)";
+            ctx.beginPath();
+            ctx.arc(sweepPt.x, sweepPt.y, 5.0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 4. Phosphor telemetry readout
+        ctx.font = "9px 'Cascadia Mono', Consolas, monospace";
+        ctx.fillStyle = "rgba(143, 191, 159, 0.75)";
+        ctx.fillText("FREQ 1420.405 MHz // [CH-A] 50mV/div", 6, 11);
+        ctx.fillStyle = "rgba(127, 183, 201, 0.65)";
+        ctx.fillText("SNR +28.4 dB // DECRYPTED", w - 142, 11);
     }
 
     renderVoid() {
@@ -2251,7 +2574,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             });
             const json = await res.json();
             if (json.ok) {
-                this.sound.playChime();
+                this.sound.playCashRegister();
                 this.appendLog(`[VOID] ${json.message}`, "reward");
                 this.state = json.state;
                 this.renderHUD();
@@ -2356,9 +2679,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     renderMarketTable() {
         if (!this.state) return;
         this.syncMarketLotBar();
+        this.syncMarketCategoryFilters();
         this.renderTradeAutomation();
         this.marketTableBody.innerHTML = "";
-        const quotes = this.state.market_quotes || [];
+        const allQuotes = this.state.market_quotes || [];
+        const activeCat = this.marketActiveCategory || "all";
+        const quotes = activeCat === "all"
+            ? allQuotes
+            : allQuotes.filter(q => (q.category || "gen").toLowerCase().includes(activeCat) || (q.commodity_id || "").toLowerCase().includes(activeCat));
         const cargo = this.state.ship.cargo || {};
         const avgCost = this.state.cargo_avg_cost || {};
         const lot = this.tradeLot;
@@ -2374,8 +2702,35 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const margin = avg ? (q.sell_price >= avg ? "td-profit" : "td-loss") : "";
             const commId = this.escapeHtml(q.commodity_id);
 
+            const diff = avg ? (q.sell_price - avg) : 0;
+            const marginChip = avg
+                ? `<span class="market-margin-chip ${diff >= 0 ? "margin-pos" : "margin-neg"}">${diff >= 0 ? `+${diff} ▲` : `${diff} ▼`}</span>`
+                : "";
+            const cat = (q.category || "GEN").toUpperCase().slice(0, 4);
+
+            const baseP = Number(q.base_price || (q.buy_price * 0.85));
+            const trend = q.buy_price > baseP * 1.05 ? 1 : (q.buy_price < baseP * 0.95 ? -1 : 0);
+            const trendIcon = trend > 0 ? "▲" : (trend < 0 ? "▼" : "—");
+            const trendClass = trend > 0 ? "trend-up" : (trend < 0 ? "trend-down" : "trend-flat");
+            const sparklineSvg = trend > 0
+                ? `<svg class="trend-sparkline" width="28" height="12" viewBox="0 0 28 12"><defs><linearGradient id="sg-${commId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity="0.35"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs><polygon points="1,11 1,9 7,7 13,8 20,3 27,1 27,11" fill="url(#sg-${commId})" /><path d="M1,9 L7,7 L13,8 L20,3 L27,1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`
+                : (trend < 0
+                    ? `<svg class="trend-sparkline" width="28" height="12" viewBox="0 0 28 12"><defs><linearGradient id="sg-${commId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity="0.35"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs><polygon points="1,11 1,1 7,3 13,2 20,8 27,10 27,11" fill="url(#sg-${commId})" /><path d="M1,1 L7,3 L13,2 L20,8 L27,10" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`
+                    : `<svg class="trend-sparkline" width="28" height="12" viewBox="0 0 28 12"><path d="M1,6 L7,6 L13,5 L20,7 L27,6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`);
+            const trendBadge = `<span class="market-trend-badge ${trendClass}" title="Galactic volatility price trend">${sparklineSvg} ${trendIcon}</span>`;
+
             tr.innerHTML = `
-                <td><strong class="commodity-name">${this.escapeHtml(q.name)}</strong><small class="commodity-category">${this.escapeHtml(q.category)}</small></td>
+                <td>
+                    <div class="commodity-info-cell">
+                        <strong class="commodity-name">${this.escapeHtml(q.name)}</strong>
+                        <div class="commodity-meta-row">
+                            <span class="commodity-cat-badge cat-${cat.toLowerCase()}">${cat}</span>
+                            <small class="commodity-category">${this.escapeHtml(q.category)}</small>
+                            ${trendBadge}
+                            ${marginChip}
+                        </div>
+                    </div>
+                </td>
                 <td class="td-buy">${q.buy_price}</td>
                 <td class="td-sell ${margin}">${q.sell_price}</td>
                 <td class="td-hold">${holdCount}${avg ? `<small class="td-avg" title="Average paid per unit held">@${avg}</small>` : ""}</td>
@@ -2449,6 +2804,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const active = button.getAttribute("data-lot") === this.tradeLot;
             button.classList.toggle("active", active);
             button.setAttribute("aria-pressed", String(active));
+        });
+    }
+
+    syncMarketCategoryFilters() {
+        const bar = document.getElementById("marketCategoryFilters");
+        if (!bar || bar.dataset.bound) return;
+        bar.dataset.bound = "true";
+        bar.querySelectorAll(".market-cat-pill").forEach(btn => {
+            btn.addEventListener("click", () => {
+                bar.querySelectorAll(".market-cat-pill").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                this.marketActiveCategory = btn.dataset.cat || "all";
+                this.renderMarketTable();
+            });
         });
     }
 
@@ -2632,10 +3001,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const credits = this.state.ship?.credits || 0;
             const isDocked = !!(this.state.orbiting_body && this.state.orbiting_body.station_dockable);
 
+            const curHull = this.state.ship?.max_hull || 100;
+            const curShield = this.state.ship?.max_shield || 50;
+            const curFuel = this.state.ship?.max_fuel || 100;
+            const curCargo = this.state.ship?.cargo_capacity || 30;
+
             chassisList.forEach(c => {
                 const isCurrent = currentClass === c.ship_class;
                 const isStarter = c.cost === 0;
                 const canAfford = credits >= c.cost;
+                const dHull = c.max_hull - curHull;
+                const dShield = c.max_shield - curShield;
+                const dFuel = c.max_fuel - curFuel;
+                const dCargo = c.cargo_capacity - curCargo;
                 const card = document.createElement("div");
                 card.className = `chassis-card ${isCurrent ? 'installed' : ''}`;
                 card.innerHTML = `
@@ -2645,11 +3023,27 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                             <strong class="chassis-name">${this.escapeHtml(c.name)}</strong>
                         </div>
                         <p class="chassis-desc">${this.escapeHtml(c.description)}</p>
-                        <div class="chassis-specs">
-                            <span>Hull: <strong>${c.max_hull}</strong></span>
-                            <span>Shield: <strong>${c.max_shield}</strong></span>
-                            <span>Fuel: <strong>${c.max_fuel}</strong></span>
-                            <span>Cargo: <strong>${c.cargo_capacity}</strong></span>
+                        <div class="chassis-specs comparison-matrix">
+                            <div class="spec-col">
+                                <span class="spec-label">HULL</span>
+                                <strong class="spec-val">${c.max_hull}</strong>
+                                ${isCurrent ? '' : (dHull > 0 ? `<span class="delta-stat pos">+${dHull} ▲</span>` : dHull < 0 ? `<span class="delta-stat neg">${dHull} ▼</span>` : '<span class="delta-stat eq">±0</span>')}
+                            </div>
+                            <div class="spec-col">
+                                <span class="spec-label">SHIELD</span>
+                                <strong class="spec-val">${c.max_shield}</strong>
+                                ${isCurrent ? '' : (dShield > 0 ? `<span class="delta-stat pos">+${dShield} ▲</span>` : dShield < 0 ? `<span class="delta-stat neg">${dShield} ▼</span>` : '<span class="delta-stat eq">±0</span>')}
+                            </div>
+                            <div class="spec-col">
+                                <span class="spec-label">FUEL</span>
+                                <strong class="spec-val">${c.max_fuel}</strong>
+                                ${isCurrent ? '' : (dFuel > 0 ? `<span class="delta-stat pos">+${dFuel} ▲</span>` : dFuel < 0 ? `<span class="delta-stat neg">${dFuel} ▼</span>` : '<span class="delta-stat eq">±0</span>')}
+                            </div>
+                            <div class="spec-col">
+                                <span class="spec-label">CARGO</span>
+                                <strong class="spec-val">${c.cargo_capacity}</strong>
+                                ${isCurrent ? '' : (dCargo > 0 ? `<span class="delta-stat pos">+${dCargo} ▲</span>` : dCargo < 0 ? `<span class="delta-stat neg">${dCargo} ▼</span>` : '<span class="delta-stat eq">±0</span>')}
+                            </div>
                         </div>
                         <div class="chassis-perk">★ ${this.escapeHtml(c.specialty_perk)}</div>
                     </div>
@@ -2949,11 +3343,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         const shipClass = String(ship.ship_class || "Corvette Scout");
         const silhouettes = {
-            standard: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#7fb7c9;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#0080ff;stop-opacity:0.6"/></linearGradient></defs><path d="M280,60 L20,10 L20,110 Z" fill="url(#shipGrad)" stroke="#7fb7c9" stroke-width="2"/><circle cx="260" cy="60" r="8" fill="#c9a35a" opacity="0.8"/><rect x="20" y="40" width="60" height="40" fill="#1a2a4a" stroke="#7fb7c9" stroke-width="1" rx="4"/></svg>`,
-            freighter: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#c9a35a;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#ff8800;stop-opacity:0.6"/></linearGradient></defs><path d="M260,55 L20,10 L20,110 L260,65 Z" fill="url(#shipGrad)" stroke="#c9a35a" stroke-width="2"/><rect x="30" y="25" width="200" height="70" fill="#2a2a1a" stroke="#c9a35a" stroke-width="1" rx="6"/><circle cx="240" cy="60" r="10" fill="#7fb7c9" opacity="0.8"/></svg>`,
-            fighter: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#c96b5a;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#cc0033;stop-opacity:0.6"/></linearGradient></defs><path d="M290,60 L20,10 L20,110 Z" fill="url(#shipGrad)" stroke="#c96b5a" stroke-width="2"/><path d="M270,60 L290,70 L270,80 Z" fill="#c96b5a" opacity="0.8"/><rect x="20" y="45" width="40" height="30" fill="#3a1a1a" stroke="#c96b5a" stroke-width="1" rx="3"/></svg>`,
-            explorer: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#a98bbd;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#7209b7;stop-opacity:0.6"/></linearGradient></defs><path d="M270,60 L30,15 L30,105 Z" fill="url(#shipGrad)" stroke="#a98bbd" stroke-width="2"/><ellipse cx="30" cy="60" rx="20" ry="15" fill="#2a1a3a" stroke="#a98bbd" stroke-width="1"/><circle cx="250" cy="60" r="6" fill="#8fbf9f" opacity="0.8"/></svg>`,
-            stealth: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#444;stop-opacity:0.9"/><stop offset="100%" style="stop-color:#111;stop-opacity:0.7"/></linearGradient></defs><path d="M280,60 L30,10 L30,110 Z" fill="url(#shipGrad)" stroke="#666" stroke-width="1.5"/><path d="M260,60 L270,65 L260,70" fill="none" stroke="#8fbf9f" stroke-width="2" opacity="0.6"/></svg>`
+            standard: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGradStd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a1828" stop-opacity="0.95"/><stop offset="100%" stop-color="#040c16" stop-opacity="0.98"/></linearGradient></defs><line x1="10" y1="60" x2="290" y2="60" stroke="rgba(127,183,201,0.18)" stroke-width="0.8" stroke-dasharray="4,4"/><path d="M285,60 L190,26 L60,26 L25,44 L25,76 L60,94 L190,94 Z" fill="url(#shipGradStd)" stroke="#7fb7c9" stroke-width="1.8"/><polygon points="280,60 195,34 195,86" fill="rgba(127,183,201,0.15)" stroke="#7fb7c9" stroke-width="1"/><rect x="75" y="40" width="70" height="40" fill="#061220" stroke="rgba(201,163,90,0.6)" stroke-width="1" rx="2"/><circle cx="110" cy="60" r="10" fill="rgba(127,183,201,0.25)" stroke="#7fb7c9" stroke-width="1.2"/><rect x="15" y="48" width="12" height="10" fill="#00f0ff" opacity="0.8"/><rect x="15" y="62" width="12" height="10" fill="#00f0ff" opacity="0.8"/><circle cx="250" cy="60" r="4.5" fill="#c9a35a"/><text x="28" y="112" font-family="'Cascadia Mono',monospace" font-size="9" fill="rgba(127,183,201,0.6)">SEC-01 // VF-CORVETTE</text></svg>`,
+            freighter: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGradFr" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#18140a" stop-opacity="0.95"/><stop offset="100%" stop-color="#0c0904" stop-opacity="0.98"/></linearGradient></defs><line x1="10" y1="60" x2="290" y2="60" stroke="rgba(201,163,90,0.18)" stroke-width="0.8" stroke-dasharray="4,4"/><path d="M260,35 L280,60 L260,85 L35,85 L20,70 L20,50 L35,35 Z" fill="url(#shipGradFr)" stroke="#c9a35a" stroke-width="1.8"/><rect x="50" y="22" width="60" height="76" fill="#141008" stroke="rgba(201,163,90,0.5)" stroke-width="1" rx="2"/><rect x="120" y="22" width="60" height="76" fill="#141008" stroke="rgba(201,163,90,0.5)" stroke-width="1" rx="2"/><circle cx="205" cy="60" r="11" fill="rgba(201,163,90,0.25)" stroke="#c9a35a" stroke-width="1.2"/><rect x="12" y="44" width="10" height="12" fill="#ffaa33" opacity="0.85"/><rect x="12" y="64" width="10" height="12" fill="#ffaa33" opacity="0.85"/><circle cx="260" cy="60" r="5" fill="#7fb7c9"/><text x="28" y="112" font-family="'Cascadia Mono',monospace" font-size="9" fill="rgba(201,163,90,0.6)">SEC-02 // CARGO-BULK</text></svg>`,
+            fighter: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGradFgt" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a0a0a" stop-opacity="0.95"/><stop offset="100%" stop-color="#0d0404" stop-opacity="0.98"/></linearGradient></defs><line x1="10" y1="60" x2="290" y2="60" stroke="rgba(201,107,90,0.18)" stroke-width="0.8" stroke-dasharray="4,4"/><path d="M290,60 L210,38 L40,15 L70,52 L25,52 L25,68 L70,68 L40,105 L210,82 Z" fill="url(#shipGradFgt)" stroke="#c96b5a" stroke-width="1.8"/><circle cx="130" cy="60" r="8" fill="rgba(201,107,90,0.3)" stroke="#c96b5a" stroke-width="1"/><rect x="16" y="55" width="12" height="10" fill="#ff4422" opacity="0.9"/><circle cx="260" cy="60" r="4" fill="#ffd166"/><text x="28" y="112" font-family="'Cascadia Mono',monospace" font-size="9" fill="rgba(201,107,90,0.6)">SEC-03 // STRIKE-INTERCEPTOR</text></svg>`,
+            explorer: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGradExp" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#140a1a" stop-opacity="0.95"/><stop offset="100%" stop-color="#0a040d" stop-opacity="0.98"/></linearGradient></defs><line x1="10" y1="60" x2="290" y2="60" stroke="rgba(169,139,189,0.18)" stroke-width="0.8" stroke-dasharray="4,4"/><path d="M290,60 L240,48 L170,30 L45,30 L30,48 L30,72 L45,90 L170,90 L240,72 Z" fill="url(#shipGradExp)" stroke="#a98bbd" stroke-width="1.8"/><circle cx="210" cy="60" r="14" fill="none" stroke="rgba(169,139,189,0.6)" stroke-width="1"/><circle cx="105" cy="60" r="9" fill="rgba(143,191,159,0.25)" stroke="#8fbf9f" stroke-width="1"/><rect x="20" y="54" width="12" height="12" fill="#aa66ff" opacity="0.85"/><circle cx="270" cy="60" r="4.5" fill="#8fbf9f"/><text x="28" y="112" font-family="'Cascadia Mono',monospace" font-size="9" fill="rgba(169,139,189,0.6)">SEC-04 // DEEP-SURVEY</text></svg>`,
+            stealth: `<svg viewBox="0 0 300 120" class="ship-silhouette"><defs><linearGradient id="shipGradStl" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#101418" stop-opacity="0.95"/><stop offset="100%" stop-color="#06090c" stop-opacity="0.98"/></linearGradient></defs><line x1="10" y1="60" x2="290" y2="60" stroke="rgba(143,191,159,0.18)" stroke-width="0.8" stroke-dasharray="4,4"/><path d="M285,60 L210,32 L40,46 L65,60 L40,74 L210,88 Z" fill="url(#shipGradStl)" stroke="#8fbf9f" stroke-width="1.5"/><line x1="65" y1="60" x2="250" y2="60" stroke="#8fbf9f" stroke-width="1.2" opacity="0.75"/><circle cx="120" cy="60" r="7" fill="rgba(143,191,159,0.2)" stroke="#8fbf9f" stroke-width="1"/><rect x="32" y="56" width="10" height="8" fill="#55ccaa" opacity="0.75"/><text x="28" y="112" font-family="'Cascadia Mono',monospace" font-size="9" fill="rgba(143,191,159,0.6)">SEC-05 // RECON-GHOST</text></svg>`
         };
         const silhouette = /freight|cargo/i.test(shipClass) ? "freighter"
             : /fighter|intercept/i.test(shipClass) ? "fighter"
@@ -2982,7 +3376,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const code = codes[slot] || String(slot).replace(/_/g, "").slice(0, 4).toUpperCase();
             const slotLabel = labels[slot] || slot;
             slotDiv.innerHTML = mod
-                ? `<span class="ship-module-icon">🛠</span><span class="ship-module-name">${this.escapeHtml(code)}</span>`
+                ? `<span class="ship-module-icon">✚</span><span class="ship-module-name">${this.escapeHtml(code)}</span>`
                 : `<span class="ship-module-icon">+</span><span class="ship-module-name">${this.escapeHtml(code)}</span>`;
             slotDiv.title = mod
                 ? `${slotLabel} — ${mod.name}: ${mod.description}`
@@ -3143,11 +3537,26 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         : captainShip
                             ? ` | <span class="crew-captain">CAPTAIN: ${this.escapeHtml(captainShip.name)}</span>`
                             : (away ? ` | <span class="crew-away">AWAY: ${this.escapeHtml(away.name)}</span>` : "");
+                const curStation = (m.station || "").toLowerCase();
+                const stationBadge = curStation ? ` <span class="station-badge station-${curStation}">[STATION: ${curStation.toUpperCase()}]</span>` : "";
+                const stationOptions = [
+                    { id: "", label: "NO STATION" },
+                    { id: "helm", label: "➤ HELM (+40% Pilot)" },
+                    { id: "engineering", label: "⚡ ENG (+40% Eng)" },
+                    { id: "tactical", label: "✦ TAC (+40% Marine)" },
+                    { id: "science", label: "⬡ SCI (+40% Sci)" },
+                    { id: "medical", label: "✚ MED (+40% Medic)" },
+                ];
+                const stationSelect = `
+                    <select class="crew-station-select" data-station-crew="${this.escapeHtml(m.id)}" ${away || outpost ? "disabled" : ""} title="Assign officer to starship duty station">
+                        ${stationOptions.map(opt => `<option value="${opt.id}" ${curStation === opt.id ? "selected" : ""}>${opt.label}</option>`).join("")}
+                    </select>
+                `;
                 return `
                 <div class="crew-row">
                     <div class="crew-portrait">${this.portraitAvatar(m.portrait, m.name)}</div>
                     <div class="crew-info-block">
-                        <strong>${this.escapeHtml(m.name)}</strong>
+                        <strong>${this.escapeHtml(m.name)}${stationBadge}</strong>
                         <small>${this.escapeHtml(m.role)} · SKILL ${m.skill} · XP ${m.xp || 0}/${xpToNext}${statusNote}</small>
                         ${(m.medals || []).length ? `<div class="crew-medals">${m.medals.map(medal => `<span>★ ${this.escapeHtml(medal)}</span>`).join("")}</div>` : ""}
                     </div>
@@ -3156,12 +3565,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         <span class="crew-morale-text">${morale}${moraleNote}</span>
                     </div>
                     <div class="crew-actions">
+                        ${stationSelect}
                         <button class="btn-hud btn-amber" data-train-crew="${this.escapeHtml(m.id)}" ${m.skill >= 10 || injury > 0 ? "disabled" : ""}>DRILL</button>
                         <button class="btn-hud" data-dismiss-crew="${this.escapeHtml(m.id)}" ${away || outpost ? "disabled" : ""}>DISMISS</button>
                     </div>
                 </div>
                 `;
             }).join("") : `<p class="panel-intro-text">No crew aboard. Dock at a station and recruit specialists.</p>`;
+            this.crewRoster.querySelectorAll("[data-station-crew]").forEach(sel =>
+                sel.addEventListener("change", (e) => this.postAction("/api/crew/station", { crew_id: sel.getAttribute("data-station-crew"), station: e.target.value }, "crew"))
+            );
             this.crewRoster.querySelectorAll("[data-train-crew]").forEach(btn =>
                 btn.addEventListener("click", () => this.postAction("/api/crew/train", { crew_id: btn.getAttribute("data-train-crew") }, "crew"))
             );
@@ -3189,8 +3602,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
         const body = data.body || {};
         const operations = data.operations || [];
+        if (this.surfaceSelectedOp && !operations.some(op => op.id === this.surfaceSelectedOp)) {
+            this.surfaceSelectedOp = null;
+        }
+        const selectedOp = operations.find(op => op.id === this.surfaceSelectedOp);
         const wasHidden = this.surfaceOps.style.display === "none";
-        const rows = operations.map(op => {
+        const rows = operations.map((op, index) => {
             const riskClass = op.risk >= 35 ? "risk-high" : (op.risk >= 18 ? "risk-mid" : "risk-low");
             const rewards = [];
             if (op.credits) rewards.push(`+${op.credits} CR`);
@@ -3199,9 +3616,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (op.heal_injuries) rewards.push(`HEAL ${op.heal_injuries}`);
             if (op.morale) rewards.push(`MORALE ${op.morale > 0 ? "+" : ""}${op.morale}`);
             (op.cargo || []).forEach(item => rewards.push(`+${item.quantity} ${item.name || item.id}`));
-            return `<div class="surface-op-row ${op.used ? "is-worked" : ""}">
+            return `<div class="surface-op-row ${op.used ? "is-worked" : ""} ${op.id === this.surfaceSelectedOp ? "is-selected" : ""}">
                 <div class="surface-op-main">
-                    <strong>${this.escapeHtml(op.name)}</strong>
+                    <strong><span class="surface-site-index">S${index + 1}</span>${this.escapeHtml(op.name)}</strong>
                     <small>${this.escapeHtml(op.description)}</small>
                     <small class="surface-op-reward">${rewards.map(item => this.escapeHtml(item)).join(" · ")}</small>
                 </div>
@@ -3211,14 +3628,47 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 </div>
             </div>`;
         }).join("");
+        const mapMarkup = this.surfaceMap ? `
+            <div class="surface-map-wrap">
+                <canvas class="surface-map-canvas" id="surfaceMapCanvas" aria-label="Surface map of ${this.escapeHtml(body.name || "world")}"></canvas>
+                <div class="surface-map-bar">
+                    <span>SURFACE SCAN // ${this.escapeHtml(String(body.body_type || "unknown").replace(/_/g, " ").toUpperCase())}</span>
+                    <span>${operations.length} SITES</span>
+                </div>
+                <div class="surface-map-hint">${selectedOp
+                    ? `SELECTED // ${this.escapeHtml(selectedOp.name)} - RUN BELOW`
+                    : "CLICK A SITE TO SELECT ITS OPERATION"}</div>
+            </div>` : "";
         this.surfaceOps.style.display = "block";
         this.surfaceOps.innerHTML = `
             <div class="surface-header">
                 <h4>SURFACE OPERATIONS // ${this.escapeHtml(body.name || "")}</h4>
                 <span>${data.used_count}/${data.total_count} WORKED</span>
             </div>
+            ${mapMarkup}
             <div class="surface-op-list">${rows || '<p class="panel-intro-text">No operations available.</p>'}</div>
         `;
+        const mapCanvas = this.surfaceOps.querySelector("#surfaceMapCanvas");
+        if (mapCanvas && this.surfaceMap) {
+            this.surfaceMap.draw(mapCanvas, body, operations, this.surfaceSelectedOp);
+            mapCanvas.addEventListener("click", event => {
+                const site = this.surfaceMap.hitTest(mapCanvas, event);
+                if (!site) return;
+                this.surfaceSelectedOp = site.id;
+                this.renderSurfaceOps();
+                const row = this.surfaceOps.querySelector(`[data-surface-op="${site.id}"]`)?.closest(".surface-op-row");
+                const card = this.surfaceOps.closest(".nav-target-card");
+                if (row && card) {
+                    const cardRect = card.getBoundingClientRect();
+                    const rowRect = row.getBoundingClientRect();
+                    if (rowRect.bottom > cardRect.bottom - 6) card.scrollTop += rowRect.bottom - cardRect.bottom + 6;
+                    else if (rowRect.top < cardRect.top + 6) card.scrollTop -= cardRect.top - rowRect.top + 6;
+                }
+            });
+            mapCanvas.addEventListener("mousemove", event => {
+                mapCanvas.style.cursor = this.surfaceMap.hitTest(mapCanvas, event) ? "pointer" : "crosshair";
+            });
+        }
         this.surfaceOps.querySelectorAll("[data-surface-op]").forEach(button => {
             button.addEventListener("click", () => this.handleSurfaceOp(button.getAttribute("data-surface-op")));
         });
@@ -3382,12 +3832,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         for (let i = 0; i < key.length; i++) hash = ((hash << 5) - hash + key.charCodeAt(i)) | 0;
         const color = palette[Math.abs(hash) % palette.length];
         const initials = String(name || "?").split(/\s+/).map(p => p[0] || "").slice(0, 2).join("").toUpperCase();
-        const fontSize = Math.max(12, size * 0.3);
+        const fontSize = Math.max(9, size * 0.24);
+        const gradId = `vf-av-grad-${Math.abs(hash)}`;
         return `<svg viewBox="0 0 40 40" width="${size}" height="${size}" role="img" aria-label="${this.escapeHtml(name || "portrait")}">
-            <circle cx="20" cy="20" r="18" fill="rgba(0,0,0,.55)" stroke="${color}" stroke-width="1.5"></circle>
-            <circle cx="20" cy="15" r="6" fill="${color}" opacity="0.8"></circle>
-            <path d="M8 34 Q20 22 32 34" fill="none" stroke="${color}" stroke-width="2" opacity="0.7"></path>
-            <text x="20" y="26" text-anchor="middle" font-size="${fontSize}" fill="#fff" font-family="monospace">${this.escapeHtml(initials)}</text>
+            <defs>
+                <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="${color}" stop-opacity="0.32"/>
+                    <stop offset="100%" stop-color="#040912" stop-opacity="0.95"/>
+                </linearGradient>
+            </defs>
+            <polygon points="10,2 30,2 38,10 38,30 30,38 10,38 2,30 2,10" fill="url(#${gradId})" stroke="${color}" stroke-width="1.2"/>
+            <line x1="2" y1="20" x2="6" y2="20" stroke="${color}" stroke-width="1" opacity="0.8"/>
+            <line x1="34" y1="20" x2="38" y2="20" stroke="${color}" stroke-width="1" opacity="0.8"/>
+            <line x1="20" y1="2" x2="20" y2="6" stroke="${color}" stroke-width="1" opacity="0.8"/>
+            <line x1="20" y1="34" x2="20" y2="38" stroke="${color}" stroke-width="1" opacity="0.8"/>
+            <path d="M12,12 L20,7 L28,12" fill="none" stroke="${color}" stroke-width="1.4" opacity="0.9"/>
+            <circle cx="20" cy="17" r="4.5" fill="${color}" opacity="0.85"/>
+            <path d="M9,32 Q20,23 31,32" fill="none" stroke="${color}" stroke-width="1.6" opacity="0.75"/>
+            <rect x="10" y="27" width="20" height="9" fill="#040912" stroke="${color}" stroke-width="0.8" rx="1"/>
+            <text x="20" y="34.2" text-anchor="middle" font-size="${fontSize}" fill="#ffffff" font-family="'Cascadia Mono', Consolas, monospace" font-weight="700">${this.escapeHtml(initials)}</text>
         </svg>`;
     }
 
@@ -3612,8 +4075,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const napRemaining = Math.max(0, Number(napUntil[l.faction_id] || 0) - currentTick);
             const isNap = napRemaining > 0;
             const ownWar = wars.find(w => w.active
-                && "sol_coalition" in (w.attacker_id, w.defender_id)
-                && l.faction_id in (w.attacker_id, w.defender_id));
+                && (w.attacker_id === "sol_coalition" || w.defender_id === "sol_coalition")
+                && (w.attacker_id === l.faction_id || w.defender_id === l.faction_id));
             const atWar = wars.some(w => w.active && (w.defender_id === l.faction_id || w.attacker_id === l.faction_id));
             const canAlly = !isEliminated && !isAllied && standing >= 70;
             const canPact = !isEliminated && !isPact && !ownWar && standing >= 40;
@@ -3690,11 +4153,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.codexCategoryFilters) {
             const categories = codex.categories || [];
             const activeCat = this.activeCodexCategory || "all";
+            const catIcons = {
+                all: "◈", exploration: "✦", command: "⬡", commerce: "¤",
+                combat: "⚔", diplomacy: "⚖", legacy: "★",
+            };
             const buttonsHtml = [
-                `<button class="codex-cat-filter ${activeCat === "all" ? "active" : ""}" data-category="all">ALL (${totals.entries})</button>`,
+                `<button class="codex-cat-filter ${activeCat === "all" ? "active" : ""}" data-category="all">◈ ALL (${totals.entries})</button>`,
                 ...categories.map(c => `
                     <button class="codex-cat-filter ${activeCat === c.id ? "active" : ""}" data-category="${this.escapeHtml(c.id)}">
-                        ${this.escapeHtml(c.name.toUpperCase())} (${c.claimed}/${c.entries})
+                        ${catIcons[c.id] || "◇"} ${this.escapeHtml(c.name.toUpperCase())} (${c.claimed}/${c.entries})
                     </button>
                 `)
             ].join("");
@@ -3931,13 +4398,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const card = document.createElement("div");
             card.className = "drone-card";
 
+            const integrity = Math.max(0, Math.min(100, Number(d.integrity ?? 100)));
+            const roleGlyph = /combat|attack|fighter/i.test(d.drone_type) ? "▲" : /scout|survey/i.test(d.drone_type) ? "◈" : "⬡";
             card.innerHTML = `
                 <div class="drone-meta">
-                    <strong class="drone-name">${this.escapeHtml(d.name)}</strong>
+                    <strong class="drone-name"><span style="color:var(--console-gold);margin-right:4px;">${roleGlyph}</span>${this.escapeHtml(d.name)}</strong>
                     <span class="drone-sub">${this.escapeHtml(d.drone_type.toUpperCase())} // ${this.escapeHtml(d.assigned_system_id.toUpperCase())} [${this.escapeHtml(d.status.toUpperCase())}]</span>
                 </div>
+                <div class="vital-meter" style="margin:4px 0 6px;"><div class="meter-fill ${integrity > 50 ? 'fill-green' : 'fill-amber'}" style="width:${integrity}%;"></div></div>
                 <div class="drone-stats">
-                    LVL ${d.level ?? 1} // EFF ${(d.efficiency ?? 1).toFixed(2)} // INTEGRITY ${d.integrity ?? 100}% // SORTIES ${d.sorties ?? 0}${d.specialty ? " // " + this.escapeHtml(d.specialty.toUpperCase()) : ""}
+                    LVL ${d.level ?? 1} // EFF ${(d.efficiency ?? 1).toFixed(2)} // INTEGRITY ${integrity}% // SORTIES ${d.sorties ?? 0}${d.specialty ? " // " + this.escapeHtml(d.specialty.toUpperCase()) : ""}
                 </div>
                 <div class="drone-yield-badge">
                     +${d.cargo_accumulated} Ore / +${d.credits_accumulated} CR
@@ -4080,7 +4550,28 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.relicsGrid.innerHTML = `<p class="panel-intro-text">No ancient Precursor Relics recovered yet. Recover them via planet sensor sweeps, anomalies and contracts.</p>`;
             return;
         }
-        this.relicsGrid.innerHTML = relics.map(r => `
+        const setBonuses = (this.state.relic_set_bonuses) || {};
+        const counts = {};
+        for (const r of relics) counts[r.rarity] = (counts[r.rarity] || 0) + 1;
+        const thresholds = { common: 3, rare: 3, epic: 2, legendary: 1 };
+        const setRows = ["common", "rare", "epic", "legendary"].map(rarity => {
+            const have = counts[rarity] || 0;
+            const need = thresholds[rarity];
+            const active = have >= need;
+            return `<div class="relic-set-row ${active ? "is-active" : ""}"><span class="relic-set-name">${rarity.toUpperCase()}</span><span class="relic-set-count">${have}/${need}</span><span class="relic-set-status">${active ? "RESONANCE ACTIVE" : "collecting"}</span></div>`;
+        }).join("");
+        const bonusLine = Object.keys(setBonuses).length
+            ? `<p class="relic-set-bonuses">Set bonuses: ${Object.entries(setBonuses).map(([k, v]) => (k === "shield_cap" ? ("+" + Math.round(v) + " MW " + k) : ("+" + Math.round(v * 100) + "% " + k))).join(", ")}</p>`
+            : "";
+        const fuseLadder = { common: "rare", rare: "epic", epic: "legendary" };
+        const fuseButtons = Object.entries(fuseLadder).map(([rarity, target]) => {
+            const have = counts[rarity] || 0;
+            const canFuse = have >= 3;
+            return `<button class="btn-relic-fuse" data-rarity="${rarity}" ${canFuse ? "" : "disabled"} title="Fuse 3 ${rarity} relics into 1 ${target} relic (${have}/3 ready)">FUSE 3×${rarity.toUpperCase()} → ${target.toUpperCase()}</button>`;
+        }).join("");
+        const fuseRow = `<div class="relic-fuse-row"><span class="relic-fuse-label">RESONANCE FORGE</span>${fuseButtons}</div>`;
+        const setPanel = `<div class="relic-set-panel"><div class="relic-set-title">RELIC SET RESONANCE</div>${setRows}${bonusLine}${fuseRow}</div>`;
+        this.relicsGrid.innerHTML = setPanel + relics.map(r => `
             <div class="relic-card">
                 <div class="relic-header-row">
                     <strong class="relic-name">${this.escapeHtml(r.name)}</strong>
@@ -4089,13 +4580,52 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 <p class="relic-desc">${this.escapeHtml(r.description)}</p>
             </div>
         `).join("");
+        this.relicsGrid.querySelectorAll(".btn-relic-fuse").forEach(btn => {
+            btn.addEventListener("click", () => this.handleFuseRelics(btn.getAttribute("data-rarity")));
+        });
+    }
+
+    async handleFuseRelics(rarity) {
+        if (!rarity || !this.state) return;
+        this.sound.init();
+        this.sound.playBeep(660);
+        try {
+            const res = await apiFetch("/api/relics/fuse", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rarity }),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                this.sound.playChime();
+                this.appendLog(data.message || "Relics fused at the resonance forge.", "reward");
+            } else {
+                this.sound.playAlarm();
+                this.appendLog(`[RELICS] ${data.message}`, "hazard");
+            }
+            if (data.state) {
+                this.state = data.state;
+                this.renderHUD();
+            }
+        } catch (e) {
+            this.appendLog(`[ERROR] Relic fusion failed: ${e.message}`, "hazard");
+        }
     }
 
     appendLog(text, type = "system") {
         const line = document.createElement("div");
         line.className = `log-line log-${type}`;
-        const timeStr = new Date().toLocaleTimeString();
-        line.textContent = `[${timeStr}] ${text}`;
+        const timeStr = this.state?.tick != null ? `T+${String(this.state.tick).padStart(4, "0")}` : new Date().toLocaleTimeString();
+        const tagMatch = String(text || "").match(/^\[([A-Z0-9_\-]+)\]\s*(.*)$/);
+        if (tagMatch) {
+            const tag = tagMatch[1];
+            const rest = tagMatch[2];
+            const tagClass = tag.toLowerCase().replace(/[^a-z0-9]/g, "");
+            line.innerHTML = `<span class="log-time">[${timeStr}]</span><span class="log-tag tag-${tagClass}">[${this.escapeHtml(tag)}]</span> ${this.escapeHtml(rest)}`;
+        } else {
+            const defaultTag = type === "reward" ? "DATA" : (type === "hazard" ? "WARN" : "SYS");
+            line.innerHTML = `<span class="log-time">[${timeStr}]</span><span class="log-tag tag-${defaultTag.toLowerCase()}">[${defaultTag}]</span> ${this.escapeHtml(text)}`;
+        }
         this.flightLogStream.appendChild(line);
         this.flightLogStream.scrollTop = this.flightLogStream.scrollHeight;
     }
@@ -4104,9 +4634,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     async handleCombat(action) {
         this.sound.init();
+        this.combatFlash = null;
+        this.combatBeamUntil = 0;
+        const prevShip = (this.state && this.state.ship) || {};
+        const prevHull = Number(prevShip.hull || 0);
+        const prevShield = Number(prevShip.shield || 0);
         const currentCombo = (this.state && this.state.ship) ? (this.state.ship.tactical_combo || 0) : 0;
-        if (action === "fire_lasers") {
-            if (currentCombo >= 2) {
+        if (action === "fire_lasers" || action === "target_bridge") {
+            if (currentCombo >= 2 || action === "target_bridge") {
                 this.sound.playCritHit();
             } else {
                 this.sound.playLaser();
@@ -4124,14 +4659,57 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const json = await res.json();
             if (json.ok) {
                 this.sound.playChime();
+                const at = this.lastShipPosition || this.mapCenter();
+                const color = action === "target_bridge" ? "#c96b5a" : (action === "target_engines" ? "#e2c078" : (action === "fire_lasers" ? "#ffd166" : "#7fb7c9"));
+                const count = action === "target_bridge" ? 28 : (action === "fire_lasers" ? 20 : 12);
+                this.particles?.burst(at.x, at.y, count, color, 190);
+                this.particles?.ring(at.x, at.y, color, 75, 0.55);
+                this.combatBeamUntil = performance.now() + 180;
+                this.combatFlash = {
+                    target: (action === "shield_absorb" || action === "evasive_burn" || action === "flee")
+                        ? "player" : "enemy",
+                    color: action === "flee" ? "#a98bbd" : color,
+                    fired: false,
+                };
                 this.appendLog(json.message, "reward");
             } else {
                 this.appendLog(`[COMBAT] ${json.message}`, "hazard");
             }
             this.state = json.state;
+            const ship = (json.state && json.state.ship) || null;
+            if (ship) {
+                const hull = Number(ship.hull || 0);
+                const shield = Number(ship.shield || 0);
+                if (hull < prevHull) this.sound.playHullDamage();
+                else if (shield < prevShield) this.sound.playShieldDeflect();
+            }
             this.renderHUD();
         } catch (e) {
             this.appendLog(`[ERROR] Tactical maneuver failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleFabricate(type) {
+        this.sound?.init();
+        this.sound?.playBeep(440);
+        try {
+            const res = await apiFetch("/api/fabricate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ munitions_type: type })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound?.playChime();
+                this.appendLog(json.message, "reward");
+            } else {
+                this.sound?.playAlarm?.();
+                this.appendLog(`[FABRICATION] ${json.message}`, "hazard");
+            }
+            this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Field fabrication failed: ${e.message}`, "hazard");
         }
     }
 
@@ -4455,6 +5033,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 } else {
                     this.sound.playChime();
                 }
+                const at = this.lastShipPosition || this.mapCenter();
+                this.particles?.ring(at.x, at.y, "#7fb7c9", 120, 0.85);
+                this.particles?.burst(at.x, at.y, 8, "#9fe6ff", 55);
                 this.appendLog(json.message, "reward");
                 this.state = json.state;
                 this.renderHUD();
@@ -4469,7 +5050,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async handleJumpAction() {
         if (!this.selectedTarget || this.selectedType !== "system") return;
         this.sound.init();
-        this.sound.playJump();
+        this.sound.playQuantumWarp();
         try {
             const res = await apiFetch("/api/jump", {
                 method: "POST",
@@ -4478,6 +5059,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             });
             const json = await res.json();
             if (json.ok) {
+                const at = this.mapCenter();
+                this.particles?.burst(at.x, at.y, 30, "#a98bbd", 240);
+                this.particles?.ring(at.x, at.y, "#a98bbd", 180, 0.9);
                 this.appendLog(json.message, "system");
                 this.state = json.state;
                 this.renderHUD();
@@ -4617,6 +5201,57 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         } catch (e) {
             this.appendLog(`[ERROR] Decision action failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleCustomsResolve(action) {
+        this.sound.init();
+        this.sound.playBeep(440, 0.08, "triangle");
+        try {
+            const res = await apiFetch("/api/customs/resolve", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: action }),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                if (action === "bribe") this.sound.playCashRegister();
+                else if (action === "flee") this.sound.playQuantumWarp();
+                else this.sound.playChime();
+                this.appendLog(data.message || "Customs encounter resolved.", "system");
+            } else {
+                this.sound.playAlarm();
+                this.appendLog(`[ERROR] ${data.message}`, "hazard");
+            }
+            if (data.state) {
+                this.state = data.state;
+                this.renderHUD();
+            }
+        } catch (e) {
+            this.appendLog(`[ERROR] Customs resolution failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleOverhaul() {
+        this.sound.init();
+        this.sound.playBeep(750);
+        try {
+            const res = await apiFetch("/api/overhaul", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({})
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound.playChime();
+                this.appendLog(json.message, "reward");
+                this.state = json.state;
+                this.renderHUD();
+            } else {
+                this.appendLog(`[ERROR] ${json.message}`, "hazard");
+            }
+        } catch (e) {
+            this.appendLog(`[ERROR] Overhaul failed: ${e.message}`, "hazard");
         }
     }
 
@@ -4916,9 +5551,32 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
             if (this.salvageInfo) {
                 if (salvage) {
-                    const risk = Math.max(5, Math.round((salvage.danger || 0) * 100));
+                    const currentStrategy = this.salvageStrategy || "balanced";
+                    const baseRisk = Math.max(5, Math.round((salvage.danger || 0) * 100));
+                    const estRisk = currentStrategy === "cautious" ? Math.max(2, Math.round(baseRisk * 0.5)) : (currentStrategy === "aggressive" ? Math.min(85, baseRisk + 15) : baseRisk);
                     this.salvageInfo.style.display = "block";
-                    this.salvageInfo.textContent = `DERELICT: ${salvage.name} // RISK ~${risk}% // REWARD ${salvage.credits} CR + ${salvage.cargo_quantity}x ${salvage.cargo_item}`;
+                    this.salvageInfo.innerHTML = `
+                        <div class="salvage-header">
+                            <span class="salvage-title">DERELICT // ${this.escapeHtml(salvage.name)}</span>
+                            <span class="salvage-risk">RISK ~${estRisk}%</span>
+                        </div>
+                        <div class="salvage-strategy-selector" role="group" aria-label="Salvage Strategy">
+                            <button class="btn-salvage-strat ${currentStrategy === "cautious" ? "active" : ""}" data-strategy="cautious" title="Safe extraction: -50% risk, guaranteed minimal hull damage">CAUTIOUS</button>
+                            <button class="btn-salvage-strat ${currentStrategy === "balanced" ? "active" : ""}" data-strategy="balanced" title="Standard boarding sweep">BALANCED</button>
+                            <button class="btn-salvage-strat ${currentStrategy === "aggressive" ? "active" : ""}" data-strategy="aggressive" title="Heavy breach: +50% credits, bonus cargo, +heat">HEAVY (+50% CR)</button>
+                            <button class="btn-salvage-strat ${currentStrategy === "scientific" ? "active" : ""}" data-strategy="scientific" title="Sensor reverse-engineering: +35 Research Data, +XP">ANALYZE (+RES)</button>
+                        </div>
+                        <div class="salvage-rewards-row">
+                            <span>YIELD: <strong>${salvage.credits} CR + ${salvage.cargo_quantity}x ${this.escapeHtml(salvage.cargo_item)}</strong></span>
+                        </div>
+                    `;
+                    this.salvageInfo.querySelectorAll(".btn-salvage-strat").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            this.salvageStrategy = btn.getAttribute("data-strategy");
+                            this.updateTargetCard();
+                        });
+                    });
                 } else {
                     this.salvageInfo.style.display = "none";
                 }
@@ -5143,8 +5801,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     startRenderLoop() {
         if (this.rafId !== null) return;
-        const render = () => {
-            if (!document.hidden) this.drawRadar();
+        let lastDraw = 0;
+        const render = timestamp => {
+            if (!document.hidden) {
+                const state = this.state;
+                const idle = Boolean(state?.time?.is_paused)
+                    && !state?.active_combat
+                    && !state?.travel
+                    && !state?.ship?.travel
+                    && !this.travelAnimation;
+                if (!idle || timestamp - lastDraw >= IDLE_FRAME_MS) {
+                    this.drawRadar();
+                    lastDraw = timestamp;
+                }
+            }
             this.rafId = requestAnimationFrame(render);
         };
         this.rafId = requestAnimationFrame(render);
@@ -5267,6 +5937,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const ctx = this.ctx;
         const w = this.viewW;
         const h = this.viewH;
+        this.particles?.update();
         ctx.setTransform(this.dpr || 1, 0, 0, this.dpr || 1, 0, 0);
         ctx.clearRect(0, 0, w, h);
         this.ensureRadarBackdrop(w, h);
@@ -5292,6 +5963,182 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         } else {
             this.drawGalaxyView(cx, cy);
         }
+        if (this.state?.active_combat) this.drawCombatVisual();
+    }
+
+    // A close-range tactical view: two hulls, engine plumes, a firing beam and impact
+    // particles. It is visual-only; the authoritative bars and buttons sit above it.
+    drawCombatVisual() {
+        if (!this.combatCanvas || !this.state?.active_combat) return;
+        const canvas = this.combatCanvas;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = Math.max(320, Math.round(canvas.clientWidth || 440));
+        const cssH = Math.round(cssW * 0.26);
+        if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+            canvas.width = Math.round(cssW * dpr);
+            canvas.height = Math.round(cssH * dpr);
+        }
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const bg = ctx.createLinearGradient(0, 0, 0, cssH);
+        bg.addColorStop(0, "#0a1424");
+        bg.addColorStop(1, "#04070d");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, cssW, cssH);
+        const seed = this.captainHash(String(this.state.active_combat.enemy_name || "hostile"));
+        for (let i = 0; i < 46; i++) {
+            const sx = ((seed + i * 97) % 1000) / 1000 * cssW;
+            const sy = ((seed + i * 193) % 1000) / 1000 * cssH;
+            ctx.fillStyle = i % 9 === 0 ? "rgba(201, 163, 90, 0.8)" : "rgba(233, 240, 247, 0.45)";
+            ctx.fillRect(sx, sy, i % 7 === 0 ? 1.6 : 1, i % 7 === 0 ? 1.6 : 1);
+        }
+        const player = { x: cssW * 0.17, y: cssH * 0.52 };
+        const enemy = { x: cssW * 0.83, y: cssH * 0.48 };
+        this.combatScene = { player, enemy, w: cssW, h: cssH };
+        ctx.save();
+        ctx.strokeStyle = "rgba(127, 183, 201, 0.22)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 4]);
+        ctx.beginPath();
+        ctx.moveTo(player.x + 16, player.y);
+        ctx.lineTo(enemy.x - 16, enemy.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = "rgba(224, 122, 102, 0.35)";
+        ctx.beginPath();
+        ctx.arc(enemy.x, enemy.y, cssH * 0.30, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Tactical Targeting Brackets around Enemy Ship
+        ctx.save();
+        ctx.strokeStyle = "rgba(201, 107, 90, 0.75)";
+        ctx.lineWidth = 1.4;
+        const boxS = cssH * 0.28;
+        const cornerL = boxS * 0.35;
+        // Top-left
+        ctx.beginPath();
+        ctx.moveTo(enemy.x - boxS, enemy.y - boxS + cornerL);
+        ctx.lineTo(enemy.x - boxS, enemy.y - boxS);
+        ctx.lineTo(enemy.x - boxS + cornerL, enemy.y - boxS);
+        ctx.stroke();
+        // Top-right
+        ctx.beginPath();
+        ctx.moveTo(enemy.x + boxS - cornerL, enemy.y - boxS);
+        ctx.lineTo(enemy.x + boxS, enemy.y - boxS);
+        ctx.lineTo(enemy.x + boxS, enemy.y - boxS + cornerL);
+        ctx.stroke();
+        // Bottom-left
+        ctx.beginPath();
+        ctx.moveTo(enemy.x - boxS, enemy.y + boxS - cornerL);
+        ctx.lineTo(enemy.x - boxS, enemy.y + boxS);
+        ctx.lineTo(enemy.x - boxS + cornerL, enemy.y + boxS);
+        ctx.stroke();
+        // Bottom-right
+        ctx.beginPath();
+        ctx.moveTo(enemy.x + boxS - cornerL, enemy.y + boxS);
+        ctx.lineTo(enemy.x + boxS, enemy.y + boxS);
+        ctx.lineTo(enemy.x + boxS, enemy.y + boxS - cornerL);
+        ctx.stroke();
+        // Target acquisition crosshair pip & telemetry readouts
+        ctx.fillStyle = "rgba(255, 120, 100, 0.9)";
+        ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.font = "8px 'Cascadia Mono', Consolas, monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(201, 107, 90, 0.85)";
+        ctx.fillText("LOCK: TGT-01", enemy.x, enemy.y - boxS - 4);
+        ctx.fillStyle = "rgba(127, 183, 201, 0.75)";
+        ctx.fillText("DIST: 1.4M KM", enemy.x, enemy.y + boxS + 11);
+        ctx.restore();
+        ctx.restore();
+        this.combatFx?.trail(player.x - 12, player.y, 0, "#8fd8ff", 0.8);
+        this.combatFx?.trail(enemy.x + 12, enemy.y, Math.PI, "#e07a66", 0.7);
+        if (Number(this.state.active_combat?.enemy_hull || 0) < Number(this.state.active_combat?.enemy_max_hull || 1) * 0.4) {
+            if (Math.random() < 0.35) {
+                this.combatFx?.trail(enemy.x + (Math.random() - 0.5) * 16, enemy.y + (Math.random() - 0.5) * 16, Math.PI + (Math.random() - 0.5) * 0.6, "#ff6b5b", 0.6);
+            }
+        }
+        if (performance.now() < this.combatBeamUntil) {
+            ctx.save();
+            ctx.globalCompositeOperation = "lighter";
+            // Volumetric ambient bloom sheath
+            ctx.strokeStyle = "rgba(255, 209, 102, 0.25)";
+            ctx.shadowColor = "#ffd166";
+            ctx.shadowBlur = 14;
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(player.x + 13, player.y);
+            ctx.lineTo(enemy.x - 13, enemy.y);
+            ctx.stroke();
+
+            // High-energy radiant plasma beam
+            ctx.strokeStyle = "#ffd166";
+            ctx.shadowBlur = 8;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(player.x + 13, player.y);
+            ctx.lineTo(enemy.x - 13, enemy.y);
+            ctx.stroke();
+
+            // Intense ionizing core with micro-jitter
+            const jY = (Math.random() - 0.5) * 1.2;
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.2;
+            ctx.shadowBlur = 2;
+            ctx.beginPath();
+            ctx.moveTo(player.x + 13, player.y);
+            ctx.lineTo((player.x + enemy.x) * 0.5, (player.y + enemy.y) * 0.5 + jY);
+            ctx.lineTo(enemy.x - 13, enemy.y);
+            ctx.stroke();
+
+            // Firing muzzle flash at player prow
+            const muzzle = ctx.createRadialGradient(player.x + 13, player.y, 1, player.x + 13, player.y, 11);
+            muzzle.addColorStop(0, "#ffffff");
+            muzzle.addColorStop(0.45, "#ffd166");
+            muzzle.addColorStop(1, "rgba(255, 209, 102, 0)");
+            ctx.fillStyle = muzzle;
+            ctx.beginPath();
+            ctx.arc(player.x + 13, player.y, 11, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Shield deflection ripple arc if target shield is active
+            if (Number(this.state.active_combat?.enemy_shield || 0) > 0) {
+                ctx.strokeStyle = "rgba(111, 195, 215, 0.85)";
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(enemy.x - 4, enemy.y, cssH * 0.28, Math.PI * 0.72, Math.PI * 1.28);
+                ctx.stroke();
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(enemy.x - 4, enemy.y, cssH * 0.28, Math.PI * 0.82, Math.PI * 1.18);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+        if (this.combatFlash && !this.combatFlash.fired) {
+            this.combatFlash.fired = true;
+            const target = this.combatFlash.target === "player" ? player : enemy;
+            this.combatFx?.burst(target.x, target.y, 18, this.combatFlash.color || "#ffd166", 190);
+            this.combatFx?.ring(target.x, target.y, this.combatFlash.color || "#ffd166", 42, 0.5);
+            if (target === enemy && Number(this.state.active_combat?.enemy_shield || 0) > 0) {
+                this.combatFx?.hexShieldImpact(target.x - 4, target.y, cssH * 0.28, "rgba(111, 195, 215, 0.85)");
+            }
+        }
+        this.combatFx?.update();
+        this.combatFx?.draw(ctx);
+        this.celestial?.drawShip(ctx, player.x, player.y, 0, Math.max(12, cssW * 0.035), "#8fbf9f", this.shipVariant());
+        this.celestial?.drawShip(ctx, enemy.x, enemy.y, Math.PI, Math.max(14, cssW * 0.04), "#e07a66", this.enemyVariant());
+        ctx.font = "10px 'Cascadia Mono', Consolas, monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#8fbf9f";
+        ctx.fillText("VF-FLAGSHIP", player.x, cssH - 7);
+        ctx.fillStyle = "#e07a66";
+        ctx.fillText(String(this.state.active_combat.enemy_name || "HOSTILE").toUpperCase(), enemy.x, cssH - 7);
+        const vignette = ctx.createRadialGradient(cssW / 2, cssH / 2, cssH * 0.2, cssW / 2, cssH / 2, cssW * 0.7);
+        vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+        vignette.addColorStop(1, "rgba(2, 5, 12, 0.55)");
+        ctx.fillStyle = vignette;
+        ctx.fillRect(0, 0, cssW, cssH);
     }
 
     drawOrbitsView(cx, cy) {
@@ -5301,19 +6148,30 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const bodies = curSys.bodies;
         const ship = this.state.ship;
         const now = Date.now() * 0.001;
-        const auScale = 45 * this.zoom * this.radarScale();
+        const auScale = this.orbitFitScale(bodies);
+        const labels = [];
+        this._radarLabelBoxes = [];
+        this.lastShipPosition = { x: cx, y: cy };
         // A Dyson swarm encloses its primary. Drawing the star's corona underneath would
         // bury the collector shell in glare, so the swarm replaces the star sprite.
         const hasDysonSwarm = bodies.some(b => b.body_type === "dyson_sphere");
 
 
         if (this.radarGrid) {
-            ctx.strokeStyle = "rgba(127, 183, 201, 0.06)";
+            ctx.strokeStyle = "rgba(127, 183, 201, 0.07)";
             ctx.lineWidth = 1;
             for (let radius = 60; radius < Math.max(this.viewW, this.viewH); radius += 60) {
                 ctx.beginPath();
                 ctx.arc(cx, cy, radius, 0, Math.PI * 2);
                 ctx.stroke();
+                const auDist = radius / Math.max(1, auScale);
+                if (auDist >= 0.25) {
+                    ctx.save();
+                    ctx.font = "9px 'Cascadia Mono', Consolas, monospace";
+                    ctx.fillStyle = "rgba(127, 183, 201, 0.32)";
+                    ctx.fillText(`${auDist.toFixed(1)} AU`, cx + radius + 4, cy - 3);
+                    ctx.restore();
+                }
             }
             for (let x = 0; x < this.viewW; x += 60) {
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, this.viewH); ctx.stroke();
@@ -5330,6 +6188,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
             if (b.body_type === "star" && this.celestial) {
                 this.celestial.drawStar(ctx, b, cx, cy, 13 * Math.max(0.8, this.zoom) * Math.min(1.6, this.radarScale()), now);
+                // Solar wind ion flare
+                if (this.particles && Math.random() < 0.25) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = 14 + Math.random() * 8;
+                    const speed = 25 + Math.random() * 35;
+                    this.particles.ion?.(
+                        cx + Math.cos(angle) * dist,
+                        cy + Math.sin(angle) * dist,
+                        Math.cos(angle) * speed,
+                        Math.sin(angle) * speed,
+                        "#ffd166",
+                        0.75,
+                        1.4
+                    );
+                }
                 return;
             }
             if (b.body_type === "star") {
@@ -5419,9 +6292,63 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
 
             if (this.selectedTarget && this.selectedTarget.id === b.id) {
+                const pad = bodyRadius + 6;
+                const corner = Math.max(5, Math.round(pad * 0.42));
+                const pulse = 1.0 + Math.sin(now * 3.5) * 0.05;
+                const pPad = pad * pulse;
+                ctx.save();
                 ctx.strokeStyle = "#7fb7c9";
                 ctx.lineWidth = 1.5;
-                ctx.strokeRect(bx - bodyRadius - 5, by - bodyRadius - 5, (bodyRadius + 5) * 2, (bodyRadius + 5) * 2);
+                ctx.beginPath();
+                // Top-Left ┌
+                ctx.moveTo(bx - pPad, by - pPad + corner);
+                ctx.lineTo(bx - pPad, by - pPad);
+                ctx.lineTo(bx - pPad + corner, by - pPad);
+                // Top-Right ┐
+                ctx.moveTo(bx + pPad - corner, by - pPad);
+                ctx.lineTo(bx + pPad, by - pPad);
+                ctx.lineTo(bx + pPad, by - pPad + corner);
+                // Bottom-Left └
+                ctx.moveTo(bx - pPad, by + pPad - corner);
+                ctx.lineTo(bx - pPad, by + pPad);
+                ctx.lineTo(bx - pPad + corner, by + pPad);
+                // Bottom-Right ┘
+                ctx.moveTo(bx + pPad - corner, by + pPad);
+                ctx.lineTo(bx + pPad, by + pPad);
+                ctx.lineTo(bx + pPad, by + pPad - corner);
+                ctx.stroke();
+
+                // Cardinal reticle tick pips
+                ctx.strokeStyle = "rgba(127, 183, 201, 0.55)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(bx, by - pPad - 4); ctx.lineTo(bx, by - pPad);
+                ctx.moveTo(bx, by + pPad); ctx.lineTo(bx, by + pPad + 4);
+                ctx.moveTo(bx - pPad - 4, by); ctx.lineTo(bx - pPad, by);
+                ctx.moveTo(bx + pPad, by); ctx.lineTo(bx + pPad + 4, by);
+                ctx.stroke();
+
+                // Orbital tangent velocity vector
+                if (orbitR > 0) {
+                    const tang = angle + Math.PI / 2;
+                    const vLen = Math.max(14, pPad * 0.95);
+                    const vx = bx + Math.cos(tang) * vLen;
+                    const vy = by + Math.sin(tang) * vLen;
+                    ctx.strokeStyle = "rgba(201, 163, 90, 0.75)";
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.moveTo(bx, by);
+                    ctx.lineTo(vx, vy);
+                    ctx.stroke();
+                    const aHead = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(vx, vy);
+                    ctx.lineTo(vx - Math.cos(tang - 0.5) * aHead, vy - Math.sin(tang - 0.5) * aHead);
+                    ctx.moveTo(vx, vy);
+                    ctx.lineTo(vx - Math.cos(tang + 0.5) * aHead, vy - Math.sin(tang + 0.5) * aHead);
+                    ctx.stroke();
+                }
+                ctx.restore();
             }
 
             const activeTravel = ship.travel || this.state.travel || null;
@@ -5432,25 +6359,35 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const sx = bx + Math.cos(parkA) * parkR;
                 const sy = by + Math.sin(parkA) * parkR;
                 if (this.celestial) {
-                    this.celestial.drawShip(ctx, sx, sy, parkA + Math.PI / 2, 6 * Math.max(1, this.zoom));
+                    this.celestial.drawShip(ctx, sx, sy, parkA + Math.PI / 2, 6 * Math.max(1, this.zoom), "#8fbf9f", this.shipVariant());
                 } else {
                     ctx.beginPath();
                     ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
                     ctx.fillStyle = "#8fbf9f";
                     ctx.fill();
                 }
-                ctx.font = "12px 'Share Tech Mono'";
-                ctx.fillStyle = "#8fbf9f";
-                ctx.fillText("VF-FLAGSHIP", bx + bodyRadius + 14, by - bodyRadius - 10);
+                this.lastShipPosition = { x: sx, y: sy };
+                this.particles?.trail(sx, sy, parkA + Math.PI / 2, "#8fd8ff", 0.9);
+                labels.push({
+                    text: "VF-FLAGSHIP",
+                    x: bx,
+                    y: by,
+                    radius: bodyRadius + 12 * Math.max(1, this.zoom),
+                    color: "#8fbf9f",
+                    priority: 3,
+                    mono: true,
+                });
             }
 
             if (this.radarLabels) {
-                ctx.font = "12px 'Segoe UI'";
-                ctx.fillStyle = "#ece4d4";
-                const nameWidth = ctx.measureText(b.name).width;
-                let nameX = bx + bodyRadius + 6;
-                if (nameX + nameWidth > this.viewW - 6) nameX = bx - bodyRadius - 6 - nameWidth;
-                ctx.fillText(b.name, Math.max(6, nameX), by + 3);
+                labels.push({
+                    text: b.name,
+                    x: bx,
+                    y: by,
+                    radius: bodyRadius,
+                    color: "#ece4d4",
+                    priority: this.selectedTarget && this.selectedTarget.id === b.id ? 4 : 1,
+                });
             }
         });
 
@@ -5468,16 +6405,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const toY = cy + Math.sin(toAngle) * targetBody.orbit_radius * auScale;
             ctx.save();
             ctx.setLineDash([6, 6]);
-            ctx.strokeStyle = "rgba(111, 195, 215, 0.5)";
-            ctx.lineWidth = 1;
+            ctx.lineDashOffset = -(now * 24) % 12;
+            ctx.strokeStyle = "rgba(111, 195, 215, 0.65)";
+            ctx.lineWidth = 1.2;
             ctx.beginPath();
             ctx.moveTo(fromX, fromY);
             ctx.lineTo(toX, toY);
             ctx.stroke();
             ctx.setLineDash([]);
-            ctx.font = "10px 'Segoe UI'";
-            ctx.fillStyle = "rgba(236, 228, 212, 0.68)";
-            ctx.fillText("COURSE PLOT", (fromX + toX) / 2 + 6, (fromY + toY) / 2 - 6);
+            const distAu = Math.hypot(toX - fromX, toY - fromY) / Math.max(1, auScale);
+            ctx.font = "10px 'Cascadia Mono', Consolas, monospace";
+            ctx.fillStyle = "rgba(236, 228, 212, 0.85)";
+            ctx.fillText(`COURSE PLOT // ${distAu.toFixed(2)} AU`, (fromX + toX) / 2 + 8, (fromY + toY) / 2 - 6);
             ctx.restore();
         }
 
@@ -5489,17 +6428,30 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const sx = cx + Math.cos(anchorAngle) * anchorAu * auScale;
             const sy = cy + Math.sin(anchorAngle) * anchorAu * auScale;
             if (this.celestial) {
-                this.celestial.drawShip(ctx, sx, sy, anchorAngle + Math.PI / 2, 6 * Math.max(1, this.zoom));
+                this.celestial.drawShip(ctx, sx, sy, anchorAngle + Math.PI / 2, 6 * Math.max(1, this.zoom), "#8fbf9f", this.shipVariant());
             } else {
                 ctx.beginPath();
                 ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
                 ctx.fillStyle = "#8fbf9f";
                 ctx.fill();
             }
-            ctx.font = "12px 'Share Tech Mono'";
-            ctx.fillStyle = "#8fbf9f";
-            ctx.fillText("VF-FLAGSHIP (OPEN SPACE)", sx + 10, sy - 7);
+            this.lastShipPosition = { x: sx, y: sy };
+            this.particles?.trail(sx, sy, anchorAngle + Math.PI / 2, "#8fd8ff", 0.9);
+            labels.push({
+                text: "VF-FLAGSHIP (OPEN SPACE)",
+                x: sx,
+                y: sy,
+                radius: 8 * Math.max(1, this.zoom),
+                color: "#8fbf9f",
+                priority: 4,
+                mono: true,
+            });
         }
+        this.particles?.draw(ctx);
+        labels.sort((a, b) => b.priority - a.priority);
+        labels.forEach(label => this.placeRadarLabel(
+            ctx, label.text, label.x, label.y, label.radius, label.color, label.priority, label.mono,
+        ));
         this.drawSystemTraffic(ctx, cx, cy, auScale, now);
         this.drawPointSelection(ctx, cx, cy, auScale, ship);
         this.drawTravelAnimation(ctx, cx, cy, auScale);
@@ -5527,6 +6479,90 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (b.body_type === "ring_world") return 24 * scale;
         const sizeLog = Math.log2(Math.max(1, (b.radius_km || 1000) / 1000));
         return Math.max(6, Math.min(22, 6 + sizeLog * 3)) * scale;
+    }
+
+    shipVariant() {
+        const cls = String(this.state?.ship?.ship_class || "").toLowerCase();
+        if (/freight|cargo|hauler|transport/.test(cls)) return "freighter";
+        if (/fighter|intercept|strike|gunship/.test(cls)) return "fighter";
+        if (/explor|survey|science|pathfinder/.test(cls)) return "explorer";
+        if (/stealth|ghost|shadow|phantom/.test(cls)) return "stealth";
+        if (/dread|capital|battle|cruiser|carrier/.test(cls)) return "capital";
+        return "standard";
+    }
+
+    enemyVariant() {
+        const combat = this.state?.active_combat || {};
+        const cls = String(combat.enemy_class || combat.enemy_name || "").toLowerCase();
+        if (/dread|capital|battle|cruiser|carrier/.test(cls)) return "capital";
+        if (/fighter|interceptor|strike/.test(cls)) return "fighter";
+        if (/freight|hauler|transport/.test(cls)) return "freighter";
+        if (/stealth|ghost|shadow/.test(cls)) return "stealth";
+        return "standard";
+    }
+
+    // The outermost orbit must stay inside the visible radar: at 720p the center panel
+    // is only ~246px tall, so a fixed 45px/AU pushed worlds under the command strip.
+    orbitFitScale(bodies) {
+        const rect = this.mapRect || { w: this.viewW, h: this.viewH };
+        const maxAu = Math.max(0.1, ...bodies
+            .filter(body => body.body_type !== "dyson_sphere")
+            .map(body => Number(body.orbit_radius) || 0));
+        const base = 45 * this.radarScale();
+        const fit = Math.min(rect.w, rect.h) * 0.43 / maxAu;
+        return Math.max(6, Math.min(base, fit)) * this.zoom;
+    }
+
+    // Body and flagship labels share one collision map so two names never overlap, and
+    // every label stays inside the visible radar rather than sliding under the HUD.
+    placeRadarLabel(ctx, text, x, y, radius, color, priority = 0, mono = false) {
+        const rect = this.mapRect || { x: 0, y: 0, w: this.viewW, h: this.viewH };
+        const boxes = this._radarLabelBoxes || [];
+        const font = mono
+            ? "12px 'Cascadia Mono', Consolas, monospace"
+            : "12px 'Segoe UI'";
+        ctx.save();
+        ctx.font = font;
+        const width = ctx.measureText(text).width;
+        const height = 14;
+        const gap = 6;
+        const candidates = [
+            { x: x + radius + gap, y: y - height / 2 },
+            { x: x - radius - gap - width, y: y - height / 2 },
+            { x: x - width / 2, y: y + radius + gap },
+            { x: x - width / 2, y: y - radius - gap - height },
+        ];
+        const place = box => {
+            ctx.fillStyle = "rgba(4, 9, 19, 0.58)";
+            ctx.fillRect(box.x, box.y, box.w, box.h);
+            ctx.fillStyle = color;
+            ctx.fillText(text, box.x + 3, box.y + height - 3);
+            boxes.push(box);
+            this._radarLabelBoxes = boxes;
+        };
+        for (const candidate of candidates) {
+            const box = { x: candidate.x - 3, y: candidate.y - 2, w: width + 6, h: height + 4 };
+            if (box.x < rect.x + 4 || box.y < rect.y + 4
+                || box.x + box.w > rect.x + rect.w - 4
+                || box.y + box.h > rect.y + rect.h - 4) continue;
+            if (boxes.some(other => box.x < other.x + other.w && box.x + box.w > other.x
+                && box.y < other.y + other.h && box.y + box.h > other.y)) continue;
+            place(box);
+            ctx.restore();
+            return true;
+        }
+        if (priority >= 4) {
+            // A selected body or the flagship must stay named even in a crowded strip.
+            const box = {
+                x: Math.max(rect.x + 4, Math.min(rect.x + rect.w - width - 10, x + radius + gap)),
+                y: Math.max(rect.y + 4, Math.min(rect.y + rect.h - height - 6, y - height / 2)),
+                w: width + 6,
+                h: height + 4,
+            };
+            place(box);
+        }
+        ctx.restore();
+        return false;
     }
 
     galaxyTransform(cx, cy) {
@@ -5573,6 +6609,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const owners = politics.systems || {};
         const at = s => [gx + s.x * scale, gy + s.y * scale];
 
+        this.drawGalaxyNebula(ctx, transform, now);
         this.drawTerritory(ctx, transform, systems, owners);
         // Crowded maps (720p, zoomed out) label only what matters; the rest show on hover.
         const gaps = systems.map(a => Math.min(...systems.filter(b => b !== a)
@@ -5598,6 +6635,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
                 ctx.stroke();
+                // Interstellar transit pulse flow
+                const laneSeed = ((s1.x * 37 + s2.y * 59) & 0xffff) / 65535;
+                const flowPhase = ((now * 0.18 + laneSeed) % 1.0);
+                const px = x1 + (x2 - x1) * flowPhase;
+                const py = y1 + (y2 - y1) * flowPhase;
+                ctx.fillStyle = crossing ? "rgba(236, 228, 212, 0.65)" : "rgba(143, 216, 255, 0.75)";
+                ctx.beginPath();
+                ctx.arc(px, py, Math.max(1.2, 1.6 * nodeScale), 0, Math.PI * 2);
+                ctx.fill();
             });
         });
 
@@ -5627,7 +6673,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const isSelected = (this.selectedTarget && this.selectedTarget.id === s.id);
             const radius = (isCurrent ? 9 : 7) * nodeScale;
 
-            this.drawStarGlyph(ctx, sx, sy, radius, s.color || "#6fc3d7");
+            this.drawStarGlyph(ctx, sx, sy, radius, s.color || "#6fc3d7", s.id, now);
             // Owner ring: whose system this is, readable even where territories overlap.
             ctx.beginPath();
             ctx.arc(sx, sy, radius + 4 * nodeScale, 0, Math.PI * 2);
@@ -5670,6 +6716,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         });
 
         this.drawGalaxyTraffic(ctx, transform, now);
+        this.particles?.draw(ctx);
         this.drawPoliticsLegend(ctx, politics);
     }
 
@@ -5733,6 +6780,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const color = this.captainColor(captain);
             const selected = this.selectedType === "captain" && this.selectedTarget && this.selectedTarget.id === captain.id;
             this.drawShipGlyph(ctx, pos.x, pos.y, pos.angle, color, selected ? 7 : 5);
+            this.particles?.trail(pos.x, pos.y, pos.angle, color, 0.55);
             if (selected) {
                 ctx.beginPath();
                 ctx.arc(pos.x, pos.y, 12, 0, Math.PI * 2);
@@ -5741,7 +6789,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.stroke();
             }
             if (this.radarLabels || selected) {
-                ctx.font = "11px 'Share Tech Mono'";
+                ctx.font = "11px 'Cascadia Mono', Consolas, monospace";
                 ctx.fillStyle = color;
                 ctx.fillText(captain.name, pos.x + 9, pos.y - 6);
             }
@@ -5800,17 +6848,106 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 color,
                 marker.size,
             );
+            this.particles?.trail(marker.x, marker.y, marker.angle + Math.PI / 2, color, 0.5);
         });
     }
 
-    drawStarGlyph(ctx, x, y, radius, color) {
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.4);
-        glow.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-        glow.addColorStop(0.28, color);
-        glow.addColorStop(1, "rgba(0, 0, 0, 0)");
-        ctx.fillStyle = glow;
+    // A galaxy-only nebula wash and dust lane behind the territory. It drifts a fraction
+    // of the map pan, so the political layer reads as a foreground over deep space.
+    drawGalaxyNebula(ctx, transform, now) {
+        const w = this.viewW;
+        const h = this.viewH;
+        const px = this.panX * 0.12;
+        const py = this.panY * 0.12;
+        const drift = Math.sin(now * 0.03) * 6;
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        const blue = ctx.createRadialGradient(
+            w * 0.70 + px + drift, h * 0.30 + py, 0,
+            w * 0.70 + px + drift, h * 0.30 + py, Math.max(w, h) * 0.58,
+        );
+        blue.addColorStop(0, "rgba(58, 104, 170, 0.20)");
+        blue.addColorStop(0.45, "rgba(38, 64, 118, 0.10)");
+        blue.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = blue;
+        ctx.fillRect(0, 0, w, h);
+        const violet = ctx.createRadialGradient(
+            w * 0.26 + px * 0.6 - drift, h * 0.74 + py * 0.6, 0,
+            w * 0.26 + px * 0.6 - drift, h * 0.74 + py * 0.6, Math.max(w, h) * 0.46,
+        );
+        violet.addColorStop(0, "rgba(118, 80, 160, 0.13)");
+        violet.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = violet;
+        ctx.fillRect(0, 0, w, h);
+        // Core bulge amber stellar dust lane
+        const amber = ctx.createRadialGradient(
+            w * 0.52 + px * 0.8, h * 0.48 + py * 0.8 + drift * 0.5, 0,
+            w * 0.52 + px * 0.8, h * 0.48 + py * 0.8 + drift * 0.5, Math.max(w, h) * 0.36,
+        );
+        amber.addColorStop(0, "rgba(201, 163, 90, 0.12)");
+        amber.addColorStop(0.35, "rgba(160, 95, 40, 0.05)");
+        amber.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = amber;
+        ctx.fillRect(0, 0, w, h);
+        ctx.translate(w * 0.62 + px, h * 0.48 + py);
+        ctx.rotate(-0.42);
+        const dust = ctx.createLinearGradient(0, -h * 0.12, 0, h * 0.12);
+        dust.addColorStop(0, "rgba(0, 0, 0, 0)");
+        dust.addColorStop(0.5, "rgba(4, 8, 16, 0.24)");
+        dust.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = dust;
+        ctx.fillRect(-w * 0.8, -h * 0.12, w * 1.6, h * 0.24);
+        ctx.restore();
+    }
+
+    // Seeded star glyph: a soft corona, a white core and four diffraction rays whose
+    // length and rotation come from the system id, so no two key stars read alike.
+    drawStarGlyph(ctx, x, y, radius, color, seed = "", now = 0) {
+        const hash = this.captainHash(seed || color);
+        const phase = (hash % 997) / 997 * Math.PI * 2;
+        const pulse = 0.92 + Math.sin(now * 1.4 + phase) * 0.08;
+        const halo = ctx.createRadialGradient(x, y, radius * 0.5, x, y, radius * 4.4 * pulse);
+        halo.addColorStop(0, "rgba(255, 255, 255, 0.42)");
+        halo.addColorStop(0.24, color);
+        halo.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = halo;
         ctx.beginPath();
-        ctx.arc(x, y, radius * 2.4, 0, Math.PI * 2);
+        ctx.arc(x, y, radius * 4.4 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        const core = ctx.createRadialGradient(x, y, 0, x, y, radius * 1.35);
+        core.addColorStop(0, "#ffffff");
+        core.addColorStop(0.35, color);
+        core.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 1.35, 0, Math.PI * 2);
+        ctx.fill();
+        const ray = radius * (2.3 + (hash % 100) / 100 * 1.3);
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(phase * 0.12);
+        ctx.strokeStyle = color;
+        ctx.lineCap = "round";
+        ctx.lineWidth = Math.max(0.8, radius * 0.10);
+        ctx.globalAlpha = 0.34;
+        ctx.beginPath();
+        ctx.moveTo(-ray, 0); ctx.lineTo(ray, 0);
+        ctx.moveTo(0, -ray); ctx.lineTo(0, ray);
+        ctx.stroke();
+        ctx.rotate(Math.PI / 4);
+        ctx.globalAlpha = 0.16;
+        ctx.lineWidth = Math.max(0.6, radius * 0.06);
+        ctx.beginPath();
+        ctx.moveTo(-ray * 0.5, 0); ctx.lineTo(ray * 0.5, 0);
+        ctx.moveTo(0, -ray * 0.5); ctx.lineTo(0, ray * 0.5);
+        ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(1.2, radius * 0.34), 0, Math.PI * 2);
         ctx.fill();
     }
 
@@ -5840,8 +6977,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     renderTerritory(transform, systems, owners) {
-        // ~480 cells across at any resolution keeps a rebuild (every pan/zoom frame) cheap.
-        const cell = Math.max(4, Math.round(this.viewW / 480));
+        // ~960 cells across keeps borders crisp at 1080p while a cached rebuild stays cheap.
+        const cell = Math.max(2, Math.round(this.viewW / 960));
         const cw = Math.ceil(this.viewW / cell);
         const ch = Math.ceil(this.viewH / cell);
         const ownerIds = [];
@@ -5920,8 +7057,28 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const sctx = smooth.getContext("2d");
         sctx.imageSmoothingEnabled = true;
         sctx.imageSmoothingQuality = "high";
-        sctx.filter = "blur(1.2px)";
+        sctx.filter = "blur(1.6px)";
         sctx.drawImage(canvas, 0, 0, smooth.width, smooth.height);
+        // A fine diagonal hatch gives owned space a cartographic texture without
+        // brightening the wash. source-atop keeps it inside the territory mask.
+        sctx.filter = "none";
+        const hatch = document.createElement("canvas");
+        hatch.width = 8;
+        hatch.height = 8;
+        const hctx = hatch.getContext("2d");
+        hctx.strokeStyle = "rgba(255, 255, 255, 0.10)";
+        hctx.lineWidth = 1;
+        hctx.beginPath();
+        hctx.moveTo(-2, 6);
+        hctx.lineTo(6, -2);
+        hctx.stroke();
+        const pattern = sctx.createPattern(hatch, "repeat");
+        if (pattern) {
+            sctx.globalCompositeOperation = "source-atop";
+            sctx.fillStyle = pattern;
+            sctx.fillRect(0, 0, smooth.width, smooth.height);
+            sctx.globalCompositeOperation = "source-over";
+        }
         return smooth;
     }
 
@@ -6856,7 +8013,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     async handleSalvage() {
         this.sound.init();
-        const res = await this.postAction("/api/salvage", {});
+        const strategy = this.salvageStrategy || "balanced";
+        const res = await this.postAction("/api/salvage", { strategy });
         if (res && res.ok) {
             this.sound.playBountyChime();
             this.updateTargetCard();
@@ -7012,7 +8170,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         ctx.moveTo(tx, ty - 15);
         ctx.lineTo(tx, ty + 15);
         ctx.stroke();
-        ctx.font = "12px 'Share Tech Mono'";
+        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.fillStyle = "#7fb7c9";
         ctx.fillText(
             `VECTOR ${au.toFixed(2)} AU // ${(angle * 180 / Math.PI).toFixed(0)} DEG`,
@@ -7111,15 +8269,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.fillText("DESTINATION VECTOR", tx + 15, ty - 11);
         }
 
+        const heading = Math.atan2(ty - oy, tx - ox);
         if (this.celestial) {
-            this.celestial.drawShip(ctx, x, y, Math.atan2(ty - oy, tx - ox), 9 * Math.max(1, this.zoom), "#7fb7c9");
+            this.celestial.drawShip(ctx, x, y, heading, 9 * Math.max(1, this.zoom), "#7fb7c9", this.shipVariant());
         } else {
             ctx.beginPath();
             ctx.arc(x, y, 5, 0, Math.PI * 2);
             ctx.fillStyle = "#7fb7c9";
             ctx.fill();
         }
-        ctx.font = "12px 'Share Tech Mono'";
+        this.lastShipPosition = { x, y };
+        this.particles?.warp(x, y, heading, "#7fb7c9");
+        this.particles?.warp(x, y, heading, "#b7e4ff");
+        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.fillStyle = "#7fb7c9";
         if (activeTravel) {
             const remTicks = Math.max(1, (activeTravel.arrival_tick || anim.arrivalTick) - (this.state?.time?.tick || 0));

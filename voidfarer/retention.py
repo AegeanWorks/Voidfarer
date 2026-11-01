@@ -369,13 +369,17 @@ def calculate_passive_multipliers(ship: ShipState) -> dict[str, float]:
     # Streak multiplies yields up to +150% (2.5x)
     streak_mult = 1.0 + min(1.5, (streak - 1) * 0.15)
 
+    # Hull wear degrades sensor and trade efficiency (max -10% at 100% wear).
+    wear = max(0.0, min(100.0, getattr(ship, "wear", 0.0)))
+    wear_penalty = 1.0 - (wear / 100.0) * 0.10
+
     multipliers: dict[str, float] = {
         "laser_dmg": 1.0,
         "shield_cap": 0.0,
         "max_hull": 0.0,
         "fuel_efficiency": 1.0,
-        "scan_bounty": 1.0 * streak_mult,
-        "trade_margin": 1.0 * streak_mult,
+        "scan_bounty": 1.0 * streak_mult * wear_penalty,
+        "trade_margin": 1.0 * streak_mult * wear_penalty,
         "drone_yield": 1.0,
         "relic_find": 0.0,
         "void_stability": 0.0,
@@ -434,4 +438,57 @@ def calculate_passive_multipliers(ship: ShipState) -> dict[str, float]:
         elif stat == "void_stability":
             multipliers["void_stability"] += mult
 
+    # Relic set bonuses: collecting enough relics of one rarity grants a resonance bonus.
+    # This rewards collection and gives a long-term progression hook beyond individual stats.
+    for stat, value in relic_set_bonuses(ship.relics).items():
+        if stat in multipliers:
+            multipliers[stat] += value
+
     return multipliers
+
+
+# One table drives the passive bonuses, the CLI set display and the codex metric.
+RELIC_SET_THRESHOLDS: dict[str, int] = {
+    "common": 3,
+    "rare": 3,
+    "epic": 2,
+    "legendary": 1,
+}
+
+
+def relic_count_by_rarity(relics) -> dict[str, int]:
+    from collections import Counter
+
+    return dict(Counter(getattr(r, "rarity", "") for r in (relics or ())))
+
+
+def relic_completed_sets(relics) -> int:
+    """How many rarity sets are complete at their threshold."""
+    counts = relic_count_by_rarity(relics)
+    return sum(
+        1 for rarity, threshold in RELIC_SET_THRESHOLDS.items()
+        if counts.get(rarity, 0) >= threshold
+    )
+
+
+def relic_set_bonuses(relics) -> dict[str, float]:
+    """Compute set bonuses from collecting relics of the same rarity.
+
+    Returns a mapping of stat -> bonus value (same units as passive multipliers).
+    """
+    counts = relic_count_by_rarity(relics)
+    bonuses: dict[str, float] = {}
+
+    if counts.get("common", 0) >= RELIC_SET_THRESHOLDS["common"]:
+        bonuses["scan_bounty"] = bonuses.get("scan_bounty", 0.0) + 0.05
+    if counts.get("rare", 0) >= RELIC_SET_THRESHOLDS["rare"]:
+        bonuses["scan_bounty"] = bonuses.get("scan_bounty", 0.0) + 0.10
+        bonuses["trade_margin"] = bonuses.get("trade_margin", 0.0) + 0.05
+    if counts.get("epic", 0) >= RELIC_SET_THRESHOLDS["epic"]:
+        bonuses["laser_dmg"] = bonuses.get("laser_dmg", 0.0) + 0.15
+        bonuses["shield_cap"] = bonuses.get("shield_cap", 0.0) + 10.0
+    if counts.get("legendary", 0) >= RELIC_SET_THRESHOLDS["legendary"]:
+        bonuses["scan_bounty"] = bonuses.get("scan_bounty", 0.0) + 0.25
+        bonuses["trade_margin"] = bonuses.get("trade_margin", 0.0) + 0.25
+        bonuses["laser_dmg"] = bonuses.get("laser_dmg", 0.0) + 0.25
+    return bonuses

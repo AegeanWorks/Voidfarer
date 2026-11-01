@@ -8,6 +8,7 @@ import hashlib
 import math
 import random
 import threading
+import time
 from typing import Any, Sequence
 
 from voidfarer.enemies import (
@@ -59,6 +60,12 @@ from voidfarer.character import (
 from voidfarer.codex import build_codex_report, get_codex_entry
 from voidfarer.decisions import eligible_decisions, make_decision_event
 from voidfarer.pirates import generate_pirate_encounter, pirate_risk
+from voidfarer.smuggling import (
+    calculate_customs_scan_risk,
+    generate_customs_encounter,
+    get_contraband_in_cargo,
+    is_contraband,
+)
 from voidfarer.away import (
     AWAY_MISSION_MAP,
     AWAY_MISSION_TYPES,
@@ -231,6 +238,8 @@ from voidfarer.models import (
     PilotMastery,
     PrecursorRelic,
     CrewMember,
+    CustomsEncounter,
+    CompletedQuest,
     Outpost,
     PlayerCharacter,
     QuantumMessage,
@@ -268,6 +277,7 @@ from voidfarer.retention import (
     calculate_passive_multipliers,
     generate_contract,
     generate_initial_contracts,
+    relic_set_bonuses,
     roll_relic_drop,
 )
 from voidfarer.surface import (
@@ -638,6 +648,7 @@ class SimulationEngine:
             message_bonuses=kwargs.get("message_bonuses", cur.message_bonuses),
             flight_log=kwargs.get("flight_log", cur.flight_log),
             streak=kwargs.get("streak", cur.streak),
+            wear=kwargs.get("wear", cur.wear),
             relics=kwargs.get("relics", cur.relics),
             mastery=kwargs.get("mastery", cur.mastery),
             active_contracts=kwargs.get("active_contracts", cur.active_contracts),
@@ -686,6 +697,7 @@ class SimulationEngine:
             active_anomaly=kwargs["active_anomaly"] if "active_anomaly" in kwargs else cur.active_anomaly,
             active_combat=kwargs["active_combat"] if "active_combat" in kwargs else cur.active_combat,
             active_pirate=kwargs["active_pirate"] if "active_pirate" in kwargs else cur.active_pirate,
+            active_customs=kwargs["active_customs"] if "active_customs" in kwargs else cur.active_customs,
             pending_decision=kwargs["pending_decision"] if "pending_decision" in kwargs else cur.pending_decision,
             decision_history=kwargs.get("decision_history", cur.decision_history),
             time=kwargs.get("time", cur.time),
@@ -705,6 +717,7 @@ class SimulationEngine:
             eliminated_factions=kwargs.get("eliminated_factions", cur.eliminated_factions),
             codex=kwargs.get("codex", cur.codex),
             local_dock_purchases=kwargs.get("local_dock_purchases", cur.local_dock_purchases),
+            completed_quests=kwargs.get("completed_quests", cur.completed_quests),
             trade_automation=kwargs.get("trade_automation", cur.trade_automation),
             quantum_automation=kwargs.get(
                 "quantum_automation", cur.quantum_automation
@@ -1667,6 +1680,29 @@ class SimulationEngine:
                         f"PIRATE ENCOUNTER: {active_pirate.band_name} demands "
                         f"{active_pirate.toll_credits} cr for safe passage ({raid_risk.reason})."
                     )
+            # Check contraband security customs inspection in high-security systems
+            active_customs = None
+            if not combat and not anomaly and active_pirate is None:
+                contraband = get_contraband_in_cargo(self.state.ship.cargo)
+                if contraband and target_sys.security >= 0.65:
+                    scan_chance, _ = calculate_customs_scan_risk(
+                        target_sys, self.state.ship.cargo, self.state.ship, self.state.ship.power, equipment
+                    )
+                    customs_roll = self._stable_unit(
+                        self.state.galaxy_seed, "customs", target_system_id, self.state.time.tick
+                    )
+                    if customs_roll < scan_chance:
+                        active_customs = generate_customs_encounter(
+                            target_sys,
+                            self.state.ship.cargo,
+                            self.state.ship,
+                            seed=int(self._stable_unit(
+                                self.state.galaxy_seed, "customs_seed", target_system_id, self.state.time.tick
+                            ) * 99999) + 1,
+                        )
+                        new_log.append(
+                            f"CUSTOMS INTERDICTION: {active_customs.patrol_vessel} locked scanners on illicit cargo ({len(contraband)} types detected)!"
+                        )
 
             # Tutorial progression on hyperspace jump
             new_tut, tut_cr, tut_xp, tut_relics, tut_logs = self._progress_tutorial("jump")
@@ -1701,6 +1737,33 @@ class SimulationEngine:
                 tut_relics,
             )
 
+            # Solar storm space weather hazards in high-energy spectral systems
+            new_reactor = self.state.ship.reactor
+            if not combat and target_sys.spectral_type in ("O", "B", "WolfRayet", "RedGiant", "Neutron"):
+                weather_roll = self._stable_unit(
+                    self.state.galaxy_seed, "solar_weather", target_system_id, self.state.time.tick
+                )
+                if weather_roll < 0.35:
+                    if self.state.ship.power.shields >= 35:
+                        new_log.append(
+                            f"SPACE WEATHER DEFLECTION: Deflector grid ({self.state.ship.power.shields}% power) deflected high-energy coronal solar flare from {target_sys.name} (+25 Pilot XP)."
+                        )
+                        new_mastery, xp_logs = self._award_pilot_xp(25, new_mastery)
+                        new_log.extend(xp_logs)
+                    else:
+                        surge_drain = 15
+                        if new_shield >= surge_drain:
+                            new_shield -= surge_drain
+                        else:
+                            overflow = surge_drain - new_shield
+                            new_shield = 0
+                            new_hull = max(1, new_hull - overflow)
+                        max_h = reactor_heat_capacity(new_reactor, equipment)
+                        new_reactor = replace(new_reactor, heat=min(max_h, new_reactor.heat + 8.0))
+                        new_log.append(
+                            f"SPACE WEATHER HAZARD: High-energy coronal solar flare from {target_sys.name} penetrated deflector grid! (-15 Shield, +8 Reactor Heat). Maintain Shields >= 35% in high-energy systems to deflect radiation."
+                        )
+
             arrival_crew = self.state.ship.crew
             if is_hostile_territory:
                 arrival_crew, hostile_morale_log = apply_morale_event(
@@ -1714,6 +1777,7 @@ class SimulationEngine:
                 max_hull=new_max_hull,
                 shield=new_shield,
                 max_shield=new_max_shield,
+                reactor=new_reactor,
                 fuel=new_fuel,
                 credits=self.state.ship.credits + tut_cr,
                 current_system_id=target_system_id,
@@ -1725,6 +1789,7 @@ class SimulationEngine:
                 fleet_drones=updated_drones,
                 flight_log=tuple(new_log[-20:]),
                 streak=new_streak,
+                wear=min(100.0, self.state.ship.wear + 1.0),
                 mastery=new_mastery,
                 relics=tuple(list(self.state.ship.relics) + tut_relics),
                 active_contracts=updated_contracts,
@@ -1837,6 +1902,7 @@ class SimulationEngine:
                 active_anomaly=anomaly,
                 active_combat=combat,
                 active_pirate=active_pirate,
+                active_customs=active_customs,
                 stats=stats,
                 time=transit_time,
                 economy=new_econ,
@@ -3922,6 +3988,41 @@ class SimulationEngine:
             self.state = self._clone_state(ship=self._clone_ship(crew=remaining))
             return True, f"Crew member {member.name} dismissed."
 
+    def assign_crew_station(self, crew_id: str, station: str) -> tuple[bool, str]:
+        """Assign an active crew specialist to a flagship bridge/departmental station."""
+        with self.lock:
+            valid_stations = {"helm", "tactical", "engineering", "science", "medical", "unassigned", ""}
+            clean_station = station.lower().strip()
+            if clean_station not in valid_stations:
+                return False, f"Unknown station '{station}'. Valid stations: helm, tactical, engineering, science, medical, unassigned."
+
+            member = next((c for c in self.state.ship.crew if c.id == crew_id), None)
+            if not member:
+                return False, f"Unknown crew member '{crew_id}'."
+
+            if member.status != "active":
+                return False, f"Crew member {member.name} is not on active duty ({member.status})."
+
+            target_station = "" if clean_station == "unassigned" else clean_station
+            updated_crew = []
+            for c in self.state.ship.crew:
+                if c.id == crew_id:
+                    updated_crew.append(replace(c, station=target_station))
+                elif target_station and getattr(c, "station", "") == target_station:
+                    # Unseat previous officer from this station
+                    updated_crew.append(replace(c, station=""))
+                else:
+                    updated_crew.append(c)
+
+            action_desc = "relieved from station duties." if not target_station else f"assigned to the {target_station.upper()} station."
+            msg = f"{member.name} ({member.role.capitalize()}, Skill {member.skill}) {action_desc}"
+            new_ship = self._clone_ship(
+                crew=tuple(updated_crew),
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [f"Duty assignment: {msg}"]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, msg
+
     def get_crew_report(self) -> dict[str, Any]:
         with self.lock:
             crew = self.state.ship.crew
@@ -5657,6 +5758,51 @@ class SimulationEngine:
             )
             return True, line
 
+    def fuse_relics(self, source_rarity: str) -> tuple[bool, str, dict[str, Any]]:
+        """Fuse three relics of one rarity into a single relic of the next rarity."""
+        with self.lock:
+            ship = self.state.ship
+            source_rarity = (source_rarity or "").strip().lower()
+            ladder = {"common": "rare", "rare": "epic", "epic": "legendary"}
+            if source_rarity not in ladder:
+                return False, "Cannot fuse legendary relics further (or unknown rarity).", {}
+            owned = [r for r in ship.relics if r.rarity == source_rarity]
+            if len(owned) < 3:
+                return False, f"Need 3 {source_rarity} relics to fuse (have {len(owned)}).", {}
+
+            target_rarity = ladder[source_rarity]
+            owned_ids = {r.id for r in ship.relics}
+            candidates = [r for r in CATALOG_RELICS if r.rarity == target_rarity and r.id not in owned_ids]
+            if candidates:
+                new_relic = self.rng.choice(candidates)
+            else:
+                new_relic = PrecursorRelic(
+                    id=f"fused_{target_rarity}_{len(ship.relics)}",
+                    name=f"Fused {target_rarity.title()} Relic",
+                    rarity=target_rarity,
+                    description="Forged from three lesser relics at a resonance forge.",
+                    passive_stat="scan_bounty",
+                    stat_multiplier=0.15,
+                )
+
+            # Remove the first three source relics.
+            remaining: list[Any] = []
+            removed = 0
+            for r in ship.relics:
+                if r.rarity == source_rarity and removed < 3:
+                    removed += 1
+                    continue
+                remaining.append(r)
+            remaining.append(new_relic)
+
+            log_entry = f"Relic fusion: 3 {source_rarity} relics forged into {new_relic.name} ({target_rarity})."
+            new_ship = self._clone_ship(
+                relics=tuple(remaining),
+                flight_log=tuple(list(ship.flight_log[-19:]) + [log_entry]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, f"Fused 3 {source_rarity} relics into {new_relic.name} ({target_rarity}).", {"relic": new_relic.to_dict()}
+
     def _combat_defeat(self, combat: CombatEncounter, note: str = "",
                        fleet_ships: tuple | None = None, crew: tuple | None = None,
                        streak: int | None = None, fuel: int | None = None) -> tuple[bool, str]:
@@ -5725,7 +5871,7 @@ class SimulationEngine:
             ability_cd = max(0, combat.ability_cooldown - 1)
             intent = combat.enemy_intent if combat.enemy_intent in {"fire", "brace", "evade", "execute", "ability"} else "fire"
             enemy_guard = 0.55 if intent == "brace" else 1.0
-            damaging_actions = {"fire_lasers", "drone_strike", "target_subsystem", "target_weapons", "target_shields"}
+            damaging_actions = {"fire_lasers", "drone_strike", "target_subsystem", "target_weapons", "target_shields", "target_engines", "target_bridge", "point_defense"}
             enemy_miss = action in damaging_actions and intent == "evade" and self.rng.random() < 0.35
             weapon_miss = False
             enemy_hull_before = enemy_rem_hull
@@ -5736,6 +5882,32 @@ class SimulationEngine:
             fleet_volley = 0
             boarding_crew = None
             battle_stance = self.state.ship.battle_stance
+
+            # Combat Reactor Thermal Curve & Overheating Tracking
+            heat_gain = 0.0
+            if action == "fire_lasers":
+                heat_gain = 6.0
+            elif action in ("target_subsystem", "target_weapons", "target_shields", "target_engines"):
+                heat_gain = 5.0
+            elif action == "target_bridge":
+                heat_gain = 10.0
+            elif action == "shield_absorb":
+                heat_gain = 4.0
+            elif action == "point_defense":
+                heat_gain = 3.0
+
+            if heat_gain > 0.0:
+                reactor_mode = self.state.ship.reactor.mode
+                if reactor_mode == "overclock":
+                    heat_gain *= 1.5
+                elif reactor_mode == "eco":
+                    heat_gain *= 0.7
+
+            max_heat = reactor_heat_capacity(self.state.ship.reactor, equipment)
+            combat_reactor = replace(
+                self.state.ship.reactor,
+                heat=min(max_heat, self.state.ship.reactor.heat + heat_gain),
+            )
 
             if action == "fire_lasers":
                 wep_power = self._effective_power("weapons")
@@ -5787,8 +5959,8 @@ class SimulationEngine:
                     enemy_rem_shield = max(0, enemy_rem_shield - sensor_burn)
                     strike_desc = f"Scout Drone focused beam telemetry! Collapsed {sensor_burn} MW of enemy deflector shields!"
 
-            elif action in ("target_subsystem", "target_weapons", "target_shields"):
-                subsystem = "shields" if action == "target_shields" else "weapons"
+            elif action in ("target_subsystem", "target_weapons", "target_shields", "target_engines", "target_bridge"):
+                subsystem = "shields" if action == "target_shields" else ("engines" if action == "target_engines" else ("bridge" if action == "target_bridge" else "weapons"))
                 new_combo += 1
                 if subsystem == "weapons":
                     enemy_rem_damage = max(6, int(combat.enemy_damage * 0.60))
@@ -5798,10 +5970,43 @@ class SimulationEngine:
                     else:
                         enemy_rem_hull -= strike_dmg
                     strike_desc = f"Targeted strike hit enemy weapon arrays! Disabled fire-control (-40% enemy firepower) and dealt {strike_dmg} damage!"
-                else:
+                elif subsystem == "shields":
                     shield_ion = max(1, int(40 * enemy_guard))
                     enemy_rem_shield = max(0, enemy_rem_shield - shield_ion)
                     strike_desc = f"Ion pulse targeted enemy shield generators! EMP cascade drained {shield_ion} MW shields!"
+                elif subsystem == "engines":
+                    strike_dmg = max(1, int(18 * enemy_guard))
+                    if strike_dmg <= enemy_rem_shield:
+                        enemy_rem_shield -= strike_dmg
+                    else:
+                        overflow = strike_dmg - enemy_rem_shield
+                        enemy_rem_shield = 0
+                        enemy_rem_hull -= overflow
+                    intent = "brace"
+                    enemy_miss = False
+                    strike_desc = f"Pinpoint strike on enemy drive manifolds! Disabled impulse thrusters (collapsed enemy evasion) and dealt {strike_dmg} damage!"
+                elif subsystem == "bridge":
+                    wep_power = self._effective_power("weapons")
+                    if wep_power < 15:
+                        return False, "Targeting enemy command bridge requires at least 15% Weapons reactor power allocation."
+                    bridge_miss = self.rng.random() > 0.75
+                    if bridge_miss:
+                        weapon_miss = True
+                        enemy_miss = True
+                        strike_desc = "Targeted bridge shot deflected off reinforced blast shutters; the high-risk strike failed to penetrate."
+                    else:
+                        crit_dmg = max(1, int(50 * enemy_guard))
+                        if crit_dmg <= enemy_rem_shield:
+                            enemy_rem_shield -= crit_dmg
+                        else:
+                            overflow = crit_dmg - enemy_rem_shield
+                            enemy_rem_shield = 0
+                            enemy_rem_hull -= overflow
+                        enemy_rem_damage = 0
+                        strike_desc = f"Bridge strike pierced the command deck! Hostile command crew panicked; counter-battery cancelled (0 inbound damage) and dealt {crit_dmg} critical damage!"
+
+                if combat_reactor.heat >= max_heat * 0.85 and heat_gain > 0.0:
+                    strike_desc += f" [REACTOR WARNING: Core heat at {combat_reactor.heat:.0f}/{max_heat:.0f} MW]"
 
             elif action in ("board_enemy", "board", "capture"):
                 if combat.enemy_shield > 0:
@@ -5876,6 +6081,30 @@ class SimulationEngine:
                     strike_desc += f" {morale_log}"
                 new_combo = 0
 
+            elif action == "point_defense":
+                wep_power = self._effective_power("weapons")
+                eng_power = self._effective_power("engines")
+                if wep_power < 15 and eng_power < 15:
+                    return False, "Point Defense Cannons require at least 15% power routed to Weapons or Engines."
+                flak_dmg = 14
+                if enemy_rem_shield > 0:
+                    shield_hit = min(flak_dmg, enemy_rem_shield)
+                    enemy_rem_shield -= shield_hit
+                    rem_flak = flak_dmg - shield_hit
+                    if rem_flak > 0:
+                        enemy_rem_hull = max(0, enemy_rem_hull - rem_flak)
+                else:
+                    enemy_rem_hull = max(0, enemy_rem_hull - flak_dmg)
+                strike_desc = f"Point Defense Cannons engaged! Tungsten flak shredded hostile armor for {flak_dmg} kinetic damage."
+                new_combo += 1
+
+            elif action == "vent_heat":
+                ok, purged_reactor, purge_msg = vent_reactor(combat_reactor, self.state.time.tick)
+                if not ok:
+                    return False, purge_msg
+                combat_reactor = purged_reactor
+                strike_desc = f"Tactical Coolant Vent: {purge_msg}"
+
             elif action == "shield_absorb":
                 boost = 30 + (25 if "dreadnought_tactics" in self.state.ship.mastery.specializations else 0)
                 new_shield = min(self.state.ship.max_shield, new_shield + boost)
@@ -5922,7 +6151,7 @@ class SimulationEngine:
                     archetype_id=combat.archetype_id,
                 )
                 new_log = list(self.state.ship.flight_log[-19:]) + [msg]
-                new_ship = self._clone_ship(hull=new_hull, shield=new_shield, tactical_combo=new_combo, streak=new_streak, flight_log=tuple(new_log[-20:]))
+                new_ship = self._clone_ship(hull=new_hull, shield=new_shield, reactor=combat_reactor, tactical_combo=new_combo, streak=new_streak, flight_log=tuple(new_log[-20:]))
                 self.state = self._clone_state(ship=new_ship, active_combat=new_combat)
                 return True, msg
 
@@ -5971,7 +6200,7 @@ class SimulationEngine:
                 return True, msg
 
             else:
-                return False, f"Unknown combat action '{action}'. Choices: fire_lasers, drone_strike, target_subsystem, board_enemy, shield_absorb, evasive_burn, flee."
+                return False, f"Unknown combat action '{action}'. Choices: fire_lasers, drone_strike, target_subsystem, target_weapons, target_shields, target_engines, target_bridge, board_enemy, shield_absorb, point_defense, vent_heat, evasive_burn, flee."
 
             if enemy_miss:
                 enemy_rem_hull = enemy_hull_before
@@ -6166,6 +6395,7 @@ class SimulationEngine:
                     active_contracts=updated_contracts,
                     faction_standings=new_faction_standings,
                     corp_standings=new_corp_standings,
+                    reactor=combat_reactor,
                     tactical_combo=0,
                     streak=new_streak,
                     crew=victory_crew,
@@ -6208,6 +6438,9 @@ class SimulationEngine:
             # Standard counter-battery
             inbound = int(enemy_rem_damage * (1.5 if intent == "execute" else 1.0))
             evasion_note = ""
+            if action == "point_defense":
+                inbound = max(1, int(inbound * 0.30))
+                evasion_note = " [PDC flak screen intercepted 70% of inbound counter-battery!]"
             fleet_evasion = min(
                 0.45,
                 fleet_evasion_bonus(fleet_ships, battle_stance)
@@ -6215,7 +6448,7 @@ class SimulationEngine:
             )
             if inbound > 0 and (equipment["evasion"] + mercenary_evasion + fleet_evasion) > 0.0 and self.rng.random() < (equipment["evasion"] + mercenary_evasion + fleet_evasion):
                 inbound = 0
-                evasion_note = " [Ion afterburners and escort screen evaded incoming fire!]"
+                evasion_note += " [Ion afterburners and escort screen evaded incoming fire!]"
             if inbound > 0 and fleet_ships:
                 fleet_ships, absorbed = apply_fleet_casualties(fleet_ships, max(1, inbound // 2))
                 if absorbed > 0:
@@ -6291,6 +6524,7 @@ class SimulationEngine:
             new_ship = self._clone_ship(
                 hull=new_hull,
                 shield=new_shield,
+                reactor=combat_reactor,
                 tactical_combo=new_combo,
                 streak=new_streak,
                 crew=(
@@ -6462,6 +6696,157 @@ class SimulationEngine:
 
             return False, f"Unknown pirate action '{action}'. Use pay, fight, or evade."
 
+    def resolve_customs(self, action: str) -> tuple[bool, str]:
+        """Resolve a customs interdiction: bribe, jettison, confiscate, or flee."""
+        with self.lock:
+            encounter = self.state.active_customs
+            if encounter is None:
+                return False, "No customs inspection is active."
+
+            action = str(action).strip().lower()
+            stats = dict(self.state.stats)
+            sys_faction_id = get_faction_id_from_name(encounter.faction)
+            standings = dict(self.state.ship.faction_standings)
+
+            if action in ("bribe", "pay"):
+                if self.state.ship.credits < encounter.bribe_amount:
+                    return False, f"Insufficient credits: {encounter.bribe_amount} cr required for bribe, {self.state.ship.credits} available."
+                new_credits = self.state.ship.credits - encounter.bribe_amount
+                stats["bribes_paid"] = int(stats.get("bribes_paid", 0)) + 1
+                new_mastery, xp_logs = self._award_pilot_xp(30, self.state.ship.mastery)
+                log = f"CUSTOMS BRIBE: Paid {encounter.bribe_amount} cr to {encounter.patrol_vessel}. Manifest cleared off the record (+30 XP)."
+                new_ship = self._clone_ship(
+                    credits=new_credits,
+                    mastery=new_mastery,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log] + xp_logs),
+                )
+                self.state = self._clone_state(ship=new_ship, active_customs=None, stats=stats)
+                return True, log
+
+            if action in ("jettison", "dump"):
+                new_cargo = {k: v for k, v in self.state.ship.cargo.items() if not is_contraband(k)}
+                dumped_units = sum(encounter.contraband_found.values())
+                stats["smuggling_evaded"] = int(stats.get("smuggling_evaded", 0)) + 1
+                log = f"CARGO JETTISONED: Purged {dumped_units} units of contraband into the void. Customs scanner reads clean; released without citation."
+                new_ship = self._clone_ship(
+                    cargo=new_cargo,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+                )
+                self.state = self._clone_state(ship=new_ship, active_customs=None, stats=stats)
+                return True, log
+
+            if action in ("confiscate", "comply", "surrender"):
+                new_cargo = {k: v for k, v in self.state.ship.cargo.items() if not is_contraband(k)}
+                fine_paid = min(self.state.ship.credits, encounter.fine_amount)
+                new_credits = self.state.ship.credits - fine_paid
+                current_standing = standings.get(sys_faction_id, 0)
+                standings[sys_faction_id] = max(-100, current_standing - 5)
+                stats["contraband_seized"] = int(stats.get("contraband_seized", 0)) + 1
+                log = f"CONTRABAND CONFISCATED: Patrol seized illicit goods. Levied {fine_paid} cr penalty and logged citation (-5 standing with {encounter.faction})."
+                new_ship = self._clone_ship(
+                    cargo=new_cargo,
+                    credits=new_credits,
+                    faction_standings=standings,
+                    flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+                )
+                self.state = self._clone_state(ship=new_ship, active_customs=None, stats=stats)
+                return True, log
+
+            if action in ("flee", "burn", "evade"):
+                fuel_cost = 5
+                if self.state.ship.fuel < fuel_cost:
+                    return False, f"Insufficient fuel to burn thrusters: {fuel_cost} required."
+                new_fuel = self.state.ship.fuel - fuel_cost
+                eng_power = self._effective_power("engines")
+                current_standing = standings.get(sys_faction_id, 0)
+                standings[sys_faction_id] = max(-100, current_standing - 15)
+
+                evasion_success = eng_power >= 35 or self.rng.random() < 0.65
+                if evasion_success:
+                    stats["smuggling_evaded"] = int(stats.get("smuggling_evaded", 0)) + 1
+                    log = f"EVADED CUSTOMS: Emergency engine burn escaped {encounter.patrol_vessel} cordon! Fugitive warrant issued (-15 standing with {encounter.faction})."
+                    new_ship = self._clone_ship(
+                        fuel=new_fuel,
+                        faction_standings=standings,
+                        flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+                    )
+                    self.state = self._clone_state(ship=new_ship, active_customs=None, stats=stats)
+                    return True, log
+                else:
+                    new_cargo = {k: v for k, v in self.state.ship.cargo.items() if not is_contraband(k)}
+                    fine_paid = min(self.state.ship.credits, encounter.fine_amount)
+                    new_credits = self.state.ship.credits - fine_paid
+                    new_hull = max(1, self.state.ship.hull - 15)
+                    stats["contraband_seized"] = int(stats.get("contraband_seized", 0)) + 1
+                    log = f"INTERCEPTED: Suppression fire hit your ship (-15 Hull)! Contraband confiscated and {fine_paid} cr fine imposed (-15 standing)."
+                    new_ship = self._clone_ship(
+                        hull=new_hull,
+                        fuel=new_fuel,
+                        cargo=new_cargo,
+                        credits=new_credits,
+                        faction_standings=standings,
+                        flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log]),
+                    )
+                    self.state = self._clone_state(ship=new_ship, active_customs=None, stats=stats)
+                    return True, log
+
+            return False, f"Unknown customs action: '{action}'. Choose 'bribe', 'jettison', 'confiscate', or 'flee'."
+
+    def overhaul_ship(self) -> tuple[bool, str]:
+        """Overhaul structural frame and hyperlane wear at orbital drydock."""
+        with self.lock:
+            ok, msg = self._require_service_dock()
+            if not ok:
+                return False, "Ship overhaul requires a station or a Frontier Shipyard in this system."
+            wear = self.state.ship.wear
+            if wear <= 0.0:
+                return False, "Ship structural frame is pristine with 0% hyperlane wear."
+            faction_id = get_faction_id_from_name(self.current_system.faction)
+            perks = get_faction_service_perks(faction_id, self.state.ship.faction_standings.get(faction_id, 0))
+            cost = max(10, int(wear * 4.5 * (1.0 - float(perks["repair_discount"]))))
+            if self.state.ship.credits < cost:
+                return False, f"Insufficient credits: overhaul costs {cost} cr ({wear:.1f}% wear)."
+            new_ship = self._clone_ship(
+                wear=0.0,
+                credits=self.state.ship.credits - cost,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [f"Drydock overhaul completed: {wear:.1f}% wear restored for {cost} cr."]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, f"Structural overhaul completed: {wear:.1f}% wear scrubbed for {cost} cr."
+
+    def drydock_quote(self) -> dict[str, Any]:
+        """Live drydock service prices for the cockpit service deck.
+
+        Mirrors the exact formulas used by repair_hull, refuel and overhaul_ship so the
+        labels can never quote a different price than the charge.
+        """
+        with self.lock:
+            docked, _ = self._require_service_dock()
+            ship = self.state.ship
+            faction_id = get_faction_id_from_name(self.current_system.faction)
+            perks = get_faction_service_perks(
+                faction_id, ship.faction_standings.get(faction_id, 0)
+            )
+            discount = float(perks["repair_discount"])
+            repair_hp = min(25, max(0, ship.max_hull - ship.hull))
+            repair_cost = max(0, int(repair_hp * 4 * (1.0 - discount)))
+            fuel_units = min(20, max(0, ship.max_fuel - ship.fuel))
+            refuel_cost = 0 if perks["free_refuel"] else fuel_units * 6
+            wear = max(0.0, float(ship.wear))
+            overhaul_cost = 0 if wear <= 0.0 else max(10, int(wear * 4.5 * (1.0 - discount)))
+            return {
+                "docked": docked,
+                "repair_hp": repair_hp,
+                "repair_cost": repair_cost,
+                "fuel_units": fuel_units,
+                "refuel_cost": refuel_cost,
+                "free_refuel": bool(perks["free_refuel"]),
+                "wear": round(wear, 2),
+                "overhaul_cost": overhaul_cost,
+                "repair_discount": round(discount, 3),
+                "credits": ship.credits,
+            }
+
     def repair_hull(self, amount: int = 25) -> tuple[bool, str]:
         """Repair ship hull integrity at orbital station."""
         with self.lock:
@@ -6487,6 +6872,7 @@ class SimulationEngine:
             new_ship = self._clone_ship(
                 hull=self.state.ship.hull + actual,
                 credits=self.state.ship.credits - cost,
+                wear=max(0.0, self.state.ship.wear - actual * 0.2),
                 flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [f"Drydock repair: +{actual} HP for {cost} cr."]),
             )
 
@@ -6524,6 +6910,72 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship)
 
             return True, f"Fuel tanks replenished: +{actual} units for {cost} cr."
+
+    def fabricate_munitions(self, munitions_type: str = "patch_kit") -> tuple[bool, str]:
+        """Field-fabricate emergency hull patch kits or fuel packs from raw titanium alloy."""
+        with self.lock:
+            ship = self.state.ship
+            cargo = dict(ship.cargo)
+            titanium_count = cargo.get("titanium", 0)
+            if titanium_count < 1:
+                return False, "Field fabrication failed: Insufficient titanium alloy in cargo (1 unit required)."
+
+            blueprint = munitions_type.lower().strip()
+            if blueprint in ("patch_kit", "armor_patch", "hull_patch"):
+                if ship.hull >= ship.max_hull:
+                    return False, f"Hull integrity is already at maximum capacity ({ship.hull}/{ship.max_hull} HP)."
+                new_cargo = dict(cargo)
+                new_cargo["titanium"] -= 1
+                if new_cargo["titanium"] <= 0:
+                    del new_cargo["titanium"]
+                restored = min(25, ship.max_hull - ship.hull)
+                new_hull = ship.hull + restored
+                msg = f"Fabricated Emergency Armor Patch Kit from 1x titanium alloy (+{restored} Hull restored; {new_hull}/{ship.max_hull} HP)."
+                new_ship = self._clone_ship(
+                    hull=new_hull,
+                    cargo=new_cargo,
+                    flight_log=tuple(list(ship.flight_log[-19:]) + [msg]),
+                )
+                self.state = self._clone_state(ship=new_ship)
+                return True, msg
+
+            elif blueprint in ("fuel_cell", "fuel_pack", "energy_cell"):
+                if ship.fuel >= ship.max_fuel:
+                    return False, f"Quantum fuel tanks are already at maximum capacity ({ship.fuel}/{ship.max_fuel} Fuel)."
+                new_cargo = dict(cargo)
+                new_cargo["titanium"] -= 1
+                if new_cargo["titanium"] <= 0:
+                    del new_cargo["titanium"]
+                restored = min(25, ship.max_fuel - ship.fuel)
+                new_fuel = ship.fuel + restored
+                msg = f"Synthesized Emergency Fuel Cell Pack from 1x titanium alloy (+{restored} Fuel restored; {new_fuel}/{ship.max_fuel} Fuel)."
+                new_ship = self._clone_ship(
+                    fuel=new_fuel,
+                    cargo=new_cargo,
+                    flight_log=tuple(list(ship.flight_log[-19:]) + [msg]),
+                )
+                self.state = self._clone_state(ship=new_ship)
+                return True, msg
+
+            else:
+                return False, f"Unknown fabrication blueprint '{munitions_type}'. Valid blueprints: 'patch_kit', 'fuel_cell'."
+
+    def check_solar_weather(self, system: StarSystem | None = None) -> dict[str, Any]:
+        """Telemetry check for space weather and coronal radiation risk in the specified or current system."""
+        with self.lock:
+            sys_obj = system or self.current_system
+            is_active = sys_obj.spectral_type in ("O", "B", "WolfRayet", "RedGiant", "Neutron")
+            weather_hazard = 0.35 if is_active else 0.0
+            return {
+                "system_id": sys_obj.id,
+                "system_name": sys_obj.name,
+                "spectral_type": sys_obj.spectral_type,
+                "active_hazard": is_active,
+                "hazard_chance": weather_hazard,
+                "recommended_shields": 35,
+                "player_shields_power": self.state.ship.power.shields,
+                "shield_protected": self.state.ship.power.shields >= 35,
+            }
 
     def step_orbits(self, delta_time: float = 1.0) -> None:
         """Advance celestial bodies along orbital mechanics paths and cycle fleet drones."""
@@ -6638,7 +7090,21 @@ class SimulationEngine:
                 flight_log=tuple(new_log[-20:]),
             )
 
-            self.state = self._clone_state(ship=new_ship, stats=stats)
+            completed_quest = CompletedQuest(
+                id=found.id,
+                title=found.title,
+                kind=found.category,
+                completed_at=time.time() * 1000.0,
+                rewards={
+                    "credits": found.reward_credits,
+                    "xp": found.reward_xp,
+                    "relic": relic.name if relic else "",
+                },
+            )
+            new_completed = tuple((list(self.state.completed_quests) + [completed_quest])[-50:])
+            self.state = self._clone_state(
+                ship=new_ship, stats=stats, completed_quests=new_completed
+            )
 
             return True, f"Claimed {found.title}: +{found.reward_credits} cr, +{found.reward_xp} XP.{relic_msg} New contract: [{new_contract.title}].", {
                 "reward_credits": found.reward_credits,
@@ -7072,11 +7538,13 @@ class SimulationEngine:
                 "active_anomaly": self.state.active_anomaly.to_dict() if self.state.active_anomaly else None,
                 "active_combat": self.state.active_combat.to_dict() if self.state.active_combat else None,
                 "active_pirate": self.state.active_pirate.to_dict() if self.state.active_pirate else None,
+                "active_customs": self.state.active_customs.to_dict() if self.state.active_customs else None,
                 "pending_decision": self.state.pending_decision.to_dict() if self.state.pending_decision else None,
                 "decision_history": list(self.state.decision_history),
                 "time": self.state.time.to_dict(),
                 "stats": dict(self.state.stats),
                 "codex": build_codex_report(self.state),
+                "relic_set_bonuses": relic_set_bonuses(self.state.ship.relics),
                 "equipment_bonuses": equipment_snapshot,
                 "map_modifiers": system_modifier_summary(cur_sys),
                 "map_effects": self._map_effects(cur_sys),
@@ -7222,6 +7690,8 @@ class SimulationEngine:
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),
+                "quests_completed": [q.to_dict() for q in self.state.completed_quests],
+                "drydock": self.drydock_quote(),
                 "fleet_stats": [
                     {
                         **d.to_dict(),
@@ -7967,9 +8437,17 @@ class SimulationEngine:
                 self.maybe_trigger_decision("land")
             return True, log
 
-    def salvage_derelict(self) -> tuple[bool, str, dict[str, Any]]:
+    def salvage_derelict(self, strategy: str = "balanced") -> tuple[bool, str, dict[str, Any]]:
         """Board the current body's derelict hulk for cargo, credits, and hazard risk."""
         with self.lock:
+            strategy = str(strategy).strip().lower() or "balanced"
+            if strategy not in ("cautious", "balanced", "aggressive", "scientific"):
+                return (
+                    False,
+                    f"Unknown salvage strategy '{strategy}'. "
+                    "Choose cautious, balanced, aggressive or scientific.",
+                    {},
+                )
             lock = self._action_lock_reason()
             if lock:
                 return False, lock, {}
@@ -7992,30 +8470,81 @@ class SimulationEngine:
             equipment = self._combined_equipment()
             crew_bonuses = calculate_crew_bonuses(self.state.ship.crew)
             sensor_edge = (self._effective_power("sensors") - 25) / 25.0 * 0.12
-            danger = max(0.05, min(0.65, site.danger - sensor_edge - crew_bonuses["boarding_defense"] * 0.5))
+            base_danger = max(0.05, min(0.65, site.danger - sensor_edge - crew_bonuses["boarding_defense"] * 0.5))
+            
+            if strategy == "cautious":
+                danger = max(0.02, base_danger * 0.5)
+            elif strategy == "aggressive":
+                danger = min(0.85, base_danger + 0.15)
+            elif strategy == "scientific":
+                danger = min(0.80, base_danger + 0.08) if self._effective_power("sensors") < 25 else base_danger
+            else:
+                danger = base_danger
+                
             success = self.rng.random() >= danger
 
             cargo = dict(self.state.ship.cargo)
             granted = 0
+            research_gain = 0
+            overflow = 0
             if success:
-                granted, overflow = self._grant_cargo(cargo, site.cargo_item, site.cargo_quantity)
-                credits = site.credits
-                hull_damage = 0
-                heat_gain = 4.0
-                outcome = "HULL STRIPPED"
+                if strategy == "cautious":
+                    granted, overflow = self._grant_cargo(cargo, site.cargo_item, site.cargo_quantity)
+                    credits = max(10, int(site.credits * 0.85))
+                    hull_damage = 0
+                    heat_gain = 2.0
+                    outcome = "CAUTIOUS EXTRACTION"
+                    xp_award = 65
+                elif strategy == "aggressive":
+                    extra = 1 if self.rng.random() < 0.45 else 0
+                    granted, overflow = self._grant_cargo(cargo, site.cargo_item, site.cargo_quantity + extra)
+                    credits = int(site.credits * 1.5)
+                    hull_damage = 0
+                    heat_gain = 12.0
+                    outcome = "HEAVY BREACH HARVEST"
+                    xp_award = 75
+                elif strategy == "scientific":
+                    granted, overflow = self._grant_cargo(cargo, site.cargo_item, site.cargo_quantity)
+                    credits = site.credits
+                    hull_damage = 0
+                    heat_gain = 5.0
+                    research_gain = 35
+                    outcome = "CORE ARCHIVE EXTRACTED"
+                    xp_award = 90
+                else:
+                    granted, overflow = self._grant_cargo(cargo, site.cargo_item, site.cargo_quantity)
+                    credits = site.credits
+                    hull_damage = 0
+                    heat_gain = 4.0
+                    outcome = "HULL STRIPPED"
+                    xp_award = 55
                 if overflow:
                     outcome += f" ({overflow} unit(s) left behind, hold full)"
             else:
-                credits = max(25, site.credits // 4)
-                hull_damage = 6 + int(danger * 22)
-                heat_gain = 9.0
-                outcome = "BOARDING ACCIDENT"
+                if strategy == "cautious":
+                    credits = max(20, site.credits // 5)
+                    hull_damage = min(3, 1 + int(danger * 8))
+                    heat_gain = 4.0
+                    outcome = "SURVEY ABORTED"
+                    xp_award = 30
+                elif strategy == "aggressive":
+                    credits = max(15, site.credits // 4)
+                    hull_damage = 10 + int(danger * 26)
+                    heat_gain = 15.0
+                    outcome = "BREACH ACCIDENT"
+                    xp_award = 20
+                else:
+                    credits = max(25, site.credits // 4)
+                    hull_damage = 6 + int(danger * 22)
+                    heat_gain = 9.0
+                    outcome = "BOARDING ACCIDENT"
+                    xp_award = 25
 
             reactor = self.state.ship.reactor
             max_heat = reactor_heat_capacity(reactor, equipment)
             new_reactor = replace(reactor, heat=min(max_heat, reactor.heat + heat_gain))
             new_hull = max(1, self.state.ship.hull - hull_damage)
-            new_mastery, xp_logs = self._award_pilot_xp(55 if success else 25, self.state.ship.mastery)
+            new_mastery, xp_logs = self._award_pilot_xp(xp_award, self.state.ship.mastery)
 
             log_entry = (
                 f"DERELICT SALVAGE [{outcome}]: {site.name}. +{credits} cr"
@@ -8042,7 +8571,10 @@ class SimulationEngine:
             stats["salvage"] = stats.get("salvage", 0) + 1
             stats["credits_earned"] = stats.get("credits_earned", 0) + credits
             systems = self._replace_system_body(body.id, salvage_claimed=True)
-            self.state = self._clone_state(ship=new_ship, systems=systems, stats=stats)
+            new_research = self.state.research
+            if research_gain > 0:
+                new_research = replace(self.state.research, points=self.state.research.points + research_gain)
+            self.state = self._clone_state(ship=new_ship, systems=systems, stats=stats, research=new_research)
             if self.allow_decision_events:
                 self.maybe_trigger_decision("orbit")
             report = {
@@ -8275,6 +8807,12 @@ class SimulationEngine:
             return (
                 f"Pirate intercept unresolved: {pirate.band_name} demands "
                 f"{pirate.toll_credits} cr. Pay, fight, or evade before continuing."
+            )
+        customs = self.state.active_customs
+        if customs is not None:
+            return (
+                f"Customs interdiction unresolved: {customs.patrol_vessel} locked scanners on your hold. "
+                "Bribe, jettison, confiscate, or flee before continuing."
             )
         if self.state.ship.void_traversal is not None:
             return (
@@ -8547,6 +9085,7 @@ class SimulationEngine:
                 time_scale=cur_time.time_scale,
                 elapsed_days=new_days,
             )
+            new_stats_tick = dict(self.state.stats)
 
             # 1. Orbital revolution: advance current_angle for every body in every star system
             stability_by_faction = self._faction_stability()
@@ -8705,8 +9244,9 @@ class SimulationEngine:
                     active_id = None
                     progress = 0
             if active_id is None and queue:
-                while queue:
-                    next_id = queue.pop(0)
+                # Start the first eligible project but keep blocked entries: their
+                # prerequisites may finish later, so dropping them would lose the order.
+                for index, next_id in enumerate(queue):
                     next_project = get_research_project(next_id)
                     if next_project is None or next_id in completed:
                         continue
@@ -8717,10 +9257,17 @@ class SimulationEngine:
                         continue
                     active_id = next_id
                     progress = 0
+                    del queue[index]
                     new_flight_log_research += (
                         f" RESEARCH STARTED: {next_project.name}."
                     )
                     break
+                queue = [
+                    queued_id
+                    for queued_id in queue
+                    if get_research_project(queued_id) is not None
+                    and queued_id not in completed
+                ]
             new_research = ResearchState(
                 points=points,
                 progress=progress,
@@ -8911,7 +9458,7 @@ class SimulationEngine:
             new_visited_systems = self.state.visited_systems
             new_mastery = cur_ship.mastery
             new_credits_delta = 0
-            new_stats_tick = self.state.stats
+            # new_stats_tick is initialized as dict(self.state.stats) at tick start
             if new_void is not None:
                 ticks_in_void = max(0, min(num_ticks, new_void.arrival_tick - cur_time.tick))
                 storm_chance = self._void_storm_chance()

@@ -472,7 +472,7 @@ class TestSleekHUDDeclutter(unittest.TestCase):
         self.assertIn("deathAcknowledged", self.js)
         self.assertIn('role="status" aria-live="polite"', self.html)
         self.assertNotIn("Spend points with SHIFT+1..6", self.html)
-        self.assertIn("SHIFT+1..6 USE ABILITY", self.html)
+        self.assertIn("SHIFT+1..6 // K HIDE // TRAIN", self.html)
         self.assertNotIn('id="hudSkillsPoints"', self.html)
         self.assertNotIn('id="characterSkills"', self.html,
                          "the PLAYER tab must no longer own a skills summary")
@@ -584,6 +584,35 @@ class TestSingleLineVitalsAndDistanceParity(unittest.TestCase):
     def test_radar_backdrop_is_cached(self):
         self.assertIn("ensureRadarBackdrop", self.js)
         self.assertIn("drawImage(this.radarBackdrop", self.js)
+
+    def test_idle_radar_frames_are_throttled(self):
+        self.assertIn("IDLE_FRAME_MS", self.js)
+        self.assertIn("timestamp - lastDraw >= IDLE_FRAME_MS", self.js)
+        self.assertIn("state?.time?.is_paused", self.js)
+
+    def test_orbits_fit_the_visible_radar(self):
+        self.assertRegex(self.js, r"orbitFitScale\(bodies\)\s*\{")
+        self.assertIn("const auScale = this.orbitFitScale(bodies);", self.js)
+        self.assertIn("Math.min(rect.w, rect.h)", self.js,
+                      "orbit fit must use the visible map rectangle, not the full viewport")
+
+    def test_radar_labels_are_collision_placed_inside_the_map(self):
+        self.assertIn("placeRadarLabel", self.js)
+        self.assertIn("_radarLabelBoxes", self.js)
+        self.assertIn("box.x + box.w > rect.x + rect.w", self.js,
+                      "labels must be rejected when they leave the visible radar")
+
+    def test_canvas_labels_use_a_loaded_console_font(self):
+        self.assertFalse("Share Tech Mono" in self.js, "canvas cannot rely on an unloaded font")
+        self.assertIn("'Cascadia Mono', Consolas, monospace", self.js)
+
+    def test_diplomacy_war_lookup_compares_ids_instead_of_using_in(self):
+        self.assertNotIn(" in (w.attacker_id", self.js,
+                         "JS `in` needs an object; war IDs are strings")
+        self.assertIn(
+            'w.attacker_id === "sol_coalition" || w.defender_id === "sol_coalition"',
+            self.js,
+        )
 
 class TestArsenalParityAndBulkDepotUI(unittest.TestCase):
     @classmethod
@@ -858,6 +887,15 @@ class TestStrategicGalaxyMap(unittest.TestCase):
         self.assertIn("drawPoliticsLegend", self.js)
         self.assertIn("war.fronts", self.js)
 
+    def test_galaxy_has_a_nebula_layer_and_seeded_star_rays(self):
+        self.assertIn("drawGalaxyNebula(ctx, transform, now)", self.js)
+        self.assertIn(
+            'this.drawStarGlyph(ctx, sx, sy, radius, s.color || "#6fc3d7", s.id, now)',
+            self.js,
+        )
+        self.assertIn("const ray", self.js)
+        self.assertIn("dust lane", self.js.lower())
+
 
 class TestCelestialModels(unittest.TestCase):
     """Procedural celestial models: their own module, loaded before the cockpit, sprites cached."""
@@ -875,15 +913,265 @@ class TestCelestialModels(unittest.TestCase):
     def test_every_generated_body_type_has_a_model(self):
         body_types = (
             "terrestrial", "oceanic", "super_earth", "savanna", "tundra", "desert_world", "barren", "ice_world",
-            "lava_world", "toxic", "ringed_giant", "ice_giant", "ring_world", "dyson_sphere", "orbital_station",
-            "research_outpost", "quantum_relay", "solar_collector", "black_hole", "wormhole", "asteroid_belt",
+            "lava_world", "volcanic", "toxic", "gas_giant", "ringed_giant", "ice_giant", "ring_world",
+            "dyson_sphere", "orbital_station", "research_outpost", "quantum_relay", "solar_collector",
+            "black_hole", "wormhole", "asteroid_belt",
         )
         for body_type in body_types:
-            self.assertIn(body_type, self.celestial, f"no model for {body_type}")
+            self.assertTrue(body_type in self.celestial, f"no model for {body_type}")
 
     def test_surface_sprites_are_cached(self):
         self.assertIn("this.sprites.get(key)", self.celestial)
         self.assertIn("bodyDisplayRadius(b)", self.js, "drawing and hit tests share one body size")
+
+    def test_body_limb_follows_the_star(self):
+        self.assertIn("drawLimb(ctx, x, y, r, lightAngle)", self.celestial)
+        self.assertNotIn("this.limb(ctx, R)", self.celestial,
+                         "the baked highlight must not contradict the terminator")
+
+    def test_ship_models_cover_hull_classes(self):
+        self.assertIn('variant = "standard"', self.celestial)
+        for variant in ("freighter", "fighter", "explorer", "stealth", "capital"):
+            self.assertTrue(variant in self.celestial, f"no ship model for {variant}")
+
+    def test_cloud_bands_drift_over_time(self):
+        self.assertIn("drawCloudDrift", self.celestial)
+        self.assertIn("this.drawCloudDrift(ctx, body, x, y, r, now)", self.celestial)
+
+    def test_rocky_worlds_turn_slowly(self):
+        self.assertIn("SURFACE_SPIN_PERIOD_MS", self.celestial)
+        self.assertIn("surfaceSpin(body, now)", self.celestial)
+        self.assertIn("this.surfaceSpin(body, now)", self.celestial)
+        # Giants keep their static bands; only rocky surfaces turn.
+        self.assertIn("if (!ROCKY_STYLES[body.body_type]) return 0;", self.celestial)
+        # Polar caps stay with the axis instead of rotating with the terrain.
+        self.assertIn("this.drawCaps(ctx, x, y, r)", self.celestial)
+        self.assertNotIn("ctx.ellipse(0, -R * 0.95", self.celestial)
+
+
+class TestGraphicsAssets(unittest.TestCase):
+    """Browser identity and galaxy texture assets."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_favicon_is_linked_and_present(self):
+        self.assertIn("favicon.svg", self.html)
+        path = STATIC_DIR / "favicon.svg"
+        self.assertTrue(path.exists(), "favicon.svg is missing")
+        self.assertIn("viewBox", path.read_text(encoding="utf-8"))
+
+    def test_territory_has_a_cached_hatch_pattern(self):
+        self.assertIn("createPattern", self.js)
+        self.assertIn("source-atop", self.js)
+
+    def test_no_color_emoji_remain_in_the_cockpit(self):
+        combined = self.html + self.js
+        color = sorted({ch for ch in combined if ord(ch) >= 0x1F000})
+        self.assertFalse(color, f"color emoji remain: {color}")
+
+    def test_territory_raster_uses_finer_cells(self):
+        self.assertIn("this.viewW / 960", self.js)
+        self.assertIn("Math.max(2, Math.round(this.viewW / 960))", self.js)
+
+    def test_badge_dot_colors_are_all_styled(self):
+        for name in ("dot-cyan", "dot-red", "dot-purple"):
+            self.assertIn(
+                f".{name} {{ background: var(--neon-",
+                self.css,
+                f"{name} must use a palette token instead of falling back to the default dot color",
+            )
+
+    def test_hud_text_meets_the_twelve_pixel_readability_floor(self):
+        selectors = (
+            ".vital-label", ".vital-subtext", ".vital-icon",
+            ".cadet-pip", ".cadet-pip-divider",
+            ".salvage-rewards-row", ".subsystem-title", ".btn-subsystem",
+            ".fabrication-header", ".btn-fabricate",
+            ".subsystem-gauge .gauge-label", ".subsystem-gauge .gauge-val",
+            ".crew-station-select", ".station-badge", ".market-trend-badge",
+            ".target-info-grid", ".log-line .log-time", ".log-line .log-tag",
+        )
+        for selector in selectors:
+            match = re.search(rf"^{re.escape(selector)}[^{{]*\{{[^}}]*font-size:\s*([\d.]+)px", self.css, re.M)
+            self.assertIsNotNone(match, f"{selector} must declare a pixel font-size")
+            self.assertGreaterEqual(float(match.group(1)), 12.0, f"{selector} is below the 12px floor")
+
+
+    def test_legacy_theme_tokens_alias_the_console_palette(self):
+        self.assertIn("--neon-cyan: var(--console-cyan)", self.css)
+        self.assertIn("--text-primary: var(--console-ivory)", self.css)
+
+    def test_core_palette_is_declared_once(self):
+        tokens = {
+            "--console-bg": "#06090f",
+            "--console-panel": "#0c121c",
+            "--console-panel-2": "#101825",
+            "--console-gold": "#c9a35a",
+            "--console-gold-bright": "#e2c078",
+            "--console-ivory": "#ece4d4",
+            "--console-cyan": "#7fb7c9",
+            "--console-red": "#c96b5a",
+            "--console-green": "#8fbf9f",
+            "--console-purple": "#a98bbd",
+        }
+        remainder = self.css
+        for token, value in tokens.items():
+            self.assertIn(f"{token}: {value};", self.css)
+            remainder = remainder.replace(f"{token}: {value};", "")
+        for token, value in tokens.items():
+            self.assertEqual(remainder.lower().count(value), 0, f"{value} must use {token}")
+
+
+class TestDrydockServiceQuotes(unittest.TestCase):
+    """The service deck must quote the engine's live prices, not a client estimate."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_service_labels_read_the_engine_quote(self):
+        self.assertIn("const drydock = this.state.drydock", self.js)
+        for label in ("repairCostLabel", "refuelCostLabel", "overhaulCostLabel"):
+            self.assertIn(f"this.{label}", self.js)
+        self.assertNotIn("Math.round(wearVal * 4.5)", self.js,
+                         "overhaul cost must come from the engine, not a client estimate")
+
+
+class TestRelicFusionCockpit(unittest.TestCase):
+    """Relic fusion needs a cockpit path beside the CLI and REST endpoint."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_relic_panel_offers_fusion_controls(self):
+        self.assertIn("btn-relic-fuse", self.js)
+        self.assertIn("handleFuseRelics", self.js)
+        self.assertIn("/api/relics/fuse", self.js)
+        self.assertIn(".btn-relic-fuse", self.css)
+        self.assertIn("FUSE 3×", self.js)
+
+
+class TestParticleFX(unittest.TestCase):
+    """Visual-only particle layer: pooled, frame-updated and wired to world actions."""
+
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        path = STATIC_DIR / "particles.js"
+        cls.particles = path.read_text(encoding="utf-8") if path.exists() else ""
+
+    def test_particle_system_loads_before_the_cockpit(self):
+        self.assertIn('src="particles.js"', self.html)
+        self.assertLess(self.html.index('src="particles.js"'), self.html.index('src="app.js"'))
+        self.assertIn("window.ParticleSystem = ParticleSystem", self.particles)
+
+    def test_particle_pool_is_capped(self):
+        self.assertIn("class ParticleSystem", self.particles)
+        self.assertIn("this.max", self.particles)
+        self.assertIn("this.items.length >= this.max", self.particles)
+
+    def test_frame_updates_and_draws_the_layer(self):
+        self.assertIn("this.particles?.update()", self.js)
+        self.assertIn("this.particles?.draw(ctx)", self.js)
+        self.assertIn("globalCompositeOperation", self.particles)
+        self.assertIn("ctx.restore()", self.particles)
+
+    def test_ship_transit_scan_and_combat_emit_particles(self):
+        self.assertIn("particles?.trail", self.js)
+        self.assertIn("particles?.warp", self.js)
+        self.assertIn("particles?.ring", self.js)
+        self.assertIn("particles?.burst", self.js)
+        self.assertIn("lastShipPosition", self.js)
+
+
+class TestCombatVisual(unittest.TestCase):
+    """Tactical combat viewport: two hulls, a firing beam and impact particles."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_combat_card_has_a_tactical_canvas(self):
+        self.assertIn('id="combatVisual"', self.html)
+        self.assertIn(".combat-visual", self.css)
+
+    def test_combat_visual_draws_two_ships_and_fx(self):
+        self.assertIn("drawCombatVisual()", self.js)
+        self.assertIn("this.combatFx", self.js)
+        self.assertIn("this.combatScene", self.js)
+
+    def test_combat_action_arms_a_beam_or_burst(self):
+        self.assertIn("combatBeamUntil", self.js)
+        self.assertIn("combatFlash", self.js)
+
+    def test_ship_and_enemy_variants_are_resolved_on_the_map(self):
+        self.assertIn("shipVariant()", self.js)
+        self.assertIn("enemyVariant()", self.js)
+        self.assertIn("this.shipVariant()", self.js)
+        self.assertIn("this.enemyVariant()", self.js)
+
+    def test_combat_stance_and_ability_hint_are_not_tiny(self):
+        self.assertNotIn("font-size: 0.48rem", self.css)
+        self.assertNotRegex(
+            self.css,
+            r"\.combat-stance-line\s*\{[^}]*font-size:\s*11px",
+            "the combat stance line must meet the 12px floor",
+        )
+
+    def test_combat_reports_shield_deflection_and_hull_damage_audio(self):
+        self.assertIn("this.sound.playShieldDeflect();", self.js)
+        self.assertIn("this.sound.playHullDamage();", self.js)
+        self.assertNotIn("playBuzzer", self.js, "fabrication failures must use a real SoundController method")
+
+
+
+class TestSurfaceTileMap(unittest.TestCase):
+    """Seeded surface tiles: biome coverage, canvas wiring and site selection."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+        path = STATIC_DIR / "surfacemap.js"
+        cls.surface = path.read_text(encoding="utf-8") if path.exists() else ""
+
+    def test_surface_renderer_loads_before_the_cockpit(self):
+        self.assertIn('src="surfacemap.js"', self.html)
+        self.assertLess(self.html.index('src="surfacemap.js"'), self.html.index('src="app.js"'))
+        self.assertIn("window.SurfaceMapRenderer = SurfaceMapRenderer", self.surface)
+
+    def test_biome_palettes_cover_landable_types(self):
+        for body_type in (
+            "terrestrial", "oceanic", "savanna", "tundra", "super_earth", "desert_world",
+            "barren", "ice_world", "lava_world", "volcanic", "toxic", "gas_giant",
+        ):
+            self.assertTrue(body_type in self.surface, f"no surface biome for {body_type}")
+
+    def test_surface_card_embeds_the_map_canvas(self):
+        self.assertIn('id="surfaceMapCanvas"', self.js)
+        self.assertIn(".surface-map-canvas", self.css)
+        self.assertIn("this.surfaceMap.draw(", self.js)
+
+    def test_clicking_a_site_selects_the_operation(self):
+        self.assertIn("hitTest", self.surface)
+        self.assertIn("surfaceSelectedOp", self.js)
+        self.assertIn("this.surfaceMap.hitTest(", self.js)
+
+    def test_map_is_seeded_by_body_and_operations(self):
+        self.assertIn("generate(body, operations)", self.surface)
+        self.assertIn("body.id", self.surface)
+        self.assertIn("list.map", self.surface)
 
 
 class TestStrategyPanels(unittest.TestCase):

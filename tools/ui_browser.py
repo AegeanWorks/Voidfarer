@@ -33,7 +33,7 @@ from voidfarer.server import VoidFarerHandler, start_background_server  # noqa: 
 from voidfarer.storage import StorageManager  # noqa: E402
 from tools.ui_audit import TABS, VIEWPORTS  # noqa: E402
 
-SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "boarding", "galaxy", "death", "ability", "surface", "waypoint", "vector", "relief")
+SCENARIOS = ("cockpit", "menu", "settings", "character", "target", "event", "combat", "boarding", "galaxy", "death", "ability", "surface", "waypoint", "vector", "relief", "customs")
 TAB_IDS = {
     "player": "tabBtnPlayer",
     "skills": "tabBtnSkills",
@@ -191,6 +191,23 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
     elif scenario == "combat":
         page.evaluate(
             """() => {
+                // The tactical canvas reads state.active_combat, so seed the real state
+                // instead of only faking the card DOM.
+                if (window.cockpit && window.cockpit.state) {
+                    window.cockpit.state.active_combat = {
+                        enemy_name: "Corsair Marauder",
+                        enemy_class: "Marauder",
+                        faction_id: "outlaw_corsairs",
+                        enemy_hull: 72,
+                        enemy_max_hull: 80,
+                        enemy_shield: 18,
+                        enemy_max_shield: 30,
+                    };
+                    window.cockpit.renderHUD();
+                    // Show one firing frame so the review proves the beam and impact FX.
+                    window.cockpit.combatFlash = {target: "enemy", color: "#ffd166", fired: false};
+                    window.cockpit.combatBeamUntil = performance.now() + 1200;
+                }
                 const card = document.getElementById("combatCard");
                 if (card) card.style.display = "flex";
                 const title = document.getElementById("combatEnemyTitle");
@@ -207,10 +224,32 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
                 if (shieldValue) shieldValue.textContent = "18 / 30";
                 const shieldBar = document.getElementById("combatEnemyShieldBar");
                 if (shieldBar) shieldBar.style.width = "60%";
-                window.cockpit.gameStarted = false;
+                // Hold the review state without stopping the RAF or opening the menu.
+                if (window.cockpit) window.cockpit.refreshInFlight = true;
             }"""
         )
         page.wait_for_timeout(500)
+    elif scenario == "customs":
+        page.evaluate(
+            """() => {
+                if (window.cockpit && window.cockpit.state) {
+                    window.cockpit.state.active_customs = {
+                        id: "customs_sol_test",
+                        faction: "Sol Coalition",
+                        system_id: "sol",
+                        system_name: "Sol System",
+                        patrol_vessel: "Sol Coalition Customs Cutter 'Vigilant'",
+                        contraband_found: { xenoliths: 2 },
+                        fine_amount: 1450,
+                        bribe_amount: 750,
+                        description: "Sol Coalition Customs Cutter 'Vigilant' hails your ship with tactical locks engaged: 'Unscheduled cargo signature detected. Stand by for customs interdiction inspection.'"
+                    };
+                    window.cockpit.renderHUD();
+                }
+            }"""
+        )
+        page.wait_for_timeout(700)
+
     if tab and scenario == "cockpit":
         page.evaluate("(name) => window.cockpit.switchRightTab(name)", tab)
         page.wait_for_timeout(900)

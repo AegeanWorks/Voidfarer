@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VOIDFARER // Tactical Cockpit & Autonomous Galaxy Simulator</title>
-    <link rel="icon" href="data:,">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="description" content="Autonomous deep-space fleet, procedural galaxy, and holographic cockpit simulation engine with real-time orbital mechanics, commodity trading, fleet drones, and tactical combat.">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -240,7 +240,7 @@
             <!-- Quick Action & Audio Controls -->
             <div class="hud-top-actions">
                 <button class="btn-hud" id="audioToggleBtn" title="Toggle Synthesized Audio">
-                    <span class="icon" id="audioIcon">🔊</span> SOUND FX
+                    <span class="icon" id="audioIcon">◉</span> SOUND FX
                 </button>
                 <button class="btn-hud" id="btnMainMenu" title="Open Main Menu (Hotkey: ESC)">MENU [ESC]</button>
             </div>
@@ -287,7 +287,7 @@
                     <div class="vital-label">
                         <span class="vital-icon" aria-hidden="true">▲</span>
                         <span>STREAK</span>
-                        <strong class="flame-text" id="streakVal">🔥 1</strong>
+                        <strong class="flame-text" id="streakVal">✧ 1</strong>
                     </div>
                     <div class="vital-subtext" id="streakSubtext">x1.00 // FLEE RESETS</div>
                 </div>
@@ -329,10 +329,11 @@
         <!-- Cadet Flight Academy Ribbon -->
         <div class="cadet-academy-banner" id="cadetBanner" style="display: none;">
             <div class="cadet-badge">
-                <span class="academy-icon">🎓</span>
+                <span class="academy-icon">△</span>
                 <div class="cadet-meta">
                     <span class="cadet-tag">CADET FLIGHT ACADEMY // ONBOARDING</span>
                     <h3 class="cadet-milestone-title" id="cadetMilestoneTitle">Milestone 1/6: Orbital Insertion</h3>
+                    <div class="cadet-step-pips" id="cadetStepPips"></div>
                 </div>
             </div>
             <div class="cadet-desc-box">
@@ -390,13 +391,21 @@
                         <!-- Station Services -->
                         <div class="station-services-bar" id="stationServicesBar">
                             <button class="btn-service" id="btnDrydockRepair">
-                                <span class="icon">🛠️</span>
+                                <span class="icon">✚</span>
                                 <div class="service-meta">
                                     <span>REPAIR HULL (+25)</span>
                                     <small id="repairCostLabel">100 CR</small>
                                 </div>
                             </button>
                             <button class="btn-service" id="btnRefuelTanks">
+                            <button class="btn-service" id="btnDrydockOverhaul">
+                                <span class="icon">⚙</span>
+                                <div class="service-meta">
+                                    <span>OVERHAUL FRAME</span>
+                                    <small id="overhaulCostLabel">0.0% WEAR</small>
+                                </div>
+                            </button>
+
                                 <span class="icon">⛽</span>
                                 <div class="service-meta">
                                     <span>REFUEL (+20)</span>
@@ -453,6 +462,16 @@
                             <span class="market-lot-hint">⇧ CLICK = MAX</span>
                         </div>
 
+                        <!-- Commodity Category Filter Pills -->
+                        <div class="market-category-filters" id="marketCategoryFilters" role="group" aria-label="Commodity category filters">
+                            <button class="market-cat-pill active" data-action="filter-cat" data-cat="all">ALL</button>
+                            <button class="market-cat-pill" data-action="filter-cat" data-cat="ore">ORE</button>
+                            <button class="market-cat-pill" data-action="filter-cat" data-cat="tech">TECH</button>
+                            <button class="market-cat-pill" data-action="filter-cat" data-cat="food">FOOD</button>
+                            <button class="market-cat-pill" data-action="filter-cat" data-cat="medi">MED</button>
+                            <button class="market-cat-pill" data-action="filter-cat" data-cat="cont">CONTRABAND</button>
+                        </div>
+
                         <!-- Commodity Exchange List -->
                         <div class="commodity-table-container">
                             <table class="market-table">
@@ -470,7 +489,7 @@
                         </div>
 
                         <div class="no-market-message" id="noMarketMsg" style="display: none;">
-                            <span class="big-icon">🪐</span>
+                            <span class="big-icon">◉</span>
                             <h4>NO ORBITAL EXCHANGE</h4>
                             <p>Ship is currently orbiting an unpopulated body or in deep space. Orbit a space station or colony to trade.</p>
                         </div>
@@ -692,6 +711,16 @@
                             <div class="ship-visual" id="shipVisual"></div>
                             <div class="ship-stats-panel" id="shipStatsPanel"></div>
                         </div>
+                        <div class="field-fabrication-box">
+                            <div class="fabrication-header">
+                                <span>FIELD MUNITIONS &amp; REPAIR FABRICATION</span>
+                                <small>// TITANIUM ALLOY BLUEPRINTS</small>
+                            </div>
+                            <div class="fabrication-actions">
+                                <button class="btn-fabricate" id="btnFabricatePatch" title="Synthesize an emergency armor patch kit from 1x titanium alloy (+25 Hull)">⚙ FABRICATE ARMOR PATCH (1x Ti)</button>
+                                <button class="btn-fabricate" id="btnFabricateFuel" title="Synthesize an emergency quantum fuel pack from 1x titanium alloy (+25 Fuel)">⚡ FABRICATE FUEL PACK (1x Ti)</button>
+                            </div>
+                        </div>
                         <div class="ship-catalog-header"><span>MODULE CATALOG</span><small>// REFIT BAY</small></div>
                         <div class="ship-modules-grid" id="shipModulesGrid"></div>
                     </div>
@@ -788,7 +817,7 @@
                         <!-- Critical Moral Choice Card -->
                         <div class="story-choice-container" id="storyChoiceContainer" style="display: none;">
                             <div class="choice-prompt-header">
-                                <span class="choice-alert-icon">⚡</span>
+                                <span class="choice-alert-icon">↯</span>
                                 <h4>TACTICAL TRANSMISSION DECISION REQUIRED</h4>
                             </div>
                             <div class="story-choices-list" id="storyChoicesList"></div>
@@ -813,6 +842,9 @@
                             <div class="feed-header">
                                 <span>DECRYPTED COMMS STREAM</span>
                                 <small id="commsLogCount">0 TRANSMISSIONS</small>
+                            </div>
+                            <div class="comms-oscilloscope-container">
+                                <canvas class="comms-oscilloscope-canvas" id="commsOscilloscope" width="340" height="42"></canvas>
                             </div>
                             <div class="transmissions-stream" id="transmissionsStream">
                                 <!-- Populated dynamically with character avatars, badges, and typewriter effect -->
@@ -860,13 +892,14 @@
                 <!-- Combat Intercept Overlay (Active when intercepted) -->
                 <div class="combat-alert-card" id="combatCard" style="display: none;">
                     <div class="combat-header">
-                        <span class="combat-icon">⚔️</span>
+                        <span class="combat-icon">⌖</span>
                         <div class="combat-text">
                             <span class="combat-tag">HOSTILE INTERCEPT DETECTED</span>
                             <h3 class="combat-title" id="combatEnemyTitle">Pirate Raider</h3>
                             <span class="badge-faction" id="combatEnemyFaction">FACTION: OUTLAW</span>
                         </div>
                     </div>
+                    <canvas class="combat-visual" id="combatVisual" width="920" height="240" aria-label="Tactical combat viewport"></canvas>
                     <div class="combat-health-bar-container" id="combatShieldContainer" style="display: none;">
                         <div class="combat-health-label" style="color: #7fb7c9;">
                             <span>ENEMY DEFLECTOR SHIELD</span>
@@ -881,21 +914,51 @@
                         </div>
                         <div class="combat-meter"><div class="combat-meter-fill" id="combatEnemyBar" style="width: 100%;"></div></div>
                     </div>
+                    <div class="combat-subsystems-status" id="combatSubsystemsStatus">
+                        <div class="subsystem-gauge" id="subsystemGaugeWep" title="Enemy Weapon Array Fire-Control">
+                            <span class="gauge-label">WEAPONS</span>
+                            <div class="gauge-bar"><div class="gauge-fill fill-wep" id="subsystemFillWep" style="width: 100%;"></div></div>
+                            <span class="gauge-val" id="subsystemValWep">100%</span>
+                        </div>
+                        <div class="subsystem-gauge" id="subsystemGaugeEng" title="Enemy Drive Thrusters &amp; Evasion">
+                            <span class="gauge-label">DRIVES</span>
+                            <div class="gauge-bar"><div class="gauge-fill fill-eng" id="subsystemFillEng" style="width: 100%;"></div></div>
+                            <span class="gauge-val" id="subsystemValEng">NOMINAL</span>
+                        </div>
+                        <div class="subsystem-gauge" id="subsystemGaugeShd" title="Deflector Shield Capacitors">
+                            <span class="gauge-label">SHIELDS</span>
+                            <div class="gauge-bar"><div class="gauge-fill fill-shd" id="subsystemFillShd" style="width: 100%;"></div></div>
+                            <span class="gauge-val" id="subsystemValShd">ACTIVE</span>
+                        </div>
+                        <div class="subsystem-gauge" id="subsystemGaugeBrdg" title="Command Bridge Status">
+                            <span class="gauge-label">COMMAND</span>
+                            <div class="gauge-bar"><div class="gauge-fill fill-brdg" id="subsystemFillBrdg" style="width: 100%;"></div></div>
+                            <span class="gauge-val" id="subsystemValBrdg">ALERT</span>
+                        </div>
+                    </div>
                     <div class="combat-telegraph-banner" id="combatTelegraphBanner" style="display: none;">
                         <span class="icon">⚠</span> <span id="combatTelegraphText">Hostile weapon telemetry incoming</span>
                     </div>
                     <div class="combat-tactics-grid">
-                        <button class="btn-combat btn-red" id="btnCombatFire">🎯 FIRE LASER ARRAY</button>
-                        <button class="btn-combat btn-cyan" id="btnCombatDrone">🛸 DRONE STRIKE</button>
-                        <button class="btn-combat btn-amber" id="btnCombatTarget">⚡ TARGET SUBSYSTEM</button>
-                        <button class="btn-combat btn-purple" id="btnCombatBoard" data-testid="combat-board" disabled>🪝 BOARD &amp; CAPTURE</button>
-                        <button class="btn-combat btn-green" id="btnCombatGambit" disabled>🎖️ CAPTAIN'S GAMBIT</button>
-                        <button class="btn-combat btn-blue" id="btnCombatAbsorb">🛡️ SHIELD OVERCHARGE</button>
-                        <button class="btn-combat btn-amber" id="btnCombatEvade">🚀 EVASIVE BURN</button>
-                        <button class="btn-combat btn-purple" id="btnCombatFlee">⚡ FLEE SECTOR (-8 FUEL)</button>
+                        <button class="btn-combat btn-red" id="btnCombatFire">◎ FIRE LASER ARRAY</button>
+                        <button class="btn-combat btn-cyan" id="btnCombatDrone">◇ DRONE STRIKE</button>
+                        <button class="btn-combat btn-amber" id="btnCombatTarget">↯ TARGET SUBSYSTEM</button>
+                        <button class="btn-combat btn-green" id="btnCombatPdc" title="Point Defense Cannons: intercept 70% incoming fire and shred enemy with tungsten flak">⛨ PDC FLAK SCREEN</button>
+                        <button class="btn-combat btn-purple" id="btnCombatBoard" data-testid="combat-board" disabled>⌁ BOARD &amp; CAPTURE</button>
+                        <button class="btn-combat btn-green" id="btnCombatGambit" disabled>✦ CAPTAIN'S GAMBIT</button>
+                        <button class="btn-combat btn-blue" id="btnCombatAbsorb">⬡ SHIELD OVERCHARGE</button>
+                        <button class="btn-combat btn-amber" id="btnCombatEvade">➤ EVASIVE BURN</button>
+                        <button class="btn-combat btn-purple" id="btnCombatFlee">↯ FLEE SECTOR (-8 FUEL)</button>
+                    </div>
+                    <div class="combat-subsystems-row" id="combatSubsystemsRow">
+                        <span class="subsystem-title">PINPOINT SUBSYSTEM TARGETING:</span>
+                        <button class="btn-subsystem" data-subsystem="weapons" id="btnSubsystemWeapons" title="Disable enemy fire control (-40% enemy firepower)">[ WEAPONS ]</button>
+                        <button class="btn-subsystem" data-subsystem="shields" id="btnSubsystemShields" title="Ion pulse cascade drains 40 MW enemy deflector shields">[ SHIELDS ]</button>
+                        <button class="btn-subsystem" data-subsystem="engines" id="btnSubsystemEngines" title="Strike drive manifolds to collapse enemy evasion rating (18 dmg)">[ ENGINES ]</button>
+                        <button class="btn-subsystem" data-subsystem="bridge" id="btnSubsystemBridge" title="High-risk shot to command bridge: cancels enemy counter-battery &amp; deals 50 dmg">[ BRIDGE ]</button>
                     </div>
                     <div class="combat-combo-badge" id="combatComboBadge" style="display: none;">
-                        ⚡ TACTICAL COMBO: <span id="combatComboCount">0</span> <strong class="crit-ready-text" id="critReadyText">(CRITICAL OVERCHARGE READY!)</strong>
+                        ↯ TACTICAL COMBO: <span id="combatComboCount">0</span> <strong class="crit-ready-text" id="critReadyText">(CRITICAL OVERCHARGE READY!)</strong>
                     </div>
                     <div class="combat-stance-line" id="combatStanceLine">FLEET STANCE: BALANCED</div>
                 </div>
@@ -903,7 +966,7 @@
                 <!-- Anomaly Modal / Card (Prominent when active) -->
                 <div class="anomaly-alert-card" id="anomalyCard" style="display: none;">
                     <div class="anomaly-header">
-                        <span class="alert-icon">⚠️</span>
+                        <span class="alert-icon">⚠</span>
                         <div class="alert-text">
                             <span class="alert-tag">PROXIMITY HAZARD</span>
                             <h3 class="alert-title" id="anomalyTitle">Anomaly Detected</h3>
@@ -913,10 +976,29 @@
                     <div class="anomaly-choices" id="anomalyChoices"></div>
                 </div>
 
+                <!-- Customs Security Interdiction Card (blocks flight until resolved) -->
+                <div class="anomaly-alert-card customs-alert-card" id="customsCard" style="display: none;" aria-live="assertive" aria-label="Customs interdiction">
+                    <div class="anomaly-header">
+                        <span class="alert-icon">⚠</span>
+                        <div class="alert-text">
+                            <span class="alert-tag">SECURITY PATROL // CONTRABAND DETECTED</span>
+                            <h3 class="alert-title" id="customsTitle">Customs Inspection</h3>
+                        </div>
+                    </div>
+                    <p class="anomaly-desc" id="customsDesc">Federal patrol cutters have surrounded your ship.</p>
+                    <div class="customs-manifest-line" id="customsManifest"></div>
+                    <div class="anomaly-choices customs-choices">
+                        <button class="anomaly-choice-btn btn-customs-bribe" id="btnCustomsBribe">BRIBE PATROL</button>
+                        <button class="anomaly-choice-btn btn-customs-jettison" id="btnCustomsJettison">JETTISON CONTRABAND</button>
+                        <button class="anomaly-choice-btn btn-customs-confiscate" id="btnCustomsConfiscate">SUBMIT TO CONFISCATION</button>
+                        <button class="anomaly-choice-btn btn-customs-flee" id="btnCustomsFlee">FLEE CORDON</button>
+                    </div>
+                </div>
+
                 <!-- Pirate Toll Card (blocks flight until resolved) -->
                 <div class="anomaly-alert-card pirate-alert-card" id="pirateCard" style="display: none;" aria-live="assertive" aria-label="Pirate intercept">
                     <div class="anomaly-header">
-                        <span class="alert-icon">☠</span>
+                        <span class="alert-icon">✖</span>
                         <div class="alert-text">
                             <span class="alert-tag">PIRATE INTERCEPT</span>
                             <h3 class="alert-title" id="pirateTitle">Corsair Toll</h3>
@@ -984,7 +1066,7 @@
                 <!-- Combined command panel: power routing and abilities in one frame -->
                 <div class="sub-panel reactor-panel power-abilities-panel hud-strip-panel" id="panelReactor">
                     <div class="panel-header power-abilities-header">
-                        <div class="panel-tag"><span class="badge-dot dot-amber"></span><span class="strip-icon">⚡</span> COMMAND SYSTEMS</div>
+                        <div class="panel-tag"><span class="badge-dot dot-amber"></span><span class="strip-icon">↯</span> COMMAND SYSTEMS</div>
                         <h2 class="panel-title">REACTOR + ABILITIES</h2>
                         <span class="power-total" id="powerTotal">100% ALLOCATED</span>
                     </div>
@@ -998,7 +1080,7 @@
 
                     <div class="reactor-sim-strip">
                         <div class="reactor-thermal">
-                            <span>🔥 REACTOR HEAT</span>
+                            <span>✧ REACTOR HEAT</span>
                             <div class="reactor-heat-track"><div class="reactor-heat-fill" id="reactorHeatFill" style="width: 0%;"></div></div>
                             <strong id="reactorHeatLabel">0 / 100</strong>
                         </div>
@@ -1019,7 +1101,7 @@
                     <div class="power-matrix">
                         <div class="power-slider-row">
                             <div class="power-header">
-                                <span class="pwr-label cyan-glow"><span class="pwr-icon">🚀</span> ENGINES <kbd class="hotkey-chip">Q</kbd></span>
+                                <span class="pwr-label cyan-glow"><span class="pwr-icon">➤</span> ENGINES <kbd class="hotkey-chip">Q</kbd></span>
                                 <span class="pwr-val" id="pwrEngVal">25%</span>
                             </div>
                             <input type="range" min="0" max="100" value="25" class="pwr-slider cyan-range" id="sliderEng">
@@ -1028,7 +1110,7 @@
 
                         <div class="power-slider-row">
                             <div class="power-header">
-                                <span class="pwr-label blue-glow"><span class="pwr-icon">🛡</span> SHIELDS <kbd class="hotkey-chip">W</kbd></span>
+                                <span class="pwr-label blue-glow"><span class="pwr-icon">⬡</span> SHIELDS <kbd class="hotkey-chip">W</kbd></span>
                                 <span class="pwr-val" id="pwrShdVal">25%</span>
                             </div>
                             <input type="range" min="0" max="100" value="25" class="pwr-slider blue-range" id="sliderShd">
@@ -1037,7 +1119,7 @@
 
                         <div class="power-slider-row">
                             <div class="power-header">
-                                <span class="pwr-label magenta-glow"><span class="pwr-icon">📡</span> SENSORS <kbd class="hotkey-chip">E</kbd></span>
+                                <span class="pwr-label magenta-glow"><span class="pwr-icon">◈</span> SENSORS <kbd class="hotkey-chip">E</kbd></span>
                                 <span class="pwr-val" id="pwrSenVal">25%</span>
                             </div>
                             <input type="range" min="0" max="100" value="25" class="pwr-slider magenta-range" id="sliderSen">
@@ -1046,7 +1128,7 @@
 
                         <div class="power-slider-row">
                             <div class="power-header">
-                                <span class="pwr-label red-glow"><span class="pwr-icon">🎯</span> WEAPONS <kbd class="hotkey-chip">R</kbd></span>
+                                <span class="pwr-label red-glow"><span class="pwr-icon">◎</span> WEAPONS <kbd class="hotkey-chip">R</kbd></span>
                                 <span class="pwr-val" id="pwrWepVal">25%</span>
                             </div>
                             <input type="range" min="0" max="100" value="25" class="pwr-slider red-range" id="sliderWep">
@@ -1070,7 +1152,7 @@
                                 <button class="text-btn" id="btnOpenSkillsTab" title="Open commander skills, ranks and perks">DOSSIER</button>
                             </div>
                             <div class="skills-quick-grid" id="hudSkillsGrid"></div>
-                            <p class="skills-quick-hint">SHIFT+1..6 USE ABILITY // K TO HIDE // DOSSIER TO TRAIN SKILLS</p>
+                            <p class="skills-quick-hint">SHIFT+1..6 // K HIDE // TRAIN</p>
                         </div>
                     </div>
                 </div>
@@ -1079,7 +1161,7 @@
                 <div class="hud-strip-right" id="hudStripRight">
                     <div class="sub-panel map-controls-panel" id="mapControlsPanel">
                         <div class="panel-header">
-                            <div class="panel-tag"><span class="badge-dot"></span><span class="strip-icon">🗺</span> MAP CONTROLS</div>
+                            <div class="panel-tag"><span class="badge-dot"></span><span class="strip-icon">▦</span> MAP CONTROLS</div>
                             <h2 class="panel-title">RADAR<span class="title-long"> SETTINGS</span></h2>
                         </div>
                         <div class="map-controls-content">
@@ -1091,7 +1173,7 @@
                                 <button class="ctrl-btn" id="btnToggleGrid" title="Toggle Radar Grid">GRID</button>
                                 <button class="ctrl-btn" id="btnToggleLabels" title="Toggle Orbit Labels">LABELS</button>
                                 <button class="btn-hud btn-cyan" id="quickScanBtn" title="Sensor Scan">
-                                    <span class="icon">📡</span> SCAN
+                                    <span class="icon">◈</span> SCAN
                                 </button>
                             </div>
                             <div class="radar-zoom-stack" aria-label="Radar zoom and centering">
@@ -1104,7 +1186,7 @@
 
                     <div class="sub-panel log-panel hud-strip-panel" id="logPanel">
                         <div class="panel-header">
-                            <div class="panel-tag"><span class="badge-dot dot-green"></span><span class="strip-icon">📡</span> TELEMETRY</div>
+                            <div class="panel-tag"><span class="badge-dot dot-green"></span><span class="strip-icon">◈</span> TELEMETRY</div>
                             <h2 class="panel-title"><span class="title-long">TACTICAL </span>FLIGHT LOG</h2>
                             <span class="hotkey-chip" title="Toggle telemetry log (L)">L</span>
                             <div class="log-header-actions">
@@ -1153,6 +1235,8 @@
 
     <!-- Scripts -->
     <script src="celestial.js"></script>
+    <script src="particles.js"></script>
+    <script src="surfacemap.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

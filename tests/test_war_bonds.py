@@ -95,6 +95,14 @@ class WarBondPledgeTest(unittest.TestCase):
         self.assertTrue(restored.wars[0].bonds_resolved)
         self.assertEqual(restored.wars[0].support["sol_coalition"], 500)
 
+    def test_tick_with_resolving_war_bonds_updates_stats_without_error(self):
+        engine = SimulationEngine(seed=42)
+        war = _war(score=30.0, active=False, support={"sol_coalition": 500}, resolved=False)
+        engine.state = engine._clone_state(wars=(war,))
+        result = engine.tick(1)
+        self.assertEqual(result["ticks_advanced"], 1)
+        self.assertEqual(engine.state.stats.get("war_bond_payouts"), 750)
+
 
 if __name__ == "__main__":
     unittest.main()

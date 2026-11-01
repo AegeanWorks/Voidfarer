@@ -6,7 +6,68 @@ from voidfarer.engine import SimulationEngine
 from voidfarer.enemies import ENEMY_ARCHETYPES
 from voidfarer.factions import get_faction_service_perks
 from voidfarer.models import CombatEncounter, PrecursorRelic
-from voidfarer.retention import CATALOG_RELICS, calculate_passive_multipliers
+from voidfarer.retention import (
+    CATALOG_RELICS,
+    RELIC_SET_THRESHOLDS,
+    calculate_passive_multipliers,
+    relic_completed_sets,
+    relic_set_bonuses,
+)
+
+
+class RelicSetBonusTest(unittest.TestCase):
+    def _relic(self, rid, rarity):
+        return PrecursorRelic(
+            id=rid, name=rid, rarity=rarity, description="",
+            passive_stat="scan_bounty", stat_multiplier=0.0,
+        )
+
+    def test_no_set_bonus_below_threshold(self):
+        relics = (self._relic("a", "common"), self._relic("b", "common"))
+        self.assertEqual(relic_set_bonuses(relics), {})
+
+    def test_common_set_grants_scan_bonus(self):
+        relics = tuple(self._relic(f"c{i}", "common") for i in range(3))
+        b = relic_set_bonuses(relics)
+        self.assertAlmostEqual(b.get("scan_bounty", 0.0), 0.05)
+
+    def test_rare_set_grants_scan_and_trade(self):
+        relics = tuple(self._relic(f"r{i}", "rare") for i in range(3))
+        b = relic_set_bonuses(relics)
+        self.assertAlmostEqual(b.get("scan_bounty", 0.0), 0.10)
+        self.assertAlmostEqual(b.get("trade_margin", 0.0), 0.05)
+
+    def test_epic_set_grants_combat_and_shield(self):
+        relics = tuple(self._relic(f"e{i}", "epic") for i in range(2))
+        b = relic_set_bonuses(relics)
+        self.assertAlmostEqual(b.get("laser_dmg", 0.0), 0.15)
+        self.assertAlmostEqual(b.get("shield_cap", 0.0), 10.0)
+
+    def test_legendary_set_grants_all(self):
+        relics = (self._relic("l1", "legendary"),)
+        b = relic_set_bonuses(relics)
+        self.assertAlmostEqual(b.get("scan_bounty", 0.0), 0.25)
+        self.assertAlmostEqual(b.get("trade_margin", 0.0), 0.25)
+        self.assertAlmostEqual(b.get("laser_dmg", 0.0), 0.25)
+
+    def test_set_bonus_applied_in_passive_multipliers(self):
+        ship = SimulationEngine(seed=1).state.ship
+        relics = tuple(self._relic(f"c{i}", "common") for i in range(3))
+        ship = ship.__class__(**{**ship.__dict__, "relics": relics})
+        mults = calculate_passive_multipliers(ship)
+        # base scan_bounty 1.0 * streak(1) + 0.05 set bonus = 1.05
+        self.assertAlmostEqual(mults["scan_bounty"], 1.05, places=2)
+
+    def test_completed_sets_follow_the_shared_thresholds(self):
+        full = tuple(
+            self._relic(f"{rarity}_{index}", rarity)
+            for rarity, count in RELIC_SET_THRESHOLDS.items()
+            for index in range(count)
+        )
+        self.assertEqual(relic_completed_sets(full), len(RELIC_SET_THRESHOLDS))
+        self.assertEqual(
+            relic_completed_sets(full[:-1]), len(RELIC_SET_THRESHOLDS) - 1
+        )
 from voidfarer.server import start_background_server
 from voidfarer.storage import StorageManager
 from voidfarer.story import STORY_RELICS
@@ -100,8 +161,8 @@ class MultiStatRelicTest(unittest.TestCase):
         relic = next(r for r in CATALOG_RELICS if r.id == "relic_eye_of_void")
         ship = engine._clone_ship(relics=(relic,))
         multipliers = calculate_passive_multipliers(ship)
-        self.assertAlmostEqual(multipliers["laser_dmg"], 1.35)
-        self.assertAlmostEqual(multipliers["scan_bounty"], 1.35)
+        self.assertAlmostEqual(multipliers["laser_dmg"], 1.6)
+        self.assertAlmostEqual(multipliers["scan_bounty"], 1.6)
 
     def test_core_matrix_boosts_fuel_and_laser(self):
         engine = SimulationEngine(seed=42)

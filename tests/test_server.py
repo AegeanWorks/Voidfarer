@@ -11,7 +11,7 @@ from pathlib import Path
 from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
 from voidfarer.engine import SimulationEngine
 from voidfarer.fleet import build_fleet_ship
-from voidfarer.models import CombatEncounter, CrewMember, FleetShip, Outpost
+from voidfarer.models import CombatEncounter, CrewMember, FleetShip, Outpost, PrecursorRelic
 from voidfarer.megastructures import MEGASTRUCTURE_RESTORATION
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
@@ -893,6 +893,64 @@ class TestServer(unittest.TestCase):
         # Missing entry_id fails with 400
         st_missing, _ = self._post("/api/codex/claim", {})
         self.assertEqual(st_missing, 400)
+
+    def test_customs_resolve_endpoint(self):
+        from voidfarer.models import CustomsEncounter
+        engine = VoidFarerHandler.engine
+        encounter = CustomsEncounter(
+            id="srv_customs", faction="Sol Coalition", system_id="sol", system_name="Sol System",
+            patrol_vessel="Sol Cutter", contraband_found={"xenoliths": 1},
+            fine_amount=1000, bribe_amount=400, description="Patrol intercept",
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(credits=2000, cargo={"xenoliths": 1}),
+            active_customs=encounter,
+        )
+        st_blocked, _ = self._post("/api/jump", {"target": "alpha_centauri"})
+        self.assertEqual(st_blocked, 409)
+
+        st_res, data_res = self._post("/api/customs/resolve", {"action": "bribe"})
+        self.assertEqual(st_res, 200)
+        payload = json.loads(data_res.decode("utf-8"))
+        self.assertTrue(payload["ok"])
+        self.assertIsNone(payload["state"]["active_customs"])
+        self.assertEqual(payload["state"]["ship"]["credits"], 1600)
+
+    def test_overhaul_endpoint(self):
+        engine = VoidFarerHandler.engine
+        station_body = next(b.id for b in engine.current_system.bodies if b.station_dockable)
+        engine.orbit(station_body)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(wear=20.0, credits=5000)
+        )
+        st, data = self._post("/api/overhaul", {})
+        self.assertEqual(st, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["state"]["ship"]["wear"], 0.0)
+
+    def test_relic_fuse_endpoint(self):
+        engine = VoidFarerHandler.engine
+        commons = tuple(
+            PrecursorRelic(
+                id=f"srv_fuse_{index}", name=f"Srv Fuse {index}", rarity="common",
+                description="test", passive_stat="scan_bounty", stat_multiplier=0.01,
+            )
+            for index in range(3)
+        )
+        engine.state = engine._clone_state(ship=engine._clone_ship(relics=commons))
+        st, data = self._post("/api/relics/fuse", {"rarity": "common"})
+        self.assertEqual(st, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"])
+        self.assertEqual(len(payload["state"]["ship"]["relics"]), 1)
+        self.assertEqual(payload["state"]["ship"]["relics"][0]["rarity"], "rare")
+        self.assertEqual(payload["relic"]["rarity"], "rare")
+
+        _, data_again = self._post("/api/relics/fuse", {"rarity": "common"})
+        payload_again = json.loads(data_again.decode("utf-8"))
+        self.assertFalse(payload_again["ok"])
+        self.assertIn("Need 3 common relics", payload_again["message"])
 
 
 if __name__ == "__main__":

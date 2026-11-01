@@ -2,6 +2,8 @@
 
 import io
 import os
+import runpy
+import sys
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -9,6 +11,7 @@ from unittest.mock import patch
 
 from voidfarer.cli import cmd_inventory, cmd_repl, main
 from voidfarer.engine import SimulationEngine
+from voidfarer.models import CombatEncounter, CustomsEncounter, PrecursorRelic
 from voidfarer.storage import StorageManager
 from voidfarer.story import STORY_RELICS
 
@@ -309,6 +312,43 @@ class TestCLIRelicsWithRecoveredRelics(_IsolatedCliTestCase):
         self.assertIn("Active Passive Fleet Modifiers", output)
         self.assertIn("Scan Bounty Boost", output)
         self.assertIn("Hull Reinforcement", output)
+
+    def test_relics_fuse_persists_the_fused_relic(self):
+        common = tuple(
+            PrecursorRelic(
+                id=f"fuse_test_{index}",
+                name=f"Fuse Test {index}",
+                rarity="common",
+                description="test relic",
+                passive_stat="scan_bounty",
+                stat_multiplier=0.01,
+            )
+            for index in range(3)
+        )
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(ship=engine._clone_ship(relics=common))
+        save_dir = Path(self._tmp.name) / ".voidfarer"
+        StorageManager(save_dir).save(engine.state)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = main(["relics", "fuse", "common"])
+
+        self.assertEqual(code, 0)
+        self.assertIn("Fused 3 common relics", mock_out.getvalue())
+        relics = StorageManager(save_dir).load().ship.relics
+        self.assertEqual(len(relics), 1)
+        self.assertEqual(relics[0].rarity, "rare")
+
+    def test_cli_runs_as_module_and_reaches_the_fuse_handler(self):
+        argv = [
+            "voidfarer", "--save-path", str(Path(self._tmp.name) / ".voidfarer"),
+            "relics", "fuse", "common",
+        ]
+        with patch.object(sys, "argv", argv), patch("sys.stdout", new_callable=io.StringIO):
+            with self.assertRaises(SystemExit) as raised:
+                runpy.run_module("voidfarer.cli", run_name="__main__")
+        self.assertIn(raised.exception.code, (0, 1))
+
     def test_cli_frontier_commands(self):
         cases = [
             (["quests"], "QUEST PANEL"),
@@ -352,3 +392,121 @@ class TestCLIMaxTrades(_IsolatedCliTestCase):
             with self.assertRaises(SystemExit) as raised:
                 main(["buy", "fuel_cells", "lots"])
         self.assertEqual(raised.exception.code, 2)
+
+
+class TestCLINewMechanicsParity(_IsolatedCliTestCase):
+    """Smuggling, overhaul, fabrication and salvage strategies need CLI parity with REST."""
+
+    def _saved(self, engine: SimulationEngine) -> tuple[StorageManager, Path]:
+        save_dir = Path(self._tmp.name) / ".voidfarer"
+        storage = StorageManager(save_dir)
+        storage.save(engine.state)
+        return storage, save_dir
+
+    def test_customs_status_and_jettison(self):
+        encounter = CustomsEncounter(
+            id="cli_customs", faction="Sol Coalition", system_id="sol", system_name="Sol System",
+            patrol_vessel="Sol Cutter", contraband_found={"xenoliths": 2},
+            fine_amount=1200, bribe_amount=600, description="Patrol intercept",
+        )
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(credits=2000, cargo={"xenoliths": 2, "titanium": 4}),
+            active_customs=encounter,
+        )
+        _, save_dir = self._saved(engine)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["customs"]), 0)
+        self.assertIn("CUSTOMS INTERDICTION", mock_out.getvalue())
+        self.assertIn("xenoliths", mock_out.getvalue())
+
+        with patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(main(["customs", "jettison"]), 0)
+        state = StorageManager(save_dir).load()
+        self.assertIsNone(state.active_customs)
+        self.assertNotIn("xenoliths", state.ship.cargo)
+        self.assertEqual(state.ship.cargo.get("titanium"), 4)
+
+    def test_overhaul_command_scrubs_wear_and_persists(self):
+        engine = SimulationEngine(seed=42)
+        body = next(b.id for b in engine.current_system.bodies if b.station_dockable)
+        engine.orbit(body)
+        engine.state = engine._clone_state(ship=engine._clone_ship(wear=20.0, credits=5000))
+        _, save_dir = self._saved(engine)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["overhaul"]), 0)
+        self.assertIn("overhaul completed", mock_out.getvalue().lower())
+        ship = StorageManager(save_dir).load().ship
+        self.assertEqual(ship.wear, 0.0)
+        self.assertLess(ship.credits, 5000)
+
+    def test_fabricate_command_consumes_titanium(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(ship=engine._clone_ship(hull=50, cargo={"titanium": 2}))
+        _, save_dir = self._saved(engine)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["fabricate", "patch_kit"]), 0)
+        self.assertIn("+25 Hull", mock_out.getvalue())
+        ship = StorageManager(save_dir).load().ship
+        self.assertEqual(ship.hull, 75)
+        self.assertEqual(ship.cargo.get("titanium"), 1)
+
+    def test_salvage_strategy_is_forwarded_to_the_engine(self):
+        with patch.object(SimulationEngine, "salvage_derelict", return_value=(True, "ok", {})) as called:
+            with patch("sys.stdout", new_callable=io.StringIO):
+                self.assertEqual(main(["salvage", "aggressive"]), 0)
+        called.assert_called_once_with(strategy="aggressive")
+
+
+class TestCLICombatAndCrewParity(_IsolatedCliTestCase):
+    """New combat subsystems and bridge stations must be reachable from the terminal."""
+
+    def _combat_action_for(self, argv):
+        with patch.object(SimulationEngine, "combat_action", return_value=(True, "ok")) as called:
+            with patch("sys.stdout", new_callable=io.StringIO):
+                self.assertEqual(main(argv), 0)
+        return called.call_args.args[0]
+
+    def test_new_combat_maneuvers_map_to_engine_actions(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            active_combat=CombatEncounter(
+                id="cli_combat", enemy_name="Raider", enemy_class="Frigate",
+                enemy_hull=100, enemy_max_hull=100, enemy_damage=10, bounty_credits=100,
+            )
+        )
+        StorageManager(Path(self._tmp.name) / ".voidfarer").save(engine.state)
+        cases = {
+            ("combat", "target", "engines"): "target_engines",
+            ("combat", "target", "drive"): "target_engines",
+            ("combat", "target", "bridge"): "target_bridge",
+            ("combat", "target", "shields"): "target_shields",
+            ("combat", "target", "weapons"): "target_weapons",
+            ("combat", "target"): "target_weapons",
+            ("combat", "pdc"): "point_defense",
+            ("combat", "vent"): "vent_heat",
+        }
+        for argv, expected in cases.items():
+            with self.subTest(argv=argv):
+                self.assertEqual(self._combat_action_for(list(argv)), expected)
+
+    def test_crew_station_assignment_persists(self):
+        engine = SimulationEngine(seed=42)
+        crew = next(c for c in engine.state.ship.crew if c.status == "active")
+        save_dir = Path(self._tmp.name) / ".voidfarer"
+        StorageManager(save_dir).save(engine.state)
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["crew", "station", crew.id, "helm"]), 0)
+        self.assertIn("HELM station", mock_out.getvalue())
+        reloaded = StorageManager(save_dir).load()
+        self.assertEqual(next(c for c in reloaded.ship.crew if c.id == crew.id).station, "helm")
+
+        with patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(main(["crew", "station", crew.id, "unassigned"]), 0)
+        reloaded = StorageManager(save_dir).load()
+        self.assertEqual(next(c for c in reloaded.ship.crew if c.id == crew.id).station, "")
+

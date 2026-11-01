@@ -301,7 +301,7 @@ class ShipDossierLegibilityTest(unittest.TestCase):
         self.assertIn("const codes = report.slot_codes || {};", self.js)
         self.assertIn("this.escapeHtml(code)", self.js)
         self.assertNotIn('<span class="ship-module-icon">?</span>', self.js)
-        self.assertIn('<span class="ship-module-icon">🛠</span>', self.js)
+        self.assertIn('<span class="ship-module-icon">✚</span>', self.js)
         self.assertIn('slotDiv.setAttribute("aria-label"', self.js)
 
     def test_catalog_names_wrap_instead_of_losing_words(self):

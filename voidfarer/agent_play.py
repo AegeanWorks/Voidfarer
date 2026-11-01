@@ -26,6 +26,11 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/anomaly": "prompt-driven: an anomaly must be resolved",
     "/api/combat": "prompt-driven: a hostile intercept must occur",
     "/api/pirate/resolve": "prompt-driven: a pirate toll must intercept",
+    "/api/customs/resolve": "prompt-driven: an active customs interdiction must intercept",
+    "/api/fabricate": "needs titanium alloy in cargo hold",
+    "/api/weather": "telemetry endpoint for solar space weather",
+    "/api/overhaul": "needs an orbital dock and hyperlane frame wear",
+    "/api/relics/fuse": "needs three relics of one rarity",
     "/api/decision/resolve": "prompt-driven: a blocking decision must be pending",
     "/api/reconstruct": "needs a devastated inhabited world in orbit",
     "/api/void/dive": "needs a black-hole horizon",
@@ -60,6 +65,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/contract/claim": "needs a completed contract",
     "/api/away/recall": "needs an active away mission",
     "/api/crew/shore": "needs crew ashore at a colony",
+    "/api/crew/station": "needs an active crew specialist",
     "/api/crew/dismiss": "would erase the only crew roster in the run",
     "/api/story/choice": "needs an active story choice",
     "/api/trade/quantum/place": "needs a quantum-trade unlock",
@@ -190,6 +196,10 @@ class AiCaptain:
         pirate = state.get("active_pirate")
         if pirate:
             return "/api/pirate/resolve", {"action": "evade"}, "pirate"
+
+        customs = state.get("active_customs")
+        if customs:
+            return "/api/customs/resolve", {"action": "jettison"}, "customs"
         if state.get("active_combat"):
             return "/api/combat", {"action": "fire_lasers"}, "combat"
         if state.get("active_anomaly"):

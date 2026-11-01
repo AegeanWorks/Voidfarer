@@ -122,6 +122,12 @@ class TestExplorationMechanics(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("derelict", msg.lower())
 
+    def test_unknown_salvage_strategy_is_rejected(self):
+        ok, msg, report = self.engine.salvage_derelict("reckless")
+        self.assertFalse(ok)
+        self.assertIn("unknown salvage strategy", msg.lower())
+        self.assertEqual(report, {})
+
     def test_fuel_scoop_refuels_and_heats_reactor(self):
         star = next(b for b in self.engine.current_system.bodies if b.body_type == "star")
         self.engine.orbit(star.id)

@@ -36,7 +36,9 @@ from voidfarer.outposts import OUTPOST_TYPES
 from voidfarer.research import RESEARCH_PROJECTS
 from voidfarer.retention import (
     PILOT_TALENTS,
+    RELIC_SET_THRESHOLDS,
     calculate_passive_multipliers,
+    relic_set_bonuses,
 )
 from voidfarer.server import BackgroundServer, run_server, start_background_server
 from voidfarer.storage import StorageManager
@@ -128,6 +130,7 @@ def cmd_status(engine: SimulationEngine) -> int:
     print(f"╠════ VITAL TELEMETRY ════════════════════════════════════════════════╣{RESET}")
     streak_mult = 1.0 + min(1.5, (ship.streak - 1) * 0.15)
     print(f"║ Streak:    {RED}🔥 {ship.streak} jumps (x{streak_mult:.2f}){RESET}   Mastery:  {YELLOW}★ Lvl {ship.mastery.level} [{ship.mastery.xp}/{ship.mastery.next_level_xp} XP]{RESET}           ║")
+    print(f"║ Hull Wear: {YELLOW}{ship.wear:>5.1f}%{RESET}  (degrades scan/trade efficiency; repaired at drydock)                      ║")
     print(f"║ Hull:      {_bar(ship.hull, ship.max_hull, 24, RED if ship.hull < 30 else GREEN)}                      ║")
     print(f"║ Shields:   {_bar(ship.shield, ship.max_shield, 24, BLUE)}                      ║")
     print(f"║ Fuel:      {_bar(ship.fuel, ship.max_fuel, 24, YELLOW)}                      ║")
@@ -1041,7 +1044,9 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
         print(f"\n{BOLD}Tactical maneuvers:{RESET}")
         print(f"  {BOLD}combat fire{RESET}    - Fire laser battery strike")
         print(f"  {BOLD}combat drone{RESET}   - Launch kinetic drone strike / sensor burn")
-        print(f"  {BOLD}combat target{RESET}  - Target subsystem (e.g. combat target weapons)")
+        print(f"  {BOLD}combat target{RESET}  - Target subsystem (weapons, shields, engines or bridge)")
+        print(f"  {BOLD}combat pdc{RESET}     - Point-defense flak screen against counter-battery")
+        print(f"  {BOLD}combat vent{RESET}    - Purge reactor heat mid-fight")
         print(f"  {BOLD}combat board{RESET}   - Board a crippled enemy with a marine party")
         print(f"  {BOLD}combat gambit{RESET}  - Spend a local captain's once-per-battle specialty")
         print(f"  {BOLD}combat absorb{RESET}  - Overcharge shield capacitors")
@@ -1050,6 +1055,22 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
         return 0
 
     sub = parts[1].lower()
+    target_arg = parts[2].lower() if len(parts) > 2 else ""
+    subsystem_map = {
+        "weapon": "target_weapons",
+        "weapons": "target_weapons",
+        "guns": "target_weapons",
+        "shield": "target_shields",
+        "shields": "target_shields",
+        "deflector": "target_shields",
+        "engine": "target_engines",
+        "engines": "target_engines",
+        "drive": "target_engines",
+        "thrusters": "target_engines",
+        "bridge": "target_bridge",
+        "command": "target_bridge",
+        "deck": "target_bridge",
+    }
     action_map = {
         "fire": "fire_lasers",
         "laser": "fire_lasers",
@@ -1057,8 +1078,8 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
         "drone": "drone_strike",
         "dronestrike": "drone_strike",
         "strike": "drone_strike",
-        "target": "target_weapons" if len(parts) <= 2 else ("target_shields" if "shield" in parts[2].lower() else "target_weapons"),
-        "subsystem": "target_weapons",
+        "target": subsystem_map.get(target_arg, "target_weapons"),
+        "subsystem": subsystem_map.get(target_arg, "target_weapons"),
         "board": "board_enemy",
         "boarding": "board_enemy",
         "capture": "board_enemy",
@@ -1070,6 +1091,12 @@ def cmd_combat(engine: SimulationEngine, storage: StorageManager, parts: list[st
         "dodge": "evasive_burn",
         "flee": "flee",
         "escape": "flee",
+        "pdc": "point_defense",
+        "pointdefense": "point_defense",
+        "flak": "point_defense",
+        "vent": "vent_heat",
+        "coolant": "vent_heat",
+        "purge": "vent_heat",
     }
     action = action_map.get(sub, sub)
     ok, msg = engine.combat_action(action)
@@ -1273,6 +1300,26 @@ def cmd_relics(engine: SimulationEngine) -> int:
         color = rarity_colors.get(r.rarity, RESET)
         print(f"• {color}[{r.rarity.upper()}]{RESET} {BOLD}{r.name}{RESET} ({r.id})")
         print(f"  {DIM}{r.description}{RESET}\n")
+
+    from collections import Counter
+
+    rarity_counts = Counter(r.rarity for r in relics)
+    print(f"{BOLD}Relic Set Resonance:{RESET}")
+    for rarity, threshold in RELIC_SET_THRESHOLDS.items():
+        count = rarity_counts.get(rarity, 0)
+        status = f"{GREEN}ACTIVE{RESET}" if count >= threshold else f"{DIM}{count}/{threshold}{RESET}"
+        print(f"  {rarity.capitalize():<10} x{count:<2}  {status}")
+
+    bonuses = relic_set_bonuses(relics)
+    if bonuses:
+        parts = []
+        for k, v in bonuses.items():
+            if k == "shield_cap":
+                parts.append(f"+{int(v)} {k}")
+            else:
+                parts.append(f"+{int(v * 100)}% {k}")
+        print(f"  {BOLD}Set bonuses:{RESET} " + ", ".join(parts))
+    print()
 
     multipliers = calculate_passive_multipliers(engine.state.ship)
     print(f"{BOLD}Active Passive Fleet Modifiers:{RESET}")
@@ -2060,9 +2107,11 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
             )
             print(
                 f"{member['id']:<18} {BOLD}{member['name']:<18}{RESET} {member['role']:<12} "
-                f"SKILL {member['skill']} {xp_note} MORALE {member['morale']:.0f} [{morale_note}] WAGE {member['wage']} PORTRAIT {member['portrait']}{injury_note}{medal_note}"
+                f"SKILL {member['skill']} {xp_note} MORALE {member['morale']:.0f} [{morale_note}] WAGE {member['wage']} PORTRAIT {member['portrait']}"
+                f"{' ' + CYAN + 'STATION ' + member['station'].upper() + RESET if member.get('station') else ''}{injury_note}{medal_note}"
             )
         print(f"\n{DIM}Recruit: crew recruit <{'|'.join(r.id for r in CREW_ROLES)}> | Drill: crew train <id> | Dismiss: crew dismiss <id> | Shore leave: crew shore{RESET}")
+        print(f"{DIM}Assign a bridge station: crew station <id> <helm|engineering|science|medical|tactical|unassigned>{RESET}")
         print(f"{DIM}Away teams: away | away launch <mission_type> [crew_ids...] | away recall <mission_id>{RESET}")
         return 0
     if sub in ("recruit", "hire"):
@@ -2094,6 +2143,15 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
             print(f"{RED}Usage:{RESET} crew dismiss <crew_id>")
             return 1
         ok, msg = engine.dismiss_crew(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub in ("station", "post", "assign"):
+        if len(parts) < 4:
+            print(f"{RED}Usage:{RESET} crew station <crew_id> <helm|engineering|science|medical|tactical|unassigned>")
+            return 1
+        ok, msg = engine.assign_crew_station(parts[2], parts[3])
         print((GREEN if ok else RED) + msg + RESET)
         if ok:
             storage.save(engine.state)
@@ -2183,6 +2241,50 @@ def cmd_pirate(engine: SimulationEngine, storage: StorageManager, parts: list[st
         print(f"{RED}Unknown pirate action '{action}'. Use pay, fight, or evade.{RESET}")
         return 1
     ok, msg = engine.resolve_pirate_encounter(action)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
+
+
+def cmd_customs(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    action = parts[1].lower() if len(parts) > 1 else "status"
+    customs = engine.state.active_customs
+    if action in ("status", "list", "show"):
+        if customs is None:
+            print(f"\n{DIM}No customs interdiction active. Cargo scans only threaten high-security systems when contraband is aboard.{RESET}")
+            return 0
+        print(f"\n{YELLOW}{BOLD}=== CUSTOMS INTERDICTION ==={RESET}")
+        print(f"{BOLD}{customs.patrol_vessel}{RESET} // {customs.system_name} // faction {customs.faction}")
+        print(customs.description)
+        goods = ", ".join(f"{qty}x {cid}" for cid, qty in sorted(customs.contraband_found.items())) or "none detected"
+        print(f"Illicit goods: {RED}{goods}{RESET}")
+        print(
+            f"Fine: {customs.fine_amount} cr | Bribe: {customs.bribe_amount} cr | "
+            f"Your credits: {engine.state.ship.credits} | Fuel: {engine.state.ship.fuel}"
+        )
+        print(f"{DIM}Resolve: customs bribe | customs jettison | customs confiscate | customs flee{RESET}")
+        return 0
+    if action not in ("bribe", "jettison", "confiscate", "flee"):
+        print(f"{RED}Unknown customs action '{action}'. Use bribe, jettison, confiscate, or flee.{RESET}")
+        return 1
+    ok, msg = engine.resolve_customs(action)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
+
+
+def cmd_overhaul(engine: SimulationEngine, storage: StorageManager) -> int:
+    ok, msg = engine.overhaul_ship()
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
+
+
+def cmd_fabricate(engine: SimulationEngine, storage: StorageManager, blueprint: str) -> int:
+    ok, msg = engine.fabricate_munitions(blueprint)
     print((GREEN if ok else RED) + msg + RESET)
     if ok:
         storage.save(engine.state)
@@ -2719,6 +2821,19 @@ def _run_trade(engine: SimulationEngine, commodity_id: str, quantity: int | str,
     return engine.trade(commodity_id, int(quantity), is_buy=is_buy)
 
 
+def cmd_relics_fuse(engine: SimulationEngine, source_rarity: str | None) -> int:
+    if not source_rarity:
+        print("Usage: relics fuse <common|rare|epic>")
+        return 1
+    ok, msg, info = engine.fuse_relics(source_rarity)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        relic = info.get("relic", {})
+        if relic:
+            print(f"  New relic: {relic.get('name')} [{str(relic.get('rarity', '')).upper()}]")
+    return 0 if ok else 1
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Main CLI entrypoint."""
     if argv is None:
@@ -2803,10 +2918,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             "fire", "laser", "attack", "drone", "strike", "target", "subsystem",
             "board", "capture", "prize", "absorb", "shield", "defend", "evade",
             "dodge", "flee", "escape", "stance", "formation", "gambit", "captain",
+            "pdc", "vent",
         ],
         help="Tactical maneuver",
     )
-    combat_p.add_argument("target", nargs="?", help="Subsystem target for 'combat target' (weapons or shields)")
+    combat_p.add_argument(
+        "target", nargs="?",
+        help="Subsystem target for 'combat target' (weapons, shields, engines or bridge)",
+    )
 
     contracts_p = subparsers.add_parser("contracts", help="Inspect and claim dynamic sector bounty contracts")
     contracts_p.add_argument("action", nargs="?", default="list", choices=["list", "claim", "refresh"])
@@ -2816,7 +2935,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     mastery_p.add_argument("action", nargs="?", default="status", choices=["status", "list", "unlock"])
     mastery_p.add_argument("talent_id", nargs="?", help="Talent ID to unlock")
 
-    subparsers.add_parser("relics", help="Display ancient Precursor Relics and passive modifiers")
+    relics_p = subparsers.add_parser("relics", help="Display ancient Precursor Relics and passive modifiers")
+    relics_p.add_argument("action", nargs="?", default="status", choices=["status", "fuse"])
+    relics_p.add_argument("rarity", nargs="?", help="Rarity to fuse (common/rare/epic)")
     subparsers.add_parser("streak", help="Display expedition jump streak and multiplier")
 
     tut_p = subparsers.add_parser("tutorial", help="Cadet Flight Academy onboarding and guidance")
@@ -2886,8 +3007,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     subparsers.add_parser("corporations", help="Alias for 'corps'")
 
     crew_p = subparsers.add_parser("crew", help="Crew roster, recruiting, drills, shore leave, and portraits")
-    crew_p.add_argument("action", nargs="?", default="list", choices=["list", "recruit", "train", "shore", "dismiss"])
-    crew_p.add_argument("value", nargs="?", help="Role or crew id")
+    crew_p.add_argument(
+        "action", nargs="?", default="list",
+        choices=["list", "recruit", "train", "shore", "dismiss", "station"],
+    )
+    crew_p.add_argument("value", nargs="?", help="Role, crew id, or crew id for station assignment")
+    crew_p.add_argument("value2", nargs="?", help="Station for 'crew station'")
 
     away_p = subparsers.add_parser("away", help="Deploy, inspect, or recall away-team expeditions")
     away_p.add_argument("action", nargs="?", default="list", choices=["list", "launch", "recall"])
@@ -2899,6 +3024,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     decision_p = subparsers.add_parser("decision", help="Inspect or resolve the pending real-time decision")
     decision_p.add_argument("action", nargs="?", default="status", choices=["status", "choose"])
     decision_p.add_argument("choice_id", nargs="?", help="Choice id to resolve")
+
+    customs_p = subparsers.add_parser("customs", help="Inspect or resolve a customs interdiction")
+    customs_p.add_argument(
+        "action", nargs="?", default="status",
+        choices=["status", "bribe", "jettison", "confiscate", "flee"],
+    )
 
     quantum_p = subparsers.add_parser("quantum", help="Quantum freight routes, orders, and shipping")
     quantum_p.add_argument("action", nargs="?", default="routes", choices=["routes", "orders", "ship"])
@@ -2912,8 +3043,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     settings_p.add_argument("action", nargs="?", default="show", choices=["show", "decisions"])
     settings_p.add_argument("value", nargs="?", help="relaxed, normal or frequent")
 
-    subparsers.add_parser("salvage", help="Board the derelict at the current body")
+    salvage_p = subparsers.add_parser("salvage", help="Board the derelict at the current body")
+    salvage_p.add_argument(
+        "strategy", nargs="?", default="balanced",
+        choices=["cautious", "balanced", "aggressive", "scientific"],
+    )
     subparsers.add_parser("scoop", help="Scoop fuel from a star, gas giant, or ice body")
+    subparsers.add_parser("overhaul", help="Scrub hyperlane hull wear at an orbital drydock")
+
+    fabricate_p = subparsers.add_parser("fabricate", help="Field-fabricate repairs from salvaged titanium")
+    fabricate_p.add_argument("blueprint", nargs="?", default="patch_kit", choices=["patch_kit", "fuel_cell"])
 
     weapons_p = subparsers.add_parser("weapons", help="Weapon types, installation, and primary selection")
     weapons_p.add_argument("action", nargs="?", default="list", choices=["list", "install", "set"])
@@ -2996,11 +3135,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         parts = ["crew", args.action]
         if args.value:
             parts.append(args.value)
+        if args.value2:
+            parts.append(args.value2)
         return cmd_crew(engine, storage, parts)
     elif args.command == "away":
         return cmd_away(engine, storage, ["away", args.action] + list(args.values))
     elif args.command == "pirate":
         return cmd_pirate(engine, storage, ["pirate", args.action])
+    elif args.command == "customs":
+        return cmd_customs(engine, storage, ["customs", args.action])
     elif args.command == "decision":
         return cmd_decision(engine, storage, ["decision", args.action] + ([args.choice_id] if args.choice_id else []))
     elif args.command == "quantum":
@@ -3194,6 +3337,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 parts.append(args.talent_id)
         return cmd_mastery(engine, storage, parts)
     elif args.command == "relics":
+        if getattr(args, "action", "status") == "fuse":
+            code = cmd_relics_fuse(engine, getattr(args, "rarity", None))
+            if code == 0:
+                storage.save(engine.state)
+            return code
         return cmd_relics(engine)
     elif args.command == "streak":
         return cmd_streak(engine)
@@ -3222,13 +3370,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         storage.save(engine.state)
         return 0 if ok else 1
     elif args.command == "salvage":
-        ok, msg, report = engine.salvage_derelict()
+        ok, msg, report = engine.salvage_derelict(strategy=args.strategy)
         print((GREEN if ok else RED) + msg + RESET)
         if ok and report.get("site"):
             site = report["site"]
             print(f"{DIM}Site: {site['name']} | Risk: {report['danger']*100:.0f}% | Success: {report['success']}{RESET}")
         storage.save(engine.state)
         return 0 if ok else 1
+    elif args.command == "overhaul":
+        return cmd_overhaul(engine, storage)
+    elif args.command == "fabricate":
+        return cmd_fabricate(engine, storage, args.blueprint)
     elif args.command == "scoop":
         ok, msg = engine.scoop_fuel()
         print((GREEN if ok else RED) + msg + RESET)
@@ -3298,4 +3450,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

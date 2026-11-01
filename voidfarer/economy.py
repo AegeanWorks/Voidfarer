@@ -90,6 +90,42 @@ EVENT_TEMPLATES = [
         "category": "boom",
         "duration": 45,
     },
+    {
+        "id_prefix": "famine_embargo",
+        "title": "Interstellar Grain Embargo",
+        "description": "Regional trade sanctions and dock strikes choke agricultural hyperlanes. Hydroponic nutrient rations surge in demand.",
+        "commodity_id": "hydroponics",
+        "price_multiplier": 2.15,
+        "category": "crisis",
+        "duration": 35,
+    },
+    {
+        "id_prefix": "tech_surplus",
+        "title": "Silicon Foundry High-Yield Glut",
+        "description": "Megacorp fabrication yards report massive overproduction of quantum wafer substrates. Spot prices plunge.",
+        "commodity_id": "microchips",
+        "price_multiplier": 0.55,
+        "category": "boom",
+        "duration": 30,
+    },
+    {
+        "id_prefix": "energy_deregulation",
+        "title": "Antimatter Fusion Reserve Sell-Off",
+        "description": "Central energy authorities release strategic fuel stockpiles onto regional exchanges, driving quantum fuel cell prices to multi-year lows.",
+        "commodity_id": "fuel_cells",
+        "price_multiplier": 0.65,
+        "category": "boom",
+        "duration": 28,
+    },
+    {
+        "id_prefix": "defense_mobilization",
+        "title": "Border Fleet Armament Procurement",
+        "description": "Warfront mobilization orders requisition all available structural titanium alloy. Export prices spike rapidly.",
+        "commodity_id": "titanium",
+        "price_multiplier": 1.85,
+        "category": "crisis",
+        "duration": 40,
+    },
 ]
 
 
@@ -352,8 +388,17 @@ def calculate_dynamic_market_quote(
     if faction_standing != 0:
         base = max(2, int(base * faction_standing_price_factor(faction_standing)))
 
-    # 5. Spread calculation
-    spread = max(2, int(base * 0.12))
+    # 5. Spread calculation (with dynamic event volatility)
+    spread_factor = 0.12
+    for evt in economy.active_events:
+        if evt.system_id == system.id and evt.commodity_id == commodity.id:
+            if evt.category in ("crisis", "blockade", "shortage"):
+                spread_factor = 0.16  # Market panic widens spread
+            elif evt.category in ("boom", "breakthrough"):
+                spread_factor = 0.08  # High liquidity narrows spread
+            break
+
+    spread = max(2, int(base * spread_factor))
     buy_price = max(2, base + spread)
     sell_price = max(1, base - spread)
 
@@ -362,6 +407,13 @@ def calculate_dynamic_market_quote(
     if trade_pact:
         buy_price = max(2, int(buy_price * 0.94))
         sell_price = max(1, int(sell_price * 1.06))
+
+    # 5b. Faction Allied standing margin scaling (Milestone 5)
+    # Allied status (standing >= 50) grants favorable trade margins (+5% to +10%)
+    if faction_standing >= 50:
+        ally_margin = min(0.08, (faction_standing - 40) * 0.0015)
+        buy_price = max(2, int(buy_price * (1.0 - ally_margin)))
+        sell_price = max(1, min(buy_price - 1, int(sell_price * (1.0 + ally_margin))))
 
     return MarketQuote(
         commodity_id=commodity.id,

@@ -2,7 +2,7 @@
 
 import unittest
 from voidfarer.engine import SimulationEngine
-from voidfarer.models import AnomalyChoice, AnomalyEncounter, CombatEncounter, FleetDrone
+from voidfarer.models import AnomalyChoice, AnomalyEncounter, CombatEncounter, FleetDrone, GameState
 from voidfarer.upgrades import get_upgrade
 
 
@@ -193,6 +193,21 @@ class TestEngine(unittest.TestCase):
         self.assertIn("new_contract", info)
         self.assertIsNotNone(info["relic"])
         self.assertEqual(len(self.engine.state.ship.active_contracts), 5)
+
+        # The claimed contract is recorded in the completed-quest ledger, exposed to
+        # the cockpit and survives a serialization round trip.
+        self.assertEqual(len(self.engine.state.completed_quests), 1)
+        record = self.engine.state.completed_quests[0]
+        self.assertEqual(record.title, fulfilled.title)
+        self.assertEqual(record.kind, fulfilled.category)
+        self.assertEqual(record.rewards["credits"], 500)
+        self.assertEqual(record.rewards["xp"], 150)
+        self.assertGreater(record.completed_at, 0)
+        snapshot = self.engine.get_status_snapshot()
+        self.assertEqual(snapshot["quests_completed"][0]["title"], fulfilled.title)
+        restored = GameState.from_dict(self.engine.state.to_dict())
+        self.assertEqual(len(restored.completed_quests), 1)
+        self.assertEqual(restored.completed_quests[0].title, fulfilled.title)
 
     def test_pilot_mastery_and_talents(self):
         # Promote pilot by granting talent point
@@ -422,6 +437,39 @@ class TestEngine(unittest.TestCase):
         self.assertTrue(ok)
         boosted_burn = 100 - self.engine.state.ship.fuel
         self.assertLess(boosted_burn, base_burn)
+
+    def test_drydock_quote_matches_every_service_charge(self):
+        station = next(b.id for b in self.engine.current_system.bodies if b.station_dockable)
+        self.engine.orbit(station)
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(hull=50, fuel=30, wear=20.0, credits=5000)
+        )
+
+        quote = self.engine.drydock_quote()
+        self.assertTrue(quote["docked"])
+        self.assertEqual(quote["repair_hp"], 25)
+        self.assertEqual(quote["fuel_units"], 20)
+        self.assertGreater(quote["overhaul_cost"], 0)
+        self.assertEqual(self.engine.get_status_snapshot()["drydock"], quote)
+
+        credits = self.engine.state.ship.credits
+        ok, _ = self.engine.repair_hull(25)
+        self.assertTrue(ok)
+        self.assertEqual(credits - self.engine.state.ship.credits, quote["repair_cost"])
+
+        quote = self.engine.drydock_quote()
+        credits = self.engine.state.ship.credits
+        ok, _ = self.engine.refuel(20)
+        self.assertTrue(ok)
+        self.assertEqual(credits - self.engine.state.ship.credits, quote["refuel_cost"])
+
+        quote = self.engine.drydock_quote()
+        credits = self.engine.state.ship.credits
+        ok, _ = self.engine.overhaul_ship()
+        self.assertTrue(ok)
+        self.assertEqual(credits - self.engine.state.ship.credits, quote["overhaul_cost"])
+        self.assertEqual(self.engine.state.ship.wear, 0.0)
+        self.assertIn(f"{quote['wear']:.1f}% wear restored", self.engine.state.ship.flight_log[-1])
 
 
 if __name__ == "__main__":

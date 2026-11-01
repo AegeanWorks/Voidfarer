@@ -63,6 +63,37 @@ class ResearchQueueEngineTest(unittest.TestCase):
         self.assertEqual(research.queue, ())
         self.assertEqual(payload["ticks_advanced"], 1)
 
+    def test_blocked_queued_projects_are_kept_until_their_prerequisite_finishes(self):
+        # automated_hull_repair needs efficient_fusion, which is not complete yet.
+        self.engine.state = self.engine._clone_state(
+            research=ResearchState(
+                points=0,
+                progress=0,
+                active_project_id=None,
+                completed=(),
+                queue=("automated_hull_repair", "plasma_weapons"),
+            )
+        )
+        self.engine.tick(1)
+        research = self.engine.state.research
+        self.assertEqual(research.active_project_id, "plasma_weapons")
+        self.assertEqual(research.queue, ("automated_hull_repair",))
+
+        # Once the prerequisite finishes, the retained entry starts automatically.
+        self.engine.state = self.engine._clone_state(
+            research=ResearchState(
+                points=0,
+                progress=0,
+                active_project_id=None,
+                completed=("efficient_fusion",),
+                queue=("automated_hull_repair",),
+            )
+        )
+        self.engine.tick(1)
+        research = self.engine.state.research
+        self.assertEqual(research.active_project_id, "automated_hull_repair")
+        self.assertEqual(research.queue, ())
+
     def test_queue_persists_across_saves(self):
         self.engine.queue_research("advanced_cooling")
         restored = GameState.from_dict(self.engine.state.to_dict())

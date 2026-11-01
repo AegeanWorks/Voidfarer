@@ -423,6 +423,18 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "relics", 3, 900, 280,
     ),
     CodexEntry(
+        "relic_resonance", "legacy", "Relic Resonance",
+        "Complete a relic rarity set.",
+        "Collect 3 common, 3 rare, 2 epic, or 1 legendary relic.",
+        "relic_sets", 1, 500, 150,
+    ),
+    CodexEntry(
+        "relic_master", "legacy", "Relic Master",
+        "Complete all four relic rarity sets.",
+        "Gather every rarity tier to full resonance.",
+        "relic_sets", 4, 2000, 600,
+    ),
+    CodexEntry(
         "curator", "legacy", "Curator",
         "Claim ten codex milestones.",
         "Collect rewards from the discovery codex.",
@@ -462,6 +474,7 @@ METRIC_LABELS: dict[str, str] = {
     "anomalies_resolved": "Anomalies resolved",
     "messages_resolved": "Message branches",
     "relics": "Precursor relics",
+    "relic_sets": "Relic rarity sets completed",
     "crew": "Crew members",
     "crew_max_skill": "Best crew skill",
     "crew_medals": "Crew medals",
@@ -600,6 +613,10 @@ def metric_value(state: GameState, metric: str) -> int:
         return sum(1 for message in state.messages if message.resolved_choice)
     if metric == "relics":
         return len(ship.relics)
+    if metric == "relic_sets":
+        from voidfarer.retention import relic_completed_sets
+
+        return relic_completed_sets(ship.relics)
     if metric == "crew":
         return len(ship.crew)
     if metric == "crew_max_skill":

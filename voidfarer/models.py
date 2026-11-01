@@ -589,6 +589,36 @@ class BountyContract:
 
 
 @dataclass(frozen=True)
+class CompletedQuest:
+    """A finished contract kept in the Captain's Log quest ledger."""
+
+    id: str
+    title: str
+    kind: str
+    completed_at: float
+    rewards: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "kind": self.kind,
+            "completed_at": self.completed_at,
+            "rewards": dict(self.rewards),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CompletedQuest:
+        return cls(
+            id=str(data.get("id", "")),
+            title=str(data.get("title", "")),
+            kind=str(data.get("kind", "contract")),
+            completed_at=float(data.get("completed_at", 0.0)),
+            rewards=dict(data.get("rewards") or {}),
+        )
+
+
+@dataclass(frozen=True)
 class PrecursorRelic:
     """Ancient artifact dropped via variable ratio schedule with passive multipliers."""
 
@@ -1170,6 +1200,52 @@ class PirateEncounter:
         )
 
 
+
+@dataclass(frozen=True)
+class CustomsEncounter:
+    """A customs security inspection for contraband in high-security systems."""
+
+    id: str
+    faction: str
+    system_id: str
+    system_name: str
+    patrol_vessel: str
+    contraband_found: dict[str, int]
+    fine_amount: int
+    bribe_amount: int
+    description: str
+    seed: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "faction": self.faction,
+            "system_id": self.system_id,
+            "system_name": self.system_name,
+            "patrol_vessel": self.patrol_vessel,
+            "contraband_found": dict(self.contraband_found),
+            "fine_amount": self.fine_amount,
+            "bribe_amount": self.bribe_amount,
+            "description": self.description,
+            "seed": self.seed,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CustomsEncounter:
+        return cls(
+            id=str(data["id"]),
+            faction=str(data.get("faction", "Security Patrol")),
+            system_id=str(data.get("system_id", "sol")),
+            system_name=str(data.get("system_name", "Unknown")),
+            patrol_vessel=str(data.get("patrol_vessel", "Patrol Cutter")),
+            contraband_found={str(k): int(v) for k, v in (data.get("contraband_found") or {}).items()},
+            fine_amount=max(0, int(data.get("fine_amount", 0))),
+            bribe_amount=max(0, int(data.get("bribe_amount", 0))),
+            description=str(data.get("description", "")),
+            seed=int(data.get("seed", 0)),
+        )
+
+
 @dataclass(frozen=True)
 class GameEvent:
     """Realtime popup event delivered to the cockpit."""
@@ -1581,6 +1657,7 @@ class CrewMember:
     battles: int = 0
     away_missions: int = 0
     medals: tuple[str, ...] = ()
+    station: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -1602,6 +1679,7 @@ class CrewMember:
             battles=max(0, int(data.get("battles", 0))),
             away_missions=max(0, int(data.get("away_missions", 0))),
             medals=tuple(str(medal) for medal in data.get("medals", ())),
+            station=str(data.get("station", "")),
         )
 
 
@@ -1773,6 +1851,7 @@ class ShipState:
     message_bonuses: dict[str, float] = field(default_factory=dict)
     flight_log: tuple[str, ...] = ()
     streak: int = 1
+    wear: float = 0.0
     relics: tuple[PrecursorRelic, ...] = ()
     mastery: PilotMastery = field(default_factory=PilotMastery)
     active_contracts: tuple[BountyContract, ...] = ()
@@ -1831,6 +1910,7 @@ class ShipState:
             "message_bonuses": dict(self.message_bonuses),
             "flight_log": list(self.flight_log),
             "streak": self.streak,
+            "wear": round(self.wear, 2),
             "relics": [r.to_dict() for r in self.relics],
             "mastery": self.mastery.to_dict(),
             "active_contracts": [c.to_dict() for c in self.active_contracts],
@@ -1907,6 +1987,7 @@ class ShipState:
             message_bonuses={str(k): float(v) for k, v in data.get("message_bonuses", {}).items()},
             flight_log=tuple(data.get("flight_log", ())),
             streak=int(data.get("streak", 1)),
+            wear=float(data.get("wear", 0.0)),
             relics=tuple(PrecursorRelic.from_dict(r) for r in data.get("relics", [])),
             mastery=PilotMastery.from_dict(data.get("mastery", {})),
             active_contracts=tuple(BountyContract.from_dict(c) for c in data.get("active_contracts", [])),
@@ -2110,6 +2191,7 @@ class GameState:
     active_anomaly: AnomalyEncounter | None = None
     active_combat: CombatEncounter | None = None
     active_pirate: PirateEncounter | None = None
+    active_customs: CustomsEncounter | None = None
     pending_decision: DecisionEvent | None = None
     decision_history: tuple[str, ...] = ()
     time: TimeState = field(default_factory=TimeState)
@@ -2149,6 +2231,7 @@ class GameState:
     eliminated_factions: tuple[str, ...] = ()
     codex: CodexState = field(default_factory=CodexState)
     local_dock_purchases: dict[tuple[str, str, str], tuple[int, int]] = field(default_factory=dict)
+    completed_quests: tuple[CompletedQuest, ...] = ()
     trade_automation: TradeAutomation = field(default_factory=TradeAutomation)
     quantum_automation: QuantumAutomation = field(default_factory=QuantumAutomation)
 
@@ -2162,6 +2245,7 @@ class GameState:
             "active_anomaly": self.active_anomaly.to_dict() if self.active_anomaly else None,
             "active_combat": self.active_combat.to_dict() if self.active_combat else None,
             "active_pirate": self.active_pirate.to_dict() if self.active_pirate else None,
+            "active_customs": self.active_customs.to_dict() if self.active_customs else None,
             "pending_decision": self.pending_decision.to_dict() if self.pending_decision else None,
             "decision_history": list(self.decision_history),
             "time": self.time.to_dict(),
@@ -2186,6 +2270,7 @@ class GameState:
             },
             "trade_automation": self.trade_automation.to_dict(),
             "quantum_automation": self.quantum_automation.to_dict(),
+            "completed_quests": [q.to_dict() for q in self.completed_quests],
         }
 
     @classmethod
@@ -2207,6 +2292,11 @@ class GameState:
         active_pirate = (
             PirateEncounter.from_dict(data["active_pirate"])
             if data.get("active_pirate")
+            else None
+        )
+        active_customs = (
+            CustomsEncounter.from_dict(data["active_customs"])
+            if data.get("active_customs")
             else None
         )
         pending_decision = (
@@ -2234,6 +2324,7 @@ class GameState:
             active_anomaly=active_anomaly,
             active_combat=active_combat,
             active_pirate=active_pirate,
+            active_customs=active_customs,
             pending_decision=pending_decision,
             decision_history=tuple(str(item) for item in data.get("decision_history", ())),
             time=TimeState.from_dict(data.get("time", {})),
@@ -2264,6 +2355,9 @@ class GameState:
             eliminated_factions=tuple(data.get("eliminated_factions", ())),
             codex=CodexState.from_dict(data.get("codex", {})),
             local_dock_purchases=dock_purchases,
+            completed_quests=tuple(
+                CompletedQuest.from_dict(q) for q in (data.get("completed_quests") or ())
+            ),
             trade_automation=TradeAutomation.from_dict(data.get("trade_automation", {})),
             quantum_automation=QuantumAutomation.from_dict(
                 data.get("quantum_automation", {})

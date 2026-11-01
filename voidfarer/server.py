@@ -23,6 +23,7 @@ from voidfarer.inventory import get_inventory_manifest
 from voidfarer.mapmods import MAP_MODIFIER_CATALOG, aggregate_map_modifiers, system_modifier_summary
 from voidfarer.shipmods import get_ship_mod
 from voidfarer.storage import StorageManager, resolve_slot_name
+from voidfarer.retention import relic_set_bonuses
 from voidfarer.upgrades import (
     CATALOG_CHASSIS,
     CATALOG_UPGRADES,
@@ -200,7 +201,8 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         if path == "/api/relics":
             with self.engine.lock:
                 relics = [r.to_dict() for r in self.engine.state.ship.relics]
-            self._send_json({"ok": True, "relics": relics})
+                set_bonuses = relic_set_bonuses(self.engine.state.ship.relics)
+            self._send_json({"ok": True, "relics": relics, "set_bonuses": set_bonuses})
             return
 
         if path == "/api/tutorial":
@@ -217,6 +219,10 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/void":
             self._send_json({"ok": True, "void": self.engine.void_status()})
+            return
+
+        if path == "/api/weather":
+            self._send_json({"ok": True, "data": self.engine.check_solar_weather()})
             return
 
         if path == "/api/time":
@@ -450,6 +456,23 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if (
+            self.engine.state.active_customs is not None
+            and path not in (
+                "/api/customs/resolve", "/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save",
+                "/api/settings/decisions", "/api/load", "/api/new-game", "/api/reset",
+                "/api/delete-save",
+            )
+        ):
+            customs = self.engine.state.active_customs
+            self._send_error_json(
+                f"Customs interdiction unresolved: {customs.patrol_vessel} locked scanners on your hold. "
+                "Bribe, jettison, confiscate, or flee before continuing.",
+                status=HTTPStatus.CONFLICT,
+                include_state=True,
+            )
+            return
+
+        if (
             self.engine.state.active_pirate is not None
             and path not in (
                 "/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save",
@@ -596,6 +619,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/crew/station":
+            crew_id = str(body.get("crew_id", ""))
+            station = str(body.get("station", ""))
+            ok, msg = self.engine.assign_crew_station(crew_id, station)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/away/launch":
             mission_type = str(body.get("mission_type", ""))
             raw_crew = body.get("crew_ids")
@@ -609,6 +640,31 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             ok, msg = self.engine.recall_away_mission(str(body.get("mission_id", "")))
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/customs/resolve":
+            action = str((body or {}).get("action", "bribe"))
+            ok, msg = self.engine.resolve_customs(action)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/overhaul":
+            ok, msg = self.engine.overhaul_ship()
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/relics/fuse":
+            rarity = str((body or {}).get("rarity", "")).strip().lower()
+            ok, msg, info = self.engine.fuse_relics(rarity)
+            self.storage.save(self.engine.state)
+            self._send_json({
+                "ok": ok,
+                "message": msg,
+                "relic": info.get("relic"),
+                "state": self.engine.get_status_snapshot(),
+            })
             return
 
         if path == "/api/pirate/resolve":
@@ -727,7 +783,8 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/salvage":
-            ok, msg, report = self.engine.salvage_derelict()
+            strategy = (body or {}).get("strategy", "balanced") if isinstance(body, dict) else "balanced"
+            ok, msg, report = self.engine.salvage_derelict(strategy=strategy)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "report": report, "state": self.engine.get_status_snapshot()})
             return
@@ -1114,8 +1171,16 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/combat":
-            action = str(body.get("action", "fire_lasers"))
+            subsystem = str(body.get("subsystem", ""))
+            action = f"target_{subsystem}" if subsystem else str(body.get("action", "fire_lasers"))
             ok, msg = self.engine.combat_action(action)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/fabricate":
+            munitions_type = str(body.get("munitions_type", body.get("type", "patch_kit")))
+            ok, msg = self.engine.fabricate_munitions(munitions_type)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
@@ -1425,7 +1490,14 @@ def run_server(
             if not time_obj.is_paused and time_obj.speed > 0:
                 if ticker_stop.wait(tick_interval(time_obj.speed)):
                     break
-                engine.tick(1)
+                try:
+                    engine.tick(1)
+                except Exception as exc:
+                    import traceback
+                    print(f"[ERROR] Engine tick failed: {exc}", file=sys.stderr)
+                    traceback.print_exc()
+                    if ticker_stop.wait(1.0):
+                        break
                 if time.monotonic() - last_save >= AUTOSAVE_SECONDS:
                     try:
                         storage.save(engine.state)

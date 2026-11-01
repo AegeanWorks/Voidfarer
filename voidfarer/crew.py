@@ -114,6 +114,14 @@ def calculate_crew_bonuses(crew: Sequence[CrewMember]) -> dict[str, float]:
         if member.injury_ticks > 0:
             skill = max(1.0, skill * 0.5)
         morale = max(0.25, member.morale / 100.0)
+        station_mult = 1.4 if getattr(member, "station", "") and (
+            (member.station == "helm" and member.role == "pilot") or
+            (member.station == "engineering" and member.role == "engineer") or
+            (member.station == "science" and member.role == "scientist") or
+            (member.station == "medical" and member.role == "medic") or
+            (member.station == "tactical" and member.role == "marine")
+        ) else (1.15 if getattr(member, "station", "") else 1.0)
+        skill = skill * station_mult
         if member.role == "pilot":
             bonuses["evasion"] += 0.015 * skill * morale
             bonuses["fuel_efficiency"] *= max(0.80, 1.0 - 0.012 * skill * morale)
