@@ -994,11 +994,34 @@ class TestGraphicsAssets(unittest.TestCase):
             ".subsystem-gauge .gauge-label", ".subsystem-gauge .gauge-val",
             ".crew-station-select", ".station-badge", ".market-trend-badge",
             ".target-info-grid", ".log-line .log-time", ".log-line .log-tag",
+            ".fleet-upkeep-line", ".fleet-stance-label", ".fleet-stance-btn",
+            ".fleet-stance-hint", ".fleet-role",
         )
         for selector in selectors:
             match = re.search(rf"^{re.escape(selector)}[^{{]*\{{[^}}]*font-size:\s*([\d.]+)px", self.css, re.M)
             self.assertIsNotNone(match, f"{selector} must declare a pixel font-size")
             self.assertGreaterEqual(float(match.group(1)), 12.0, f"{selector} is below the 12px floor")
+
+    def test_ability_pip_contrast_meets_wcag_aa(self):
+        # 0.7 alpha blends to >=4.7:1 on both pip backgrounds; lower alphas fail AA.
+        for selector in (".cadet-pip", ".cadet-pip-divider"):
+            block = re.search(rf"^{re.escape(selector)} \{{[^}}]*\}}", self.css, re.M)
+            self.assertIsNotNone(block, f"{selector} must be declared")
+            alpha = re.search(r"color: rgba\(127, 183, 201, ([\d.]+)\)", block.group(0))
+            self.assertIsNotNone(alpha, f"{selector} must use the muted cyan token")
+            self.assertGreaterEqual(float(alpha.group(1)), 0.7,
+                                    f"{selector} contrast falls below WCAG AA")
+
+    def test_ship_labels_and_portrait_initials_use_12px(self):
+        self.assertNotIn('font-size="9"', self.js)
+        self.assertIn('font-size="12"', self.js)
+        self.assertIn("Math.max(12, size * 0.24)", self.js)
+
+    def test_fleet_stance_buttons_meet_the_minimum_target_size(self):
+        match = re.search(r"^\.fleet-stance-btn \{[^}]*min-height:\s*(\d+)px", self.css, re.M)
+        self.assertIsNotNone(match, ".fleet-stance-btn must declare a min-height")
+        self.assertGreaterEqual(int(match.group(1)), 24,
+                                "fleet stance buttons are below the 24px target floor")
 
 
     def test_legacy_theme_tokens_alias_the_console_palette(self):
