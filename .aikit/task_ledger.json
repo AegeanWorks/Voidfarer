@@ -1,55 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-delivery-audit-v10",
+    "task_id": "voidfarer-ui-audit-v11",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1793499700.2360423,
-    "owner": "kilo:delivery",
-    "started_by": "kilo:delivery",
+    "updated_at": 1793523263.1969235,
+    "owner": "kilo:audit",
+    "started_by": "kilo:audit",
     "continuations": [],
-    "completed_at": 1793499700.3792949
+    "completed_at": 1793523263.331188
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-defect-audit-v4",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Verify: claim records ledger, snapshot exposes quests_completed, GameState round trip preserves it; 1,098 tests pass; click-map 0 errors/0 hscroll; project gates 5/5. checklists: passed (test, mechanics, hygiene, guidelines, secrets). Delivery held: uncommitted (no commit authorization)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793491076.7296553,
-      "timestamp_str": "2026-11-01 02:57:56",
-      "agent": "kilo:audit"
-    },
-    {
-      "task_id": "voidfarer-defect-audit-v4",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-defect-audit-v4' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793491076.9053688,
-      "timestamp_str": "2026-11-01 02:57:56",
-      "agent": "kilo:audit"
-    },
-    {
-      "task_id": "voidfarer-defect-audit-v5",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: replace hardcoded and client-computed drydock prices with an engine quote that matches the actual repair/refuel/overhaul charges",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793491886.5888386,
-      "timestamp_str": "2026-11-01 03:11:26",
-      "agent": "kilo:audit",
-      "impact_assessment": {
-        "why": "The service deck showed stale 100/120 CR labels and an overhaul estimate that ignored faction repair discounts and free refuel, so displayed prices could differ from the charge",
-        "benefits": "Live, exact service quotes for repair, refuel and overhaul with correct disable states",
-        "risks": "contract: additive drydock snapshot key; dependency: none; concurrency: read-only quote under the existing RLock; state: no state mutation",
-        "mitigation": "Quote-vs-charge invariant test, static cockpit test, full suite, click-map and five gates"
-      }
-    },
     {
       "task_id": "voidfarer-defect-audit-v5",
       "phase": "in_progress",
@@ -260,6 +222,44 @@
       "timestamp": 1793499700.3792963,
       "timestamp_str": "2026-11-01 05:21:40",
       "agent": "kilo:delivery"
+    },
+    {
+      "task_id": "voidfarer-ui-audit-v11",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: audit every cockpit tab and scenario with ui_audit --check for contrast, tiny text and target size, and fix the confirmed failures",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793523250.7895942,
+      "timestamp_str": "2026-11-01 11:54:10",
+      "agent": "kilo:audit",
+      "impact_assessment": {
+        "why": "Layout-only click-map audits never measured WCAG contrast or target size; ui_audit --check found 10 contrast failures from the ability pips, 9px ship labels, 9.6px portrait initials and 22px fleet stance buttons",
+        "benefits": "AA contrast for the pips, 12px SVG and portrait labels, and 24px+ fleet stance targets across every audited surface",
+        "risks": "contract: none, presentation-only; dependency: none; concurrency: none; state: none",
+        "mitigation": "Browser audit before and after each fix, static regression tests for contrast alpha, 12px floor and 24px targets, full suite and five gates"
+      }
+    },
+    {
+      "task_id": "voidfarer-ui-audit-v11",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Verify: ui_audit --check now reports 0 contrast/tiny/targets for cockpit, all 16 tabs and every scenario on desktop, laptop and short; 1,111 tests pass; ai_play gaps 0; gates 5/5. checklists: passed (test, mechanics, hygiene, guidelines, secrets)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793523263.1969235,
+      "timestamp_str": "2026-11-01 11:54:23",
+      "agent": "kilo:audit"
+    },
+    {
+      "task_id": "voidfarer-ui-audit-v11",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-ui-audit-v11' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793523263.3311894,
+      "timestamp_str": "2026-11-01 11:54:23",
+      "agent": "kilo:audit"
     }
   ]
 }

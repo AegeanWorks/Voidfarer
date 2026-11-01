@@ -9,8 +9,8 @@
 - **Total Python Modules**: `122`
 - **Total Classes**: `307`
 - **Total Top-Level Functions**: `344`
-- **Total Class Methods**: `1799`
-- **Total Source Lines**: `47087`
+- **Total Class Methods**: `1802`
+- **Total Source Lines**: `47110`
 
 ---
 
@@ -327,7 +327,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1856` lines (`81721` bytes)
+**Size**: `1879` lines (`83146` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -476,6 +476,9 @@
   - Method `.test_territory_raster_uses_finer_cells()`
   - Method `.test_badge_dot_colors_are_all_styled()`
   - Method `.test_hud_text_meets_the_twelve_pixel_readability_floor()`
+  - Method `.test_ability_pip_contrast_meets_wcag_aa()`
+  - Method `.test_ship_labels_and_portrait_initials_use_12px()`
+  - Method `.test_fleet_stance_buttons_meet_the_minimum_target_size()`
   - Method `.test_legacy_theme_tokens_alias_the_console_palette()`
   - Method `.test_core_palette_is_declared_once()`
 - `class TestDrydockServiceQuotes` - *The service deck must quote the engine's live prices, not a client estimate.*

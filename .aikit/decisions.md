@@ -1630,6 +1630,17 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   3. Add `RELIC_SET_THRESHOLDS`, `relic_count_by_rarity` and `relic_completed_sets` to `retention`, route `relic_set_bonuses`, the codex `relic_sets` metric and the CLI display through them, drop the redundant branch, and pin the thresholds with a test.
 - **Consequences**: A queued research project can no longer be lost to a prerequisite race, REST callers get an explicit salvage refusal, and relic resonance has a single source of truth. The suite grows to 1,108 tests, `ai_play --steps 180` still reports 38/51 actions with zero gaps, every browser scenario and tab audit is clean, and the five project gates pass. The pending batch and these fixes are committed and pushed; the cockpit UI human-review evidence gate is left open because no human visual review was performed.
 
+### ADR-139: Cockpit Contrast, SVG Labels and Fleet Control Ergonomics
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The project's real-browser audit reports tiny text, small targets and WCAG contrast failures that the layout-only click-map never measured. `ui_audit --check` found ten contrast failures on every viewport from the cadet ability pips (divider 1.77:1, locked numerals 2.99:1), plus sub-12px SVG ship schematic labels (9px), crew portrait initials (9.6px), the fleet upkeep line (11px), and fleet stance buttons only 22px tall with 10px labels.
+- **Decision**:
+  1. Raise the `.cadet-pip` and `.cadet-pip-divider` muted-cyan alpha from 0.3/0.5 to 0.7, which blends to at least 4.7:1 on their backgrounds, and pin both with a WCAG-AA test.
+  2. Render the five ship schematic labels and every portrait initial at 12px, and extend the 12px floor test to the fleet upkeep, stance label/button/hint and role toggle.
+  3. Give the fleet stance buttons a 26px minimum height and 12px labels, and pin the 24px target floor with a test.
+- **Consequences**: `ui_audit --check` now reports 0 contrast, 0 tiny text and 0 target violations across desktop, laptop and short viewports for the cockpit, all 16 tabs and every scenario it covers (menu, settings, character, event, combat, target). The suite grows to 1,111 tests, `ai_play` still reports zero gaps, and all five project gates pass.
+
+
 
 
 
