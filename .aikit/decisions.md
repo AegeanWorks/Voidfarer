@@ -1653,6 +1653,19 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   6. Add telemetry category tag styles (`.tag-combat`, `.tag-market`, `.tag-transit`, `.tag-hazard`, `.tag-outpost`, `.tag-data`, `.tag-warn`) in `style.css` using core palette tokens.
 - **Consequences**: Visual depth, spatial orientation, and combat kinetic immersion are significantly elevated while preserving 60 FPS canvas performance, 12px readability floors, and WCAG-AA contrast compliance. Unit tests cover all newly wired visual assets and styles across 1,111+ tests, `ai_play` verifies zero action gaps, and 5/5 strict project gates pass.
 
+### ADR-141: Radar Pan Physics, Background Parallax, Range Scale Indicator, and Smooth Camera Focus
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Panning the radar canvas previously abruptly stopped with zero momentum, left the deep cosmic starfield completely static (causing a flat visual feel), lacked spatial range awareness, and resetting the view abruptly snapped to the system star rather than smoothly centering on the player's flagship.
+- **Decision**:
+  1. Implement drag velocity tracking (`panVx`, `panVy`) and exponential decay momentum physics on pointer release (`panVx *= 0.90`).
+  2. Implement tiled multi-layered cosmic starfield parallax in `drawRadar` (`bgParallax = 0.08`), giving physical depth to deep-space nebulae and star clusters during panning.
+  3. Implement smooth camera focus interpolation (`targetPanX`, `targetPanY` with lerp damping) on double-click, hotkey `C`, and the `btnResetView` radar button, which now centers smoothly on the player flagship on first click and system center on second click.
+  4. Render an Astronomical Range Scale Bar in the lower-left corner of the visible radar viewport, dynamically calculating AU-to-pixel ratios.
+  5. Render off-screen navigation reticle chevrons on the radar viewport boundary when the selected target or waypoint is panned outside the screen.
+- **Consequences**: Navigation feel is fluid, responsive, and tactile. All 1,111 tests pass, `ai_play` verifies zero action gaps, and 5/5 strict project gates pass.
+
+
 
 
 

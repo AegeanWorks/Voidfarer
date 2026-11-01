@@ -206,6 +206,11 @@ class StellarDepthAndOfficerTest(unittest.TestCase):
         self.assertIn("syncMarketCategoryFilters", app_js)
         self.assertIn(".log-line .log-tag.tag-combat", style_css)
         self.assertIn(".log-line .log-tag.tag-transit", style_css)
+        self.assertIn("RANGE SCALE", app_js)
+        self.assertIn("panVx", app_js)
+        self.assertIn("targetPanX", app_js)
+        self.assertIn("bgParallax", app_js)
+        self.assertIn("handleCanvasDblClick", app_js)
 
 
 if __name__ == "__main__":

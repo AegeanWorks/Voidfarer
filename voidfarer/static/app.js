@@ -444,6 +444,12 @@ class CockpitApp {
         this.zoom = 1.0;
         this.panX = 0;
         this.panY = 0;
+        this.panVx = 0;
+        this.panVy = 0;
+        this.targetPanX = null;
+        this.targetPanY = null;
+        this.lastDragPoint = null;
+        this.lastDragTime = 0;
         this.isDragging = false;
         this.dragStartX = 0;
         this.dragStartY = 0;
@@ -873,9 +879,22 @@ class CockpitApp {
             this.sound.playBeep(900, 0.04);
         });
         document.getElementById("btnResetView").addEventListener("click", () => {
-            this.zoom = 1.0;
-            this.panX = 0;
-            this.panY = 0;
+            const { x: cx, y: cy } = this.mapCenter();
+            if (this.lastShipPosition) {
+                const shipOffset = Math.hypot(this.lastShipPosition.x - cx, this.lastShipPosition.y - cy);
+                if (shipOffset < 8 && (Math.abs(this.panX) > 2 || Math.abs(this.panY) > 2)) {
+                    this.targetPanX = 0;
+                    this.targetPanY = 0;
+                } else {
+                    this.targetPanX = -(this.lastShipPosition.x - cx - this.panX);
+                    this.targetPanY = -(this.lastShipPosition.y - cy - this.panY);
+                }
+            } else {
+                this.targetPanX = 0;
+                this.targetPanY = 0;
+            }
+            this.panVx = 0;
+            this.panVy = 0;
             this.sound.playBeep(1000, 0.05);
         });
 
@@ -1214,21 +1233,42 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.suppressClick = false;
             this.dragStartX = point.x - this.panX;
             this.dragStartY = point.y - this.panY;
+            this.lastDragPoint = point;
+            this.lastDragTime = performance.now();
+            this.panVx = 0;
+            this.panVy = 0;
+            this.targetPanX = null;
+            this.targetPanY = null;
         });
 
         window.addEventListener("mouseup", () => {
             if (this.dragMoved) this.suppressClick = true;
             this.isDragging = false;
+            const speed = Math.hypot(this.panVx, this.panVy);
+            if (speed > 40) {
+                this.panVx = (this.panVx / speed) * 40;
+                this.panVy = (this.panVy / speed) * 40;
+            }
         });
 
         this.canvas.addEventListener("mousemove", (e) => {
             const point = this.pointerToCanvas(e);
             if (this.isDragging) {
+                const now = performance.now();
+                const dt = Math.max(1, now - (this.lastDragTime || now));
                 const nextX = point.x - this.dragStartX;
                 const nextY = point.y - this.dragStartY;
                 if (Math.hypot(nextX - this.panX, nextY - this.panY) > 3) {
                     this.dragMoved = true;
                 }
+                if (this.lastDragPoint) {
+                    const sampleVx = (point.x - this.lastDragPoint.x) / (dt / 16.67);
+                    const sampleVy = (point.y - this.lastDragPoint.y) / (dt / 16.67);
+                    this.panVx = this.panVx * 0.35 + sampleVx * 0.65;
+                    this.panVy = this.panVy * 0.35 + sampleVy * 0.65;
+                }
+                this.lastDragPoint = point;
+                this.lastDragTime = now;
                 this.panX = nextX;
                 this.panY = nextY;
             } else {
@@ -1243,6 +1283,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }, { passive: false });
 
         this.canvas.addEventListener("click", (e) => this.handleCanvasClick(e));
+        this.canvas.addEventListener("dblclick", (e) => this.handleCanvasDblClick(e));
 
         // Clear Log
         document.getElementById("clearLogBtn").addEventListener("click", () => {
@@ -1325,6 +1366,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else if (hotkey === "l") {
                 e.preventDefault();
                 this.toggleLogPanel();
+            } else if (hotkey === "c") {
+                e.preventDefault();
+                document.getElementById("btnResetView")?.click();
             } else if (e.shiftKey && /^Digit[1-6]$/.test(e.code)) {
                 e.preventDefault();
                 this.useAbilityQuick(ABILITY_ORDER[Number(e.code.slice(-1)) - 1]);
@@ -5951,13 +5995,43 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const ctx = this.ctx;
         const w = this.viewW;
         const h = this.viewH;
+
+        // Pan physics & smooth camera focus interpolation
+        if (this.targetPanX !== null && this.targetPanY !== null) {
+            this.panX += (this.targetPanX - this.panX) * 0.14;
+            this.panY += (this.targetPanY - this.panY) * 0.14;
+            if (Math.hypot(this.targetPanX - this.panX, this.targetPanY - this.panY) < 0.6) {
+                this.panX = this.targetPanX;
+                this.panY = this.targetPanY;
+                this.targetPanX = null;
+                this.targetPanY = null;
+            }
+        } else if (!this.isDragging && (Math.abs(this.panVx) > 0.08 || Math.abs(this.panVy) > 0.08)) {
+            this.panX += this.panVx;
+            this.panY += this.panVy;
+            this.panVx *= 0.90;
+            this.panVy *= 0.90;
+        } else if (!this.isDragging) {
+            this.panVx = 0;
+            this.panVy = 0;
+        }
+
         this.particles?.update();
         ctx.setTransform(this.dpr || 1, 0, 0, this.dpr || 1, 0, 0);
         ctx.clearRect(0, 0, w, h);
         this.ensureRadarBackdrop(w, h);
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = "source-over";
-        ctx.drawImage(this.radarBackdrop, 0, 0, w, h);
+
+        // Parallax deep-space backdrop shift (factor 0.08)
+        const bgParallax = 0.08;
+        const offX = ((this.panX * bgParallax) % w + w) % w - w;
+        const offY = ((this.panY * bgParallax) % h + h) % h - h;
+        for (let dx = offX; dx < w; dx += w) {
+            for (let dy = offY; dy < h; dy += h) {
+                ctx.drawImage(this.radarBackdrop, dx, dy, w, h);
+            }
+        }
 
         const { x: cx, y: cy } = this.mapCenter();
 
@@ -6534,6 +6608,70 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.drawSystemTraffic(ctx, cx, cy, auScale, now);
         this.drawPointSelection(ctx, cx, cy, auScale, ship);
         this.drawTravelAnimation(ctx, cx, cy, auScale);
+
+        // Offscreen Navigation Reticle for Selected Target
+        if (this.selectedTarget && this.mapRect) {
+            const tX = this.selectedType === "point"
+                ? (cx + Math.cos(this.selectedTarget.angle) * (this.selectedTarget.au * auScale))
+                : (cx + Math.cos(this.selectedTarget.current_angle || 0) * (this.selectedTarget.orbit_radius * auScale));
+            const tY = this.selectedType === "point"
+                ? (cy + Math.sin(this.selectedTarget.angle) * (this.selectedTarget.au * auScale))
+                : (cy + Math.sin(this.selectedTarget.current_angle || 0) * (this.selectedTarget.orbit_radius * auScale));
+            const mr = this.mapRect;
+            const margin = 28;
+            const isOffscreen = tX < mr.x + margin || tX > mr.x + mr.w - margin || tY < mr.y + margin || tY > mr.y + mr.h - margin;
+            if (isOffscreen) {
+                const angle = Math.atan2(tY - cy, tX - cx);
+                const edgeX = Math.max(mr.x + margin, Math.min(mr.x + mr.w - margin, cx + Math.cos(angle) * (mr.w * 0.44)));
+                const edgeY = Math.max(mr.y + margin, Math.min(mr.y + mr.h - margin, cy + Math.sin(angle) * (mr.h * 0.44)));
+                ctx.save();
+                ctx.translate(edgeX, edgeY);
+                ctx.rotate(angle);
+                ctx.fillStyle = "#c9a35a";
+                ctx.beginPath();
+                ctx.moveTo(10, 0);
+                ctx.lineTo(-6, -6);
+                ctx.lineTo(-3, 0);
+                ctx.lineTo(-6, 6);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
+                ctx.fillStyle = "rgba(201, 163, 90, 0.9)";
+                const isRight = edgeX > mr.x + mr.w / 2;
+                ctx.textAlign = isRight ? "right" : "left";
+                const labelX = isRight ? edgeX - 12 : edgeX + 12;
+                const distAu = Math.hypot(tX - cx, tY - cy) / Math.max(1, auScale);
+                ctx.fillText(`${this.selectedTarget.name || "WAYPOINT"} (${distAu.toFixed(1)} AU)`, labelX, edgeY + 4);
+                ctx.restore();
+            }
+        }
+
+        // Astronomical Range Scale Bar in lower-left corner of visible radar viewport
+        if (this.mapRect) {
+            const scaleAu = auScale > 180 ? 0.5 : (auScale > 60 ? 1.0 : (auScale > 20 ? 5.0 : 10.0));
+            const scalePx = scaleAu * auScale;
+            if (scalePx > 20 && scalePx < this.mapRect.w * 0.4) {
+                const padX = this.mapRect.x + 22;
+                const padY = this.mapRect.y + this.mapRect.h - 18;
+                ctx.save();
+                ctx.strokeStyle = "rgba(127, 183, 201, 0.45)";
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(padX, padY - 4);
+                ctx.lineTo(padX, padY);
+                ctx.lineTo(padX + scalePx, padY);
+                ctx.lineTo(padX + scalePx, padY - 4);
+                ctx.stroke();
+                ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
+                ctx.fillStyle = "rgba(127, 183, 201, 0.65)";
+                ctx.textAlign = "center";
+                ctx.fillText(`RANGE SCALE [ ${scaleAu < 1 ? scaleAu.toFixed(1) : scaleAu.toFixed(0)} AU ]`, padX + scalePx * 0.5, padY - 6);
+                ctx.restore();
+            }
+        }
     }
 
     // Display size is logarithmic in real radius: an Earth ~14px, a gas giant ~22px at 1x,
@@ -7355,6 +7493,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.selectedType = null;
             this.updateTargetCard();
         }
+    }
+
+    handleCanvasDblClick(e) {
+        const point = this.pointerToCanvas(e);
+        const { x: cx, y: cy } = this.mapCenter();
+        const baseCenterX = cx - this.panX;
+        const baseCenterY = cy - this.panY;
+        this.targetPanX = -(point.x - baseCenterX);
+        this.targetPanY = -(point.y - baseCenterY);
+        this.panVx = 0;
+        this.panVy = 0;
+        this.sound?.playBeep?.(1200, 0.04);
     }
     // Outposts the orbited world can host, each with its cost and yield.
     renderOutpostBuild() {
