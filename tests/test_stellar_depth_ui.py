@@ -211,6 +211,12 @@ class StellarDepthAndOfficerTest(unittest.TestCase):
         self.assertIn("targetPanX", app_js)
         self.assertIn("bgParallax", app_js)
         self.assertIn("handleCanvasDblClick", app_js)
+        self.assertIn("playDock()", app_js)
+        self.assertIn("playWarp()", app_js)
+        self.assertIn("playFlak()", app_js)
+        self.assertIn(".character-abilities .ability-row", style_css)
+        self.assertIn(".character-abilities .ability-row.ready", style_css)
+        self.assertIn("solar array", celestial_js)
 
 
 if __name__ == "__main__":

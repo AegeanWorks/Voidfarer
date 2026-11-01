@@ -471,6 +471,25 @@ class CelestialRenderer {
         const color = body.color || "#00f0ff";
         ctx.lineCap = "round";
         if (type === "orbital_station") {
+            // Horizontal photovoltaic solar array truss
+            ctx.strokeStyle = color;
+            ctx.lineWidth = Math.max(1, R * 0.08);
+            ctx.beginPath();
+            ctx.moveTo(-R * 1.45, 0); ctx.lineTo(-R * 0.85, 0);
+            ctx.moveTo(R * 0.85, 0); ctx.lineTo(R * 1.45, 0);
+            ctx.stroke();
+            ctx.fillStyle = color;
+            for (const dir of [-1, 1]) {
+                for (let k = 0; k < 3; k++) {
+                    const px = dir * (R * 0.98 + k * R * 0.15);
+                    ctx.save();
+                    ctx.globalAlpha = 0.72;
+                    ctx.fillRect(px - R * 0.05, -R * 0.24, R * 0.10, R * 0.48);
+                    ctx.restore();
+                }
+            }
+
+            // Torus hull ring and spokes
             ctx.strokeStyle = color;
             ctx.lineWidth = Math.max(1, R * 0.18);
             ctx.beginPath(); ctx.arc(0, 0, R * 0.85, 0, Math.PI * 2); ctx.stroke();
@@ -479,8 +498,24 @@ class CelestialRenderer {
                 const a = i * Math.PI / 2;
                 ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * R * 0.85, Math.sin(a) * R * 0.85); ctx.stroke();
             }
+
+            // Docking clearance strobe beacons
+            const strobeLit = Math.floor(Date.now() / 320) % 2 === 0;
+            for (let i = 0; i < 4; i++) {
+                const a = i * Math.PI / 2;
+                ctx.save();
+                ctx.fillStyle = strobeLit ? color : (String.fromCharCode(35) + "ece4d4");
+                ctx.beginPath();
+                ctx.arc(Math.cos(a) * R * 0.85, Math.sin(a) * R * 0.85, Math.max(1.4, R * 0.09), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Central command hub and observation spire
             ctx.fillStyle = "#e9f7ff";
             ctx.beginPath(); ctx.arc(0, 0, R * 0.25, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(0, 0, R * 0.12, 0, Math.PI * 2); ctx.fill();
         } else if (type === "research_outpost") {
             ctx.fillStyle = color;
             ctx.fillRect(-R * 0.35, -R * 0.35, R * 0.7, R * 0.7);

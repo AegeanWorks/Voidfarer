@@ -253,6 +253,74 @@ class SoundController {
         } catch (e) {}
     }
 
+    playDock() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(120, now);
+            osc.frequency.exponentialRampToValueAtTime(55, now + 0.22);
+            gain.gain.setValueAtTime(0.24, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+            osc.connect(gain);
+            gain.connect(this.master);
+            osc.start(now);
+            osc.stop(now + 0.28);
+            const osc2 = this.ctx.createOscillator();
+            const gain2 = this.ctx.createGain();
+            osc2.type = "triangle";
+            osc2.frequency.setValueAtTime(880, now + 0.08);
+            osc2.frequency.setValueAtTime(1320, now + 0.16);
+            gain2.gain.setValueAtTime(0.09, now + 0.08);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc2.connect(gain2);
+            gain2.connect(this.master);
+            osc2.start(now + 0.08);
+            osc2.stop(now + 0.38);
+        } catch (e) {}
+    }
+
+    playWarp() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(60, now);
+            osc.frequency.exponentialRampToValueAtTime(320, now + 0.18);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.42);
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+            osc.connect(gain);
+            gain.connect(this.master);
+            osc.start(now);
+            osc.stop(now + 0.48);
+        } catch (e) {}
+    }
+
+    playFlak() {
+        if (!this.enabled || !this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            [0, 0.07].forEach((delay) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = "square";
+                osc.frequency.setValueAtTime(280, now + delay);
+                osc.frequency.exponentialRampToValueAtTime(45, now + delay + 0.12);
+                gain.gain.setValueAtTime(0.18, now + delay);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.14);
+                osc.connect(gain);
+                gain.connect(this.master);
+                osc.start(now + delay);
+                osc.stop(now + delay + 0.16);
+            });
+        } catch (e) {}
+    }
+
     playLevelUp() {
         if (!this.enabled || !this.ctx) return;
         try {
@@ -3209,7 +3277,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const contextBlocked = (id === "battle_focus" && !this.state.active_combat)
                 || (id === "emergency_repair" && (Number(shipState.hull || 0) <= 0 || Number(shipState.hull || 0) >= Number(shipState.max_hull || 1)))
                 || (id === "charm_offensive" && !charmTarget);
-            return `<div class="ability-row ${isUnlocked ? "" : "locked"}">
+            const isReady = isUnlocked && cd === 0 && !contextBlocked;
+            return `<div class="ability-row ${isUnlocked ? (isReady ? "ready" : "") : "locked"}">
                 <span><strong>${this.escapeHtml(info.name)}</strong><br><small>${this.escapeHtml(info.description)}</small></span>
                 <span class="cooldown">${isUnlocked ? (cd > 0 ? `CD ${cd}` : contextBlocked ? "IDLE" : "READY") : "LOCKED"}</span>
                 <button class="btn-hud btn-amber" data-use-ability="${this.escapeHtml(id)}" data-ability-faction="${this.escapeHtml(charmTarget || "")}" ${!isUnlocked || cd > 0 || contextBlocked ? "disabled" : ""}>USE</button>
@@ -4690,6 +4759,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else {
                 this.sound.playLaser();
             }
+        } else if (action === "point_defense") {
+            this.sound.playFlak();
         } else {
             this.sound.playBeep(600);
         }
@@ -8261,6 +8332,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     async handleTravelAction(mode = "sublight") {
         if (!this.selectedTarget) return;
+        if (mode === "quantum") {
+            this.sound?.playWarp?.();
+        } else {
+            this.sound?.playJump?.();
+        }
         if (this.selectedType === "point") {
             const fromId = this.state?.ship?.orbiting_body_id || null;
             const res = await this.postAction("/api/travel/point", {
@@ -8528,6 +8604,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (anim.mode === "quantum") {
                 this.particles?.quantumFlash?.(tx, ty, "#7fb7c9");
             }
+            this.sound?.playDock?.();
             this.travelAnimation = null;
         }
     }

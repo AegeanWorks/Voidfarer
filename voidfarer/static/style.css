@@ -3407,6 +3407,14 @@ body.void-transit::after {
 .research-projects .research-row > span:nth-child(2) { text-align: right; white-space: nowrap; color: var(--console-muted); }
 .research-projects .research-row > button { justify-self: end; min-width: 62px; }
 .research-projects .research-row small { display: block; color: var(--console-muted); font-size: 12px; overflow-wrap: anywhere; }
+/* Fixed columns keep "USE" and cooldown state on one vertical line, matching research ergonomics. */
+.character-abilities .ability-row { display: grid; grid-template-columns: minmax(0, 1fr) 58px 54px; align-items: center; }
+.character-abilities .ability-row > span:first-child { min-width: 0; }
+.character-abilities .ability-row > span.cooldown { text-align: center; white-space: nowrap; font-weight: 700; font-size: 12px; }
+.character-abilities .ability-row > button { justify-self: end; min-width: 50px; }
+.character-abilities .ability-row small { display: block; color: var(--console-muted); font-size: 12px; overflow-wrap: anywhere; }
+.character-abilities .ability-row.ready { border-color: rgba(143, 191, 159, .45); }
+.character-abilities .ability-row.ready .cooldown { color: var(--console-green); text-shadow: 0 0 6px rgba(143, 191, 159, .4); }
 .empire-section { margin-bottom: 14px; }
 .diplomacy-row .leader-behavior { color: var(--neon-amber); font-size: .6rem; }
 .diplomacy-row.eliminated { opacity: .4; text-decoration: line-through; }

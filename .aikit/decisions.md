@@ -1665,6 +1665,21 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   5. Render off-screen navigation reticle chevrons on the radar viewport boundary when the selected target or waypoint is panned outside the screen.
 - **Consequences**: Navigation feel is fluid, responsive, and tactile. All 1,111 tests pass, `ai_play` verifies zero action gaps, and 5/5 strict project gates pass.
 
+### ADR-142: Orbital Station Visual Architecture, Synthesized Spatial Audio, and Ability Bay Grid Ergonomics
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Orbital stations previously rendered as basic line rings without docking trusses or clearance strobes, tactical maneuvers (PDC flak, quantum warp thrum, pneumatic airlock docking) lacked dedicated sound synthesis feedback in `SoundController`, and character abilities suffered from variable description length causing the cooldown indicator and USE button to drift horizontally.
+- **Decision**:
+  1. Extend `SoundController` in `voidfarer/static/app.js` with pure Web Audio API oscillators:
+     - `playDock()`: Low pneumatic airlock seal sine sweep + high dual-tone chime.
+     - `playWarp()`: Sub-bass sawtooth implosion thrum with low-frequency sweep.
+     - `playFlak()`: Dual concussive square-wave counter-battery burst.
+  2. Wire `playDock()` to transit arrival, `playWarp()` to quantum travel activation, and `playFlak()` to Point Defense Cannon combat activation.
+  3. Add photovoltaic solar array wings along the horizontal truss booms and perimeter docking clearance strobe beacons to orbital stations in `celestial.js`.
+  4. Refactor `.character-abilities .ability-row` in `style.css` to a fixed 3-column grid (`minmax(0, 1fr) 58px 54px`), aligning cooldown status and action buttons regardless of description wrap, and highlight ready abilities with `.ability-row.ready` and `var(--console-green)`.
+- **Consequences**: Airlock docking, warp transit, and PDC flak bursts provide visceral audio feedback; orbital stations have a distinctive silhouette with photovoltaic wings; ability cards stay neatly aligned with clear visual readiness cues. All unit tests pass, Playwright browser audit records 0 errors, 0 horizontal scrolls, and 0 tiny elements, and all 5 project quality gates pass.
+
+
 
 
 
