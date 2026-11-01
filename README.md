@@ -118,10 +118,12 @@ voidfarer/
 │       ├── style.css     <- sci-fi glassmorphism design system
 │       ├── app.js        <- radar math, Web Audio synth & REST link
 │       ├── celestial.js  <- procedural planet, station & ship models
-│       ├── particles.js  <- pooled FX layer; surfacemap.js <- landing tile map
-│       ├── cursor-default.svg <- themed default cockpit cursor
-│       ├── cursor-pointer.svg <- themed pointer cursor for controls
-│       └── cursor-crosshair.svg <- themed radar crosshair cursor
+│       ├── particles.js  <- pooled warp, scan & impact FX layer
+│       ├── surfacemap.js <- seeded landing-site biome tile map
+│       ├── favicon.svg   <- browser tab glyph
+│       ├── cursor-default.svg <- themed cursor
+│       ├── cursor-pointer.svg <- pointer cursor
+│       └── cursor-crosshair.svg <- radar crosshair
 ├── tools/                <- developer proofs
 │   ├── __init__.py       <- package marker
 │   ├── ui_audit.py       <- layout metrics
@@ -375,7 +377,6 @@ gaps**: every POST route in `/api/agent/actions` is either exercised or listed i
 
 The click-map enumerates every rendered control via `window.voidfarerClickMap()` and fails
 on a missing or duplicate handle (desktop: 162 controls, 0 missing, 0 duplicates).
-Scenario and tab audits (16 tabs) report 0 errors, hscroll and tiny text.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
