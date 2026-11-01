@@ -6201,12 +6201,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         // Target acquisition crosshair pip & telemetry readouts
         ctx.fillStyle = "rgba(255, 120, 100, 0.9)";
         ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 2, 0, Math.PI * 2); ctx.fill();
-        ctx.font = "8px 'Cascadia Mono', Consolas, monospace";
+        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.textAlign = "center";
         ctx.fillStyle = "rgba(201, 107, 90, 0.85)";
-        ctx.fillText("LOCK: TGT-01", enemy.x, enemy.y - boxS - 4);
+        ctx.fillText("LOCK: TGT-01", enemy.x, enemy.y - boxS - 6);
         ctx.fillStyle = "rgba(127, 183, 201, 0.75)";
-        ctx.fillText("DIST: 1.4M KM", enemy.x, enemy.y + boxS + 11);
+        ctx.fillText("DIST: 1.4M KM", enemy.x, enemy.y + boxS + 14);
         ctx.restore();
         ctx.restore();
         this.combatFx?.trail(player.x - 12, player.y, 0, "#8fd8ff", 0.8);
@@ -6297,12 +6297,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.combatFx?.draw(ctx);
         this.celestial?.drawShip(ctx, player.x, player.y, 0, Math.max(12, cssW * 0.035), "#8fbf9f", this.shipVariant());
         this.celestial?.drawShip(ctx, enemy.x, enemy.y, Math.PI, Math.max(14, cssW * 0.04), "#e07a66", this.enemyVariant());
-        ctx.font = "10px 'Cascadia Mono', Consolas, monospace";
+        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.textAlign = "center";
         ctx.fillStyle = "#8fbf9f";
-        ctx.fillText("VF-FLAGSHIP", player.x, cssH - 7);
+        ctx.fillText("VF-FLAGSHIP", player.x, cssH - 8);
         ctx.fillStyle = "#e07a66";
-        ctx.fillText(String(this.state.active_combat.enemy_name || "HOSTILE").toUpperCase(), enemy.x, cssH - 7);
+        ctx.fillText(String(this.state.active_combat.enemy_name || "HOSTILE").toUpperCase(), enemy.x, cssH - 8);
         const vignette = ctx.createRadialGradient(cssW / 2, cssH / 2, cssH * 0.2, cssW / 2, cssH / 2, cssW * 0.7);
         vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
         vignette.addColorStop(1, "rgba(2, 5, 12, 0.55)");

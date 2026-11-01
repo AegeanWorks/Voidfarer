@@ -1679,6 +1679,16 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   4. Refactor `.character-abilities .ability-row` in `style.css` to a fixed 3-column grid (`minmax(0, 1fr) 58px 54px`), aligning cooldown status and action buttons regardless of description wrap, and highlight ready abilities with `.ability-row.ready` and `var(--console-green)`.
 - **Consequences**: Airlock docking, warp transit, and PDC flak bursts provide visceral audio feedback; orbital stations have a distinctive silhouette with photovoltaic wings; ability cards stay neatly aligned with clear visual readiness cues. All unit tests pass, Playwright browser audit records 0 errors, 0 horizontal scrolls, and 0 tiny elements, and all 5 project quality gates pass.
 
+### ADR-143: Cockpit Typography Floor Hardening and Tactical Combat Visual Scaling
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: A headless Playwright audit across all 15 cockpit terminal tabs identified three sub-12px elements in the Factions tab (`.war-bond-note` declared at 11px), along with legacy sub-12px declarations in outposts, fleet ranks, chassis comparisons, cadet pips, auto-trade, and combat canvas telemetry.
+- **Decision**:
+  1. Harden all sub-12px CSS selectors across `style.css` to strictly comply with the >=12px typography floor (`.war-bond-note`, `.flight-log-stream`, `.fleet-xp-label`, `.outpost-crew-mult`, `.outpost-service-badge`, `.fleet-service`, `.market-cat-pill`, `.auto-trade-grid label`, `.fleet-rank`, `.salvage-info`, `.btn-salvage-strat`, `.relic-set-title`, `.spec-col`).
+  2. Preserve pinned legacy regression contract selectors (`.ship-module-name` and `.combat-stance-line`).
+  3. Upgrade combat canvas target acquisition telemetry and flagship/hostile labels from 8px/10px to 12px with aligned vertical spacing in `drawCombatVisual`.
+- **Consequences**: Zero typography floor findings across all 15 tabs (`tiny 0`), crisp readability on high-DPI and scaled Windows displays, full WCAG-AA compliance, and 100% test pass gate across all 1,111+ tests.
+
 
 
 

@@ -1995,7 +1995,7 @@ body.cockpit-theme {
 
 .relic-set-title {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.08em;
     color: var(--console-gold);
     border-bottom: 1px solid var(--border-subtle);
@@ -2008,7 +2008,7 @@ body.cockpit-theme {
     align-items: center;
     gap: 8px;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--console-muted);
 }
 
@@ -2033,7 +2033,7 @@ body.cockpit-theme {
 
 .relic-set-bonuses {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     color: var(--console-gold-bright);
     margin: 4px 0 0;
     padding-top: 4px;
@@ -2053,7 +2053,7 @@ body.cockpit-theme {
 .relic-fuse-label {
     flex: 0 0 100%;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.06em;
     color: var(--console-muted);
 }
@@ -2064,7 +2064,7 @@ body.cockpit-theme {
     min-height: 24px;
     padding: 2px 6px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.02em;
     color: var(--console-ivory);
     background: rgba(201, 163, 90, 0.08);
@@ -2206,7 +2206,7 @@ body.cockpit-theme {
     gap: 4px;
     margin-top: 3px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
 }
 
@@ -4007,10 +4007,10 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 
 /* Shipyard Chassis Comparison Hologram */
 .comparison-matrix { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0; padding: 6px 8px; border: 1px solid rgba(127, 183, 201, 0.2); background: rgba(127, 183, 201, 0.04); }
-.spec-col { display: flex; flex-direction: column; align-items: center; font-family: var(--font-mono); font-size: 11px; }
-.spec-col .spec-label { font-size: 9px; color: var(--console-muted); letter-spacing: 0.06em; }
+.spec-col { display: flex; flex-direction: column; align-items: center; font-family: var(--font-mono); font-size: 12px; }
+.spec-col .spec-label { font-size: 12px; color: var(--console-muted); letter-spacing: 0.06em; }
 .spec-col .spec-val { color: var(--console-ivory); font-size: 13px; font-weight: 700; margin: 1px 0; }
-.delta-stat { font-size: 10px; font-weight: 600; }
+.delta-stat { font-size: 12px; font-weight: 600; }
 .delta-stat.pos { color: var(--console-green); }
 .delta-stat.neg { color: var(--console-red); }
 .delta-stat.eq { color: var(--console-muted); }
@@ -4909,7 +4909,7 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 .skill-quick-chip.is-cooldown:disabled { opacity: 0.82; }
 .skill-quick-chip.is-ready .skill-quick-rank { color: var(--neon-cyan); }
 .skill-quick-chip.is-cooldown .skill-quick-rank { color: var(--neon-amber); }
-.skill-train-btn { margin-top: 6px; align-self: flex-start; font-size: 11px; padding: 3px 8px; }
+.skill-train-btn { margin-top: 6px; align-self: flex-start; font-size: 12px; padding: 3px 8px; }
 
 .skill-quick-hotkey {
     font-family: var(--font-mono);
@@ -7052,7 +7052,7 @@ input[type="text"], input[type="number"], select, textarea { min-height: 30px; b
 }
 .flight-log-stream {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.45;
     background: rgba(4, 8, 17, 0.65);
     border: 1px solid rgba(201, 163, 90, 0.15);
@@ -8369,7 +8369,7 @@ body.cockpit-theme .panel-center {
     background: transparent;
     color: var(--console-cyan);
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.05em;
     cursor: pointer;
@@ -8982,7 +8982,7 @@ body.cockpit-theme .nav-panel > .panel-header {
 .trade-automation { margin: 4px 0 8px; padding: 7px 9px; border: 1px solid rgba(143, 191, 159, 0.28); border-left: 2px solid rgba(143, 191, 159, 0.7); background: rgba(5, 11, 22, 0.62); }
 .auto-trade-header { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; color: var(--console-green); font-family: var(--font-display); font-size: 12px; letter-spacing: 0.06em; }
 .auto-trade-grid { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, minmax(52px, 0.45fr)) auto auto; gap: 5px; align-items: end; margin-top: 5px; }
-.auto-trade-grid label { display: flex; flex-direction: column; gap: 2px; color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.auto-trade-grid label { display: flex; flex-direction: column; gap: 2px; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
 .auto-trade-grid select, .auto-trade-grid input { width: 100%; min-width: 0; height: 26px; font-size: 12px; }
 .auto-trade-grid .btn-hud { min-height: 26px; padding: 2px 7px; font-size: 12px; }
 .auto-trade-note { margin: 4px 0 0; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
@@ -9007,7 +9007,7 @@ body.cockpit-theme .nav-panel > .panel-header {
     padding: 0 4px;
     border: 1px solid rgba(111, 195, 215, 0.35);
     color: var(--console-cyan);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.05em;
 }
 .fleet-rank.rank-regular { border-color: rgba(143, 191, 159, 0.5); color: var(--console-green); }
@@ -9022,17 +9022,17 @@ body.cockpit-theme .nav-panel > .panel-header {
     background: rgba(111, 195, 215, 0.08);
 }
 .fleet-xp-fill { display: block; height: 100%; background: linear-gradient(90deg, #6fc3d7, var(--console-gold)); }
-.fleet-xp-label { flex: 0 0 auto; color: var(--console-muted); font-size: 11px; }
+.fleet-xp-label { flex: 0 0 auto; color: var(--console-muted); font-size: 12px; }
 
 /* Outpost specialists: crew selection, output multiplier and recall chips. */
 .outpost-crew-bar { display: flex; gap: 5px; align-items: center; margin-top: 3px; }
-.outpost-crew-mult { flex: 0 0 auto; color: var(--console-cyan); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+.outpost-crew-mult { flex: 0 0 auto; color: var(--console-cyan); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
 .outpost-crew-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
 .outpost-crew-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }
 .outpost-crew-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
-.outpost-crew-chip { display: inline-flex; align-items: center; gap: 3px; padding: 1px 4px; border: 1px solid rgba(143, 191, 159, 0.35); color: var(--console-green); font-family: var(--font-mono); font-size: 11px; }
+.outpost-crew-chip { display: inline-flex; align-items: center; gap: 3px; padding: 1px 4px; border: 1px solid rgba(143, 191, 159, 0.35); color: var(--console-green); font-family: var(--font-mono); font-size: 12px; }
 .outpost-crew-chip button { border: 0; background: transparent; color: var(--console-gold-bright); cursor: pointer; padding: 0 2px; font-size: 13px; line-height: 1; }
-.outpost-crew-empty { color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.outpost-crew-empty { color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
 .crew-outpost { color: var(--console-cyan); }
 
 /* Escort wing upkeep summary above the roster. */
@@ -9054,50 +9054,50 @@ body.cockpit-theme .nav-panel > .panel-header {
 .fleet-role.role-support { border-color: rgba(143, 191, 159, 0.55); color: var(--console-green); }
 
 /* Frontier shipyard service link shown on the outpost and fleet headers. */
-.outpost-service-badge { margin-left: 4px; padding: 0 4px; border: 1px solid rgba(143, 191, 159, 0.45); color: var(--console-green); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; }
+.outpost-service-badge { margin-left: 4px; padding: 0 4px; border: 1px solid rgba(143, 191, 159, 0.45); color: var(--console-green); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; }
 
 /* Outpost specialization: level-3 production focus and switch control. */
 .outpost-spec-bar { display: flex; gap: 5px; align-items: center; margin-top: 3px; }
-.outpost-spec-label { flex: 0 0 auto; color: var(--console-purple); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+.outpost-spec-label { flex: 0 0 auto; color: var(--console-purple); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
 .outpost-spec-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
 .outpost-spec-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }
-.outpost-spec-locked { color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.outpost-spec-locked { color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
 
 /* Outpost supply links: same-system hub routing and output multiplier. */
 .outpost-supply-bar { display: flex; gap: 5px; align-items: center; margin-top: 3px; }
-.outpost-supply-label { flex: 0 0 auto; color: var(--console-green); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+.outpost-supply-label { flex: 0 0 auto; color: var(--console-green); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
 .outpost-supply-bar select { flex: 1 1 auto; min-width: 0; height: 26px; font-size: 12px; }
 .outpost-supply-bar .btn-hud { flex: 0 0 auto; min-height: 26px; padding: 2px 7px; font-size: 12px; }
-.outpost-supply-status { color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.outpost-supply-status { color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
 
 /* Escort service record: battles, kills, patrol contacts and patrol bounties. */
-.fleet-service { grid-column: 2; grid-row: 4; color: var(--console-muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.02em; }
+.fleet-service { grid-column: 2; grid-row: 4; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; }
 
 /* Outpost integrity and defense readout beside the repair control. */
-.outpost-integrity { margin-left: 4px; color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; white-space: nowrap; }
+.outpost-integrity { margin-left: 4px; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
 .outpost-row-actions { display: flex; gap: 4px; align-items: center; }
 .outpost-row-actions .btn-hud { min-height: 26px; padding: 2px 6px; font-size: 12px; }
 
 /* War bond terms in the faction war card. */
-.war-bond-note { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 11px; }
+.war-bond-note { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 12px; }
 
 /* Research queue: START/QUEUE share the row, queued projects get a cancel control. */
 .research-projects .research-row { grid-template-columns: minmax(0, 1fr) 54px auto auto; gap: 6px; }
-.research-queue-header { margin: 7px 0 2px; color: var(--console-cyan); font-family: var(--font-display); font-size: 11px; letter-spacing: 0.06em; }
+.research-queue-header { margin: 7px 0 2px; color: var(--console-cyan); font-family: var(--font-display); font-size: 12px; letter-spacing: 0.06em; }
 .research-projects .research-queue-row { border-left: 2px solid rgba(201, 163, 90, 0.5); }
 
 /* Escort captain assignment row and crew-roster captain badge. */
-.fleet-captain-row { grid-column: 2; grid-row: 5; display: flex; gap: 4px; align-items: center; min-width: 0; color: var(--console-muted); font-family: var(--font-mono); font-size: 10px; }
-.fleet-captain-row select { flex: 1 1 auto; min-width: 0; height: 24px; font-size: 11px; }
-.fleet-captain-row .btn-hud { flex: 0 0 auto; min-height: 24px; padding: 1px 5px; font-size: 11px; }
+.fleet-captain-row { grid-column: 2; grid-row: 5; display: flex; gap: 4px; align-items: center; min-width: 0; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
+.fleet-captain-row select { flex: 1 1 auto; min-width: 0; height: 24px; font-size: 12px; }
+.fleet-captain-row .btn-hud { flex: 0 0 auto; min-height: 24px; padding: 1px 5px; font-size: 12px; }
 .crew-captain { color: var(--console-gold-bright); }
-.crew-medals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.02em; }
+.crew-medals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; }
 .crew-medals span { border: 1px solid rgba(201, 163, 90, 0.35); padding: 0 4px; }
 
 /* Quantum auto-freight policy row above the manual route list. */
-.quantum-auto { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 6px; padding: 4px 6px; border: 1px solid rgba(169, 139, 189, 0.28); color: var(--console-muted); font-family: var(--font-mono); font-size: 11px; }
+.quantum-auto { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 6px; padding: 4px 6px; border: 1px solid rgba(169, 139, 189, 0.28); color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
 .quantum-auto label { display: flex; align-items: center; gap: 4px; }
-.quantum-auto input[type="number"] { width: 64px; height: 24px; font-size: 11px; }
+.quantum-auto input[type="number"] { width: 64px; height: 24px; font-size: 12px; }
 .quantum-auto input[type="checkbox"] { accent-color: var(--console-purple); }
 
 /* Market table category micro-badges & margin chips */
@@ -9136,7 +9136,7 @@ body.cockpit-theme .nav-panel > .panel-header {
     background: rgba(10, 18, 32, 0.85);
     border: 1px solid rgba(201, 163, 90, 0.3);
     border-radius: 3px;
-    font-size: 11px;
+    font-size: 12px;
 }
 .salvage-header {
     display: flex;
@@ -9147,7 +9147,7 @@ body.cockpit-theme .nav-panel > .panel-header {
     color: var(--console-gold);
 }
 .salvage-title { font-weight: 600; letter-spacing: 0.04em; }
-.salvage-risk { color: var(--console-red); font-size: 10px; }
+.salvage-risk { color: var(--console-red); font-size: 12px; }
 .salvage-strategy-selector {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -9157,7 +9157,7 @@ body.cockpit-theme .nav-panel > .panel-header {
 .btn-salvage-strat {
     padding: 2px 4px;
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.02em;
     background: rgba(5, 10, 20, 0.6);
     border: 1px solid rgba(127, 183, 201, 0.2);

@@ -217,6 +217,8 @@ class StellarDepthAndOfficerTest(unittest.TestCase):
         self.assertIn(".character-abilities .ability-row", style_css)
         self.assertIn(".character-abilities .ability-row.ready", style_css)
         self.assertIn("solar array", celestial_js)
+        self.assertIn(".war-bond-note { color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 12px; }", style_css)
+        self.assertIn("LOCK: TGT-01", app_js)
 
 
 if __name__ == "__main__":

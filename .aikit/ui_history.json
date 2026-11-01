@@ -432,5 +432,19 @@
     "final_snapshot_digest": "bf20da340ce48dc2f8444300950485679b1e3774fcc0720363ea1ecd7763d92b",
     "final_snapshot_entries": 1128,
     "surface_digest": "e835e42cec6dcb641e625aa2dc7f0296d65b9ad6b2efc53be4a98a5238eeb56b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "8602a15c9ffb0f6a9b2efee3155e52fc62e8c364",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793546297.6511226,
+    "finished_at": 1793546636.1840792,
+    "strikes": 0,
+    "reviewer": "Playwright Headless Browser (0 errors, 0 hscroll, 0 tiny across all 15 tabs and click-map)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "bf20da340ce48dc2f8444300950485679b1e3774fcc0720363ea1ecd7763d92b",
+    "final_snapshot_entries": 1128,
+    "surface_digest": "bc13604d32ae170014783b4e1ff31d8842f4389159f5abc219c08b0abdde649c"
   }
 ]
