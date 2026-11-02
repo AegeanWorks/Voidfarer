@@ -3403,11 +3403,11 @@ body.void-transit::after {
 .research-row .progress div { height: 100%; background: var(--neon-cyan); }
 /* Fixed columns keep "START" and the point cost on one vertical line; flex let the
    cost drift with each project's description length. */
-.research-projects .research-row { display: grid; grid-template-columns: minmax(0, 1fr) 54px auto; align-items: center; }
+.research-projects .research-row { display: grid; grid-template-columns: minmax(0, 1fr) 54px auto auto; align-items: center; }
 .research-projects .research-row > span:first-child { min-width: 0; }
 .research-projects .research-row > span:nth-child(2) { text-align: right; white-space: nowrap; color: var(--console-muted); }
 .research-projects .research-row > button { justify-self: end; min-width: 62px; }
-.research-projects .research-row small { display: block; color: var(--console-muted); font-size: 12px; overflow-wrap: anywhere; }
+.research-projects .research-row small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--console-muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
 /* Fixed columns keep "USE" and cooldown state on one vertical line, matching research ergonomics. */
 .character-abilities .ability-row { display: grid; grid-template-columns: minmax(0, 1fr) 58px 54px; align-items: center; }
 .character-abilities .ability-row > span:first-child { min-width: 0; }
@@ -6310,7 +6310,7 @@ body.cockpit-theme .nav-panel > .panel-header {
 .subpanel-title { font-family: var(--font-display); font-size: 14px; color: var(--console-ivory); letter-spacing: 0.06em; }
 
 /* Market ledger */
-.station-services-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.station-services-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; grid-auto-rows: 1fr; align-items: stretch; }
 .btn-service {
     min-height: 48px;
     padding: 8px 10px;
