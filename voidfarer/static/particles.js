@@ -321,9 +321,9 @@ class ParticleSystem {
     }
 
     flakBurst(x, y, radius = 22, color, sparkColor, smokeColor) {
-        const ringCol = color || (String.fromCharCode(35) + "e2c078");
-        const sparkCol = sparkColor || (String.fromCharCode(35) + "ffffff");
-        const smokeCol = smokeColor || `rgb${"a"}阳180, 190, 205, 0.5)`.replace("阳", "(");
+        const ringCol = color || "#e2c078";
+        const sparkCol = sparkColor || "#ffffff";
+        const smokeCol = smokeColor || "rgba(180, 190, 205, 0.5)";
         this.spawn({
             x, y,
             life: 0.35,
@@ -368,7 +368,7 @@ class ParticleSystem {
     }
 
     ionArc(x1, y1, x2, y2, color) {
-        const arcColor = color || (String.fromCharCode(35) + "7fb7c9");
+        const arcColor = color || "#7fb7c9";
         const dx = x2 - x1;
         const dy = y2 - y1;
         const dist = Math.hypot(dx, dy);
@@ -396,8 +396,8 @@ class ParticleSystem {
     }
 
     quantumFlash(x, y, color, coreColor) {
-        const flashCol = color || (String.fromCharCode(35) + "7fb7c9");
-        const coreCol = coreColor || (String.fromCharCode(35) + "ffffff");
+        const flashCol = color || "#7fb7c9";
+        const coreCol = coreColor || "#ffffff";
         this.spawn({
             x, y,
             life: 0.45,

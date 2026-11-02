@@ -172,10 +172,24 @@ class SurfaceMapRenderer {
             const y = tile.y * th;
             ctx.fillStyle = tile.fill;
             ctx.fillRect(x, y, tw + 1, th + 1);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.055)";
-            ctx.fillRect(x, y, tw + 1, 1);
-            ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
-            ctx.fillRect(x, y + th - 1, tw + 1, 1);
+            // Elevation relief: raised kinds catch a top highlight, low/water
+            // kinds settle with a deeper base shade. Flat cost, no extra passes.
+            if (tile.kind === "high" || tile.kind === "rock" || tile.kind === "regolith") {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.09)";
+                ctx.fillRect(x, y, tw + 1, 1);
+                ctx.fillStyle = "rgba(0, 0, 0, 0.20)";
+                ctx.fillRect(x, y + th - 1, tw + 1, 1);
+            } else if (tile.kind === "water" || tile.kind === "vent" || tile.kind === "lava") {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.22)";
+                ctx.fillRect(x, y, tw + 1, th + 1);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+                ctx.fillRect(x, y, tw + 1, 1);
+            } else {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.055)";
+                ctx.fillRect(x, y, tw + 1, 1);
+                ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
+                ctx.fillRect(x, y + th - 1, tw + 1, 1);
+            }
             this.drawFeature(ctx, tile, x, y, tw, th, seed);
         }
         ctx.strokeStyle = "rgba(4, 9, 19, 0.20)";
@@ -213,6 +227,20 @@ class SurfaceMapRenderer {
             const color = site.used ? "#6b7280" : site.risk >= 35 ? "#c96b5a" : site.risk >= 18 ? "#c9a35a" : "#8fbf9f";
             ctx.save();
             ctx.translate(x, y);
+            // Risk glow: unused elevated-risk sites breathe in their risk
+            // color so danger reads before the player commits a party.
+            // Phase is seeded per site so markers stay out of sync.
+            if (!site.used && site.risk >= 18) {
+                const pulse = 0.5 + 0.5 * Math.sin(performance.now() * 0.004 + site.index * 1.3);
+                ctx.save();
+                ctx.globalAlpha = 0.22 + pulse * 0.34;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.arc(0, 0, 7 + pulse * 2.5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
             if (selected) {
                 ctx.strokeStyle = "#8fd8ff";
                 ctx.lineWidth = 1.4;

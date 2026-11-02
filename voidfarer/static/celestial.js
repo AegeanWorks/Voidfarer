@@ -80,6 +80,7 @@ class CelestialRenderer {
         if (spin) ctx.rotate(spin);
         ctx.drawImage(sprite.canvas, -sprite.half, -sprite.half, sprite.half * 2, sprite.half * 2);
         ctx.restore();
+        if (STATION_TYPES.has(type)) this.drawStationSignal(ctx, x, y, r, now, body.color || "currentColor");
         if (ROCKY_STYLES[type] && ROCKY_STYLES[type].caps) this.drawCaps(ctx, x, y, r);
         if (ROCKY_STYLES[type] && ROCKY_STYLES[type].clouds) {
             this.drawCloudDrift(ctx, body, x, y, r, now);
@@ -351,10 +352,10 @@ class CelestialRenderer {
         // 2. Outer forward-scattering airglow crescent along the stellar limb
         ctx.save();
         const limbGlow = ctx.createRadialGradient(x, y, r * 0.94, x, y, r * 1.22);
-        const atmoCol = (o) => `rgb${"a"}阳${style.atmo}, ${o})`.replace("阳", "(");
+        const atmoCol = (o) => `rgba(${style.atmo}, ${o})`;
         limbGlow.addColorStop(0, atmoCol(0.55));
         limbGlow.addColorStop(0.45, atmoCol(0.22));
-        limbGlow.addColorStop(1, `rgb${"a"}阳0, 0, 0, 0)`.replace("阳", "("));
+        limbGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
         ctx.fillStyle = limbGlow;
         ctx.beginPath();
         ctx.arc(x, y, r * 1.22, lightAngle - Math.PI * 0.48, lightAngle + Math.PI * 0.48);
@@ -499,12 +500,14 @@ class CelestialRenderer {
                 ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * R * 0.85, Math.sin(a) * R * 0.85); ctx.stroke();
             }
 
-            // Docking clearance strobe beacons
-            const strobeLit = Math.floor(Date.now() / 320) % 2 === 0;
+            // Docking clearance strobe beacons: seeded phase keeps each
+            // station's 1.2s blink out of sync without freezing the animation.
+            const strobePhase = (celestialHash(body.id || body.name || "station") % 1200) / 1200;
+            const strobeLit = ((Date.now() / 1200 + strobePhase) % 1) < 0.5;
             for (let i = 0; i < 4; i++) {
                 const a = i * Math.PI / 2;
                 ctx.save();
-                ctx.fillStyle = strobeLit ? color : (String.fromCharCode(35) + "ece4d4");
+                ctx.fillStyle = strobeLit ? color : "#ece4d4";
                 ctx.beginPath();
                 ctx.arc(Math.cos(a) * R * 0.85, Math.sin(a) * R * 0.85, Math.max(1.4, R * 0.09), 0, Math.PI * 2);
                 ctx.fill();
@@ -541,6 +544,21 @@ class CelestialRenderer {
                 for (let k = 0; k < 3; k++) ctx.fillRect(sx * (R * 0.25 + k * R * 0.26), -R * 0.32, R * 0.22, R * 0.64);
             }
         }
+
+    }
+
+    drawStationSignal(ctx, x, y, r, now, color) {
+        const phase = (now % 1800) / 1800;
+        const radius = r * (1.45 + phase * 0.9);
+        ctx.save();
+        ctx.globalAlpha = (1 - phase) * 0.32;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = Math.max(0.6, r * 0.035);
+        ctx.setLineDash([Math.max(2, r * 0.35), Math.max(2, r * 0.22)]);
+        ctx.beginPath();
+        ctx.arc(x, y, radius, -Math.PI * 0.25, Math.PI * 0.8);
+        ctx.stroke();
+        ctx.restore();
     }
 
     // Seeded cloud bands slide across the disc, giving inhabited worlds a living
@@ -1046,24 +1064,39 @@ class CelestialRenderer {
         const rng = celestialRng(`${body.id}|belt`);
         const drift = now * (body.orbit_speed || 0.01) * 0.2;
         ctx.save();
-        ctx.fillStyle = "rgba(170, 160, 150, 0.75)";
         for (let i = 0; i < 160; i++) {
             const a = rng() * Math.PI * 2 + drift;
             const spread = (rng() - 0.5) * 10 * zoom;
             const size = 0.6 + rng() * 1.6 * Math.min(2, zoom);
+            const shadeTone = 150 + Math.floor(rng() * 60);
+            ctx.fillStyle = `rgba(${shadeTone}, ${shadeTone - 10}, ${shadeTone - 20}, ${0.55 + rng() * 0.3})`;
             ctx.fillRect(cx + Math.cos(a) * (orbitR + spread), cy + Math.sin(a) * (orbitR + spread), size, size);
         }
         ctx.restore();
     }
 
-    drawMoons(ctx, body, x, y, r, now) {
+    drawMoons(ctx, body, x, y, r, now, lightAngle = 0) {
         const moons = body.moons || [];
         moons.slice(0, 4).forEach((moon, i) => {
             const dist = r * (1.9 + i * 0.6);
             const a = now * (0.6 / (i + 1)) + i * 2.1;
-            ctx.fillStyle = "rgba(200, 205, 215, 0.85)";
+            const mx = x + Math.cos(a) * dist;
+            const my = y + Math.sin(a) * dist * 0.6;
+            const mr = Math.max(1, r * 0.18);
+            ctx.fillStyle = "rgba(200, 205, 215, 0.9)";
             ctx.beginPath();
-            ctx.arc(x + Math.cos(a) * dist, y + Math.sin(a) * dist * 0.6, Math.max(1, r * 0.18), 0, Math.PI * 2);
+            ctx.arc(mx, my, mr, 0, Math.PI * 2);
+            ctx.fill();
+            // Cheap night-side shading so moons read as spheres, not flat dots.
+            const shadow = ctx.createLinearGradient(
+                mx + Math.cos(lightAngle) * mr, my + Math.sin(lightAngle) * mr,
+                mx - Math.cos(lightAngle) * mr, my - Math.sin(lightAngle) * mr,
+            );
+            shadow.addColorStop(0, "rgba(0, 0, 0, 0)");
+            shadow.addColorStop(1, "rgba(2, 4, 10, 0.55)");
+            ctx.fillStyle = shadow;
+            ctx.beginPath();
+            ctx.arc(mx, my, mr, 0, Math.PI * 2);
             ctx.fill();
         });
     }
@@ -1165,7 +1198,7 @@ class CelestialRenderer {
 
         // High-tech cockpit canopy glint
         if (s >= 7) {
-            ctx.fillStyle = `rgb${"a"}阳226, 192, 120, 0.75)`.replace("阳", "(");
+            ctx.fillStyle = "rgba(226, 192, 120, 0.75)";
             ctx.beginPath();
             ctx.ellipse(s * 0.32, 0, Math.max(1.2, s * 0.14), Math.max(0.8, s * 0.08), 0, 0, Math.PI * 2);
             ctx.fill();
@@ -1179,11 +1212,11 @@ class CelestialRenderer {
             if (variant === "fighter") { wingY = s * 0.72; wingX = -s * 0.82; }
             else if (variant === "explorer") { wingY = s * 0.40; wingX = -s * 0.52; }
             else if (variant === "capital") { wingY = s * 0.48; wingX = -s * 0.25; }
-            ctx.fillStyle = String.fromCharCode(35) + "c96b5a";
+            ctx.fillStyle = "#c96b5a";
             ctx.beginPath();
             ctx.arc(wingX, -wingY, Math.max(1.0, s * 0.08), 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = String.fromCharCode(35) + "8fbf9f";
+            ctx.fillStyle = "#8fbf9f";
             ctx.beginPath();
             ctx.arc(wingX, wingY, Math.max(1.0, s * 0.08), 0, Math.PI * 2);
             ctx.fill();

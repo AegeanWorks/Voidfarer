@@ -61,6 +61,44 @@ const ABILITY_META = {
     trade_instinct: { icon: "¤", name: "Trade Instinct", label: "Trade" },
 };
 const ABILITY_UNLOCK_RANK = { charm_offensive: 7, trade_instinct: 7 };
+const ROOM_LAYOUTS = {
+    standard: [
+        ["bridge", "BRIDGE", "FLIGHT", "◆"],
+        ["reactor", "REACTOR", "POWER", "◎"],
+        ["medbay", "MEDBAY", "RECOVERY", "✚"],
+        ["crew", "CREW DECK", "QUARTERS", "◇"],
+        ["cargo", "CARGO", "LOGISTICS", "▣"],
+        ["sensor", "SENSORIUM", "SCIENCE", "⌬"],
+    ],
+    freighter: [
+        ["bridge", "BRIDGE", "FLIGHT", "◆"],
+        ["cargo", "CARGO HOLD", "LOGISTICS", "▣"],
+        ["cargo_b", "CARGO HOLD B", "LOGISTICS", "▣"],
+        ["reactor", "REACTOR", "POWER", "◎"],
+        ["crew", "CREW DECK", "QUARTERS", "◇"],
+        ["dock", "DOCKING BAY", "TRANSFER", "⊞"],
+    ],
+    fighter: [
+        ["cockpit", "COCKPIT", "FLIGHT", "◆"],
+        ["reactor", "REACTOR", "POWER", "◎"],
+        ["weapons", "WEAPONS", "TACTICAL", "⊕"],
+        ["medbay", "MEDBAY", "RECOVERY", "✚"],
+    ],
+    explorer: [
+        ["bridge", "BRIDGE", "FLIGHT", "◆"],
+        ["sensor", "SENSORIUM", "SCIENCE", "⌬"],
+        ["lab", "FIELD LAB", "RESEARCH", "⌘"],
+        ["reactor", "REACTOR", "POWER", "◎"],
+        ["crew", "CREW DECK", "QUARTERS", "◇"],
+        ["airlock", "AIRLOCK", "AWAY TEAM", "△"],
+    ],
+    stealth: [
+        ["cockpit", "COCKPIT", "FLIGHT", "◆"],
+        ["reactor", "REACTOR", "POWER", "◎"],
+        ["ghost", "GHOST BAY", "COVERT", "◇"],
+        ["sensor", "PASSIVE SENSORS", "SCIENCE", "⌬"],
+    ],
+};
 // Left terminal rail order, top to bottom; [ and ] cycle through it.
 const TERMINAL_TABS = [
     "player", "skills", "crew", "ship", "market", "arsenal", "fleet", "contracts",
@@ -753,6 +791,16 @@ class CockpitApp {
         this.contractsBadge = document.getElementById("contractsBadge");
         this.storyBadge = document.getElementById("storyBadge");
         this.messagesBadge = document.getElementById("messagesBadge");
+        this.marketBadge = document.getElementById("marketBadge");
+        this.aiBadge = document.getElementById("aiBadge");
+        this.skillsBadge = document.getElementById("skillsBadge");
+        this.questsBadge = document.getElementById("questsBadge");
+        this.factionsBadge = document.getElementById("factionsBadge");
+        this.empireBadge = document.getElementById("empireBadge");
+        this.crewBadge = document.getElementById("crewBadge");
+        this.fleetBadge = document.getElementById("fleetBadge");
+        this.arsenalBadge = document.getElementById("arsenalBadge");
+        this.shipBadge = document.getElementById("shipBadge");
 
         this.tabContentMarket = document.getElementById("tabContentMarket");
         this.tabContentArsenal = document.getElementById("tabContentArsenal");
@@ -871,6 +919,8 @@ class CockpitApp {
         this.shipVisual = document.getElementById("shipVisual");
         this.shipModulesGrid = document.getElementById("shipModulesGrid");
         this.shipStatsPanel = document.getElementById("shipStatsPanel");
+        this.shipRoomGrid = document.getElementById("shipRoomGrid");
+        this.shipInteriorStatus = document.getElementById("shipInteriorStatus");
         this.researchSummary = document.getElementById("researchSummary");
         this.researchProjects = document.getElementById("researchProjects");
         this.outpostSummary = document.getElementById("outpostSummary");
@@ -1863,6 +1913,147 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.contractsBadge.style.display = "none";
         }
 
+        // Ship attention badge: docked drydock repair you can afford right now
+        if (this.shipBadge) {
+            const drydock = this.state.drydock || {};
+            const credits = Number((this.state.ship || {}).credits || 0);
+            const serviceable = Boolean(drydock.docked)
+                && Number(drydock.repair_hp || 0) > 0
+                && credits >= Number(drydock.repair_cost || 0);
+            this.shipBadge.style.display = serviceable ? "inline-block" : "none";
+        }
+
+        // Arsenal attention badge: unequipped upgrades you can afford right now
+        if (this.arsenalBadge) {
+            const credits = Number((this.state.ship || {}).credits || 0);
+            const equipped = (this.state.ship || {}).equipped_upgrades || {};
+            const buyable = (this.state.catalog_upgrades || []).filter(u =>
+                equipped[u.slot] !== u.id && Number(u.cost || Infinity) <= credits
+            ).length;
+            if (buyable > 0) {
+                this.arsenalBadge.style.display = "inline-block";
+                this.arsenalBadge.textContent = buyable;
+            } else {
+                this.arsenalBadge.style.display = "none";
+            }
+        }
+
+        // Fleet attention badge: escorts ready to train below Ace at an affordable fee
+        if (this.fleetBadge) {
+            const credits = Number((this.state.ship || {}).credits || 0);
+            const fleetShips = ((this.state.fleet_manager || {}).ships || this.state.ship.fleet_ships || []);
+            const trainable = fleetShips.filter(s => {
+                const xpMax = Number(s.experience_max || 300);
+                return Number(s.experience || 0) < xpMax && Number(s.training_cost || 0) <= credits;
+            }).length;
+            if (trainable > 0) {
+                this.fleetBadge.style.display = "inline-block";
+                this.fleetBadge.textContent = trainable;
+            } else {
+                this.fleetBadge.style.display = "none";
+            }
+        }
+
+        // Crew attention badge: injured members needing care
+        if (this.crewBadge) {
+            const hurt = (this.state.ship.crew || []).filter(m => Number(m.injury_ticks || 0) > 0).length;
+            if (hurt > 0) {
+                this.crewBadge.style.display = "inline-block";
+                this.crewBadge.textContent = hurt;
+            } else {
+                this.crewBadge.style.display = "none";
+            }
+        }
+
+        // Empire attention badge: outposts with damage you can afford to repair
+        if (this.empireBadge) {
+            const credits = Number((this.state.ship || {}).credits || 0);
+            const repairable = (this.state.outposts || []).filter(o =>
+                Number(o.integrity ?? 100) < 100 && Number(o.repair_cost ?? Infinity) <= credits
+            ).length;
+            if (repairable > 0) {
+                this.empireBadge.style.display = "inline-block";
+                this.empireBadge.textContent = repairable;
+            } else {
+                this.empireBadge.style.display = "none";
+            }
+        }
+
+        // Faction attention badge: active wars involving your polity or your bonds
+        if (this.factionsBadge) {
+            const gpWars = ((this.state.galactic_politics || {}).wars || []).concat(this.state.wars || []);
+            const seen = new Set();
+            let involved = 0;
+            gpWars.forEach(w => {
+                if (!w || !w.active || seen.has(w.id)) return;
+                seen.add(w.id);
+                const pledged = Object.values(w.support || {}).some(v => Number(v) > 0);
+                if (w.attacker_id === "sol_coalition" || w.defender_id === "sol_coalition" || pledged) involved++;
+            });
+            if (involved > 0) {
+                this.factionsBadge.style.display = "inline-block";
+                this.factionsBadge.textContent = involved;
+            } else {
+                this.factionsBadge.style.display = "none";
+            }
+        }
+
+        // AI command attention badge: recruitable captains (hireable or allyable)
+        if (this.aiBadge) {
+            const credits = Number((this.state.ship || {}).credits || 0);
+            const recruitable = (this.state.ai_captains || []).filter(c => {
+                const hireable = c.archetype === "mercenary" && !c.hired && credits >= 2500;
+                const allyable = !c.ally && Number(c.trust || 0) >= 50;
+                return hireable || allyable;
+            }).length;
+            if (recruitable > 0) {
+                this.aiBadge.style.display = "inline-block";
+                this.aiBadge.textContent = recruitable;
+            } else {
+                this.aiBadge.style.display = "none";
+            }
+        }
+
+        // Commerce attention badge: held goods selling above average cost
+        if (this.marketBadge) {
+            const cargo = (this.state.ship || {}).cargo || {};
+            const avgCost = this.state.cargo_avg_cost || {};
+            const quotes = this.state.market_quotes || [];
+            const winners = quotes.filter(q => {
+                const hold = Number(cargo[q.commodity_id] || 0);
+                const avg = Number(avgCost[q.commodity_id] || 0);
+                return hold > 0 && avg > 0 && Number(q.sell_price || 0) > avg;
+            }).length;
+            if (winners > 0) {
+                this.marketBadge.style.display = "inline-block";
+                this.marketBadge.textContent = winners;
+            } else {
+                this.marketBadge.style.display = "none";
+            }
+        }
+
+        // Skills attention badge: unspent specialization points
+        if (this.skillsBadge) {
+            const points = Number(((this.state.ship || {}).mastery || {}).talent_points || 0);
+            if (points > 0) {
+                this.skillsBadge.style.display = "inline-block";
+                this.skillsBadge.textContent = points;
+            } else {
+                this.skillsBadge.style.display = "none";
+            }
+        }
+
+        // Quest attention badge: claimable contract quests surface here too
+        if (this.questsBadge) {
+            const claimable = readyContracts.length;
+            if (claimable > 0) {
+                this.questsBadge.style.display = "inline-block";
+                this.questsBadge.textContent = claimable;
+            } else {
+                this.questsBadge.style.display = "none";
+            }
+        }
+
         // Captain's log ready notification badge
         const codex = this.state.codex;
         if (codex && this.codexBadge) {
@@ -1980,14 +2171,22 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
 
             if (this.btnCombatBoard) {
-                const hasMarine = (ship.crew || []).some(
+                const crew = ship.crew || [];
+                const hasMarine = crew.some(
                     member => member.role === "marine" && member.status === "active"
+                        && Number(member.injury_ticks || 0) === 0
+                );
+                const hurtMarine = !hasMarine && crew.some(
+                    member => member.role === "marine" && member.status === "active"
+                        && Number(member.injury_ticks || 0) > 0
                 );
                 const crippledAt = Math.max(1, Math.floor(c.enemy_max_hull * 0.30));
                 const boardable = c.enemy_shield <= 0 && c.enemy_hull <= crippledAt && hasMarine;
                 this.btnCombatBoard.disabled = !boardable;
                 this.btnCombatBoard.title = !hasMarine
-                    ? "Recruit a marine before boarding"
+                    ? (hurtMarine
+                        ? "Marine party injured — let them recover first"
+                        : "Recruit a marine before boarding")
                     : c.enemy_shield > 0
                         ? "Collapse enemy shields first"
                         : c.enemy_hull > crippledAt
@@ -3246,6 +3445,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const nextXp = ch.next_level_xp || 400;
         const xpPct = Math.min(100, (xp / nextXp) * 100);
         const traits = ch.traits || [];
+        const bgCatalog = this.state.character_background_catalog || {};
+        const bgEntry = Object.values(bgCatalog).find(b =>
+            String((b && b.name) || "").toLowerCase() === String(ch.background || "Navigator").toLowerCase()
+        ) || null;
+        const bgLore = bgEntry && bgEntry.description ? String(bgEntry.description) : "";
+        const bgBonus = bgEntry && bgEntry.skills
+            ? Object.entries(bgEntry.skills).map(([s, v]) => `+${v} ${String(s).toUpperCase()}`).join(" · ")
+            : "";
 
         this.characterProfile.innerHTML = `
             <div class="character-portrait-large">${this.portraitAvatar(ch.portrait, ch.name || "Player", 60)}</div>
@@ -3255,9 +3462,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 </div>
                 <div class="character-meta">
                     <span>Age ${ch.age || 30}</span>
-                    <span>${this.escapeHtml(ch.background || "Navigator")}</span>
+                    <span title="${this.escapeHtml(bgLore || "No recorded history")}">${this.escapeHtml(ch.background || "Navigator")}</span>
                     <span>${skillPoints} SP AVAILABLE</span>
                 </div>
+                ${bgLore ? `<div class="character-origin-lore" title="Origin training: ${this.escapeHtml(bgBonus)}">${this.escapeHtml(bgLore)}</div>` : ""}
                 <div class="character-xp-row">
                     <span class="character-level">LEVEL ${ch.level || 1}</span>
                     <div class="character-xp-bar"><div class="character-xp-fill" style="width: ${xpPct}%"></div></div>
@@ -3468,6 +3676,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             : /stealth|ghost/i.test(shipClass) ? "stealth"
             : "standard";
         this.shipVisual.innerHTML = silhouettes[silhouette];
+        this.renderShipInterior(silhouette, shipClass);
 
         const slotPositions = {
             frame: { top: "50%", left: "20%" },
@@ -3563,6 +3772,62 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 </div>
                 ${docked ? "" : `<p class="panel-intro-text" style="color: var(--neon-amber);">Orbit a station or colony drydock to install or remove structural modifications.</p>`}
             `;
+        }
+    }
+
+    renderShipInterior(silhouette, shipClass) {
+        if (!this.shipRoomGrid) return;
+        const modelRooms = Array.isArray(this.state.ship && this.state.ship.rooms)
+            ? this.state.ship.rooms
+            : [];
+        const layout = modelRooms.length
+            ? modelRooms.map(room => [room.id, room.label, room.function, null, room.status])
+            : (ROOM_LAYOUTS[silhouette] || ROOM_LAYOUTS.standard);
+        const crew = Array.isArray(this.state.crew) ? this.state.crew : [];
+        const installed = this.state.ship_mods && this.state.ship_mods.installed
+            ? this.state.ship_mods.installed
+            : {};
+        const operational = Number(this.state.ship && this.state.ship.hull || 0) > 0;
+        const staffedRoles = new Set(crew.map(member => String(member.role || "").toLowerCase()));
+        const roleMatches = {
+            bridge: ["navigator", "pilot", "commander"],
+            cockpit: ["navigator", "pilot", "commander"],
+            reactor: ["engineer", "engineering"],
+            sensor: ["scientist", "science"],
+            lab: ["scientist", "science"],
+            weapons: ["gunner", "combat"],
+            cargo: ["trader", "quartermaster"],
+            cargo_b: ["trader", "quartermaster"],
+            crew: ["medic", "security", "engineer"],
+            medbay: ["medic", "doctor"],
+        };
+        const roomCards = layout.map(([id, label, department, icon, modelStatus], index) => {
+            const staffed = (roleMatches[id] || []).some(role => staffedRoles.has(role));
+            const powered = operational && (index !== layout.length - 1 || Object.keys(installed).length > 0);
+            const state = !powered ? "offline" : staffed ? "staffed" : (modelStatus || "online");
+            const stateLabel = state.toUpperCase();
+            const roomIcon = icon || ({
+                bridge: "◆", cockpit: "◆", reactor: "◎", medbay: "✚", crew: "◇",
+                cargo: "▣", cargo_b: "▣", sensor: "⌬", lab: "⌘", airlock: "△",
+                weapons: "⊕", dock: "⊞", ghost: "◇"
+            }[id] || "◇");
+            const tip = `${label} // ${department} // ${stateLabel}`;
+            return `
+                <article class="ship-room-card ${state}" data-room="${this.escapeHtml(id)}" title="${this.escapeHtml(tip)}">
+                    <div class="ship-room-card-top">
+                        <span class="ship-room-icon" aria-hidden="true">${roomIcon}</span>
+                        <span class="ship-room-state">${stateLabel}</span>
+                    </div>
+                    <strong>${this.escapeHtml(label)}</strong>
+                    <small>${this.escapeHtml(department)} // ${String(index + 1).padStart(2, "0")}</small>
+                    <div class="ship-room-scanline"></div>
+                </article>
+            `;
+        }).join("");
+        this.shipRoomGrid.innerHTML = roomCards;
+        if (this.shipInteriorStatus) {
+            const staffed = layout.filter(([id]) => (roleMatches[id] || []).some(role => staffedRoles.has(role))).length;
+            this.shipInteriorStatus.textContent = `${shipClass.toUpperCase()} // ${staffed}/${layout.length} STAFFED`;
         }
     }
 
@@ -3665,6 +3930,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         ${stationOptions.map(opt => `<option value="${opt.id}" ${curStation === opt.id ? "selected" : ""}>${opt.label}</option>`).join("")}
                     </select>
                 `;
+                const drillCost = 160 + Math.max(1, Number(m.skill || 1)) * 120;
+                const drillReady = m.skill < 10 && injury <= 0 && Number((this.state.ship || {}).credits || 0) >= drillCost;
+                const drillTitle = m.skill >= 10 ? "Already at maximum skill rank"
+                    : (injury > 0 ? "Injured crew cannot drill"
+                    : (drillReady ? `Drill to skill ${Number(m.skill) + 1} for ${drillCost} CR` : `Needs ${drillCost} CR`));
                 return `
                 <div class="crew-row">
                     <div class="crew-portrait">${this.portraitAvatar(m.portrait, m.name)}</div>
@@ -3679,7 +3949,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     </div>
                     <div class="crew-actions">
                         ${stationSelect}
-                        <button class="btn-hud btn-amber" data-train-crew="${this.escapeHtml(m.id)}" ${m.skill >= 10 || injury > 0 ? "disabled" : ""}>DRILL</button>
+                        <button class="btn-hud btn-amber" data-train-crew="${this.escapeHtml(m.id)}" ${drillReady ? "" : "disabled"} title="${this.escapeHtml(drillTitle)}">DRILL · ${drillCost}</button>
                         <button class="btn-hud" data-dismiss-crew="${this.escapeHtml(m.id)}" ${away || outpost ? "disabled" : ""}>DISMISS</button>
                     </div>
                 </div>
@@ -4197,9 +4467,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const canNap = !isEliminated && !isNap && !isAllied && !ownWar
                 && l.faction_id !== "sol_coalition" && standing >= 30;
             const petition = ownWar && Number(this.state.ship.credits || 0) >= 500;
+            const creed = l.ideology ? `<br><small class="faction-creed" title="${this.escapeHtml(l.description || "")}">${this.escapeHtml(l.ideology)} · HQ: ${this.escapeHtml(l.headquarters_system || "unknown")}</small>` : "";
             return `<div class="diplomacy-row ${isEliminated ? "eliminated" : ""}">
                 <span><strong>${this.escapeHtml(l.name)}</strong> (${this.escapeHtml(l.faction_id)})<br>
-                <small>${this.escapeHtml(l.title)} — <span class="leader-behavior">${this.escapeHtml(l.behavior)}</span></small></span>
+                <small>${this.escapeHtml(l.title)} — <span class="leader-behavior">${this.escapeHtml(l.behavior)}</span></small>${creed}</span>
                 <span>standing ${standing}${isAllied ? " | ALLIED" : ""}${isPact ? " | PACT" : ""}${isResearchPact ? " | R&D" : ""}${isNap ? ` | NAP ${napRemaining}T` : ""}${atWar ? " | WAR" : ""}</span>
                 <div class="diplomacy-actions">
                     <button class="btn-hud" data-diplo-action="improve" data-diplo-id="${this.escapeHtml(l.faction_id)}">IMPROVE</button>
@@ -4537,16 +4808,22 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         if (this.mercenaryRoster) {
             const catalog = Object.values(this.state.mercenary_catalog || {});
+            const credits = Number((this.state.ship || {}).credits || 0);
             const hired = new Set((this.state.ship.fleet_drones || []).filter(d => d.drone_type === "mercenary").map(d => d.specialty));
-            this.mercenaryRoster.innerHTML = `<h4 class="commission-title">MERCENARY CONTRACTS</h4>` + catalog.map(m => `
+            this.mercenaryRoster.innerHTML = `<h4 class="commission-title">MERCENARY CONTRACTS</h4>` + catalog.map(m => {
+                const contracted = hired.has(m.specialty);
+                const afford = credits >= Number(m.cost || 0);
+                const label = contracted ? "CONTRACTED" : (afford ? "HIRE" : `${m.cost} CR`);
+                const title = contracted ? "Already contracted" : (afford ? `Hire for ${m.cost} CR` : `Needs ${m.cost} CR`);
+                return `
                 <div class="depot-card fleet-procurement-row">
                     <div class="procurement-info"><h4>${this.escapeHtml(m.name)}</h4><small>${this.escapeHtml(m.description)}</small></div>
                     <span class="procurement-value">${m.cost} CR</span>
                     <div class="depot-actions">
-                        <button class="btn-hud btn-cyan" data-merc="${this.escapeHtml(m.id)}" ${hired.has(m.specialty) ? "disabled" : ""}>${hired.has(m.specialty) ? "CONTRACTED" : "HIRE"}</button>
+                        <button class="btn-hud btn-cyan" data-merc="${this.escapeHtml(m.id)}" ${contracted || !afford ? "disabled" : ""} title="${this.escapeHtml(title)}">${this.escapeHtml(label)}</button>
                     </div>
                 </div>
-            `).join("");
+            `; }).join("");
             this.mercenaryRoster.querySelectorAll("[data-merc]").forEach(btn => {
                 btn.addEventListener("click", () => this.postAction("/api/mercenary/hire", { merc_id: btn.getAttribute("data-merc") }, "fleet"));
             });
@@ -6494,7 +6771,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     ctx.fill();
                 } else {
                     this.celestial.drawBody(ctx, b, bx, by, bodyRadius, Math.atan2(cy - by, cx - bx), now, this.dpr || 1);
-                    this.celestial.drawMoons(ctx, b, bx, by, bodyRadius, now);
+                    this.celestial.drawMoons(ctx, b, bx, by, bodyRadius, now, Math.atan2(cy - by, cx - bx));
                 }
             } else {
                 ctx.beginPath();
@@ -7628,6 +7905,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             return;
         }
         const credits = this.state.ship.credits;
+        const masteryLevel = Number((this.state.ship.mastery || {}).level || 1);
+        const chartered = masteryLevel >= 2;
+        if (!chartered) {
+            host.innerHTML = `<h4 class="commission-title">FOUND AN OUTPOST AT ${this.escapeHtml(body.name.toUpperCase())}</h4>`
+                + `<p class="panel-intro-text">Outpost charters require Pilot Mastery level 2 (recognized commander); current level ${masteryLevel}. Earn XP through contracts, scans and victories.</p>`;
+            return;
+        }
         host.innerHTML = `<h4 class="commission-title">FOUND AN OUTPOST AT ${this.escapeHtml(body.name.toUpperCase())}</h4>` + options.map(t => {
             const yields = Object.entries(t.production || {}).map(([k, v]) => `+${v} ${k}`).join(" · ");
             return `
@@ -8169,14 +8453,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.questsList) {
             this.questsList.innerHTML = quests.length ? quests.map(q => {
                 const pct = q.target_count > 0 ? Math.min(100, Math.round((q.progress / q.target_count) * 100)) : 0;
+                const action = q.kind === "contract" && q.completed
+                    ? `<button class="btn-claim-contract" data-claim-quest="${this.escapeHtml(q.id)}">CLAIM REWARD</button>`
+                    : (q.kind === "story"
+                        ? `<button class="btn-hud" data-view-story="1">VIEW IN COMMS LOG</button>`
+                        : "");
                 return `<div class="quest-card">
                     <h4>${this.escapeHtml(q.title)}</h4>
                     <div>${this.escapeHtml(q.description)}</div>
                     <div>TYPE: ${this.escapeHtml(q.kind.toUpperCase())} // REWARD: ${this.escapeHtml(q.reward)}</div>
                     <div class="quest-progress"><div style="width:${pct}%"></div></div>
-                    <div>${q.progress}/${q.target_count} ${q.completed ? "// COMPLETE" : ""}</div>
+                    <div>${q.progress}/${q.target_count} ${q.completed ? "// COMPLETE" : ""} ${action}</div>
                 </div>`;
             }).join("") : '<div class="quest-card">No active quests.</div>';
+            this.questsList.querySelectorAll("[data-claim-quest]").forEach(btn => {
+                btn.addEventListener("click", () => this.handleClaimContract(btn.getAttribute("data-claim-quest")));
+            });
+            this.questsList.querySelectorAll("[data-view-story]").forEach(btn => {
+                btn.addEventListener("click", () => this.switchRightTab("story"));
+            });
         }
 
         // Completed quests
@@ -8207,21 +8502,36 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     renderAICaptains() {
         if (!this.state || !this.aiList) return;
         const captains = this.state.ai_captains || [];
-        this.aiList.innerHTML = captains.map(c => `
+        const credits = Number((this.state.ship || {}).credits || 0);
+        this.aiList.innerHTML = captains.map(c => {
+            const trust = Number(c.trust || 0);
+            const hireCost = 2500;
+            const canHire = !c.hired && credits >= hireCost;
+            const hireTitle = c.hired ? "Already under contract"
+                : (canHire ? `Hire ${c.name} for ${hireCost} CR` : `Needs ${hireCost} CR`);
+            const canAlly = !c.ally && trust >= 50;
+            const allyTitle = c.ally ? "Already an ally"
+                : (canAlly ? "Form an alliance: +5% trade margin" : `Requires 50 trust (current ${trust})`);
+            const captainFuel = Number((c.cargo || {})["fuel_cells"] || 0);
+            const holdFuel = Number(((this.state.ship || {}).cargo || {})["fuel_cells"] || 0);
+            const buyTitle = captainFuel > 0 ? "Buy 1 fuel from this captain" : `${c.name} has no fuel to sell`;
+            const sellTitle = holdFuel > 0 ? "Sell 1 fuel to this captain" : "No fuel in hold to sell";
+            return `
             <div class="ai-card">
                 <h4>${this.escapeHtml(c.name)} <small>[${this.escapeHtml(c.archetype.toUpperCase())}]</small></h4>
                 <div>${this.escapeHtml(c.description)}</div>
-                <div>SYSTEM: ${this.escapeHtml(c.system_id)} // TRUST: ${c.trust} // STANDING: ${c.standing}</div>
+                <div>SYSTEM: ${this.escapeHtml(c.system_id)} // TRUST: ${trust} // STANDING: ${c.standing}</div>
                 <div>CARGO: ${Object.entries(c.cargo || {}).map(([k, v]) => `${this.escapeHtml(k)} x${v}`).join(", ") || "empty"}</div>
                 <div class="ai-actions">
                     <button class="btn-hud" data-captain="${this.escapeHtml(c.id)}" data-action="hail">HAIL</button>
-                    <button class="btn-hud" data-captain="${this.escapeHtml(c.id)}" data-action="buy">BUY FUEL</button>
-                    <button class="btn-hud" data-captain="${this.escapeHtml(c.id)}" data-action="sell">SELL FUEL</button>
-                    ${c.archetype === "mercenary" ? `<button class="btn-hud btn-cyan" data-captain="${this.escapeHtml(c.id)}" data-action="hire" ${c.hired ? "disabled" : ""}>HIRE</button>` : ""}
-                    <button class="btn-hud btn-green" data-captain="${this.escapeHtml(c.id)}" data-action="ally" ${c.ally ? "disabled" : ""}>ALLY</button>
+                    <button class="btn-hud" data-captain="${this.escapeHtml(c.id)}" data-action="buy" ${captainFuel > 0 ? "" : "disabled"} title="${this.escapeHtml(buyTitle)}">BUY FUEL</button>
+                    <button class="btn-hud" data-captain="${this.escapeHtml(c.id)}" data-action="sell" ${holdFuel > 0 ? "" : "disabled"} title="${this.escapeHtml(sellTitle)}">SELL FUEL</button>
+                    ${c.archetype === "mercenary" ? `<button class="btn-hud btn-cyan" data-captain="${this.escapeHtml(c.id)}" data-action="hire" ${canHire ? "" : "disabled"} title="${this.escapeHtml(hireTitle)}">HIRE · ${hireCost}</button>` : ""}
+                    <button class="btn-hud btn-green" data-captain="${this.escapeHtml(c.id)}" data-action="ally" ${canAlly ? "" : "disabled"} title="${this.escapeHtml(allyTitle)}">ALLY</button>
                 </div>
             </div>
-        `).join("") || '<div class="ai-card">No AI captains in range.</div>';
+        `;
+        }).join("") || '<div class="ai-card">No AI captains in range.</div>';
         this.aiList.querySelectorAll("[data-captain]").forEach(btn => {
             btn.addEventListener("click", () => this.handleAIAction(btn.getAttribute("data-captain"), btn.getAttribute("data-action")));
         });

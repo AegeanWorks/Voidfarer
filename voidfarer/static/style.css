@@ -3283,6 +3283,7 @@ body.void-transit::after {
 .character-name { font-family: var(--font-display); font-size: 1.2rem; color: var(--text-primary); }
 .character-meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-secondary); display: flex; gap: 1rem; flex-wrap: wrap; }
 .character-meta span { background: rgba(127, 183, 201, 0.1); padding: 2px 8px; border-radius: 3px; border: 1px solid var(--border-subtle); }
+.character-origin-lore { font-size: 0.75rem; font-style: italic; color: var(--text-muted); margin-top: 6px; line-height: 1.45; }
 .character-xp-row { display: flex; align-items: center; gap: 1rem; }
 .character-level { font-family: var(--font-display); color: var(--neon-cyan); font-size: 0.9rem; }
 .character-xp-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
@@ -3417,6 +3418,7 @@ body.void-transit::after {
 .character-abilities .ability-row.ready .cooldown { color: var(--console-green); text-shadow: 0 0 6px rgba(143, 191, 159, .4); }
 .empire-section { margin-bottom: 14px; }
 .diplomacy-row .leader-behavior { color: var(--neon-amber); font-size: .6rem; }
+.diplomacy-row .faction-creed { color: var(--text-muted); font-size: .75rem; font-style: italic; }
 .diplomacy-row.eliminated { opacity: .4; text-decoration: line-through; }
 /* --- Portraits and crew --- */
 .commander-portrait { float: left; margin-right: 10px; }
@@ -4347,6 +4349,156 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 
 .ship-silhouette:hover {
     transform: scale(1.02);
+}
+
+.ship-interior-panel {
+    background:
+        linear-gradient(135deg, rgba(127, 183, 201, 0.06), transparent 42%),
+        rgba(3, 10, 18, 0.72);
+    border: 1px solid rgba(127, 183, 201, 0.32);
+    border-radius: 4px;
+    padding: 11px;
+    position: relative;
+    overflow-y: auto;
+    flex: 0 1 auto;
+    min-height: 160px;
+    max-height: 264px;
+}
+
+.ship-interior-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent 0 17px, rgba(127, 183, 201, 0.035) 18px);
+}
+
+.ship-interior-header,
+.ship-room-card-top,
+.ship-room-legend {
+    display: flex;
+    align-items: center;
+}
+
+.ship-interior-header {
+    justify-content: space-between;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.ship-interior-title {
+    margin: 3px 0 0;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    color: var(--text-primary);
+}
+
+.ship-interior-status {
+    color: var(--neon-green);
+    font: 700 0.75rem var(--font-mono);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    max-width: 12em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ship-room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+    gap: 7px;
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.ship-room-card {
+    min-height: 66px;
+    padding: 8px;
+    border: 1px solid rgba(127, 183, 201, 0.25);
+    background: rgba(8, 18, 30, 0.82);
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ship-room-card.staffed {
+    border-color: rgba(143, 191, 159, 0.65);
+    background: linear-gradient(135deg, rgba(143, 191, 159, 0.13), rgba(8, 18, 30, 0.82));
+}
+
+.ship-room-card.offline {
+    opacity: 0.55;
+    border-color: rgba(201, 107, 90, 0.5);
+}
+
+.ship-room-card-top {
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.ship-room-icon {
+    color: var(--neon-cyan);
+    font-size: 1rem;
+    text-shadow: 0 0 8px rgba(127, 183, 201, 0.55);
+}
+
+.ship-room-state {
+    color: var(--neon-green);
+    font: 700 0.75rem var(--font-mono);
+}
+
+.ship-room-card.offline .ship-room-state {
+    color: var(--console-red);
+}
+
+.ship-room-card strong {
+    display: block;
+    color: var(--text-primary);
+    font: 700 0.75rem var(--font-display);
+    letter-spacing: 0.04em;
+}
+
+.ship-room-card small {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-muted);
+    font: 0.75rem var(--font-mono);
+}
+
+.ship-room-scanline {
+    height: 2px;
+    margin-top: 7px;
+    background: linear-gradient(90deg, var(--neon-cyan), transparent);
+    opacity: 0.65;
+}
+
+.ship-room-legend {
+    gap: 12px;
+    margin-top: 9px;
+    color: var(--text-muted);
+    font: 0.75rem var(--font-mono);
+    position: relative;
+    z-index: 1;
+}
+
+.room-legend-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 4px;
+    border-radius: 50%;
+    background: var(--neon-cyan);
+}
+
+.room-legend-dot.staffed {
+    background: var(--neon-green);
+}
+
+.room-legend-dot.offline {
+    background: var(--console-red);
 }
 
 .ship-module-slot {
@@ -8184,6 +8336,25 @@ body.cockpit-theme .panel-center {
 .ship-stats-panel { width: 100%; min-width: 0; flex: none; }
 @media (max-width: 1599px) {
     .ship-top-row { grid-template-columns: 1fr; }
+    .ship-interior-panel {
+        flex-basis: auto;
+        min-height: 160px;
+        max-height: 232px;
+        padding: 8px;
+    }
+    .ship-interior-title {
+        font-size: 0.78rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .ship-room-grid { gap: 5px; margin-top: 6px; }
+    .ship-room-card { min-height: 56px; padding: 6px; }
+    .ship-room-card-top { margin-bottom: 4px; }
+    .ship-room-card strong { font-size: 0.75rem; }
+    .ship-room-card small { font-size: 0.75rem; }
+    .ship-room-scanline { margin-top: 4px; }
+    .ship-room-legend { gap: 7px; margin-top: 5px; font-size: 0.75rem; }
 }
 
 /* Static HUD surfaces should not pay for full-screen backdrop blur. */
@@ -8821,6 +8992,7 @@ body.cockpit-theme .nav-panel > .panel-header {
 .contract-cat-badge.cat-surface { color: #b9e3c7; background: rgba(143, 191, 159, 0.14); border-color: rgba(143, 191, 159, 0.4); }
 .contract-cat-badge.cat-anomaly { color: #d8c49a; background: rgba(169, 139, 189, 0.12); border-color: rgba(169, 139, 189, 0.4); }
 .contract-cat-badge.cat-diplomacy { color: #b9dce8; background: rgba(127, 183, 201, 0.14); border-color: rgba(127, 183, 201, 0.4); }
+.contract-cat-badge.cat-colonial { color: #ffd166; background: rgba(201, 163, 90, 0.16); border-color: rgba(201, 163, 90, 0.45); }
 .contract-cat-badge.cat-fleet { color: #b9dce8; background: rgba(127, 183, 201, 0.14); border-color: rgba(127, 183, 201, 0.4); }
 
 /* --- G-013: one command panel for reactor routing and abilities; the left
