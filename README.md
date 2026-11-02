@@ -453,7 +453,7 @@ python -m voidfarer.cli character use emergency_repair
 
 python -m voidfarer.cli research start advanced_cooling
 python -m voidfarer.cli outpost list
-python -m voidfarer.cli outpost build solar sol_ring_world
+python -m voidfarer.cli outpost build solar sol_ring_world  # needs Mastery 2 (charter)
 python -m voidfarer.cli outpost module <outpost_id> laboratory
 python -m voidfarer.cli outpost crew <outpost_id> <crew_id>
 

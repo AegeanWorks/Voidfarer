@@ -178,6 +178,112 @@ def _engine_at_war(credits=5000):
     return engine
 
 
+class TestLeaderVoices(unittest.TestCase):
+    def test_every_behavior_voices_every_occasion(self):
+        from voidfarer.faction_state import LEADER_ARCHETYPES, LEADER_VOICES, leader_voice
+        from voidfarer.models import FactionLeader
+        occasions = ("greet", "thanks", "pact", "warcry")
+        for behavior in LEADER_ARCHETYPES:
+            self.assertIn(behavior, LEADER_VOICES, behavior)
+            leader = FactionLeader(
+                id=f"leader_test_{behavior}", faction_id="sol_coalition",
+                name="Test Leader", title="Sovereign", behavior=behavior,
+            )
+            for occasion in occasions:
+                line = leader_voice(leader, occasion)
+                self.assertTrue(line and len(line) > 12, (behavior, occasion))
+        self.assertTrue(
+            leader_voice(
+                FactionLeader(id="x", faction_id="y", name="Z", title="T", behavior="unknown"),
+                "greet",
+            )
+        )
+
+    def test_voice_is_stable_per_leader_and_varies_across_leaders(self):
+        from voidfarer.faction_state import generate_faction_leaders, leader_voice
+        leaders = generate_faction_leaders(42)
+        first = {leader_voice(leader, "greet") for leader in leaders}
+        second = {leader_voice(leader, "greet") for leader in leaders}
+        self.assertEqual(first, second)
+        self.assertGreater(len(first), 1)
+
+    def test_defiance_covers_every_behavior(self):
+        from voidfarer.faction_state import LEADER_ARCHETYPES, LEADER_VOICES, leader_voice
+        from voidfarer.models import FactionLeader
+        for behavior in LEADER_ARCHETYPES:
+            self.assertIn("defiance", LEADER_VOICES.get(behavior, {}), behavior)
+            leader = FactionLeader(
+                id=f"def_{behavior}", faction_id="sol_coalition",
+                name="Defender", title="Warden", behavior=behavior,
+            )
+            line = leader_voice(leader, "defiance")
+            self.assertTrue(line and len(line) > 12, behavior)
+
+    def test_declaration_carries_defender_defiance(self):
+        from voidfarer.faction_state import (
+            generate_faction_leaders,
+            simulate_faction_behaviors,
+        )
+        import random
+        from voidfarer.engine import SimulationEngine
+        engine = SimulationEngine(seed=42)
+        leaders = generate_faction_leaders(42)
+        _wars, _systems, _removed, logs = simulate_faction_behaviors(
+            leaders, (), engine.state.systems, random.Random(1), 10, (), 2000,
+            frozenset(), frozenset(),
+        )
+        declarations = [line for line in logs if "WAR DECLARED" in line]
+        self.assertTrue(declarations, "seed must declare at least one war")
+        for line in declarations:
+            self.assertIn(" answers: ", line)
+
+    def test_nap_carries_the_leader_voice(self):
+        from voidfarer.faction_state import leader_for, leader_voice
+        engine = _engine_at_war()
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(faction_standings={"ashen_choir": 35})
+        )
+        ok, msg = engine.faction_diplomacy("ashen_choir", "nap")
+        self.assertTrue(ok, msg)
+        leader = leader_for(engine.state.faction_leaders, "ashen_choir")
+        self.assertIsNotNone(leader)
+        self.assertIn(leader_voice(leader, "pact"), msg)
+
+    def test_diplomacy_replies_carry_the_leader_voice(self):
+        from voidfarer.faction_state import leader_for, leader_voice
+        engine = _engine_at_war()
+        ok, msg = engine.faction_diplomacy("nebula_collective", "improve")
+        self.assertTrue(ok, msg)
+        leader = leader_for(engine.state.faction_leaders, "nebula_collective")
+        self.assertIsNotNone(leader)
+        self.assertIn(leader.name, msg)
+        self.assertIn(leader_voice(leader, "greet"), msg)
+        ok, msg = engine.faction_diplomacy("nebula_collective", "gift", 300)
+        self.assertTrue(ok, msg)
+        self.assertIn(leader_voice(leader, "thanks"), msg)
+
+
+class TestFactionLorePanel(unittest.TestCase):
+    def test_leader_snapshot_carries_faction_creed(self):
+        engine = SimulationEngine(seed=42)
+        snapshot = engine.get_status_snapshot(include_static=False)
+        leaders = {entry["faction_id"]: entry for entry in snapshot["faction_leaders"]}
+        self.assertIn("sol_coalition", leaders)
+        entry = leaders["sol_coalition"]
+        self.assertTrue(entry.get("ideology"), "creed must be present")
+        self.assertTrue(entry.get("description"), "lore must be present")
+        self.assertTrue(entry.get("headquarters_system"), "HQ must be present")
+
+    def test_cockpit_diplomacy_row_surfaces_the_creed(self):
+        static = Path(__file__).parent.parent / "voidfarer" / "static"
+        html = (static / "index.html").read_text(encoding="utf-8")
+        script = (static / "app.js").read_text(encoding="utf-8")
+        style = (static / "style.css").read_text(encoding="utf-8")
+        self.assertIn("faction-creed", script + html)
+        self.assertIn("ideology", script)
+        self.assertIn(".faction-creed", style)
+
+
 class TestWarSupport(unittest.TestCase):
     def test_support_spends_credits_shifts_score_and_standing(self):
         engine = _engine_at_war()
@@ -190,6 +296,33 @@ class TestWarSupport(unittest.TestCase):
         self.assertEqual(war.support.get("nebula_collective"), 1200)
         self.assertGreater(engine.state.ship.faction_standings.get("nebula_collective", 0), before)
         self.assertLess(engine.state.ship.faction_standings.get("sol_coalition", 0), 0)
+
+    def test_commander_bond_subscriptions_are_capped_per_war(self):
+        engine = _engine_at_war(credits=20000)
+        ok, msg = engine.support_war("w_test", "nebula_collective", 5000)
+        self.assertTrue(ok, msg)
+        ok, msg = engine.support_war("w_test", "nebula_collective", 2000)
+        self.assertFalse(ok)
+        self.assertIn("cap", msg.lower())
+        self.assertEqual(engine.state.wars[0].support.get("nebula_collective"), 5000)
+
+    def test_dust_pledges_earn_no_standing(self):
+        engine = _engine_at_war()
+        before = engine.state.ship.faction_standings.get("nebula_collective", 0)
+        ok, msg = engine.support_war("w_test", "nebula_collective", 100)
+        self.assertTrue(ok, msg)
+        self.assertEqual(
+            engine.state.ship.faction_standings.get("nebula_collective", 0), before
+        )
+
+    def test_meaningful_pledges_still_earn_standing(self):
+        engine = _engine_at_war()
+        before = engine.state.ship.faction_standings.get("nebula_collective", 0)
+        ok, msg = engine.support_war("w_test", "nebula_collective", 1200)
+        self.assertTrue(ok, msg)
+        self.assertGreater(
+            engine.state.ship.faction_standings.get("nebula_collective", 0), before
+        )
 
     def test_support_is_refused_when_it_cannot_apply(self):
         engine = _engine_at_war(credits=50)

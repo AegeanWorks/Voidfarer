@@ -184,6 +184,73 @@ class DecisionEventTest(unittest.TestCase):
         self.assertEqual(engine.state.ship.credits, credits - 300)
         self.assertIn(definition.id, engine.state.decision_history)
 
+    def test_colonial_offer_triggers_at_mastery_2_without_outposts(self):
+        engine = SimulationEngine(seed=42)
+        mastery, _ = engine._award_pilot_xp(500, engine.state.ship.mastery)
+        engine.state = engine._clone_state(ship=engine._clone_ship(mastery=mastery))
+        ids = [d.id for d in eligible_decisions(engine.state, "tick")]
+        self.assertIn("colonial_offer", ids)
+
+    def test_colonial_offer_hidden_below_mastery_2(self):
+        engine = SimulationEngine(seed=42)
+        ids = [d.id for d in eligible_decisions(engine.state, "tick")]
+        self.assertNotIn("colonial_offer", ids)
+
+    def test_colonial_offer_hidden_once_founded(self):
+        from voidfarer.models import Outpost
+        engine = SimulationEngine(seed=42)
+        mastery, _ = engine._award_pilot_xp(500, engine.state.ship.mastery)
+        claimed = Outpost(
+            id="o1", name="Mine", system_id="sol", body_id="sol_body_2",
+            outpost_type="mining",
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(mastery=mastery), outposts=(claimed,)
+        )
+        ids = [d.id for d in eligible_decisions(engine.state, "tick")]
+        self.assertNotIn("colonial_offer", ids)
+
+    def test_accepting_colonial_offer_grants_a_colonial_contract(self):
+        engine = SimulationEngine(seed=42)
+        definition = next(d for d in DECISION_DEFINITIONS if d.id == "colonial_offer")
+        event = make_decision_event(definition, 0, "tick")
+        engine.state = engine._clone_state(pending_decision=event)
+        before = len(engine.state.ship.active_contracts)
+        accept = next(c for c in definition.choices if c.id == "accept")
+        ok, msg = engine.resolve_decision(accept.id)
+        self.assertTrue(ok, msg)
+        after = engine.state.ship.active_contracts
+        self.assertEqual(len(after), before + 1)
+        self.assertEqual(after[-1].category, "colonial")
+        self.assertGreater(
+            engine.state.ship.faction_standings.get("sol_coalition", 0), 0
+        )
+
+    def test_declining_colonial_offer_grants_nothing(self):
+        engine = SimulationEngine(seed=42)
+        definition = next(d for d in DECISION_DEFINITIONS if d.id == "colonial_offer")
+        event = make_decision_event(definition, 0, "tick")
+        engine.state = engine._clone_state(pending_decision=event)
+        before = len(engine.state.ship.active_contracts)
+        decline = next(c for c in definition.choices if c.id == "decline")
+        ok, msg = engine.resolve_decision(decline.id)
+        self.assertTrue(ok, msg)
+        self.assertEqual(len(engine.state.ship.active_contracts), before)
+        self.assertIn(definition.id, engine.state.decision_history)
+
+    def test_colonial_offer_opens_through_the_live_tick_path(self):
+        engine = SimulationEngine(seed=42)
+        engine.allow_decision_events = True
+        mastery, _ = engine._award_pilot_xp(500, engine.state.ship.mastery)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(mastery=mastery),
+            stats=dict(engine.state.stats, last_decision_tick=-10000),
+        )
+        engine.tick(1)
+        pending = engine.state.pending_decision
+        self.assertIsNotNone(pending, "the colonial offer must open on the live tick path")
+        self.assertEqual(pending.definition_id, "colonial_offer")
+
     def test_decisions_are_rate_limited_by_the_cadence_window(self):
         engine = SimulationEngine(seed=42)
         engine.allow_decision_events = True

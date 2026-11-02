@@ -3,10 +3,47 @@
 import unittest
 
 from voidfarer.engine import SimulationEngine
-from voidfarer.frontier import generate_ai_captains, generate_depots, simulate_ai_trade
+from voidfarer.frontier import (
+    AI_CAPTAIN_HAILS,
+    captain_hail,
+    generate_ai_captains,
+    generate_depots,
+    simulate_ai_trade,
+)
 from voidfarer.galaxy import GalaxyGenerator
 from voidfarer.models import AICaptain, Depot, FleetDrone, GameState, Moon, QuantumMessage
 from voidfarer.retention import PILOT_TALENTS
+
+
+class CaptainHailVoicesTest(unittest.TestCase):
+    def test_every_archetype_voices_a_hail(self):
+        systems = GalaxyGenerator(seed=42).generate_galaxy()
+        for archetype in ("trader", "mercenary", "ally", "pirate"):
+            self.assertIn(archetype, AI_CAPTAIN_HAILS)
+            captain = next(
+                c for c in generate_ai_captains(systems, 42) if c.archetype == archetype
+            )
+            line = captain_hail(captain)
+            self.assertTrue(line and len(line) > 12, archetype)
+        unknown = AICaptain(
+            id="x", name="X", archetype="ghost", system_id="sol", credits=0
+        )
+        self.assertTrue(captain_hail(unknown))
+
+    def test_hail_is_stable_per_captain_and_varies_across_cast(self):
+        systems = GalaxyGenerator(seed=42).generate_galaxy()
+        captains = generate_ai_captains(systems, 42)
+        first = {captain_hail(c) for c in captains}
+        self.assertEqual(first, {captain_hail(c) for c in captains})
+        self.assertGreater(len(first), 1)
+
+    def test_hailing_a_captain_carries_their_voice(self):
+        engine = SimulationEngine(seed=42)
+        target = next(c for c in engine.state.ai_captains if c.archetype == "pirate")
+        ok, msg = engine.interact_ai(target.id, "hail")
+        self.assertTrue(ok, msg)
+        self.assertIn(target.name, msg)
+        self.assertIn(captain_hail(target), msg)
 
 
 class FrontierBootstrapTest(unittest.TestCase):

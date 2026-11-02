@@ -32,6 +32,18 @@ class FrontierShipyardTest(unittest.TestCase):
             outpost_type="shipyard",
         )
 
+    def test_escort_repair_rejects_non_positive_amounts(self):
+        self.engine.state = self.engine._clone_state(
+            outposts=(self._shipyard(),)
+        )
+        before = self.engine.state.ship.credits
+        for amount in (-60, 0):
+            ok, msg = self.engine.repair_escorts(amount)
+            self.assertFalse(ok, msg)
+            self.assertIn("positive", msg.lower())
+        self.assertEqual(self.engine.state.ship.credits, before)
+        self.assertEqual(self.engine.state.ship.fleet_ships[0].hull, 40)
+
     def test_local_shipyard_services_hull_fuel_and_escorts(self):
         self.engine.state = self.engine._clone_state(
             outposts=(self._shipyard(),)

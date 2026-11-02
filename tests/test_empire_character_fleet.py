@@ -15,7 +15,7 @@ from voidfarer.factions import CANONICAL_FACTIONS
 from voidfarer.faction_state import generate_faction_leaders, resolve_wars
 from voidfarer.fleet import apply_fleet_casualties, build_fleet_ship, fleet_damage
 from voidfarer.galaxy import GalaxyGenerator
-from voidfarer.models import CombatEncounter, FleetShip, GameState, Outpost, PlayerCharacter, ReactorState, ResearchState, WarState
+from voidfarer.models import BountyContract, CombatEncounter, FleetShip, GameState, Outpost, PlayerCharacter, ReactorState, ResearchState, WarState
 from voidfarer.navigation import route_plan, shortest_route
 from voidfarer.outposts import OUTPOST_TYPES, can_build_on, outpost_tick_production
 from voidfarer.reactor import reactor_output_efficiency
@@ -93,9 +93,119 @@ class CharacterResearchOutpostTest(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("Unknown", msg)
 
-    def test_outpost_builds_and_produces_on_tick(self):
+    def _promote_to_commander(self):
+        mastery, _ = self.engine._award_pilot_xp(500, self.engine.state.ship.mastery)
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(mastery=mastery)
+        )
+        return mastery
+
+    def test_outpost_charter_requires_mastery_level_2(self):
         self.engine.state = self.engine._clone_state(
             ship=self.engine._clone_ship(credits=5000)
+        )
+        ok, msg = self.engine.orbit("sol_ring_world")
+        self.assertTrue(ok, msg)
+        ok, msg = self.engine.build_outpost("sol_ring_world", "solar")
+        self.assertFalse(ok)
+        self.assertIn("Mastery", msg)
+        self.assertEqual(len(self.engine.state.outposts), 0)
+
+    def test_level_2_promotion_announces_the_charter_unlock(self):
+        _, logs = self.engine._award_pilot_xp(500, self.engine.state.ship.mastery)
+        self.assertTrue(any("PROMOTION" in line for line in logs))
+        self.assertTrue(any("CHARTER" in line for line in logs))
+
+    def test_charter_announcement_fires_once_on_the_crossing(self):
+        two, _ = self.engine._award_pilot_xp(500, self.engine.state.ship.mastery)
+        self.assertEqual(two.level, 2)
+        _, logs = self.engine._award_pilot_xp(two.next_level_xp, two)
+        self.assertTrue(any("PROMOTION" in line for line in logs))
+        self.assertFalse(any("CHARTER" in line for line in logs))
+
+    def test_small_xp_awards_stay_silent_about_charters(self):
+        _, logs = self.engine._award_pilot_xp(25, self.engine.state.ship.mastery)
+        self.assertEqual(logs, [])
+
+    def test_academy_run_promotes_to_commander_and_charters_a_colony(self):
+        engine = SimulationEngine(seed=42)
+        ok, msg = engine.orbit("sol_body_1")
+        self.assertTrue(ok, msg)
+        ok, _msg, _info = engine.scan()
+        self.assertTrue(ok, _msg)
+        ok, msg = engine.route_power(30, 25, 25, 20)
+        self.assertTrue(ok, msg)
+        ok, msg = engine.trade("fuel_cells", 1, True)
+        self.assertTrue(ok, msg)
+        ok, msg = engine.buy_drone("mining")
+        self.assertTrue(ok, msg)
+        self.assertGreaterEqual(engine.state.ship.mastery.level, 2)
+        self.assertTrue(
+            any("CHARTER" in entry for entry in engine.state.ship.flight_log),
+            "level-2 promotion should announce the charter unlock in the flight log",
+        )
+        ok, msg = engine.orbit("sol_ring_world")
+        self.assertTrue(ok, msg)
+        ok, msg = engine.build_outpost("sol_ring_world", "solar")
+        self.assertTrue(ok, msg)
+        self.assertEqual(len(engine.state.outposts), 1)
+
+    def test_colonial_contracts_generate_from_template(self):
+        from voidfarer.retention import CONTRACT_CATEGORIES, generate_contract
+        import random
+        self.assertIn("colonial", CONTRACT_CATEGORIES)
+        contract = generate_contract(random.Random(42), category="colonial")
+        self.assertEqual(contract.category, "colonial")
+        self.assertGreaterEqual(contract.target_count, 1)
+        self.assertLessEqual(contract.target_count, 2)
+        self.assertGreater(contract.reward_credits, 0)
+        self.assertGreater(contract.reward_xp, 0)
+
+    def test_founding_an_outpost_progresses_colonial_contracts(self):
+        from voidfarer.retention import generate_contract
+        import random
+        charter, _ = self.engine._award_pilot_xp(500, self.engine.state.ship.mastery)
+        colonial = BountyContract(
+            id="contract_colonial_test",
+            title="Colonial Charter Mandate",
+            description="Found 1 colonial outpost on a suitable world.",
+            category="colonial",
+            target_count=1,
+            current_count=0,
+            reward_credits=800,
+            reward_xp=200,
+            reward_relic_tier=None,
+            completed=False,
+        )
+        actives = self.engine.state.ship.active_contracts + (colonial,)
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(credits=9000, mastery=charter, active_contracts=actives)
+        )
+        ok, msg = self.engine.orbit("sol_ring_world")
+        self.assertTrue(ok, msg)
+        ok, msg = self.engine.build_outpost("sol_ring_world", "solar")
+        self.assertTrue(ok, msg)
+        done = [c for c in self.engine.state.ship.active_contracts if c.id == "contract_colonial_test"]
+        self.assertEqual(len(done), 1)
+        self.assertTrue(done[0].completed)
+        self.assertIn("OBJECTIVE COMPLETE", msg)
+
+    def test_outpost_charter_unlocks_at_mastery_level_2(self):
+        mastery = self._promote_to_commander()
+        self.assertEqual(mastery.level, 2)
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(credits=5000, mastery=mastery)
+        )
+        ok, msg = self.engine.orbit("sol_ring_world")
+        self.assertTrue(ok, msg)
+        ok, msg = self.engine.build_outpost("sol_ring_world", "solar")
+        self.assertTrue(ok, msg)
+        self.assertEqual(len(self.engine.state.outposts), 1)
+
+    def test_outpost_builds_and_produces_on_tick(self):
+        mastery = self._promote_to_commander()
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(credits=5000, mastery=mastery)
         )
         ok, msg = self.engine.orbit("sol_ring_world")
         self.assertTrue(ok, msg)
@@ -126,8 +236,9 @@ class CharacterResearchOutpostTest(unittest.TestCase):
         self.assertLessEqual(monthly, 400)
 
     def test_outpost_upgrade_costs_less_than_building_and_adds_quarter_output(self):
+        mastery, _ = self.engine._award_pilot_xp(500, self.engine.state.ship.mastery)
         self.engine.state = self.engine._clone_state(
-            ship=self.engine._clone_ship(credits=5000)
+            ship=self.engine._clone_ship(credits=5000, mastery=mastery)
         )
         self.engine.orbit("sol_body_2")
         ok, _ = self.engine.build_outpost("sol_body_2", "mining")
@@ -331,6 +442,7 @@ class NewSystemsSerializationAndCLITest(unittest.TestCase):
             if body.body_type == "terrestrial" and body.station_dockable
         )
         engine = SimulationEngine(seed=42)
+        charter, _ = engine._award_pilot_xp(500, engine.state.ship.mastery)
         engine.state = engine._clone_state(
             systems=galaxy,
             ship=engine._clone_ship(
@@ -339,6 +451,7 @@ class NewSystemsSerializationAndCLITest(unittest.TestCase):
                 credits=9000,
                 cargo={},
                 cargo_cost={},
+                mastery=charter,
             ),
         )
         snapshot = engine.get_status_snapshot()
@@ -388,6 +501,42 @@ class NewSystemsSerializationAndCLITest(unittest.TestCase):
         for symbol in ("renderPlayer", "renderCrew", "renderEmpire", "renderFleetManager", "renderSkillsQuickPanel", "orbitFade", "fadeOuter"):
             self.assertIn(symbol, script)
         self.assertIn("height: 44px", style)
+
+
+class TestCommanderBackgrounds(unittest.TestCase):
+    def test_navigator_background_grants_origin_training(self):
+        engine = SimulationEngine(seed=42)
+        ok, msg = engine.reset(42, {"background": "navigator"})
+        self.assertTrue(ok, msg)
+        character = engine.state.character
+        self.assertEqual(character.background, "Navigator")
+        self.assertEqual(character.skills["piloting"], 3)
+        self.assertEqual(character.skills["science"], 2)
+
+    def test_background_matching_is_case_insensitive(self):
+        engine = SimulationEngine(seed=42)
+        ok, msg = engine.reset(42, {"background": "MARINE"})
+        self.assertTrue(ok, msg)
+        character = engine.state.character
+        self.assertEqual(character.background, "Marine")
+        self.assertEqual(character.skills["combat"], 3)
+
+    def test_unknown_background_passes_through_without_bonus(self):
+        engine = SimulationEngine(seed=42)
+        ok, msg = engine.reset(42, {"background": "Star Drifter"})
+        self.assertTrue(ok, msg)
+        character = engine.state.character
+        self.assertEqual(character.background, "Star Drifter")
+        self.assertTrue(all(level == 1 for level in character.skills.values()))
+
+    def test_background_bonuses_apply_after_budget_validation(self):
+        engine = SimulationEngine(seed=42)
+        skills = {skill: 8 for skill in ("piloting", "engineering", "science", "combat", "diplomacy", "trade")}
+        ok, msg = engine.reset(42, {"background": "engineer", "skills": skills})
+        self.assertTrue(ok, msg)
+        character = engine.state.character
+        self.assertEqual(character.skills["engineering"], 10)
+        self.assertEqual(character.skills["piloting"], 9)
 
 
 if __name__ == "__main__":

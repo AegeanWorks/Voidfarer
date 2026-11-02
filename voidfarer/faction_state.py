@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import math
 import random
 from dataclasses import replace
@@ -18,6 +19,129 @@ LEADER_ARCHETYPES: dict[str, dict[str, Any]] = {
     "opportunist": {"aggression": 0.60, "diplomacy": 0.55, "ambition": 0.85},
     "visionary": {"aggression": 0.35, "diplomacy": 0.70, "ambition": 0.65},
 }
+
+# Voiced lines per archetype and occasion. Two lines per cell so the stable
+# per-leader pick still varies across the nine sovereigns.
+LEADER_VOICES: dict[str, dict[str, tuple[str, ...]]] = {
+    "militarist": {
+        "greet": (
+            "Speak quickly, Commander. My time belongs to the fleet.",
+            "The fleet keeps short audiences. State your business.",
+        ),
+        "thanks": (
+            "Materiel received. It will be spent where it matters.",
+            "Noted in the war ledger. You have our attention.",
+        ),
+        "pact": (
+            "Signed. Break it and learn what our signatures cost.",
+            "The pact holds as long as your spine does.",
+        ),
+        "warcry": (
+            "They mistook our patience for weakness. Correct them.",
+            "Sound the muster. We end this quickly and completely.",
+        ),
+        "defiance": (
+            "Come and take them. The fleet is already moving.",
+            "We have buried better fleets than yours. Advance.",
+        ),
+    },
+    "merchant": {
+        "greet": (
+            "Always a pleasure. What are we buying today, Commander?",
+            "Back again? Good. The market favors the punctual.",
+        ),
+        "thanks": (
+            "A sound investment. I will remember the terms fondly.",
+            "Capital in motion. My favorite kind of diplomacy.",
+        ),
+        "pact": (
+            "A fair contract, fairly witnessed. Profit to us both.",
+            "Signed in triplicate, honored to the credit.",
+        ),
+        "warcry": (
+            "They taxed the wrong ledger. Collect in full.",
+            "War is expensive. Losing it costs more. Move.",
+        ),
+        "defiance": (
+            "Our insurers already priced your defeat. Do proceed.",
+            "Every credit you spend here is one we will collect twice.",
+        ),
+    },
+    "isolationist": {
+        "greet": (
+            "You have come far to be turned away. Make it brief.",
+            "Our gates rarely open. Speak, then go.",
+        ),
+        "thanks": (
+            "We accept. Do not mistake courtesy for welcome.",
+            "Leave the gift at the threshold. It will be put to use.",
+        ),
+        "pact": (
+            "Our gates open a crack, no wider. Honor the distance.",
+            "A narrow door, clearly marked. Do not widen it.",
+        ),
+        "warcry": (
+            "They crossed the boundary stones. Drive them back.",
+            "The silence is broken. Answer with silence of your own.",
+        ),
+        "defiance": (
+            "The gates were closed for a reason. You will learn it.",
+            "Turn back. The threshold keeps what it catches.",
+        ),
+    },
+    "opportunist": {
+        "greet": (
+            "Commander! Fortune smiles. Tell me how we both profit.",
+            "What timing. I was just wondering who to favor next.",
+        ),
+        "thanks": (
+            "Generous. I do love a friend with timing.",
+            "Consider the favor banked, with interest.",
+        ),
+        "pact": (
+            "Signed, sealed, and already working in our favor.",
+            "A pleasure doing inevitable business with you.",
+        ),
+        "warcry": (
+            "The odds just turned. How unfortunate. For them.",
+            "New management approaches. Try to keep the furniture intact.",
+        ),
+        "defiance": (
+            "Bold. Wrong, but bold. The odds were never yours.",
+            "I have already sold the salvage rights to your fleet.",
+        ),
+    },
+    "visionary": {
+        "greet": (
+            "The currents brought you. The currents are rarely wrong.",
+            "I have seen this meeting. It goes well if you listen.",
+        ),
+        "thanks": (
+            "Given freely, returned a hundredfold. So the pattern holds.",
+            "The pattern thanks you, as do I.",
+        ),
+        "pact": (
+            "Not ink but intent binds us. The future is listening.",
+            "We sign for those not yet born to read it.",
+        ),
+        "warcry": (
+            "History asked for a hinge. We oblige.",
+            "The old order ends today. Ours begins.",
+        ),
+        "defiance": (
+            "The pattern foresaw you. It did not flinch. Neither do we.",
+            "Come, then. The future is already on our side.",
+        ),
+    },
+}
+
+
+def leader_voice(leader: FactionLeader, occasion: str) -> str:
+    """Deterministic voiced line for a leader and occasion; stable per save seed."""
+    table = LEADER_VOICES.get(leader.behavior) or LEADER_VOICES["opportunist"]
+    lines = table.get(occasion) or table["greet"]
+    digest = hashlib.md5(f"{leader.id}:{occasion}".encode("utf-8")).hexdigest()
+    return lines[int(digest, 16) % len(lines)]
 
 LEADER_NAMES: tuple[str, ...] = (
     "Admiral Vance", "Director Sable", "Archon Ilsa", "Warlord Kaez", "Magister Orun",
@@ -458,7 +582,9 @@ def simulate_faction_behaviors(
             active_pairs.add(pair)
             attacker_name = CANONICAL_FACTIONS[leader.faction_id].name
             defender_name = CANONICAL_FACTIONS[weakest].name if weakest in CANONICAL_FACTIONS else weakest
-            logs.append(f"WAR DECLARED: {attacker_name} ({leader.name}) moves against {defender_name}.")
+            defender = leader_for(leaders, war.defender_id)
+            defiance = f" {defender.name} answers: \"{leader_voice(defender, 'defiance')}\"" if defender is not None else ""
+            logs.append(f"WAR DECLARED: {attacker_name} ({leader.name}) moves against {defender_name}. {leader.name}: \"{leader_voice(leader, 'warcry')}\"{defiance}")
             break
 
     systems, attrition_logs = apply_war_devastation(new_wars, systems, rng, num_ticks)

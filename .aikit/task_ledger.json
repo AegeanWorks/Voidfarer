@@ -1,273 +1,264 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-travel-open-space-parity-and-ticker-resilience",
+    "task_id": "voidfarer-nap-voice-parity",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1793548782.289931,
-    "owner": "antigravity:lead",
-    "started_by": "antigravity:lead",
-    "continuations": [],
-    "completed_at": 1793548786.6996648
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1793631711.8336775,
+    "owner": "kilo:1",
+    "started_by": "kilo:1",
+    "continuations": []
   },
   "checkpoints": [
     {
-      "task_id": "voidfarer-nebula-depth-and-tactical-reticle",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/5] Plan: add interstellar nebula backdrop, Rayleigh limb scattering, navigational bearing compass reticle, and combat flak/arc particles.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793533991.6884706,
-      "timestamp_str": "2026-11-01 14:53:11",
-      "agent": "antigravity:lead",
-      "impact_assessment": {
-        "why": "Elevate cosmic visual grandeur, spatial navigation orientation, atmospheric fidelity, and combat kinetic immersion in Voidfarer cockpit.",
-        "benefits": "Multi-layered procedural cosmic dust nebulae, atmospheric limb glow, holographic bearing compass, tactical combat flak/arc FX, and categorized flight log telemetry chips.",
-        "risks": "contract: preserve 60fps canvas performance and clean GameState serialization; dependency: zero external dependencies; concurrency: thread-safe engine; state: clean state cloning.",
-        "mitigation": "Deterministic seeded procedural rendering, canvas layer caching, 12px text floor preservation, 100% test pass gate, and Playwright screenshot verification."
-      },
-      "handoff": {
-        "state": "clean",
-        "next": "implement nebula dust lanes and atmospheric scattering in celestial.js",
-        "failed": "none",
-        "open": "none",
-        "evidence": "5/5 gates passed"
-      }
-    },
-    {
-      "task_id": "voidfarer-nebula-depth-and-tactical-reticle",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: cosmic dust filaments cached; azimuth reticle wired; flak, ion arc and quantum flash FX verified; 1,111 tests pass; 5/5 gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793535695.7028918,
-      "timestamp_str": "2026-11-01 15:21:35",
-      "agent": "antigravity:lead"
-    },
-    {
-      "task_id": "voidfarer-nebula-depth-and-tactical-reticle",
+      "task_id": "voidfarer-ai-fuel-gates",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'voidfarer-nebula-depth-and-tactical-reticle' completed successfully.",
+      "description": "Task 'voidfarer-ai-fuel-gates' completed successfully.",
       "status": "completed",
-      "timestamp": 1793535701.7125766,
-      "timestamp_str": "2026-11-01 15:21:41",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575062.831584,
+      "timestamp_str": "2026-11-02 02:17:42",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-radar-pan-parallax-and-camera-focus",
+      "task_id": "voidfarer-skills-talent-badge",
       "phase": "phase 2",
       "phase_num": 2,
-      "description": "[1/3] Plan: implement multi-layer starfield parallax during radar pan, drag inertia, smooth camera focus interpolation, and off-screen target navigation chevrons.",
+      "description": "[1/3] Plan: attention badge on SKILLS for unspent talent points",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793542589.731714,
-      "timestamp_str": "2026-11-01 17:16:29",
-      "agent": "antigravity:lead",
+      "timestamp": 1793575090.6164439,
+      "timestamp_str": "2026-11-02 02:18:10",
+      "agent": "kilo:1",
       "impact_assessment": {
-        "why": "Panning the radar canvas currently leaves the cosmic backdrop static and abruptly stops with zero drag inertia, lacking spatial depth and off-screen situational awareness.",
-        "benefits": "Adds rich cosmic parallax depth during navigation, smooth physics-based pan inertia, animated camera centering, and off-screen target navigation reticles.",
-        "risks": "contract: preserve 60fps canvas performance and clean GameState serialization; dependency: zero external dependencies; concurrency: thread-safe engine; state: clean state cloning.",
-        "mitigation": "Offscreen canvas backdrop layer caching, requestAnimationFrame timestamp delta interpolation, single-declaration palette compliance, and 100% test pass gate."
+        "why": "Unspent specialization points hide in the top-bar subtext while every other spendable resource now carries a tab badge",
+        "benefits": "Consistent spend signal; clears on allocation",
+        "risks": "contract: static surface only, reads mastery talent_points; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "Bounded to two static files, node check, click-map, 720p skills audit"
       }
     },
     {
-      "task_id": "voidfarer-radar-pan-parallax-and-camera-focus",
+      "task_id": "voidfarer-skills-talent-badge",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[2/2] Verify: drag momentum, starfield parallax, smooth camera focus, range scale and offscreen chevrons verified; 1,111 tests pass; 5/5 gates pass. checklists: passed",
+      "description": "[3/3] Verify: badge counts unspent talent points and clears on allocation, click-map 162 clean, skills audit clean, 1163 tests pass. checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793543245.5569727,
-      "timestamp_str": "2026-11-01 17:27:25",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575224.218905,
+      "timestamp_str": "2026-11-02 02:20:24",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-radar-pan-parallax-and-camera-focus",
+      "task_id": "voidfarer-skills-talent-badge",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'voidfarer-radar-pan-parallax-and-camera-focus' completed successfully.",
+      "description": "Task 'voidfarer-skills-talent-badge' completed successfully.",
       "status": "completed",
-      "timestamp": 1793543253.4591563,
-      "timestamp_str": "2026-11-01 17:27:33",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575253.752791,
+      "timestamp_str": "2026-11-02 02:20:53",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-station-engineering-audio-and-ability-bay",
+      "task_id": "voidfarer-commerce-margin-badge",
       "phase": "phase 2",
       "phase_num": 2,
-      "description": "[1/3] Plan: implement orbital station visual architecture, pneumatic docking/warp/flak audio synthesis, and character ability bay grid ergonomics.",
+      "description": "[1/3] Plan: attention badge on COMMERCE for held goods selling above average cost",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793544422.3884585,
-      "timestamp_str": "2026-11-01 17:47:02",
-      "agent": "antigravity:lead",
+      "timestamp": 1793575266.365907,
+      "timestamp_str": "2026-11-02 02:21:06",
+      "agent": "kilo:1",
       "impact_assessment": {
-        "why": "Orbital stations currently render as basic line rings without docking infrastructure; ability cards suffer from flex wrap jitter on long descriptions; and tactical maneuvers lack pneumatic docking, warp thrum, and flak audio feedback.",
-        "benefits": "Elevates orbital station model fidelity with photovoltaic arrays and docking strobes; provides visceral audio feedback via Web Audio API synthesis; and delivers clean fixed-column ability card ergonomics.",
-        "risks": "contract: preserve 60fps canvas performance and clean GameState serialization; dependency: zero external dependencies; concurrency: thread-safe engine; state: clean state cloning.",
-        "mitigation": "Offscreen sprite caching, deterministic procedural geometry, 12px font floor compliance, single-declaration palette compliance, and 100% test pass gate."
+        "why": "Profitable sales hide in the quote table; the margin chips already compute the signal per row but nothing surfaces it at tab level",
+        "benefits": "Sell winners at a glance; mirrors the row chip rule exactly; clears as holdings sell",
+        "risks": "contract: static surface only, reads quotes plus cargo averages; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "Bounded to two static files, node check, click-map, 720p market audit"
       }
     },
     {
-      "task_id": "voidfarer-station-engineering-audio-and-ability-bay",
+      "task_id": "voidfarer-commerce-margin-badge",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[3/3] Verify: station photovoltaic arrays, synthesized sound (playDock, playWarp, playFlak), ability bay fixed 3-column grid and .ready cues; 1,111+ tests pass, Playwright browser audit 0 errors/0 hscroll/0 tiny; gates 5/5. checklists: passed",
+      "description": "[3/3] Verify: badge counts profitable holdings per the margin-chip rule, click-map 162 clean, market audit clean, 1163 tests pass. checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793545196.8142807,
-      "timestamp_str": "2026-11-01 17:59:56",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575369.5997143,
+      "timestamp_str": "2026-11-02 02:22:49",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-station-engineering-audio-and-ability-bay",
+      "task_id": "voidfarer-commerce-margin-badge",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'voidfarer-station-engineering-audio-and-ability-bay' completed successfully.",
+      "description": "Task 'voidfarer-commerce-margin-badge' completed successfully.",
       "status": "completed",
-      "timestamp": 1793545201.6706245,
-      "timestamp_str": "2026-11-01 18:00:01",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575388.2703967,
+      "timestamp_str": "2026-11-02 02:23:08",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-typography-floor-and-combat-telemetry",
+      "task_id": "voidfarer-ai-recruit-badge",
       "phase": "phase 2",
       "phase_num": 2,
-      "description": "[1/3] Plan: harden typography floor across factions, relics, outposts, and combat canvas to eliminate sub-12px elements; add combat kinetic effects.",
+      "description": "[1/3] Plan: attention badge on AI COMMAND for recruitable captains",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793546239.7995028,
-      "timestamp_str": "2026-11-01 18:17:19",
-      "agent": "antigravity:lead",
+      "timestamp": 1793575396.5463996,
+      "timestamp_str": "2026-11-02 02:23:16",
+      "agent": "kilo:1",
       "impact_assessment": {
-        "why": "Factions tab and other decks had legacy 10px and 11px font styles violating the >=12px readability floor; combat canvas had 8px/10px pips.",
-        "benefits": "100% compliance with >=12px readability floor across all 15 cockpit tabs; crisp combat target telemetry.",
-        "risks": "contract: no layout wrapping regressions; dependency: 0 external deps; concurrency: safe; state: safe.",
-        "mitigation": "Playwright full-tab audit across all viewports; 100% test pass gate."
+        "why": "Hireable mercenaries and allyable captains hide in the roster although the buttons now gate on exactly these conditions",
+        "benefits": "Badge mirrors the button rules: affordable unhired mercenaries plus 50-trust unallied captains",
+        "risks": "contract: static surface only, reuses button gate logic; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "Bounded to two static files, node check, click-map, 720p AI audit"
       }
     },
     {
-      "task_id": "voidfarer-typography-floor-and-combat-telemetry",
+      "task_id": "voidfarer-ai-recruit-badge",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[3/3] Verify: hardened typography floor across factions, relics, outposts, auto-trade, and combat canvas to eliminate sub-12px elements; 1,111+ tests pass, Playwright browser audit 0 errors/0 hscroll/0 tiny across all 15 tabs and click-map; gates 5/5. checklists: passed",
+      "description": "[3/3] Verify: badge mirrors HIRE/ALLY button rules exactly, click-map 162 clean, AI audit clean, 1163 tests pass. checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793546737.9007611,
-      "timestamp_str": "2026-11-01 18:25:37",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575483.8371377,
+      "timestamp_str": "2026-11-02 02:24:43",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-typography-floor-and-combat-telemetry",
+      "task_id": "voidfarer-ai-recruit-badge",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'voidfarer-typography-floor-and-combat-telemetry' completed successfully.",
+      "description": "Task 'voidfarer-ai-recruit-badge' completed successfully.",
       "status": "completed",
-      "timestamp": 1793546751.870004,
-      "timestamp_str": "2026-11-01 18:25:51",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575504.6269937,
+      "timestamp_str": "2026-11-02 02:25:04",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-radar-hit-test-scale-alignment",
+      "task_id": "voidfarer-player-origin-lore",
       "phase": "phase 2",
       "phase_num": 2,
-      "description": "[1/3] Plan: align radar canvas hit-testing auScale with orbitFitScale in handleCanvasClick and handleCanvasMouseMove, and enable star body selection.",
+      "description": "[1/3] Plan: surface commander origin lore in the PLAYER dossier",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793547355.9862168,
-      "timestamp_str": "2026-11-01 18:35:55",
-      "agent": "antigravity:lead",
+      "timestamp": 1793575526.4597995,
+      "timestamp_str": "2026-11-02 02:25:26",
+      "agent": "kilo:1",
       "impact_assessment": {
-        "why": "handleCanvasClick and handleCanvasMouseMove used hardcoded 45*zoom*radarScale rather than orbitFitScale, causing clicked planets to be missed and open-space vectors to land at mismatched distances.",
-        "benefits": "Precise 1:1 click targeting for all celestial bodies, traffic, and vectors; clicking exactly selects the target under the cursor.",
-        "risks": "contract: preserve click behavior and point navigation; dependency: zero external deps; concurrency: safe; state: safe.",
-        "mitigation": "Playwright click testing; 100% test pass gate."
+        "why": "Background lore written for the catalog never reaches the dossier; the meta row shows only the origin name",
+        "benefits": "Origin backstory visible where identity lives; tooltip plus lore line from the snapshot catalog",
+        "risks": "contract: static surface only, reads existing background catalog; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "Node check, click-map, 720p player audit, fast gate"
       }
     },
     {
-      "task_id": "voidfarer-radar-hit-test-scale-alignment",
-      "phase": "phase 3",
-      "phase_num": 3,
-      "description": "[2/3] Implemented scale alignment and central star targeting in app.js and added unit test in test_stellar_depth_ui.py",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793547886.3472185,
-      "timestamp_str": "2026-11-01 18:44:46",
-      "agent": "antigravity:lead"
-    },
-    {
-      "task_id": "voidfarer-radar-hit-test-scale-alignment",
+      "task_id": "voidfarer-player-origin-lore",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[3/3] Verified 5/5 quality gates, Playwright multi-viewport click tests, and ADR-144; checklists: passed",
+      "description": "[3/3] Verify: dossier shows origin backstory and training with tooltip, template regression caught by node check and fixed, click-map 162 clean, player audit clean, 1163 tests pass. checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793547900.637901,
-      "timestamp_str": "2026-11-01 18:45:00",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575744.5210469,
+      "timestamp_str": "2026-11-02 02:29:04",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-radar-hit-test-scale-alignment",
+      "task_id": "voidfarer-player-origin-lore",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'voidfarer-radar-hit-test-scale-alignment' completed successfully.",
+      "description": "Task 'voidfarer-player-origin-lore' completed successfully.",
       "status": "completed",
-      "timestamp": 1793547903.7683625,
-      "timestamp_str": "2026-11-01 18:45:03",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575764.6649857,
+      "timestamp_str": "2026-11-02 02:29:24",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-travel-open-space-parity-and-ticker-resilience",
-      "phase": "phase 1",
-      "phase_num": 1,
-      "description": "[1/3] Plan: align open-space distance and course plotting in app.js and harden background ticker loop resilience in server.py",
+      "task_id": "voidfarer-left-tabs-certify",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: full 16-tab audit sweep at 720p and desktop to certify final state",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793548462.258984,
-      "timestamp_str": "2026-11-01 18:54:22",
-      "agent": "antigravity:lead",
+      "timestamp": 1793575787.2966921,
+      "timestamp_str": "2026-11-02 02:29:47",
+      "agent": "kilo:1",
       "impact_assessment": {
-        "why": "Ensure open space waypoint coordinates are used in distance calculation and trajectory rendering, and harden background server ticker loop",
-        "benefits": "Accurate travel estimates from open space, clear course plot visualization, resilient ticker execution",
-        "risks": "contract: preserve existing transit and distance calculation contracts; state: safe",
-        "mitigation": "Playwright UI verification and unit tests"
+        "why": "Eleven left-tab changes landed across many audits; a single fresh sweep proves no regressions and certifies the complete surface",
+        "benefits": "One clean report across every tab and both viewports",
+        "risks": "contract: read-only audits; dependency: none; concurrency: none; state: none",
+        "mitigation": "Playwright scenario audits, no file changes"
       }
     },
     {
-      "task_id": "voidfarer-travel-open-space-parity-and-ticker-resilience",
-      "phase": "phase 3",
-      "phase_num": 3,
-      "description": "[2/3] Implemented open-space distance and trajectory plotting in app.js, ticker exception handling in server.py, and unit test in test_stellar_depth_ui.py",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793548777.0823333,
-      "timestamp_str": "2026-11-01 18:59:37",
-      "agent": "antigravity:lead"
-    },
-    {
-      "task_id": "voidfarer-travel-open-space-parity-and-ticker-resilience",
+      "task_id": "voidfarer-left-tabs-certify",
       "phase": "phase 4",
       "phase_num": 4,
-      "description": "[3/3] Verified 5/5 quality gates, Playwright browser scenarios, and ADR-145; checklists: passed",
+      "description": "[2/2] Certify: all 16 left tabs 0 errors at 720p, click-map 162 clean, 1163 tests pass. checklists: passed",
       "files_affected": [],
       "status": "in_progress",
-      "timestamp": 1793548782.289931,
-      "timestamp_str": "2026-11-01 18:59:42",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575962.8929014,
+      "timestamp_str": "2026-11-02 02:32:42",
+      "agent": "kilo:1"
     },
     {
-      "task_id": "voidfarer-travel-open-space-parity-and-ticker-resilience",
+      "task_id": "voidfarer-left-tabs-certify",
       "phase": "completed",
       "phase_num": 5,
-      "description": "Task 'voidfarer-travel-open-space-parity-and-ticker-resilience' completed successfully.",
+      "description": "Task 'voidfarer-left-tabs-certify' completed successfully.",
       "status": "completed",
-      "timestamp": 1793548786.6996665,
-      "timestamp_str": "2026-11-01 18:59:46",
-      "agent": "antigravity:lead"
+      "timestamp": 1793575983.959685,
+      "timestamp_str": "2026-11-02 02:33:03",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "voidfarer-repair-amount-guard",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: reject non-positive escort repair amounts instead of charging for nothing",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793631087.3584476,
+      "timestamp_str": "2026-11-02 17:51:27",
+      "agent": "kilo:1",
+      "impact_assessment": {
+        "why": "repair_escorts(-60) returns success and charges the 50cr floor while restoring 0 integrity; fuzzing hostile inputs found it",
+        "benefits": "No-op paid actions are refused like every other validated action; matches min-amount conventions",
+        "risks": "contract: non-positive amounts now return False with a message; dependency: none; concurrency: single-threaded; state: no change on rejection",
+        "mitigation": "Failing-first test, full suite plus captain gate"
+      }
+    },
+    {
+      "task_id": "voidfarer-repair-amount-guard",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verify: non-positive escort repairs refused with no charge, matches hull/refuel convention; 1164 tests pass; captain 0 gaps; ADR-159; all gates pass. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793631237.6289144,
+      "timestamp_str": "2026-11-02 17:53:57",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "voidfarer-repair-amount-guard",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-repair-amount-guard' completed successfully.",
+      "status": "completed",
+      "timestamp": 1793631710.770729,
+      "timestamp_str": "2026-11-02 18:01:50",
+      "agent": "kilo:1"
+    },
+    {
+      "task_id": "voidfarer-nap-voice-parity",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verify: NAP branch carries pact-occasion leader voice, new test plus full suite green. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793631711.8336775,
+      "timestamp_str": "2026-11-02 18:01:51",
+      "agent": "kilo:1"
     }
   ]
 }

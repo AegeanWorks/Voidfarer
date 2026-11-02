@@ -335,6 +335,13 @@ DECISION_DEFINITIONS: tuple[DecisionDefinition, ...] = (
             _choice("bypass", "Land on the far side", "Risk the fine for a free approach.", {"standing": {"sol_coalition": -2}, "log": "You touch down out of sight of the tower."}),
         ), _at_inhabited, priority=33,
     ),
+    DecisionDefinition(
+        "colonial_offer", "The Colonial Offer", "Admiral Vance has reviewed your flight record. The Coalition will charter your first colony and file its first mandate — if you will plant the flag.",
+        "major", ("tick",), (
+            _choice("accept", "Accept the mandate", "Take the Coalition charter and its first colonial contract.", {"standing": {"sol_coalition": 2}, "contract": "colonial", "log": "Vance signs the charter. Your first colonial mandate is filed with the outpost bureau."}),
+            _choice("decline", "Decline for now", "Stay a free captain a while longer.", {"log": "Vance accepts your refusal; the Coalition will find another flag to plant."}),
+        ), lambda state: state.ship.mastery.level >= 2 and len(state.outposts) == 0, priority=88,
+    ),
 )
 
 DECISION_MAP: dict[str, DecisionDefinition] = {d.id: d for d in DECISION_DEFINITIONS}

@@ -474,5 +474,24 @@
     "final_snapshot_digest": "bf20da340ce48dc2f8444300950485679b1e3774fcc0720363ea1ecd7763d92b",
     "final_snapshot_entries": 1128,
     "surface_digest": "810f76bd3d1835036d7aca66a0f0a96f7c3f6884eb419ddc4c4d009be3dd2ee2"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "413484031e7c2a63646d6a93925b5ca3abaf6106",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793552729.253977,
+    "finished_at": 1793552959.109792,
+    "strikes": 3,
+    "reviewer": "Copilot SDK in VS Code",
+    "allowed_removals": [
+      {
+        "pattern": "voidfarer/static/celestial.js",
+        "reason": "This cockpit visual task intentionally extends the procedural celestial sprite model with a deterministic animated station signal."
+      }
+    ],
+    "final_snapshot_digest": "11f05513d5193cd3bb042b738c390458fad6feed0bd69e178391fbdc6fd7acd0",
+    "final_snapshot_entries": 1134,
+    "surface_digest": "6549f76bf5b7e2a3e9325280d4dc987452b14cf04caebea2acee306795790da2"
   }
 ]

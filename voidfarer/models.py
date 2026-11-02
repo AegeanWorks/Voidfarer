@@ -912,6 +912,7 @@ class StoryChapter:
             2: "act3_eternity_gate",
             3: "act4_hollow_between",
             4: "act5_first_voidfarers",
+            5: "act6_first_charter",
         }
         return chapter_ids.get(self.chapter_index, f"act{self.chapter_index + 1}")
 
@@ -1820,6 +1821,89 @@ class AwayMission:
 
 
 @dataclass(frozen=True)
+class ShipRoom:
+    """Persistent room manifest entry used by the cockpit interior schematic."""
+
+    id: str
+    label: str
+    function: str
+    status: str = "online"
+    order: int = 0
+
+    def __post_init__(self) -> None:
+        if self.status not in {"online", "staffed", "offline"}:
+            raise ValueError(f"Unknown room status: {self.status}")
+        if self.order < 0:
+            raise ValueError("Room order cannot be negative")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "label": self.label,
+            "function": self.function,
+            "status": self.status,
+            "order": self.order,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ShipRoom:
+        return cls(
+            id=str(data.get("id", "compartment")),
+            label=str(data.get("label", "COMPARTMENT")),
+            function=str(data.get("function", "GENERAL")),
+            status=str(data.get("status", "online")),
+            order=max(0, int(data.get("order", 0))),
+        )
+
+    @classmethod
+    def default_layout(cls, ship_class: str) -> tuple[ShipRoom, ...]:
+        """Return a deterministic manifest for old saves without room data."""
+        normalized = str(ship_class).lower()
+        if "freight" in normalized or "cargo" in normalized:
+            entries = (
+                ("bridge", "BRIDGE", "FLIGHT"),
+                ("cargo", "CARGO HOLD", "LOGISTICS"),
+                ("cargo_b", "CARGO HOLD B", "LOGISTICS"),
+                ("reactor", "REACTOR", "POWER"),
+                ("crew", "CREW DECK", "QUARTERS"),
+                ("dock", "DOCKING BAY", "TRANSFER"),
+            )
+        elif "fighter" in normalized or "intercept" in normalized:
+            entries = (
+                ("cockpit", "COCKPIT", "FLIGHT"),
+                ("reactor", "REACTOR", "POWER"),
+                ("weapons", "WEAPONS", "TACTICAL"),
+                ("medbay", "MEDBAY", "RECOVERY"),
+            )
+        elif "explor" in normalized or "survey" in normalized:
+            entries = (
+                ("bridge", "BRIDGE", "FLIGHT"),
+                ("sensor", "SENSORIUM", "SCIENCE"),
+                ("lab", "FIELD LAB", "RESEARCH"),
+                ("reactor", "REACTOR", "POWER"),
+                ("crew", "CREW DECK", "QUARTERS"),
+                ("airlock", "AIRLOCK", "AWAY TEAM"),
+            )
+        elif "stealth" in normalized or "ghost" in normalized:
+            entries = (
+                ("cockpit", "COCKPIT", "FLIGHT"),
+                ("reactor", "REACTOR", "POWER"),
+                ("ghost", "GHOST BAY", "COVERT"),
+                ("sensor", "PASSIVE SENSORS", "SCIENCE"),
+            )
+        else:
+            entries = (
+                ("bridge", "BRIDGE", "FLIGHT"),
+                ("reactor", "REACTOR", "POWER"),
+                ("medbay", "MEDBAY", "RECOVERY"),
+                ("crew", "CREW DECK", "QUARTERS"),
+                ("cargo", "CARGO", "LOGISTICS"),
+                ("sensor", "SENSORIUM", "SCIENCE"),
+            )
+        return tuple(cls(room_id, label, function, order=index) for index, (room_id, label, function) in enumerate(entries))
+
+
+@dataclass(frozen=True)
 class ShipState:
     """Complete telemetry, resource inventory, and status of the player's flagship."""
 
@@ -1842,6 +1926,7 @@ class ShipState:
     upgrades: tuple[str, ...] = ()
     equipped_upgrades: dict[str, str] = field(default_factory=dict)
     ship_mods: dict[str, str] = field(default_factory=dict)
+    rooms: tuple[ShipRoom, ...] = ()
     fleet_drones: tuple[FleetDrone, ...] = ()
     fleet_ships: tuple[FleetShip, ...] = ()
     battle_stance: str = "balanced"
@@ -1879,6 +1964,10 @@ class ShipState:
     waypoint_au: float = 0.0
     waypoint_angle: float = 0.0
 
+    def __post_init__(self) -> None:
+        if not self.rooms:
+            object.__setattr__(self, "rooms", ShipRoom.default_layout(self.ship_class))
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "commander_name": self.commander_name,
@@ -1901,6 +1990,7 @@ class ShipState:
             "upgrades": list(self.upgrades),
             "equipped_upgrades": dict(self.equipped_upgrades),
             "ship_mods": dict(self.ship_mods),
+            "rooms": [room.to_dict() for room in self.rooms],
             "fleet_drones": [d.to_dict() for d in self.fleet_drones],
             "fleet_ships": [s.to_dict() for s in self.fleet_ships],
             "battle_stance": self.battle_stance,
@@ -1957,6 +2047,12 @@ class ShipState:
         }
         corp_standings = dict(data.get("corp_standings") or default_corps)
 
+        rooms_data = data.get("rooms")
+        rooms = (
+            tuple(ShipRoom.from_dict(room) for room in rooms_data)
+            if rooms_data is not None
+            else ShipRoom.default_layout(str(data.get("ship_class", "Vanguard Explorer")))
+        )
         return cls(
             commander_name=str(data.get("commander_name", "Valerius")),
             callsign=str(data.get("callsign", "Aegis-7")),
@@ -1978,6 +2074,7 @@ class ShipState:
             upgrades=tuple(data.get("upgrades", ())),
             equipped_upgrades=dict(data.get("equipped_upgrades", {})),
             ship_mods={str(k): str(v) for k, v in data.get("ship_mods", {}).items()},
+            rooms=rooms,
             fleet_drones=tuple(FleetDrone.from_dict(d) for d in data.get("fleet_drones", [])),
             fleet_ships=tuple(FleetShip.from_dict(s) for s in data.get("fleet_ships", [])),
             battle_stance=str(data.get("battle_stance", "balanced")),
@@ -2363,4 +2460,3 @@ class GameState:
                 data.get("quantum_automation", {})
             ),
         )
-

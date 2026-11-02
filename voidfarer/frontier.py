@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import random
 from dataclasses import replace
 from typing import Any
@@ -46,6 +47,38 @@ AI_CAPTAIN_SEEDS: tuple[tuple[str, str, str], ...] = (
     ("captain_sable", "Sable Voss", "ally"),
     ("captain_kade", "Kade Redshift", "pirate"),
 )
+
+# Hail greetings per captain archetype; the stable per-captain pick keeps the
+# five autonomous hulls distinct without touching saves or RNG streams.
+AI_CAPTAIN_HAILS: dict[str, tuple[str, ...]] = {
+    "trader": (
+        "Vega here. Manifest is open and the scales are honest. What do you need?",
+        "Broker on the line. I move anything legal, most things twice.",
+        "Hauler with room to spare. Name your cargo and your price.",
+    ),
+    "mercenary": (
+        "Ironjaw listening. My guns are rented, never bought. State the target.",
+        "You have thirty seconds. Contract terms, then coordinates.",
+        "Rorik here. I bill by the battle and finish what I start.",
+    ),
+    "ally": (
+        "Sable Voss. The outer systems remember their friends. How can I help?",
+        "Envoy on an open channel. Speak plainly and we will get along.",
+        "Good to hear a friendly voice out here. What do you propose?",
+    ),
+    "pirate": (
+        "Redshift here. Your hold looks heavy, friend. Let's lighten it together.",
+        "Kade on the wire. Pay the toll or pay the welder. Your call.",
+        "Well well. Fly straight and this stays a conversation.",
+    ),
+}
+
+
+def captain_hail(captain: AICaptain) -> str:
+    """Deterministic hail greeting for a captain; stable per captain id."""
+    lines = AI_CAPTAIN_HAILS.get(captain.archetype) or AI_CAPTAIN_HAILS["trader"]
+    digest = hashlib.md5(f"{captain.id}:hail".encode("utf-8")).hexdigest()
+    return lines[int(digest, 16) % len(lines)]
 
 
 def generate_ai_captains(systems: dict[str, StarSystem], seed: int = 42) -> tuple[AICaptain, ...]:

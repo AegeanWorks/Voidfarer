@@ -297,6 +297,12 @@ class TestStoryAndTutorial(unittest.TestCase):
 
         ok, msg = self.engine.make_story_choice("choice_claim_title")
         self.assertTrue(ok)
+        self.assertFalse(self.engine.state.ship.story.completed)
+        self.assertEqual(self.engine.state.ship.story.active_act, 6)
+
+        # Act VI epilogue: the free charter completes the campaign
+        ok, msg = self.engine.make_story_choice("choice_free_charter")
+        self.assertTrue(ok)
         self.assertIn("CAMPAIGN FINALE", msg)
         story = self.engine.state.ship.story
         self.assertTrue(story.completed)
@@ -539,6 +545,9 @@ class TestStoryBranchingMechanics(unittest.TestCase):
 
         ok, msg = self.engine.make_story_choice("choice_sell_echoes")
         self.assertTrue(ok, msg)
+        self.assertFalse(self.engine.state.ship.story.completed)
+        ok, msg = self.engine.make_story_choice("choice_free_charter")
+        self.assertTrue(ok, msg)
         story = self.engine.state.ship.story
         self.assertTrue(story.completed)
         self.assertEqual(story.ending_id, "ending_shadow_broker")
@@ -549,6 +558,64 @@ class TestStoryBranchingMechanics(unittest.TestCase):
         story = self.engine.state.ship.story
         speakers = [(t.speaker, t.message) for t in story.transmission_log]
         self.assertTrue(any(speaker == "Cipher" and "profitable exchange" in message for speaker, message in speakers))
+
+    def test_campaign_ends_in_charter_finale(self):
+        self.assertEqual(len(CAMPAIGN_CHAPTERS), 6)
+        finale = CAMPAIGN_CHAPTERS[5]
+        self.assertEqual(finale.chapter_index, 5)
+        self.assertEqual(finale.id, "act6_first_charter")
+        self.assertIn("Charter", finale.title)
+        self.assertEqual(
+            {c.id for c in finale.choices},
+            {"choice_sign_charter", "choice_free_charter"},
+        )
+
+    def _engine_at_finale(self, reputation=None):
+        from dataclasses import replace
+        story = StoryState(
+            current_chapter_index=5,
+            chapters=CAMPAIGN_CHAPTERS,
+            transmission_log=(),
+            reputation=reputation or {},
+        )
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(story=story, credits=5000)
+        )
+        return engine
+
+    def test_charter_finale_coalition_path_needs_standing(self):
+        engine = self._engine_at_finale()
+        ok, msg = engine.make_story_choice("choice_sign_charter")
+        self.assertFalse(ok)
+        self.assertIn("reputation", msg.lower())
+        engine = self._engine_at_finale(reputation={"coalition": 25})
+        ok, msg = engine.make_story_choice("choice_sign_charter")
+        self.assertTrue(ok, msg)
+        story = engine.state.ship.story
+        self.assertTrue(story.completed)
+        self.assertTrue(story.flags.get("charter_signed_coalition"))
+
+    def test_charter_finale_free_path_stays_open(self):
+        engine = self._engine_at_finale()
+        ok, msg = engine.make_story_choice("choice_free_charter")
+        self.assertTrue(ok, msg)
+        story = engine.state.ship.story
+        self.assertTrue(story.completed)
+        self.assertTrue(story.flags.get("charter_free"))
+
+    def test_completed_five_act_save_reopens_at_finale(self):
+        legacy = StoryState(
+            current_chapter_index=5,
+            chapters=CAMPAIGN_CHAPTERS[:5],
+            transmission_log=(),
+            completed=True,
+        )
+        migrated = migrate_story_state(legacy)
+        self.assertEqual(len(migrated.chapters), 6)
+        self.assertFalse(migrated.completed)
+        self.assertEqual(migrated.current_chapter_index, 5)
+        self.assertEqual(migrated.current_chapter_id, "act6_first_charter")
 
     def test_resolve_story_ending_variants(self):
         def story_with_flags(flags):
@@ -606,7 +673,7 @@ class TestStoryBranchingMechanics(unittest.TestCase):
             completed=True,
         )
         migrated = migrate_story_state(legacy)
-        self.assertEqual(len(migrated.chapters), 5)
+        self.assertEqual(len(migrated.chapters), 6)
         self.assertFalse(migrated.completed)
         self.assertEqual(migrated.current_chapter_index, 3)
         self.assertTrue(any("Cygnus gate" in t.message for t in migrated.transmission_log))
@@ -619,7 +686,7 @@ class TestStoryBranchingMechanics(unittest.TestCase):
             transmission_log=(CAMPAIGN_CHAPTERS[0].transmission,),
         )
         migrated_mid = migrate_story_state(mid)
-        self.assertEqual(len(migrated_mid.chapters), 5)
+        self.assertEqual(len(migrated_mid.chapters), 6)
         self.assertEqual(migrated_mid.current_chapter_index, 1)
         self.assertFalse(migrated_mid.completed)
         self.assertEqual(len(migrated_mid.transmission_log), 1)
@@ -642,7 +709,7 @@ class TestStoryBranchingMechanics(unittest.TestCase):
         ok, msg = self.engine.load_state(legacy_state)
         self.assertTrue(ok)
         story = self.engine.state.ship.story
-        self.assertEqual(len(story.chapters), 5)
+        self.assertEqual(len(story.chapters), 6)
         self.assertFalse(story.completed)
         self.assertEqual(story.current_chapter_index, 3)
         self.assertEqual(story.current_chapter_id, "act4_hollow_between")

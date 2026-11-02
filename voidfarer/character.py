@@ -20,6 +20,62 @@ STARTING_SKILL_BASE = 5
 STARTING_SKILL_POINTS = 20
 MAX_STARTING_SKILL_TOTAL = len(SKILL_CATALOG) * STARTING_SKILL_BASE + STARTING_SKILL_POINTS
 
+# Commander origins: origin training applies after the creation budget, so a
+# background never eats skill points — it adds up to +3 ranks of backstory.
+COMMANDER_BACKGROUNDS: dict[str, dict[str, Any]] = {
+    "navigator": {
+        "name": "Navigator",
+        "description": "Academy flight-track graduate. Plotted convoy lanes through the Rift before earning a commission.",
+        "skills": {"piloting": 2, "science": 1},
+    },
+    "engineer": {
+        "name": "Engineer",
+        "description": "Drydock-raised reactor tech. Can hear a misaligned coil before the diagnostics do.",
+        "skills": {"engineering": 2, "piloting": 1},
+    },
+    "marine": {
+        "name": "Marine",
+        "description": "Coalition drop infantry. Breached three hulks before trading the rifle for a command chair.",
+        "skills": {"combat": 2, "engineering": 1},
+    },
+    "merchant": {
+        "name": "Merchant",
+        "description": "Free trader out of the outer markets. Knows every spread from Sol to the Veil.",
+        "skills": {"trade": 2, "diplomacy": 1},
+    },
+    "diplomat": {
+        "name": "Diplomat",
+        "description": "Consular attache who talked a blockade into a trade pact. The flag follows the words.",
+        "skills": {"diplomacy": 2, "trade": 1},
+    },
+    "prospector": {
+        "name": "Prospector",
+        "description": "Belt runner and survey hand. Reads rock the way navigators read stars.",
+        "skills": {"science": 2, "trade": 1},
+    },
+}
+
+
+def match_background(background: str) -> str | None:
+    """Canonical background id for an id or display name (case-insensitive); None for custom strings."""
+    want = str(background or "").strip().lower()
+    for background_id, info in COMMANDER_BACKGROUNDS.items():
+        if want == background_id or want == str(info.get("name", "")).lower():
+            return background_id
+    return None
+
+
+def apply_background_bonus(skills: dict[str, int], background_id: str) -> dict[str, int]:
+    """Layer origin training onto creation skills, capped at rank 10."""
+    info = COMMANDER_BACKGROUNDS.get(background_id)
+    if not info:
+        return dict(skills)
+    updated = dict(skills)
+    for skill, bonus in dict(info.get("skills", {})).items():
+        if skill in updated:
+            updated[skill] = max(1, min(10, int(updated[skill]) + int(bonus)))
+    return updated
+
 ABILITY_CATALOG: dict[str, dict[str, Any]] = {
     "overclock": {
         "name": "Reactor Overclock",

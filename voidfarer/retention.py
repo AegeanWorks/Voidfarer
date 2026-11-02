@@ -254,11 +254,20 @@ CONTRACT_TEMPLATES = (    {
         "base_xp": 140,
         "relic_tier": None,
     },
+    {
+        "category": "colonial",
+        "title": "Colonial Charter Mandate",
+        "desc_template": "Found {target} colonial outpost on suitable worlds.",
+        "target_range": (1, 2),
+        "base_credits": 800,
+        "base_xp": 200,
+        "relic_tier": "common",
+    },
 )
 
 CONTRACT_CATEGORIES: tuple[str, ...] = (
     "exploration", "combat", "mining", "trade", "delivery",
-    "pirates", "surface", "anomaly", "diplomacy",
+    "pirates", "surface", "anomaly", "diplomacy", "colonial",
 )
 
 

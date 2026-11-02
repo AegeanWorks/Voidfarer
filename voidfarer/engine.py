@@ -44,13 +44,16 @@ from voidfarer.crew import (
 )
 from voidfarer.character import (
     ABILITY_CATALOG,
+    COMMANDER_BACKGROUNDS,
     MAX_STARTING_SKILL_TOTAL,
     SKILL_CATALOG,
     STARTING_SKILL_BASE,
     STARTING_SKILL_POINTS,
     ability_ready,
     advance_age,
+    apply_background_bonus,
     award_character_xp,
+    match_background,
     reconcile_abilities,
     skill_bonus,
     start_ability_cooldown,
@@ -99,6 +102,8 @@ from voidfarer.faction_state import (
     faction_strength,
     force_peace_for_broke_factions,
     generate_faction_leaders,
+    leader_for,
+    leader_voice,
     simulate_faction_behaviors,
 )
 from voidfarer.fleet import (
@@ -190,7 +195,14 @@ from voidfarer.demographics import (
 )
 from voidfarer.faction_economy import initialize_faction_economies, tick_faction_economies
 from voidfarer.faction_trade import compute_trade_links, trade_partner_names
-from voidfarer.messaging import choice_by_id, follow_up_message, tree_catalog, tree_root_message
+from voidfarer.messaging import (
+    choice_by_id,
+    follow_up_message,
+    quantum_offer_for_standing,
+    refugee_messages_for_new_wars,
+    tree_catalog,
+    tree_root_message,
+)
 from voidfarer.mapmods import (
     aggregate_map_modifiers,
     generate_map_modifiers,
@@ -265,6 +277,7 @@ from voidfarer.models import (
 )
 from voidfarer.frontier import (
     MERCENARY_CATALOG,
+    captain_hail,
     generate_ai_captains,
     generate_depots,
     generate_welcome_messages,
@@ -322,6 +335,7 @@ STATIC_SNAPSHOT_KEYS = (
     "catalog_upgrades",
     "catalog_weapons",
     "character_skill_catalog",
+    "character_background_catalog",
     "crew_roles",
     "enemy_archetypes",
     "mercenary_catalog",
@@ -345,6 +359,7 @@ def static_catalogs() -> dict[str, Any]:
         "catalog_upgrades": [u.to_dict() for u in CATALOG_UPGRADES],
         "catalog_weapons": weapon_catalog(),
         "character_skill_catalog": {sid: dict(info) for sid, info in SKILL_CATALOG.items()},
+    "character_background_catalog": {bid: dict(info) for bid, info in COMMANDER_BACKGROUNDS.items()},
         "crew_roles": crew_catalog(),
         "enemy_archetypes": {aid: asdict(a) for aid, a in ENEMY_ARCHETYPES.items()},
         "mercenary_catalog": MERCENARY_CATALOG,
@@ -985,6 +1000,11 @@ class SimulationEngine:
             points += 1
             next_xp = int(next_xp * 1.5)
             logs.append(f"★ PILOT PROMOTION: Reached Pilot Mastery Level {level}! Earned +1 Specialization Point.")
+            if level == self.OUTPOST_CHARTER_MASTERY_LEVEL:
+                logs.append(
+                    "★ OUTPOST CHARTERS AVAILABLE: recognized commander status confirmed — "
+                    "found colonies from the Empire tab (outpost build)."
+                )
 
         return PilotMastery(
             level=level,
@@ -1079,6 +1099,10 @@ class SimulationEngine:
                 skills[skill] = max(1, min(10, int(raw_skills[skill])))
             except (TypeError, ValueError):
                 continue
+        matched = match_background(background)
+        if matched is not None:
+            background = str(COMMANDER_BACKGROUNDS[matched]["name"])
+            skills = apply_background_bonus(skills, matched)
         updated_character = replace(character, name=name, age=age, background=background, skills=skills)
         updated_character, _ = reconcile_abilities(updated_character)
         updated_ship = self._clone_ship(commander_name=name)
@@ -2922,6 +2946,8 @@ class SimulationEngine:
             name = project.name if project else project_id
             return True, f"Removed {name} from the research queue."
 
+    OUTPOST_CHARTER_MASTERY_LEVEL = 2
+
     def build_outpost(self, body_id: str, outpost_type_id: str) -> tuple[bool, str]:
         with self.lock:
             outpost_type = get_outpost_type(outpost_type_id)
@@ -2932,6 +2958,13 @@ class SimulationEngine:
                 return False, f"Body '{body_id}' not found in {self.current_system.name}."
             if self.state.ship.orbiting_body_id != body_id:
                 return False, f"Ship must establish orbit around {body.name} before construction."
+            if self.state.ship.mastery.level < self.OUTPOST_CHARTER_MASTERY_LEVEL:
+                return False, (
+                    f"Outpost charters require Pilot Mastery level "
+                    f"{self.OUTPOST_CHARTER_MASTERY_LEVEL} (recognized commander); "
+                    f"current level {self.state.ship.mastery.level}. "
+                    f"Earn XP through contracts, scans and victories."
+                )
             if not can_build_on(body, outpost_type):
                 return False, f"{outpost_type.name} cannot be built on a {body.body_type}."
             if any(o.body_id == body_id for o in self.state.outposts):
@@ -2945,9 +2978,16 @@ class SimulationEngine:
                 self.state.time.tick,
                 len(self.state.outposts),
             )
-            new_ship = self._clone_ship(credits=self.state.ship.credits - outpost_type.cost)
+            updated_contracts, contract_logs = self._progress_contracts("colonial", 1)
+            new_ship = self._clone_ship(
+                credits=self.state.ship.credits - outpost_type.cost,
+                active_contracts=updated_contracts,
+            )
             self.state = self._clone_state(ship=new_ship, outposts=self.state.outposts + (outpost,))
-            return True, f"Founded {outpost.name} for {outpost_type.cost} cr."
+            msg = f"Founded {outpost.name} for {outpost_type.cost} cr."
+            if contract_logs:
+                msg += " " + " ".join(contract_logs)
+            return True, msg
 
     def upgrade_outpost(self, outpost_id: str) -> tuple[bool, str]:
         with self.lock:
@@ -3539,6 +3579,24 @@ class SimulationEngine:
             if until > now and faction_id != "sol_coalition"
         )
 
+    def _leader_voice_line(self, faction_id: str, occasion: str) -> str:
+        """Voiced leader reply for a diplomacy exchange, empty when leaderless."""
+        leader = leader_for(self.state.faction_leaders, faction_id)
+        if leader is None:
+            return ""
+        return f' {leader.name}: "{leader_voice(leader, occasion)}"'
+
+    @staticmethod
+    def _leader_payload(leader) -> dict:
+        """Snapshot payload joining leader identity with faction creed and lore."""
+        payload = leader.to_dict()
+        faction = CANONICAL_FACTIONS.get(leader.faction_id)
+        if faction is not None:
+            payload["ideology"] = faction.ideology
+            payload["description"] = faction.description
+            payload["headquarters_system"] = faction.headquarters_system
+        return payload
+
     def faction_diplomacy(self, faction_id: str, action: str, amount: int = 0) -> tuple[bool, str]:
         with self.lock:
             if faction_id not in CANONICAL_FACTIONS:
@@ -3556,7 +3614,7 @@ class SimulationEngine:
                 self.state = self._clone_state(
                     ship=self._clone_ship(faction_standings=standings, active_contracts=new_contracts),
                 )
-                return True, f"Diplomatic talks with {CANONICAL_FACTIONS[faction_id].name}: standing {current:+d} -> {standings[faction_id]:+d}." + (" " + " ".join(contract_logs) if contract_logs else "")
+                return True, f"Diplomatic talks with {CANONICAL_FACTIONS[faction_id].name}: standing {current:+d} -> {standings[faction_id]:+d}.{self._leader_voice_line(faction_id, 'greet')}" + (" " + " ".join(contract_logs) if contract_logs else "")
             if act in ("gift", "aid"):
                 cost = max(100, int(amount) if amount else 300)
                 if self.state.ship.credits < cost:
@@ -3570,7 +3628,7 @@ class SimulationEngine:
                     active_contracts=new_contracts,
                 )
                 self.state = self._clone_state(ship=new_ship)
-                return True, f"Aid package delivered to {CANONICAL_FACTIONS[faction_id].name} ({cost} cr, +{gain} standing)." + (" " + " ".join(contract_logs) if contract_logs else "")
+                return True, f"Aid package delivered to {CANONICAL_FACTIONS[faction_id].name} ({cost} cr, +{gain} standing).{self._leader_voice_line(faction_id, 'thanks')}" + (" " + " ".join(contract_logs) if contract_logs else "")
             if act in ("trade_pact", "pact"):
                 faction_name = CANONICAL_FACTIONS[faction_id].name
                 if faction_id in self.state.ship.trade_pacts:
@@ -3583,7 +3641,7 @@ class SimulationEngine:
                         f"Trade pact requires standing >= 40 (current {current:+d}).",
                     )
                 pacts = tuple(sorted(set(self.state.ship.trade_pacts) | {faction_id}))
-                line = f"TRADE PACT: {faction_name} opens its markets to your flag."
+                line = f"TRADE PACT: {faction_name} opens its markets to your flag.{self._leader_voice_line(faction_id, 'pact')}"
                 new_ship = self._clone_ship(
                     trade_pacts=pacts,
                     flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
@@ -3607,6 +3665,7 @@ class SimulationEngine:
                 line = (
                     f"RESEARCH PACT: {faction_name} shares laboratory data "
                     "(+5% passive research while at peace)."
+                    f"{self._leader_voice_line(faction_id, 'pact')}"
                 )
                 new_ship = self._clone_ship(
                     research_pacts=pacts,
@@ -3641,6 +3700,7 @@ class SimulationEngine:
                 line = (
                     f"NON-AGGRESSION PACT: {faction_name} will not open a new war "
                     f"with the Sol Coalition for {self.NON_AGGRESSION_TICKS} ticks."
+                    f"{self._leader_voice_line(faction_id, 'pact')}"
                 )
                 new_ship = self._clone_ship(
                     non_aggression_until=pacts,
@@ -3654,7 +3714,7 @@ class SimulationEngine:
                 if current < 70:
                     return False, f"Alliance requires standing >= 70 (current {current:+d})."
                 allies = tuple(sorted(set(self.state.ship.allies) | {faction_id}))
-                line = f"ALLIANCE FORMED: {CANONICAL_FACTIONS[faction_id].name} joins your coalition."
+                line = f"ALLIANCE FORMED: {CANONICAL_FACTIONS[faction_id].name} joins your coalition.{self._leader_voice_line(faction_id, 'pact')}"
                 new_ship = self._clone_ship(
                     allies=allies,
                     flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
@@ -3790,6 +3850,8 @@ class SimulationEngine:
 
     def repair_escorts(self, amount: int = 60) -> tuple[bool, str]:
         with self.lock:
+            if not isinstance(amount, int) or isinstance(amount, bool) or amount <= 0:
+                return False, "Repair amount must be a positive integer."
             ok, msg = self._require_service_dock()
             if not ok:
                 return False, msg
@@ -6021,8 +6083,16 @@ class SimulationEngine:
                 marines = [
                     member for member in ship.crew
                     if member.role == "marine" and member.status == "active"
+                    and member.injury_ticks == 0
                 ]
                 if not marines:
+                    hurt = any(
+                        member.role == "marine" and member.status == "active"
+                        and member.injury_ticks > 0
+                        for member in ship.crew
+                    )
+                    if hurt:
+                        return False, "Marine boarding party is injured and unfit to breach; let them recover first."
                     return False, "No active marine boarding party aboard."
                 marine = max(marines, key=lambda member: member.skill)
                 hull_edge = 1.0 - combat.enemy_hull / max(1, combat.enemy_max_hull)
@@ -7605,7 +7675,7 @@ class SimulationEngine:
                 },
                 "outposts": [self._outpost_payload(o) for o in self.state.outposts],
                 "megastructure": self.get_megastructure_report(),
-                "faction_leaders": [leader.to_dict() for leader in self.state.faction_leaders],
+                "faction_leaders": [self._leader_payload(leader) for leader in self.state.faction_leaders],
                 "wars": [war.to_dict() for war in self.state.wars],
                 "faction_economies": [e.to_dict() for e in self.state.faction_economies],
                 "trade_links": [t.to_dict() for t in self.state.trade_links],
@@ -7708,6 +7778,7 @@ class SimulationEngine:
     # Smallest pledge that moves a war, and the most one pledge can move it.
     WAR_SUPPORT_MIN_CREDITS = 100
     WAR_SUPPORT_MAX_SHIFT = 6.0
+    WAR_BOND_MAX_PER_COMMANDER = 6000
 
     def _resolve_war_bonds(
         self, wars: tuple[WarState, ...]
@@ -7763,10 +7834,16 @@ class SimulationEngine:
             ship = self.state.ship
             if ship.credits < credits:
                 return False, f"Insufficient credits: {credits} cr pledged, {ship.credits} cr available."
+            already = int(war.support.get(faction_id, 0))
+            if already + credits > self.WAR_BOND_MAX_PER_COMMANDER:
+                return False, (
+                    f"Bond subscriptions are capped at {self.WAR_BOND_MAX_PER_COMMANDER} cr "
+                    f"per commander per war (already pledged {already} cr to this side)."
+                )
             shift = min(self.WAR_SUPPORT_MAX_SHIFT, credits / 400.0)
             score = war.war_score + (shift if faction_id == war.attacker_id else -shift)
             enemy_id = war.defender_id if faction_id == war.attacker_id else war.attacker_id
-            gain = min(10, max(1, credits // 300))
+            gain = min(10, credits // 300)
             standings = dict(ship.faction_standings)
             standings[faction_id] = min(100, standings.get(faction_id, 0) + gain)
             standings[enemy_id] = max(-100, standings.get(enemy_id, 0) - max(1, gain // 2))
@@ -7934,7 +8011,7 @@ class SimulationEngine:
             if action == "hail":
                 updated = replace(captain, trust=min(100, captain.trust + 2), standing=min(100, captain.standing + 1))
                 self.state = self._clone_state(ai_captains=self._replace_ai_captain(updated))
-                return True, f"{captain.name}: '{captain.description}' Quantum link trust increased."
+                return True, f"{captain.name}: \"{captain_hail(captain)}\" {captain.description} Quantum link trust increased."
             if action in ("buy", "sell"):
                 if not commodity_id or commodity_id not in COMMODITY_MAP:
                     return False, "A valid commodity is required for captain trade."
@@ -8999,10 +9076,20 @@ class SimulationEngine:
                     queue=research.queue,
                 )
 
+            active_contracts = ship.active_contracts
+            granted_title = ""
+            contract_category = str(effects.get("contract") or "").strip()
+            if contract_category:
+                granted = generate_contract(self.rng, category=contract_category)
+                active_contracts = tuple(list(active_contracts) + [granted])
+                granted_title = granted.title
+
             credits = max(0, ship.credits + int(effects.get("credits", 0)))
             fuel = max(0, min(ship.max_fuel, ship.fuel + int(effects.get("fuel", 0))))
             hull = max(0, min(ship.max_hull, ship.hull + int(effects.get("hull", 0))))
             log = str(effects.get("log") or f"DECISION [{pending.title}]: {choice.label}.")
+            if granted_title:
+                log = f"{log} New contract: [{granted_title}]."
             new_ship = self._clone_ship(
                 credits=credits,
                 fuel=fuel,
@@ -9011,6 +9098,7 @@ class SimulationEngine:
                 crew=crew,
                 reactor=reactor,
                 faction_standings=standings,
+                active_contracts=active_contracts,
                 flight_log=tuple(list(ship.flight_log[-19:]) + [log]),
             )
             stats = dict(self.state.stats)
@@ -9883,6 +9971,20 @@ class SimulationEngine:
                 flight_log=tuple(trim_log(new_flight_log)),
             )
 
+            # Fresh wars displace civilians: queue one refugee-fleet plea unless an
+            # unresolved plea already waits in the inbox.
+            refugee_pleas = refugee_messages_for_new_wars(
+                {w.id for w in self.state.wars},
+                new_wars,
+                self.state.messages,
+                new_tick,
+            )
+            # The Collective notices rising captains once: a first compact offer.
+            quantum_offers = quantum_offer_for_standing(
+                new_standings,
+                self.state.messages,
+                new_tick,
+            )
             self.state = self._clone_state(
                 ship=new_ship,
                 systems=updated_systems,
@@ -9901,6 +10003,7 @@ class SimulationEngine:
                 faction_economies=new_faction_economies,
                 trade_links=new_trade_links,
                 eliminated_factions=new_eliminated,
+                messages=tuple(self.state.messages) + tuple(refugee_pleas) + tuple(quantum_offers),
             )
 
             self._run_trade_automation()

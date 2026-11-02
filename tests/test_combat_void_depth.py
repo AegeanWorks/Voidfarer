@@ -4,6 +4,7 @@ import io
 import random
 import tempfile
 import unittest
+from dataclasses import replace
 from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
@@ -179,6 +180,40 @@ class TestBoardingAndPrizeCapture(unittest.TestCase):
         marine = next(member for member in engine.state.ship.crew if member.role == "marine")
         self.assertGreater(marine.injury_ticks, 0)
         self.assertIn("REPELLED", message.upper())
+
+    def test_boarding_rejects_an_injured_marine_party(self):
+        engine = self._engine_with_combat()
+        hurt = tuple(
+            replace(member, injury_ticks=6) if member.role == "marine" else member
+            for member in engine.state.ship.crew
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(crew=hurt, hull=100, shield=100),
+            active_combat=engine.state.active_combat,
+        )
+        ok, message = engine.combat_action("board_enemy")
+        self.assertFalse(ok)
+        self.assertIn("injur", message.lower())
+
+    def test_boarding_prefers_a_fit_marine_over_an_injured_veteran(self):
+        engine = self._engine_with_combat(marine=False)
+        base = len(engine.state.ship.crew)
+        veteran = replace(
+            recruit_crew_member("marine", 42, base), skill=9, injury_ticks=6
+        )
+        rookie = replace(
+            recruit_crew_member("marine", 7, base + 1), skill=1, injury_ticks=0
+        )
+        crew = engine.state.ship.crew + (veteran, rookie)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(crew=crew, hull=100, shield=100),
+            active_combat=engine.state.active_combat,
+        )
+        engine.rng.random = lambda: 0.0
+        ok, message = engine.combat_action("board_enemy")
+        self.assertTrue(ok, message)
+        self.assertIn("PRIZE", message.upper())
+        self.assertIn(rookie.name, message)
 
     def test_boarding_requires_down_shields_low_hull_and_a_marine(self):
         engine = self._engine_with_combat(shield=20)

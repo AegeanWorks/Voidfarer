@@ -2058,6 +2058,8 @@ def cmd_diplomacy(engine: SimulationEngine, storage: StorageManager, parts: list
                 f"{CYAN}{leader.behavior:<13}{RESET} standing {standing:+4d}{pact}{research}{nap}"
                 + (f" {RED}[ELIMINATED]{RESET}" if eliminated else "")
             )
+            if faction is not None:
+                print(f"{'':<20} {DIM}{faction.ideology} - HQ: {faction.headquarters_system}{RESET}")
         active_wars = [w for w in engine.state.wars if w.active]
         print(f"\nActive wars: {len(active_wars)}")
         for war in active_wars:

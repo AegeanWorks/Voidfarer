@@ -23,6 +23,35 @@ from voidfarer.storage import StorageManager
 STATIC_DIR = Path(__file__).parent.parent / "voidfarer" / "static"
 
 
+class TestWarBondCodex(unittest.TestCase):
+    def test_bondholder_milestone_tracks_payouts(self):
+        engine = SimulationEngine(seed=42)
+        entry = CODEX_MAP["bondholder"]
+        self.assertEqual(entry.category, "commerce")
+        self.assertEqual(metric_value(engine.state, "war_bond_payouts"), 0)
+        engine.state = engine._clone_state(
+            stats={**engine.state.stats, "war_bond_payouts": 2500}
+        )
+        self.assertGreaterEqual(
+            metric_value(engine.state, "war_bond_payouts"), entry.target
+        )
+
+    def test_bondholder_completes_only_on_real_payouts(self):
+        engine = SimulationEngine(seed=42)
+        report = {
+            record["id"]: record for record in build_codex_report(engine.state)["entries"]
+        }
+        self.assertFalse(report["bondholder"]["completed"])
+        engine.state = engine._clone_state(
+            stats={**engine.state.stats, "war_bond_payouts": 2000}
+        )
+        report = {
+            record["id"]: record for record in build_codex_report(engine.state)["entries"]
+        }
+        self.assertTrue(report["bondholder"]["completed"])
+        self.assertTrue(report["bondholder"]["ready"])
+
+
 class TestCodexCatalog(unittest.TestCase):
     def test_entry_ids_are_unique_and_resolvable(self):
         ids = [entry.id for entry in CODEX_ENTRIES]

@@ -165,6 +165,10 @@ def fleet_upkeep(ships: tuple[FleetShip, ...]) -> int:
         if ship.hull <= 0:
             continue
         base = FLEET_UPKEEP_BY_ROLE.get(ship.role, 30)
+        if ship.role == "prize":
+            # Captured hulls are cheap to berth but dear to crew: upkeep tracks
+            # captured firepower so an elite prize costs like a bought warship.
+            base += max(0, int(ship.damage) - 10)
         base_discount = 1.0 - FLEET_CAPTAIN_UPKEEP.get(ship.captain_role, 1.0)
         discount = 1.0 - base_discount * _captain_multiplier(ship)
         total += int(base * discount)

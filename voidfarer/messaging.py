@@ -269,6 +269,48 @@ def choice_by_id(message: QuantumMessage, choice_id: str) -> MessageChoice | Non
     return next((c for c in message.choices if c.id == choice_id), None)
 
 
+QUANTUM_OFFER_FACTION = "nebula_collective"
+QUANTUM_OFFER_STANDING = 10
+
+
+def quantum_offer_for_standing(
+    standings: dict[str, int],
+    existing_messages: tuple[QuantumMessage, ...],
+    tick: int,
+) -> tuple[QuantumMessage, ...]:
+    """Offer the Collective compact once standing first reaches the threshold.
+
+    Any prior copy (resolved or not) suppresses redelivery, so the offer fires
+    exactly once per career regardless of which system raised standing.
+    """
+    if int(standings.get(QUANTUM_OFFER_FACTION, 0)) < QUANTUM_OFFER_STANDING:
+        return ()
+    if any(m.tree_id == "quantum_offer" for m in existing_messages):
+        return ()
+    root = tree_root_message("quantum_offer", tick)
+    return (root,) if root is not None else ()
+
+
+def refugee_messages_for_new_wars(
+    old_war_ids: set[str],
+    new_wars: tuple,
+    existing_messages: tuple[QuantumMessage, ...],
+    tick: int,
+) -> tuple[QuantumMessage, ...]:
+    """Queue one refugee-fleet plea when fresh wars break out.
+
+    Wars the player already knows about change nothing; an unresolved plea in
+    the inbox suppresses duplicates; a resolved plea does not block later wars.
+    """
+    declared = [w for w in new_wars if getattr(w, "active", False) and w.id not in old_war_ids]
+    if not declared:
+        return ()
+    if any(m.tree_id == "refugee_fleet" and not m.resolved_choice for m in existing_messages):
+        return ()
+    root = tree_root_message("refugee_fleet", tick)
+    return (root,) if root is not None else ()
+
+
 def tree_catalog() -> list[dict[str, Any]]:
     return [
         {

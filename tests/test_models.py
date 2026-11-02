@@ -10,6 +10,7 @@ from voidfarer.models import (
     PilotMastery,
     PrecursorRelic,
     ShipPower,
+    ShipRoom,
     ShipState,
     ShipUpgrade,
     StarSystem,
@@ -23,6 +24,34 @@ from voidfarer.models import (
 
 
 class TestModels(unittest.TestCase):
+    def test_ship_room_layout_is_deterministic_and_serializable(self):
+        rooms = ShipRoom.default_layout("Vanguard Explorer")
+        self.assertEqual([room.id for room in rooms], ["bridge", "sensor", "lab", "reactor", "crew", "airlock"])
+        self.assertEqual(rooms, tuple(ShipRoom.from_dict(room.to_dict()) for room in rooms))
+
+        with self.assertRaises(ValueError):
+            ShipRoom("bad", "BAD", "TEST", status="unknown")
+
+    def test_ship_state_adds_rooms_to_legacy_save(self):
+        state = ShipState.from_dict({
+            "commander_name": "Astraea",
+            "callsign": "VF-Test",
+            "ship_class": "Cargo Freighter",
+            "hull": 100,
+            "max_hull": 100,
+            "shield": 100,
+            "max_shield": 100,
+            "fuel": 50,
+            "max_fuel": 50,
+            "credits": 100,
+            "cargo": {},
+            "cargo_capacity": 20,
+            "current_system_id": "sol",
+            "orbiting_body_id": None,
+        })
+        self.assertEqual(state.rooms[1].id, "cargo")
+        self.assertEqual(ShipState.from_dict(state.to_dict()).rooms, state.rooms)
+
     def test_ship_power_validation(self):
         p = ShipPower(engines=30, shields=30, sensors=20, weapons=20)
         self.assertEqual(p.engines + p.shields + p.sensors + p.weapons, 100)

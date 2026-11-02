@@ -23,6 +23,17 @@ class FleetUpkeepMathTest(unittest.TestCase):
         wreck = replace(corvette, hull=0, status="destroyed")
         self.assertEqual(fleet_upkeep((wreck,)), 0)
 
+    def test_prize_upkeep_scales_with_captured_firepower(self):
+        corvette = build_fleet_ship("corvette", "sol", 0)
+        skiff = replace(corvette, role="prize", damage=8)
+        self.assertEqual(fleet_upkeep((skiff,)), 25)
+        gunboat = replace(corvette, role="prize", damage=12)
+        self.assertEqual(fleet_upkeep((gunboat,)), 27)
+        elite = replace(corvette, role="prize", damage=30)
+        self.assertEqual(fleet_upkeep((elite,)), 45)
+        dreadnought = replace(corvette, role="prize", damage=40)
+        self.assertEqual(fleet_upkeep((dreadnought,)), 55)
+
 
 class FleetUpkeepEngineTest(unittest.TestCase):
     def setUp(self):

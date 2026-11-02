@@ -61,8 +61,9 @@ class OutpostCrewMathTest(unittest.TestCase):
 class OutpostCrewEngineTest(unittest.TestCase):
     def setUp(self):
         self.engine = SimulationEngine(seed=42)
+        charter, _ = self.engine._award_pilot_xp(500, self.engine.state.ship.mastery)
         self.engine.state = self.engine._clone_state(
-            ship=self.engine._clone_ship(credits=10000, orbiting_body_id="sol_body_1")
+            ship=self.engine._clone_ship(credits=10000, orbiting_body_id="sol_body_1", mastery=charter)
         )
         ok, message = self.engine.build_outpost("sol_body_1", "shipyard")
         self.assertTrue(ok, message)

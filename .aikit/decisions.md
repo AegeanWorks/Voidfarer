@@ -1711,22 +1711,106 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   4. Add unit test assertions in `tests/test_stellar_depth_ui.py`.
 - **Consequences**: Accurate 1:1 polar Euclidean travel estimates from open-space holding stations, visual trajectory course lines connecting vectors to planets, resilient temporal ticker execution across background servers, and 0 errors / 0 hscroll / 0 tiny elements across Playwright browser scenarios.
 
+### ADR-146: Captain-to-Ruler Arc, Outpost Charters Gated on Pilot Mastery 2
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: A fresh cadet on tick 0 with starting credits could found colonies, collapsing the captain vs ruler identity: ship command (fly, scan, fight, board) and territorial rule (outposts, diplomacy, wars) sat side by side with no progression arc. Diplomacy is already earned-authority gated (pact 40 / R&D 60 / ally 70), but founding territory had a credits-only gate.
+- **Decision**:
+  1. `SimulationEngine.build_outpost` requires Pilot Mastery level 2 (recognized commander); level-1 callers get a rejection naming the requirement and how to earn it (contracts, scans and victories). Location checks (orbit) still fire first so immediate-action feedback is preserved.
+  2. The cockpit Empire outpost panel shows the charter requirement instead of BUILD buttons below level 2 (`ship.mastery.level` parity, server authoritative).
+  3. Captain tier stays open from tick 0; ruler tier unlocks through play. Existing open-founding tests now earn the charter through `_award_pilot_xp`.
+- **Consequences**: A clear growth arc answers am-I-captain-or-ruler with both, in order; failed boarding (marine fitness) and charter gating give early failures real downtime and progression cost. Suite grows to 1,119 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-147: Ruler Quest Loop - Colonial Contracts and the Colonial Offer Beat
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: All nine contract categories rewarded captain-tier actions; founding colonies (the signature ruler act per ADR-146) advanced no quest, and the Mastery 2 transition had a log line but no narrative moment.
+- **Decision**:
+  1. New `colonial` contract template in `retention.py` (Colonial Charter Mandate, 1-2 foundings, 800 cr / 200 XP base, common relic tier) registered in `CONTRACT_CATEGORIES`; `build_outpost` progresses it and appends the OBJECTIVE COMPLETE line to the founding message. Claim replacement is category-sticky, so the loop sustains itself.
+  2. New `colonial_offer` decision beat in `decisions.py`: Admiral Vance offers the mandate at Mastery 2 with zero outposts (priority 88, non-repeatable). Accepting grants +2 Coalition standing and a colonial contract; declining closes the offer.
+  3. New generic `contract` effect key in `resolve_decision` granting a fresh contract of the named category - reusable for future quest rewards.
+  4. Gold `.cat-colonial` badge style in the cockpit contract list.
+- **Consequences**: Ruler play gains progression, XP income, and relic flow symmetric with other playstyles; the story system carries the captain-to-ruler transition. Suite grows to 1,130 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-148: Prize Upkeep Scales With Captured Firepower
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Captured prizes cost a flat 25 cr/month regardless of power, while a bought frigate (24 damage) costs 55 plus 4,200 upfront. Elite prizes (30+ damage) were strictly cheaper than bought warships with no purchase price, so boarding dominated buying once crippled kills became routine.
+- **Decision**: In `fleet_upkeep`, prize-role ships pay `25 + max(0, damage - 10)`: small prizes stay at 25, a 30-damage elite pays 45, a 40-damage dreadnought-class prize pays 55 (frigate rate). Bought-role rates, quartermaster discounts, and wreck handling are unchanged; CLI and cockpit read server aggregates, so no display changes were needed.
+- **Consequences**: Prize fleets stay a bargain (no purchase price, damaged goods with halved damage and fixed evasion) but late-game armadas carry running costs; bought-vs-captured remains a real choice. Suite grows to 1,131 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-149: War-Bond Subscription Caps and Earned Standing
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Repeat pledges were uncapped, so a rich commander could force any war past the 25-point decider (five max pledges) for a risk-free 1.5x return, and 100 cr dust pledges farmed +1 standing each toward pact/ally thresholds.
+- **Decision**: `support_war` caps backing at `WAR_BOND_MAX_PER_COMMANDER` (6,000 cr) per commander per war per side, reusing the accumulating `support` map with no schema change; the standing formula drops its +1 floor (`min(10, credits // 300)`), so sub-300 pledges move the front but earn no standing. The cockpit already pledges in 500 cr clicks and shows running totals, so the cap surfaces through the server message with no UI change.
+- **Consequences**: War bonds stay profitable speculation but cannot single-handedly decide wars; standing must be earned with meaningful pledges and pact/ally gates keep their meaning. Suite grows to 1,134 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-150: Bondholder Codex Milestone for War-Bond Payouts
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: War bonds were a full economy (pledges, settlements, logs) with zero codex recognition, while every neighboring system (trade, contracts, combat, diplomacy) has milestones. The `war_bond_payouts` stat was already tracked at settlement with no reader.
+- **Decision**: New `bondholder` commerce entry (collect 2,000 cr in payouts, 900 cr / 260 XP) backed by a `war_bond_payouts` metric branch, METRIC_LABELS row, and STATS_ORDER slot. Claim and report flows are generic by id, so no UI changes were needed.
+- **Consequences**: Bond play earns legacy progress symmetric with other playstyles. Suite grows to 1,137 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-151: Commander Origin Backgrounds With Skill Bonuses
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Background was a free-text label with no mechanical or lore meaning, so commander identity was cosmetic at creation while ship choice shaped the whole early game.
+- **Decision**: New `COMMANDER_BACKGROUNDS` catalog in `character.py` (navigator, engineer, marine, merchant, diplomat, prospector; +2/+1 skills with one-line lore each). `_apply_commander_profile` matches ids or display names case-insensitively, canonicalizes the name, and layers bonuses after budget validation (capped at rank 10); unknown strings pass through with no bonus for save compatibility. Surfaced as `character_background_catalog` in the static snapshot keys for CLI/cockpit/server parity.
+- **Consequences**: Creation choices gain weight without touching the skill budget; the server new-game test now pins the engineer bonus. Suite grows to 1,141 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-152: Voiced Faction Leaders in Diplomacy and War Declarations
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Leaders were stat blocks: diplomacy replies were formulaic and war declarations name-dropped without character, so nine factions felt interchangeable in dialogue.
+- **Decision**: New `LEADER_VOICES` table in `faction_state.py` (five archetypes by four occasions, two lines per cell) with a deterministic `leader_voice` picker (md5 of leader id and occasion, no RNG-stream or save changes). Wired into improve/gift/pact/research-pact/alliance replies via `_leader_voice_line` (empty when leaderless) and into the war-declaration log's war-cry. Fallback to the opportunist voice for unknown behaviors.
+- **Consequences**: Faction personality now speaks in every exchange; live probe confirmed a declaration renders with its war-cry. Suite grows to 1,144 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-153: Voiced AI Captain Hails by Archetype
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Every hail read the same generic archetype blurb, so the five autonomous captains felt interchangeable on first contact.
+- **Decision**: New `AI_CAPTAIN_HAILS` table in `frontier.py` (four archetypes, three greetings each) with a deterministic `captain_hail` picker (md5 of captain id, trader fallback). The `interact_ai` hail reply now carries the quoted greeting ahead of the description and trust note; no save or RNG-stream changes.
+- **Consequences**: First contact gains character per hull. Suite grows to 1,147 tests; the 180-step captain keeps zero coverage gaps.
+### ADR-154: Act VI The First Charter Campaign Finale
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The five-act Cipher campaign predated the captain-to-ruler arc and ended without acknowledging it; the charter gate, offer beat, and colonial contracts had no payoff in the main storyline.
+- **Decision**: New `Act VI: The First Charter` epilogue chapter (index 5, id `act6_first_charter`, no target system so it plays anywhere) with a Vance transmission and two charter choices: signing the Coalition protectorate (1,500 cr, needs +20 coalition reputation, sets `charter_signed_coalition`) or declaring a Free Charter (800 cr, sets `charter_free`). Chapter id map extended; endings unchanged (new flags are inert to `resolve_story_ending`). Migration generalizes by construction: completed five-act saves reopen at index 5, the first new act.
+- **Consequences**: The main story ends on the ruler transition with a real branching decision; completed veterans get the finale on load. Suite grows to 1,151 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-155: Refugee Plea Delivery on War Declarations
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The refugee_fleet message tree was fully written and unit-tested but never delivered in live play, while new wars broke out silently for civilians. The tree fiction describes refugees fleeing a faction war, so declarations are the exact trigger.
+- **Decision**: New pure helper `refugee_messages_for_new_wars` in `messaging.py` (one plea per declaring tick, suppressed only by an unresolved copy, resolved copies do not block later wars). `SimulationEngine.tick` compares pre- and post-simulation war ids and appends the plea to the inbox through the final state assembly; no schema or catalog changes.
+- **Consequences**: Dead quest content becomes a live hook; wars gain a civilian consequence the player can answer through the existing message-choice machinery. Suite grows to 1,156 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-156: Quantum Compact Offer on Nebula Standing
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: The quantum_offer compact was the second orphaned tree: defined and resolvable but never offered. A research partnership should arrive when the Collective notices a rising captain, giving standing a narrative payoff beyond pact thresholds.
+- **Decision**: New pure helper `quantum_offer_for_standing` in `messaging.py` (fires once ever at Nebula standing +10; any prior copy suppresses redelivery). `SimulationEngine.tick` appends it alongside refugee pleas; no schema or catalog changes.
+- **Consequences**: Both orphaned trees are now live. Suite grows to 1,159 tests; the 180-step captain keeps zero coverage gaps.
 
+### ADR-157: Faction Creed in the Diplomacy Panel
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: Faction lore (ideology, description, headquarters) existed server-side but never reached the player; diplomacy rows showed names and numbers without character.
+- **Decision**: Snapshot joins creed fields onto faction_leader entries via `_leader_payload` (no schema change; custom factions simply omit the keys). Cockpit renders an italic creed line with the full description as hover text plus a `.faction-creed` style at the 12px floor; CLI diplomacy list prints the creed under each row.
+- **Consequences**: Every diplomacy row carries its faction's character. Suite grows to 1,161 tests; the 180-step captain keeps zero coverage gaps; empire audit clean at 720p.
 
+### ADR-158: Defender Defiance in War Declarations
+- **Date**: 2026-11-01
+- **Status**: Accepted
+- **Context**: War declarations quoted only the attacker's war-cry; the defender was silent, so wars read as monologues at the moment of maximum drama.
+- **Decision**: New `defiance` occasion in `LEADER_VOICES` (two lines per archetype, deterministic per leader) appended to the declaration log as a named answer; silent when the defender has no leader record.
+- **Consequences**: Declarations read as dialogues. Suite grows to 1,163 tests; the 180-step captain keeps zero coverage gaps.
 
-
-
-
-
-
-
-
+### ADR-159: Escort Repair Rejects Non-Positive Amounts
+- **Date**: 2026-11-02
+- **Status**: Accepted
+- **Context**: Hostile-input fuzzing found `repair_escorts(-60)` returning success while charging the 50 cr floor for zero integrity restored; hull repair and refuel already reject non-positive amounts with the same message.
+- **Decision**: `repair_escorts` validates first with the identical `isinstance`/bool/positivity guard and message, matching repair_hull ordering (validation before dock check).
+- **Consequences**: No-op paid actions are refused uniformly across all three repair paths. Suite grows to 1,164 tests; the 180-step captain keeps zero coverage gaps.

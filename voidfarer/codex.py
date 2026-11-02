@@ -316,6 +316,12 @@ CODEX_ENTRIES: tuple[CodexEntry, ...] = (
         "Enable AUTO-FREIGHT in the Quantum Freight panel.",
         "quantum_auto_orders", 5, 1000, 280,
     ),
+    CodexEntry(
+        "bondholder", "commerce", "Bondholder",
+        "Collect 2,000 cr in war-bond payouts.",
+        "Back a winning side with war support before the settlement.",
+        "war_bond_payouts", 2000, 900, 260,
+    ),
     # Combat
     CodexEntry(
         "first_blood", "combat", "First Blood",
@@ -471,6 +477,7 @@ METRIC_LABELS: dict[str, str] = {
     "ships_captured": "Prizes captured",
     "ships_sold": "Ships sold",
     "contracts_completed": "Contracts completed",
+    "war_bond_payouts": "War-bond payouts",
     "anomalies_resolved": "Anomalies resolved",
     "messages_resolved": "Message branches",
     "relics": "Precursor relics",
@@ -523,6 +530,7 @@ STATS_ORDER: tuple[str, ...] = (
     "ships_captured",
     "ships_sold",
     "contracts_completed",
+    "war_bond_payouts",
     "anomalies_resolved",
     "messages_resolved",
     "relics",
@@ -607,6 +615,8 @@ def metric_value(state: GameState, metric: str) -> int:
         return int(state.stats.get("ships_sold", 0))
     if metric == "contracts_completed":
         return int(state.stats.get("contracts_completed", 0))
+    if metric == "war_bond_payouts":
+        return int(state.stats.get("war_bond_payouts", 0))
     if metric == "anomalies_resolved":
         return int(state.stats.get("anomalies_resolved", 0))
     if metric == "messages_resolved":

@@ -4,6 +4,7 @@ import contextlib
 import io
 import tempfile
 import unittest
+
 from dataclasses import replace
 from pathlib import Path
 
@@ -12,7 +13,7 @@ from voidfarer.crew import CREW_ROLES, calculate_crew_bonuses, recruit_crew_memb
 from voidfarer.engine import SimulationEngine
 from voidfarer.galaxy import GalaxyGenerator
 from voidfarer.messaging import TREE_MAP, tree_root_message
-from voidfarer.models import CombatEncounter, CrewMember, FleetShip, MessageChoice, QuantumMessage
+from voidfarer.models import CombatEncounter, CrewMember, FleetShip, MessageChoice, QuantumMessage, WarState
 from voidfarer.research import RESEARCH_MAP
 from voidfarer.weapons import WEAPON_CATALOG, get_weapon
 
@@ -209,6 +210,91 @@ class QuantumAndObjectsTest(unittest.TestCase):
         for symbol in ("portraitAvatar", "message-choice-btn", "data-msg-choice", "crew-row"):
             self.assertIn(symbol, script + html)
         self.assertIn("/api/messages/choose", script)
+
+
+class TestRefugeeDelivery(unittest.TestCase):
+    def _war(self, war_id="w_new", active=True):
+        return WarState(
+            id=war_id, attacker_id="nebula_collective",
+            defender_id="ashen_choir", started_tick=10, active=active,
+        )
+
+    def test_new_war_queues_refugee_plea(self):
+        from voidfarer.messaging import refugee_messages_for_new_wars
+        messages = refugee_messages_for_new_wars(set(), (self._war(),), (), 120)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].tree_id, "refugee_fleet")
+        self.assertIsNone(messages[0].resolved_choice)
+
+    def test_no_new_war_means_no_plea(self):
+        from voidfarer.messaging import refugee_messages_for_new_wars
+        war = self._war()
+        self.assertEqual(
+            refugee_messages_for_new_wars({war.id}, (war,), (), 120), ()
+        )
+        self.assertEqual(refugee_messages_for_new_wars(set(), (), (), 120), ())
+
+    def test_unresolved_plea_blocks_duplicates(self):
+        from voidfarer.messaging import refugee_messages_for_new_wars, tree_root_message
+        pending = tree_root_message("refugee_fleet", 50)
+        self.assertIsNotNone(pending)
+        messages = refugee_messages_for_new_wars(
+            set(), (self._war("w_a"), self._war("w_b")), (pending,), 120
+        )
+        self.assertEqual(messages, ())
+
+    def test_resolved_plea_does_not_block_later_wars(self):
+        from voidfarer.messaging import refugee_messages_for_new_wars, tree_root_message
+        from dataclasses import replace as dc_replace
+        done = dc_replace(tree_root_message("refugee_fleet", 50), resolved_choice="accept_crew")
+        messages = refugee_messages_for_new_wars(set(), (self._war("w_c"),), (done,), 200)
+        self.assertEqual(len(messages), 1)
+
+    def test_declaration_tick_delivers_the_plea(self):
+        engine = SimulationEngine(seed=7)
+        engine.tick(120)
+        pleas = [m for m in engine.state.messages if m.tree_id == "refugee_fleet"]
+        self.assertTrue(pleas, "a fresh declaration must queue the refugee plea")
+
+
+class TestQuantumOfferDelivery(unittest.TestCase):
+    def test_offer_fires_at_threshold_only(self):
+        from voidfarer.messaging import quantum_offer_for_standing
+        self.assertEqual(quantum_offer_for_standing({"nebula_collective": 9}, (), 10), ())
+        offers = quantum_offer_for_standing({"nebula_collective": 10}, (), 10)
+        self.assertEqual(len(offers), 1)
+        self.assertEqual(offers[0].tree_id, "quantum_offer")
+        self.assertIsNone(offers[0].resolved_choice)
+
+    def test_prior_copy_suppresses_redelivery(self):
+        from voidfarer.messaging import quantum_offer_for_standing, tree_root_message
+        from dataclasses import replace as dc_replace
+        pending = tree_root_message("quantum_offer", 5)
+        self.assertIsNotNone(pending)
+        self.assertEqual(
+            quantum_offer_for_standing({"nebula_collective": 50}, (pending,), 10), ()
+        )
+        done = dc_replace(pending, resolved_choice="decline")
+        self.assertEqual(
+            quantum_offer_for_standing({"nebula_collective": 50}, (done,), 10), ()
+        )
+
+    def test_tick_delivers_offer_on_crossing(self):
+        from voidfarer.engine import SimulationEngine
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(faction_standings={"nebula_collective": 9})
+        )
+        engine.tick(1)
+        self.assertFalse(
+            [m for m in engine.state.messages if m.tree_id == "quantum_offer"]
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(faction_standings={"nebula_collective": 10})
+        )
+        engine.tick(1)
+        offers = [m for m in engine.state.messages if m.tree_id == "quantum_offer"]
+        self.assertEqual(len(offers), 1)
 
 
 if __name__ == "__main__":

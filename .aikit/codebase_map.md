@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `122`
-- **Total Classes**: `307`
-- **Total Top-Level Functions**: `344`
-- **Total Class Methods**: `1804`
-- **Total Source Lines**: `47166`
+- **Total Classes**: `315`
+- **Total Top-Level Functions**: `350`
+- **Total Class Methods**: `1866`
+- **Total Source Lines**: `48346`
 
 ---
 
@@ -220,9 +220,12 @@
 ### [`tests/test_captains_log_codex.py`](tests/test_captains_log_codex.py)
 > *Regression tests for the captain's log, discovery codex, statistics, and rewards.*
 
-**Size**: `224` lines (`9462` bytes)
+**Size**: `253` lines (`10653` bytes)
 
 **Classes:**
+- `class TestWarBondCodex`
+  - Method `.test_bondholder_milestone_tracks_payouts()`
+  - Method `.test_bondholder_completes_only_on_real_payouts()`
 - `class TestCodexCatalog`
   - Method `.test_entry_ids_are_unique_and_resolvable()`
   - Method `.test_entries_have_positive_targets_and_valid_categories()`
@@ -660,7 +663,7 @@
 ### [`tests/test_combat_void_depth.py`](tests/test_combat_void_depth.py)
 > *Regression tests for progression-scaled combat and Hollow resonance risk/reward.*
 
-**Size**: `358` lines (`15657` bytes)
+**Size**: `393` lines (`17139` bytes)
 
 **Classes:**
 - `class TestProgressionThreatScaling`
@@ -676,6 +679,8 @@
   - Method `._engine_with_combat(*, shield, hull, marine)`
   - Method `.test_a_crippled_enemy_can_be_captured_as_a_prize()`
   - Method `.test_a_failed_boarding_action_injures_the_marine_party()`
+  - Method `.test_boarding_rejects_an_injured_marine_party()`
+  - Method `.test_boarding_prefers_a_fit_marine_over_an_injured_veteran()`
   - Method `.test_boarding_requires_down_shields_low_hull_and_a_marine()`
 - `class TestEvasiveBurnDiscipline`
   - Method `._engine(fuel, streak, combo)`
@@ -765,7 +770,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `394` lines (`18728` bytes)
+**Size**: `543` lines (`25798` bytes)
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -777,6 +782,15 @@
   - Method `.test_overclock_is_a_timed_reactor_surge()`
   - Method `.test_research_project_completes_on_tick()`
   - Method `.test_unknown_research_project_rejected()`
+  - Method `._promote_to_commander()`
+  - Method `.test_outpost_charter_requires_mastery_level_2()`
+  - Method `.test_level_2_promotion_announces_the_charter_unlock()`
+  - Method `.test_charter_announcement_fires_once_on_the_crossing()`
+  - Method `.test_small_xp_awards_stay_silent_about_charters()`
+  - Method `.test_academy_run_promotes_to_commander_and_charters_a_colony()`
+  - Method `.test_colonial_contracts_generate_from_template()`
+  - Method `.test_founding_an_outpost_progresses_colonial_contracts()`
+  - Method `.test_outpost_charter_unlocks_at_mastery_level_2()`
   - Method `.test_outpost_builds_and_produces_on_tick()`
   - Method `.test_outpost_requires_orbit()`
   - Method `.test_outposts_pay_back_over_multiple_months()`
@@ -806,6 +820,11 @@
   - Method `.test_game_state_round_trip_preserves_new_fields()`
   - Method `.test_new_cli_commands_run()`
   - Method `.test_cockpit_fleet_character_empire_and_void_fade_wiring()`
+- `class TestCommanderBackgrounds`
+  - Method `.test_navigator_background_grants_origin_training()`
+  - Method `.test_background_matching_is_case_insensitive()`
+  - Method `.test_unknown_background_passes_through_without_bonus()`
+  - Method `.test_background_bonuses_apply_after_budget_validation()`
 
 ---
 
@@ -1068,11 +1087,12 @@
 ### [`tests/test_fleet_upkeep.py`](tests/test_fleet_upkeep.py)
 > *Fleet upkeep: monthly escort payroll, cash flow and shortfall readiness.*
 
-**Size**: `69` lines (`2807` bytes)
+**Size**: `80` lines (`3393` bytes)
 
 **Classes:**
 - `class FleetUpkeepMathTest`
   - Method `.test_upkeep_scales_with_living_roles()`
+  - Method `.test_prize_upkeep_scales_with_captured_firepower()`
 - `class FleetUpkeepEngineTest`
   - Method `.setUp()`
   - Method `.test_cash_flow_separates_crew_and_fleet_upkeep()`
@@ -1105,7 +1125,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `489` lines (`24951` bytes)
+**Size**: `556` lines (`28312` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
@@ -1123,6 +1143,12 @@
 - `class DecisionEventTest`
   - Method `.test_at_least_twenty_five_conditional_events()`
   - Method `.test_pending_decision_blocks_time_until_resolved()`
+  - Method `.test_colonial_offer_triggers_at_mastery_2_without_outposts()`
+  - Method `.test_colonial_offer_hidden_below_mastery_2()`
+  - Method `.test_colonial_offer_hidden_once_founded()`
+  - Method `.test_accepting_colonial_offer_grants_a_colonial_contract()`
+  - Method `.test_declining_colonial_offer_grants_nothing()`
+  - Method `.test_colonial_offer_opens_through_the_live_tick_path()`
   - Method `.test_decisions_are_rate_limited_by_the_cadence_window()`
   - Method `.test_first_decision_waits_for_the_initial_relaxed_window()`
   - Method `.test_a_failed_roll_still_consumes_the_cadence_window()`
@@ -1157,12 +1183,13 @@
 ### [`tests/test_frontier_shipyard.py`](tests/test_frontier_shipyard.py)
 > *Frontier shipyards service hulls, escorts and weapons without a station dock.*
 
-**Size**: `89` lines (`3262` bytes)
+**Size**: `101` lines (`3795` bytes)
 
 **Classes:**
 - `class FrontierShipyardTest`
   - Method `.setUp()`
   - Method `._shipyard(system_id)`
+  - Method `.test_escort_repair_rejects_non_positive_amounts()`
   - Method `.test_local_shipyard_services_hull_fuel_and_escorts()`
   - Method `.test_without_a_shipyard_undocked_services_are_refused()`
   - Method `.test_remote_shipyard_does_not_service_the_current_system()`
@@ -1173,9 +1200,13 @@
 ### [`tests/test_frontier_systems.py`](tests/test_frontier_systems.py)
 > *Coverage for frontier systems: AI captains, depots, messages, landing, and fleets.*
 
-**Size**: `264` lines (`11497` bytes)
+**Size**: `301` lines (`12950` bytes)
 
 **Classes:**
+- `class CaptainHailVoicesTest`
+  - Method `.test_every_archetype_voices_a_hail()`
+  - Method `.test_hail_is_stable_per_captain_and_varies_across_cast()`
+  - Method `.test_hailing_a_captain_carries_their_voice()`
 - `class FrontierBootstrapTest`
   - Method `.setUp()`
   - Method `.test_initial_state_has_captains_depots_and_messages()`
@@ -1215,7 +1246,7 @@
 ### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
 > *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
 
-**Size**: `370` lines (`18057` bytes)
+**Size**: `503` lines (`24407` bytes)
 
 **Classes:**
 - `class FixedRng` - *Noise-free rng: uniform returns a fixed value, choice takes the first item.*
@@ -1238,8 +1269,21 @@
   - Method `.test_a_defending_faction_is_not_dogpiled()`
   - Method `.test_exhaustion_ends_the_war_with_a_treaty()`
   - Method `.test_old_war_records_load_with_defaults()`
+- `class TestLeaderVoices`
+  - Method `.test_every_behavior_voices_every_occasion()`
+  - Method `.test_voice_is_stable_per_leader_and_varies_across_leaders()`
+  - Method `.test_defiance_covers_every_behavior()`
+  - Method `.test_declaration_carries_defender_defiance()`
+  - Method `.test_nap_carries_the_leader_voice()`
+  - Method `.test_diplomacy_replies_carry_the_leader_voice()`
+- `class TestFactionLorePanel`
+  - Method `.test_leader_snapshot_carries_faction_creed()`
+  - Method `.test_cockpit_diplomacy_row_surfaces_the_creed()`
 - `class TestWarSupport`
   - Method `.test_support_spends_credits_shifts_score_and_standing()`
+  - Method `.test_commander_bond_subscriptions_are_capped_per_war()`
+  - Method `.test_dust_pledges_earn_no_standing()`
+  - Method `.test_meaningful_pledges_still_earn_standing()`
   - Method `.test_support_is_refused_when_it_cannot_apply()`
   - Method `.test_snapshot_exposes_territory_and_fronts()`
 - `class TestCaptainDiplomacyLimits` - *A privateer captain petitions; they never command sovereign war and peace.*
@@ -1359,7 +1403,7 @@
 ### [`tests/test_messaging_crew_quantum.py`](tests/test_messaging_crew_quantum.py)
 > *Regression tests for message trees, crew, portraits, weapons, quantum tech, and megastructures.*
 
-**Size**: `215` lines (`9835` bytes)
+**Size**: `301` lines (`13722` bytes)
 
 **Classes:**
 - `class MessageTreeTest`
@@ -1385,16 +1429,29 @@
   - Method `.test_character_portrait_and_era()`
   - Method `.test_cli_new_systems_commands()`
   - Method `.test_cockpit_message_choices_crew_portrait_wiring()`
+- `class TestRefugeeDelivery`
+  - Method `._war(war_id, active)`
+  - Method `.test_new_war_queues_refugee_plea()`
+  - Method `.test_no_new_war_means_no_plea()`
+  - Method `.test_unresolved_plea_blocks_duplicates()`
+  - Method `.test_resolved_plea_does_not_block_later_wars()`
+  - Method `.test_declaration_tick_delivers_the_plea()`
+- `class TestQuantumOfferDelivery`
+  - Method `.test_offer_fires_at_threshold_only()`
+  - Method `.test_prior_copy_suppresses_redelivery()`
+  - Method `.test_tick_delivers_offer_on_crossing()`
 
 ---
 
 ### [`tests/test_models.py`](tests/test_models.py)
 > *Unit tests for domain state models and frozen DTO serialization.*
 
-**Size**: `323` lines (`10912` bytes)
+**Size**: `352` lines (`12063` bytes)
 
 **Classes:**
 - `class TestModels`
+  - Method `.test_ship_room_layout_is_deterministic_and_serializable()`
+  - Method `.test_ship_state_adds_rooms_to_legacy_save()`
   - Method `.test_ship_power_validation()`
   - Method `.test_celestial_body_serialization()`
   - Method `.test_star_system_serialization()`
@@ -1465,7 +1522,7 @@
 ### [`tests/test_outpost_crew.py`](tests/test_outpost_crew.py)
 > *Outpost crew: specialist bonuses, assignment rules and persistence.*
 
-**Size**: `133` lines (`5367` bytes)
+**Size**: `134` lines (`5470` bytes)
 
 **Classes:**
 - `class OutpostCrewMathTest`
@@ -1771,7 +1828,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `957` lines (`40863` bytes)
+**Size**: `957` lines (`40864` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1995,7 +2052,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `674` lines (`28755` bytes)
+**Size**: `741` lines (`31556` bytes)
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -2028,6 +2085,11 @@
   - Method `.test_locked_choices_report_branch_resolvable_reasons()`
   - Method `.test_persistent_flags_drive_distinct_endings()`
   - Method `.test_follow_up_transmissions_persist()`
+  - Method `.test_campaign_ends_in_charter_finale()`
+  - Method `._engine_at_finale(reputation)`
+  - Method `.test_charter_finale_coalition_path_needs_standing()`
+  - Method `.test_charter_finale_free_path_stays_open()`
+  - Method `.test_completed_five_act_save_reopens_at_finale()`
   - Method `.test_resolve_story_ending_variants()`
   - Method `.test_chapter_flag_gating_skips_ineligible_chapters()`
   - Method `.test_migrate_story_state_variants()`
@@ -2504,9 +2566,11 @@
 ### [`voidfarer/character.py`](voidfarer/character.py)
 > *Commander character progression, skills, and activatable abilities.*
 
-**Size**: `154` lines (`6112` bytes)
+**Size**: `210` lines (`8480` bytes)
 
 **Functions:**
+- `def match_background(background)` - *Canonical background id for an id or display name (case-insensitive); None for custom strings.*
+- `def apply_background_bonus(skills, background_id)` - *Layer origin training onto creation skills, capped at rank 10.*
 - `def skill_level(character, skill)`
 - `def skill_bonus(character, skill)` - *Percent bonus per skill level above baseline.*
 - `def reconcile_abilities(character)` - *Append every ability whose skill requirement this character already meets.*
@@ -2522,7 +2586,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3452` lines (`174757` bytes)
+**Size**: `3454` lines (`174895` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2592,7 +2656,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `744` lines (`26263` bytes)
+**Size**: `754` lines (`26662` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -2638,7 +2702,7 @@
 ### [`voidfarer/decisions.py`](voidfarer/decisions.py)
 > *Conditional real-time decision events that pause the simulation until resolved.*
 
-**Size**: `372` lines (`25433` bytes)
+**Size**: `379` lines (`26244` bytes)
 
 **Classes:**
 - `class DecisionDefinition`
@@ -2712,7 +2776,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10024` lines (`493587` bytes)
+**Size**: `10127` lines (`498572` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2813,6 +2877,8 @@
   - Method `.non_aggression_active(faction_id)` - *A non-aggression pact protects against new wars until its expiry tick.*
   - Method `.non_aggression_remaining(faction_id)`
   - Method `._active_non_aggression_pairs(tick)` - *Pairs involving the player's polity that active pacts keep out of war.*
+  - Method `._leader_voice_line(faction_id, occasion)` - *Voiced leader reply for a diplomacy exchange, empty when leaderless.*
+  - Method `._leader_payload(leader)` - *Snapshot payload joining leader identity with faction creed and lore.*
   - Method `.faction_diplomacy(faction_id, action, amount)`
   - Method `.buy_escort(escort_type, system_id)`
   - Method `.assign_escort(ship_id, system_id)`
@@ -2980,9 +3046,10 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `498` lines (`22218` bytes)
+**Size**: `624` lines (`27258` bytes)
 
 **Functions:**
+- `def leader_voice(leader, occasion)` - *Deterministic voiced line for a leader and occasion; stable per save seed.*
 - `def generate_faction_leaders(seed)` - *Create one deterministic leader per canonical sovereign faction.*
 - `def _faction_systems(faction_id, systems)`
 - `def faction_strength(faction_id, systems)`
@@ -3046,7 +3113,7 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `361` lines (`12452` bytes)
+**Size**: `365` lines (`12695` bytes)
 
 **Functions:**
 - `def captain_skill_multiplier(skill)` - *Role bonuses grow 5% per skill rank above 1; skill 0 is legacy-neutral.*
@@ -3072,9 +3139,10 @@
 ### [`voidfarer/frontier.py`](voidfarer/frontier.py)
 > *Frontier systems: autonomous captains, depots, mercenaries, and quantum messages.*
 
-**Size**: `197` lines (`7981` bytes)
+**Size**: `230` lines (`9515` bytes)
 
 **Functions:**
+- `def captain_hail(captain)` - *Deterministic hail greeting for a captain; stable per captain id.*
 - `def generate_ai_captains(systems, seed)` - *Create a deterministic roster of autonomous captains distributed across the galaxy.*
 - `def generate_depots(systems)` - *Create one system-local depot per star system.*
 - `def generate_welcome_messages(tick)` - *Seed the inbox with onboarding quantum messages.*
@@ -3165,7 +3233,7 @@
 ### [`voidfarer/messaging.py`](voidfarer/messaging.py)
 > *Branching quantum message trees and their consequences.*
 
-**Size**: `290` lines (`11940` bytes)
+**Size**: `332` lines (`13460` bytes)
 
 **Classes:**
 - `class MessageNode`
@@ -3176,6 +3244,8 @@
 - `def tree_root_message(tree_id, tick, message_id)`
 - `def follow_up_message(tree_id, node_id, tick, parent_id)`
 - `def choice_by_id(message, choice_id)`
+- `def quantum_offer_for_standing(standings, existing_messages, tick)` - *Offer the Collective compact once standing first reaches the threshold.*
+- `def refugee_messages_for_new_wars(old_war_ids, new_wars, existing_messages, tick)` - *Queue one refugee-fleet plea when fresh wars break out.*
 - `def tree_catalog()`
 
 ---
@@ -3183,7 +3253,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2366` lines (`88226` bytes)
+**Size**: `2462` lines (`92010` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -3340,7 +3410,13 @@
 - `class AwayMission` - *An away-team expedition assigned to a celestial body for a finite duration.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
+- `class ShipRoom` - *Persistent room manifest entry used by the cockpit interior schematic.*
+  - Method `.__post_init__()`
+  - Method `.to_dict()`
+  - Method `.from_dict(data)`
+  - Method `.default_layout(ship_class)` - *Return a deterministic manifest for old saves without room data.*
 - `class ShipState` - *Complete telemetry, resource inventory, and status of the player's flagship.*
+  - Method `.__post_init__()`
   - Method `.to_dict()`
   - Method `.from_dict(data)`
 - `class TimeState` - *Universal cosmic stardate, simulation ticks, and time control state.*
@@ -3459,7 +3535,7 @@
 ### [`voidfarer/retention.py`](voidfarer/retention.py)
 > *Psychological retention mechanics, Precursor relics, dynamic contracts, and pilot mastery.*
 
-**Size**: `494` lines (`17680` bytes)
+**Size**: `503` lines (`17979` bytes)
 
 **Functions:**
 - `def generate_contract(rng, category)` - *Procedurally instantiate a fresh BountyContract following Zeigarnik task loops.*
@@ -3564,7 +3640,7 @@
 ### [`voidfarer/story.py`](voidfarer/story.py)
 > *Interactive Cadet Flight Academy tutorial and branching narrative campaign systems.*
 
-**Size**: `505` lines (`22710` bytes)
+**Size**: `541` lines (`24674` bytes)
 
 **Functions:**
 - `def generate_initial_tutorial()` - *Construct a fresh Cadet Flight Academy tutorial state.*

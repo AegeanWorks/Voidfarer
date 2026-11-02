@@ -137,7 +137,7 @@ class TestServer(unittest.TestCase):
         self.assertEqual(character["name"], "Nova")
         self.assertEqual(character["age"], 41)
         self.assertEqual(character["background"], "Engineer")
-        self.assertEqual(character["skills"]["engineering"], 9)
+        self.assertEqual(character["skills"]["engineering"], 10)
         self.assertEqual(character["skills"]["combat"], 2)
         self.assertEqual(payload["state"]["ship"]["commander_name"], "Nova")
 

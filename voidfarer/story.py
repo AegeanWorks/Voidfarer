@@ -292,6 +292,40 @@ CAMPAIGN_CHAPTERS: tuple[StoryChapter, ...] = (
         ),
         completed=False,
     ),
+    StoryChapter(
+        chapter_index=5,
+        title="Act VI: The First Charter",
+        target_system_id=None,
+        objective="Found a colonial outpost and choose the terms of its charter.",
+        transmission=StoryTransmission(
+            speaker="Admiral Vance",
+            callsign="SC-HighCommand",
+            channel="Encrypted Coalition Command",
+            message="Commander. The Coalition watched you climb from cadet to commander, and the frontier needs more than survey beacons now. Plant the flag under our charter and fly with the fleet behind you, or declare it free and answer to no one. Either way, Commander: stay.",
+            timestamp_system="sol",
+        ),
+        choices=(
+            StoryChoice(
+                id="choice_sign_charter",
+                text="Sign the Coalition Charter: found your colony as a Coalition protectorate.",
+                faction_alignment="coalition",
+                reward_credits=1500,
+                outcome_text="Vance countersigns the charter himself. Coalition supply ships are already plotting the course.",
+                sets_flags=("charter_signed_coalition",),
+                requirements=StoryRequirements(min_reputation={"coalition": 20}),
+                locked_text="Requires +20 Coalition reputation.",
+            ),
+            StoryChoice(
+                id="choice_free_charter",
+                text="Declare a Free Charter: your colony answers to no flag but its own.",
+                faction_alignment="independent",
+                reward_credits=800,
+                outcome_text="No countersignature, no oversight, no safety net. The frontier holds its breath, then applauds.",
+                sets_flags=("charter_free",),
+            ),
+        ),
+        completed=False,
+    ),
 )
 
 
@@ -401,6 +435,8 @@ STORY_FLAG_GLOSSARY: dict[str, str] = {
     "voidfarer_oath": "Swearing the Voidfarer's Oath at the Cygnus Void Gate (Act IV)",
     "horizon_witnessed": "Charting the Cygnus rift from the accretion shelf (Act IV)",
     "title_claimed": "Claiming the title of the First VoidFarers (Act V)",
+    "charter_signed_coalition": "Signing the Coalition Charter for your first colony (Act VI)",
+    "charter_free": "Declaring a Free Charter for your first colony (Act VI)",
     "echoes_archived": "Archiving the echo chorus in Coalition deep-vaults (Act V)",
     "echoes_sold": "Selling the echo recordings to the Syndicate (Act V)",
 }
