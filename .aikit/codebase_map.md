@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `122`
-- **Total Classes**: `315`
-- **Total Top-Level Functions**: `350`
-- **Total Class Methods**: `1866`
-- **Total Source Lines**: `48346`
+- **Total Python Modules**: `123`
+- **Total Classes**: `318`
+- **Total Top-Level Functions**: `352`
+- **Total Class Methods**: `1875`
+- **Total Source Lines**: `48470`
 
 ---
 
@@ -1323,6 +1323,31 @@
   - Method `.test_random_anomaly_generation()`
   - Method `.test_population_mechanics_and_colony_tiers()`
   - Method `.test_orbit_and_sublight_distance_parity()`
+
+---
+
+### [`tests/test_half_sim_tick.py`](tests/test_half_sim_tick.py)
+> *Half-simulation tick proofs: economy, factions, and crew drift with zero player input.*
+
+**Size**: `124` lines (`4646` bytes)
+
+**Classes:**
+- `class TestHalfSimEconomyDrift`
+  - Method `.test_stockpiles_drift_with_no_player_input()`
+  - Method `.test_economy_tick_is_deterministic_for_seed()`
+  - Method `.test_pure_economy_tick_is_deterministic_for_seed()`
+- `class TestHalfSimFactionDrift`
+  - Method `.test_faction_treasuries_move_with_no_player_input()`
+  - Method `.test_faction_tick_is_deterministic_for_seed()`
+- `class TestHalfSimCrewNeeds`
+  - Method `.test_unpaid_crew_morale_falls_without_player_input()`
+  - Method `.test_paid_crew_morale_recovers_without_player_input()`
+  - Method `.test_crew_tick_is_deterministic_for_seed()`
+  - Method `.test_engine_tick_moves_crew_state_with_no_player_input()`
+
+**Functions:**
+- `def _member(member_id, morale, wage)`
+- `def _world_snapshot(engine)` - *Comparable snapshot of the ticking world state.*
 
 ---
 
