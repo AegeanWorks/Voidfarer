@@ -1814,3 +1814,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Hostile-input fuzzing found `repair_escorts(-60)` returning success while charging the 50 cr floor for zero integrity restored; hull repair and refuel already reject non-positive amounts with the same message.
 - **Decision**: `repair_escorts` validates first with the identical `isinstance`/bool/positivity guard and message, matching repair_hull ordering (validation before dock check).
 - **Consequences**: No-op paid actions are refused uniformly across all three repair paths. Suite grows to 1,164 tests; the 180-step captain keeps zero coverage gaps.
+
+### ADR-160: Left-Panel Subsection Layout and Uniform Row Heights
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: 720p screenshots showed the Market station-services grid collapsed (REPAIR full-width, empty cell, OVERHAUL below, REFUEL as orphan text from unclosed `<button>` nesting in `index.html:400-414`) and Empire research rows crushed to one word per line (3-column CSS at `style.css:3406` vs 4-child HTML, 270px content width at 1280px viewport).
+- **Decision**: Close the three service buttons verbatim (Repair/Refuel/Overhaul, ids and handlers unchanged); set `.station-services-bar` to `grid-auto-rows:1fr`; correct the early research-row rule to 4 columns to match `app.js:4254-4260` and the later `style.css:9257` rule; clamp research descriptions to 2 lines (`-webkit-line-clamp:2`) for uniform per-row heights. No card-grid redesign, no new panels, stdlib-only.
+- **Consequences**: After photos quote "REFUEL (+20)" as a real button beside REPAIR and "120 pts START QUEUE" sharing one row with a 2-line clamp; `ui verify` green, `ui_inventory` still lists all three service bindings, half-sim determinism tests (9/9) and scripted `tick(24)` treasury/morale drift unchanged.
