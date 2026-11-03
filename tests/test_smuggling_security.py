@@ -78,6 +78,25 @@ class TestSmugglingSecurity(unittest.TestCase):
         self.assertLess(risk_sensor, risk_base)
         self.assertTrue(any("ECM" in r for r in reasons_sensor))
 
+    def test_stealth_upgrade_values_not_keys(self):
+        cur_sys = self.engine.current_system  # Sol: security 1.0
+        cargo = {"xenoliths": 4}
+        ship_with_stealth_value = self.engine._clone_ship(
+            equipped_upgrades={"slot1": "stealth_coating"}
+        )
+        _, reasons_value = calculate_customs_scan_risk(
+            cur_sys, cargo, ship_with_stealth_value, self.engine.state.ship.power
+        )
+        self.assertTrue(any("Stealth" in r for r in reasons_value))
+
+        ship_with_stealth_key = self.engine._clone_ship(
+            equipped_upgrades={"stealth_slot": "basic_sensor"}
+        )
+        _, reasons_key = calculate_customs_scan_risk(
+            cur_sys, cargo, ship_with_stealth_key, self.engine.state.ship.power
+        )
+        self.assertFalse(any("Stealth" in r for r in reasons_key))
+
     def test_generate_customs_encounter(self):
         cur_sys = self.engine.current_system
         cargo = {"xenoliths": 2}

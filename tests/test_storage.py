@@ -148,6 +148,15 @@ class TestStorage(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.storage.save(self.engine.state, slot=bad_slot)
 
+    def test_orphan_bak_slot_is_listed(self):
+        self.storage.save(self.engine.state, slot="slot_1")
+        self.engine.tick(1)
+        self.storage.save(self.engine.state, slot="slot_1")
+        primary = Path(self.storage._slot_path("slot_1")[1])
+        primary.unlink()
+        self.assertIsNotNone(self.storage.load("slot_1"))
+        self.assertIn("slot_1", [s["slot"] for s in self.storage.list_saves()])
+
 
 if __name__ == "__main__":
     unittest.main()

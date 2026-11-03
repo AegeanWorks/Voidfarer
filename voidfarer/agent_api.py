@@ -10,6 +10,7 @@ from typing import Any
 _ROUTE_RE = re.compile(r'if path == "(/api/[^"]+)"')
 _FIELD_RES = (
     re.compile(r'body\.get\("([^"]+)"'),
+    re.compile(r'\(body\s+or\s+\{\}\)\.get\("([^"]+)"'),
     re.compile(r'_int_field\(body,\s*"([^"]+)"'),
     re.compile(r'_float_field\(body,\s*"([^"]+)"'),
     re.compile(r'_bool_field\(body,\s*"([^"]+)"'),

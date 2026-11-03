@@ -36,6 +36,9 @@ class AgentApiCatalogTest(unittest.TestCase):
         self.assertIn("action", by_path["/api/diplomacy"]["fields"])
         self.assertIn("distance_au", by_path["/api/travel/point"]["fields"])
         self.assertIn("angle", by_path["/api/travel/point"]["fields"])
+        self.assertIn("strategy", by_path["/api/salvage"].get("fields", []))
+        self.assertIn("action", by_path["/api/customs/resolve"].get("fields", []))
+        self.assertIn("rarity", by_path["/api/relics/fuse"].get("fields", []))
 
     def test_observations_include_state(self):
         paths = {entry["path"] for entry in self.catalog["observations"]}
@@ -104,6 +107,15 @@ class AgentPlayTest(unittest.TestCase):
         restored = type(self.engine.state).from_dict(self.engine.state.to_dict())
         self.assertEqual(restored.time.tick, snapshot["time"]["tick"])
         self.assertIsNotNone(restored.ship)
+
+
+class AiPlayToolArgsTest(unittest.TestCase):
+    def test_rejects_non_positive_steps(self):
+        from tools.ai_play import main as ai_play_main
+        for bad in ("0", "-5"):
+            with self.assertRaises(SystemExit) as ctx:
+                ai_play_main(["--steps", bad])
+            self.assertEqual(ctx.exception.code, 2)
 
 
 if __name__ == "__main__":

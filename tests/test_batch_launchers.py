@@ -7,6 +7,7 @@ made cmd pipe the echo into a nonexistent command and abort the script with exit
 code 255 before any menu appeared (double-click looked like "nothing happens").
 """
 
+import re
 import shutil
 import subprocess
 import sys
@@ -16,6 +17,18 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PLAY_BAT = PROJECT_ROOT / "play.bat"
 CLI_BAT = PROJECT_ROOT / "voidfarer.bat"
+
+
+class TestReadmeColdStartAccuracy(unittest.TestCase):
+    """Hand-maintained README counts must match the repository layout."""
+
+    def test_tree_suite_count_matches_tests_dir(self):
+        suites = sorted((PROJECT_ROOT / "tests").glob("test_*.py"))
+        self.assertGreater(len(suites), 70)
+        readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+        match = re.search(r"\((\d+) suites\)", readme)
+        self.assertIsNotNone(match, "README tree no longer states a suite count")
+        self.assertEqual(int(match.group(1)), len(suites))
 
 
 class TestLauncherLineEndings(unittest.TestCase):

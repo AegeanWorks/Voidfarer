@@ -829,6 +829,11 @@ def write_report(reports: Sequence[Dict[str, Any]], out: Path, browser: Optional
     return out / "report.md"
 
 
+def audit_timeout(base_timeout: int, dpr: float) -> int:
+    """Scale the per-viewport capture budget by rendered pixel count (dpr squared)."""
+    return max(1, int(round(base_timeout * max(1.0, dpr * dpr))))
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """Run the audit, write screenshots plus JSON/Markdown, and print a concise summary."""
     parser = argparse.ArgumentParser(description="Headless VoidFarer cockpit UI audit")
@@ -882,9 +887,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             return 1
         VoidFarerHandler.static_dir = static
         # A 2x capture rasters four times the pixels and settles the same animated
-        # radar for the same virtual time; a measured 1080p@2x pass takes ~350 s, so
-        # scaling by dpr squared alone would sit right on the limit.
-        timeout = max(1, int(round(args.timeout * max(1.0, 2.0 * args.dpr * args.dpr))))
+        # radar for the same virtual time; a measured 1080p@2x pass takes ~350 s.
+        timeout = audit_timeout(args.timeout, args.dpr)
         if args.dpr != 1:
             print(f"Scaling {args.dpr:g}x: {timeout}s per viewport "
                   f"(a 2x 1080p capture measured ~350s)")

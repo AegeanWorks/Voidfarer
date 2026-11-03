@@ -1,8 +1,11 @@
 """Unit tests for simulation engine state transitions, flight, upgrades, fleet, and combat."""
 
 import unittest
+from dataclasses import replace
+from unittest.mock import patch
+
 from voidfarer.engine import SimulationEngine
-from voidfarer.models import AnomalyChoice, AnomalyEncounter, CombatEncounter, FleetDrone, GameState
+from voidfarer.models import AnomalyChoice, AnomalyEncounter, CombatEncounter, FleetDrone, GameState, ShipRoom
 from voidfarer.upgrades import get_upgrade
 
 
@@ -470,6 +473,40 @@ class TestEngine(unittest.TestCase):
         self.assertEqual(credits - self.engine.state.ship.credits, quote["overhaul_cost"])
         self.assertEqual(self.engine.state.ship.wear, 0.0)
         self.assertIn(f"{quote['wear']:.1f}% wear restored", self.engine.state.ship.flight_log[-1])
+
+
+class TestCloneShipPreservation(unittest.TestCase):
+    """_clone_ship must preserve every ShipState field it is not asked to change."""
+
+    def setUp(self):
+        self.engine = SimulationEngine(seed=42)
+
+    def test_clone_ship_preserves_custom_rooms(self):
+        custom = (
+            ShipRoom(id="custom", label="CUSTOM", function="TEST", order=99),
+        ) + self.engine.state.ship.rooms
+        self.engine.state = self.engine._clone_state(
+            ship=replace(self.engine.state.ship, rooms=custom)
+        )
+        self.assertEqual(self.engine.state.ship.rooms[0].id, "custom")
+        self.engine.orbit("sol_body_1")
+        self.assertEqual(self.engine.state.ship.rooms[0].id, "custom")
+        self.assertEqual(len(self.engine.state.ship.rooms), len(custom))
+
+    def test_jump_preserves_wear_and_reactor_when_economy_logs(self):
+        self.engine.orbit("sol_body_1")
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(fuel=100, wear=10.0)
+        )
+        target = self.engine.current_system.connections[0]
+        with patch(
+            "voidfarer.engine.tick_global_economy",
+            return_value=(self.engine.state.economy, ["ECON: boom"]),
+        ):
+            ok, msg = self.engine.jump(target)
+        self.assertTrue(ok, msg)
+        self.assertAlmostEqual(self.engine.state.ship.wear, 11.0)
+        self.assertIn("ECON: boom", " ".join(self.engine.state.ship.flight_log))
 
 
 if __name__ == "__main__":

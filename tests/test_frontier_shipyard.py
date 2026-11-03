@@ -96,6 +96,19 @@ class FrontierShipyardTest(unittest.TestCase):
         self.assertEqual(report["outposts"][0]["outpost_type"], "shipyard")
         self.assertEqual(report["outposts"][0]["system_id"], "sol")
 
+    def test_recommissioned_escort_ids_stay_unique(self):
+        self.engine.orbit("sol_body_1")
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(credits=20000)
+        )
+        self.assertTrue(self.engine.buy_escort("corvette")[0])
+        self.assertTrue(self.engine.buy_escort("corvette")[0])
+        first_id = self.engine.state.ship.fleet_ships[0].id
+        self.assertTrue(self.engine.sell_escort(first_id)[0])
+        self.assertTrue(self.engine.buy_escort("corvette")[0])
+        ids = [s.id for s in self.engine.state.ship.fleet_ships]
+        self.assertEqual(len(ids), len(set(ids)))
+
 
 if __name__ == "__main__":
     unittest.main()

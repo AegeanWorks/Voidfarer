@@ -28,6 +28,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--json", action="store_true", help="Print the raw report as JSON")
     args = parser.parse_args(argv)
+    if args.steps < 1:
+        parser.error("--steps must be >= 1")
 
     with tempfile.TemporaryDirectory() as temp_dir:
         engine = SimulationEngine(seed=args.seed)

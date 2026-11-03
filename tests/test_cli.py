@@ -9,7 +9,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from voidfarer.cli import cmd_inventory, cmd_repl, main
+from voidfarer.cli import cmd_inventory, cmd_repl, cmd_status, main
 from voidfarer.engine import SimulationEngine
 from voidfarer.models import CombatEncounter, CustomsEncounter, PrecursorRelic
 from voidfarer.storage import StorageManager
@@ -44,6 +44,18 @@ class TestCLI(_IsolatedCliTestCase):
             output = mock_out.getvalue()
             self.assertIn("Astraea", output)
             self.assertIn("VF-Vanguard", output)
+
+    def test_cli_status_shows_cargo_volume_not_units(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(cargo={"titanium": 20})
+        )
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = cmd_status(engine)
+            self.assertEqual(code, 0)
+            output = mock_out.getvalue()
+            self.assertIn("40/40", output)
+            self.assertIn("volume", output)
 
     def test_cli_chart(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:

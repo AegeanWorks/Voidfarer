@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `125`
-- **Total Classes**: `320`
-- **Total Top-Level Functions**: `352`
-- **Total Class Methods**: `1886`
-- **Total Source Lines**: `48606`
+- **Total Classes**: `323`
+- **Total Top-Level Functions**: `353`
+- **Total Class Methods**: `1899`
+- **Total Source Lines**: `48753`
 
 ---
 
@@ -62,7 +62,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `110` lines (`5032` bytes)
+**Size**: `122` lines (`5606` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -78,6 +78,8 @@
   - Method `.test_every_catalog_action_is_attempted_or_documented()`
   - Method `.test_coverage_gap_detection()`
   - Method `.test_the_engine_state_stays_loadable_after_play()`
+- `class AiPlayToolArgsTest`
+  - Method `.test_rejects_non_positive_steps()`
 
 ---
 
@@ -181,9 +183,11 @@
 ### [`tests/test_batch_launchers.py`](tests/test_batch_launchers.py)
 > *Regression tests for the Windows batch launchers (``play.bat``, ``voidfarer.bat``).*
 
-**Size**: `57` lines (`2141` bytes)
+**Size**: `70` lines (`2719` bytes)
 
 **Classes:**
+- `class TestReadmeColdStartAccuracy` - *Hand-maintained README counts must match the repository layout.*
+  - Method `.test_tree_suite_count_matches_tests_dir()`
 - `class TestLauncherLineEndings` - *cmd.exe parses CRLF batches reliably; lone LF endings can abort a script mid-file.*
   - Method `._assert_crlf(path)`
   - Method `.test_play_bat_uses_crlf_line_endings()`
@@ -275,7 +279,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `512` lines (`23422` bytes)
+**Size**: `524` lines (`23928` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -283,6 +287,7 @@
 - `class TestCLI`
   - Method `.test_cli_help()`
   - Method `.test_cli_status()`
+  - Method `.test_cli_status_shows_cargo_volume_not_units()`
   - Method `.test_cli_chart()`
   - Method `.test_cli_power()`
   - Method `.test_cli_quantum_autotrade_status_parses()`
@@ -346,7 +351,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1879` lines (`83146` bytes)
+**Size**: `1888` lines (`83480` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -394,6 +399,7 @@
   - Method `.test_frontier_tabs_and_radar_overlay_exist()`
   - Method `.test_frontier_renderers_are_wired()`
   - Method `.test_esc_key_toggles_main_menu()`
+  - Method `.test_menu_resume_closes_without_reload()`
   - Method `.test_multiple_save_slots_ui_exists()`
   - Method `.test_nav_radar_orbital_map_is_full_viewport_background()`
   - Method `.test_radar_background_is_black()`
@@ -847,7 +853,7 @@
 ### [`tests/test_engine.py`](tests/test_engine.py)
 > *Unit tests for simulation engine state transitions, flight, upgrades, fleet, and combat.*
 
-**Size**: `476` lines (`20424` bytes)
+**Size**: `513` lines (`21959` bytes)
 
 **Classes:**
 - `class TestEngine`
@@ -874,6 +880,10 @@
   - Method `.test_remove_ship_mod_rejects_if_cargo_exceeds_reduced_capacity()`
   - Method `.test_quantum_travel_fuel_cost_applies_fuel_efficiency_bonuses()`
   - Method `.test_drydock_quote_matches_every_service_charge()`
+- `class TestCloneShipPreservation` - *_clone_ship must preserve every ShipState field it is not asked to change.*
+  - Method `.setUp()`
+  - Method `.test_clone_ship_preserves_custom_rooms()`
+  - Method `.test_jump_preserves_wear_and_reactor_when_economy_logs()`
 
 ---
 
@@ -992,7 +1002,7 @@
 ### [`tests/test_factions_and_enemies.py`](tests/test_factions_and_enemies.py)
 > *Unit tests for Factions, Corporations, and Enhanced Combat Enemies.*
 
-**Size**: `255` lines (`10181` bytes)
+**Size**: `271` lines (`10864` bytes)
 
 **Classes:**
 - `class TestFactionsAndCorporations` - *Test faction registries, corporations, standing calculations, and market modifiers.*
@@ -1000,6 +1010,7 @@
   - Method `.test_canonical_corporations_exist()`
   - Method `.test_faction_standing_tiers()`
   - Method `.test_market_modifiers()`
+  - Method `.test_allied_service_perks_are_monotonic()`
 - `class TestEnemiesAndCombatModels` - *Test enemy archetypes, generation, and extended CombatEncounter model.*
   - Method `.test_enemy_archetypes()`
   - Method `.test_generate_system_enemy()`
@@ -1199,7 +1210,7 @@
 ### [`tests/test_frontier_shipyard.py`](tests/test_frontier_shipyard.py)
 > *Frontier shipyards service hulls, escorts and weapons without a station dock.*
 
-**Size**: `101` lines (`3795` bytes)
+**Size**: `114` lines (`4440` bytes)
 
 **Classes:**
 - `class FrontierShipyardTest`
@@ -1210,6 +1221,7 @@
   - Method `.test_without_a_shipyard_undocked_services_are_refused()`
   - Method `.test_remote_shipyard_does_not_service_the_current_system()`
   - Method `.test_report_marks_the_local_shipyard()`
+  - Method `.test_recommissioned_escort_ids_stay_unique()`
 
 ---
 
@@ -2010,7 +2022,7 @@
 ### [`tests/test_smuggling_security.py`](tests/test_smuggling_security.py)
 > *Unit tests for contraband smuggling, security scans, and customs interdiction.*
 
-**Size**: `166` lines (`7430` bytes)
+**Size**: `185` lines (`8268` bytes)
 
 **Classes:**
 - `class TestSmugglingSecurity`
@@ -2019,6 +2031,7 @@
   - Method `.test_get_contraband_in_cargo()`
   - Method `.test_customs_scan_risk_clean_or_low_security()`
   - Method `.test_customs_scan_risk_with_contraband_and_evasion()`
+  - Method `.test_stealth_upgrade_values_not_keys()`
   - Method `.test_generate_customs_encounter()`
   - Method `.test_resolve_customs_bribe()`
   - Method `.test_resolve_customs_jettison()`
@@ -2074,7 +2087,7 @@
 ### [`tests/test_storage.py`](tests/test_storage.py)
 > *Unit tests for atomic persistence, crash safety, and shadow backup recovery.*
 
-**Size**: `153` lines (`6485` bytes)
+**Size**: `162` lines (`6904` bytes)
 
 **Classes:**
 - `class TestStorage`
@@ -2087,6 +2100,7 @@
   - Method `.test_invalid_utf8_does_not_crash_loading()`
   - Method `.test_multiple_save_slots_persist_list_and_delete_independently()`
   - Method `.test_invalid_save_slot_name_raises_value_error()`
+  - Method `.test_orphan_bak_slot_is_listed()`
 
 ---
 
@@ -2288,7 +2302,7 @@
 ### [`tests/test_ui_audit.py`](tests/test_ui_audit.py)
 > *The headless cockpit audit has deterministic viewport, parsing and wrapper helpers.*
 
-**Size**: `78` lines (`3811` bytes)
+**Size**: `82` lines (`4061` bytes)
 
 **Classes:**
 - `class AuditHelpersTest`
@@ -2302,6 +2316,7 @@
   - Method `.test_browser_command_emulates_windows_scaling()`
   - Method `.test_a_blurry_radar_backing_store_is_a_severe_finding()`
   - Method `.test_summary_line_reports_the_radar_state()`
+  - Method `.test_dpr_timeout_scaling_matches_documented_capture_cost()`
 
 ---
 
@@ -2433,7 +2448,7 @@
 ### [`tools/ai_play.py`](tools/ai_play.py)
 > *Play VoidFarer headlessly through the public API and report mechanic coverage.*
 
-**Size**: `76` lines (`2983` bytes)
+**Size**: `78` lines (`3051` bytes)
 
 **Functions:**
 - `def main(argv)`
@@ -2443,7 +2458,7 @@
 ### [`tools/ui_audit.py`](tools/ui_audit.py)
 > *Capture VoidFarer cockpit screenshots and a measurable UI audit with headless Edge or Chrome.*
 
-**Size**: `924` lines (`36684` bytes)
+**Size**: `928` lines (`36791` bytes)
 
 **Functions:**
 - `def find_browser()` - *Locate an installed Edge or Chrome executable without a third-party dependency.*
@@ -2456,6 +2471,7 @@
 - `def summary_line(report)` - *One ASCII-safe console line for a viewport report.*
 - `def severe_findings(report)` - *Names of findings that should fail an explicit audit check.*
 - `def write_report(reports, out, browser)` - *Write the combined JSON and Markdown evidence packet.*
+- `def audit_timeout(base_timeout, dpr)` - *Scale the per-viewport capture budget by rendered pixel count (dpr squared).*
 - `def main(argv)` - *Run the audit, write screenshots plus JSON/Markdown, and print a concise summary.*
 
 ---
@@ -2513,7 +2529,7 @@
 ### [`voidfarer/agent_api.py`](voidfarer/agent_api.py)
 > *Discoverable action catalog so an AI can play every mechanic through the public API.*
 
-**Size**: `79` lines (`2704` bytes)
+**Size**: `80` lines (`2761` bytes)
 
 **Functions:**
 - `def _sections(source)` - *Split the handler source into the GET and POST halves.*
@@ -2642,7 +2658,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3454` lines (`174895` bytes)
+**Size**: `3455` lines (`174933` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2832,7 +2848,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10131` lines (`499107` bytes)
+**Size**: `10111` lines (`498057` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -2936,6 +2952,7 @@
   - Method `._leader_voice_line(faction_id, occasion)` - *Voiced leader reply for a diplomacy exchange, empty when leaderless.*
   - Method `._leader_payload(leader)` - *Snapshot payload joining leader identity with faction creed and lore.*
   - Method `.faction_diplomacy(faction_id, action, amount)`
+  - Method `._next_escort_index(escort_type)` - *Return a commission counter that never reuses an id freed by sale or loss.*
   - Method `.buy_escort(escort_type, system_id)`
   - Method `.assign_escort(ship_id, system_id)`
   - Method `.set_fleet_role(ship_id, role)` - *Change an escort's squadron role outside combat.*
@@ -3145,7 +3162,7 @@
 ### [`voidfarer/factions.py`](voidfarer/factions.py)
 > *Galactic Factions, Megacorporations, Standings, and Geopolitical Mechanics.*
 
-**Size**: `332` lines (`13550` bytes)
+**Size**: `333` lines (`13628` bytes)
 
 **Classes:**
 - `class Faction` - *Sovereign faction or interstellar coalition.*
@@ -3659,7 +3676,7 @@
 ### [`voidfarer/smuggling.py`](voidfarer/smuggling.py)
 > *Contraband smuggling mechanics, customs scanner risks, and security interdiction.*
 
-**Size**: `153` lines (`5154` bytes)
+**Size**: `156` lines (`5302` bytes)
 
 **Functions:**
 - `def is_contraband(commodity_id)` - *Return True if the commodity is classed as illicit contraband.*
@@ -3672,7 +3689,7 @@
 ### [`voidfarer/storage.py`](voidfarer/storage.py)
 > *Crash-resilient storage engine and atomic persistence for VoidFarer.*
 
-**Size**: `194` lines (`7708` bytes)
+**Size**: `205` lines (`8177` bytes)
 
 **Classes:**
 - `class StorageManager` - *Manages power-loss safe atomic persistence and shadow backups.*

@@ -7,6 +7,7 @@ from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
     get_faction,
     get_corporation,
+    get_faction_service_perks,
     get_faction_standing_tier,
     calculate_faction_market_modifier,
 )
@@ -64,6 +65,21 @@ class TestFactionsAndCorporations(unittest.TestCase):
 
         mod_allied = calculate_faction_market_modifier("sol_coalition", 80)
         self.assertLess(mod_allied, 1.0)  # Allied discount reduces purchase price
+
+    def test_allied_service_perks_are_monotonic(self):
+        for fid in (
+            "sol_coalition", "vanguard_syndicate", "precursor_watch",
+            "nebula_collective", "outlaw_corsairs", "kepler_concord",
+            "helios_compact", "ashen_choir", "iron_meridian",
+        ):
+            friendly = get_faction_service_perks(fid, 40)
+            allied = get_faction_service_perks(fid, 80)
+            self.assertGreaterEqual(
+                allied["repair_discount"], friendly["repair_discount"], fid
+            )
+            self.assertGreaterEqual(
+                allied["trade_margin"], friendly["trade_margin"], fid
+            )
 
 
 class TestEnemiesAndCombatModels(unittest.TestCase):

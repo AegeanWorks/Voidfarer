@@ -368,6 +368,15 @@ class TestFrontierCockpitUI(unittest.TestCase):
         self.assertIn("toggleMainMenu", self.js)
         self.assertIn("ESC", self.html)
 
+    def test_menu_resume_closes_without_reload(self):
+        at = self.js.find("btnMenuResume")
+        self.assertGreaterEqual(at, 0)
+        end = self.js.find("});", at)
+        self.assertGreater(end, at)
+        block = self.js[at:end]
+        self.assertIn("closeMainMenu", block)
+        self.assertNotIn("/api/load", block)
+
     def test_multiple_save_slots_ui_exists(self):
         for marker in ("saveSlotInput", "saveSlotsList"):
             self.assertIn(f'id="{marker}"', self.html)

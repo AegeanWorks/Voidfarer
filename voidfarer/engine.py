@@ -658,6 +658,7 @@ class SimulationEngine:
             upgrades=kwargs.get("upgrades", cur.upgrades),
             equipped_upgrades=kwargs.get("equipped_upgrades", cur.equipped_upgrades),
             ship_mods=kwargs.get("ship_mods", cur.ship_mods),
+            rooms=kwargs.get("rooms", cur.rooms),
             fleet_drones=kwargs.get("fleet_drones", cur.fleet_drones),
             fleet_ships=kwargs.get("fleet_ships", cur.fleet_ships),
             battle_stance=kwargs.get("battle_stance", cur.battle_stance),
@@ -1888,40 +1889,7 @@ class SimulationEngine:
             new_econ, econ_logs = tick_global_economy(self.state.economy, 2, self.state.systems, self.rng)
             if econ_logs:
                 new_flight_log = list(new_ship.flight_log) + econ_logs
-                new_ship = self._clone_ship(
-                    ship_class=new_ship.ship_class,
-                    hull=new_ship.hull,
-                    max_hull=new_ship.max_hull,
-                    shield=new_ship.shield,
-                    max_shield=new_ship.max_shield,
-                    fuel=new_ship.fuel,
-                    max_fuel=new_ship.max_fuel,
-                    credits=new_ship.credits,
-                    cargo=new_ship.cargo,
-                    cargo_capacity=new_ship.cargo_capacity,
-                    current_system_id=new_ship.current_system_id,
-                    orbiting_body_id=new_ship.orbiting_body_id,
-                    landed_body_id=None,
-                    travel=None,
-                    waypoint_au=0.0,
-                    waypoint_angle=0.0,
-                    power=new_ship.power,
-                    upgrades=new_ship.upgrades,
-                    equipped_upgrades=new_ship.equipped_upgrades,
-                    fleet_drones=new_ship.fleet_drones,
-                    flight_log=tuple(trim_log(new_flight_log)),
-                    streak=new_ship.streak,
-                    relics=new_ship.relics,
-                    mastery=new_ship.mastery,
-                    active_contracts=new_ship.active_contracts,
-                    tactical_combo=new_ship.tactical_combo,
-                    near_miss_scanner_bonus=new_ship.near_miss_scanner_bonus,
-                    tutorial=new_ship.tutorial,
-                    story=new_ship.story,
-                    crew=new_ship.crew,
-                    faction_standings=new_ship.faction_standings,
-                    corp_standings=new_ship.corp_standings,
-                )
+                new_ship = replace(new_ship, flight_log=tuple(trim_log(new_flight_log)))
 
             self.state = self._clone_state(
                 ship=new_ship,
@@ -3781,6 +3749,16 @@ class SimulationEngine:
                 return True, line
             return False, f"Unknown diplomacy action '{action}'."
 
+    def _next_escort_index(self, escort_type: str) -> int:
+        """Return a commission counter that never reuses an id freed by sale or loss."""
+        prefix = f"escort_{escort_type}_"
+        taken = [
+            int(ship.id[len(prefix):])
+            for ship in self.state.ship.fleet_ships
+            if ship.id.startswith(prefix) and ship.id[len(prefix):].isdigit()
+        ]
+        return max(taken) if taken else len(self.state.ship.fleet_ships)
+
     def buy_escort(self, escort_type: str, system_id: str | None = None) -> tuple[bool, str]:
         with self.lock:
             ok, msg = self._require_service_dock()
@@ -3794,7 +3772,9 @@ class SimulationEngine:
             target_system = system_id or self.state.ship.current_system_id
             if target_system not in self.state.systems:
                 return False, f"Unknown system '{target_system}'."
-            ship = build_fleet_ship(escort_type, target_system, len(self.state.ship.fleet_ships))
+            ship = build_fleet_ship(
+                escort_type, target_system, self._next_escort_index(escort_type)
+            )
             new_ship = self._clone_ship(
                 credits=self.state.ship.credits - template["cost"],
                 fleet_ships=self.state.ship.fleet_ships + (ship,),

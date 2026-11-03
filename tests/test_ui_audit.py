@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.ui_audit import (ERROR_COLLECTOR, WRAPPER_JS, browser_command, outer_window,
+from tools.ui_audit import (ERROR_COLLECTOR, WRAPPER_JS, audit_timeout, browser_command, outer_window,
                             parse_audit, prepare_static, severe_findings, summary_line)
 
 
@@ -64,7 +64,6 @@ class AuditHelpersTest(unittest.TestCase):
                   "radar": {"dprCorrect": False, "dpr": 2}}
         self.assertEqual(severe_findings(report), ["radarDpr"])
         self.assertEqual(severe_findings({"radar": {"dprCorrect": True}}), [])
-
     def test_summary_line_reports_the_radar_state(self):
         line = summary_line({"name": "desktop@2x", "viewport": {"width": 1920, "height": 1080},
                              "radar": {"dprCorrect": True}})
@@ -72,6 +71,11 @@ class AuditHelpersTest(unittest.TestCase):
         blurry = summary_line({"name": "desktop", "viewport": {"width": 1920, "height": 1080},
                                "radar": {"dprCorrect": False}})
         self.assertIn("radar BLURRY", blurry)
+
+    def test_dpr_timeout_scaling_matches_documented_capture_cost(self):
+        self.assertEqual(audit_timeout(120, 1), 120)
+        self.assertEqual(audit_timeout(120, 1.5), 270)
+        self.assertEqual(audit_timeout(120, 2.0), 480)
 
 
 if __name__ == "__main__":

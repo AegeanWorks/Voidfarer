@@ -142,6 +142,17 @@ class StorageManager:
             if _SLOT_NAME_RE.match(stem_suffix) and stem_suffix != "default":
                 candidates.append((stem_suffix, path))
 
+        known = {slot for slot, _ in candidates}
+        for path in sorted(self.data_dir.glob("voidfarer_save_*.bak")):
+            stem_suffix = path.stem[len("voidfarer_save_"):]
+            if (
+                _SLOT_NAME_RE.match(stem_suffix)
+                and stem_suffix != "default"
+                and stem_suffix not in known
+            ):
+                candidates.append((stem_suffix, path.with_suffix(".json")))
+                known.add(stem_suffix)
+
         summaries: list[dict[str, Any]] = []
         for slot_name, path in candidates:
             data = self._read_json_file(path)

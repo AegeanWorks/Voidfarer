@@ -1125,7 +1125,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         document.getElementById("btnMainMenu")?.addEventListener("click", () => this.toggleMainMenu());
         document.getElementById("btnCloseSettings")?.addEventListener("click", () => this.closeSettings());
         document.getElementById("btnMenuResume")?.addEventListener("click", () => {
-            this.menuAction("/api/load", "Game loaded.");
+            this.closeMainMenu();
         });
         document.getElementById("btnMenuSave")?.addEventListener("click", () => this.menuAction("/api/save", "Game saved."));
         document.getElementById("btnMenuLoad")?.addEventListener("click", () => this.menuAction("/api/load", "Game loaded."));

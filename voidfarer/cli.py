@@ -49,6 +49,7 @@ from voidfarer.economy import (
 )
 from voidfarer.inventory import (
     ITEM_CATALOG,
+    calculate_cargo_volume,
     get_inventory_manifest,
     get_item_info,
 )
@@ -126,7 +127,7 @@ def cmd_status(engine: SimulationEngine) -> int:
     print(f"║ Commander: {CYAN}{ship.commander_name:<16}{RESET} Callsign: {YELLOW}{ship.callsign:<16}{RESET} Class: {ship.ship_class:<12} ║")
     t = engine.state.time
     print(f"║ Date:      {YELLOW}{t.current_date:<10}{RESET}  (Tick #{t.tick:<5})   Temporal Clock: {GREEN if not t.is_paused else RED}{t.time_scale:<10}{RESET}       ║")
-    print(f"║ Credits:   {YELLOW}{ship.credits:>8} cr{RESET}       Cargo:    {sum(ship.cargo.values()):>2}/{ship.cargo_capacity:<2} units                     ║")
+    print(f"║ Credits:   {YELLOW}{ship.credits:>8} cr{RESET}       Cargo:    {calculate_cargo_volume(ship.cargo):>2}/{ship.cargo_capacity:<2} volume                    ║")
     print(f"╠════ VITAL TELEMETRY ════════════════════════════════════════════════╣{RESET}")
     streak_mult = 1.0 + min(1.5, (ship.streak - 1) * 0.15)
     print(f"║ Streak:    {RED}🔥 {ship.streak} jumps (x{streak_mult:.2f}){RESET}   Mastery:  {YELLOW}★ Lvl {ship.mastery.level} [{ship.mastery.xp}/{ship.mastery.next_level_xp} XP]{RESET}           ║")

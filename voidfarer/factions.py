@@ -316,6 +316,7 @@ def get_faction_service_perks(faction_id: str, standing: int) -> dict[str, float
     if standing >= 70:
         perks["trade_margin"] = float(perks["trade_margin"]) + 0.20
         perks["free_refuel"] = True
+        perks["repair_discount"] = max(float(perks["repair_discount"]), 0.15)
     elif standing >= 25:
         perks["trade_margin"] = float(perks["trade_margin"]) + 0.10
         perks["repair_discount"] = max(float(perks["repair_discount"]), 0.15)

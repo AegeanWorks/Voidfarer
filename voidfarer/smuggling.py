@@ -83,9 +83,12 @@ def calculate_customs_scan_risk(
         kw in ship.ship_class.lower()
         for kw in ("stealth", "ghost", "phantom", "shadow")
     )
+    has_stealth_upgrades = False
+    equipped = getattr(ship, "equipped_upgrades", ()) or ()
+    equipped_ids = equipped.values() if isinstance(equipped, dict) else equipped
     has_stealth_upgrades = any(
         "stealth" in uid.lower() or "cloak" in uid.lower()
-        for uid in getattr(ship, "equipped_upgrades", ())
+        for uid in equipped_ids
     )
     if is_stealth_hull or has_stealth_upgrades:
         evasion += 0.40
