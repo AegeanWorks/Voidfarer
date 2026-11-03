@@ -16,6 +16,13 @@ BLACK_HOLE_HAZARD = {
     "relic_find": 0.10,
 }
 
+# Jump encounter tuning (Stage 3 balance: DATA the game reads).
+JUMP_ENCOUNTER_TUNING = {
+    "hostile_sec_combat": 0.65,
+    "low_sec_combat": 0.25,
+    "anomaly": 0.20,
+}
+
 # Void traversal tuning (PRINCIPLE G-012: deterministic per save seed, stdlib only)
 VOID_LANE_SEED_SALT = 0x5A17
 VOID_SPOKE_COUNT = 2

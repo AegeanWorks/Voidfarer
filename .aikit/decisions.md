@@ -1835,3 +1835,17 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Wave audit 0,10,20,30 (first 30 commits: ce6d513 economy, f7497ec hardening) left `trade`, `buy_item`, and `jettison_cargo` guarding only `quantity <= 0` while `repair_hull`/`repair_escorts`/`refuel` enforce `not isinstance(int) or bool or <= 0`. Repro on seed 1 at a docked station: `trade('fuel_cells', True, True)` succeeded with message `Purchased Truex ...` (cargo 5 -> 6), `trade('fuel_cells', 1.5, True)` minted fractional cargo 6.5 with 79.5 cr cost, `buy_item(..., True)` succeeded, and `trade('fuel_cells', '2', True)` raised `TypeError` instead of refusing.
 - **Decision**: Apply the identical repair-hull strict guard to all three economy entry points: `if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity <= 0: return False, "Quantity must be a positive integer."` State is untouched on rejection. Residual (deferred): `deposit/withdraw/sell_from_depot/place_quantum_order/interact_ai` still coerce via `int()` and truncate bool/float; server `_int_field` already blocks them on REST, direct-engine calls remain lenient.
 - **Consequences**: No fractional cargo, no `Truex` messages, no `TypeError` on string quantities; all three paths match the repair convention. Added `tests/test_trade_quantity_guards.py` (3 tests, failing-first 3/3 red before, green after). Suite grows 1,174 -> 1,177 tests; `python aikit.py check voidfarer` 5/5 gates pass.
+
+### ADR-163: Stage 3 Balance Tuning as DATA Tables (Execute, Tachyon, Encounters, Tolls, Research)
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: Jump interruptions (~60%: 0.65 hostile / 0.40 low-sec / 0.35 anomaly), execute x1.5 inbound spikes with 15 direct-hull tachyon, uncapped haven tolls (~90-400cr on 2000cr start), and 1 RP/tick research vs 480-cost grinds were unfair/unfun. All were hardcoded literals.
+- **Decision**: Tune as DATA the game reads: `enemies.EXECUTE_DAMAGE_MULTIPLIER=1.25`, `enemies.TACHYON_LANCE_HULL_DAMAGE=10`; `navigation.JUMP_ENCOUNTER_TUNING={hostile 0.65, low-sec 0.25, anomaly 0.20}`; `pirates.PIRATE_HAVEN_BONUS=0.20`, `pirates.TOLL_CAP_BY_THREAT={1:220,2:320,3:420,4:520,5:620}`; `research.RESEARCH_BASE_GAIN_PER_TICK=2`; wire in `engine.py` (shield-absorb, counter-battery, jump rolls, research tick). Proven by `tests/test_balance_tuning_stage3.py` (6 tests, failing-first red on missing constants, green after; 50-seed toll p95=220).
+- **Consequences**: Seeded 10-round combat hull loss <=60; 20 jumps <=8 intercepts; toll p95 <=300; `time/step x60` advances >=120 RP. No save-schema change; costs untouched.
+
+### ADR-164: Fuel Glyph Joins Monochrome Console Language
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: The refuel button used color-emoji `⛽` (U+26FD) while the cockpit otherwise speaks text glyphs (`◆◎◇⌬¤`); Windows fallback varied. Scanline overlay (z999 < modal z5100, pointer-events none) and 9px badge floor verified correct — no code change.
+- **Decision**: Swap the single `⛽` in `voidfarer/static/index.html` refuel button for `◆` (existing diamond language); leave `⚙/✚` (text presentation). Prove with `ui_browser --scenario cockpit|death|event --viewports short` before/after pairs (all errors 0 hscroll 0 tiny 0; death/event confirm modal legibility over scanline).
+- **Consequences**: Monochrome HUD; zero layout shift (same 18px `.icon` box); no JS/CSS change.

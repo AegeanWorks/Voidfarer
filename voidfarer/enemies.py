@@ -127,6 +127,10 @@ THREAT_SCALE_PER_LEVEL = 0.05
 THREAT_SCALE_CAP = 0.75
 DREADNOUGHT_MIN_THREAT_LEVEL = 4
 
+# Combat tuning (Stage 3 balance: DATA the game reads, never hardcoded one-offs).
+EXECUTE_DAMAGE_MULTIPLIER = 1.25
+TACHYON_LANCE_HULL_DAMAGE = 10
+
 
 def threat_multiplier(threat_level: int) -> float:
     """Scale generated intercept strength with the pilot's command experience.

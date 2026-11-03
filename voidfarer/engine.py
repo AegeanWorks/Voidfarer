@@ -13,6 +13,8 @@ from typing import Any, Sequence
 
 from voidfarer.enemies import (
     ENEMY_ARCHETYPES,
+    EXECUTE_DAMAGE_MULTIPLIER,
+    TACHYON_LANCE_HULL_DAMAGE,
     choose_enemy_intent,
     generate_system_enemy,
 )
@@ -135,6 +137,7 @@ from voidfarer.megastructures import (
     restoration_bonuses,
 )
 from voidfarer.navigation import (
+    JUMP_ENCOUNTER_TUNING,
     generate_void_lanes,
     route_plan,
     shortest_route,
@@ -163,6 +166,7 @@ from voidfarer.outposts import (
     upgrade_outpost,
 )
 from voidfarer.research import (
+    RESEARCH_BASE_GAIN_PER_TICK,
     RESEARCH_MAP,
     RESEARCH_PROJECTS,
     available_projects,
@@ -1647,7 +1651,7 @@ class SimulationEngine:
             )
             encounter_risk_mult = float(target_map["encounter_mult"]) * float(reactor_mode.get("encounter_mult", 1.0))
 
-            if is_hostile_territory and self.rng.random() < min(0.95, 0.65 * encounter_risk_mult * (1.0 - encounter_evasion)):
+            if is_hostile_territory and self.rng.random() < min(0.95, JUMP_ENCOUNTER_TUNING["hostile_sec_combat"] * encounter_risk_mult * (1.0 - encounter_evasion)):
                 combat = generate_system_enemy(
                     system_id=target_system_id,
                     security=target_sys.security,
@@ -1659,7 +1663,7 @@ class SimulationEngine:
             elif target_sys.security < 0.35:
                 if has_escort:
                     new_log.append("TACTICAL: Combat escort frigate dispersed hostile ambush.")
-                elif self.rng.random() < min(0.95, 0.40 * encounter_risk_mult * (1.0 - encounter_evasion)):
+                elif self.rng.random() < min(0.95, JUMP_ENCOUNTER_TUNING["low_sec_combat"] * encounter_risk_mult * (1.0 - encounter_evasion)):
                     combat = generate_system_enemy(
                         system_id=target_system_id,
                         security=target_sys.security,
@@ -1669,7 +1673,7 @@ class SimulationEngine:
                     )
                     new_log.append(f"ALERT: Intercepted by hostile {combat.enemy_name}! Weapons locked.")
 
-            if not combat and self.rng.random() < 0.35:
+            if not combat and self.rng.random() < JUMP_ENCOUNTER_TUNING["anomaly"]:
                 anomaly = GalaxyGenerator.get_random_anomaly(self.rng.randint(1, 99999))
                 new_log.append(f"WARNING: Deep-space anomaly detected! [{anomaly.title}]")
 
@@ -6178,7 +6182,7 @@ class SimulationEngine:
             elif action == "shield_absorb":
                 boost = 30 + (25 if "dreadnought_tactics" in self.state.ship.mastery.specializations else 0)
                 new_shield = min(self.state.ship.max_shield, new_shield + boost)
-                mitigated = max(1, int(combat.enemy_damage * 0.35 * (1.5 if intent == "execute" else 1.0)))
+                mitigated = max(1, int(combat.enemy_damage * 0.35 * (EXECUTE_DAMAGE_MULTIPLIER if intent == "execute" else 1.0)))
                 if new_shield >= mitigated:
                     new_shield -= mitigated
                 else:
@@ -6501,12 +6505,12 @@ class SimulationEngine:
                     ability_note = " [ABILITY: Nanite Swarm regenerated +20 enemy Hull!]"
                     ability_cd = 2
                 elif combat.special_ability == "tachyon_lance":
-                    new_hull = max(0, new_hull - 15)
-                    ability_note = " [ABILITY: Tachyon Lance phase-pierced your shields for 15 direct hull damage!]"
+                    new_hull = max(0, new_hull - TACHYON_LANCE_HULL_DAMAGE)
+                    ability_note = f" [ABILITY: Tachyon Lance phase-pierced your shields for {TACHYON_LANCE_HULL_DAMAGE} direct hull damage!]"
                     ability_cd = 2
 
             # Standard counter-battery
-            inbound = int(enemy_rem_damage * (1.5 if intent == "execute" else 1.0))
+            inbound = int(enemy_rem_damage * (EXECUTE_DAMAGE_MULTIPLIER if intent == "execute" else 1.0))
             evasion_note = ""
             if action == "point_defense":
                 inbound = max(1, int(inbound * 0.30))
@@ -9274,7 +9278,7 @@ class SimulationEngine:
             new_character = tick_ability_cooldowns(new_character, num_ticks)
             research_state = self.state.research
             outpost_credits = 0
-            research_gain = 1 + int((new_character.skills.get("science", 1) - 1) * 0.5)
+            research_gain = RESEARCH_BASE_GAIN_PER_TICK + int((new_character.skills.get("science", 1) - 1) * 0.5)
             research_yield_mult = 1.0 + float(self._research_bonuses()["outpost_yield"]) + self._skill("trade")
             updated_outposts = []
             updated_depots = list(self.state.depots)

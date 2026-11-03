@@ -136,6 +136,9 @@ RESEARCH_PROJECTS: tuple[ResearchProject, ...] = (
 
 RESEARCH_MAP: dict[str, ResearchProject] = {p.id: p for p in RESEARCH_PROJECTS}
 
+# Research pacing (Stage 3 balance: DATA the game reads).
+RESEARCH_BASE_GAIN_PER_TICK = 2
+
 DEFAULT_RESEARCH_BONUSES: dict[str, float] = {
     "reactor_cooling": 0.0,
     "reactor_output": 0.0,

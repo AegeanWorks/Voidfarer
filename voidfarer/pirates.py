@@ -38,6 +38,10 @@ PIRATE_BANDS: tuple[dict[str, object], ...] = (
 
 PIRATE_HAVENS: frozenset[str] = frozenset({"rift_station", "cygnus_x1", "golconda", "draco", "ashen"})
 
+# Pirate tuning (Stage 3 balance: DATA the game reads).
+PIRATE_HAVEN_BONUS = 0.20
+TOLL_CAP_BY_THREAT: dict[int, int] = {1: 220, 2: 320, 3: 420, 4: 520, 5: 620}
+
 
 @dataclass(frozen=True)
 class PirateRisk:
@@ -57,7 +61,7 @@ def pirate_risk(
     chance = 0.04
     reasons = []
     if system.id in PIRATE_HAVENS:
-        chance += 0.30
+        chance += PIRATE_HAVEN_BONUS
         reasons.append("pirate haven")
     if system.faction.strip().lower() == "void corsairs":
         chance += 0.18
@@ -93,6 +97,8 @@ def generate_pirate_encounter(
     toll = int(90 + threat_level * 55 + max(0.0, 1.0 - system.security) * 260 + rng.randint(0, 90))
     if standing <= -50:
         toll = int(toll * 1.35)
+    cap = TOLL_CAP_BY_THREAT.get(max(1, int(threat_level)), 620)
+    toll = min(toll, cap)
     return PirateEncounter(
         id=f"pirate_{system.id}_{seed % 100000}",
         band_name=str(band["name"]),
