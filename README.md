@@ -578,9 +578,11 @@ Free for personal play under the Aegean Game License 1.1 (AGL-1.1); see [LICENSE
 <!-- aegean:screenshots:start -->
 ## Screenshots
 
-<a href="https://github.com/AegeanWorks/Voidfarer/commit/1262ed9"><img src="assets/screenshots/2026-10-28-index.png" alt="Voidfarer interface at 2026-10-28"></a>
+<a href="https://github.com/AegeanWorks/Voidfarer/commit/95cf80c"><img src="assets/screenshots/2026-11-03-menu.png" alt="Voidfarer save menu at 2026-11-03"></a>
 
-*commit `1262ed9` · 2026-10-28*
+<a href="https://github.com/AegeanWorks/Voidfarer/commit/95cf80c"><img src="assets/screenshots/2026-11-03-cockpit.png" alt="Voidfarer cockpit at 2026-11-03"></a>
+
+*commit `95cf80c` · 2026-11-03 · viewport 1920x1080 · scripted `ui_browser` menu + cockpit; absolute-path caption fixed*
 <!-- aegean:screenshots:end -->
 The project declares that contract in `.aikit/project.json` as `mechanics.core` and
 `mechanics.test`, so `python aikit.py check voidfarer` runs the 180-step captain as a

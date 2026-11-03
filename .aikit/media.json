@@ -46,7 +46,7 @@
     {
       "path": "assets/screenshots/2026-10-28-index.png",
       "alt": "Voidfarer interface at 2026-10-28",
-      "caption": "Voidfarer interface captured from C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer\\voidfarer\\static\\index.html",
+      "caption": "Superseded Vanguard login at commit 1262ed9; replaced by the scripted 2026-11-03 captures. Kept as history.",
       "commit": "1262ed935ebdcad038b2f066eba4594a6d9c1893",
       "taken_at": "2026-10-28",
       "viewport": "1440x900",
@@ -60,6 +60,44 @@
         "notes": "Real non-blank UI: Voidfarer login with Vanguard panel; legible, unclipped.",
         "score": 90,
         "reviewed_at": "2026-10-28T11:49:30"
+      }
+    },
+    {
+      "path": "assets/screenshots/2026-11-03-menu.png",
+      "alt": "Voidfarer save menu at 2026-11-03",
+      "caption": "Save-slot menu from tools/ui_browser.py menu scenario: slots, Vanguard panel, quantum link.",
+      "commit": "95cf80ca5246db38c49e839a63658ff0af9a5a49",
+      "taken_at": "2026-11-03",
+      "viewport": "1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "status": "approved",
+      "review": {
+        "status": "approved",
+        "reviewer": "agent:kilo",
+        "method": "vision",
+        "notes": "Real scripted capture: save slots, continue/save/load/delete/new/settings plus Vanguard corvette panel. Fresh zero-save state.",
+        "score": 92,
+        "reviewed_at": "2026-11-03"
+      }
+    },
+    {
+      "path": "assets/screenshots/2026-11-03-cockpit.png",
+      "alt": "Voidfarer cockpit at 2026-11-03",
+      "caption": "Full tactical cockpit from the cockpit scenario: character, Sol orbits, reactor, radar, flight log, onboarding milestone.",
+      "commit": "95cf80ca5246db38c49e839a63658ff0af9a5a49",
+      "taken_at": "2026-11-03",
+      "viewport": "1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "status": "approved",
+      "review": {
+        "status": "approved",
+        "reviewer": "agent:kilo",
+        "method": "vision",
+        "notes": "Real scripted capture: onboarding milestone, abilities, orbit map, power routing, radar settings and telemetry all legible; proves the post-rework cockpit.",
+        "score": 94,
+        "reviewed_at": "2026-11-03"
       }
     }
   ],

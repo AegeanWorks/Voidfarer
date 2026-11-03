@@ -1821,3 +1821,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: 720p screenshots showed the Market station-services grid collapsed (REPAIR full-width, empty cell, OVERHAUL below, REFUEL as orphan text from unclosed `<button>` nesting in `index.html:400-414`) and Empire research rows crushed to one word per line (3-column CSS at `style.css:3406` vs 4-child HTML, 270px content width at 1280px viewport).
 - **Decision**: Close the three service buttons verbatim (Repair/Refuel/Overhaul, ids and handlers unchanged); set `.station-services-bar` to `grid-auto-rows:1fr`; correct the early research-row rule to 4 columns to match `app.js:4254-4260` and the later `style.css:9257` rule; clamp research descriptions to 2 lines (`-webkit-line-clamp:2`) for uniform per-row heights. No card-grid redesign, no new panels, stdlib-only.
 - **Consequences**: After photos quote "REFUEL (+20)" as a real button beside REPAIR and "120 pts START QUEUE" sharing one row with a 2-line clamp; `ui verify` green, `ui_inventory` still lists all three service bindings, half-sim determinism tests (9/9) and scripted `tick(24)` treasury/morale drift unchanged.
+
+### ADR-161: Scripted menu and cockpit keepers; absolute-path caption fixed
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: The 10-28 Vanguard keeper predates 6248 lines of cockpit drift and its caption leaked a developer absolute path; hand-driving views was unavailable.
+- **Decision**: Capture `python tools/ui_browser.py --scenario menu|cockpit --viewports desktop` at commit `95cf80c` (viewport 1920x1080), register both in `.aikit/media.json` and the README `aegean:screenshots` block, and fix the 10-28 caption to a history note. A first attempt staged the old file under a new name and deleted fresh captures; both were re-shot deterministically (identical byte sizes) before registering.
+- **Consequences**: README proves the post-rework menu and full cockpit. Reproduce with the two ui_browser commands above.
