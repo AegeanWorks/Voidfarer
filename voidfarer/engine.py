@@ -4837,8 +4837,8 @@ class SimulationEngine:
             if not body or not body.station_dockable:
                 return False, "Docking authorization required: ship must orbit a station or habitable colony to trade."
 
-            if quantity <= 0:
-                return False, "Quantity must be greater than zero."
+            if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity <= 0:
+                return False, "Quantity must be a positive integer."
 
             comm = COMMODITY_MAP.get(commodity_id)
             if not comm:
@@ -5492,8 +5492,8 @@ class SimulationEngine:
     def buy_item(self, item_id: str, quantity: int = 1) -> tuple[bool, str]:
         """Purchase consumable items from an orbital station terminal."""
         with self.lock:
-            if quantity <= 0:
-                return False, "Quantity must be greater than zero."
+            if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity <= 0:
+                return False, "Quantity must be a positive integer."
 
             body = self.docked_body
             if not body or not body.station_dockable:
@@ -5523,8 +5523,8 @@ class SimulationEngine:
     def jettison_cargo(self, item_id: str, quantity: int) -> tuple[bool, str]:
         """Jettison cargo into the cosmic vacuum to free hold space."""
         with self.lock:
-            if quantity <= 0:
-                return False, "Quantity must be greater than zero."
+            if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity <= 0:
+                return False, "Quantity must be a positive integer."
             cargo = dict(self.state.ship.cargo)
             owned = cargo.get(item_id, 0)
             if owned < quantity:

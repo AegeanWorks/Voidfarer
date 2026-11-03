@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `123`
-- **Total Classes**: `318`
+- **Total Python Modules**: `124`
+- **Total Classes**: `319`
 - **Total Top-Level Functions**: `352`
-- **Total Class Methods**: `1875`
-- **Total Source Lines**: `48470`
+- **Total Class Methods**: `1880`
+- **Total Source Lines**: `48517`
 
 ---
 
@@ -2229,6 +2229,21 @@
 
 ---
 
+### [`tests/test_trade_quantity_guards.py`](tests/test_trade_quantity_guards.py)
+> *Regression: trade/buy/jettison reject non-int quantities like repair_hull does.*
+
+**Size**: `47` lines (`1811` bytes)
+
+**Classes:**
+- `class TradeQuantityGuardsTest`
+  - Method `.setUp()`
+  - Method `._snapshot()`
+  - Method `.test_trade_rejects_bool_float_and_str()`
+  - Method `.test_buy_item_rejects_bool_float_and_str()`
+  - Method `.test_jettison_rejects_bool_float_and_str()`
+
+---
+
 ### [`tests/test_transit_civ_events.py`](tests/test_transit_civ_events.py)
 > *Tests for in-system transit (TravelState), planetary civilization metadata, and cockpit GameEvents.*
 
@@ -2801,7 +2816,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10127` lines (`498572` bytes)
+**Size**: `10127` lines (`498764` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
