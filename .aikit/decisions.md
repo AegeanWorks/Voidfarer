@@ -1849,3 +1849,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The refuel button used color-emoji `⛽` (U+26FD) while the cockpit otherwise speaks text glyphs (`◆◎◇⌬¤`); Windows fallback varied. Scanline overlay (z999 < modal z5100, pointer-events none) and 9px badge floor verified correct — no code change.
 - **Decision**: Swap the single `⛽` in `voidfarer/static/index.html` refuel button for `◆` (existing diamond language); leave `⚙/✚` (text presentation). Prove with `ui_browser --scenario cockpit|death|event --viewports short` before/after pairs (all errors 0 hscroll 0 tiny 0; death/event confirm modal legibility over scanline).
 - **Consequences**: Monochrome HUD; zero layout shift (same 18px `.icon` box); no JS/CSS change.
+
+### ADR-165: ECM Test Recalibrated to Tuned Encounter Threshold (Not Weakened)
+- **Date**: 2026-11-03
+- **Status**: Accepted
+- **Context**: ADR-163 lowered low-sec combat 0.40 -> 0.25. `tests/test_equipment_bonuses.py::_combat_after_jump` pinned `rng.random == 0.30`, which sat below the old threshold but above the new one, so the baseline no longer intercepted (suite 1182/1183, 1 failure). The test's intent — ECM (+0.40 evasion) turns an intercept into an evasion — is unchanged.
+- **Decision**: Repin the stub to 0.20 (below 0.25 baseline threshold, above the 0.15 ECM-adjusted threshold), keeping the strict assertTrue/assertFalse split. Intent preserved, no assertion weakened.
+- **Consequences**: Full suite green again; any future threshold retune must move this pin together with `JUMP_ENCOUNTER_TUNING`.

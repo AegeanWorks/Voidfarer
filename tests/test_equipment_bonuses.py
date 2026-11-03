@@ -163,7 +163,9 @@ class TestEngineEquipmentIntegration(unittest.TestCase):
         engine.state = engine._clone_state(
             ship=engine._clone_ship(current_system_id="cygnus_x1", orbiting_body_id=None, equipped_upgrades=equipped)
         )
-        with patch.object(engine.rng, "random", return_value=0.30):
+        # Pinned below the tuned low-sec threshold (Stage 3: 0.40 -> 0.25) so the
+        # baseline still intercepts while ECM (+0.40 evasion) still evades.
+        with patch.object(engine.rng, "random", return_value=0.20):
             ok, _ = engine.jump("pulsar_psr")
         self.assertTrue(ok)
         return engine.state.active_combat is not None
