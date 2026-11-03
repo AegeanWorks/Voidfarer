@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `124`
-- **Total Classes**: `319`
+- **Total Python Modules**: `125`
+- **Total Classes**: `320`
 - **Total Top-Level Functions**: `352`
-- **Total Class Methods**: `1880`
-- **Total Source Lines**: `48517`
+- **Total Class Methods**: `1886`
+- **Total Source Lines**: `48606`
 
 ---
 
@@ -159,6 +159,22 @@
 
 **Functions:**
 - `def _crew(member_id, role, skill, specialty, injury)`
+
+---
+
+### [`tests/test_balance_tuning_stage3.py`](tests/test_balance_tuning_stage3.py)
+> *Stage 3 balance tuning proofs (M3-M6): DATA tables the game reads.*
+
+**Size**: `63` lines (`2080` bytes)
+
+**Classes:**
+- `class BalanceTuningStage3Test`
+  - Method `.test_execute_multiplier_tuned()`
+  - Method `.test_tachyon_damage_tuned()`
+  - Method `.test_jump_encounter_rates_tuned()`
+  - Method `.test_pirate_haven_bonus_tuned()`
+  - Method `.test_threat_one_toll_capped()`
+  - Method `.test_research_base_gain_tuned()`
 
 ---
 
@@ -890,7 +906,7 @@
 ### [`tests/test_equipment_bonuses.py`](tests/test_equipment_bonuses.py)
 > *Regression tests for hardware module stat bonuses and chassis specialty perks.*
 
-**Size**: `173` lines (`7518` bytes)
+**Size**: `175` lines (`7676` bytes)
 
 **Classes:**
 - `class TestEquipmentBonusAggregation` - *Verify the pure aggregation rules without touching engine state.*
@@ -2801,7 +2817,7 @@
 ### [`voidfarer/enemies.py`](voidfarer/enemies.py)
 > *Hostile Enemy Archetypes, Tactical Combat AI, and Procedural Intercept Generation.*
 
-**Size**: `279` lines (`10979` bytes)
+**Size**: `283` lines (`11126` bytes)
 
 **Classes:**
 - `class EnemyArchetype` - *Blueprint for procedural hostile intercepts across galactic territories.*
@@ -2816,7 +2832,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10127` lines (`498764` bytes)
+**Size**: `10131` lines (`499107` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3485,7 +3501,7 @@
 ### [`voidfarer/navigation.py`](voidfarer/navigation.py)
 > *Navigation routing, jump planning, and black-hole hazard helpers.*
 
-**Size**: `182` lines (`6395` bytes)
+**Size**: `189` lines (`6569` bytes)
 
 **Functions:**
 - `def shortest_route(systems, start_id, target_id)`
@@ -3529,7 +3545,7 @@
 ### [`voidfarer/pirates.py`](voidfarer/pirates.py)
 > *Pirate bands, toll encounters, and deterministic raid generation.*
 
-**Size**: `106` lines (`3370` bytes)
+**Size**: `112` lines (`3636` bytes)
 
 **Classes:**
 - `class PirateRisk`
@@ -3559,7 +3575,7 @@
 ### [`voidfarer/research.py`](voidfarer/research.py)
 > *Research projects and technology bonuses.*
 
-**Size**: `179` lines (`5777` bytes)
+**Size**: `182` lines (`5868` bytes)
 
 **Classes:**
 - `class ResearchProject`
