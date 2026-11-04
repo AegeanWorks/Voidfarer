@@ -63,6 +63,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/fleet/refit": "needs an owned escort",
     "/api/fleet/escort/sell": "needs a docked station and an owned escort",
     "/api/contract/claim": "needs a completed contract",
+    "/api/contract/swap": "needs a pending contract offer from a claim",
     "/api/away/recall": "needs an active away mission",
     "/api/crew/shore": "needs crew ashore at a colony",
     "/api/crew/station": "needs an active crew specialist",
@@ -296,6 +297,7 @@ class AiCaptain:
             self._tour_route,
             self._tour_messages,
             self._tour_contracts,
+            self._tour_swap,
             self._tour_refuel,
             self._tour_repair,
             self._tour_crew,
@@ -348,6 +350,19 @@ class AiCaptain:
                     return action
         self.tour_exhausted = True
         return None
+
+    def _tour_swap(self):
+        """Exercise the free contract-offer swap once offers exist."""
+        ship = self.state.get("ship") or {}
+        offers = ship.get("contract_offers") or []
+        active = ship.get("active_contracts") or []
+        if not offers or not active:
+            return None
+        offer = offers[0] if isinstance(offers[0], dict) else None
+        drop = active[-1] if isinstance(active[-1], dict) else None
+        if not offer or not drop or not offer.get("id") or not drop.get("id"):
+            return None
+        return "/api/contract/swap", {"offer_id": offer["id"], "drop_id": drop["id"]}, "contract_swap"
 
     def _tour_power(self):
         return "/api/power", {"engines": 25, "shields": 25, "sensors": 25, "weapons": 25}, "power"

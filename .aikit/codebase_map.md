@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `125`
-- **Total Classes**: `323`
-- **Total Top-Level Functions**: `353`
-- **Total Class Methods**: `1899`
-- **Total Source Lines**: `48753`
+- **Total Python Modules**: `126`
+- **Total Classes**: `329`
+- **Total Top-Level Functions**: `356`
+- **Total Class Methods**: `1917`
+- **Total Source Lines**: `49320`
 
 ---
 
@@ -847,6 +847,37 @@
   - Method `.test_background_matching_is_case_insensitive()`
   - Method `.test_unknown_background_passes_through_without_bonus()`
   - Method `.test_background_bonuses_apply_after_budget_validation()`
+
+---
+
+### [`tests/test_engagement_odds.py`](tests/test_engagement_odds.py)
+> *Stage 3 engagement odds: one tunable table, stated == coded.*
+
+**Size**: `247` lines (`10488` bytes)
+
+**Classes:**
+- `class TestStreakMultiplier`
+  - Method `.test_values_match_legacy_formula()`
+  - Method `.test_tuning_table_is_the_single_source()`
+- `class TestPayoutMagnitude`
+  - Method `.test_stated_table_weights_sum_to_one()`
+  - Method `.test_deterministic_per_event_without_touching_live_rng()`
+  - Method `.test_distribution_matches_stated_70_20_10()`
+  - Method `.test_odds_table_matches_coded_table()`
+  - Method `.test_relic_windows_are_honest_constants()`
+- `class TestCombatNearMiss`
+  - Method `._engine_with_target(hull, max_hull, seed)`
+  - Method `.test_flag_defaults_false_and_round_trips()`
+  - Method `.test_first_near_miss_grants_capped_surge_then_flavor()`
+  - Method `.test_whiffed_shot_breaks_combo()`
+- `class TestContractSwap`
+  - Method `._engine_with_completed_contract(seed)`
+  - Method `.test_claim_draws_free_offers_and_swap_is_unpunished()`
+  - Method `.test_swap_rejects_unknown_ids()`
+- `class TestVoidProjector`
+  - Method `.test_gamble_block_states_every_term()`
+- `class TestSalvageReport`
+  - Method `.test_report_carries_stated_odds()`
 
 ---
 
@@ -2542,7 +2573,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `774` lines (`33956` bytes)
+**Size**: `789` lines (`34705` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2555,6 +2586,7 @@
   - Method `.play(steps)`
   - Method `._choose(step)`
   - Method `._next_tour_action()`
+  - Method `._tour_swap()` - *Exercise the free contract-offer swap once offers exist.*
   - Method `._tour_power()`
   - Method `._tour_reactor()`
   - Method `._tour_route()`
@@ -2658,7 +2690,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3455` lines (`174933` bytes)
+**Size**: `3493` lines (`177191` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2848,7 +2880,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10111` lines (`498057` bytes)
+**Size**: `10295` lines (`508243` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3020,6 +3052,7 @@
   - Method `.step_orbits(delta_time)` - *Advance celestial bodies along orbital mechanics paths and cycle fleet drones.*
   - Method `.refresh_contracts()` - *Reroll the mission board across every category for a broker fee.*
   - Method `.claim_contract(contract_id)` - *Claim rewards for a fulfilled contract and immediately draw a new assignment.*
+  - Method `.swap_contract_offer(offer_id, drop_id)` - *Swap a pending contract offer into the active board, free and unpunished.*
   - Method `.unlock_talent(talent_id)` - *Unlock a Pilot Specialization Perk using available talent points.*
   - Method `._story_unmet_requirements(requirements, *, chapter)` - *List human-readable unmet gating conditions for a chapter or choice.*
   - Method `.story_status()` - *Objective snapshot of the narrative campaign for CLI, REST, and cockpit parity.*
@@ -3326,7 +3359,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2462` lines (`92010` bytes)
+**Size**: `2467` lines (`92354` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -3608,9 +3641,12 @@
 ### [`voidfarer/retention.py`](voidfarer/retention.py)
 > *Psychological retention mechanics, Precursor relics, dynamic contracts, and pilot mastery.*
 
-**Size**: `503` lines (`17979` bytes)
+**Size**: `573` lines (`20966` bytes)
 
 **Functions:**
+- `def streak_multiplier(streak)` - *Expedition streak yield multiplier (loss-aversion loop, Kahneman/Tversky).*
+- `def payout_magnitude_for(seed, *parts)` - *Deterministic (multiplier, label) from the payout table for one event.*
+- `def payout_odds_table()` - *Player-facing statement of the payout table (stated == coded).*
 - `def generate_contract(rng, category)` - *Procedurally instantiate a fresh BountyContract following Zeigarnik task loops.*
 - `def generate_initial_contracts(rng)` - *Generate the starter trio of active contracts across distinct categories.*
 - `def roll_relic_drop(rng, bonus_prob, forced_tier, current_system)` - *Execute a Variable Ratio drop roll for Precursor Relics.*
@@ -3624,7 +3660,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1554` lines (`66984` bytes)
+**Size**: `1562` lines (`67419` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

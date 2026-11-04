@@ -290,12 +290,23 @@ from voidfarer.frontier import (
 from voidfarer.retention import (
     CATALOG_RELICS,
     CONTRACT_CATEGORIES,
+    CONTRACT_OFFER_COUNT,
+    CONTRACT_OFFERS_MAX,
+    NEAR_MISS_COMBAT_HULL_FRACTION,
+    NEAR_MISS_SALVAGE_WINDOW,
+    NEAR_MISS_SCAN_BONUS,
     PILOT_TALENTS,
+    RELIC_BASE_THRESHOLD,
+    RELIC_NEAR_MISS_WINDOW,
+    STREAK_TUNING,
     calculate_passive_multipliers,
     generate_contract,
     generate_initial_contracts,
+    payout_magnitude_for,
+    payout_odds_table,
     relic_set_bonuses,
     roll_relic_drop,
+    streak_multiplier,
 )
 from voidfarer.surface import (
     SURFACE_OPERATION_MAP,
@@ -672,6 +683,7 @@ class SimulationEngine:
             relics=kwargs.get("relics", cur.relics),
             mastery=kwargs.get("mastery", cur.mastery),
             active_contracts=kwargs.get("active_contracts", cur.active_contracts),
+            contract_offers=kwargs.get("contract_offers", cur.contract_offers),
             tactical_combo=kwargs.get("tactical_combo", cur.tactical_combo),
             near_miss_scanner_bonus=kwargs.get("near_miss_scanner_bonus", cur.near_miss_scanner_bonus),
             tutorial=kwargs.get("tutorial", cur.tutorial),
@@ -1444,6 +1456,7 @@ class SimulationEngine:
             stats["credits_earned"] = int(stats.get("credits_earned", 0)) + resonance_credits
             banked_resonance = traversal.resonance * progress * self.VOID_EMERGE_RESONANCE_SHARE
             stats["void_resonance"] = int(stats.get("void_resonance", 0)) + int(round(banked_resonance))
+            stats["void_emerges"] = int(stats.get("void_emerges", 0)) + 1
 
             self.state = self._clone_state(
                 ship=self._clone_ship(
@@ -1494,12 +1507,21 @@ class SimulationEngine:
                     dest = self.state.systems.get(sys_id)
                     if dest is None:
                         continue
+                    plan = void_route_plan(self.state.systems, self.state.galaxy_seed, cur_id, sys_id)
                     destinations.append({
                         "system_id": sys_id,
                         "name": dest.name,
-                        "fuel_estimate": void_route_plan(self.state.systems, self.state.galaxy_seed, cur_id, sys_id)["fuel_estimate"],
+                        "fuel_estimate": plan["fuel_estimate"],
+                        "duration_ticks": plan["duration_ticks"],
                     })
 
+            emerge_now = (
+                self._void_resonance_payout(
+                    traversal.resonance,
+                    traversal.progress(self.state.time.tick) * self.VOID_EMERGE_RESONANCE_SHARE,
+                )
+                if traversal else (0, 0)
+            )
             return {
                 "current_system_id": cur_id,
                 "anchors": [sid for sid in lanes if any(
@@ -1516,12 +1538,31 @@ class SimulationEngine:
                 "resonance": round(traversal.resonance, 1) if traversal else 0.0,
                 "projected_resonance_credits": self._void_resonance_payout(traversal.resonance)[0] if traversal else 0,
                 "projected_resonance_xp": self._void_resonance_payout(traversal.resonance)[1] if traversal else 0,
+                "projected_emerge_credits": emerge_now[0],
+                "projected_emerge_xp": emerge_now[1],
                 "dive_ready": not reasons,
                 "blockers": reasons,
                 "destinations": destinations,
                 "storm_chance": round(self._void_storm_chance(), 3),
                 "shield": self.state.ship.shield,
                 "fuel": self.state.ship.fuel,
+                # Push-your-luck projector: every number the gamble needs,
+                # stated from the same constants the tick loop reads.
+                "gamble": {
+                    "storm_chance": round(self._void_storm_chance(), 3),
+                    "stability_loss_per_storm": self.VOID_STORM_STABILITY_LOSS,
+                    "shield_loss_per_storm": self.VOID_STORM_SHIELD_LOSS,
+                    "hull_loss_per_storm": self.VOID_STORM_HULL_LOSS,
+                    "low_stability_threshold": self.VOID_LOW_STABILITY_THRESHOLD,
+                    "low_stability_bonus": self.VOID_LOW_STABILITY_RESONANCE_BONUS,
+                    "emerge_share": self.VOID_EMERGE_RESONANCE_SHARE,
+                    "collapse_hull_cost": self.VOID_EMERGENCE_HULL_DAMAGE,
+                    "collapse_resonance_kept": 0.0,
+                    "credits_per_resonance": self.VOID_RESONANCE_CREDITS,
+                    "xp_per_resonance": self.VOID_RESONANCE_XP,
+                    "arrival_xp": self.VOID_ARRIVAL_XP,
+                    "first_visit_bonus": self.VOID_FIRST_VISIT_BONUS,
+                },
             }
 
     def _process_drone_cycle(self, ship: ShipState) -> tuple[FleetDrone, ...]:
@@ -1613,8 +1654,8 @@ class SimulationEngine:
             visited.add(target_system_id)
 
             # Update streak (rewarding safe transit under loss aversion mechanics)
-            new_streak = min(10, self.state.ship.streak + 1) if self.state.ship.hull >= 75 else self.state.ship.streak
-            streak_mult = 1.0 + min(1.5, (new_streak - 1) * 0.15)
+            new_streak = min(int(STREAK_TUNING["max_streak"]), self.state.ship.streak + 1) if self.state.ship.hull >= 75 else self.state.ship.streak
+            streak_mult = streak_multiplier(new_streak)
             log_entry = f"Hyperspace jump completed to {target_sys.name} (fuel: {fuel_cost}). Streak: x{streak_mult:.2f} ({new_streak} jumps)."
             if system_has_black_hole(target_sys):
                 log_entry += " WARNING: gravitational shear from a black hole increased fuel demand and reactor load."
@@ -2404,7 +2445,7 @@ class SimulationEngine:
                 new_relics.append(found_relic)
                 new_log.append(f"★ PRECURSOR ARTIFACT DISCOVERED: Salvaged {found_relic.rarity.upper()} relic [{found_relic.name}]! {found_relic.description}")
             elif is_near_miss:
-                new_near_miss = 0.25
+                new_near_miss = NEAR_MISS_SCAN_BONUS
                 new_log.append("RESONANCE NEAR-MISS: Faint Precursor harmonics slipped out of phase! Sensor array tuned (+25% discovery chance next scan).")
 
             # Progress exploration contracts and award survey pilot XP
@@ -2450,6 +2491,8 @@ class SimulationEngine:
             stats["credits_earned"] += credit_bounty + survey_bonus
             if newly_complete:
                 stats["systems_surveyed"] = int(stats.get("systems_surveyed", 0)) + 1
+            if is_near_miss:
+                stats["near_miss_scans"] = int(stats.get("near_miss_scans", 0)) + 1
 
             self.state = self._clone_state(ship=new_ship, systems=systems, stats=stats)
             anomaly_roll = self._stable_unit(
@@ -2480,6 +2523,12 @@ class SimulationEngine:
                 "hazards": list(body.hazards),
                 "relic": found_relic.to_dict() if found_relic else None,
                 "near_miss": is_near_miss,
+                "relic_odds": {
+                    "base_threshold": RELIC_BASE_THRESHOLD,
+                    "bonus_prob": round(relic_bonus, 3),
+                    "effective_threshold": round(RELIC_BASE_THRESHOLD + relic_bonus, 3),
+                    "near_miss_window": RELIC_NEAR_MISS_WINDOW,
+                },
                 "survey_complete": newly_complete,
                 "survey_bonus": survey_bonus,
             }
@@ -5966,8 +6015,11 @@ class SimulationEngine:
                 weapon_miss = self.rng.random() > weapon.accuracy
                 if weapon_miss:
                     enemy_miss = True
-
-                new_combo += 1
+                    new_combo = 0
+                    combo_break_note = " COMBO BROKEN: the whiffed shot cost all tactical focus."
+                else:
+                    new_combo += 1
+                    combo_break_note = ""
                 crit_text = ""
                 if new_combo >= 3:
                     shield_dmg = int(shield_dmg * 1.5)
@@ -5975,7 +6027,7 @@ class SimulationEngine:
                     crit_text = f" (TACTICAL OVERCHARGE x{new_combo}: +50% CRIT DAMAGE!)"
 
                 if weapon_miss:
-                    strike_desc = f"{weapon.name} firing solution failed; the shot went wide."
+                    strike_desc = f"{weapon.name} firing solution failed; the shot went wide.{combo_break_note}"
                 elif enemy_rem_shield > 0:
                     if shield_dmg <= enemy_rem_shield:
                         enemy_rem_shield -= shield_dmg
@@ -6203,6 +6255,7 @@ class SimulationEngine:
                     ai_profile=combat.ai_profile,
                     enemy_intent=next_intent,
                     archetype_id=combat.archetype_id,
+                    near_miss_awarded=combat.near_miss_awarded,
                 )
                 new_log = list(self.state.ship.flight_log[-19:]) + [msg]
                 new_ship = self._clone_ship(hull=new_hull, shield=new_shield, reactor=combat_reactor, tactical_combo=new_combo, streak=new_streak, flight_log=tuple(new_log[-20:]))
@@ -6261,6 +6314,26 @@ class SimulationEngine:
                 enemy_rem_shield = enemy_shield_before
                 if not weapon_miss:
                     strike_desc = "Enemy AI jinked out of your firing solution; the strike missed."
+            # Near-miss comeback (Clark et al.: almost-WON only). The first
+            # near-miss per encounter grants one capped +1 combo surge; later
+            # ones are flavor. Never manufactured: real hull proximity only.
+            if (
+                action in damaging_actions
+                and not enemy_miss
+                and enemy_rem_hull > 0
+                and combat.enemy_max_hull > 0
+                and enemy_rem_hull <= combat.enemy_max_hull * NEAR_MISS_COMBAT_HULL_FRACTION
+            ):
+                stats["near_miss_combat"] = int(stats.get("near_miss_combat", 0)) + 1
+                if not combat.near_miss_awarded:
+                    new_combo += 1
+                    combat = replace(combat, near_miss_awarded=True)
+                    strike_desc += (
+                        f" NEAR-MISS SURGE: {combat.enemy_name} hangs by a thread "
+                        "— tactical focus surges (+1 combo, once per fight)!"
+                    )
+                else:
+                    strike_desc += " Near miss again — the kill slips away. Finish it."
             elif fleet_ships and action in damaging_actions:
                 fleet_volley = fleet_damage(fleet_ships, battle_stance)
                 if fleet_volley > 0:
@@ -6275,10 +6348,16 @@ class SimulationEngine:
 
             # Check if enemy was neutralized
             if enemy_rem_hull <= 0:
-                new_credits += combat.bounty_credits
+                payout_mult, payout_label = payout_magnitude_for(
+                    self.seed, "combat-payout", combat.id,
+                    int(stats.get("combat_victories", 0)),
+                )
+                bounty_paid = int(combat.bounty_credits * payout_mult)
+                stats[f"payout_{payout_label}"] = int(stats.get(f"payout_{payout_label}", 0)) + 1
+                new_credits += bounty_paid
                 salvage_granted, salvage_overflow = self._grant_cargo(cargo, combat.salvage_commodity, 2)
                 stats["combat_victories"] += 1
-                stats["credits_earned"] += combat.bounty_credits
+                stats["credits_earned"] += bounty_paid
                 if any(d.drone_type == "mercenary" and d.specialty == "repair" for d in self.state.ship.fleet_drones):
                     new_hull = min(self.state.ship.max_hull, new_hull + 8)
 
@@ -6404,9 +6483,14 @@ class SimulationEngine:
                         )
                     fleet_updates.append(updated_escort)
                 new_fleet_ships = tuple(fleet_updates)
+                payout_note = (
+                    f" [{payout_label.upper()} x{payout_mult:.1f}]"
+                    if payout_label != "standard"
+                    else ""
+                )
                 msg = (
                     f"VICTORY: {combat.enemy_name} neutralized! "
-                    f"Collected {combat.bounty_credits} cr bounty, salvaged {salvage_granted}x {combat.salvage_commodity}"
+                    f"Collected {bounty_paid} cr bounty{payout_note}, salvaged {salvage_granted}x {combat.salvage_commodity}"
                     f"{f' ({salvage_overflow} jettisoned: hold full)' if salvage_overflow else ''}.{relic_note}{rep_note}"
                     + (f" {' '.join(rank_up_lines)}" if rank_up_lines else "")
                     + (f" {' '.join(captain_promotions)}" if captain_promotions else "")
@@ -6570,6 +6654,7 @@ class SimulationEngine:
                 ai_profile=combat.ai_profile,
                 enemy_intent=next_intent,
                 archetype_id=combat.archetype_id,
+                near_miss_awarded=combat.near_miss_awarded,
             )
 
             new_log = list(self.state.ship.flight_log[-19:]) + [msg]
@@ -7115,6 +7200,17 @@ class SimulationEngine:
             # Continuous Zeigarnik cycle: replace completed contract with a new task
             new_contract = generate_contract(self.rng, category=found.category)
             updated_contracts = tuple([c for c in self.state.ship.active_contracts if c.id != contract_id] + [new_contract])
+            # Autonomy: draw alternative offers beside the auto-replacement so
+            # the captain picks work instead of only receiving it. Free swap,
+            # never punished (all-ages table, no decline cooldown).
+            offer_categories = [c for c in CONTRACT_CATEGORIES if c != found.category]
+            self.rng.shuffle(offer_categories)
+            fresh_offers = [
+                generate_contract(self.rng, category=cat)
+                for cat in offer_categories[:CONTRACT_OFFER_COUNT]
+            ]
+            kept = [o for o in self.state.ship.contract_offers if o.id not in {c.id for c in updated_contracts}]
+            contract_offers = tuple((kept + fresh_offers)[-CONTRACT_OFFERS_MAX:])
 
             relic_msg = f" Discovered Precursor Relic [{relic.name}] ({relic.rarity.upper()})!" if relic else ""
             log_entry = f"CONTRACT CLAIMED: [{found.title}] rewarded {found.reward_credits} cr and {found.reward_xp} XP.{relic_msg}"
@@ -7123,6 +7219,7 @@ class SimulationEngine:
             stats = dict(self.state.stats)
             stats["credits_earned"] += found.reward_credits
             stats["contracts_completed"] = stats.get("contracts_completed", 0) + 1
+            stats["contract_offers_drawn"] = int(stats.get("contract_offers_drawn", 0)) + len(fresh_offers)
 
             new_hull, new_max_hull, new_shield, new_max_shield = self._apply_relic_stat_bonuses(
                 self.state.ship.hull,
@@ -7141,6 +7238,7 @@ class SimulationEngine:
                 mastery=new_mastery,
                 relics=tuple(new_relics),
                 active_contracts=updated_contracts,
+                contract_offers=contract_offers,
                 flight_log=tuple(new_log[-20:]),
             )
 
@@ -7165,7 +7263,42 @@ class SimulationEngine:
                 "reward_xp": found.reward_xp,
                 "relic": relic.to_dict() if relic else None,
                 "new_contract": new_contract.to_dict(),
+                "replacement_options": [o.to_dict() for o in fresh_offers],
             }
+
+    def swap_contract_offer(self, offer_id: str, drop_id: str) -> tuple[bool, str]:
+        """Swap a pending contract offer into the active board, free and unpunished.
+
+        The dropped active assignment is discarded without penalty; declining
+        or swapping work is never punished at this table (all-ages ethics line).
+        """
+        with self.lock:
+            offer_id = str(offer_id or "").strip()
+            drop_id = str(drop_id or "").strip()
+            offer = next((o for o in self.state.ship.contract_offers if o.id == offer_id), None)
+            if offer is None:
+                return False, f"Unknown contract offer '{offer_id}'. Claim a contract to draw offers."
+            drop = next((c for c in self.state.ship.active_contracts if c.id == drop_id), None)
+            if drop is None:
+                return False, f"Unknown active contract '{drop_id}'. Nothing swapped."
+            updated_contracts = tuple(
+                [c for c in self.state.ship.active_contracts if c.id != drop_id] + [offer]
+            )
+            remaining_offers = tuple(o for o in self.state.ship.contract_offers if o.id != offer_id)
+            log_entry = (
+                f"CONTRACT SWAP: chose [{offer.title}] over [{drop.title}]. "
+                "No fee, no standing loss."
+            )
+            new_log = list(self.state.ship.flight_log[-19:]) + [log_entry]
+            new_ship = self._clone_ship(
+                active_contracts=updated_contracts,
+                contract_offers=remaining_offers,
+                flight_log=tuple(new_log[-20:]),
+            )
+            stats = dict(self.state.stats)
+            stats["contract_swaps"] = int(stats.get("contract_swaps", 0)) + 1
+            self.state = self._clone_state(ship=new_ship, stats=stats)
+            return True, log_entry
 
     def unlock_talent(self, talent_id: str) -> tuple[bool, str]:
         """Unlock a Pilot Specialization Perk using available talent points."""
@@ -8542,12 +8675,21 @@ class SimulationEngine:
             else:
                 danger = base_danger
                 
-            success = self.rng.random() >= danger
+            danger_roll = self.rng.random()
+            success = danger_roll >= danger
+            # Almost-WON near-miss: the boarding roll just missed (failed but
+            # within the window). First one per scan cycle reuses the sensor
+            # tune bonus; all of them are logged, never manufactured.
+            salvage_near_miss = (not success) and (danger_roll >= danger - NEAR_MISS_SALVAGE_WINDOW)
 
             cargo = dict(self.state.ship.cargo)
             granted = 0
             research_gain = 0
             overflow = 0
+            payout_mult, payout_label = payout_magnitude_for(
+                self.seed, "salvage-payout", site.body_id, strategy,
+                int(self.state.stats.get("salvage", 0)),
+            )
             if success:
                 if strategy == "cautious":
                     granted, overflow = self._grant_cargo(cargo, site.cargo_item, site.cargo_quantity)
@@ -8601,6 +8743,21 @@ class SimulationEngine:
                     outcome = "BOARDING ACCIDENT"
                     xp_award = 25
 
+            # Variable-ratio magnitude on success (unpredictable magnitude AND
+            # timing; deterministic stream, live RNG untouched).
+            payout_note = ""
+            if success and payout_label != "standard":
+                credits = int(credits * payout_mult)
+                payout_note = f" [{payout_label.upper()} x{payout_mult:.1f}]"
+                outcome += payout_note
+            # Salvage near-miss: failed but close — wreck schematics tune the
+            # sensors (+25% next scan, same capped bonus pool as scan misses).
+            tune_note = ""
+            tune_bonus = 0.0
+            if salvage_near_miss:
+                tune_bonus = NEAR_MISS_SCAN_BONUS
+                tune_note = " NEAR-MISS: wreck schematics tune the sensors (+25% next scan)."
+
             reactor = self.state.ship.reactor
             max_heat = reactor_heat_capacity(reactor, equipment)
             new_reactor = replace(reactor, heat=min(max_heat, reactor.heat + heat_gain))
@@ -8612,6 +8769,8 @@ class SimulationEngine:
                 + (f", +{granted} {site.cargo_item}" if granted else "")
                 + (f", hull -{hull_damage}" if hull_damage else "")
                 + f", reactor heat +{heat_gain:.0f}."
+                + (f" Stated danger was {danger:.0%}; roll {danger_roll:.0%}." if not success else f" Stated danger was {danger:.0%}.")
+                + tune_note
             )
             updated_contracts = self.state.ship.active_contracts
             contract_logs: list[str] = []
@@ -8626,11 +8785,19 @@ class SimulationEngine:
                 reactor=new_reactor,
                 mastery=new_mastery,
                 active_contracts=updated_contracts,
+                near_miss_scanner_bonus=(
+                    tune_bonus if salvage_near_miss
+                    else self.state.ship.near_miss_scanner_bonus
+                ),
                 flight_log=tuple(new_log[-20:]),
             )
             stats = dict(self.state.stats)
             stats["salvage"] = stats.get("salvage", 0) + 1
             stats["credits_earned"] = stats.get("credits_earned", 0) + credits
+            stats[f"payout_{payout_label}"] = int(stats.get(f"payout_{payout_label}", 0)) + 1
+            stats[f"salvage_strategy_{strategy}"] = int(stats.get(f"salvage_strategy_{strategy}", 0)) + 1
+            if salvage_near_miss:
+                stats["near_miss_salvage"] = int(stats.get("near_miss_salvage", 0)) + 1
             systems = self._replace_system_body(body.id, salvage_claimed=True)
             new_research = self.state.research
             if research_gain > 0:
@@ -8642,6 +8809,11 @@ class SimulationEngine:
                 "site": site.to_dict(),
                 "success": success,
                 "danger": round(danger, 2),
+                "danger_roll": round(danger_roll, 3),
+                "near_miss": salvage_near_miss,
+                "payout_mult": payout_mult,
+                "payout_label": payout_label,
+                "odds": payout_odds_table(),
                 "credits": credits,
                 "cargo_item": site.cargo_item if granted else None,
                 "cargo_quantity": granted,
@@ -8686,6 +8858,11 @@ class SimulationEngine:
                 self._effective_power("sensors") * float(self._map_effects()["sensor_mult"]),
                 self._skill("science"),
             )
+            payout_mult, payout_label = payout_magnitude_for(
+                self.seed, "scoop-payout", body.id, base_tapped,
+            )
+            if payout_label != "standard":
+                recovered = max(1, int(round(recovered * payout_mult)))
             new_fuel = min(self.state.ship.max_fuel, self.state.ship.fuel + recovered)
             gained = new_fuel - self.state.ship.fuel
             reactor = self.state.ship.reactor
@@ -8703,8 +8880,13 @@ class SimulationEngine:
                 volatile_recharge_tick=new_recharge,
             )
 
+            payout_note = (
+                f" [{payout_label.upper()} x{payout_mult:.1f}]"
+                if payout_label != "standard"
+                else ""
+            )
             log_entry = (
-                f"FUEL SCOOP: {profile['label']} at {body.name} recovered {gained} fuel "
+                f"FUEL SCOOP: {profile['label']} at {body.name} recovered {gained} fuel{payout_note} "
                 f"(reactor heat +{profile['heat']:.0f}, volatiles {new_tapped}/{reserve})."
             )
             new_ship = self._clone_ship(
@@ -8714,6 +8896,7 @@ class SimulationEngine:
             )
             stats = dict(self.state.stats)
             stats["scoops"] = stats.get("scoops", 0) + 1
+            stats[f"payout_{payout_label}"] = int(stats.get(f"payout_{payout_label}", 0)) + 1
             self.state = self._clone_state(ship=new_ship, systems=systems, stats=stats)
             return True, log_entry
 
@@ -9572,6 +9755,7 @@ class SimulationEngine:
                     new_hull = max(1, new_hull - self.VOID_EMERGENCE_HULL_DAMAGE)
                     new_orbiting_body_id = horizon_id
                     new_void = None
+                    new_stats_tick["void_collapses"] = int(new_stats_tick.get("void_collapses", 0)) + 1
                     new_flight_log.append(
                         f"VOID COLLAPSE: Stability lost. The Hollow expels the hull violently at {origin_name} "
                         f"(hull -{self.VOID_EMERGENCE_HULL_DAMAGE}, resonance {resonance:.0f} lost)."

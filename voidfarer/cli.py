@@ -38,7 +38,9 @@ from voidfarer.retention import (
     PILOT_TALENTS,
     RELIC_SET_THRESHOLDS,
     calculate_passive_multipliers,
+    payout_odds_table,
     relic_set_bonuses,
+    streak_multiplier,
 )
 from voidfarer.server import BackgroundServer, run_server, start_background_server
 from voidfarer.storage import StorageManager
@@ -129,7 +131,7 @@ def cmd_status(engine: SimulationEngine) -> int:
     print(f"║ Date:      {YELLOW}{t.current_date:<10}{RESET}  (Tick #{t.tick:<5})   Temporal Clock: {GREEN if not t.is_paused else RED}{t.time_scale:<10}{RESET}       ║")
     print(f"║ Credits:   {YELLOW}{ship.credits:>8} cr{RESET}       Cargo:    {calculate_cargo_volume(ship.cargo):>2}/{ship.cargo_capacity:<2} volume                    ║")
     print(f"╠════ VITAL TELEMETRY ════════════════════════════════════════════════╣{RESET}")
-    streak_mult = 1.0 + min(1.5, (ship.streak - 1) * 0.15)
+    streak_mult = streak_multiplier(ship.streak)
     print(f"║ Streak:    {RED}🔥 {ship.streak} jumps (x{streak_mult:.2f}){RESET}   Mastery:  {YELLOW}★ Lvl {ship.mastery.level} [{ship.mastery.xp}/{ship.mastery.next_level_xp} XP]{RESET}           ║")
     print(f"║ Hull Wear: {YELLOW}{ship.wear:>5.1f}%{RESET}  (degrades scan/trade efficiency; repaired at drydock)                      ║")
     print(f"║ Hull:      {_bar(ship.hull, ship.max_hull, 24, RED if ship.hull < 30 else GREEN)}                      ║")
@@ -1205,6 +1207,14 @@ def cmd_contracts(engine: SimulationEngine, storage: StorageManager, parts: list
             print(f"  {DIM}{c.description}{RESET}")
             print(f"  Progress: {prog_bar} | Reward: {YELLOW}+{c.reward_credits} cr{RESET}, {CYAN}+{c.reward_xp} XP{RESET}{relic_tag}\n")
 
+        offers = engine.state.ship.contract_offers
+        if offers:
+            print(f"{BOLD}{MAGENTA}--- PENDING OFFERS (free swap, no penalty) ---{RESET}")
+            for o in offers:
+                print(f"• {BOLD}{o.title}{RESET} ({o.id}) - {CYAN}{o.category.upper()}{RESET} | Reward: {YELLOW}+{o.reward_credits} cr{RESET}, {CYAN}+{o.reward_xp} XP{RESET}")
+                print(f"  {DIM}{o.description}{RESET}")
+            print(f"{GREEN}{BOLD}Choose work: contracts swap <offer_id> <active_id>{RESET}\n")
+
         ready = [c for c in contracts if c.completed]
         if ready:
             print(f"{GREEN}{BOLD}Claim completed assignment: contracts claim <id>{RESET}")
@@ -1230,13 +1240,24 @@ def cmd_contracts(engine: SimulationEngine, storage: StorageManager, parts: list
         else:
             cid = parts[2]
 
-        ok, msg, _ = engine.claim_contract(cid)
+        ok, msg, info = engine.claim_contract(cid)
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            for opt in info.get("replacement_options", []):
+                print(f"  {DIM}Offer: {opt['title']} ({opt['id']}) [{opt['category']}] +{opt['reward_credits']} cr — swap with: contracts swap {opt['id']} <active_id>{RESET}")
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub == "swap":
+        if len(parts) < 4:
+            print(f"{RED}Usage:{RESET} contracts swap <offer_id> <active_id>")
+            return 1
+        ok, msg = engine.swap_contract_offer(parts[2], parts[3])
         print((GREEN if ok else RED) + msg + RESET)
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
 
-    print(f"{RED}Unknown contracts command '{sub}'. Options: list, claim <id>, refresh.{RESET}")
+    print(f"{RED}Unknown contracts command '{sub}'. Options: list, claim <id>, swap <offer_id> <active_id>, refresh.{RESET}")
     return 1
 
 
@@ -1456,7 +1477,7 @@ def cmd_codex(engine: SimulationEngine, storage: StorageManager, parts: list[str
 def cmd_streak(engine: SimulationEngine) -> int:
     """Display current expedition jump streak and active loss aversion multiplier."""
     ship = engine.state.ship
-    mult = 1.0 + min(1.5, (ship.streak - 1) * 0.15)
+    mult = streak_multiplier(ship.streak)
     print(f"\n{BOLD}{CYAN}=== EXPEDITION JUMP STREAK ==={RESET}")
     print(f"Current Streak: {RED}{BOLD}🔥 {ship.streak} consecutive jumps{RESET}")
     print(f"Streak Multiplier: {YELLOW}{BOLD}x{mult:.2f}{RESET} (+{int((mult - 1.0) * 100)}% to all trade, scan, and contract rewards)")
@@ -1640,17 +1661,31 @@ def cmd_void(engine: SimulationEngine, storage: StorageManager, parts: list[str]
         print(f"║ Storms:     {YELLOW}{traversal['storms_weathered']}{RESET} weathered  |  Progress: {int((status['traversal_progress'] or 0.0) * 100)}%")
         print(
             f"║ Resonance:  {YELLOW}{traversal.get('resonance', 0.0):.0f}{RESET} storm resonance  |  "
-            f"Payout: ~{status.get('projected_resonance_credits', 0)} cr, ~{status.get('projected_resonance_xp', 0)} XP"
+            f"Arrival payout: ~{status.get('projected_resonance_credits', 0)} cr, ~{status.get('projected_resonance_xp', 0)} XP"
+        )
+        print(
+            f"║ Emerge now: ~{status.get('projected_emerge_credits', 0)} cr, ~{status.get('projected_emerge_xp', 0)} XP "
+            f"(prorated share, collapse loses all resonance)"
         )
         print(f"║ {CYAN}Type: void emerge{RESET} for emergency surfacing (prorated resonance, hull and shield damage).")
     else:
         if status["dive_ready"]:
+            gamble = status.get("gamble", {})
             print(f"║ Status:     {GREEN}READY TO DIVE{RESET} (orbiting a black-hole event horizon)")
             print(f"║ Storm Risk: {YELLOW}{status['storm_chance'] * 100:.0f}%{RESET} per tick in the Hollow")
+            print(
+                f"║ Each storm: +1 resonance (~{gamble.get('credits_per_resonance', 120)} cr) "
+                f"at -{gamble.get('stability_loss_per_storm', 15):.0f} stability, "
+                f"-{gamble.get('shield_loss_per_storm', 10)} shield, -{gamble.get('hull_loss_per_storm', 5)} hull"
+            )
+            print(
+                f"║ Collapse (0 stability): hull -{gamble.get('collapse_hull_cost', 25)}, "
+                f"ALL resonance lost. Emerge banks {int(gamble.get('emerge_share', 0.5) * 100)}% of progress."
+            )
             print(f"╠════ CHARTED DESTINATIONS ════════════════════════════════════════════╣{RESET}")
             if status["destinations"]:
                 for dest in status["destinations"]:
-                    print(f"║ • {BOLD}{dest['system_id']:<24}{RESET} {dest['name']:<28} Fuel: ~{dest['fuel_estimate']}")
+                    print(f"║ • {BOLD}{dest['system_id']:<24}{RESET} {dest['name']:<28} Fuel: ~{dest['fuel_estimate']}  Ticks: ~{dest.get('duration_ticks', '?')}")
                 print(f"║ {CYAN}Type: void dive <system_id>{RESET} to slip beyond the horizon.")
             else:
                 print(f"║ No void lanes lead onward from this horizon.")
@@ -2931,8 +2966,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
 
     contracts_p = subparsers.add_parser("contracts", help="Inspect and claim dynamic sector bounty contracts")
-    contracts_p.add_argument("action", nargs="?", default="list", choices=["list", "claim", "refresh"])
-    contracts_p.add_argument("contract_id", nargs="?", help="Contract ID to claim")
+    contracts_p.add_argument("action", nargs="?", default="list", choices=["list", "claim", "swap", "refresh"])
+    contracts_p.add_argument("contract_id", nargs="?", help="Contract ID to claim, or offer ID to swap")
+    contracts_p.add_argument("drop_id", nargs="?", help="Active contract ID to drop for a swap")
 
     mastery_p = subparsers.add_parser("mastery", help="Pilot rank progression and talent specializations")
     mastery_p.add_argument("action", nargs="?", default="status", choices=["status", "list", "unlock"])
@@ -3331,6 +3367,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             parts.append(args.action)
             if args.contract_id:
                 parts.append(args.contract_id)
+            if getattr(args, "drop_id", None):
+                parts.append(args.drop_id)
         return cmd_contracts(engine, storage, parts)
     elif args.command == "mastery":
         parts = ["mastery"]

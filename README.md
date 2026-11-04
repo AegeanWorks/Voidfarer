@@ -130,7 +130,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (78 suites)
+└── tests/                <- unit & integration test suite (79 suites)
 ```
 
 ---
@@ -225,8 +225,11 @@ Hostile strength scales +5% hull, shields, damage and bounty per Pilot Mastery l
 # View active contracts, progress bars, and rewards
 python -m voidfarer.cli contracts
 
-# Claim completed contract reward and draw replacement assignment
+# Claim completed contract reward and draw replacement assignment (plus 2 free-swap offers)
 python -m voidfarer.cli contracts claim contract_explore_alpha_centauri
+
+# Swap any active contract for a pending offer: free, no standing loss
+python -m voidfarer.cli contracts swap <offer_id> <active_id>
 ```
 
 ### 8. Pilot Mastery & Specializations (Self-Determination)
@@ -319,7 +322,7 @@ python -m voidfarer.cli void dive golconda
 # Emergency surfacing back through the entry horizon (costs hull and shields)
 python -m voidfarer.cli void emerge
 ```
-Black holes anchor a seeded void-lane graph. Diving needs a horizon orbit, fuel and 25% shields; storms drain stability and add resonance (120 cr, 15 XP each on arrival); `void emerge` banks half, collapse loses all.
+Black holes anchor a seeded void-lane graph. Diving needs a horizon orbit, fuel and 25% shields; storms drain stability and add resonance (120 cr, 15 XP each on arrival); `void emerge` banks half, collapse loses all. `void` prints the full gamble (storm chance, per-storm losses, emerge share, collapse cost). Salvage credits, combat bounties and scoop fuel pay variable magnitude (standard 1.0x / rich 1.5x / jackpot 2.5x at stated 70/20/10 odds); whiffed shots break combo, and near-won fights/salvage grant a capped comeback.
 
 ### 14. Geopolitical Factions & Megacorporations
 ```bash
@@ -561,7 +564,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,177-test suite runs in about 60 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,208-test suite runs in about 60 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

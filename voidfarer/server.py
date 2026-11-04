@@ -1192,6 +1192,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": ok, "message": msg, "claim_info": info, "state": self.engine.get_status_snapshot()})
             return
 
+        if path == "/api/contract/swap":
+            offer_id = str(body.get("offer_id", body.get("contract_id", "")))
+            drop_id = str(body.get("drop_id", body.get("active_id", "")))
+            ok, msg = self.engine.swap_contract_offer(offer_id, drop_id)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
         if path == "/api/mastery/unlock":
             talent_id = str(body.get("talent_id", ""))
             ok, msg = self.engine.unlock_talent(talent_id)

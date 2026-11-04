@@ -523,6 +523,7 @@ class CombatEncounter:
     archetype_id: str = ""
     captain_gambit_used: bool = False
     captain_evasion_bonus: float = 0.0
+    near_miss_awarded: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -551,6 +552,7 @@ class CombatEncounter:
             captain_evasion_bonus=max(
                 0.0, min(0.35, float(data.get("captain_evasion_bonus", 0.0)))
             ),
+            near_miss_awarded=bool(data.get("near_miss_awarded", False)),
         )
 
 
@@ -1940,6 +1942,7 @@ class ShipState:
     relics: tuple[PrecursorRelic, ...] = ()
     mastery: PilotMastery = field(default_factory=PilotMastery)
     active_contracts: tuple[BountyContract, ...] = ()
+    contract_offers: tuple[BountyContract, ...] = ()
     tactical_combo: int = 0
     near_miss_scanner_bonus: float = 0.0
     tutorial: TutorialState = field(default_factory=TutorialState)
@@ -2004,6 +2007,7 @@ class ShipState:
             "relics": [r.to_dict() for r in self.relics],
             "mastery": self.mastery.to_dict(),
             "active_contracts": [c.to_dict() for c in self.active_contracts],
+            "contract_offers": [c.to_dict() for c in self.contract_offers],
             "tactical_combo": self.tactical_combo,
             "near_miss_scanner_bonus": self.near_miss_scanner_bonus,
             "tutorial": self.tutorial.to_dict(),
@@ -2088,6 +2092,7 @@ class ShipState:
             relics=tuple(PrecursorRelic.from_dict(r) for r in data.get("relics", [])),
             mastery=PilotMastery.from_dict(data.get("mastery", {})),
             active_contracts=tuple(BountyContract.from_dict(c) for c in data.get("active_contracts", [])),
+            contract_offers=tuple(BountyContract.from_dict(c) for c in data.get("contract_offers", [])),
             tactical_combo=int(data.get("tactical_combo", 0)),
             near_miss_scanner_bonus=float(data.get("near_miss_scanner_bonus", 0.0)),
             tutorial=TutorialState.from_dict(data.get("tutorial", {})),

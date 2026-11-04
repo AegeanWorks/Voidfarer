@@ -2,10 +2,85 @@
 
 from __future__ import annotations
 
+import hashlib
 import random
 from typing import Any
 
 from voidfarer.models import BountyContract, PilotMastery, PrecursorRelic, ShipState
+
+
+# ---------------------------------------------------------------------------
+# Engagement tuning (Stage 3 fairness: DATA the game reads, not buried magic).
+# Every number below is surfaced to players through CLI/server/cockpit text,
+# so stated odds and coded odds share one source of truth. See ADR-0xx.
+# ---------------------------------------------------------------------------
+
+STREAK_TUNING: dict[str, float] = {
+    "per_jump": 0.15,   # +15% yield per consecutive jump
+    "cap": 1.5,         # +150% maximum (x2.50 multiplier)
+    "max_streak": 10,   # jumps counted toward the multiplier
+}
+
+
+def streak_multiplier(streak: int) -> float:
+    """Expedition streak yield multiplier (loss-aversion loop, Kahneman/Tversky)."""
+    return 1.0 + min(STREAK_TUNING["cap"], (max(1, int(streak)) - 1) * STREAK_TUNING["per_jump"])
+
+
+# Variable-ratio payout magnitude (Skinner: unpredictable magnitude AND timing).
+# Rolled per salvage / combat victory / scoop via a deterministic stream that
+# never disturbs the live RNG sequence (mirrors SimulationEngine._stable_unit).
+PAYOUT_MAGNITUDE_TABLE: tuple[tuple[str, float, float, str], ...] = (
+    # (label, multiplier, weight, log_tag)
+    ("standard", 1.0, 0.70, "STANDARD YIELD"),
+    ("rich", 1.5, 0.20, "RICH VEIN"),
+    ("jackpot", 2.5, 0.10, "JACKPOT"),
+)
+
+
+def payout_magnitude_for(seed: int, *parts: object) -> tuple[float, str]:
+    """Deterministic (multiplier, label) from the payout table for one event."""
+    payload = "|".join([str(seed)] + [str(p) for p in parts]).encode("utf-8")
+    digest = hashlib.blake2b(payload, digest_size=8).digest()
+    roll = int.from_bytes(digest, "big") / float(2**64)
+    cumulative = 0.0
+    total = sum(weight for _, _, weight, _ in PAYOUT_MAGNITUDE_TABLE)
+    for label, mult, weight, _ in PAYOUT_MAGNITUDE_TABLE:
+        cumulative += weight / total
+        if roll < cumulative:
+            return mult, label
+    return PAYOUT_MAGNITUDE_TABLE[0][1], PAYOUT_MAGNITUDE_TABLE[0][0]
+
+
+def payout_odds_table() -> dict[str, Any]:
+    """Player-facing statement of the payout table (stated == coded)."""
+    return {
+        "table": [
+            {"label": label, "multiplier": mult, "weight": weight, "tag": tag}
+            for label, mult, weight, tag in PAYOUT_MAGNITUDE_TABLE
+        ],
+        "applies_to": ["salvage credits", "combat bounty credits", "scoop fuel"],
+    }
+
+
+# Variable-ratio relic presence (thresholds shared so UI text and rolls agree).
+RELIC_BASE_THRESHOLD = 0.30
+RELIC_NEAR_MISS_WINDOW = 0.15
+RELIC_TIER_CUTS: tuple[tuple[str, float], ...] = (
+    ("common", 0.50),
+    ("rare", 0.80),
+    ("epic", 0.95),
+    ("legendary", 1.01),
+)
+
+# Near-miss windows (Clark et al.: almost-WON, never almost-lost).
+NEAR_MISS_COMBAT_HULL_FRACTION = 0.10  # enemy survives at <=10% max hull
+NEAR_MISS_SALVAGE_WINDOW = 0.10        # danger roll misses success by <0.10
+NEAR_MISS_SCAN_BONUS = 0.25            # one-capped comeback bonus (existing)
+
+# Contract autonomy: offers drawn beside the auto-replacement (free swap).
+CONTRACT_OFFER_COUNT = 2
+CONTRACT_OFFERS_MAX = 3
 
 PILOT_TALENTS: dict[str, dict[str, Any]] = {
     "void_cartographer": {
@@ -334,20 +409,17 @@ def roll_relic_drop(
             False,
         )
 
-    base_threshold = 0.30 + bonus_prob
+    base_threshold = RELIC_BASE_THRESHOLD + bonus_prob
     roll = rng.random()
 
     if roll < base_threshold:
         # Rolled a relic! Determine rarity tier via weighted distribution
         tier_roll = rng.random()
-        if tier_roll < 0.50:
-            tier = "common"
-        elif tier_roll < 0.80:
-            tier = "rare"
-        elif tier_roll < 0.95:
-            tier = "epic"
-        else:
-            tier = "legendary"
+        tier = "legendary"
+        for cut_tier, cut in RELIC_TIER_CUTS:
+            if tier_roll < cut:
+                tier = cut_tier
+                break
 
         pool = RELICS_BY_RARITY[tier]
         chosen = rng.choice(pool)
@@ -365,8 +437,8 @@ def roll_relic_drop(
             False,
         )
 
-    # Near-miss window: roll just missed the threshold by <= 0.15
-    if roll < base_threshold + 0.15:
+    # Near-miss window: roll just missed the threshold (almost-WON)
+    if roll < base_threshold + RELIC_NEAR_MISS_WINDOW:
         return None, True
 
     return None, False
@@ -374,9 +446,7 @@ def roll_relic_drop(
 
 def calculate_passive_multipliers(ship: ShipState) -> dict[str, float]:
     """Calculate aggregate multipliers across streak, installed relics, and pilot talents."""
-    streak = max(1, ship.streak)
-    # Streak multiplies yields up to +150% (2.5x)
-    streak_mult = 1.0 + min(1.5, (streak - 1) * 0.15)
+    streak_mult = streak_multiplier(ship.streak)
 
     # Hull wear degrades sensor and trade efficiency (max -10% at 100% wear).
     wear = max(0.0, min(100.0, getattr(ship, "wear", 0.0)))
