@@ -210,8 +210,10 @@ def step_population(
     """Advance one world's population with logistic growth, tech limits and war deaths."""
     pop = max(0, int(population))
     ticks = max(0, int(num_ticks))
-    if pop <= 0 or ticks <= 0:
+    if pop <= 0:
         return 0
+    if ticks <= 0:
+        return pop
     cap = effective_capacity(population_capacity, devastation)
     if cap <= 0:
         return 0

@@ -509,7 +509,7 @@ def migrate_story_state(story: StoryState) -> StoryState:
     if story.campaign_title != "The Precursor Cipher":
         return story
     current_length = len(story.chapters)
-    if current_length >= len(CAMPAIGN_CHAPTERS) or current_length == 0:
+    if current_length >= len(CAMPAIGN_CHAPTERS):
         return story
 
     merged = list(story.chapters)

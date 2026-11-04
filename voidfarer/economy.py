@@ -198,6 +198,12 @@ def tick_global_economy(
     """Advance economic simulation: update stockpiles, decrement event clocks, spawn emergent news."""
     if rng is None:
         rng = random.Random()
+    try:
+        tick_count = int(num_ticks)
+    except (TypeError, ValueError):
+        tick_count = 1
+    if tick_count <= 0:
+        return state, []
 
     news_logs: list[str] = []
     updated_markets = dict(state.markets)

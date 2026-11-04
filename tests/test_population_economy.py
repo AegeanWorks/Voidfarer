@@ -374,5 +374,12 @@ class TestFactionEconomy(unittest.TestCase):
         self.assertTrue(any(body.devastation > 0 for sid in front for body in engine.state.systems[sid].bodies))
 
 
+class TestZeroTickPopulationNoop(unittest.TestCase):
+    def test_zero_tick_population_is_noop(self):
+        self.assertEqual(step_population(1000, 5000, 80.0, 5, 0.0, 0, 50.0), 1000)
+        self.assertEqual(step_population(1000, 5000, 80.0, 5, 0.0, -3, 50.0), 1000)
+        self.assertEqual(step_population(0, 5000, 80.0, 5, 0.0, 0, 50.0), 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -229,5 +229,21 @@ class TestDynamicMarketQuotes(unittest.TestCase):
         self.assertEqual(after_stock, before_stock + 2)
 
 
+class TestTickNonPositiveIsNoop(unittest.TestCase):
+    def test_tick_negative_and_zero_ticks_rejected(self):
+        engine = SimulationEngine(seed=42)
+        econ = engine.state.economy
+        systems = engine.state.systems
+        before_tick = econ.last_updated_tick
+        same, news = tick_global_economy(econ, 0, systems, random.Random(1))
+        self.assertIs(same, econ)
+        self.assertEqual(news, [])
+        self.assertEqual(same.last_updated_tick, before_tick)
+        same_neg, news_neg = tick_global_economy(econ, -5, systems, random.Random(1))
+        self.assertIs(same_neg, econ)
+        self.assertEqual(news_neg, [])
+        self.assertEqual(same_neg.last_updated_tick, before_tick)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `126`
-- **Total Classes**: `330`
+- **Total Classes**: `332`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1920`
-- **Total Source Lines**: `49348`
+- **Total Class Methods**: `1923`
+- **Total Source Lines**: `49393`
 
 ---
 
@@ -748,7 +748,7 @@
 ### [`tests/test_economy.py`](tests/test_economy.py)
 > *Unit tests for the dynamic galactic economy, stockpiles, events, and trade routes.*
 
-**Size**: `233` lines (`10832` bytes)
+**Size**: `249` lines (`11544` bytes)
 
 **Classes:**
 - `class TestInitialEconomy` - *Verify baseline economy generation across the galaxy.*
@@ -774,6 +774,8 @@
   - Method `.test_friendly_standing_is_applied_once_on_purchase()`
   - Method `.test_friendly_standing_cannot_arbitrage_locally()`
   - Method `.test_sell_from_depot_uses_dynamic_quote_and_updates_stockpiles()`
+- `class TestTickNonPositiveIsNoop`
+  - Method `.test_tick_negative_and_zero_ticks_rejected()`
 
 ---
 
@@ -1745,7 +1747,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `378` lines (`16701` bytes)
+**Size**: `385` lines (`17049` bytes)
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -1779,6 +1781,8 @@
   - Method `.test_batched_tick_still_declares_wars_and_scars_worlds()`
   - Method `.test_reload_does_not_repopulate_a_war_killed_world()`
   - Method `.test_war_tick_lowers_front_population()`
+- `class TestZeroTickPopulationNoop`
+  - Method `.test_zero_tick_population_is_noop()`
 
 ---
 
@@ -2142,7 +2146,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `741` lines (`31556` bytes)
+**Size**: `755` lines (`32115` bytes)
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -2185,6 +2189,7 @@
   - Method `.test_migrate_story_state_variants()`
   - Method `.test_engine_load_state_migrates_legacy_campaign()`
   - Method `.test_serialization_roundtrip_preserves_flags_and_ending()`
+  - Method `.test_migrate_empty_chapters_rebuilds_campaign()`
 
 ---
 
@@ -2838,7 +2843,7 @@
 ### [`voidfarer/demographics.py`](voidfarer/demographics.py)
 > *Population capacity, technology limits, and logistic growth for VoidFarer worlds.*
 
-**Size**: `243` lines (`8440` bytes)
+**Size**: `245` lines (`8464` bytes)
 
 **Functions:**
 - `def clamp_tech_level(tech_level)` - *Return a whole tech level in the supported 1..10 band.*
@@ -2855,7 +2860,7 @@
 ### [`voidfarer/economy.py`](voidfarer/economy.py)
 > *Dynamic Global Economy, supply/demand simulation, economic events, and galactic trade network.*
 
-**Size**: `486` lines (`19039` bytes)
+**Size**: `492` lines (`19192` bytes)
 
 **Functions:**
 - `def generate_initial_economy(systems, rng)` - *Construct baseline economy state with localized stockpiles and initial macroeconomic conditions.*
@@ -3753,7 +3758,7 @@
 ### [`voidfarer/story.py`](voidfarer/story.py)
 > *Interactive Cadet Flight Academy tutorial and branching narrative campaign systems.*
 
-**Size**: `541` lines (`24674` bytes)
+**Size**: `541` lines (`24651` bytes)
 
 **Functions:**
 - `def generate_initial_tutorial()` - *Construct a fresh Cadet Flight Academy tutorial state.*

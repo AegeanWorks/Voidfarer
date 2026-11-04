@@ -736,6 +736,20 @@ class TestStoryBranchingMechanics(unittest.TestCase):
         self.assertIsNotNone(leak.follow_up)
         self.assertIn("skipped", act5.to_dict())
 
+    def test_migrate_empty_chapters_rebuilds_campaign(self):
+        from voidfarer.models import StoryState
+        from voidfarer.story import CAMPAIGN_CHAPTERS, migrate_story_state
+        empty = StoryState(
+            campaign_title="The Precursor Cipher",
+            current_chapter_index=0,
+            chapters=(),
+            transmission_log=(),
+            completed=False,
+        )
+        rebuilt = migrate_story_state(empty)
+        self.assertEqual(len(rebuilt.chapters), len(CAMPAIGN_CHAPTERS))
+        self.assertFalse(rebuilt.completed)
+
 
 if __name__ == "__main__":
     unittest.main()

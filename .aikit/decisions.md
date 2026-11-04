@@ -1879,3 +1879,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Combat heat accepts live names with legacy aliases: `overdrive`/`overclock` -> x1.5, `economy`/`eco` -> x0.7 (`engine.py:5996-5999`). Existing overclock/eco test stays green; new `test_combat_heat_uses_live_reactor_modes` pins overdrive 9.0 / economy 4.2.
   3. Diplomacy help/usage list parser verbs `improve|gift|non_aggression|trade_pact|research_pact|alliance|ceasefire` (`cli.py:2103,2106`); new `TestCLIDiplomacyHelpParity` pins `ceasefire` present, `declare_war` absent. Move `__main__` guard to end of `tests/test_cli.py` so `TestCLIMaxTrades`/`TestCLINewMechanicsParity` run on direct-file execution.
 - **Consequences**: 3 failing-first reproductions now pass; `python aikit.py check voidfarer` 5/5, `tools/ui_inventory.py` 1145 lines unchanged in shape; no save-schema change; no UI-ticket files touched.
+
+### ADR-168: Stage 3 swarm batch 2 — zero-tick noops and empty-campaign rebuild
+- **Date**: 2026-11-04
+- **Status**: Accepted
+- **Context**: Swarm batch 2 verified true: (1) `step_population(...,0)` returned 0, wiping 1000 colonists on a no-op tick (S5B1); (2) `tick_global_economy(e,-5,g)` rewound `last_updated_tick` to -5 and inverted stock flow (S5B3); (3) `migrate_story_state` passed through 0-chapter saves, leaving an empty campaign masquerading as completed Epilogue (S6B4).
+- **Decision**:
+  1. `demographics.py:213-216` splits the guard: `pop<=0 -> 0`, `ticks<=0 -> pop` (no growth, no cap-clamp, no wipe). New `TestZeroTickPopulationNoop`.
+  2. `economy.py:198-206` rejects `int(num_ticks)<=0` (or unparseable) with `return state, []` before stock/event work; `last_updated_tick` never rewinds. New `TestTickNonPositiveIsNoop`.
+  3. `story.py:512` drops `or current_length == 0` so empty saves merge all `CAMPAIGN_CHAPTERS` as uncompleted. New `test_migrate_empty_chapters_rebuilds_campaign`.
+- **Consequences**: 3 failing-first reproductions now pass; `python aikit.py check voidfarer` 5/5, `tools/ui_inventory.py` 1145 lines; no save-schema change (empty saves now heal to full campaign); no UI-ticket files touched.
