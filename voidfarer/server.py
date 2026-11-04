@@ -445,7 +445,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         pending = self.engine.state.pending_decision
         if pending is not None and path not in (
-            "/api/decision/resolve", "/api/time", "/api/save", "/api/settings/decisions",
+            "/api/decision/resolve",  "/api/save", "/api/settings/decisions",
             "/api/load", "/api/new-game", "/api/reset", "/api/delete-save",
         ):
             self._send_error_json(
@@ -458,7 +458,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         if (
             self.engine.state.active_customs is not None
             and path not in (
-                "/api/customs/resolve", "/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save",
+                "/api/customs/resolve", "/api/pirate/resolve", "/api/decision/resolve",  "/api/save",
                 "/api/settings/decisions", "/api/load", "/api/new-game", "/api/reset",
                 "/api/delete-save",
             )
@@ -475,7 +475,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         if (
             self.engine.state.active_pirate is not None
             and path not in (
-                "/api/pirate/resolve", "/api/decision/resolve", "/api/time", "/api/save",
+                "/api/pirate/resolve", "/api/decision/resolve",  "/api/save",
                 "/api/settings/decisions", "/api/load", "/api/new-game", "/api/reset",
                 "/api/delete-save",
             )
@@ -1336,12 +1336,8 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/travel/point":
             mode = str(body.get("mode", "sublight"))
-            try:
-                waypoint_au = float(body.get("distance_au", 0.0))
-                waypoint_angle = float(body.get("angle", 0.0))
-            except (TypeError, ValueError, OverflowError):
-                self._send_error_json("Waypoint needs numeric distance_au and angle (radians).")
-                return
+            waypoint_au = _float_field(body, "distance_au", 0.0)
+            waypoint_angle = _float_field(body, "angle", 0.0)
             ok, msg = self.engine.start_travel_to_point(waypoint_au, waypoint_angle, mode=mode)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})

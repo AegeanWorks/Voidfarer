@@ -9,8 +9,8 @@
 - **Total Python Modules**: `126`
 - **Total Classes**: `332`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1923`
-- **Total Source Lines**: `49393`
+- **Total Class Methods**: `1925`
+- **Total Source Lines**: `49399`
 
 ---
 
@@ -1919,7 +1919,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `957` lines (`40864` bytes)
+**Size**: `967` lines (`41429` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -1950,6 +1950,8 @@
   - Method `.test_negative_repair_and_refuel_are_rejected()`
   - Method `.test_trade_rejects_non_boolean_is_buy()`
   - Method `.test_step_rejects_negative_and_non_finite_delta()`
+  - Method `.test_travel_point_rejects_non_finite_with_400()`
+  - Method `.test_block_gates_have_no_dead_time_literal()`
   - Method `.test_scan_response_exposes_relic_and_near_miss()`
   - Method `.test_reset_is_deterministic_for_a_seed()`
   - Method `.test_get_api_shipyard_excludes_current_chassis()`
@@ -3669,7 +3671,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1562` lines (`67419` bytes)
+**Size**: `1558` lines (`67185` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

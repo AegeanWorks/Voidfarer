@@ -1889,3 +1889,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. `economy.py:198-206` rejects `int(num_ticks)<=0` (or unparseable) with `return state, []` before stock/event work; `last_updated_tick` never rewinds. New `TestTickNonPositiveIsNoop`.
   3. `story.py:512` drops `or current_length == 0` so empty saves merge all `CAMPAIGN_CHAPTERS` as uncompleted. New `test_migrate_empty_chapters_rebuilds_campaign`.
 - **Consequences**: 3 failing-first reproductions now pass; `python aikit.py check voidfarer` 5/5, `tools/ui_inventory.py` 1145 lines; no save-schema change (empty saves now heal to full campaign); no UI-ticket files touched.
+
+### ADR-169: Stage 3 swarm batch 3 — server gate and waypoint validation (landed as systems fix)
+- **Date**: 2026-11-04
+- **Status**: Accepted
+- **Context**: Swarm S1 verified true: (1) three POST gates listed dead `"/api/time",` while only `GET /api/time` exists — time POSTs are `/api/time/step|speed|pause|resume` (S1B2); (2) `POST /api/travel/point` used bare `float()` with no finite guard, unlike `_float_field` (used by `/api/step`, pinned 400 in `test_server.py:297-300`), so `distance_au 1e999` returned 200 envelope instead of 400 (S1B3). A cockpit ticket was opened, then aborted: `ui verify` rejects protected `tests/**` + `.aikit/**` changes, but gates require regression tests for every fix — the two cannot coexist in one ticket for a non-visual logic fix.
+- **Decision**:
+  1. Delete the dead `"/api/time",` literal from all three gate tuples (`server.py:448,461,478`); time POSTs stay blocked during pending/customs/pirate, matching `engine.tick` blocking (`test_frontier_depth.py:171`). New `test_block_gates_have_no_dead_time_literal` (static contract).
+  2. Route `/api/travel/point` through `_float_field` for `distance_au`/`angle` (`server.py:1337-1341`); outer `do_POST` maps `ValueError` to 400, matching `/api/step`. New `test_travel_point_rejects_non_finite_with_400` (`"1e999"`/`"NaN"` -> 400 + `ok False`).
+  3. Land as systems fix (no `static/**` change, inventory stays 1145 lines, no visual delta so no before/after captures apply); ticket aborted with surface restored, fixes re-applied verbatim.
+- **Consequences**: 2 regression tests pass; `python aikit.py check voidfarer` 5/5; no save-schema change; visual cockpit untouched.

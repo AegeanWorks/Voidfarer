@@ -299,6 +299,16 @@ class TestServer(unittest.TestCase):
             status, _ = self._post_raw("/api/step", payload)
             self.assertEqual(status, 400, payload)
 
+    def test_travel_point_rejects_non_finite_with_400(self):
+        for payload in ('{"distance_au": "1e999", "angle": 0}', '{"distance_au": 1, "angle": "NaN"}'):
+            status, data = self._post_raw("/api/travel/point", payload)
+            self.assertEqual(status, 400, payload)
+            self.assertFalse(json.loads(data.decode("utf-8"))["ok"])
+
+    def test_block_gates_have_no_dead_time_literal(self):
+        text = (Path(__file__).parent.parent / "voidfarer" / "server.py").read_text(encoding="utf-8")
+        self.assertNotIn('"/api/time",', text)
+
     def test_scan_response_exposes_relic_and_near_miss(self):
         self._post("/api/orbit", {"target": "sol_body_1"})
         status, data = self._post("/api/scan", {})
