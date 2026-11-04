@@ -1908,3 +1908,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   1. Gate `quantity` on `commodity_id` in the `ai` forwarder (`cli.py:3318-3326`); `hail` now forwards `(id, 'hail', None, 1)`. New `TestCLIAiHailParity` pins `commodity is None`.
   2. REPL `relics` branch handles `fuse` via `cmd_relics_fuse` + `storage.save` on success, mirroring `main()` (`cli.py:2605-2611`). New `TestCLIReplRelicsFuse` (3 commons → `Fused` in output).
 - **Consequences**: 2 failing-first reproductions now pass; `python aikit.py check voidfarer` 5/5, `tools/ui_inventory.py` 1145 lines; no save-schema change; no UI-ticket files touched.
+
+### ADR-171: Stage 3 swarm batch 5 — captain's gambit survives combat turns
+- **Date**: 2026-11-04
+- **Status**: Accepted
+- **Context**: Swarm S4 verified true (S4B1): both `CombatEncounter` rebuilds in `combat_action` (`engine.py:6241`, `engine.py:6642`) dropped `captain_gambit_used`/`captain_evasion_bonus`, so a gambit granted evasion that vanished on the next turn and the once-per-battle action became infinitely reusable (repro seed 42: gambit → ev 0.155/used True → `fire_lasers` → ev 0.0/used False → gambit True again).
+- **Decision**: Thread both fields through both rebuilds (`captain_gambit_used=combat.captain_gambit_used`, `captain_evasion_bonus=combat.captain_evasion_bonus`). `replace()` paths already preserved them. New `test_gambit_state_survives_combat_action` pins used+bonus across `fire_lasers` and second-gambit refusal.
+- **Consequences**: Failing-first reproduction now passes; `python aikit.py check voidfarer` 5/5, `tools/ui_inventory.py` 1145 lines; no save-schema change (additive defaults already existed); no UI-ticket files touched.

@@ -6257,6 +6257,8 @@ class SimulationEngine:
                     enemy_intent=next_intent,
                     archetype_id=combat.archetype_id,
                     near_miss_awarded=combat.near_miss_awarded,
+                    captain_gambit_used=combat.captain_gambit_used,
+                    captain_evasion_bonus=combat.captain_evasion_bonus,
                 )
                 new_log = list(self.state.ship.flight_log[-19:]) + [msg]
                 new_ship = self._clone_ship(hull=new_hull, shield=new_shield, reactor=combat_reactor, tactical_combo=new_combo, streak=new_streak, flight_log=tuple(new_log[-20:]))
@@ -6656,6 +6658,8 @@ class SimulationEngine:
                 enemy_intent=next_intent,
                 archetype_id=combat.archetype_id,
                 near_miss_awarded=combat.near_miss_awarded,
+                captain_gambit_used=combat.captain_gambit_used,
+                captain_evasion_bonus=combat.captain_evasion_bonus,
             )
 
             new_log = list(self.state.ship.flight_log[-19:]) + [msg]

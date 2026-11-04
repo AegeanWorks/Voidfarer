@@ -9,8 +9,8 @@
 - **Total Python Modules**: `126`
 - **Total Classes**: `334`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1927`
-- **Total Source Lines**: `49437`
+- **Total Class Methods**: `1928`
+- **Total Source Lines**: `49453`
 
 ---
 
@@ -200,7 +200,7 @@
 ### [`tests/test_captain_gambit.py`](tests/test_captain_gambit.py)
 > *Captain's Gambit: once-per-battle role actions scaled by captain skill.*
 
-**Size**: `134` lines (`4890` bytes)
+**Size**: `146` lines (`5477` bytes)
 
 **Classes:**
 - `class CaptainGambitTest`
@@ -213,6 +213,7 @@
   - Method `.test_scientist_drains_enemy_shields()`
   - Method `.test_marine_cuts_enemy_firepower()`
   - Method `.test_gambit_is_once_per_battle()`
+  - Method `.test_gambit_state_survives_combat_action()`
   - Method `.test_gambit_requires_a_local_captain()`
   - Method `.test_gambit_fields_round_trip_and_legacy_defaults()`
 
@@ -2895,7 +2896,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10296` lines (`508298` bytes)
+**Size**: `10300` lines (`508570` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

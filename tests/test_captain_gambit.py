@@ -102,6 +102,18 @@ class CaptainGambitTest(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("already spent", message.lower())
 
+    def test_gambit_state_survives_combat_action(self):
+        engine = self._engine("pilot")
+        self.assertTrue(engine.captain_gambit()[0])
+        bonus = engine.state.active_combat.captain_evasion_bonus
+        self.assertGreater(bonus, 0.0)
+        engine.combat_action("fire_lasers")
+        self.assertTrue(engine.state.active_combat.captain_gambit_used)
+        self.assertAlmostEqual(engine.state.active_combat.captain_evasion_bonus, bonus)
+        ok, message = engine.captain_gambit()
+        self.assertFalse(ok)
+        self.assertIn("already spent", message.lower())
+
     def test_gambit_requires_a_local_captain(self):
         engine = SimulationEngine(seed=42)
         engine.state = engine._clone_state(
