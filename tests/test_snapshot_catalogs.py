@@ -30,6 +30,11 @@ class TestStaticCatalogs(unittest.TestCase):
         for key in ("ship", "time", "character_abilities", "corporations"):
             self.assertIn(key, snapshot)
 
+    def test_snapshot_mutation_does_not_poison_cache(self):
+        snapshot = SimulationEngine(seed=42).get_status_snapshot()
+        snapshot["catalog_weapons"].append({"id": "poison"})
+        self.assertNotEqual(static_catalogs()["catalog_weapons"][-1].get("id"), "poison")
+
 
 class TestCatalogEndpoints(unittest.TestCase):
     @classmethod

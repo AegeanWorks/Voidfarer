@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, replace
 from functools import lru_cache
+import copy
 import hashlib
 import math
 import random
@@ -5993,9 +5994,9 @@ class SimulationEngine:
 
             if heat_gain > 0.0:
                 reactor_mode = self.state.ship.reactor.mode
-                if reactor_mode == "overclock":
+                if reactor_mode in ("overdrive", "overclock"):
                     heat_gain *= 1.5
-                elif reactor_mode == "eco":
+                elif reactor_mode in ("economy", "eco"):
                     heat_gain *= 0.7
 
             max_heat = reactor_heat_capacity(self.state.ship.reactor, equipment)
@@ -7889,7 +7890,7 @@ class SimulationEngine:
                 ],
             }
             if include_static:
-                snapshot.update(static_catalogs())
+                snapshot.update(copy.deepcopy(static_catalogs()))
             return snapshot
 
     # Smallest pledge that moves a war, and the most one pledge can move it.

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `126`
-- **Total Classes**: `329`
+- **Total Classes**: `330`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1917`
-- **Total Source Lines**: `49320`
+- **Total Class Methods**: `1920`
+- **Total Source Lines**: `49348`
 
 ---
 
@@ -279,7 +279,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `524` lines (`23928` bytes)
+**Size**: `537` lines (`24478` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -345,6 +345,8 @@
   - Method `._combat_action_for(argv)`
   - Method `.test_new_combat_maneuvers_map_to_engine_actions()`
   - Method `.test_crew_station_assignment_persists()`
+- `class TestCLIDiplomacyHelpParity`
+  - Method `.test_diplomacy_help_matches_parser_choices()`
 
 ---
 
@@ -663,7 +665,7 @@
 ### [`tests/test_combat_tactics.py`](tests/test_combat_tactics.py)
 > *Comprehensive unit tests for Tactical Subsystem Targeting, Combat Heat, and Field Munition Fabrication.*
 
-**Size**: `235` lines (`9644` bytes)
+**Size**: `244` lines (`10080` bytes)
 
 **Classes:**
 - `class WeatherTestEngine`
@@ -675,6 +677,7 @@
   - Method `.test_target_bridge_critical_strike_and_command_panic()`
   - Method `.test_point_defense_reports_the_intercepted_counter_battery()`
   - Method `.test_combat_reactor_thermal_curve()`
+  - Method `.test_combat_heat_uses_live_reactor_modes()`
   - Method `.test_fabricate_patch_kit_success_and_guards()`
   - Method `.test_fabricate_fuel_cell_success_and_guards()`
   - Method `.test_solar_weather_telemetry_and_hazard()`
@@ -2074,7 +2077,7 @@
 ### [`tests/test_snapshot_catalogs.py`](tests/test_snapshot_catalogs.py)
 > *Static catalogs: built once, served by /api/catalogs, and left out of polls that cache them.*
 
-**Size**: `87` lines (`3717` bytes)
+**Size**: `92` lines (`3996` bytes)
 
 **Classes:**
 - `class TestStaticCatalogs`
@@ -2082,6 +2085,7 @@
   - Method `.test_catalogs_are_built_once()`
   - Method `.test_full_snapshot_still_carries_every_catalog()`
   - Method `.test_lite_snapshot_omits_catalogs_and_keeps_live_state()`
+  - Method `.test_snapshot_mutation_does_not_poison_cache()`
 - `class TestCatalogEndpoints`
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
@@ -2690,7 +2694,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3493` lines (`177191` bytes)
+**Size**: `3493` lines (`177175` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2880,7 +2884,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10295` lines (`508243` bytes)
+**Size**: `10296` lines (`508298` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

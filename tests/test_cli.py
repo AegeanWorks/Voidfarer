@@ -377,10 +377,6 @@ class TestCLIRelicsWithRecoveredRelics(_IsolatedCliTestCase):
                 if expected:
                     self.assertIn(expected, mock_out.getvalue())
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestCLIMaxTrades(_IsolatedCliTestCase):
     """`buy <id> max` and `sell <id> all` match the REST max flag and the REPL."""
 
@@ -521,4 +517,21 @@ class TestCLICombatAndCrewParity(_IsolatedCliTestCase):
             self.assertEqual(main(["crew", "station", crew.id, "unassigned"]), 0)
         reloaded = StorageManager(save_dir).load()
         self.assertEqual(next(c for c in reloaded.ship.crew if c.id == crew.id).station, "")
+
+
+class TestCLIDiplomacyHelpParity(_IsolatedCliTestCase):
+    def test_diplomacy_help_matches_parser_choices(self):
+        from voidfarer.cli import cmd_diplomacy
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(self._tmp.name)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            cmd_diplomacy(engine, storage, ["diplomacy"])
+        text = mock_out.getvalue()
+        self.assertIn("ceasefire", text)
+        self.assertNotIn("declare_war", text)
+        self.assertNotIn("|peace ", text)
+
+
+if __name__ == "__main__":
+    unittest.main()
 

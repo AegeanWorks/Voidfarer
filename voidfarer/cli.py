@@ -2100,10 +2100,10 @@ def cmd_diplomacy(engine: SimulationEngine, storage: StorageManager, parts: list
         print(f"\nActive wars: {len(active_wars)}")
         for war in active_wars:
             print(f"  {war.attacker_id} vs {war.defender_id} | score {war.war_score:+.1f} | since tick {war.started_tick}")
-        print(f"\n{DIM}Actions: diplomacy improve|gift|non_aggression|trade_pact|research_pact|alliance|declare_war|peace <faction_id> [amount]{RESET}")
+        print(f"\n{DIM}Actions: diplomacy improve|gift|non_aggression|trade_pact|research_pact|alliance|ceasefire <faction_id> [amount]{RESET}")
         return 0
     if len(parts) < 3:
-        print(f"{RED}Usage:{RESET} diplomacy <improve|gift|non_aggression|trade_pact|research_pact|alliance|declare_war|peace> <faction_id> [amount]")
+        print(f"{RED}Usage:{RESET} diplomacy <improve|gift|non_aggression|trade_pact|research_pact|alliance|ceasefire> <faction_id> [amount]")
         return 1
     amount = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 0
     ok, msg = engine.faction_diplomacy(parts[2].lower(), sub, amount)

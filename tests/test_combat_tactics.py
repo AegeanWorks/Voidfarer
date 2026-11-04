@@ -112,6 +112,15 @@ class CombatTacticsAndMunitionsTest(unittest.TestCase):
         engine_eco.combat_action("fire_lasers")
         self.assertAlmostEqual(engine_eco.state.ship.reactor.heat, 4.2, places=1)
 
+    def test_combat_heat_uses_live_reactor_modes(self):
+        engine_od = self._engine(reactor_mode="overdrive")
+        engine_od.combat_action("fire_lasers")
+        self.assertAlmostEqual(engine_od.state.ship.reactor.heat, 9.0, places=1)
+
+        engine_econ = self._engine(reactor_mode="economy")
+        engine_econ.combat_action("fire_lasers")
+        self.assertAlmostEqual(engine_econ.state.ship.reactor.heat, 4.2, places=1)
+
     def test_fabricate_patch_kit_success_and_guards(self):
         engine = self._engine()
         # Initial hull: 60/100, cargo: 3 titanium
