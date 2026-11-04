@@ -79,6 +79,16 @@ class EmptySpaceTransitTest(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("bearing", msg)
 
+    def test_non_finite_waypoint_reports_finite_not_envelope(self):
+        engine = SimulationEngine(seed=42)
+        for bad_au in (float("inf"), float("-inf"), float("nan")):
+            ok, msg = engine.start_travel_to_point(bad_au, 0.0)
+            self.assertFalse(ok)
+            self.assertIn("finite", msg.lower())
+        ok, msg = engine.start_travel_to_point(5.0, float("inf"))
+        self.assertFalse(ok)
+        self.assertIn("finite", msg.lower())
+
     def test_a_second_vector_cannot_be_plotted_mid_flight(self):
         engine = SimulationEngine(seed=42)
         self.assertTrue(engine.start_travel_to_point(4.0, 0.2, "sublight")[0])

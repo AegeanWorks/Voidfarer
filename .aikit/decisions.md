@@ -1915,3 +1915,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Swarm S4 verified true (S4B1): both `CombatEncounter` rebuilds in `combat_action` (`engine.py:6241`, `engine.py:6642`) dropped `captain_gambit_used`/`captain_evasion_bonus`, so a gambit granted evasion that vanished on the next turn and the once-per-battle action became infinitely reusable (repro seed 42: gambit → ev 0.155/used True → `fire_lasers` → ev 0.0/used False → gambit True again).
 - **Decision**: Thread both fields through both rebuilds (`captain_gambit_used=combat.captain_gambit_used`, `captain_evasion_bonus=combat.captain_evasion_bonus`). `replace()` paths already preserved them. New `test_gambit_state_survives_combat_action` pins used+bonus across `fire_lasers` and second-gambit refusal.
 - **Consequences**: Failing-first reproduction now passes; `python aikit.py check voidfarer` 5/5, `tools/ui_inventory.py` 1145 lines; no save-schema change (additive defaults already existed); no UI-ticket files touched.
+
+### ADR-172: Wave 1 audit — monotonic escort commissions, finite-first waypoint, test-count drift
+- **Date**: 2026-11-05
+- **Status**: Accepted
+- **Context**: Wave 1 audit of HEAD~10..HEAD found 3 verified-true gaps: (1) `_next_escort_index` returned `len(fleet_ships)` when a type sold out, so `buy→sell→buy` reused `escort_frigate_1` (repro seed 1: `1→sold→1`); (2) `_point_travel_plan` range-checked before finiteness, so `inf`/`nan` AU reported "outside envelope" instead of "must be finite" (repro `inf→envelope`); (3) README claimed 1,208 tests vs 1,219 measured (`Ran 1219`) and 79 suites matched files.
+- **Decision**:
+  1. Track per-type monotonic `stats["escort_commissions_<type>"]`; `_next_escort_index` returns `max(taken_max, commissioned_max)` and `buy_escort` persists `max(old, issued_id)`. Old saves bootstrap from existing ids; future commissions never reuse. New `test_sold_out_escort_type_never_reuses_ids` pins `1→sold→2`.
+  2. Check `math.isfinite` before the AU envelope so non-finite inputs report finite-first. New `test_non_finite_waypoint_reports_finite_not_envelope` pins `inf/-inf/nan`.
+  3. Update README to 1,221 tests (1219 + 2 new) and ~140s wall time.
+- **Consequences**: 2 failing-first reproductions now pass; full suite `Ran 1221 OK`; `python aikit.py check voidfarer` 5/5 after map refresh; save-schema additive only (new stats keys default 0); no UI files touched.

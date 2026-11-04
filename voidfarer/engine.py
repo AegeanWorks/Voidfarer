@@ -2134,14 +2134,14 @@ class SimulationEngine:
             target_angle = float(waypoint_angle)
         except (TypeError, ValueError, OverflowError):
             return None, "Waypoint needs a numeric distance and bearing."
+        if not math.isfinite(target_au) or not math.isfinite(target_angle):
+            return None, "Waypoint distance and bearing must be finite numbers."
         if not self.EMPTY_SPACE_MIN_AU <= target_au <= self.EMPTY_SPACE_MAX_AU:
             return (
                 None,
                 f"Waypoint {target_au:.2f} AU is outside the "
                 f"{self.EMPTY_SPACE_MIN_AU}-{self.EMPTY_SPACE_MAX_AU} AU transit envelope.",
             )
-        if not math.isfinite(target_au) or not math.isfinite(target_angle):
-            return None, "Waypoint distance and bearing must be finite numbers."
 
         cur_sys = self.current_system
         origin = self.orbiting_body
@@ -3807,7 +3807,11 @@ class SimulationEngine:
             for ship in self.state.ship.fleet_ships
             if ship.id.startswith(prefix) and ship.id[len(prefix):].isdigit()
         ]
-        return max(taken) if taken else len(self.state.ship.fleet_ships)
+        taken_max = max(taken) if taken else 0
+        commissioned_max = int(
+            self.state.stats.get(f"escort_commissions_{escort_type}", 0)
+        )
+        return max(taken_max, commissioned_max)
 
     def buy_escort(self, escort_type: str, system_id: str | None = None) -> tuple[bool, str]:
         with self.lock:
@@ -3825,11 +3829,18 @@ class SimulationEngine:
             ship = build_fleet_ship(
                 escort_type, target_system, self._next_escort_index(escort_type)
             )
+            stats = dict(self.state.stats)
+            try:
+                issued = int(ship.id.rsplit("_", 1)[-1])
+            except (ValueError, IndexError):
+                issued = len(self.state.ship.fleet_ships) + 1
+            key = f"escort_commissions_{escort_type}"
+            stats[key] = max(int(stats.get(key, 0)), issued)
             new_ship = self._clone_ship(
                 credits=self.state.ship.credits - template["cost"],
                 fleet_ships=self.state.ship.fleet_ships + (ship,),
             )
-            self.state = self._clone_state(ship=new_ship)
+            self.state = self._clone_state(ship=new_ship, stats=stats)
             return True, f"Commissioned {ship.name} for {template['cost']} cr."
 
     def assign_escort(self, ship_id: str, system_id: str) -> tuple[bool, str]:

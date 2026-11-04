@@ -9,8 +9,8 @@
 - **Total Python Modules**: `126`
 - **Total Classes**: `334`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1928`
-- **Total Source Lines**: `49453`
+- **Total Class Methods**: `1930`
+- **Total Source Lines**: `49491`
 
 ---
 
@@ -1251,7 +1251,7 @@
 ### [`tests/test_frontier_shipyard.py`](tests/test_frontier_shipyard.py)
 > *Frontier shipyards service hulls, escorts and weapons without a station dock.*
 
-**Size**: `114` lines (`4440` bytes)
+**Size**: `131` lines (`5370` bytes)
 
 **Classes:**
 - `class FrontierShipyardTest`
@@ -1263,6 +1263,7 @@
   - Method `.test_remote_shipyard_does_not_service_the_current_system()`
   - Method `.test_report_marks_the_local_shipyard()`
   - Method `.test_recommissioned_escort_ids_stay_unique()`
+  - Method `.test_sold_out_escort_type_never_reuses_ids()`
 
 ---
 
@@ -1577,7 +1578,7 @@
 ### [`tests/test_navigation_traffic.py`](tests/test_navigation_traffic.py)
 > *Open-space transit vectors and the NPC traffic that shares the map.*
 
-**Size**: `122` lines (`5717` bytes)
+**Size**: `132` lines (`6182` bytes)
 
 **Classes:**
 - `class EmptySpaceTransitTest`
@@ -1586,6 +1587,7 @@
   - Method `.test_leaving_open_space_prices_the_transit_from_the_anchor()`
   - Method `.test_orbiting_a_body_clears_the_open_space_anchor()`
   - Method `.test_waypoint_is_refused_outside_the_transit_envelope()`
+  - Method `.test_non_finite_waypoint_reports_finite_not_envelope()`
   - Method `.test_a_second_vector_cannot_be_plotted_mid_flight()`
   - Method `.test_survey_and_orbit_actions_need_a_body()`
   - Method `.test_waypoint_survives_a_save_round_trip()`
@@ -2896,7 +2898,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10300` lines (`508570` bytes)
+**Size**: `10311` lines (`509059` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

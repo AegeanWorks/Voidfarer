@@ -109,6 +109,23 @@ class FrontierShipyardTest(unittest.TestCase):
         ids = [s.id for s in self.engine.state.ship.fleet_ships]
         self.assertEqual(len(ids), len(set(ids)))
 
+    def test_sold_out_escort_type_never_reuses_ids(self):
+        self.engine.orbit("sol_body_1")
+        self.engine.state = self.engine._clone_state(
+            ship=self.engine._clone_ship(credits=50000)
+        )
+        self.assertTrue(self.engine.buy_escort("frigate")[0])
+        frigates = [s for s in self.engine.state.ship.fleet_ships if s.id.startswith("escort_frigate_")]
+        self.assertEqual(len(frigates), 1)
+        sold_id = frigates[0].id
+        self.assertTrue(self.engine.sell_escort(sold_id)[0])
+        frigates = [s for s in self.engine.state.ship.fleet_ships if s.id.startswith("escort_frigate_")]
+        self.assertEqual(frigates, [])
+        self.assertTrue(self.engine.buy_escort("frigate")[0])
+        frigates = [s for s in self.engine.state.ship.fleet_ships if s.id.startswith("escort_frigate_")]
+        self.assertEqual(len(frigates), 1)
+        self.assertNotEqual(frigates[0].id, sold_id)
+
 
 if __name__ == "__main__":
     unittest.main()
