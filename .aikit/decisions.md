@@ -1899,3 +1899,12 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Route `/api/travel/point` through `_float_field` for `distance_au`/`angle` (`server.py:1337-1341`); outer `do_POST` maps `ValueError` to 400, matching `/api/step`. New `test_travel_point_rejects_non_finite_with_400` (`"1e999"`/`"NaN"` -> 400 + `ok False`).
   3. Land as systems fix (no `static/**` change, inventory stays 1145 lines, no visual delta so no before/after captures apply); ticket aborted with surface restored, fixes re-applied verbatim.
 - **Consequences**: 2 regression tests pass; `python aikit.py check voidfarer` 5/5; no save-schema change; visual cockpit untouched.
+
+### ADR-170: Stage 3 swarm batch 4 — CLI arg-forwarding and REPL fuse parity
+- **Date**: 2026-11-04
+- **Status**: Accepted
+- **Context**: Swarm S9 verified true: (1) `ai hail <id>` forwarded spurious commodity `"1"` because `quantity` (default 1) was appended without a commodity (`cli.py:3324-3325` repro `('ARGS', id, 'hail', '1', 1)`); (2) REPL `relics fuse common` was a silent no-op vault print because the REPL branch dropped `parts` (`cli.py:2605-2606` repro vault only, CLI `main` fuses).
+- **Decision**:
+  1. Gate `quantity` on `commodity_id` in the `ai` forwarder (`cli.py:3318-3326`); `hail` now forwards `(id, 'hail', None, 1)`. New `TestCLIAiHailParity` pins `commodity is None`.
+  2. REPL `relics` branch handles `fuse` via `cmd_relics_fuse` + `storage.save` on success, mirroring `main()` (`cli.py:2605-2611`). New `TestCLIReplRelicsFuse` (3 commons → `Fused` in output).
+- **Consequences**: 2 failing-first reproductions now pass; `python aikit.py check voidfarer` 5/5, `tools/ui_inventory.py` 1145 lines; no save-schema change; no UI-ticket files touched.

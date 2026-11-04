@@ -532,6 +532,39 @@ class TestCLIDiplomacyHelpParity(_IsolatedCliTestCase):
         self.assertNotIn("|peace ", text)
 
 
+class TestCLIAiHailParity(_IsolatedCliTestCase):
+    def test_ai_hail_forwards_no_spurious_commodity(self):
+        from voidfarer import engine as engine_mod
+        seen = {}
+        def fake_interact(self, captain_id, action, commodity=None, quantity=1):
+            seen.update(captain_id=captain_id, action=action, commodity=commodity, quantity=quantity)
+            return True, "ok"
+        with patch.object(engine_mod.SimulationEngine, "interact_ai", fake_interact):
+            with patch("sys.stdout", new_callable=io.StringIO):
+                self.assertEqual(main(["ai", "hail", "captain_vega"]), 0)
+        self.assertEqual(seen["captain_id"], "captain_vega")
+        self.assertEqual(seen["action"], "hail")
+        self.assertIsNone(seen["commodity"])
+        self.assertEqual(seen["quantity"], 1)
+
+
+class TestCLIReplRelicsFuse(_IsolatedCliTestCase):
+    def test_repl_relics_fuse(self):
+        from dataclasses import replace
+        from voidfarer.cli import cmd_repl
+        from voidfarer.retention import CATALOG_RELICS
+        commons = [r for r in CATALOG_RELICS if r.rarity == "common"][:2]
+        extra = replace(commons[0], id="relic_common_extra")
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(ship=engine._clone_ship(relics=tuple(commons + [extra])))
+        storage = StorageManager(Path(self._tmp.name) / ".voidfarer")
+        storage.save(engine.state)
+        with patch("builtins.input", side_effect=["relics fuse common", "exit"]):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+                self.assertEqual(cmd_repl(engine, storage), 0)
+        self.assertIn("Fused", mock_out.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()
 

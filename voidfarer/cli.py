@@ -2603,6 +2603,11 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
         elif cmd in ("unlock",):
             cmd_mastery(engine, storage, ["mastery", "unlock"] + parts[1:])
         elif cmd in ("relics", "relic", "vault", "artifacts"):
+            if len(parts) > 1 and parts[1] == "fuse":
+                code = cmd_relics_fuse(engine, parts[2] if len(parts) > 2 else None)
+                if code == 0:
+                    storage.save(engine.state)
+                return code
             cmd_relics(engine)
         elif cmd in ("codex", "achievements", "milestones"):
             cmd_codex(engine, storage, parts)
@@ -3321,8 +3326,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             parts.append(args.captain_id)
         if args.commodity_id:
             parts.append(args.commodity_id)
-        if args.quantity is not None:
-            parts.append(str(args.quantity))
+            if args.quantity is not None:
+                parts.append(str(args.quantity))
         return cmd_ai(engine, storage, parts)
     elif args.command == "messages":
         return cmd_messages(engine, storage, ["messages", args.action] + list(args.args))
