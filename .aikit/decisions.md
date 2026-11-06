@@ -1943,3 +1943,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Swarm A1 verified true (B-14): `applyViewportProfile()` computed `scalePercent` but the `#viewportReadout` text omitted it, so 85% vs 120% HUD states were indistinguishable in screenshots and reviews.
 - **Decision**: `static/app.js:1577` append `// SCALE ${scalePercent}%` to the readout text. Bounded UI ticket on `cockpit` (1 file, 1 line); `ui verify` passed; click-map 162 clicks 0 missing/dup/errors; settings scenario 0 errors/hscroll/tiny; before/after `desktop-settings.png` pair captured (`ui-review/readout-before`, `ui-review/readout-after`, ignored).
 - **Consequences**: Readout now quotes e.g. `1280x720 @1.0x // COMPACT // SCALE 100%`; `ui_inventory.py` still 1145 lines (no control added/removed); `aikit check` 5/5; no save-schema change.
+
+### ADR-175: Wave 3 CLI — strict quantity and diplomacy guards
+- **Date**: 2026-11-06
+- **Status**: Accepted
+- **Context**: Swarm A9 verified true by code read + direct repro: (1) `main` diplomacy forwarder appended `str(amount)` unconditionally, so `diplomacy improve` (no faction) reached engine as faction `'0'` ("Unknown faction '0'") instead of usage; (2) `cmd_depot` used `isdigit else 1` and `cmd_fleet repair_escorts` used `isdigit else 60`, silently coercing `abc`/`-5`.
+- **Decision**: Forwarder appends amount only when `faction_id` present (`cli.py:3226-3231`); depot and fleet-repair use the inventory `try int / except ValueError -> Error + 1` pattern (`cli.py:863`, `cli.py:708`). New `test_diplomacy_without_faction_shows_usage`, `test_depot_non_integer_quantity_rejected`, `test_fleet_repair_non_integer_amount_rejected`.
+- **Consequences**: 3 failing-first reproductions now pass; `ui_inventory.py` 1145 lines; `aikit check` 5/5 after map refresh; no save-schema change; no UI-ticket files touched.

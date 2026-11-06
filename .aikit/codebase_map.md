@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `126`
-- **Total Classes**: `335`
+- **Total Classes**: `336`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1935`
-- **Total Source Lines**: `49559`
+- **Total Class Methods**: `1938`
+- **Total Source Lines**: `49600`
 
 ---
 
@@ -280,7 +280,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `587` lines (`27101` bytes)
+**Size**: `616` lines (`28470` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -348,6 +348,10 @@
   - Method `.test_crew_station_assignment_persists()`
 - `class TestCLIDiplomacyHelpParity`
   - Method `.test_diplomacy_help_matches_parser_choices()`
+  - Method `.test_diplomacy_without_faction_shows_usage()`
+- `class TestCLIQuantityGuards`
+  - Method `.test_depot_non_integer_quantity_rejected()`
+  - Method `.test_fleet_repair_non_integer_amount_rejected()`
 - `class TestCLIAiHailParity`
   - Method `.test_ai_hail_forwards_no_spurious_commodity()`
 - `class TestCLIReplRelicsFuse`
@@ -2714,7 +2718,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3498` lines (`177432` bytes)
+**Size**: `3510` lines (`177713` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*

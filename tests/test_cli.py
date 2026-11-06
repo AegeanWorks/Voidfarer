@@ -531,6 +531,35 @@ class TestCLIDiplomacyHelpParity(_IsolatedCliTestCase):
         self.assertNotIn("declare_war", text)
         self.assertNotIn("|peace ", text)
 
+    def test_diplomacy_without_faction_shows_usage(self):
+        from voidfarer.cli import cmd_diplomacy
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(self._tmp.name)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            rc = cmd_diplomacy(engine, storage, ["diplomacy", "improve"])
+        self.assertEqual(rc, 1)
+        self.assertIn("Usage", mock_out.getvalue())
+
+
+class TestCLIQuantityGuards(_IsolatedCliTestCase):
+    def test_depot_non_integer_quantity_rejected(self):
+        from voidfarer.cli import cmd_depot
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(self._tmp.name)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            rc = cmd_depot(engine, storage, ["depot", "deposit", "titanium", "abc"])
+        self.assertEqual(rc, 1)
+        self.assertIn("integer", mock_out.getvalue().lower())
+
+    def test_fleet_repair_non_integer_amount_rejected(self):
+        from voidfarer.cli import cmd_fleet
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(self._tmp.name)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            rc = cmd_fleet(engine, storage, ["fleet", "repair_escorts", "abc"])
+        self.assertEqual(rc, 1)
+        self.assertIn("integer", mock_out.getvalue().lower())
+
 
 class TestCLIAiHailParity(_IsolatedCliTestCase):
     def test_ai_hail_forwards_no_spurious_commodity(self):

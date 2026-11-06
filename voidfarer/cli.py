@@ -705,7 +705,13 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             storage.save(engine.state)
         return 0 if ok else 1
     if sub in ("repair_escorts", "repair_ships"):
-        amount = int(parts[2]) if len(parts) > 2 and parts[2].isdigit() else 60
+        amount = 60
+        if len(parts) > 2:
+            try:
+                amount = int(parts[2])
+            except ValueError:
+                print(f"{RED}Error:{RESET} Amount must be an integer.")
+                return 1
         ok, msg = engine.repair_escorts(amount)
         print((GREEN if ok else RED) + msg + RESET)
         if ok:
@@ -860,7 +866,13 @@ def cmd_depot(engine: SimulationEngine, storage: StorageManager, parts: list[str
     if len(parts) < 3:
         print(f"{RED}Usage:{RESET} depot <deposit|withdraw|sell> <item> [qty]")
         return 1
-    qty = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 1
+    qty = 1
+    if len(parts) > 3:
+        try:
+            qty = int(parts[3])
+        except ValueError:
+            print(f"{RED}Error:{RESET} Quantity must be an integer.")
+            return 1
     handlers = {
         "deposit": engine.deposit_cargo,
         "withdraw": engine.withdraw_cargo,
@@ -3227,7 +3239,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         parts = ["diplomacy", args.action]
         if args.faction_id:
             parts.append(args.faction_id)
-        parts.append(str(args.amount))
+            parts.append(str(args.amount))
         return cmd_diplomacy(engine, storage, parts)
     elif args.command == "route":
         return cmd_route(engine, args.system_id)
