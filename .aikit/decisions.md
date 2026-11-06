@@ -1925,3 +1925,14 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Check `math.isfinite` before the AU envelope so non-finite inputs report finite-first. New `test_non_finite_waypoint_reports_finite_not_envelope` pins `inf/-inf/nan`.
   3. Update README to 1,221 tests (1219 + 2 new) and ~140s wall time.
 - **Consequences**: 2 failing-first reproductions now pass; full suite `Ran 1221 OK`; `python aikit.py check voidfarer` 5/5 after map refresh; save-schema additive only (new stats keys default 0); no UI files touched.
+
+### ADR-173: Stage 3 swarm wave — precursor rep, tier-2 talents, codex stats, REPL fuse stay-alive
+- **Date**: 2026-11-06
+- **Status**: Accepted
+- **Context**: 9-area analysis swarm verified true on sampling: (1) `precursor_sentinel` paid +8 precursor standing to its killer; (2) tier-2 talents unlocked but inert in `calculate_passive_multipliers`; (3) 7 completable codex metrics invisible in stats grid; (4) REPL `relics fuse` returned out of `cmd_repl`, killing the session.
+- **Decision**:
+  1. `enemies.py:89` precursor reward `+8` to `-8` (matches other archetypes punishing own faction).
+  2. `retention.py:480-489` wire `deep_space_arrays` (+0.20 scan/+0.10 relic), `overcharge_capacitors` (+0.15 laser/+15 shield), `drone_armada` (+0.25 drone), `black_market_contacts` (+0.15 margin).
+  3. `codex.py:536-551` add `relic_sets`, `escort_captains`, `outposts_specialized`, `outposts_repaired`, `research_pacts`, `trade_pacts`, `quantum_auto_orders` to `STATS_ORDER`.
+  4. `cli.py:2605-2611` REPL fuse saves then `continue`, case-insensitive `fuse`.
+- **Consequences**: 4 failing-first reproductions now pass; new `Tier2TalentTest`, `test_precursor_kill_reduces_precursor_standing`, `test_codex_stats_cover_all_labeled_metrics`, `test_repl_relics_fuse_does_not_exit`; no save-schema change; no UI-ticket files touched.

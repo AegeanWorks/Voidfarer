@@ -564,6 +564,23 @@ class TestCLIReplRelicsFuse(_IsolatedCliTestCase):
                 self.assertEqual(cmd_repl(engine, storage), 0)
         self.assertIn("Fused", mock_out.getvalue())
 
+    def test_repl_relics_fuse_does_not_exit(self):
+        from dataclasses import replace
+        from voidfarer.cli import cmd_repl
+        from voidfarer.retention import CATALOG_RELICS
+        commons = [r for r in CATALOG_RELICS if r.rarity == "common"][:2]
+        extra = replace(commons[0], id="relic_common_extra")
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(ship=engine._clone_ship(relics=tuple(commons + [extra])))
+        storage = StorageManager(Path(self._tmp.name) / ".voidfarer")
+        storage.save(engine.state)
+        with patch("builtins.input", side_effect=["relics fuse common", "status", "exit"]):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+                self.assertEqual(cmd_repl(engine, storage), 0)
+        out = mock_out.getvalue()
+        self.assertIn("Fused", out)
+        self.assertIn("VITAL TELEMETRY", out)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -477,6 +477,16 @@ def calculate_passive_multipliers(ship: ShipState) -> dict[str, float]:
     if "quantum_smuggler" in specs:
         multipliers["fuel_efficiency"] -= 0.25
         multipliers["trade_margin"] += 0.20
+    if "deep_space_arrays" in specs:
+        multipliers["scan_bounty"] += 0.20
+        multipliers["relic_find"] += 0.10
+    if "overcharge_capacitors" in specs:
+        multipliers["laser_dmg"] += 0.15
+        multipliers["shield_cap"] += 15.0
+    if "drone_armada" in specs:
+        multipliers["drone_yield"] += 0.25
+    if "black_market_contacts" in specs:
+        multipliers["trade_margin"] += 0.15
 
     # Apply precursor relics
     for r in ship.relics:

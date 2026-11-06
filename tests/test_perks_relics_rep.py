@@ -146,6 +146,29 @@ class EnemyRepRewardTest(unittest.TestCase):
         self.assertTrue(ok)
         self.assertLess(engine.state.ship.corp_standings.get("hyperion_dynamics", 0), 0)
 
+    def test_precursor_kill_reduces_precursor_standing(self):
+        engine, (ok, _) = self._victory("precursor_sentinel")
+        self.assertTrue(ok)
+        self.assertLess(engine.state.ship.faction_standings.get("precursor_watch", 0), 0)
+
+
+class Tier2TalentTest(unittest.TestCase):
+    def _mults(self, specs):
+        from dataclasses import replace
+        engine = SimulationEngine(seed=42)
+        ship = replace(engine.state.ship, mastery=replace(engine.state.ship.mastery, specializations=specs))
+        return calculate_passive_multipliers(ship)
+
+    def test_tier2_talents_apply_to_passives(self):
+        base = self._mults(("void_cartographer",))
+        full = self._mults(("void_cartographer", "deep_space_arrays", "overcharge_capacitors", "drone_armada", "black_market_contacts"))
+        self.assertGreater(full["scan_bounty"], base["scan_bounty"])
+        self.assertGreater(full["relic_find"], base["relic_find"])
+        self.assertGreater(full["laser_dmg"], base["laser_dmg"])
+        self.assertGreater(full["shield_cap"], base["shield_cap"])
+        self.assertGreater(full["drone_yield"], base["drone_yield"])
+        self.assertGreater(full["trade_margin"], base["trade_margin"])
+
 
 class MultiStatRelicTest(unittest.TestCase):
     def test_relic_bonuses_round_trip(self):

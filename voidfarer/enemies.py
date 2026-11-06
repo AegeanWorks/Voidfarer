@@ -86,7 +86,7 @@ ENEMY_ARCHETYPES: dict[str, EnemyArchetype] = {
         ability_desc="Fires a high-frequency tachyon beam that bypasses shields directly into ship hull.",
         bounty_credits=1200,
         salvage_commodity="xenoliths",
-        rep_rewards={"precursor_watch": 8, "outlaw_corsairs": 4},
+        rep_rewards={"precursor_watch": -8, "outlaw_corsairs": 4},
         ai_profile="adaptive",
     ),
     "warlord_dreadnought": EnemyArchetype(

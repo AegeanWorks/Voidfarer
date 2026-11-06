@@ -78,6 +78,17 @@ class CodexProgressionTest(unittest.TestCase):
         self.assertTrue(ok, message)
         self.assertEqual(engine.state.stats["outposts_repaired"], 1)
 
+    def test_codex_stats_cover_all_labeled_metrics(self):
+        from voidfarer.codex import CODEX_ENTRIES, METRIC_LABELS, STATS_ORDER
+        report = build_codex_report(self._state())
+        stat_ids = {row["id"] for row in report["stats"]}
+        entry_metrics = {entry.metric for entry in CODEX_ENTRIES}
+        for metric in entry_metrics:
+            self.assertIn(metric, stat_ids, metric)
+        for metric in METRIC_LABELS:
+            if metric in entry_metrics:
+                self.assertIn(metric, STATS_ORDER, metric)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `126`
-- **Total Classes**: `334`
+- **Total Classes**: `335`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1930`
-- **Total Source Lines**: `49491`
+- **Total Class Methods**: `1935`
+- **Total Source Lines**: `49559`
 
 ---
 
@@ -280,7 +280,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `570` lines (`26180` bytes)
+**Size**: `587` lines (`27101` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -352,6 +352,7 @@
   - Method `.test_ai_hail_forwards_no_spurious_commodity()`
 - `class TestCLIReplRelicsFuse`
   - Method `.test_repl_relics_fuse()`
+  - Method `.test_repl_relics_fuse_does_not_exit()`
 
 ---
 
@@ -656,7 +657,7 @@
 ### [`tests/test_codex_progression.py`](tests/test_codex_progression.py)
 > *Codex milestones for pacts, captains, outposts and auto-freight.*
 
-**Size**: `83` lines (`2923` bytes)
+**Size**: `94` lines (`3460` bytes)
 
 **Classes:**
 - `class CodexProgressionTest`
@@ -664,6 +665,7 @@
   - Method `.test_new_metrics_read_state()`
   - Method `.test_new_milestones_complete_and_are_listed()`
   - Method `.test_repair_outpost_increments_the_codex_stat()`
+  - Method `.test_codex_stats_cover_all_labeled_metrics()`
 
 ---
 
@@ -1718,7 +1720,7 @@
 ### [`tests/test_perks_relics_rep.py`](tests/test_perks_relics_rep.py)
 > *Regression tests for faction perks, enemy reputation rewards, and multi-stat relics.*
 
-**Size**: `196` lines (`8386` bytes)
+**Size**: `219` lines (`9594` bytes)
 
 **Classes:**
 - `class RelicSetBonusTest`
@@ -1741,6 +1743,10 @@
   - Method `._victory(archetype_id)`
   - Method `.test_warlord_rep_rewards_are_applied()`
   - Method `.test_corporate_rep_rewards_update_corp_standings()`
+  - Method `.test_precursor_kill_reduces_precursor_standing()`
+- `class Tier2TalentTest`
+  - Method `._mults(specs)`
+  - Method `.test_tier2_talents_apply_to_passives()`
 - `class MultiStatRelicTest`
   - Method `.test_relic_bonuses_round_trip()`
   - Method `.test_eye_of_void_boosts_laser_and_scan()`
@@ -2708,7 +2714,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3498` lines (`177427` bytes)
+**Size**: `3498` lines (`177432` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2778,7 +2784,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `754` lines (`26662` bytes)
+**Size**: `761` lines (`26824` bytes)
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -2883,7 +2889,7 @@
 ### [`voidfarer/enemies.py`](voidfarer/enemies.py)
 > *Hostile Enemy Archetypes, Tactical Combat AI, and Procedural Intercept Generation.*
 
-**Size**: `283` lines (`11126` bytes)
+**Size**: `283` lines (`11127` bytes)
 
 **Classes:**
 - `class EnemyArchetype` - *Blueprint for procedural hostile intercepts across galactic territories.*
@@ -3659,7 +3665,7 @@
 ### [`voidfarer/retention.py`](voidfarer/retention.py)
 > *Psychological retention mechanics, Precursor relics, dynamic contracts, and pilot mastery.*
 
-**Size**: `573` lines (`20966` bytes)
+**Size**: `583` lines (`21372` bytes)
 
 **Functions:**
 - `def streak_multiplier(streak)` - *Expedition streak yield multiplier (loss-aversion loop, Kahneman/Tversky).*

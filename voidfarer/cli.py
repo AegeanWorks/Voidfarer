@@ -2603,11 +2603,11 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
         elif cmd in ("unlock",):
             cmd_mastery(engine, storage, ["mastery", "unlock"] + parts[1:])
         elif cmd in ("relics", "relic", "vault", "artifacts"):
-            if len(parts) > 1 and parts[1] == "fuse":
+            if len(parts) > 1 and parts[1].lower() == "fuse":
                 code = cmd_relics_fuse(engine, parts[2] if len(parts) > 2 else None)
                 if code == 0:
                     storage.save(engine.state)
-                return code
+                continue
             cmd_relics(engine)
         elif cmd in ("codex", "achievements", "milestones"):
             cmd_codex(engine, storage, parts)
