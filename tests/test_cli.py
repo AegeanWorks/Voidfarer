@@ -611,6 +611,69 @@ class TestCLIRefitModuleParity(_IsolatedCliTestCase):
         self.assertEqual(rc, 0)
 
 
+class TestCLIBlockGuards(_IsolatedCliTestCase):
+    def _saved(self, engine):
+        save_dir = Path(self._tmp.name) / ".voidfarer"
+        storage = StorageManager(save_dir)
+        storage.save(engine.state)
+        return storage, save_dir
+
+    def _customs_engine(self):
+        encounter = CustomsEncounter(
+            id="cli_customs_block", faction="Sol Coalition", system_id="sol",
+            system_name="Sol System", patrol_vessel="Sol Cutter",
+            contraband_found={"xenoliths": 2},
+            fine_amount=1200, bribe_amount=600, description="Patrol intercept",
+        )
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(credits=2000, cargo={"xenoliths": 2, "titanium": 4}),
+            active_customs=encounter,
+        )
+        return engine
+
+    def _pending_engine(self):
+        from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
+        definition = next(d for d in DECISION_DEFINITIONS if d.id == "colony_distress")
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            pending_decision=make_decision_event(definition, 0, "tick"))
+        return engine
+
+    def test_customs_blocks_trade_but_allows_status_and_customs(self):
+        engine = self._customs_engine()
+        self._saved(engine)
+        with patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(main(["status"]), 0)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["overhaul"]), 1)
+        self.assertIn("Customs", mock_out.getvalue())
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["customs"]), 0)
+        self.assertIn("CUSTOMS INTERDICTION", mock_out.getvalue())
+
+    def test_saves_and_settings_allowed_during_pending(self):
+        engine = self._pending_engine()
+        self._saved(engine)
+        with patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(main(["saves"]), 0)
+        with patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(main(["settings"]), 0)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["overhaul"]), 1)
+        self.assertIn("Decision required", mock_out.getvalue())
+
+    def test_repl_customs_status_and_jettison(self):
+        from voidfarer.cli import cmd_repl
+        engine = self._customs_engine()
+        storage, _ = self._saved(engine)
+        with patch("builtins.input", side_effect=["customs status", "customs jettison", "exit"]):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+                self.assertEqual(cmd_repl(engine, storage), 0)
+        self.assertIn("CUSTOMS INTERDICTION", mock_out.getvalue())
+        self.assertIsNone(engine.state.active_customs)
+
+
 class TestCLIReplRelicsFuse(_IsolatedCliTestCase):
     def test_repl_relics_fuse(self):
         from dataclasses import replace

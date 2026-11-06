@@ -83,6 +83,23 @@ BOLD = "\033[1m"
 DIM = "\033[2m"
 RESET = "\033[0m"
 
+# Terminal verbs that stay usable while a decision, pirate toll, or customs
+# interdiction blocks everything else. Mirrors the server 409 allowlists
+# (server.py _do_post gates) in terminal vocabulary: saves covers the whole
+# save family (save/load/delete plus new-game/reset equivalents), settings
+# only manages decision cadence (like /api/settings/decisions).
+_ALWAYS_ALLOWED = frozenset({"decision", "status", "saves", "serve", "time", "settings"})
+_PIRATE_ALLOWED = _ALWAYS_ALLOWED | {"pirate"}
+_CUSTOMS_ALLOWED = _ALWAYS_ALLOWED | {"customs", "pirate"}
+# REPL aliases for the same sets (REPL verbs differ from shell commands).
+_REPL_ALWAYS_ALLOWED = frozenset({
+    "decision", "decide", "status", "saves", "save", "load",
+    "serve", "time", "settings", "options",
+    "help", "?", "exit", "quit", "q",
+})
+_REPL_PIRATE_ALLOWED = _REPL_ALWAYS_ALLOWED | {"pirate", "corsair"}
+_REPL_CUSTOMS_ALLOWED = _REPL_ALWAYS_ALLOWED | {"customs", "pirate", "corsair"}
+
 BANNER = f"""{CYAN}{BOLD}
 __      __ _____  _____  _____   ______        _____   ______  _____  
 \\ \\    / // ___ \\|_   _||  __ \\ |  ____/\\     |  __ \\ |  ____||  __ \\ 
@@ -2547,18 +2564,22 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
 
         pending = engine.state.pending_decision
         pirate = engine.state.active_pirate
-        allowed_while_blocked = {
-            "decision", "decide", "pirate", "corsair", "status", "save",
-            "serve", "time", "help", "?", "exit", "quit", "q",
-        }
-        if (pending is not None or pirate is not None) and cmd not in allowed_while_blocked:
-            if pending is not None:
-                print(f"{RED}Decision required:{RESET} {pending.title}. Use `decision` first.")
-            else:
-                print(
-                    f"{RED}Pirate intercept unresolved:{RESET} {pirate.band_name} demands "
-                    f"{pirate.toll_credits} cr. Use `pirate pay`, `pirate fight`, or `pirate evade`."
-                )
+        customs_block = engine.state.active_customs
+        if pending is not None and cmd not in _REPL_ALWAYS_ALLOWED:
+            print(f"{RED}Decision required:{RESET} {pending.title}. Use `decision` first.")
+            continue
+        if pirate is not None and cmd not in _REPL_PIRATE_ALLOWED:
+            print(
+                f"{RED}Pirate intercept unresolved:{RESET} {pirate.band_name} demands "
+                f"{pirate.toll_credits} cr. Use `pirate pay`, `pirate fight`, or `pirate evade`."
+            )
+            continue
+        if customs_block is not None and cmd not in _REPL_CUSTOMS_ALLOWED:
+            print(
+                f"{RED}Customs interdiction unresolved:{RESET} {customs_block.patrol_vessel} locked "
+                "scanners on your hold. Use `customs bribe`, `customs jettison`, "
+                "`customs confiscate`, or `customs flee`."
+            )
             continue
 
         if cmd in ("exit", "quit", "q"):
@@ -2578,6 +2599,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_away(engine, storage, parts)
         elif cmd in ("pirate", "corsair"):
             cmd_pirate(engine, storage, parts)
+        elif cmd in ("customs", "patrol"):
+            cmd_customs(engine, storage, parts)
         elif cmd in ("decision", "decide"):
             cmd_decision(engine, storage, parts)
         elif cmd in ("quantum", "freight"):
@@ -3195,15 +3218,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     engine, storage = _get_engine(custom_dir)
 
     pending = engine.state.pending_decision
-    if pending is not None and args.command not in ("decision", "status", "save", "serve", "time", "quit"):
+    if pending is not None and args.command not in _ALWAYS_ALLOWED:
         print(f"{RED}Decision required:{RESET} {pending.title}. Run `decision` and choose an option first.")
         return 1
 
     pirate = engine.state.active_pirate
-    if pirate is not None and args.command not in ("pirate", "decision", "status", "save", "serve", "time", "quit"):
+    if pirate is not None and args.command not in _PIRATE_ALLOWED:
         print(
             f"{RED}Pirate intercept unresolved:{RESET} {pirate.band_name} demands {pirate.toll_credits} cr. "
             "Run `pirate pay`, `pirate fight`, or `pirate evade` first."
+        )
+        return 1
+
+    customs = engine.state.active_customs
+    if customs is not None and args.command not in _CUSTOMS_ALLOWED:
+        print(
+            f"{RED}Customs interdiction unresolved:{RESET} {customs.patrol_vessel} locked scanners on your hold. "
+            "Run `customs bribe`, `customs jettison`, `customs confiscate`, or `customs flee` first."
         )
         return 1
 

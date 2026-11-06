@@ -1,54 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-wave5-shipmodule",
+    "task_id": "voidfarer-wave6-blockguards",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793992527.5253696,
+    "updated_at": 1793998363.434184,
     "owner": "unidentified",
     "started_by": "unidentified",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-left-tabs-certify",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-left-tabs-certify' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793575983.959685,
-      "timestamp_str": "2026-11-02 02:33:03",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-repair-amount-guard",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: reject non-positive escort repair amounts instead of charging for nothing",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793631087.3584476,
-      "timestamp_str": "2026-11-02 17:51:27",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "repair_escorts(-60) returns success and charges the 50cr floor while restoring 0 integrity; fuzzing hostile inputs found it",
-        "benefits": "No-op paid actions are refused like every other validated action; matches min-amount conventions",
-        "risks": "contract: non-positive amounts now return False with a message; dependency: none; concurrency: single-threaded; state: no change on rejection",
-        "mitigation": "Failing-first test, full suite plus captain gate"
-      }
-    },
-    {
-      "task_id": "voidfarer-repair-amount-guard",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: non-positive escort repairs refused with no charge, matches hull/refuel convention; 1164 tests pass; captain 0 gaps; ADR-159; all gates pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793631237.6289144,
-      "timestamp_str": "2026-11-02 17:53:57",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "voidfarer-repair-amount-guard",
       "phase": "completed",
@@ -264,6 +226,45 @@
       "status": "in_progress",
       "timestamp": 1793992527.5253696,
       "timestamp_str": "2026-11-06 22:15:27",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave6-blockguards",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: unify CLI block guards with server, wire REPL customs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793998126.0562508,
+      "timestamp_str": "2026-11-06 23:48:46",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "terminal acts during customs interdiction while HUD 409s; saves blocked though allowed; REPL cannot resolve customs",
+        "benefits": "terminal-HUD 409 parity, no silent state mutation under block",
+        "risks": "contract: cli dispatch only, engine/server untouched; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "shared allowlist constant, 3 guard hunks plus REPL customs branch, block-matrix tests, full check"
+      },
+      "plan_digest": "b2090e32766a994cab6ee891e53321a6cf3754091ce9b2852ec164c17134528c"
+    },
+    {
+      "task_id": "voidfarer-wave5-shipmodule",
+      "phase": "superseded",
+      "phase_num": 4,
+      "description": "Superseded by 'voidfarer-wave6-blockguards' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1793998126.0562508,
+      "timestamp_str": "2026-11-06 23:48:46",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave6-blockguards",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verify: block guards unified, 3 tests fail-3/3-baseline pass-fixed, inventory 1145, check 5/5. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793998363.434184,
+      "timestamp_str": "2026-11-06 23:52:43",
       "agent": "unidentified"
     }
   ]
