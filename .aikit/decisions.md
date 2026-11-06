@@ -1957,3 +1957,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Swarm A9 verified true by direct repro: save-family catalog entries carried no `fields` (slot validated out-of-line in `_resolve_slot`), so AI clients POST `{}` and never discover `slot`; `CONTEXT_ACTIONS["/api/step"]` claimed "alias of /api/time/step" while the server runs different methods and fields (`step_orbits`/`delta_time` vs `step_time`/`ticks`).
 - **Decision**: `agent_api.py:60` injects `slot` first for the save family (`/api/save`, `/api/load`, `/api/delete-save`, `/api/new-game`); `agent_play.py:20` rewords step as orbit-only micro-step pointing at `/api/time/step` for full ticks. New `test_save_family_catalog_includes_slot`, `test_step_is_documented_as_orbit_only`.
 - **Consequences**: Catalog now discovers `slot`; step lie removed (CONTEXT membership unchanged, coverage gate intact); `ui_inventory.py` 1145 lines; `aikit check` 5/5 after map refresh; no save-schema change; no UI-ticket files touched.
+
+### ADR-177: Wave 5 CLI — refit module parity for ship/module API
+- **Date**: 2026-11-06
+- **Status**: Accepted
+- **Context**: Swarm A9 verified true: `/api/ship/module` (install/remove by module id with expected-id guard) had no terminal path — `refit install/remove` work by mod id/slot but cannot remove by module id with the mismatch guard. Dropped A4 boss-roll claim on re-verify: `enemies.py:229-231` intentionally consumes the roll for seeded-sequence stability (comment says so).
+- **Decision**: `cmd_refit` gains a `module <install|remove> <module_id>` branch mirroring server semantics (`cli.py:1859`); `refit` parser gains `module` choice plus `extra` id passthrough (`cli.py:3153-3162`). New `TestCLIRefitModuleParity` (usage, bad action, unknown id, install/remove round trip).
+- **Consequences**: Terminal reaches every ship-module path; `ui_inventory.py` 1145 lines; `aikit check` 5/5 after map refresh; no save-schema change; no UI-ticket files touched.

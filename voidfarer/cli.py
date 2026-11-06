@@ -1856,7 +1856,28 @@ def cmd_refit(engine: SimulationEngine, storage: StorageManager, parts: list[str
         print(f"Effects: {CYAN}{_describe_ship_mod_effects(mod.effects)}{RESET}")
         return 0
 
-    print(f"{RED}Unknown refit command '{sub}'. Options: list, install, remove, info.{RESET}")
+    if sub in ("module", "shipmodule"):
+        if len(parts) < 4:
+            print(f"{RED}Usage:{RESET} refit module <install|remove> <module_id>")
+            return 1
+        mod_action = parts[2].lower()
+        if mod_action == "install":
+            ok, msg = engine.install_ship_mod(parts[3])
+        elif mod_action in ("uninstall", "remove"):
+            mod = get_ship_mod(parts[3])
+            if mod is None:
+                ok, msg = False, f"Unknown ship module '{parts[3]}'."
+            else:
+                ok, msg = engine.remove_ship_mod(mod.slot, expected_mod_id=mod.id)
+        else:
+            print(f"{RED}Unknown module action '{parts[2]}'. Options: install, remove.{RESET}")
+            return 1
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+
+    print(f"{RED}Unknown refit command '{sub}'. Options: list, install, remove, info, module.{RESET}")
     return 1
 
 
@@ -3151,8 +3172,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     map_p.add_argument("action", nargs="?", default="list", choices=["list", "mods"])
 
     refit_p = subparsers.add_parser("refit", help="Ship modification section: structural refits")
-    refit_p.add_argument("action", nargs="?", default="list", choices=["list", "install", "remove", "info"])
-    refit_p.add_argument("target", nargs="?", help="Modification ID or slot")
+    refit_p.add_argument("action", nargs="?", default="list", choices=["list", "install", "remove", "info", "module"])
+    refit_p.add_argument("target", nargs="?", help="Modification ID or slot (module action for 'module')")
+    refit_p.add_argument("extra", nargs="?", help="Module ID for 'refit module <install|remove>'")
 
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help="Captain's log: career statistics, milestones, and flight record")
@@ -3259,6 +3281,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         parts = ["refit", args.action]
         if args.target:
             parts.append(args.target)
+        if getattr(args, "extra", None):
+            parts.append(args.extra)
         return cmd_refit(engine, storage, parts)
     elif args.command == "log":
         return cmd_log(engine)

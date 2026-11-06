@@ -577,6 +577,40 @@ class TestCLIAiHailParity(_IsolatedCliTestCase):
         self.assertEqual(seen["quantity"], 1)
 
 
+class TestCLIRefitModuleParity(_IsolatedCliTestCase):
+    def test_module_needs_action_and_id(self):
+        from voidfarer.cli import cmd_refit
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(self._tmp.name)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            rc = cmd_refit(engine, storage, ["refit", "module"])
+        self.assertEqual(rc, 1)
+        self.assertIn("Usage", mock_out.getvalue())
+
+    def test_module_rejects_bad_action_and_unknown_id(self):
+        from voidfarer.cli import cmd_refit
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(self._tmp.name)
+        with patch("sys.stdout", new_callable=io.StringIO):
+            rc = cmd_refit(engine, storage, ["refit", "module", "vent", "reinforced_spine"])
+        self.assertEqual(rc, 1)
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            rc = cmd_refit(engine, storage, ["refit", "module", "remove", "no_such_mod"])
+        self.assertEqual(rc, 1)
+        self.assertIn("Unknown ship module", mock_out.getvalue())
+
+    def test_module_install_remove_round_trip(self):
+        from voidfarer.cli import cmd_refit
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(self._tmp.name)
+        with patch("sys.stdout", new_callable=io.StringIO):
+            rc = cmd_refit(engine, storage, ["refit", "module", "install", "reinforced_spine"])
+        self.assertEqual(rc, 0)
+        with patch("sys.stdout", new_callable=io.StringIO):
+            rc = cmd_refit(engine, storage, ["refit", "module", "remove", "reinforced_spine"])
+        self.assertEqual(rc, 0)
+
+
 class TestCLIReplRelicsFuse(_IsolatedCliTestCase):
     def test_repl_relics_fuse(self):
         from dataclasses import replace

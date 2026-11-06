@@ -1,54 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-wave4-agent-catalog",
+    "task_id": "voidfarer-wave5-shipmodule",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793992259.2641895,
+    "updated_at": 1793992527.5253696,
     "owner": "unidentified",
     "started_by": "unidentified",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-player-origin-lore",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-player-origin-lore' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793575764.6649857,
-      "timestamp_str": "2026-11-02 02:29:24",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-left-tabs-certify",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: full 16-tab audit sweep at 720p and desktop to certify final state",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793575787.2966921,
-      "timestamp_str": "2026-11-02 02:29:47",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "Eleven left-tab changes landed across many audits; a single fresh sweep proves no regressions and certifies the complete surface",
-        "benefits": "One clean report across every tab and both viewports",
-        "risks": "contract: read-only audits; dependency: none; concurrency: none; state: none",
-        "mitigation": "Playwright scenario audits, no file changes"
-      }
-    },
-    {
-      "task_id": "voidfarer-left-tabs-certify",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Certify: all 16 left tabs 0 errors at 720p, click-map 162 clean, 1163 tests pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793575962.8929014,
-      "timestamp_str": "2026-11-02 02:32:42",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "voidfarer-left-tabs-certify",
       "phase": "completed",
@@ -263,6 +225,45 @@
       "status": "in_progress",
       "timestamp": 1793992259.2641895,
       "timestamp_str": "2026-11-06 22:10:59",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave5-shipmodule",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: refit module parity for ship/module API",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793992354.6636841,
+      "timestamp_str": "2026-11-06 22:12:34",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "REST-only endpoint unreachable from terminal",
+        "benefits": "full POST-CLI parity, guarded remove-by-id",
+        "risks": "contract: cli refit extension only, engine/server untouched; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "mirror server install/remove-by-id semantics, new refit module tests, full check"
+      },
+      "plan_digest": "605bdee69e07bb132f0cda6d021062046166e601115c6442a7c4a19a6e943056"
+    },
+    {
+      "task_id": "voidfarer-wave4-agent-catalog",
+      "phase": "superseded",
+      "phase_num": 4,
+      "description": "Superseded by 'voidfarer-wave5-shipmodule' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1793992354.6636841,
+      "timestamp_str": "2026-11-06 22:12:34",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave5-shipmodule",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verify: refit module parity landed, 3 tests OK, inventory 1145, check 5/5. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793992527.5253696,
+      "timestamp_str": "2026-11-06 22:15:27",
       "agent": "unidentified"
     }
   ]
