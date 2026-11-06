@@ -1,54 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-wave-audit-0-30",
+    "task_id": "voidfarer-wave2-ui-readout",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793724801.5333161,
-    "owner": "kilo:1",
-    "started_by": "kilo:1",
+    "updated_at": 1793991587.085098,
+    "owner": "unidentified",
+    "started_by": "unidentified",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-skills-talent-badge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-skills-talent-badge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793575253.752791,
-      "timestamp_str": "2026-11-02 02:20:53",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-commerce-margin-badge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan: attention badge on COMMERCE for held goods selling above average cost",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793575266.365907,
-      "timestamp_str": "2026-11-02 02:21:06",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "Profitable sales hide in the quote table; the margin chips already compute the signal per row but nothing surfaces it at tab level",
-        "benefits": "Sell winners at a glance; mirrors the row chip rule exactly; clears as holdings sell",
-        "risks": "contract: static surface only, reads quotes plus cargo averages; dependency: none new; concurrency: none; state: no schema change",
-        "mitigation": "Bounded to two static files, node check, click-map, 720p market audit"
-      }
-    },
-    {
-      "task_id": "voidfarer-commerce-margin-badge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/3] Verify: badge counts profitable holdings per the margin-chip rule, click-map 162 clean, market audit clean, 1163 tests pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793575369.5997143,
-      "timestamp_str": "2026-11-02 02:22:49",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "voidfarer-commerce-margin-badge",
       "phase": "completed",
@@ -260,6 +222,46 @@
       "timestamp": 1793724801.5333161,
       "timestamp_str": "2026-11-03 19:53:21",
       "agent": "kilo:1"
+    },
+    {
+      "task_id": "voidfarer-wave2-ui-readout",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: viewport readout shows HUD scale",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793991325.7522166,
+      "timestamp_str": "2026-11-06 21:55:25",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "85pct vs 120pct indistinguishable in screenshots",
+        "benefits": "debuggable density, DPR reviews",
+        "risks": "contract: static surface only, reads existing uiScale; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "bounded to app.js one line, ui_inventory diff, 720p audit, click-map"
+      },
+      "plan_digest": "24c6c658c0ab429c18fd8dd40d05b5fb9f42be58b901b963aedf257f123ad831"
+    },
+    {
+      "task_id": "voidfarer-wave-audit-0-30",
+      "phase": "superseded",
+      "phase_num": 4,
+      "description": "Superseded by 'voidfarer-wave2-ui-readout' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1793991325.7522166,
+      "timestamp_str": "2026-11-06 21:55:25",
+      "agent": "unidentified",
+      "continued_from": "kilo:1"
+    },
+    {
+      "task_id": "voidfarer-wave2-ui-readout",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verify: readout SCALE landed, ui verify passed, click-map 162 clean, settings 0 errors, check 5/5. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793991587.085098,
+      "timestamp_str": "2026-11-06 21:59:47",
+      "agent": "unidentified"
     }
   ]
 }

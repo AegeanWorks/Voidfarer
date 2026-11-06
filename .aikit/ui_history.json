@@ -507,5 +507,19 @@
     "final_snapshot_digest": "08b84fd66c0e24ce578c7c77f57d423cb3152f384c45305a904b7e4144f3dd97",
     "final_snapshot_entries": 1144,
     "surface_digest": "3f842f8642bc56974843b8925afd7c5ef977b76b7224d2b19b30dd246c429527"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "3dc061efb548e697581ece9e72a5ee5c9ee86919",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1793991297.9019606,
+    "finished_at": 1793991572.9253995,
+    "strikes": 0,
+    "reviewer": "kilo:agent-clickmap-162-0-errors-settings-0-errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "10ea6c5424129a82d64df391cbf5f70200e11122cd46f15e4045371442774f1c",
+    "final_snapshot_entries": 1145,
+    "surface_digest": "e779abc3ca26273c46025d4015a809c1ce87be4299ac6be77e415a35fb6baa31"
   }
 ]

@@ -1574,7 +1574,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         document.documentElement.style.setProperty("--ui-scale", String(scalePercent / 100));
         const readout = document.getElementById("viewportReadout");
         if (readout) {
-            readout.textContent = `${width}x${height} @${(window.devicePixelRatio || 1).toFixed(1)}x // ${density.toUpperCase()}`;
+            readout.textContent = `${width}x${height} @${(window.devicePixelRatio || 1).toFixed(1)}x // ${density.toUpperCase()} // SCALE ${scalePercent}%`;
         }
         this.resizeRadarCanvas();
     }

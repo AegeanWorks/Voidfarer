@@ -1936,3 +1936,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   3. `codex.py:536-551` add `relic_sets`, `escort_captains`, `outposts_specialized`, `outposts_repaired`, `research_pacts`, `trade_pacts`, `quantum_auto_orders` to `STATS_ORDER`.
   4. `cli.py:2605-2611` REPL fuse saves then `continue`, case-insensitive `fuse`.
 - **Consequences**: 4 failing-first reproductions now pass; new `Tier2TalentTest`, `test_precursor_kill_reduces_precursor_standing`, `test_codex_stats_cover_all_labeled_metrics`, `test_repl_relics_fuse_does_not_exit`; no save-schema change; no UI-ticket files touched.
+
+### ADR-174: Wave 2 UI — viewport readout shows HUD scale
+- **Date**: 2026-11-06
+- **Status**: Accepted
+- **Context**: Swarm A1 verified true (B-14): `applyViewportProfile()` computed `scalePercent` but the `#viewportReadout` text omitted it, so 85% vs 120% HUD states were indistinguishable in screenshots and reviews.
+- **Decision**: `static/app.js:1577` append `// SCALE ${scalePercent}%` to the readout text. Bounded UI ticket on `cockpit` (1 file, 1 line); `ui verify` passed; click-map 162 clicks 0 missing/dup/errors; settings scenario 0 errors/hscroll/tiny; before/after `desktop-settings.png` pair captured (`ui-review/readout-before`, `ui-review/readout-after`, ignored).
+- **Consequences**: Readout now quotes e.g. `1280x720 @1.0x // COMPACT // SCALE 100%`; `ui_inventory.py` still 1145 lines (no control added/removed); `aikit check` 5/5; no save-schema change.
