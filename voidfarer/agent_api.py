@@ -54,12 +54,17 @@ def build_action_catalog(handler_cls: type) -> dict[str, Any]:
         source = inspect.getsource(handler_cls)
     except (OSError, TypeError):
         return {"ok": False, "actions": [], "observations": []}
+    # These handlers validate the save slot out-of-line via _resolve_slot, so
+    # the block scanner cannot see the field. Attribute it explicitly.
+    SLOT_FAMILY = {"/api/save", "/api/load", "/api/delete-save", "/api/new-game"}
     catalog: list[dict[str, Any]] = []
     observations: list[dict[str, Any]] = []
     for method, section in _sections(source).items():
         for path, block in _route_blocks(section):
             entry = {"method": method, "path": path}
             fields = _fields(block) if method == "POST" else []
+            if method == "POST" and path in SLOT_FAMILY and "slot" not in fields:
+                fields = ["slot"] + fields
             if fields:
                 entry["fields"] = fields
             if method == "GET":

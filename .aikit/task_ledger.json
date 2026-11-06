@@ -1,54 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-wave3-cli-guards",
+    "task_id": "voidfarer-wave4-agent-catalog",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793992054.9368796,
+    "updated_at": 1793992259.2641895,
     "owner": "unidentified",
     "started_by": "unidentified",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-ai-recruit-badge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-ai-recruit-badge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793575504.6269937,
-      "timestamp_str": "2026-11-02 02:25:04",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-player-origin-lore",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan: surface commander origin lore in the PLAYER dossier",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793575526.4597995,
-      "timestamp_str": "2026-11-02 02:25:26",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "Background lore written for the catalog never reaches the dossier; the meta row shows only the origin name",
-        "benefits": "Origin backstory visible where identity lives; tooltip plus lore line from the snapshot catalog",
-        "risks": "contract: static surface only, reads existing background catalog; dependency: none new; concurrency: none; state: no schema change",
-        "mitigation": "Node check, click-map, 720p player audit, fast gate"
-      }
-    },
-    {
-      "task_id": "voidfarer-player-origin-lore",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[3/3] Verify: dossier shows origin backstory and training with tooltip, template regression caught by node check and fixed, click-map 162 clean, player audit clean, 1163 tests pass. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793575744.5210469,
-      "timestamp_str": "2026-11-02 02:29:04",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "voidfarer-player-origin-lore",
       "phase": "completed",
@@ -262,6 +224,45 @@
       "status": "in_progress",
       "timestamp": 1793992054.9368796,
       "timestamp_str": "2026-11-06 22:07:34",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave4-agent-catalog",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: catalog slot fields plus step doc fix",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793992106.0824804,
+      "timestamp_str": "2026-11-06 22:08:26",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "AI clients cannot discover slot; step alias lie misroutes ticks",
+        "benefits": "correct headless/REST field discovery",
+        "risks": "contract: catalog additive (slot) plus one doc string; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "save-family slot injection, one-line CONTEXT fix, catalog tests, full check"
+      },
+      "plan_digest": "38507bb341aee32647911c2599277877e1efd4607eec5586004c87dc1a2a22d8"
+    },
+    {
+      "task_id": "voidfarer-wave3-cli-guards",
+      "phase": "superseded",
+      "phase_num": 4,
+      "description": "Superseded by 'voidfarer-wave4-agent-catalog' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1793992106.0824804,
+      "timestamp_str": "2026-11-06 22:08:26",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave4-agent-catalog",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verify: slot injection plus step doc fix, catalog tests OK, inventory 1145, check 5/5. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1793992259.2641895,
+      "timestamp_str": "2026-11-06 22:10:59",
       "agent": "unidentified"
     }
   ]

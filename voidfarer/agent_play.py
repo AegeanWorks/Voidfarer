@@ -17,7 +17,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/new-game": "lifecycle: starts a fresh campaign",
     "/api/reset": "lifecycle: wipes the campaign",
     "/api/save": "lifecycle: persistence, not a game mechanic",
-    "/api/step": "alias of /api/time/step",
+    "/api/step": "orbit-only micro-step (delta_time); use /api/time/step for full ticks",
     "/api/tutorial/reset": "meta: replays onboarding",
     "/api/tutorial/skip": "meta: skips onboarding",
     "/api/messages/choose": "needs an interactive message-tree node",

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `126`
 - **Total Classes**: `336`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1938`
-- **Total Source Lines**: `49600`
+- **Total Class Methods**: `1940`
+- **Total Source Lines**: `49618`
 
 ---
 
@@ -62,13 +62,15 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `122` lines (`5606` bytes)
+**Size**: `135` lines (`6354` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
   - Method `.setUpClass()`
   - Method `.test_catalog_describes_every_post_route()`
   - Method `.test_catalog_fields_match_the_endpoint_contract()`
+  - Method `.test_save_family_catalog_includes_slot()`
+  - Method `.test_step_is_documented_as_orbit_only()`
   - Method `.test_observations_include_state()`
 - `class AgentPlayTest`
   - Method `.setUpClass()`
@@ -2588,7 +2590,7 @@
 ### [`voidfarer/agent_api.py`](voidfarer/agent_api.py)
 > *Discoverable action catalog so an AI can play every mechanic through the public API.*
 
-**Size**: `80` lines (`2761` bytes)
+**Size**: `85` lines (`3117` bytes)
 
 **Functions:**
 - `def _sections(source)` - *Split the handler source into the GET and POST halves.*
@@ -2601,7 +2603,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `789` lines (`34705` bytes)
+**Size**: `789` lines (`34751` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

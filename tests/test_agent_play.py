@@ -40,6 +40,19 @@ class AgentApiCatalogTest(unittest.TestCase):
         self.assertIn("action", by_path["/api/customs/resolve"].get("fields", []))
         self.assertIn("rarity", by_path["/api/relics/fuse"].get("fields", []))
 
+    def test_save_family_catalog_includes_slot(self):
+        by_path = {entry["path"]: entry for entry in self.catalog["actions"]}
+        for path in ("/api/save", "/api/load", "/api/delete-save", "/api/new-game"):
+            self.assertIn("slot", by_path[path].get("fields", []), path)
+
+    def test_step_is_documented_as_orbit_only(self):
+        from voidfarer.agent_play import CONTEXT_ACTIONS
+        self.assertIn("/api/step", CONTEXT_ACTIONS)
+        self.assertNotIn("alias", CONTEXT_ACTIONS["/api/step"])
+        by_path = {entry["path"]: entry for entry in self.catalog["actions"]}
+        self.assertIn("delta_time", by_path["/api/step"].get("fields", []))
+        self.assertIn("ticks", by_path["/api/time/step"].get("fields", []))
+
     def test_observations_include_state(self):
         paths = {entry["path"] for entry in self.catalog["observations"]}
         self.assertIn("/api/state", paths)

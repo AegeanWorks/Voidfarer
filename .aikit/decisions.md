@@ -1950,3 +1950,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Swarm A9 verified true by code read + direct repro: (1) `main` diplomacy forwarder appended `str(amount)` unconditionally, so `diplomacy improve` (no faction) reached engine as faction `'0'` ("Unknown faction '0'") instead of usage; (2) `cmd_depot` used `isdigit else 1` and `cmd_fleet repair_escorts` used `isdigit else 60`, silently coercing `abc`/`-5`.
 - **Decision**: Forwarder appends amount only when `faction_id` present (`cli.py:3226-3231`); depot and fleet-repair use the inventory `try int / except ValueError -> Error + 1` pattern (`cli.py:863`, `cli.py:708`). New `test_diplomacy_without_faction_shows_usage`, `test_depot_non_integer_quantity_rejected`, `test_fleet_repair_non_integer_amount_rejected`.
 - **Consequences**: 3 failing-first reproductions now pass; `ui_inventory.py` 1145 lines; `aikit check` 5/5 after map refresh; no save-schema change; no UI-ticket files touched.
+
+### ADR-176: Wave 4 agent catalog — slot fields plus step doc fix
+- **Date**: 2026-11-06
+- **Status**: Accepted
+- **Context**: Swarm A9 verified true by direct repro: save-family catalog entries carried no `fields` (slot validated out-of-line in `_resolve_slot`), so AI clients POST `{}` and never discover `slot`; `CONTEXT_ACTIONS["/api/step"]` claimed "alias of /api/time/step" while the server runs different methods and fields (`step_orbits`/`delta_time` vs `step_time`/`ticks`).
+- **Decision**: `agent_api.py:60` injects `slot` first for the save family (`/api/save`, `/api/load`, `/api/delete-save`, `/api/new-game`); `agent_play.py:20` rewords step as orbit-only micro-step pointing at `/api/time/step` for full ticks. New `test_save_family_catalog_includes_slot`, `test_step_is_documented_as_orbit_only`.
+- **Consequences**: Catalog now discovers `slot`; step lie removed (CONTEXT membership unchanged, coverage gate intact); `ui_inventory.py` 1145 lines; `aikit check` 5/5 after map refresh; no save-schema change; no UI-ticket files touched.
