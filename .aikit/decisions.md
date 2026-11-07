@@ -2061,3 +2061,12 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. The top-bar handler writes `saveSettings()`, syncs the settings checkbox, and the load path fixes the icon/opacity; `applySettingsProfile` and `applySettingsFromUI` use `setEnabled`.
   3. Add `TestAudioMuteControl` to `tests/test_cockpit_layout.py` pinning the setter, the saved toggle, and the gain-selection expression.
 - **Consequences**: Browser play: mute gives `masterGain=0` and `storedSound=false`; reload keeps `enabled=false`, icon `MUTED`; unmute restores `masterGain≈0.8` and `storedSound=true`. 25 frames/408ms, zero console/page/HTTP errors. Frozen-state captures `cycle07-before/02-after-reload.png` (`◉ SOUND FX`) and `cycle07-after/02-after-reload.png` (`MUTED SOUND FX`) show the persisted state; the vision reviewer quoted both and found no layout break. Full suite `Ran 1257 OK`; UI task finished on cockpit. Host load caused a transient 5-error socket-timeout suite run and a 205s fast proof; an immediate rerun was green and no code changed.
+
+### ADR-188: Cycle 8 re-sweep — pilot promotions fire the unused level-up cue
+- **Date**: 2026-11-07
+- **Status**: Accepted
+- **Context**: `SoundController.playLevelUp()` existed but had no call site. A scan that pushed Pilot Mastery from 490/500 XP to level 2 rendered `★ PILOT PROMOTION` and `★ LVL 2` in silence; the instrumented browser play counted zero level-up calls before the fix.
+- **Decision**:
+  1. `renderHUD` records `_lastMasteryLevel` on its first render and invokes `this.sound.playLevelUp()` only when the level rises, so loading a save never fires a false cue.
+  2. Add `TestAudioLevelUpCue` to `tests/test_cockpit_layout.py` pinning the tracker, comparison and cue call.
+- **Consequences**: The same real browser play (seed 42, Sol B scan at 490 XP) now reports `level=2`, `levelUpSounds=1`, `★ LVL 2`, `40/750 XP · +1P`; 25 frames/402ms, zero console/page/HTTP errors. Screenshot `cycle08-after/02-after-promotion.png` shows the promoted HUD; the vision reviewer found no layout break (the promotion log itself is scrolled out of the short flight-log viewport, which is pre-existing). Full suite `Ran 1258 OK`; UI task finished on cockpit; no save-schema change.

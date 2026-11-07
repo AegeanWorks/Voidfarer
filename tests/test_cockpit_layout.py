@@ -1446,6 +1446,19 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestAudioLevelUpCue(unittest.TestCase):
+    """A Pilot Mastery promotion must invoke the synthesized level-up cue once."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_promotion_calls_the_level_up_cue(self):
+        self.assertIn("this._lastMasteryLevel", self.js)
+        self.assertIn("this.sound.playLevelUp()", self.js)
+        self.assertIn("masteryLevel > this._lastMasteryLevel", self.js)
+
+
 class TestAudioMuteControl(unittest.TestCase):
     """The top-bar mute must persist and silence the master gain immediately."""
 

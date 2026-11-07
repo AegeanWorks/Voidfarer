@@ -535,6 +535,7 @@ class CockpitApp {
         this.combatFlash = null;
         this.lastShipPosition = null;
         this.state = null;
+        this._lastMasteryLevel = null;
         this.galaxySystems = {};
         this.viewMode = "ORBITS"; // "ORBITS" or "GALAXY"
         this.activeRightTab = null; // null when collapsed, or "market", "arsenal", etc.
@@ -1830,6 +1831,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const ship = this.state.ship;
         const curSys = this.state.current_system;
         const orbBody = this.state.orbiting_body;
+
+        // A promotion is a competence milestone; the first render only records
+        // the loaded level so a save does not fire a false cue.
+        const masteryLevel = Number((ship.mastery || {}).level || 1);
+        if (this._lastMasteryLevel !== null && masteryLevel > this._lastMasteryLevel) {
+            this.sound.playLevelUp();
+        }
+        this._lastMasteryLevel = masteryLevel;
 
         // Vitals
         const hullPct = Math.round((ship.hull / ship.max_hull) * 100);

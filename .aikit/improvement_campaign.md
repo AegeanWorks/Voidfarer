@@ -15,8 +15,10 @@ does not repeat one.
 | 5 | Levels (gas/lava landings + full surface catalog) | fixed, proven |
 | 6 | Graphics and effects (NPC radar label collision) | fixed, proven |
 | 7 | Audio cues (SOUND FX mute persistence + master gain) | fixed, proven |
+| 8 | Audio cues re-sweep (pilot level-up cue) | fixed, proven |
 
-Queue after Cycle 7: re-sweep all areas for new verified findings.
+Queue after Cycle 8: re-sweep all areas for new verified findings. Candidate: PLAYER card
+level/XP vs HUD Mastery level consistency (needs confirmation of intended semantics).
 
 ---
 
@@ -374,6 +376,44 @@ python -m unittest tests.test_cockpit_layout.TestAudioMuteControl             # 
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
 python -m unittest discover                                                    # Ran 1257 OK
+python aikit.py check voidfarer                                                # 5/5
+```
+
+---
+
+## Cycle 8 — Audio re-sweep: pilot promotions fire the unused level-up cue
+
+**Find.** `SoundController.playLevelUp()` had no call site. A scan from 490/500 XP to
+level 2 rendered `★ PILOT PROMOTION` and `★ LVL 2` in silence; instrumented browser play
+counted zero level-up calls.
+
+**Analyze.** The HUD updated `mastery.level` but nothing compared the old and new level.
+Killed: firing the cue on every render (it would repeat on refresh). Survivor: remember the
+last rendered level, cue only on an increase, and skip the first render so a loaded save
+does not fire.
+
+**Fix.** `app.js`: `_lastMasteryLevel` tracker in the constructor and a guarded
+`this.sound.playLevelUp()` in `renderHUD`. Test: `TestAudioLevelUpCue`.
+
+**Proof (real browser play, 1280x720, Sol B scan from 490 XP).**
+- Before: `cycle08-before/play-report.json` — level 1 -> 2, `levelUpSounds: 0`, no cue.
+- After: `cycle08-after/play-report.json` — level 1 -> 2, `levelUpSounds: 1`,
+  `★ LVL 2`, `40/750 XP · +1P`, 25 frames/402ms, zero errors.
+- Screenshot context: `ui-review/cycle08-after/02-after-promotion.png`; vision review found
+  no layout break.
+- This is an audio claim, so the played run and instrumented call count are the proof.
+
+**Gates.** `python -m unittest discover` -> `Ran 1258 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5. UI task verified/finished. No save-schema change.
+
+**Commands.**
+```text
+python ui-review/play_cycle8.py cycle08-before                               # levelUpSounds: 0
+python ui-review/play_cycle8.py cycle08-after                                # levelUpSounds: 1
+python -m unittest tests.test_cockpit_layout.TestAudioLevelUpCue              # OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
+python -m unittest discover                                                    # Ran 1258 OK
 python aikit.py check voidfarer                                                # 5/5
 ```
 
