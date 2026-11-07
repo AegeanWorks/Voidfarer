@@ -1963,6 +1963,8 @@ class ShipState:
     away_completed: tuple[str, ...] = ()
     trade_orders: tuple[TradeOrder, ...] = ()
     surface_used: tuple[str, ...] = ()
+    # Bodies that have already paid their one-time landing survey reward.
+    surveyed_bodies: tuple[str, ...] = ()
     # Credits paid for the units still in the hold, per commodity (trade P/L basis).
     cargo_cost: dict[str, int] = field(default_factory=dict)
     # Open-space anchor in the current system; zero when the ship orbits a body.
@@ -2027,6 +2029,7 @@ class ShipState:
             "away_completed": list(self.away_completed),
             "trade_orders": [order.to_dict() for order in self.trade_orders],
             "surface_used": list(self.surface_used),
+            "surveyed_bodies": list(self.surveyed_bodies),
             "waypoint_au": self.waypoint_au,
             "waypoint_angle": self.waypoint_angle,
         }
@@ -2115,6 +2118,7 @@ class ShipState:
             away_completed=tuple(str(key) for key in data.get("away_completed", ())),
             trade_orders=tuple(TradeOrder.from_dict(order) for order in data.get("trade_orders", ())),
             surface_used=tuple(str(key) for key in data.get("surface_used", ())),
+            surveyed_bodies=tuple(str(body) for body in data.get("surveyed_bodies", ())),
             waypoint_au=float(data.get("waypoint_au", 0.0)),
             waypoint_angle=float(data.get("waypoint_angle", 0.0)),
         )

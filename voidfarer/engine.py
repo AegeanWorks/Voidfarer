@@ -713,6 +713,7 @@ class SimulationEngine:
             away_completed=kwargs.get("away_completed", cur.away_completed),
             trade_orders=kwargs.get("trade_orders", cur.trade_orders),
             surface_used=kwargs.get("surface_used", cur.surface_used),
+            surveyed_bodies=kwargs.get("surveyed_bodies", cur.surveyed_bodies),
             cargo_cost=cargo_cost,
             waypoint_au=kwargs.get("waypoint_au", cur.waypoint_au),
             waypoint_angle=kwargs.get("waypoint_angle", cur.waypoint_angle),
@@ -8463,14 +8464,24 @@ class SimulationEngine:
                 return False, f"{body.name} is not rated for habitable landing operations."
             if self.state.ship.landed_body_id == body_id:
                 return False, f"Already landed on {body.name}."
-            reward = 150 + int(body.radius_km / 1000) * 5
+            first_survey = body_id not in self.state.ship.surveyed_bodies
+            reward = (150 + int(body.radius_km / 1000) * 5) if first_survey else 0
             stats = dict(self.state.stats)
             stats["landings"] = stats.get("landings", 0) + 1
             stats["credits_earned"] = stats.get("credits_earned", 0) + reward
-            log_entry = f"SURFACE LANDING: Touched down on {body.name}. Survey reward +{reward} cr."
+            log_entry = (
+                f"SURFACE LANDING: Touched down on {body.name}. Survey reward +{reward} cr."
+                if first_survey
+                else f"SURFACE LANDING: Touched down on {body.name}. Already surveyed; no new survey reward."
+            )
             new_ship = self._clone_ship(
                 credits=self.state.ship.credits + reward,
                 landed_body_id=body_id,
+                surveyed_bodies=(
+                    tuple(dict.fromkeys(self.state.ship.surveyed_bodies + (body_id,)))
+                    if first_survey
+                    else self.state.ship.surveyed_bodies
+                ),
                 flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [log_entry]),
             )
             self.state = self._clone_state(ship=new_ship, stats=stats)

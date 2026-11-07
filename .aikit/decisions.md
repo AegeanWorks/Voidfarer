@@ -2090,3 +2090,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. The engine load migration normalizes `landable=True` for any body whose type is in that set, after the population backfill so ownership/government are not rewritten.
   3. Test: a legacy gas body loads landable while preserving its stored faction and government.
 - **Consequences**: The same legacy save, same 1280x720 view, adds `LAND ON SURFACE` to the target card (5 -> 6 action buttons); landing pays +450 cr and the ringed giant offers `2 SITES`; Cloud Scoop succeeds for +3 fuel cells, 25 frames/407ms, zero errors. Before/after captures `cycle10-before/01-legacy-target-bottom.png` and `cycle10-after/01-legacy-target-bottom.png` were reviewed by the vision subagent, which quoted the added button and found no layout break. Full suite `Ran 1260 OK`; no schema change, old saves are normalized on load and written back on their next save.
+
+### ADR-191: Cycle 11 economy — the landing survey reward is paid once per body
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `land_on_body` paid `150 + radius_km/1000*5` on every landing. A headless probe on Sol F (ringed giant) produced +450 cr three times with no travel in between; a real browser leave-and-return run paid +450 again. This is a repeatable credit farm on every landable world.
+- **Decision**:
+  1. `ShipState` gains `surveyed_bodies: tuple[str, ...] = ()`, serialized in `to_dict`/`from_dict` and forwarded by `_clone_ship`; old payloads default empty.
+  2. `land_on_body` pays the survey reward only when the body id is not already surveyed, appends the id once, and logs `Already surveyed; no new survey reward.` on repeat landings. Surface operations still open on every landing.
+  3. Tests: repeat-landing reward is zero while the first landing pays; `GameState` round-trip preserves the set and an old payload defaults empty.
+- **Consequences**: Real Edge leave-and-return play: before +450 on the second landing (credits 2,897), after +0 (credits 2,447), with the log `Already surveyed; no new survey reward.` 25 frames/413ms, zero errors; the vision reviewer quoted both logs and credits and found no new clipping. Full suite `Ran 1261 OK`; additive save field with a backward-compatible default.

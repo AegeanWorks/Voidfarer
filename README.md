@@ -491,7 +491,7 @@ python -m voidfarer.cli quantum ship titanium 2 kepler
 python -m voidfarer.cli surface
 python -m voidfarer.cli contracts refresh
 ```
-32 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. Customs cutters scan contraband in high-security systems: bribe, jettison, submit or flee. 35 decisions block time; relaxed cadence rolls once per 36-tick window. Quantum freight ships cargo for a fee. Landed teams choose from 13 operations: survey, core-sample, explore ruins, salvage, rest, tap geothermal heat, bio-prospect, recover a crash site, drill ice, tap magma, harvest reefs, scoop gas clouds, or deep-mine; environment-specific operations are offered only on matching worlds. Gas, ringed and ice giants accept aerostat landings for cloud scoops; lava and volcanic worlds accept shielded magma taps; rover-only operations stay off gas giants, and uninhabited landable claims show no government. War captures displace civilians and leave scars.
+32 systems, 9 factions share the map. Pirate havens force tolls: pay, fight, evade. Customs cutters scan contraband in high-security systems: bribe, jettison, submit or flee. 35 decisions block time; relaxed cadence rolls once per 36-tick window. Quantum freight ships cargo for a fee. Landed teams choose from 13 operations: survey, core-sample, explore ruins, salvage, rest, tap geothermal heat, bio-prospect, recover a crash site, drill ice, tap magma, harvest reefs, scoop gas clouds, or deep-mine; environment-specific operations are offered only on matching worlds. Gas, ringed and ice giants accept aerostat landings for cloud scoops; lava and volcanic worlds accept shielded magma taps; rover-only operations stay off gas giants, and uninhabited landable claims show no government. The first landing on a body pays its survey reward once; returning to an already surveyed world still opens its operations but pays no second survey bonus. War captures displace civilians and leave scars.
 
 ### 18c. Post-War Reconstruction & Relief
 ```bash
@@ -565,7 +565,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,260-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,261-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

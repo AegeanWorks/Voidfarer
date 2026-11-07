@@ -434,6 +434,31 @@ class SurfaceOperationTest(unittest.TestCase):
         ids = {row["id"] for row in surface_report(ship, body)["operations"]}
         self.assertIn("magma_tap", ids)
 
+    def test_landing_survey_reward_is_paid_once_per_body(self):
+        engine = SimulationEngine(seed=42)
+        gas = next(
+            body for body in engine.current_system.bodies
+            if body.body_type in ("gas_giant", "ringed_giant", "ice_giant", "methane_storm")
+        )
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(orbiting_body_id=gas.id, landed_body_id=None, credits=2000)
+        )
+        ok, message = engine.land_on_body(gas.id)
+        self.assertTrue(ok, message)
+        first_reward = engine.state.ship.credits - 2000
+        self.assertGreater(first_reward, 0)
+        self.assertIn(gas.id, engine.state.ship.surveyed_bodies)
+        # Leaving and returning (the travel path clears landed_body_id) must not
+        # pay the same survey reward again.
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(orbiting_body_id=gas.id, landed_body_id=None)
+        )
+        credits_before = engine.state.ship.credits
+        ok, message = engine.land_on_body(gas.id)
+        self.assertTrue(ok, message)
+        self.assertEqual(engine.state.ship.credits, credits_before)
+        self.assertIn("Already surveyed", message)
+
     def test_legacy_gas_world_becomes_landable_without_changing_owner(self):
         engine = SimulationEngine(seed=42)
         system = engine.current_system

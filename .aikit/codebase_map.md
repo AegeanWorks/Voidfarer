@@ -9,8 +9,8 @@
 - **Total Python Modules**: `127`
 - **Total Classes**: `350`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1981`
-- **Total Source Lines**: `50325`
+- **Total Class Methods**: `1982`
+- **Total Source Lines**: `50371`
 
 ---
 
@@ -1238,7 +1238,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `648` lines (`32296` bytes)
+**Size**: `673` lines (`33505` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
@@ -1277,6 +1277,7 @@
   - Method `.test_every_surface_operation_is_reachable_on_a_generated_world()`
   - Method `.test_ringed_giant_landing_offers_cloud_scoop_without_rover_ops()`
   - Method `.test_lava_world_surface_offers_magma_tap()`
+  - Method `.test_landing_survey_reward_is_paid_once_per_body()`
   - Method `.test_legacy_gas_world_becomes_landable_without_changing_owner()`
   - Method `.test_uninhabited_gas_world_keeps_no_government_after_load_migration()`
   - Method `.test_an_operation_for_another_environment_is_refused()`
@@ -1591,7 +1592,7 @@
 ### [`tests/test_models.py`](tests/test_models.py)
 > *Unit tests for domain state models and frozen DTO serialization.*
 
-**Size**: `352` lines (`12063` bytes)
+**Size**: `358` lines (`12372` bytes)
 
 **Classes:**
 - `class TestModels`
@@ -2974,7 +2975,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10362` lines (`511539` bytes)
+**Size**: `10373` lines (`512125` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3453,7 +3454,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2469` lines (`92479` bytes)
+**Size**: `2473` lines (`92744` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

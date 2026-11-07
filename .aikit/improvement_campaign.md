@@ -18,8 +18,9 @@ does not repeat one.
 | 8 | Audio cues re-sweep (pilot level-up cue) | fixed, proven |
 | 9 | UI readability re-sweep (Commander vs Pilot Mastery labels) | fixed, proven |
 | 10 | Saving/load re-sweep (legacy landable migration) | fixed, proven |
+| 11 | Economy re-sweep (one-time landing survey reward) | fixed, proven |
 
-Queue after Cycle 10: re-sweep all areas for new verified findings.
+Queue after Cycle 11: re-sweep all areas for new verified findings.
 
 ---
 
@@ -507,6 +508,47 @@ python ui-review/play_cycle10.py cycle10-before                               # 
 python ui-review/play_cycle10.py cycle10-after                                # LAND + Cloud Scoop, ok true
 python -m unittest tests.test_frontier_depth.SurfaceOperationTest             # OK
 python -m unittest discover                                                    # Ran 1260 OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py check voidfarer                                                # 5/5
+```
+
+---
+
+## Cycle 11 — Economy re-sweep: the landing survey reward is one-time
+
+**Find.** `land_on_body` paid +450 cr on every landing at Sol F; a headless probe paid it
+three times in a row, and a real leave-and-return play paid a second +450. This is a
+repeatable credit farm.
+
+**Analyze.** The landing reward was based only on body radius and had no per-body history.
+Killed: a cooldown (still farmable) or blocking repeat landings (surface operations need
+them). Survivor: persist a surveyed-body set on the ship, pay once, and keep repeat landings
+for operations.
+
+**Fix.** `ShipState.surveyed_bodies` (additive, default empty) with `to_dict`/`from_dict`
+and `_clone_ship` support. `land_on_body` pays only on the first survey, adds the id once,
+and logs `Already surveyed; no new survey reward.` on repeats. Tests: repeat reward zero,
+save round-trip, legacy payload default.
+
+**Played proof (real Edge, 1280x720, same leave-and-return sequence).**
+- Before: `ui-review/cycle11-before/play-report.json` — first +450, second +450,
+  credits `2,897 CR`; `ok=false`.
+- After: `ui-review/cycle11-after/play-report.json` — first +450, second 0, credits
+  `2,447 CR`, log `Already surveyed; no new survey reward.`; `ok=true`.
+- Screenshots: `01-first-landing.png` and `02-second-landing.png` in both folders; vision
+  review quoted the logs/credits and found no new clipping.
+- This is a mechanics claim; the played runs and credit deltas are the proof.
+
+**Gates.** `python -m unittest discover` -> `Ran 1261 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5. Additive save field with a backward-compatible default.
+
+**Commands.**
+```text
+python ui-review/probe_landing_reward.py                                      # 3x +450 before
+python ui-review/play_cycle11.py cycle11-before                               # in HEAD worktree, +450 repeat
+python ui-review/play_cycle11.py cycle11-after                                # +0 repeat, ok true
+python -m unittest tests.test_frontier_depth.SurfaceOperationTest tests.test_models.TestModels.test_game_state_roundtrip  # OK
+python -m unittest discover                                                    # Ran 1261 OK
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py check voidfarer                                                # 5/5
 ```

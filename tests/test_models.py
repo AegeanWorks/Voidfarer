@@ -261,6 +261,7 @@ class TestModels(unittest.TestCase):
             active_contracts=(contract,),
             tactical_combo=2,
             near_miss_scanner_bonus=0.25,
+            surveyed_bodies=("sol_body_1",),
         )
         state = GameState(
             version=1,
@@ -282,6 +283,11 @@ class TestModels(unittest.TestCase):
         self.assertEqual(len(restored.ship.active_contracts), 1)
         self.assertEqual(restored.ship.tactical_combo, 2)
         self.assertAlmostEqual(restored.ship.near_miss_scanner_bonus, 0.25)
+        self.assertEqual(restored.ship.surveyed_bodies, ("sol_body_1",))
+        legacy = dict(d)
+        legacy["ship"] = dict(d["ship"])
+        legacy["ship"].pop("surveyed_bodies")
+        self.assertEqual(GameState.from_dict(legacy).ship.surveyed_bodies, ())
 
     def test_tutorial_and_story_models_serialization(self):
         step = TutorialStep(

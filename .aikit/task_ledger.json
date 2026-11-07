@@ -1,115 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-cycle9-progression-labels",
+    "task_id": "voidfarer-cycle11-landing-reward",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794084525.8742206,
+    "updated_at": 1794087395.3674562,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794084527.205295
+    "completed_at": 1794087397.0834224
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cycle3-engines-collapse",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cycle3-engines-collapse' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794070194.6186457,
-      "timestamp_str": "2026-11-07 19:49:54",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-cycle4-enemy-rep-boss-ai",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan: fix legacy precursor victory rep sign and stop dead nanite intents with shields down",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794071023.6470292,
-      "timestamp_str": "2026-11-07 20:03:43",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "A legacy/custom Precursor Sentinel encounter (no archetype_id) awarded Precursor Watch +8 on victory, and the Warlord AI telegraphs nanite repair with its shields at zero even though the ability only works while shields hold.",
-        "benefits": "Enemy kills consistently punish the victim faction and the dreadnought stops wasting its special-ability turn; the victory log matches the standing delta.",
-        "risks": "contract: none (fallback string and intent policy only); dependency: none; concurrency: engine lock held; state: no new save fields; balance: warlord will fire/brace instead of a dead ability.",
-        "mitigation": "Failing-first probes saved before the fix, unit tests for both, before/after cockpit plays for boss intent and victory rep."
-      },
-      "plan_digest": "77daf2afe28270ca23215f4cdf931262185fa0e0fc0d0d276a1a61f4c9fd0afc"
-    },
-    {
-      "task_id": "voidfarer-cycle4-enemy-rep-boss-ai",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Cycle 4 verified: legacy precursor rep -8/+4 and warlord nanite gated off at zero shields; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794071713.7333336,
-      "timestamp_str": "2026-11-07 20:15:13",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-184 and campaign cycle 4",
-        "evidence": "ui-review/cycle04-before-boss/02-after-action.png, cycle04-after-boss/02-after-action.png, cycle04-before-rep/02-after-action.png, cycle04-after-rep/02-after-action.png"
-      }
-    },
-    {
-      "task_id": "voidfarer-cycle4-enemy-rep-boss-ai",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cycle4-enemy-rep-boss-ai' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794071714.8584363,
-      "timestamp_str": "2026-11-07 20:15:14",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-cycle5-cloud-magma-levels",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan: make gas and lava worlds landable and gate ground-only operations off gas giants",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794073946.346185,
-      "timestamp_str": "2026-11-07 20:52:26",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Cloud Scoop and Magma Tap are advertised surface operations but no generated gas/ringed/ice/lava world is landable, so both are unreachable; a reachability sweep finds cloud_scoop and magma_tap on zero of 70 landable bodies.",
-        "benefits": "All 13 surface operations become reachable, gas worlds get an aerostat cloud-scoop loop, and lava worlds get their magma tap without offering rover operations in a cloud deck.",
-        "risks": "contract: none; dependency: none; concurrency: none; state: landable flags are persisted, so existing saves keep old flags until a new game; balance: more landable worlds and landing rewards.",
-        "mitigation": "Reachability test over the whole generated galaxy, gas-giant landing play, env-gating tests, before/after cockpit captures; no new save field."
-      },
-      "plan_digest": "fcb5c5f927ebd9743e580a1379a0a68606895fb2a0620f30ae841e94115dfdbb"
-    },
-    {
-      "task_id": "voidfarer-cycle5-cloud-magma-levels",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Cycle 5 verified: gas/lava landings, cloud scoop + magma tap reachable, uninhabited claims stay government-free; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794075769.6724029,
-      "timestamp_str": "2026-11-07 21:22:49",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-185 and campaign cycle 5",
-        "evidence": "ui-review/cycle05-before/01b-gas-target-card-bottom.png, cycle05-after/01b-gas-target-card-bottom.png, cycle05-after/03-cloud-scoop-run.png"
-      }
-    },
-    {
-      "task_id": "voidfarer-cycle5-cloud-magma-levels",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cycle5-cloud-magma-levels' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794075771.0598984,
-      "timestamp_str": "2026-11-07 21:22:51",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-cycle6-radar-labels",
       "phase": "phase 4",
@@ -294,6 +196,104 @@
       "status": "completed",
       "timestamp": 1794084527.2052975,
       "timestamp_str": "2026-11-07 23:48:47",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cycle10-legacy-landable",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Cycle 10 verified: legacy gas-world save gains LAND and Cloud Scoop on load; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794085711.6647668,
+      "timestamp_str": "2026-11-08 00:08:31",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-190 and campaign cycle 10",
+        "evidence": "ui-review/cycle10-before/01-legacy-target-bottom.png, cycle10-after/01-legacy-target-bottom.png, cycle10-after/play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-cycle10-legacy-landable",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cycle10-legacy-landable' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794085713.0550287,
+      "timestamp_str": "2026-11-08 00:08:33",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cycle10-legacy-landable",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: normalize legacy landable flags on load from one shared surface-type set",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794085739.5130572,
+      "timestamp_str": "2026-11-08 00:08:59",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "Existing saves persist landable=false for gas/lava worlds, so they cannot use the operations unlocked in Cycle 5; generation and migration also duplicated the landable policy.",
+        "benefits": "Legacy saves gain LAND ON SURFACE, Cloud Scoop and Magma Tap on load without rewriting ownership or population; one policy constant.",
+        "risks": "contract: none; dependency: galaxy imports surface (no cycle); concurrency: constructor migration under existing load path; state: only the persisted landable boolean changes.",
+        "mitigation": "Legacy 474KB save play, ownership/government assertions, before/after target-card captures."
+      },
+      "plan_digest": "ab9b17a06068974d5eb817a8c94c59730d0bbcf9f73c190f31c4559ed9d8fbcb"
+    },
+    {
+      "task_id": "voidfarer-cycle11-landing-reward",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: pay the landing survey reward once per body and persist surveyed bodies",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794085971.682031,
+      "timestamp_str": "2026-11-08 00:12:51",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "land_on_body awards 150 + radius/1000*5 credits on every landing; a ringed giant pays +450 cr each time, so leave-and-reland farms credits indefinitely.",
+        "benefits": "Survey rewards become a real one-time discovery while repeat landings still open surface operations; old saves remain loadable.",
+        "risks": "contract: ShipState gains one additive tuple (old saves default empty); dependency: none; concurrency: engine lock held; state: surveyed set grows one id per body.",
+        "mitigation": "Failing-first engine test, save round-trip/default test, before/after scripted land-travel-land run, full suite."
+      },
+      "plan_digest": "36ed1262b412fc8203ded9d59a2d5ebe829c3a56a6ff4685593b302f9c232f45"
+    },
+    {
+      "task_id": "voidfarer-cycle10-legacy-landable",
+      "phase": "superseded",
+      "phase_num": 2,
+      "description": "Superseded by 'voidfarer-cycle11-landing-reward' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1794085971.682031,
+      "timestamp_str": "2026-11-08 00:12:51",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cycle11-landing-reward",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Cycle 11 verified: repeat landing pays 0 and logs already surveyed; first survey persists; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794087395.3674562,
+      "timestamp_str": "2026-11-08 00:36:35",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-191 and campaign cycle 11",
+        "evidence": "ui-review/cycle11-before/02-second-landing.png, cycle11-after/02-second-landing.png, cycle11-after/play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-cycle11-landing-reward",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cycle11-landing-reward' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794087397.0834248,
+      "timestamp_str": "2026-11-08 00:36:37",
       "agent": "opencode:campaign"
     }
   ]
