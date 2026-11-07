@@ -9,8 +9,8 @@
 - **Total Python Modules**: `127`
 - **Total Classes**: `346`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1968`
-- **Total Source Lines**: `50132`
+- **Total Class Methods**: `1972`
+- **Total Source Lines**: `50235`
 
 ---
 
@@ -1226,7 +1226,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `556` lines (`28312` bytes)
+**Size**: `625` lines (`31279` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
@@ -1262,6 +1262,10 @@
 - `class SurfaceOperationTest`
   - Method `.test_landing_opens_choices_and_marks_site_branch_worked()`
   - Method `.test_surface_catalog_is_deeper_and_body_specific()`
+  - Method `.test_every_surface_operation_is_reachable_on_a_generated_world()`
+  - Method `.test_ringed_giant_landing_offers_cloud_scoop_without_rover_ops()`
+  - Method `.test_lava_world_surface_offers_magma_tap()`
+  - Method `.test_uninhabited_gas_world_keeps_no_government_after_load_migration()`
   - Method `.test_an_operation_for_another_environment_is_refused()`
 - `class FrontierUiContractTest`
   - Method `.test_cockpit_has_new_mechanics_surfaces()`
@@ -2366,7 +2370,7 @@
 ### [`tests/test_transit_civ_events.py`](tests/test_transit_civ_events.py)
 > *Tests for in-system transit (TravelState), planetary civilization metadata, and cockpit GameEvents.*
 
-**Size**: `356` lines (`16308` bytes)
+**Size**: `369` lines (`16845` bytes)
 
 **Classes:**
 - `class TestTransitCivEvents` - *Verify TravelState, planetary faction/population/government, and GameEvent lifecycles.*
@@ -2957,7 +2961,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10353` lines (`511031` bytes)
+**Size**: `10356` lines (`511127` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3337,7 +3341,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1385` lines (`62320` bytes)
+**Size**: `1391` lines (`62657` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -3840,7 +3844,7 @@
 ### [`voidfarer/surface.py`](voidfarer/surface.py)
 > *Surface operations: choose what your landing party does after touchdown.*
 
-**Size**: `247` lines (`7940` bytes)
+**Size**: `259` lines (`8462` bytes)
 
 **Classes:**
 - `class SurfaceOperation`

@@ -12,8 +12,9 @@ does not repeat one.
 | 2 | Progression and saves (transit academy step) | fixed, proven |
 | 3 | Combat feel (engines collapse + DRIVES gauge) | fixed, proven |
 | 4 | Enemies/bosses (legacy rep sign + dead nanite telegraph) | fixed, proven |
+| 5 | Levels (gas/lava landings + full surface catalog) | fixed, proven |
 
-Queue after Cycle 4: levels, graphics and effects, audio cues.
+Queue after Cycle 5: graphics and effects, audio cues.
 
 ---
 
@@ -221,6 +222,60 @@ python ui-review/play_cycle4.py rep cycle04-before-rep                        # 
 python ui-review/play_cycle4.py boss cycle04-after-boss                       # ok true
 python ui-review/play_cycle4.py rep cycle04-after-rep                         # ok true
 python -m unittest discover                                                    # Ran 1251 OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py check voidfarer                                                # 5/5
+```
+
+---
+
+## Cycle 5 — Levels: gas/lava landings and a fully reachable surface catalog
+
+**Find.** A generated-galaxy reachability sweep found `cloud_scoop` and `magma_tap` on zero
+of 70 landable bodies, although the README advertises both. Evidence:
+`ui-review/cycle05-before/01b-gas-target-card-bottom.png` has no landing action for Sol F.
+
+**Analyze.** `GalaxyGenerator` marked only habitable worlds landable, excluding the gas,
+ringed, ice and lava biomes that own those operations. A landable gas world would also
+inherit rover operations that make no sense in a cloud deck, and the load migration would
+assign it a government despite zero population. Killed: changing only the operation body
+lists (still no landable host). Survivors: landable surface types, gas-only operation
+gating, and a population guard on the migration.
+
+**Fix.** `galaxy.py`: lava/volcanic/gas/ringed/ice/methane worlds join the landable set.
+`surface.py`: additive `exclude_types`; seven rover ops exclude gas types, cryo drill drops
+ice giants, cloud scoop covers all four gas types. `engine.py`: government is seeded only
+when population > 0. Tests: all operations reachable, ringed-giant cloud scoop, lava magma
+tap, uninhabited gas migration; the obsolete "landable means inhabited" test was corrected
+to the new contract and extended.
+
+**Visual proof (same 1280x720 Sol F ringed giant, target card scrolled to its actions).**
+- Before: `ui-review/cycle05-before/01b-gas-target-card-bottom.png` — no `LAND ON SURFACE`.
+- After: `ui-review/cycle05-after/01b-gas-target-card-bottom.png` — `LAND ON SURFACE`
+  appears; `POPULATION Uninhabited`, `GOVERNMENT None`.
+- After landing: `ui-review/cycle05-after/02-gas-surface-ops.png` — `SURFACE SCAN //
+  RINGED GIANT`, `2 SITES`.
+- After running: `ui-review/cycle05-after/03-cloud-scoop-run.png` — `S2 Cloud Scoop` row,
+  `+3 Quantum Fuel Cells`, `WORKED`, hold 15 -> 18.
+- Vision review: `opencode-go/gemini-4-argon` quoted the action rows, site count and Cloud
+  Scoop state, and found no new clipping.
+
+**Play report.** `python ui-review/play_cycle5.py cycle05-after` (real Edge, 1280x720,
+seed-42 Sol F): the target card gained `LAND ON SURFACE`, landing paid +450 cr, the gas map
+offered `field_rest` + `cloud_scoop`, and clicking `Cloud Scoop` succeeded for +3 fuel
+cells. 25 frames/407ms, zero console/page/HTTP errors. The before worktree run shows
+`landButton.display = none` and is recorded in `cycle05-before/run.out`.
+
+**Gates.** `python -m unittest discover` -> `Ran 1255 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5. No new save field; old saves keep their stored landable flags until a
+new game/reset.
+
+**Commands.**
+```text
+python ui-review/probe_cloud_scoop.py                                         # before: cloud_scoop NOWHERE
+python ui-review/play_cycle5.py cycle05-before                                # in HEAD worktree, ok false
+python ui-review/play_cycle5.py cycle05-after                                 # ok true
+python -m unittest tests.test_frontier_depth.SurfaceOperationTest             # OK
+python -m unittest discover                                                    # Ran 1255 OK
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py check voidfarer                                                # 5/5
 ```

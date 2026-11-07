@@ -61,12 +61,25 @@ class TestTransitCivEvents(unittest.TestCase):
         self.assertEqual(star.population, 0)
         self.assertEqual(star.government, "None")
 
-        inhabited = [b for b in sol.bodies[1:] if b.station_dockable or b.landable]
+        inhabited = [
+            b for b in sol.bodies[1:]
+            if b.station_dockable or (b.landable and b.population_capacity > 0)
+        ]
         self.assertTrue(len(inhabited) >= 1)
         for body in inhabited:
             self.assertGreater(body.population, 0)
             self.assertNotEqual(body.government, "None")
             self.assertNotEqual(body.faction, "Unclaimed")
+
+        # Gas and lava worlds are landable for environment-specific operations but
+        # remain uninhabited claims: no population and no government.
+        uninhabited_landable = [
+            b for b in sol.bodies[1:] if b.landable and b.population_capacity <= 0
+        ]
+        self.assertTrue(uninhabited_landable)
+        for body in uninhabited_landable:
+            self.assertEqual(body.population, 0)
+            self.assertEqual(body.government, "None")
 
     def test_sublight_transit_progresses_and_completes_on_tick(self) -> None:
         self.engine.orbit("sol_body_1")

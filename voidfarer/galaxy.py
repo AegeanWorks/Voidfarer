@@ -964,6 +964,12 @@ class GalaxyGenerator:
             )
 
         habitable_types = {"terrestrial", "oceanic", "savanna", "tundra", "ring_world", "dyson_sphere"}
+        # Every biome with a surface palette supports a landing party; environment
+        # gates in surface.py decide which operations fit each world type.
+        landable_surface_types = habitable_types | {
+            "lava_world", "volcanic", "gas_giant", "ringed_giant", "ice_giant",
+            "methane_storm",
+        }
         resource_map = {
             "terrestrial": ("titanium",), "oceanic": ("hydroponics",), "gas_giant": ("fuel_cells",),
             "asteroid_belt": ("titanium", "xenoliths"), "desert_world": ("titanium",), "ice_world": ("hydroponics",),
@@ -1061,7 +1067,7 @@ class GalaxyGenerator:
                     temperature_c=int(phys["temperature_c"]),
                     resources=resource_map.get(body_type, ()),
                     moons=moons,
-                    landable=body_type in habitable_types,
+                    landable=body_type in landable_surface_types,
                     faction=faction if is_inhabited else "Unclaimed",
                     population=body_pop,
                     population_capacity=body_capacity,

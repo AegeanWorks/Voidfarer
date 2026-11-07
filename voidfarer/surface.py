@@ -23,9 +23,12 @@ class SurfaceOperation:
     heal_injuries: int = 0
     credit_cost: int = 0
     body_types: tuple[str, ...] = ()
+    exclude_types: tuple[str, ...] = ()
 
     def available_on(self, body: CelestialBody) -> bool:
         """An empty body_types tuple means the operation works anywhere."""
+        if self.exclude_types and body.body_type in self.exclude_types:
+            return False
         return not self.body_types or body.body_type in self.body_types
 
     def to_dict(self) -> dict[str, object]:
@@ -48,6 +51,8 @@ class SurfaceOperation:
         }
 
 
+GAS_SURFACE_TYPES = ("gas_giant", "ringed_giant", "ice_giant", "methane_storm")
+
 SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
     SurfaceOperation(
         id="surface_survey",
@@ -56,6 +61,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         risk=8,
         credits=180,
         research=30,
+        exclude_types=GAS_SURFACE_TYPES,
     ),
     SurfaceOperation(
         id="core_sample",
@@ -64,6 +70,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         risk=18,
         cargo=(("titanium", 3),),
         hull_delta=-5,
+        exclude_types=GAS_SURFACE_TYPES,
     ),
     SurfaceOperation(
         id="ruin_excavation",
@@ -73,6 +80,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         credits=600,
         cargo=(("xenoliths", 1),),
         hull_delta=-8,
+        exclude_types=GAS_SURFACE_TYPES,
     ),
     SurfaceOperation(
         id="wreck_salvage",
@@ -81,6 +89,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         risk=22,
         cargo=(("microchips", 1), ("titanium", 2)),
         hull_delta=-4,
+        exclude_types=GAS_SURFACE_TYPES,
     ),
     SurfaceOperation(
         id="field_rest",
@@ -99,6 +108,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         credits=90,
         cargo=(("fuel_cells", 3),),
         hull_delta=-6,
+        exclude_types=GAS_SURFACE_TYPES,
     ),
     SurfaceOperation(
         id="bio_prospecting",
@@ -108,6 +118,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         research=20,
         cargo=(("medicines", 2),),
         morale=2,
+        exclude_types=GAS_SURFACE_TYPES,
     ),
     SurfaceOperation(
         id="crash_site_recovery",
@@ -116,6 +127,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         risk=24,
         cargo=(("microchips", 2), ("titanium", 1)),
         hull_delta=-7,
+        exclude_types=GAS_SURFACE_TYPES,
     ),
     SurfaceOperation(
         id="cryo_drill",
@@ -124,7 +136,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         risk=16,
         research=25,
         cargo=(("fuel_cells", 2),),
-        body_types=("ice_world", "ice_giant", "tundra"),
+        body_types=("ice_world", "tundra"),
     ),
     SurfaceOperation(
         id="magma_tap",
@@ -150,7 +162,7 @@ SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
         description="Drop a ram scoop through the upper cloud deck for deuterium.",
         risk=18,
         cargo=(("fuel_cells", 3),),
-        body_types=("gas_giant", "ringed_giant"),
+        body_types=("gas_giant", "ringed_giant", "ice_giant", "methane_storm"),
     ),
     SurfaceOperation(
         id="deep_mine",

@@ -604,7 +604,10 @@ class SimulationEngine:
                         updated_body,
                         faction=sys_obj.faction if updated_body.faction == "Unclaimed" else updated_body.faction,
                         population=pop,
-                        government=gov if updated_body.government == "None" else updated_body.government,
+                        government=(
+                            gov if pop > 0 and updated_body.government == "None"
+                            else updated_body.government
+                        ),
                     )
                 elif updated_body.population > updated_body.population_capacity > 0:
                     updated_body = replace(

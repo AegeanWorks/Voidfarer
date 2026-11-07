@@ -19,7 +19,7 @@ from voidfarer.pirates import generate_pirate_encounter, pirate_risk
 from voidfarer.retention import generate_contract
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
-from voidfarer.surface import SURFACE_OPERATIONS, SURFACE_OPERATION_MAP
+from voidfarer.surface import SURFACE_OPERATIONS, SURFACE_OPERATION_MAP, surface_report
 
 
 class FrontierContentTest(unittest.TestCase):
@@ -393,6 +393,75 @@ class SurfaceOperationTest(unittest.TestCase):
         self.assertFalse(op.available_on(replace(body, body_type="lava_world")))
         self.assertTrue(any(operation.body_types for operation in SURFACE_OPERATIONS),
                         "at least one operation must be tied to a surface environment")
+
+    def test_every_surface_operation_is_reachable_on_a_generated_world(self):
+        engine = SimulationEngine(seed=42)
+        reachable = set()
+        for system in engine.state.systems.values():
+            for body in system.bodies:
+                if not body.landable:
+                    continue
+                ship = engine._clone_ship(landed_body_id=body.id)
+                reachable.update(
+                    row["id"] for row in surface_report(ship, body)["operations"]
+                )
+        self.assertEqual({operation.id for operation in SURFACE_OPERATIONS} - reachable, set())
+
+    def test_ringed_giant_landing_offers_cloud_scoop_without_rover_ops(self):
+        engine = SimulationEngine(seed=42)
+        body = next(
+            body for body in engine.current_system.bodies
+            if body.body_type in ("gas_giant", "ringed_giant", "ice_giant", "methane_storm")
+        )
+        self.assertTrue(body.landable)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(orbiting_body_id=body.id, landed_body_id=None)
+        )
+        ok, message = engine.land_on_body(body.id)
+        self.assertTrue(ok, message)
+        ids = {row["id"] for row in engine.get_surface_report()["operations"]}
+        self.assertIn("cloud_scoop", ids)
+        self.assertNotIn("surface_survey", ids)
+
+    def test_lava_world_surface_offers_magma_tap(self):
+        engine = SimulationEngine(seed=42)
+        body = next(
+            body for system in engine.state.systems.values() for body in system.bodies
+            if body.body_type in ("lava_world", "volcanic")
+        )
+        self.assertTrue(body.landable)
+        ship = engine._clone_ship(landed_body_id=body.id)
+        ids = {row["id"] for row in surface_report(ship, body)["operations"]}
+        self.assertIn("magma_tap", ids)
+
+    def test_uninhabited_gas_world_keeps_no_government_after_load_migration(self):
+        engine = SimulationEngine(seed=42)
+        system = engine.current_system
+        body = next(
+            body for body in system.bodies
+            if body.body_type in ("gas_giant", "ringed_giant", "ice_giant", "methane_storm")
+        )
+        body = replace(
+            body,
+            landable=True,
+            population=0,
+            population_capacity=0,
+            government="None",
+            faction="Unclaimed",
+        )
+        systems = dict(engine.state.systems)
+        systems[system.id] = replace(
+            system,
+            bodies=tuple(body if candidate.id == body.id else candidate for candidate in system.bodies),
+        )
+        engine.state = engine._clone_state(systems=systems)
+        reloaded = SimulationEngine(state=engine.state)
+        migrated = next(
+            candidate for candidate in reloaded.current_system.bodies
+            if candidate.id == body.id
+        )
+        self.assertEqual(migrated.population, 0)
+        self.assertEqual(migrated.government, "None")
 
     def test_an_operation_for_another_environment_is_refused(self):
         engine = SimulationEngine(seed=42)
