@@ -961,10 +961,39 @@ def cmd_saves(engine: SimulationEngine, storage: StorageManager, parts: list[str
                 return 1
             print(f"{GREEN}Deleted save slot '{slot}'.{RESET}")
             return 0
+        if action in ("new-game", "newgame", "new"):
+            try:
+                seed = int(parts[2]) if len(parts) > 2 else 42
+            except ValueError:
+                print(f"{RED}Error:{RESET} Seed must be an integer.")
+                return 1
+            if seed < 0:
+                print(f"{RED}Error:{RESET} Seed must be 0 or greater.")
+                return 1
+            target_slot = parts[3] if len(parts) > 3 else "default"
+            ok, msg = engine.reset(seed)
+            if ok:
+                storage.save(engine.state, slot=target_slot)
+            print((GREEN if ok else RED) + f"{msg} [slot '{target_slot}']" + RESET)
+            return 0 if ok else 1
+        if action == "reset":
+            try:
+                seed = int(parts[2]) if len(parts) > 2 else 42
+            except ValueError:
+                print(f"{RED}Error:{RESET} Seed must be an integer.")
+                return 1
+            if seed < 0:
+                print(f"{RED}Error:{RESET} Seed must be 0 or greater.")
+                return 1
+            ok, msg = engine.reset(seed)
+            if ok:
+                storage.save(engine.state)
+            print((GREEN if ok else RED) + msg + RESET)
+            return 0 if ok else 1
     except ValueError as exc:
         print(f"{RED}{exc}{RESET}")
         return 1
-    print(f"{RED}Usage:{RESET} saves [list|save|load|delete] [slot]")
+    print(f"{RED}Usage:{RESET} saves [list|save|load|delete] [slot] | saves new-game [seed] [slot] | saves reset [seed]")
     return 1
 
 
@@ -3066,8 +3095,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     events_p.add_argument("event_id", nargs="?", help="Event ID to dismiss")
 
     saves_p = subparsers.add_parser("saves", help="List, save, load, or delete save slots")
-    saves_p.add_argument("action", nargs="?", default="list", choices=["list", "save", "load", "delete"])
-    saves_p.add_argument("slot", nargs="?", default="default", help="Save slot name (default: 'default')")
+    saves_p.add_argument("action", nargs="?", default="list", choices=["list", "save", "load", "delete", "new-game", "reset"])
+    saves_p.add_argument("slot", nargs="?", default=None, help="Save slot name (seed for 'saves new-game/reset')")
+    saves_p.add_argument("extra", nargs="?", default=None, help="Save slot for 'saves new-game <seed> <slot>'")
 
     pwr_p = subparsers.add_parser("power", help="Route reactor power (must sum to 100)")
     pwr_p.add_argument("engines", type=int, help="Engines power percentage")
@@ -3520,7 +3550,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             parts.append(args.event_id)
         return cmd_events(engine, storage, parts)
     elif args.command == "saves":
-        return cmd_saves(engine, storage, ["saves", args.action, args.slot])
+        parts = ["saves", args.action]
+        if args.slot is not None:
+            parts.append(args.slot)
+        if args.extra is not None:
+            parts.append(args.extra)
+        return cmd_saves(engine, storage, parts)
     elif args.command == "power":
         ok, msg = engine.route_power(args.engines, args.shields, args.sensors, args.weapons)
         print((GREEN if ok else RED) + msg + RESET)

@@ -674,6 +674,36 @@ class TestCLIBlockGuards(_IsolatedCliTestCase):
         self.assertIsNone(engine.state.active_customs)
 
 
+class TestCLISavesLifecycle(_IsolatedCliTestCase):
+    def _slot_state(self, slot):
+        save_dir = Path(self._tmp.name) / ".voidfarer"
+        return StorageManager(save_dir).load(slot=slot)
+
+    def test_new_game_resets_and_saves_named_slot(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["saves", "new-game", "7", "w7slot"]), 0)
+        self.assertIn("w7slot", mock_out.getvalue())
+        state = self._slot_state("w7slot")
+        self.assertIsNotNone(state)
+        self.assertEqual(state.time.tick, 0)
+        self.assertEqual(state.ship.credits, 2000)
+
+    def test_new_game_rejects_bad_seed(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["saves", "new-game", "abc"]), 1)
+        self.assertIn("integer", mock_out.getvalue().lower())
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            self.assertEqual(main(["saves", "new-game", "-1"]), 1)
+        self.assertIn("0 or greater", mock_out.getvalue())
+
+    def test_reset_starts_fresh_campaign(self):
+        with patch("sys.stdout", new_callable=io.StringIO):
+            self.assertEqual(main(["saves", "reset", "99"]), 0)
+        state = StorageManager(Path(self._tmp.name) / ".voidfarer").load()
+        self.assertIsNotNone(state)
+        self.assertEqual(state.time.tick, 0)
+
+
 class TestCLIReplRelicsFuse(_IsolatedCliTestCase):
     def test_repl_relics_fuse(self):
         from dataclasses import replace

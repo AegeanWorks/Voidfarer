@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `126`
-- **Total Classes**: `338`
+- **Total Classes**: `339`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1949`
-- **Total Source Lines**: `49770`
+- **Total Class Methods**: `1953`
+- **Total Source Lines**: `49835`
 
 ---
 
@@ -282,7 +282,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `713` lines (`33061` bytes)
+**Size**: `743` lines (`34468` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -367,6 +367,11 @@
   - Method `.test_customs_blocks_trade_but_allows_status_and_customs()`
   - Method `.test_saves_and_settings_allowed_during_pending()`
   - Method `.test_repl_customs_status_and_jettison()`
+- `class TestCLISavesLifecycle`
+  - Method `._slot_state(slot)`
+  - Method `.test_new_game_resets_and_saves_named_slot()`
+  - Method `.test_new_game_rejects_bad_seed()`
+  - Method `.test_reset_starts_fresh_campaign()`
 - `class TestCLIReplRelicsFuse`
   - Method `.test_repl_relics_fuse()`
   - Method `.test_repl_relics_fuse_does_not_exit()`
@@ -2731,7 +2736,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3565` lines (`180368` bytes)
+**Size**: `3600` lines (`181953` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*

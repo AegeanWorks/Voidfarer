@@ -1,55 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-wave6-blockguards",
+    "task_id": "voidfarer-wave7-saves-verbs",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1793998363.434184,
+    "updated_at": 1794037587.9471562,
     "owner": "unidentified",
     "started_by": "unidentified",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-repair-amount-guard",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-repair-amount-guard' completed successfully.",
-      "status": "completed",
-      "timestamp": 1793631710.770729,
-      "timestamp_str": "2026-11-02 18:01:50",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-nap-voice-parity",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: NAP branch carries pact-occasion leader voice, new test plus full suite green. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793631711.8336775,
-      "timestamp_str": "2026-11-02 18:01:51",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-wave-audit-0-30",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: audit waves 0,10,20,30 (first 30 commits) for quantity-type hardening gaps",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793723745.348805,
-      "timestamp_str": "2026-11-03 19:35:45",
-      "agent": "kilo:1",
-      "impact_assessment": {
-        "why": "trade/buy_item/jettison accept bool/float and create fractional cargo or Truex messages, diverging from repair_hull strict guard",
-        "benefits": "uniform positive-int contract, no fractional cargo, no TypeError on str quantity",
-        "risks": "contract: non-int quantities now refused with message; dependency: none new; concurrency: single-threaded lock; state: no schema change, rejection leaves state untouched",
-        "mitigation": "failing-first regression test, full suite plus 180-step captain gate, explicit staging"
-      },
-      "plan_digest": "17034c52247199e4d48717216b92cff06dd86eb893ad3d499f60753f1471acc1"
-    },
     {
       "task_id": "voidfarer-nap-voice-parity",
       "phase": "superseded",
@@ -265,6 +226,45 @@
       "status": "in_progress",
       "timestamp": 1793998363.434184,
       "timestamp_str": "2026-11-06 23:52:43",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave7-saves-verbs",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: saves new-game/reset parity verbs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794037406.7431736,
+      "timestamp_str": "2026-11-07 10:43:26",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "REST new-game/reset unreachable from terminal",
+        "benefits": "full lifecycle parity, no new surface",
+        "risks": "contract: cli saves dispatch only, engine/server untouched; dependency: none new; concurrency: none; state: destructive verbs confirm-less like existing delete",
+        "mitigation": "mirror server seed/slot semantics, explicit seed parsing, new saves tests, full check"
+      },
+      "plan_digest": "d8cfbda4414629b85deb7e0b466c5341ce0b1109f141afe52d4b27ab19d30c58"
+    },
+    {
+      "task_id": "voidfarer-wave6-blockguards",
+      "phase": "superseded",
+      "phase_num": 4,
+      "description": "Superseded by 'voidfarer-wave7-saves-verbs' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1794037406.7431736,
+      "timestamp_str": "2026-11-07 10:43:26",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave7-saves-verbs",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] Verify: saves new-game/reset landed, 3 tests error-baseline pass-fixed, inventory 1145, check 5/5. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794037587.9471562,
+      "timestamp_str": "2026-11-07 10:46:27",
       "agent": "unidentified"
     }
   ]
