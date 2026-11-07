@@ -16,9 +16,9 @@ does not repeat one.
 | 6 | Graphics and effects (NPC radar label collision) | fixed, proven |
 | 7 | Audio cues (SOUND FX mute persistence + master gain) | fixed, proven |
 | 8 | Audio cues re-sweep (pilot level-up cue) | fixed, proven |
+| 9 | UI readability re-sweep (Commander vs Pilot Mastery labels) | fixed, proven |
 
-Queue after Cycle 8: re-sweep all areas for new verified findings. Candidate: PLAYER card
-level/XP vs HUD Mastery level consistency (needs confirmation of intended semantics).
+Queue after Cycle 9: re-sweep all areas for new verified findings.
 
 ---
 
@@ -414,6 +414,51 @@ python -m unittest tests.test_cockpit_layout.TestAudioLevelUpCue              # 
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
 python -m unittest discover                                                    # Ran 1258 OK
+python aikit.py check voidfarer                                                # 5/5
+```
+
+---
+
+## Cycle 9 — UI readability re-sweep: Commander vs Pilot Mastery labels
+
+**Find.** After a Pilot Mastery promotion the PLAYER card still showed `LEVEL 1 0/400 XP`
+while the HUD showed `★ LVL 2 40/750 XP`; both are separate tracks (Commander character
+XP vs Pilot Mastery) but the card labeled both the same. Evidence:
+`ui-review/cycle08-after/02-after-promotion.png`.
+
+**Analyze.** `renderPlayer` read `state.character.level/xp` (Commander) while the HUD read
+`ship.mastery.level/xp` (Pilot Mastery). This is not a data bug; it is a labeling gap.
+Killed: syncing the two values (they are intentionally independent). Survivor: label both
+tracks and show them together in the PLAYER card.
+
+**Fix.** `app.js`: `COMMANDER LVL n` with its XP/bar plus a `PILOT MASTERY LVL n` row with
+mastery XP and TP, read from `ship.mastery`. `style.css`: full-width commander bar and a
+wrapping mastery row. Test: `TestProgressionTrackLabels`. The first CSS draft wrapped
+mid-word and was re-captured after the fix.
+
+**Visual proof (same promotion state, 1280x720).**
+- Before: `ui-review/cycle08-after/02-after-promotion.png` — `LEVEL 1` + `0/400 XP`, no
+  mastery line in the PLAYER card.
+- After: `ui-review/cycle09-after/02-after-promotion.png` — `COMMANDER LVL 1` / `0/400 XP`
+  and `PILOT MASTERY LVL 2` / `40/750 XP · 1 TP`, cleanly inside the card.
+- Vision review: `opencode-go/gemini-4-argon` quoted both tracks and found no clipping or
+  mid-word wrapping; the card grows and the scrollable ability list shifts, no structural
+  break.
+
+**Play report.** Same real browser promotion play (`play_cycle8.py cycle09-after`): scan
+from 490 XP, level 1 -> 2, `levelUpSounds=1`, 24 frames/411ms, zero errors; the PLAYER card
+and HUD now agree on two named tracks.
+
+**Gates.** `python -m unittest discover` -> `Ran 1259 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5. UI task verified/finished; no game-logic or save-schema change.
+
+**Commands.**
+```text
+python ui-review/play_cycle8.py cycle09-after                                # ok true
+python -m unittest tests.test_cockpit_layout.TestProgressionTrackLabels       # OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
+python -m unittest discover                                                    # Ran 1259 OK
 python aikit.py check voidfarer                                                # 5/5
 ```
 

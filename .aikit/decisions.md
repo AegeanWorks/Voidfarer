@@ -2070,3 +2070,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   1. `renderHUD` records `_lastMasteryLevel` on its first render and invokes `this.sound.playLevelUp()` only when the level rises, so loading a save never fires a false cue.
   2. Add `TestAudioLevelUpCue` to `tests/test_cockpit_layout.py` pinning the tracker, comparison and cue call.
 - **Consequences**: The same real browser play (seed 42, Sol B scan at 490 XP) now reports `level=2`, `levelUpSounds=1`, `★ LVL 2`, `40/750 XP · +1P`; 25 frames/402ms, zero console/page/HTTP errors. Screenshot `cycle08-after/02-after-promotion.png` shows the promoted HUD; the vision reviewer found no layout break (the promotion log itself is scrolled out of the short flight-log viewport, which is pre-existing). Full suite `Ran 1258 OK`; UI task finished on cockpit; no save-schema change.
+
+### ADR-189: Cycle 9 UI re-sweep — Commander and Pilot Mastery are labeled as separate tracks
+- **Date**: 2026-11-07
+- **Status**: Accepted
+- **Context**: The PLAYER card rendered `character.level/xp` (Commander: level 1, 0/400 XP, SP) while the top HUD rendered `ship.mastery.level/xp` (Pilot Mastery: level 2, 40/750 XP, talent points). Both were correct but both were labeled `LEVEL`/`XP`; after a promotion the card looked stale. The vision review of Cycle 8 flagged the apparent contradiction.
+- **Decision**:
+  1. The PLAYER card now says `COMMANDER LVL n` with its own XP and bar, followed by a full-width `PILOT MASTERY LVL n` row with mastery XP and `TP`.
+  2. `style.css` gives the commander row a full-width bar and lets the mastery row wrap between label and value; no mid-word wrapping.
+  3. Add `TestProgressionTrackLabels` to `tests/test_cockpit_layout.py` pinning both labels and the `ship.mastery` read.
+- **Consequences**: Same promotion state, 1280x720, before `cycle08-after/02-after-promotion.png` (`LEVEL 1` + `0/400 XP`, no mastery line) vs after `cycle09-after/02-after-promotion.png` (`COMMANDER LVL 1`/`0/400 XP`, `PILOT MASTERY LVL 2`/`40/750 XP · 1 TP`). The first draft wrapped mid-word; a second capture after the CSS fix is clean. Vision review quoted both tracks and found no clipping; the card grows ~55px and shifts the scrollable ability list, with no structural break. Full suite `Ran 1259 OK`; UI task finished; no game-logic or save-schema change.

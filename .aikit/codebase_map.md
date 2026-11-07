@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `349`
+- **Total Classes**: `350`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1978`
-- **Total Source Lines**: `50277`
+- **Total Class Methods**: `1980`
+- **Total Source Lines**: `50292`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1957` lines (`85965` bytes)
+**Size**: `1972` lines (`86557` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -600,6 +600,9 @@
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
   - Method `.test_outliner_panel_ends_with_its_sections()`
+- `class TestProgressionTrackLabels` - *The PLAYER card must name Commander and Pilot Mastery as separate tracks.*
+  - Method `.setUpClass()`
+  - Method `.test_player_card_labels_both_tracks()`
 - `class TestAudioLevelUpCue` - *A Pilot Mastery promotion must invoke the synthesized level-up cue once.*
   - Method `.setUpClass()`
   - Method `.test_promotion_calls_the_level_up_cue()`

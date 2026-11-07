@@ -3461,6 +3461,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const xp = ch.xp || 0;
         const nextXp = ch.next_level_xp || 400;
         const xpPct = Math.min(100, (xp / nextXp) * 100);
+        const mastery = this.state.ship?.mastery || {};
+        const masteryLevel = mastery.level || 1;
+        const masteryXp = mastery.xp || 0;
+        const masteryNext = mastery.next_level_xp || 500;
+        const masteryPoints = mastery.talent_points || 0;
         const traits = ch.traits || [];
         const bgCatalog = this.state.character_background_catalog || {};
         const bgEntry = Object.values(bgCatalog).find(b =>
@@ -3484,9 +3489,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 </div>
                 ${bgLore ? `<div class="character-origin-lore" title="Origin training: ${this.escapeHtml(bgBonus)}">${this.escapeHtml(bgLore)}</div>` : ""}
                 <div class="character-xp-row">
-                    <span class="character-level">LEVEL ${ch.level || 1}</span>
-                    <div class="character-xp-bar"><div class="character-xp-fill" style="width: ${xpPct}%"></div></div>
-                    <span class="character-xp-text" style="font-family: var(--font-mono); font-size: 12px; color: var(--neon-amber);">${xp}/${nextXp} XP</span>
+                    <span class="character-level">COMMANDER LVL ${ch.level || 1}</span>
+                    <span class="character-xp-text">${xp}/${nextXp} XP</span>
+                </div>
+                <div class="character-xp-bar"><div class="character-xp-fill" style="width: ${xpPct}%"></div></div>
+                <div class="character-mastery-row">
+                    <span class="character-mastery-label">PILOT MASTERY LVL ${masteryLevel}</span>
+                    <span class="character-mastery-xp">${masteryXp}/${masteryNext} XP${masteryPoints ? ` · ${masteryPoints} TP` : ""}</span>
                 </div>
             </div>
         `;

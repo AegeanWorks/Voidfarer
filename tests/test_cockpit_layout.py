@@ -1446,6 +1446,21 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestProgressionTrackLabels(unittest.TestCase):
+    """The PLAYER card must name Commander and Pilot Mastery as separate tracks."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_player_card_labels_both_tracks(self):
+        self.assertIn("COMMANDER LVL ${ch.level || 1}", self.js)
+        self.assertIn("PILOT MASTERY LVL ${masteryLevel}", self.js)
+        self.assertIn("this.state.ship?.mastery", self.js)
+        self.assertIn(".character-mastery-row", self.css)
+
+
 class TestAudioLevelUpCue(unittest.TestCase):
     """A Pilot Mastery promotion must invoke the synthesized level-up cue once."""
 
