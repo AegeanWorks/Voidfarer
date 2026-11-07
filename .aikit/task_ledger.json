@@ -3,24 +3,15 @@
   "active_task": {
     "task_id": "voidfarer-wave7-saves-verbs",
     "last_phase": "phase 4",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794037587.9471562,
     "owner": "unidentified",
     "started_by": "unidentified",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794038185.1814084
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-nap-voice-parity",
-      "phase": "superseded",
-      "phase_num": 4,
-      "description": "Superseded by 'voidfarer-wave-audit-0-30' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1793723745.348805,
-      "timestamp_str": "2026-11-03 19:35:45",
-      "agent": "kilo:1"
-    },
     {
       "task_id": "voidfarer-wave-audit-0-30",
       "phase": "phase 4",
@@ -265,6 +256,16 @@
       "status": "in_progress",
       "timestamp": 1794037587.9471562,
       "timestamp_str": "2026-11-07 10:46:27",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave7-saves-verbs",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-wave7-saves-verbs' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794038185.1814098,
+      "timestamp_str": "2026-11-07 10:56:25",
       "agent": "unidentified"
     }
   ]
