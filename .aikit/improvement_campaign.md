@@ -577,5 +577,19 @@ Final gates: `python -m unittest discover` -> `Ran 1261 tests ... OK`; `python a
 check voidfarer` -> 5/5 (test, mechanics, hygiene, guidelines, secrets). Campaign complete
 under the zero-verified-improvement stop rule.
 
+## Push-window verification (origin 699379d -> HEAD)
 
+| Window | Tip | Verification | Push |
+|---|---|---|---|
+| 1 -> 3 | `0f436ff` | 93 targeted tests OK; diff clean | `699379d..0f436ff` |
+| 1 -> 6 | `54bf04e` | 79 targeted tests OK; diff clean | `0f436ff..54bf04e` |
+| 1 -> 9 | `f979bd7` | 72 targeted tests OK; diff clean | `54bf04e..f979bd7` |
+| 1 -> 12 | `f3a7f9b` | 223 targeted tests OK; one EOF blank line found | `f979bd7..f3a7f9b` |
+| 1 -> 15 | `c57261f` | 106 targeted tests OK; EOF blank line carried | `f3a7f9b..c57261f` |
+| 1 -> 18 | `f3e9d8a` | 193 targeted tests OK; diff clean | `c57261f..f3e9d8a` |
+| 1 -> 21 | `98306d5` | 249 targeted tests OK; diff clean | `f3e9d8a..98306d5` |
+| 1 -> End | `9250326` + EOF fix | 56 targeted tests OK; full suite + gate | `98306d5..HEAD` |
 
+After the End push, the base window is re-checked read-only from the pushed origin; the
+final suite and gate are green. The only code-review survivor across the windows was the
+trailing blank line at EOF in this campaign file, fixed in the End window.
