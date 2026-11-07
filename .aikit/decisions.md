@@ -2111,3 +2111,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   3. `switchRightTab` auto-reveals the advanced set for deep links and `[`/`]` cycling; collapsing while an advanced tab is active returns to PLAYER so content never stays invisible.
   4. Compact the 720p rail by 1px per tab and keep the disclosure on one line; the footer stays inside the frame.
 - **Consequences**: Default visible tabs drop 16 -> 5; rail height drops 463px -> 216px (expanded 473px, `scrollHeight 471 <= 473`, no footer clipping). Browser play: `MORE` expands to 16 tabs, FACTIONS opens its geopolitics pane, `FEWER 11` restores the five core tabs and PLAYER; 25 frames/414ms, zero errors. Click-map: 163 controls, 53 visible in focus mode, 0 missing/0 duplicate; `ui_inventory.py` 1150 lines; full suite `Ran 1262 OK`; no save-schema change. Before/after captures `condense-before/01-focus-rail.png` and `condense-after/01..03` were vision-reviewed with no new clipping.
+
+### ADR-193: Mechanics condensation — the PLAYER card stops duplicating the command strip
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The PLAYER tab rendered six ability cards (Overclock, Repair, Battle Focus, Diplomacy, Science, Trade) with their own `USE` buttons while the bottom command strip already exposed all six with hotkeys, cooldowns and state. G-013 explicitly says no PLAYER skills duplicate. Measured at 1280x720: 6 duplicate buttons, PLAYER content height 1,156px, the first ability card clipped mid-sentence.
+- **Decision**:
+  1. `renderPlayer` no longer builds ability rows or `data-use-ability` buttons. Its `#characterAbilities` block becomes a compact `ABILITIES` hint pointing to the bottom command strip and `SHIFT+1..6`.
+  2. The command strip remains the single ability surface; its existing state/hotkey/cooldown chips are unchanged.
+  3. Add `TestPlayerAbilityDedup`; keep the legacy `.character-abilities .ability-row` CSS for the existing static contract.
+- **Consequences**: PLAYER duplicate controls 6 -> 0; bottom command chips remain 6; PLAYER content height 1,156px -> 581px (roughly half). Browser play: clicking the bottom-strip Overclock chip sets reactor surge to 8 ticks and logs `Overclock engaged: +25% output for 8 ticks (+12 heat).` 25 frames/405ms, zero errors. Click-map 163/53/0/0 -> 157/47/0/0; full suite `Ran 1263 OK`; before/after captures `abilities-before/01-player-tab.png` and `abilities-after/01..02` were vision-reviewed with no new clipping.

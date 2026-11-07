@@ -3491,7 +3491,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     renderPlayer() {
         if (!this.state || !this.characterProfile) return;
-        if (this.characterAbilities?.contains(document.activeElement)) return;
         const ch = this.state.character || {};
         const skillPoints = ch.skill_points || 0;
         const xp = ch.xp || 0;
@@ -3536,30 +3535,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             </div>
         `;
 
-        const abilities = Object.entries(this.state.character_abilities || {});
-        const unlocked = new Set(ch.abilities || []);
-        const cooldowns = ch.ability_cooldowns || {};
-        const shipState = this.state.ship || {};
-        const charmTarget = this.abilityTargetFaction("charm_offensive");
-        this.characterAbilities.innerHTML = abilities.map(([id, info]) => {
-            const isUnlocked = unlocked.has(id);
-            const cd = cooldowns[id] || 0;
-            const contextBlocked = (id === "battle_focus" && !this.state.active_combat)
-                || (id === "emergency_repair" && (Number(shipState.hull || 0) <= 0 || Number(shipState.hull || 0) >= Number(shipState.max_hull || 1)))
-                || (id === "charm_offensive" && !charmTarget);
-            const isReady = isUnlocked && cd === 0 && !contextBlocked;
-            return `<div class="ability-row ${isUnlocked ? (isReady ? "ready" : "") : "locked"}">
-                <span><strong>${this.escapeHtml(info.name)}</strong><br><small>${this.escapeHtml(info.description)}</small></span>
-                <span class="cooldown">${isUnlocked ? (cd > 0 ? `CD ${cd}` : contextBlocked ? "IDLE" : "READY") : "LOCKED"}</span>
-                <button class="btn-hud btn-amber" data-use-ability="${this.escapeHtml(id)}" data-ability-faction="${this.escapeHtml(charmTarget || "")}" ${!isUnlocked || cd > 0 || contextBlocked ? "disabled" : ""}>USE</button>
+        // Abilities live in the bottom command strip (G-013); keep one pointer
+        // here instead of a second set of USE controls with duplicate state.
+        this.characterAbilities.innerHTML = `
+            <div class="player-ability-hint">
+                <span class="player-ability-hint-title">ABILITIES</span>
+                <span>Use the bottom command strip · <kbd>SHIFT</kbd>+<kbd>1..6</kbd> or click a chip.</span>
             </div>`;
-        }).join("");
-        this.characterAbilities.querySelectorAll("[data-use-ability]").forEach(btn =>
-            btn.addEventListener("click", () => this.useAbilityQuick(
-                btn.getAttribute("data-use-ability"),
-                btn.getAttribute("data-ability-faction") || null
-            ))
-        );
 
         this.characterPerks.innerHTML = `
             <h4>TRAITS</h4>

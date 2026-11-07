@@ -612,3 +612,12 @@ tab and the disclosure/no-wrap footer fit.
 FEWER restores 5 and PLAYER. 25 frames/414ms, zero errors. Click-map: 163 controls
 (53 visible), 0 missing, 0 duplicate; `ui_inventory.py` 1150 lines. Vision review found no
 new clipping; expanded rail `scrollHeight 471 <= 473`. Suite `Ran 1262 OK`; gate 5/5.
+
+### Second condensation — remove the duplicated PLAYER ability set
+
+The PLAYER tab carried six ability cards with USE buttons while the bottom strip already
+owned all six. `play_abilities.py` before: 6 duplicate buttons, PLAYER height 1,156px;
+after: 0, height 581px, six command chips still present, Overclock fires from the strip
+(surge 8, `+12 heat`). Click-map 157/47/0/0; suite `Ran 1263 OK`; gate 5/5.
+Screenshots: `abilities-before/01-player-tab.png` vs `abilities-after/01-player-tab.png`
+and `02-command-strip-ability.png`.

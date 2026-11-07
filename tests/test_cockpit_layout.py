@@ -1446,6 +1446,21 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestPlayerAbilityDedup(unittest.TestCase):
+    """The PLAYER card points at the command strip instead of duplicating its controls."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_player_card_has_no_second_ability_use_set(self):
+        self.assertIn("player-ability-hint", self.js)
+        self.assertIn("Use the bottom command strip", self.js)
+        self.assertNotIn("data-use-ability", self.js)
+        self.assertIn(".player-ability-hint", self.css)
+
+
 class TestFocusRail(unittest.TestCase):
     """The default terminal rail shows the five core systems plus one disclosure."""
 

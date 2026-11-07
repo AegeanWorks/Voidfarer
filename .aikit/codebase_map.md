@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `351`
+- **Total Classes**: `352`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1984`
-- **Total Source Lines**: `50393`
+- **Total Class Methods**: `1986`
+- **Total Source Lines**: `50408`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1994` lines (`87507` bytes)
+**Size**: `2009` lines (`88090` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -600,6 +600,9 @@
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
   - Method `.test_outliner_panel_ends_with_its_sections()`
+- `class TestPlayerAbilityDedup` - *The PLAYER card points at the command strip instead of duplicating its controls.*
+  - Method `.setUpClass()`
+  - Method `.test_player_card_has_no_second_ability_use_set()`
 - `class TestFocusRail` - *The default terminal rail shows the five core systems plus one disclosure.*
   - Method `.setUpClass()`
   - Method `.test_advanced_systems_are_disclosed_by_one_control()`

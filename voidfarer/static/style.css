@@ -3420,6 +3420,9 @@ body.void-transit::after {
 .character-abilities .ability-row > button { justify-self: end; min-width: 50px; }
 .character-abilities .ability-row small { display: block; color: var(--console-muted); font-size: 12px; overflow-wrap: anywhere; }
 .character-abilities .ability-row.ready { border-color: rgba(143, 191, 159, .45); }
+.player-ability-hint { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; padding: 7px 9px; border: 1px solid rgba(127, 183, 201, 0.22); border-left: 2px solid var(--neon-cyan); background: rgba(127, 183, 201, 0.05); color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
+.player-ability-hint-title { color: var(--neon-cyan); letter-spacing: 0.08em; }
+.player-ability-hint kbd { padding: 0 3px; border: 1px solid rgba(127, 183, 201, 0.35); background: rgba(4, 9, 19, 0.6); color: var(--console-ivory); font-family: var(--font-mono); font-size: 12px; }
 .character-abilities .ability-row.ready .cooldown { color: var(--console-green); text-shadow: 0 0 6px rgba(143, 191, 159, .4); }
 .empire-section { margin-bottom: 14px; }
 .diplomacy-row .leader-behavior { color: var(--neon-amber); font-size: .6rem; }
