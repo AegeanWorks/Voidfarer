@@ -7365,9 +7365,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.stroke();
             }
             if (this.radarLabels || selected) {
-                ctx.font = "11px 'Cascadia Mono', Consolas, monospace";
-                ctx.fillStyle = color;
-                ctx.fillText(captain.name, pos.x + 9, pos.y - 6);
+                // NPC names join the body/flag label collision map instead of
+                // painting over it; a crowded map drops an unselected name.
+                this.placeRadarLabel(
+                    ctx, captain.name, pos.x, pos.y, 9, color, selected ? 4 : 0, true,
+                );
             }
         });
     }

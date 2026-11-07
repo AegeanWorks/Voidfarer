@@ -549,5 +549,19 @@
     "final_snapshot_digest": "10ea6c5424129a82d64df391cbf5f70200e11122cd46f15e4045371442774f1c",
     "final_snapshot_entries": 1145,
     "surface_digest": "2d8fd9026dde675e8da51cd3e55d4b907d232db65b1b0216689effa541010477"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "fd8f561db2fdb9b002a87d2c5204758e9f77886f",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794078115.7066095,
+    "finished_at": 1794078414.013149,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; quoted Rorik Ironjaw overlap)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "10ea6c5424129a82d64df391cbf5f70200e11122cd46f15e4045371442774f1c",
+    "final_snapshot_entries": 1145,
+    "surface_digest": "fa3b98d09d3fe938e038f70d012c4e239d1b05b70d2c0b993041518b2807163d"
   }
 ]

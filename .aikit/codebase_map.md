@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `346`
+- **Total Classes**: `347`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1972`
-- **Total Source Lines**: `50235`
+- **Total Class Methods**: `1974`
+- **Total Source Lines**: `50247`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1915` lines (`84436` bytes)
+**Size**: `1927` lines (`84879` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -600,6 +600,9 @@
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
   - Method `.test_outliner_panel_ends_with_its_sections()`
+- `class TestRadarTrafficLabels` - *NPC names must share the body-label collision map, not paint over it.*
+  - Method `.setUpClass()`
+  - Method `.test_traffic_labels_join_the_collision_map()`
 - `class TestCombatGaugeHonesty` - *The DRIVES gauge must reflect the persisted engines-disable state, not a brace posture.*
   - Method `.setUpClass()`
   - Method `.test_engines_gauge_reads_persistent_disable()`

@@ -1446,6 +1446,18 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestRadarTrafficLabels(unittest.TestCase):
+    """NPC names must share the body-label collision map, not paint over it."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_traffic_labels_join_the_collision_map(self):
+        self.assertIn("this.placeRadarLabel(\n                    ctx, captain.name", self.js)
+        self.assertNotIn("ctx.fillText(captain.name", self.js)
+
+
 class TestCombatGaugeHonesty(unittest.TestCase):
     """The DRIVES gauge must reflect the persisted engines-disable state, not a brace posture."""
 

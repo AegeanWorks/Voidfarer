@@ -13,8 +13,9 @@ does not repeat one.
 | 3 | Combat feel (engines collapse + DRIVES gauge) | fixed, proven |
 | 4 | Enemies/bosses (legacy rep sign + dead nanite telegraph) | fixed, proven |
 | 5 | Levels (gas/lava landings + full surface catalog) | fixed, proven |
+| 6 | Graphics and effects (NPC radar label collision) | fixed, proven |
 
-Queue after Cycle 5: graphics and effects, audio cues.
+Queue after Cycle 6: audio cues.
 
 ---
 
@@ -277,6 +278,55 @@ python ui-review/play_cycle5.py cycle05-after                                 # 
 python -m unittest tests.test_frontier_depth.SurfaceOperationTest             # OK
 python -m unittest discover                                                    # Ran 1255 OK
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py check voidfarer                                                # 5/5
+```
+
+---
+
+## Cycle 6 — Graphics and effects: NPC radar names join the label collision map
+
+**Find.** `Rorik Ironjaw` was painted directly over `VF-FLAGSHIP` at a deterministic
+1920x1080 radar frame, making both strings unreadable. Evidence:
+`ui-review/cycle06-before/01-radar-labels.png`.
+
+**Analyze.** `drawSystemTraffic` used a raw `ctx.fillText` after the body/flagship labels
+had already been placed through `placeRadarLabel`, so the NPC name bypassed the collision
+map. Killed: hiding all NPC names (they carry selection and trade information). Survivor:
+route traffic names through the same placement helper, dropping only unselected names when
+the map is genuinely full.
+
+**Fix.** `app.js`: `drawSystemTraffic` calls `placeRadarLabel` (priority 0, selected 4)
+instead of raw text. Test: `TestRadarTrafficLabels` pins the call and forbids the raw
+`ctx.fillText(captain.name, ...)`.
+
+**Visual proof (same default save, frozen clock 54,000 ms, 1920x1080).**
+- Before: `ui-review/cycle06-before/01-radar-labels.png` — `Rorik Ironjaw` sits on
+  `VF-FLAGSHIP`.
+- After: `ui-review/cycle06-after/01-radar-labels.png` — `Rorik Ironjaw` is boxed on its
+  own row; all body labels remain present and legible.
+- Vision review: `opencode-go/gemini-4-argon` called the before pair unreadable and quoted
+  the clear after placement; no new clipping or missing labels.
+
+**Play report.** `python ui-review/play_cycle6.py cycle06-after` (real Edge, frozen clock):
+loaded the cockpit, clicked the deterministic `Rorik Ironjaw` marker; `selectedType` became
+`captain`, the target card showed `TARGET: MERCENARY HULL // Rorik Ironjaw // SOL // TRUST
+11 // STANDING 23`. 25 frames/409ms, zero console/page/HTTP errors. Before run:
+`ui-review/cycle06-before/play-report.json` with the same successful click and the overlap
+capture.
+
+**Gates.** `python -m unittest discover` -> `Ran 1256 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5. UI task verified/finished on cockpit. The UI fast-proof timeout was
+raised to 300s in `chore(ui): allow the full suite to finish under host load` because other
+agents were loading the host.
+
+**Commands.**
+```text
+python ui-review/play_cycle6.py cycle06-before                               # overlap capture, click ok
+python ui-review/play_cycle6.py cycle06-after                                # no overlap, click ok
+python -m unittest tests.test_cockpit_layout.TestRadarTrafficLabels           # OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
+python -m unittest discover                                                    # Ran 1256 OK
 python aikit.py check voidfarer                                                # 5/5
 ```
 
