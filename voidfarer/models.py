@@ -524,6 +524,7 @@ class CombatEncounter:
     captain_gambit_used: bool = False
     captain_evasion_bonus: float = 0.0
     near_miss_awarded: bool = False
+    enemy_engines_disabled: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -553,6 +554,7 @@ class CombatEncounter:
                 0.0, min(0.35, float(data.get("captain_evasion_bonus", 0.0)))
             ),
             near_miss_awarded=bool(data.get("near_miss_awarded", False)),
+            enemy_engines_disabled=bool(data.get("enemy_engines_disabled", False)),
         )
 
 

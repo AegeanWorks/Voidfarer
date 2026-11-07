@@ -2145,9 +2145,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 wepVal.textContent = wepPct < 80 ? "▲ DAMAGED" : "● 100%";
             }
             if (engFill && engVal) {
-                const isBraced = c.enemy_intent === "brace";
-                engFill.style.width = isBraced ? "25%" : "100%";
-                engVal.textContent = isBraced ? "✕ CRIPPLED" : "● NOMINAL";
+                const enginesDisabled = Boolean(c.enemy_engines_disabled);
+                engFill.style.width = enginesDisabled ? "25%" : "100%";
+                engVal.textContent = enginesDisabled ? "✕ CRIPPLED" : "● NOMINAL";
             }
             if (shdFill && shdVal) {
                 const hasShield = (c.enemy_shield || 0) > 0;

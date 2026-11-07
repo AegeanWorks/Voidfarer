@@ -65,6 +65,45 @@ class CombatTacticsAndMunitionsTest(unittest.TestCase):
         # Verify heat was generated (+5 heat)
         self.assertGreaterEqual(engine.state.ship.reactor.heat, 5.0)
 
+    def test_engines_strike_collapses_evasion_for_the_rest_of_the_fight(self):
+        engine = self._engine()
+        engine.state = engine._clone_state(
+            active_combat=replace(
+                engine.state.active_combat,
+                ai_profile="adaptive",
+                enemy_hull=50,
+                enemy_max_hull=200,
+                enemy_shield=30,
+                enemy_max_shield=50,
+            )
+        )
+        ok, msg = engine.combat_action("target_engines")
+        self.assertTrue(ok)
+        combat = engine.state.active_combat
+        self.assertTrue(combat.enemy_engines_disabled)
+        self.assertNotEqual(combat.enemy_intent, "evade")
+        self.assertNotIn("evasive jink", combat.telegraphed_action)
+        # A forced evade roll must not turn the next strike into a miss.
+        engine.rng.random = lambda: 0.1
+        hull_before = combat.enemy_hull
+        shield_before = combat.enemy_shield
+        ok, msg = engine.combat_action("fire_lasers")
+        self.assertTrue(ok)
+        self.assertNotIn("jinked", msg)
+        after = engine.state.active_combat
+        self.assertTrue(after.enemy_engines_disabled)
+        self.assertLess(after.enemy_hull + after.enemy_shield, hull_before + shield_before)
+        # A defensive action rebuild must keep the disabled engines.
+        ok, _ = engine.combat_action("shield_absorb")
+        self.assertTrue(ok)
+        self.assertTrue(engine.state.active_combat.enemy_engines_disabled)
+
+    def test_legacy_combat_payload_defaults_engines_enabled(self):
+        engine = self._engine()
+        payload = engine.state.active_combat.to_dict()
+        payload.pop("enemy_engines_disabled")
+        self.assertFalse(CombatEncounter.from_dict(payload).enemy_engines_disabled)
+
     def test_target_bridge_requires_sufficient_weapon_power(self):
         engine = self._engine(wep_power=10)
         ok, msg = engine.combat_action("target_bridge")

@@ -10,8 +10,9 @@ does not repeat one.
 |---|---|---|
 | 1 | UI readability (1280x720 onboarding ribbon) | fixed, proven |
 | 2 | Progression and saves (transit academy step) | fixed, proven |
+| 3 | Combat feel (engines collapse + DRIVES gauge) | fixed, proven |
 
-Queue after Cycle 2: combat feel, enemies/bosses, levels, graphics and effects, audio cues.
+Queue after Cycle 3: enemies/bosses, levels, graphics and effects, audio cues.
 
 ---
 
@@ -117,4 +118,58 @@ python -m unittest discover                                                    #
 python scripts/update_knowledge_base.py --workspace projects/voidfarer         # map + README
 python aikit.py check voidfarer                                                # 5/5
 ```
+
+---
+
+## Cycle 3 — Combat feel: engines strikes collapse evasion and the DRIVES gauge tells the truth
+
+**Find.** A `[ ENGINES ]` strike logs "Disabled impulse thrusters (collapsed enemy evasion)",
+but the adaptive enemy immediately telegraphs `evade` again and the next damaging action can
+miss. The DRIVES gauge also showed `CRIPPLED` whenever the enemy braced, and `NOMINAL` while
+the engines were actually disabled.
+
+**Analyze.** `CombatEncounter` had no persistent engine state; `choose_enemy_intent` only
+looked at hull/profile, so the adaptive `enemy_hp < 0.30 -> evade` path re-armed after every
+strike. The gauge keyed off `enemy_intent === "brace"`, the wrong signal. Killed: a
+one-turn brace flag (does not survive the AI recompute). Survivor: an additive
+`enemy_engines_disabled` field, forwarded through every combat rebuild, plus a gauge that
+reads it.
+
+**Fix.** `models.py`: additive field with `from_dict` default. `enemies.py`:
+`choose_enemy_intent(..., engines_disabled)` suppresses adaptive evade. `engine.py`:
+persist the flag on a successful engines strike, ignore stale evade intent and the 35%
+evade miss while disabled, and forward the flag through the shield-absorb and standard
+rebuilds. `app.js`: DRIVES gauge reads `enemy_engines_disabled`. Tests: two-turn engine
+test, legacy-save default, static gauge contract. Before reproducer saved at
+`ui-review/cycle03-before-engine/probe.out`.
+
+**Visual proof (same 1280x720 state: Archon Sentinel hull 32/200 after the same strike).**
+- Before: `ui-review/cycle03-before-ui/02-after-engines.png` — log says disabled thrusters,
+  gauge `DRIVES ● NOMINAL`.
+- After: `ui-review/cycle03-after-ui/02-after-engines.png` — gauge `DRIVES ✗ CRIPPLED`,
+  bar at 25%; no new clipping or layout break.
+- Vision review: `opencode/nemotron-3.5-super-vl-free` quoted all four gauges, called the
+  before NOMINAL untruthful, and confirmed the after CRIPPLED state.
+
+**Play report.** `python ui-review/play_cycle3.py cycle03-after-ui` (real Edge, 1280x720,
+seeded Archon Sentinel): clicked `[ ENGINES ]`; state showed `engines_disabled=true`,
+`enemy_intent=fire` (not evade), gauge `✕ CRIPPLED`; clicked `FIRE LASER ARRAY` and the
+enemy died with a victory log, no "jinked" miss. 25 frames/406ms, zero console/page/HTTP
+errors. Before-ui run: same click sequence, gauge stayed `● NOMINAL`, proving the perceptible
+defect.
+
+**Gates.** `python -m unittest discover` -> `Ran 1249 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5; UI task verified and finished on cockpit. Save schema additive only.
+
+**Commands.**
+```text
+python ui-review/probe_combat_engines.py                                       # pre-fix: AFTER intent evade, strike missed
+python -m unittest tests.test_combat_tactics tests.test_cockpit_layout.TestCombatGaugeHonesty  # OK
+python ui-review/play_cycle3.py cycle03-before-ui                              # gauge NOMINAL
+python ui-review/play_cycle3.py cycle03-after-ui                               # gauge CRIPPLED, ok true
+python -m unittest discover                                                    # Ran 1249 OK
+python aikit.py ui begin/verify/finish voidfarer --surface cockpit             # OK
+python aikit.py check voidfarer                                                # 5/5
+```
+
 

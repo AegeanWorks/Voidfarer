@@ -1446,6 +1446,18 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestCombatGaugeHonesty(unittest.TestCase):
+    """The DRIVES gauge must reflect the persisted engines-disable state, not a brace posture."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_engines_gauge_reads_persistent_disable(self):
+        self.assertIn("c.enemy_engines_disabled", self.js)
+        self.assertNotIn("const isBraced = c.enemy_intent === \"brace\"", self.js)
+
+
 class TestCadetRibbonAtMinimumViewport(unittest.TestCase):
     """The onboarding ribbon must keep its content height at 1280x720."""
 

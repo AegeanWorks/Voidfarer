@@ -535,5 +535,19 @@
     "final_snapshot_digest": "10ea6c5424129a82d64df391cbf5f70200e11122cd46f15e4045371442774f1c",
     "final_snapshot_entries": 1145,
     "surface_digest": "bb2018f92b699951ea8e16bd0e1542848787c11c491302bfdf994c8d80e1d4e3"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "f3a7f9ba3259ca483c81d153984ca35f6f6cbf8e",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1794069112.8460724,
+    "finished_at": 1794069556.438986,
+    "strikes": 0,
+    "reviewer": "opencode/nemotron-3.5-super-vl-free (vision subagent; quoted DRIVES gauge)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "10ea6c5424129a82d64df391cbf5f70200e11122cd46f15e4045371442774f1c",
+    "final_snapshot_entries": 1145,
+    "surface_digest": "2d8fd9026dde675e8da51cd3e55d4b907d232db65b1b0216689effa541010477"
   }
 ]

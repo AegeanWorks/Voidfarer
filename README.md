@@ -518,7 +518,7 @@ python -m voidfarer.cli combat vent
 # With an active marine aboard, send the boarding party across
 python -m voidfarer.cli combat board
 ```
-A successful boarding ends the fight and takes the crippled hull as a fleet prize: it keeps its remaining hull, half its weapon damage and 8% evasion, but pays no full bounty or salvage. A failed boarding injures the lead marine, costs crew morale, resets the tactical combo and lets the enemy counter-attack. The combat card gates `BOARD & CAPTURE` on shields down, hull below 30% and an active marine; the Privateer codex milestone tracks the first prize. At a drydock, `fleet sell_escort <id>` sells escorts; the Shipbreaker milestone tracks sales.
+A successful boarding ends the fight and takes the crippled hull as a fleet prize: it keeps its remaining hull, half its weapon damage and 8% evasion, but pays no full bounty or salvage. A failed boarding injures the lead marine, costs crew morale, resets the tactical combo and lets the enemy counter-attack. The combat card gates `BOARD & CAPTURE` on shields down, hull below 30% and an active marine; the Privateer codex milestone tracks the first prize. A drive-manifold strike disables enemy impulse thrusters for the rest of the encounter: the hostile can no longer jink out of your firing solutions, and the DRIVES gauge reads CRIPPLED. At a drydock, `fleet sell_escort <id>` sells escorts; the Shipbreaker milestone tracks sales.
 
 ### 18e. Fleet Deployment & Patrols
 ```bash
@@ -565,7 +565,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,246-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,249-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

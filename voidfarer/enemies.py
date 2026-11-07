@@ -159,6 +159,7 @@ def choose_enemy_intent(
     player_shield: int,
     player_max_shield: int,
     player_combo: int,
+    engines_disabled: bool = False,
 ) -> tuple[str, str]:
     """Pick the next hostile maneuver from hull, shield, combo, and AI profile state."""
     enemy_hp = enemy_hull / max(1, enemy_max_hull)
@@ -193,7 +194,7 @@ def choose_enemy_intent(
             return "ability", SPECIAL_TELEGRAPHS[special_ability]
         if player_hp < 0.30 and has_ability:
             return "ability", SPECIAL_TELEGRAPHS[special_ability]
-        if enemy_hp < 0.30:
+        if enemy_hp < 0.30 and not engines_disabled:
             return "evade", INTENT_TELEGRAPHS["evade"]
         if player_combo >= 2:
             return "brace", INTENT_TELEGRAPHS["brace"]

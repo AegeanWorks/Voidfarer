@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `345`
+- **Total Classes**: `346`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1962`
-- **Total Source Lines**: `50015`
+- **Total Class Methods**: `1966`
+- **Total Source Lines**: `50081`
 
 ---
 
@@ -381,7 +381,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1903` lines (`83990` bytes)
+**Size**: `1915` lines (`84436` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -599,6 +599,9 @@
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
   - Method `.test_outliner_panel_ends_with_its_sections()`
+- `class TestCombatGaugeHonesty` - *The DRIVES gauge must reflect the persisted engines-disable state, not a brace posture.*
+  - Method `.setUpClass()`
+  - Method `.test_engines_gauge_reads_persistent_disable()`
 - `class TestCadetRibbonAtMinimumViewport` - *The onboarding ribbon must keep its content height at 1280x720.*
   - Method `.setUpClass()`
   - Method `.test_cadet_banner_opts_out_of_flex_shrink()`
@@ -697,7 +700,7 @@
 ### [`tests/test_combat_tactics.py`](tests/test_combat_tactics.py)
 > *Comprehensive unit tests for Tactical Subsystem Targeting, Combat Heat, and Field Munition Fabrication.*
 
-**Size**: `244` lines (`10080` bytes)
+**Size**: `283` lines (`11844` bytes)
 
 **Classes:**
 - `class WeatherTestEngine`
@@ -705,6 +708,8 @@
 - `class CombatTacticsAndMunitionsTest`
   - Method `._engine(wep_power, reactor_mode)`
   - Method `.test_target_engines_cripples_drive_manifolds()`
+  - Method `.test_engines_strike_collapses_evasion_for_the_rest_of_the_fight()`
+  - Method `.test_legacy_combat_payload_defaults_engines_enabled()`
   - Method `.test_target_bridge_requires_sufficient_weapon_power()`
   - Method `.test_target_bridge_critical_strike_and_command_panic()`
   - Method `.test_point_defense_reports_the_intercepted_counter_battery()`
@@ -2935,14 +2940,14 @@
 ### [`voidfarer/enemies.py`](voidfarer/enemies.py)
 > *Hostile Enemy Archetypes, Tactical Combat AI, and Procedural Intercept Generation.*
 
-**Size**: `283` lines (`11127` bytes)
+**Size**: `284` lines (`11188` bytes)
 
 **Classes:**
 - `class EnemyArchetype` - *Blueprint for procedural hostile intercepts across galactic territories.*
 
 **Functions:**
 - `def threat_multiplier(threat_level)` - *Scale generated intercept strength with the pilot's command experience.*
-- `def choose_enemy_intent(profile, special_ability, ability_ready, enemy_hull, enemy_max_hull, enemy_shield, enemy_max_shield, player_hull, player_max_hull, player_shield, player_max_shield, player_combo)` - *Pick the next hostile maneuver from hull, shield, combo, and AI profile state.*
+- `def choose_enemy_intent(profile, special_ability, ability_ready, enemy_hull, enemy_max_hull, enemy_shield, enemy_max_shield, player_hull, player_max_hull, player_shield, player_max_shield, player_combo, engines_disabled)` - *Pick the next hostile maneuver from hull, shield, combo, and AI profile state.*
 - `def generate_system_enemy(system_id, security, faction, seed, threat_level)` - *Generate a procedurally balanced CombatEncounter matching star system characteristics.*
 
 ---
@@ -2950,7 +2955,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10340` lines (`510353` bytes)
+**Size**: `10352` lines (`510885` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3429,7 +3434,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2467` lines (`92354` bytes)
+**Size**: `2469` lines (`92479` bytes)
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

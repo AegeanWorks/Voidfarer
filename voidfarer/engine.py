@@ -5988,11 +5988,19 @@ class SimulationEngine:
             enemy_rem_shield = combat.enemy_shield
             enemy_rem_hull = combat.enemy_hull
             enemy_rem_damage = combat.enemy_damage
+            enemy_engines_disabled = combat.enemy_engines_disabled
             ability_cd = max(0, combat.ability_cooldown - 1)
             intent = combat.enemy_intent if combat.enemy_intent in {"fire", "brace", "evade", "execute", "ability"} else "fire"
+            if enemy_engines_disabled and intent == "evade":
+                intent = "fire"
             enemy_guard = 0.55 if intent == "brace" else 1.0
             damaging_actions = {"fire_lasers", "drone_strike", "target_subsystem", "target_weapons", "target_shields", "target_engines", "target_bridge", "point_defense"}
-            enemy_miss = action in damaging_actions and intent == "evade" and self.rng.random() < 0.35
+            enemy_miss = (
+                action in damaging_actions
+                and intent == "evade"
+                and not enemy_engines_disabled
+                and self.rng.random() < 0.35
+            )
             weapon_miss = False
             enemy_hull_before = enemy_rem_hull
             enemy_shield_before = enemy_rem_shield
@@ -6105,7 +6113,7 @@ class SimulationEngine:
                         overflow = strike_dmg - enemy_rem_shield
                         enemy_rem_shield = 0
                         enemy_rem_hull -= overflow
-                    intent = "brace"
+                    enemy_engines_disabled = True
                     enemy_miss = False
                     strike_desc = f"Pinpoint strike on enemy drive manifolds! Disabled impulse thrusters (collapsed enemy evasion) and dealt {strike_dmg} damage!"
                 elif subsystem == "bridge":
@@ -6261,6 +6269,7 @@ class SimulationEngine:
                     player_shield=new_shield,
                     player_max_shield=self.state.ship.max_shield,
                     player_combo=new_combo,
+                    engines_disabled=enemy_engines_disabled,
                 )
                 new_combat = CombatEncounter(
                     id=combat.id,
@@ -6283,6 +6292,7 @@ class SimulationEngine:
                     near_miss_awarded=combat.near_miss_awarded,
                     captain_gambit_used=combat.captain_gambit_used,
                     captain_evasion_bonus=combat.captain_evasion_bonus,
+                    enemy_engines_disabled=enemy_engines_disabled,
                 )
                 new_log = list(self.state.ship.flight_log[-19:]) + [msg]
                 new_ship = self._clone_ship(hull=new_hull, shield=new_shield, reactor=combat_reactor, tactical_combo=new_combo, streak=new_streak, flight_log=tuple(new_log[-20:]))
@@ -6659,6 +6669,7 @@ class SimulationEngine:
                 player_shield=new_shield,
                 player_max_shield=self.state.ship.max_shield,
                 player_combo=new_combo,
+                engines_disabled=enemy_engines_disabled,
             )
 
             msg = f"{strike_desc} Inbound counter-battery dealt {inbound} damage.{evasion_note}{ability_note} (Enemy HP: {enemy_rem_hull}/{combat.enemy_max_hull}, Shield: {enemy_rem_shield}/{combat.enemy_max_shield})"
@@ -6684,6 +6695,7 @@ class SimulationEngine:
                 near_miss_awarded=combat.near_miss_awarded,
                 captain_gambit_used=combat.captain_gambit_used,
                 captain_evasion_bonus=combat.captain_evasion_bonus,
+                enemy_engines_disabled=enemy_engines_disabled,
             )
 
             new_log = list(self.state.ship.flight_log[-19:]) + [msg]
