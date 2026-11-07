@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-wave8-fixbatch",
-    "last_phase": "in_progress",
+    "task_id": "voidfarer-cycle1-cadet-ribbon",
+    "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794039420.265505,
-    "owner": "unidentified",
-    "started_by": "unidentified",
+    "updated_at": 1794065042.7121937,
+    "owner": "opencode:campaign",
+    "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794039426.6496897
+    "completed_at": 1794065043.039438
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-wave2-ui-readout",
-      "phase": "superseded",
-      "phase_num": 4,
-      "description": "Superseded by 'voidfarer-wave3-cli-guards' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1793991803.9121304,
-      "timestamp_str": "2026-11-06 22:03:23",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-wave3-cli-guards",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: 3 CLI guards landed with tests, inventory 1145, check 5/5. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793992054.9368796,
-      "timestamp_str": "2026-11-06 22:07:34",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-wave4-agent-catalog",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: catalog slot fields plus step doc fix",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793992106.0824804,
-      "timestamp_str": "2026-11-06 22:08:26",
-      "agent": "unidentified",
-      "impact_assessment": {
-        "why": "AI clients cannot discover slot; step alias lie misroutes ticks",
-        "benefits": "correct headless/REST field discovery",
-        "risks": "contract: catalog additive (slot) plus one doc string; dependency: none new; concurrency: none; state: no schema change",
-        "mitigation": "save-family slot injection, one-line CONTEXT fix, catalog tests, full check"
-      },
-      "plan_digest": "38507bb341aee32647911c2599277877e1efd4607eec5586004c87dc1a2a22d8"
-    },
     {
       "task_id": "voidfarer-wave3-cli-guards",
       "phase": "superseded",
@@ -265,6 +226,50 @@
       "timestamp": 1794039426.6496913,
       "timestamp_str": "2026-11-07 11:17:06",
       "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-cycle1-cadet-ribbon",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan: keep the onboarding ribbon at content height at 1280x720",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794062000.5131135,
+      "timestamp_str": "2026-11-07 17:33:20",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "At the minimum supported viewport the flex column shrinks the cadet ribbon to 38px while its badge needs 59px, so the ribbon overlaps the top bar and clips the milestone pips.",
+        "benefits": "Onboarding stays readable and non-overlapping at 1280x720; no control or state changes.",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none (CSS only); regression: 31px less cockpit grid height at 720p.",
+        "mitigation": "Failing-first CSS contract test, before/after Playwright captures at 1280x720, and a scripted browser onboarding run that advances a milestone."
+      },
+      "plan_digest": "5c6ada8f8b264161588766e653292bc8e8cb17605f9254238f5fcc0acd3cbc98"
+    },
+    {
+      "task_id": "voidfarer-cycle1-cadet-ribbon",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Cycle 1 verified: ribbon flex-shrink fix, screenshot pair and orbit play; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794065042.7121937,
+      "timestamp_str": "2026-11-07 18:24:02",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-181 and campaign record",
+        "evidence": "ui-review/cycle00-baseline/short.png, ui-review/cycle01-after/short.png, ui-review/cycle01-play/play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-cycle1-cadet-ribbon",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cycle1-cadet-ribbon' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794065043.0394397,
+      "timestamp_str": "2026-11-07 18:24:03",
+      "agent": "opencode:campaign"
     }
   ]
 }

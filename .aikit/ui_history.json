@@ -521,5 +521,19 @@
     "final_snapshot_digest": "10ea6c5424129a82d64df391cbf5f70200e11122cd46f15e4045371442774f1c",
     "final_snapshot_entries": 1145,
     "surface_digest": "e779abc3ca26273c46025d4015a809c1ce87be4299ac6be77e415a35fb6baa31"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "8712651b95b02f0b729d4bfdddfbb2b2f1058521",
+    "contract_hash": "5b6aff8b9d591d3ef3b3cbd0dcdd5aec4c88fd681e3dfb507ae145b1590d2d3d",
+    "started_at": 1794063850.393408,
+    "finished_at": 1794064123.735567,
+    "strikes": 0,
+    "reviewer": "opencode/nemotron-3.5-super-vl-free (vision subagent; on-screen text quoted)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "10ea6c5424129a82d64df391cbf5f70200e11122cd46f15e4045371442774f1c",
+    "final_snapshot_entries": 1145,
+    "surface_digest": "bb2018f92b699951ea8e16bd0e1542848787c11c491302bfdf994c8d80e1d4e3"
   }
 ]

@@ -2144,6 +2144,7 @@ body.cockpit-theme {
    ========================================================================== */
 .cadet-academy-banner {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
     gap: 1.2rem;

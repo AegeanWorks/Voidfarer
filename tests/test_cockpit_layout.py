@@ -1446,6 +1446,21 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestCadetRibbonAtMinimumViewport(unittest.TestCase):
+    """The onboarding ribbon must keep its content height at 1280x720."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_cadet_banner_opts_out_of_flex_shrink(self):
+        self.assertRegex(
+            self.css,
+            r"(?s)\.cadet-academy-banner\s*\{[^}]*flex-shrink:\s*0",
+            "the cadet ribbon is a flex item and must not shrink below its badge at 720p",
+        )
+
+
 class TestFactionEconomyCard(unittest.TestCase):
     """The faction card must show where money comes from and where it goes."""
 

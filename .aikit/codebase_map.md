@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `344`
+- **Total Classes**: `345`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1958`
-- **Total Source Lines**: `49954`
+- **Total Class Methods**: `1960`
+- **Total Source Lines**: `49969`
 
 ---
 
@@ -381,7 +381,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1888` lines (`83480` bytes)
+**Size**: `1903` lines (`83990` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -599,6 +599,9 @@
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
   - Method `.test_outliner_panel_ends_with_its_sections()`
+- `class TestCadetRibbonAtMinimumViewport` - *The onboarding ribbon must keep its content height at 1280x720.*
+  - Method `.setUpClass()`
+  - Method `.test_cadet_banner_opts_out_of_flex_shrink()`
 - `class TestFactionEconomyCard` - *The faction card must show where money comes from and where it goes.*
   - Method `.setUpClass()`
   - Method `.test_card_lists_tax_trade_industry_and_upkeep()`
