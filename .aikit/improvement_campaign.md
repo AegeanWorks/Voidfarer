@@ -17,8 +17,9 @@ does not repeat one.
 | 7 | Audio cues (SOUND FX mute persistence + master gain) | fixed, proven |
 | 8 | Audio cues re-sweep (pilot level-up cue) | fixed, proven |
 | 9 | UI readability re-sweep (Commander vs Pilot Mastery labels) | fixed, proven |
+| 10 | Saving/load re-sweep (legacy landable migration) | fixed, proven |
 
-Queue after Cycle 9: re-sweep all areas for new verified findings.
+Queue after Cycle 10: re-sweep all areas for new verified findings.
 
 ---
 
@@ -459,6 +460,54 @@ python -m unittest tests.test_cockpit_layout.TestProgressionTrackLabels       # 
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
 python -m unittest discover                                                    # Ran 1259 OK
+python aikit.py check voidfarer                                                # 5/5
+```
+
+---
+
+## Cycle 10 — Saves re-sweep: legacy saves gain the new surface landings
+
+**Find.** A real legacy save (474 KB, seed 42, `sol_body_6` ringed giant)
+persisted `landable=false`; the cockpit showed no `LAND ON SURFACE` action and no surface
+operations even though generation now supports gas-world landings. Evidence:
+`ui-review/cycle10-before/01-legacy-target-bottom.png`.
+
+**Analyze.** Cycle 5 changed `GalaxyGenerator` only; `landable` is a stored body field, so
+existing saves kept the old flag. The landable policy was also duplicated between galaxy
+generation and any future migration. Killed: recomputing the whole galaxy (would rewrite
+ownership/population). Survivor: one shared `SURFACE_LANDING_TYPES` set plus a narrow
+load-time flag normalization that leaves faction/government untouched.
+
+**Fix.** `surface.py` owns `SURFACE_LANDING_TYPES`; `galaxy.py` reads it; `engine.py` load
+migration sets `landable=True` for those body types after the population backfill. Test:
+legacy gas body becomes landable with its stored faction/government unchanged.
+
+**Visual proof (same legacy save, same 1280x720 view).**
+- Before: `ui-review/cycle10-before/01-legacy-target-bottom.png` — 5 action buttons, no
+  `LAND ON SURFACE`.
+- After: `ui-review/cycle10-after/01-legacy-target-bottom.png` — 6 buttons including
+  `LAND ON SURFACE`; clean 3x2 grid.
+- After landing/running: `cycle10-after/02-legacy-surface-ops.png` (`2 SITES`, ringed giant)
+  and `cycle10-after/03-legacy-cloud-scoop.png` (`S2 Cloud Scoop` WORKED, +3 fuel cells).
+- Vision review: `opencode-go/gemini-4-argon` quoted the added button, site count and Cloud
+  Scoop state; no new clipping.
+
+**Play report.** `python ui-review/play_cycle10.py cycle10-after` (real Edge, 1280x720,
+legacy 474 KB save): loaded with `landable=true`, landed for +450 cr, ran Cloud Scoop for
++3 fuel cells (hold 15 -> 18). 25 frames/407ms, zero errors. Before run:
+`cycle10-before/play-report.json` — `loadedLandable=false`, no landing action, `ok=false`.
+
+**Gates.** `python -m unittest discover` -> `Ran 1260 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5. No schema change; the normalized flag persists on the next save.
+
+**Commands.**
+```text
+python ui-review/make_legacy_save.py                                          # 474 KB seed-42 save, landable=false
+python ui-review/play_cycle10.py cycle10-before                               # in HEAD worktree, no LAND
+python ui-review/play_cycle10.py cycle10-after                                # LAND + Cloud Scoop, ok true
+python -m unittest tests.test_frontier_depth.SurfaceOperationTest             # OK
+python -m unittest discover                                                    # Ran 1260 OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py check voidfarer                                                # 5/5
 ```
 

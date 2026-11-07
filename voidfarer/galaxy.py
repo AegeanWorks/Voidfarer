@@ -16,6 +16,7 @@ from voidfarer.demographics import (
 )
 from voidfarer.factions import GOVERNMENT_BY_FACTION, government_for
 from voidfarer.mapmods import generate_map_modifiers
+from voidfarer.surface import SURFACE_LANDING_TYPES
 from voidfarer.models import (
     AnomalyChoice,
     AnomalyEncounter,
@@ -966,10 +967,7 @@ class GalaxyGenerator:
         habitable_types = {"terrestrial", "oceanic", "savanna", "tundra", "ring_world", "dyson_sphere"}
         # Every biome with a surface palette supports a landing party; environment
         # gates in surface.py decide which operations fit each world type.
-        landable_surface_types = habitable_types | {
-            "lava_world", "volcanic", "gas_giant", "ringed_giant", "ice_giant",
-            "methane_storm",
-        }
+        landable_surface_types = set(SURFACE_LANDING_TYPES)
         resource_map = {
             "terrestrial": ("titanium",), "oceanic": ("hydroponics",), "gas_giant": ("fuel_cells",),
             "asteroid_belt": ("titanium", "xenoliths"), "desert_world": ("titanium",), "ice_world": ("hydroponics",),

@@ -52,6 +52,12 @@ class SurfaceOperation:
 
 
 GAS_SURFACE_TYPES = ("gas_giant", "ringed_giant", "ice_giant", "methane_storm")
+# Biomes whose worlds accept a landing party; kept here so generation and the
+# load migration for older saves share one policy.
+SURFACE_LANDING_TYPES = (
+    "terrestrial", "oceanic", "savanna", "tundra", "ring_world", "dyson_sphere",
+    "lava_world", "volcanic", "gas_giant", "ringed_giant", "ice_giant", "methane_storm",
+)
 
 SURFACE_OPERATIONS: tuple[SurfaceOperation, ...] = (
     SurfaceOperation(

@@ -2080,3 +2080,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. `style.css` gives the commander row a full-width bar and lets the mastery row wrap between label and value; no mid-word wrapping.
   3. Add `TestProgressionTrackLabels` to `tests/test_cockpit_layout.py` pinning both labels and the `ship.mastery` read.
 - **Consequences**: Same promotion state, 1280x720, before `cycle08-after/02-after-promotion.png` (`LEVEL 1` + `0/400 XP`, no mastery line) vs after `cycle09-after/02-after-promotion.png` (`COMMANDER LVL 1`/`0/400 XP`, `PILOT MASTERY LVL 2`/`40/750 XP · 1 TP`). The first draft wrapped mid-word; a second capture after the CSS fix is clean. Vision review quoted both tracks and found no clipping; the card grows ~55px and shifts the scrollable ability list, with no structural break. Full suite `Ran 1259 OK`; UI task finished; no game-logic or save-schema change.
+
+### ADR-190: Cycle 10 save migration — legacy saves gain the new surface landings
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Cycle 5 changed generation so gas, ringed, ice and lava worlds are landable, but `landable` is persisted in each save. A real 474 KB legacy save with `sol_body_6` (ringed giant) still `landable=false` loaded with no `LAND ON SURFACE` action and no surface operations. The generation policy and the migration policy were duplicated as well.
+- **Decision**:
+  1. Move the shared surface set to `SURFACE_LANDING_TYPES` in `surface.py`; `galaxy.py` reads it instead of a local copy.
+  2. The engine load migration normalizes `landable=True` for any body whose type is in that set, after the population backfill so ownership/government are not rewritten.
+  3. Test: a legacy gas body loads landable while preserving its stored faction and government.
+- **Consequences**: The same legacy save, same 1280x720 view, adds `LAND ON SURFACE` to the target card (5 -> 6 action buttons); landing pays +450 cr and the ringed giant offers `2 SITES`; Cloud Scoop succeeds for +3 fuel cells, 25 frames/407ms, zero errors. Before/after captures `cycle10-before/01-legacy-target-bottom.png` and `cycle10-after/01-legacy-target-bottom.png` were reviewed by the vision subagent, which quoted the added button and found no layout break. Full suite `Ran 1260 OK`; no schema change, old saves are normalized on load and written back on their next save.

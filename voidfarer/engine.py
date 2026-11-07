@@ -310,6 +310,7 @@ from voidfarer.retention import (
     streak_multiplier,
 )
 from voidfarer.surface import (
+    SURFACE_LANDING_TYPES,
     SURFACE_OPERATION_MAP,
     resolve_surface_operation,
     surface_report,
@@ -614,6 +615,11 @@ class SimulationEngine:
                         updated_body,
                         population=updated_body.population_capacity,
                     )
+                # Older saves stored gas/lava worlds as non-landable; the landing
+                # catalogs now support them, so normalize the flag without touching
+                # their ownership or population.
+                if updated_body.body_type in SURFACE_LANDING_TYPES and not updated_body.landable:
+                    updated_body = replace(updated_body, landable=True)
                 if updated_body != body:
                     body_changed = True
                 new_bodies.append(updated_body)

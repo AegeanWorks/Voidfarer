@@ -434,6 +434,29 @@ class SurfaceOperationTest(unittest.TestCase):
         ids = {row["id"] for row in surface_report(ship, body)["operations"]}
         self.assertIn("magma_tap", ids)
 
+    def test_legacy_gas_world_becomes_landable_without_changing_owner(self):
+        engine = SimulationEngine(seed=42)
+        system = engine.current_system
+        gas = next(
+            body for body in system.bodies
+            if body.body_type in ("gas_giant", "ringed_giant", "ice_giant", "methane_storm")
+        )
+        legacy = replace(gas, landable=False)
+        systems = dict(engine.state.systems)
+        systems[system.id] = replace(
+            system,
+            bodies=tuple(legacy if candidate.id == gas.id else candidate for candidate in system.bodies),
+        )
+        engine.state = engine._clone_state(systems=systems)
+        reloaded = SimulationEngine(state=engine.state)
+        migrated = next(
+            candidate for candidate in reloaded.current_system.bodies
+            if candidate.id == gas.id
+        )
+        self.assertTrue(migrated.landable)
+        self.assertEqual(migrated.faction, legacy.faction)
+        self.assertEqual(migrated.government, legacy.government)
+
     def test_uninhabited_gas_world_keeps_no_government_after_load_migration(self):
         engine = SimulationEngine(seed=42)
         system = engine.current_system

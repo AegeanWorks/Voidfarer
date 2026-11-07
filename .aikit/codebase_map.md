@@ -9,8 +9,8 @@
 - **Total Python Modules**: `127`
 - **Total Classes**: `350`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1980`
-- **Total Source Lines**: `50292`
+- **Total Class Methods**: `1981`
+- **Total Source Lines**: `50325`
 
 ---
 
@@ -1238,7 +1238,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `625` lines (`31279` bytes)
+**Size**: `648` lines (`32296` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
@@ -1277,6 +1277,7 @@
   - Method `.test_every_surface_operation_is_reachable_on_a_generated_world()`
   - Method `.test_ringed_giant_landing_offers_cloud_scoop_without_rover_ops()`
   - Method `.test_lava_world_surface_offers_magma_tap()`
+  - Method `.test_legacy_gas_world_becomes_landable_without_changing_owner()`
   - Method `.test_uninhabited_gas_world_keeps_no_government_after_load_migration()`
   - Method `.test_an_operation_for_another_environment_is_refused()`
 - `class FrontierUiContractTest`
@@ -2973,7 +2974,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10356` lines (`511127` bytes)
+**Size**: `10362` lines (`511539` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3353,7 +3354,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1391` lines (`62657` bytes)
+**Size**: `1389` lines (`62597` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -3856,7 +3857,7 @@
 ### [`voidfarer/surface.py`](voidfarer/surface.py)
 > *Surface operations: choose what your landing party does after touchdown.*
 
-**Size**: `259` lines (`8462` bytes)
+**Size**: `265` lines (`8789` bytes)
 
 **Classes:**
 - `class SurfaceOperation`
