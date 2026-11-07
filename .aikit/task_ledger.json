@@ -1,68 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-wave7-saves-verbs",
-    "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794037587.9471562,
+    "task_id": "voidfarer-wave8-fixbatch",
+    "last_phase": "in_progress",
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794039420.265505,
     "owner": "unidentified",
     "started_by": "unidentified",
-    "continuations": [],
-    "completed_at": 1794038185.1814084
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-wave-audit-0-30",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: strict quantity guards on trade/buy/jettison, 1177 tests pass, mechanics 37 families 0 gaps, hygiene/guidelines/secrets clean, map synced, ADR-162. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793724801.5333161,
-      "timestamp_str": "2026-11-03 19:53:21",
-      "agent": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-wave2-ui-readout",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: viewport readout shows HUD scale",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793991325.7522166,
-      "timestamp_str": "2026-11-06 21:55:25",
-      "agent": "unidentified",
-      "impact_assessment": {
-        "why": "85pct vs 120pct indistinguishable in screenshots",
-        "benefits": "debuggable density, DPR reviews",
-        "risks": "contract: static surface only, reads existing uiScale; dependency: none new; concurrency: none; state: no schema change",
-        "mitigation": "bounded to app.js one line, ui_inventory diff, 720p audit, click-map"
-      },
-      "plan_digest": "24c6c658c0ab429c18fd8dd40d05b5fb9f42be58b901b963aedf257f123ad831"
-    },
-    {
-      "task_id": "voidfarer-wave-audit-0-30",
-      "phase": "superseded",
-      "phase_num": 4,
-      "description": "Superseded by 'voidfarer-wave2-ui-readout' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1793991325.7522166,
-      "timestamp_str": "2026-11-06 21:55:25",
-      "agent": "unidentified",
-      "continued_from": "kilo:1"
-    },
-    {
-      "task_id": "voidfarer-wave2-ui-readout",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: readout SCALE landed, ui verify passed, click-map 162 clean, settings 0 errors, check 5/5. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793991587.085098,
-      "timestamp_str": "2026-11-06 21:59:47",
-      "agent": "unidentified"
-    },
     {
       "task_id": "voidfarer-wave3-cli-guards",
       "phase": "phase 2",
@@ -266,6 +214,63 @@
       "status": "completed",
       "timestamp": 1794038185.1814098,
       "timestamp_str": "2026-11-07 10:56:25",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave8-reswarm",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: nine-area reswarm ownership map",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794038347.4267647,
+      "timestamp_str": "2026-11-07 10:59:07",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "prior seven waves verified green but no fresh full-tree swarm in this session; audio/event-feed and cross-area contracts need explicit ownership",
+        "benefits": "single-owner file map ends gaps/overlaps; identical brief keeps findings comparable; failing-first rule keeps noise out",
+        "risks": "contract: plan only, no code; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "read-only inventory plus file globs; no edits, no swarms, no tickets in Stage 1"
+      },
+      "plan_digest": "76ee49aa2f0d44909609d8e97e65a9ab1dc6a2c60e1687959b27f8e656f02fa0"
+    },
+    {
+      "task_id": "voidfarer-wave8-fixbatch",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: pirate flee alias, evasion cap, drone id monotonic, reset seed guard",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794038790.5718174,
+      "timestamp_str": "2026-11-07 11:06:30",
+      "agent": "unidentified",
+      "impact_assessment": {
+        "why": "swarm A9/A4/A2/A8 verified true by code read; small isolated guards with no schema or UI impact",
+        "benefits": "parser-handler parity, no guaranteed evade, no id collision, seed contract parity",
+        "risks": "contract: cli choices plus engine guards only; dependency: none new; concurrency: none; state: no schema change",
+        "mitigation": "failing-first tests per fix, minimal hunks, full check after batch"
+      },
+      "plan_digest": "4c1689babff6649f64e8ba012b3d94d9f45ae2beba29c402898452b11f1aa6d4"
+    },
+    {
+      "task_id": "voidfarer-wave8-reswarm",
+      "phase": "superseded",
+      "phase_num": 2,
+      "description": "Superseded by 'voidfarer-wave8-fixbatch' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1794038790.5718174,
+      "timestamp_str": "2026-11-07 11:06:30",
+      "agent": "unidentified"
+    },
+    {
+      "task_id": "voidfarer-wave8-fixbatch",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Verify: pirate flee, evasion cap, drone ids, seed guard landed, 1243 OK, inventory 1145, check 5/5. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794039420.265505,
+      "timestamp_str": "2026-11-07 11:17:00",
       "agent": "unidentified"
     }
   ]

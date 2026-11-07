@@ -1072,7 +1072,13 @@ class SimulationEngine:
                 error = self._validate_commander_profile(profile)
                 if error:
                     return False, error
-            self.seed = int(seed)
+            try:
+                seed_int = int(seed)
+            except (TypeError, ValueError):
+                return False, "Seed must be an integer."
+            if seed_int < 0:
+                return False, "Seed must be a non-negative integer."
+            self.seed = seed_int
             self.rng = random.Random(self.seed)
             self.state = self._create_initial_state(self.seed)
             self.decision_cadence = self.DEFAULT_DECISION_CADENCE
@@ -5605,10 +5611,17 @@ class SimulationEngine:
             target_sys = assigned_system_id or self.state.ship.current_system_id
             if target_sys not in self.state.systems:
                 return False, f"Unknown star system '{target_sys}' for drone deployment."
-            drone_id = f"drone_{drone_type}_{len(self.state.ship.fleet_drones) + 1}"
+            prefix = f"drone_{drone_type}_"
+            taken = [
+                int(d.id[len(prefix):])
+                for d in self.state.ship.fleet_drones
+                if d.id.startswith(prefix) and d.id[len(prefix):].isdigit()
+            ]
+            next_num = max(taken, default=0) + 1
+            drone_id = f"{prefix}{next_num}"
             new_drone = FleetDrone(
                 id=drone_id,
-                name=f"{template['name']} #{len(self.state.ship.fleet_drones) + 1}",
+                name=f"{template['name']} #{next_num}",
                 drone_type=drone_type,
                 assigned_system_id=target_sys,
                 status="harvesting" if drone_type == "mining" else "patrolling",
@@ -6598,7 +6611,7 @@ class SimulationEngine:
                 fleet_evasion_bonus(fleet_ships, battle_stance)
                 + combat.captain_evasion_bonus,
             )
-            if inbound > 0 and (equipment["evasion"] + mercenary_evasion + fleet_evasion) > 0.0 and self.rng.random() < (equipment["evasion"] + mercenary_evasion + fleet_evasion):
+            if inbound > 0 and (equipment["evasion"] + mercenary_evasion + fleet_evasion) > 0.0 and self.rng.random() < min(0.95, equipment["evasion"] + mercenary_evasion + fleet_evasion):
                 inbound = 0
                 evasion_note += " [Ion afterburners and escort screen evaded incoming fire!]"
             if inbound > 0 and fleet_ships:

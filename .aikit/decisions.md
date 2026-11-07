@@ -1978,3 +1978,14 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Swarm A9 verified true: `/api/new-game` and `/api/reset` had no terminal path — a headless operator could not start a fresh campaign without REST. Destructive verbs stay confirm-less, matching the existing `saves delete` behavior.
 - **Decision**: `cmd_saves` handles `new-game|newgame|new [seed] [slot]` (seed>=0 like the server minimum, explicit integer errors) and `reset [seed]` (`cli.py:964`); shell `saves` parser gains both choices plus an `extra` slot positional, passing only set args so bare forms keep `cmd_saves` defaults (`cli.py:3071`, `cli.py:3583`). New `TestCLISavesLifecycle` (named-slot round trip, bad-seed rejections, reset freshness; 3/3 error on baseline argparse choices, pass with fix).
 - **Consequences**: Full lifecycle parity from the terminal; `ui_inventory.py` 1145 lines; `aikit check` 5/5 after map refresh; no save-schema change; no UI-ticket files touched.
+
+### ADR-180: Wave 8 reswarm fix batch — pirate flee alias, reset seed guard, drone id monotonic, evasion cap
+- **Date**: 2026-11-07
+- **Status**: Accepted
+- **Context**: Nine-area reswarm (A1-A9) returned completed analysis documents; main-session sampled 4 claims and reproduced 4/4 on code read plus failing-first runs: (1) shell `pirate` choices omitted `flee` while `cmd_pirate` and engine accept it; (2) `reset(-5)` succeeded while CLI/server gates require seed>=0; (3) `buy_drone` id reused `len+1` after dismiss, colliding on re-buy; (4) combat evasion summed uncapped, guaranteeing evade at stacked bonuses.
+- **Decision**:
+  1. `cli.py:3152` parser choices gain `flee`; status hint line lists `pirate flee`.
+  2. `engine.py:1068` `reset` coerces with integer errors and rejects negative seeds (`Seed must be a non-negative integer`), matching CLI/server minima.
+  3. `engine.py:5608` drone ids use max existing numeric suffix +1 per type instead of `len+1`, preserving uniqueness after dismiss with no schema change.
+  4. `engine.py:6601` evasion roll capped at `min(0.95, total)` so stacked bonuses can still miss.
+- **Consequences**: 4 failing-first tests in `tests/test_wave8_fixbatch.py` (parser reaches engine, seed guard, id uniqueness, capped miss at rng 0.96) fail 4/4 on baseline and pass with fix; full suite `Ran 1243 OK`; `ui_inventory.py` 1145 lines; `aikit check` 5/5 after map refresh; README suite count 79->80; no save-schema change; no UI-ticket files touched. Remaining swarm findings filed as deferred (balance tuning, multi-file refactors, catalog aliasing) with reasons, not implemented.

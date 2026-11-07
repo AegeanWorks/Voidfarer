@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `126`
-- **Total Classes**: `339`
+- **Total Python Modules**: `127`
+- **Total Classes**: `344`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1953`
-- **Total Source Lines**: `49835`
+- **Total Class Methods**: `1958`
+- **Total Source Lines**: `49954`
 
 ---
 
@@ -2494,6 +2494,25 @@
 
 ---
 
+### [`tests/test_wave8_fixbatch.py`](tests/test_wave8_fixbatch.py)
+> *Wave 8 fix-batch: failing-first regressions for swarm-verified defects.*
+
+**Size**: `106` lines (`3638` bytes)
+
+**Classes:**
+- `class _IsolatedCli`
+  - Method `.setUp()`
+- `class TestPirateFleeShellParses`
+  - Method `.test_pirate_flee_reaches_engine_not_argparse()`
+- `class TestResetRejectsNegativeSeed`
+  - Method `.test_reset_negative_seed_rejected()`
+- `class TestDroneIdsNeverReused`
+  - Method `.test_drone_ids_unique_after_dismiss()`
+- `class TestEvasionCapped`
+  - Method `.test_stacked_evasion_still_misses_sometimes()`
+
+---
+
 ### [`tests/test_world_relief.py`](tests/test_world_relief.py)
 > *Post-war reconstruction, relief cargo and the market premium for bombed worlds.*
 
@@ -2736,7 +2755,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3600` lines (`181953` bytes)
+**Size**: `3600` lines (`181975` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2926,7 +2945,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10311` lines (`509059` bytes)
+**Size**: `10324` lines (`509550` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

@@ -2352,7 +2352,7 @@ def cmd_pirate(engine: SimulationEngine, storage: StorageManager, parts: list[st
         print(f"{BOLD}{pirate.band_name}{RESET} // {pirate.ship_class} // threat {pirate.threat} // {pirate.system_name}")
         print(pirate.description)
         print(f"Toll demanded: {YELLOW}{pirate.toll_credits} cr{RESET} | Your credits: {engine.state.ship.credits}")
-        print(f"{DIM}Resolve: pirate pay | pirate fight | pirate evade{RESET}")
+        print(f"{DIM}Resolve: pirate pay | pirate fight | pirate evade | pirate flee{RESET}")
         return 0
     if action not in ("pay", "fight", "evade", "flee"):
         print(f"{RED}Unknown pirate action '{action}'. Use pay, fight, or evade.{RESET}")
@@ -3149,7 +3149,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     away_p.add_argument("values", nargs="*", help="Mission type, crew ids, or mission id")
 
     pirate_p = subparsers.add_parser("pirate", help="Inspect or resolve a pirate toll encounter")
-    pirate_p.add_argument("action", nargs="?", default="status", choices=["status", "pay", "fight", "evade"])
+    pirate_p.add_argument("action", nargs="?", default="status", choices=["status", "pay", "fight", "evade", "flee"])
 
     decision_p = subparsers.add_parser("decision", help="Inspect or resolve the pending real-time decision")
     decision_p.add_argument("action", nargs="?", default="status", choices=["status", "choose"])
