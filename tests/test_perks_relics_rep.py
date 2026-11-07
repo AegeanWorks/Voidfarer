@@ -151,6 +151,36 @@ class EnemyRepRewardTest(unittest.TestCase):
         self.assertTrue(ok)
         self.assertLess(engine.state.ship.faction_standings.get("precursor_watch", 0), 0)
 
+    def test_legacy_precursor_payload_uses_the_same_sign_as_the_archetype(self):
+        engine = SimulationEngine(seed=42)
+        combat = CombatEncounter(
+            id="test_legacy_precursor",
+            enemy_name="Archon Automated Sentinel",
+            enemy_class="Alien Automaton",
+            enemy_hull=1,
+            enemy_max_hull=150,
+            enemy_damage=0,
+            bounty_credits=10,
+            salvage_commodity="xenoliths",
+            faction_id="precursor_watch",
+            special_ability="none",
+            archetype_id="",
+        )
+        engine.state = engine._clone_state(active_combat=combat)
+        before_pre = engine.state.ship.faction_standings.get("precursor_watch", 0)
+        before_out = engine.state.ship.faction_standings.get("outlaw_corsairs", 0)
+        ok, msg = engine.combat_action("fire_lasers")
+        self.assertTrue(ok)
+        self.assertEqual(
+            engine.state.ship.faction_standings.get("precursor_watch", 0),
+            before_pre - 8,
+        )
+        self.assertEqual(
+            engine.state.ship.faction_standings.get("outlaw_corsairs", 0),
+            before_out + 4,
+        )
+        self.assertIn("Precursor Watch (-8)", msg)
+
 
 class Tier2TalentTest(unittest.TestCase):
     def _mults(self, specs):

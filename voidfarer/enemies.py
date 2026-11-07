@@ -167,6 +167,9 @@ def choose_enemy_intent(
     player_hp = player_hull / max(1, player_max_hull)
     player_sh = player_shield / max(1, player_max_shield)
     has_ability = ability_ready and special_ability != "none"
+    if special_ability == "nanite_regen" and enemy_sh <= 0.0:
+        # Nanites repair only while the shield grid holds; do not telegraph a dead ability.
+        has_ability = False
 
     if profile == "warlord":
         if enemy_hp < 0.55 and special_ability == "nanite_regen" and has_ability:

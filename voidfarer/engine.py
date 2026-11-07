@@ -6450,8 +6450,9 @@ class SimulationEngine:
                     new_faction_standings["sol_coalition"] = max(-100, new_faction_standings.get("sol_coalition", 0) - 6)
                     rep_note = " [Faction Standing: Void Corsairs (+6), Sol Coalition (-6)]"
                 elif combat.faction_id == "precursor_watch":
-                    new_faction_standings["precursor_watch"] = min(100, new_faction_standings.get("precursor_watch", 0) + 8)
-                    rep_note = " [Faction Standing: Precursor Watch (+8)]"
+                    new_faction_standings["precursor_watch"] = max(-100, new_faction_standings.get("precursor_watch", 0) - 8)
+                    new_faction_standings["outlaw_corsairs"] = min(100, new_faction_standings.get("outlaw_corsairs", 0) + 4)
+                    rep_note = " [Faction Standing: Precursor Watch (-8), Void Corsairs (+4)]"
 
                 xp_gain = fleet_victory_experience(combat.enemy_max_hull)
                 local_fleet_ids = {local.id for local in fleet_ships}

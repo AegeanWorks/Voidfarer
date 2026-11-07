@@ -79,6 +79,23 @@ class TestAdaptiveEnemyAI(unittest.TestCase):
         )
         self.assertEqual(intent, "ability")
 
+    def test_warlord_skips_nanite_when_shields_are_down(self):
+        intent, _ = choose_enemy_intent(
+            profile="warlord",
+            special_ability="nanite_regen",
+            ability_ready=True,
+            enemy_hull=40,
+            enemy_max_hull=200,
+            enemy_shield=0,
+            enemy_max_shield=100,
+            player_hull=100,
+            player_max_hull=100,
+            player_shield=50,
+            player_max_shield=100,
+            player_combo=0,
+        )
+        self.assertNotEqual(intent, "ability")
+
     def test_generated_enemies_carry_ai_profile_and_intent(self):
         encounter = generate_system_enemy("rift_station", 0.05, "Void Corsairs", seed=42)
         self.assertIn(encounter.ai_profile, {a.ai_profile for a in ENEMY_ARCHETYPES.values()})

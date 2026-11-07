@@ -9,8 +9,8 @@
 - **Total Python Modules**: `127`
 - **Total Classes**: `346`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1966`
-- **Total Source Lines**: `50081`
+- **Total Class Methods**: `1968`
+- **Total Source Lines**: `50132`
 
 ---
 
@@ -88,7 +88,7 @@
 ### [`tests/test_ai_and_calendar.py`](tests/test_ai_and_calendar.py)
 > *Regression tests for adaptive enemy AI, expanded systems, and calendar dates.*
 
-**Size**: `197` lines (`7587` bytes)
+**Size**: `214` lines (`8132` bytes)
 
 **Classes:**
 - `class TestAdaptiveEnemyAI`
@@ -96,6 +96,7 @@
   - Method `.test_opportunist_executes_wounded_player()`
   - Method `.test_adaptive_profile_disrupts_high_combo()`
   - Method `.test_warlord_regenerates_when_wounded()`
+  - Method `.test_warlord_skips_nanite_when_shields_are_down()`
   - Method `.test_generated_enemies_carry_ai_profile_and_intent()`
   - Method `.test_ai_fields_round_trip_through_save_data()`
   - Method `._combat_engine(intent, profile, player_combo)`
@@ -1750,7 +1751,7 @@
 ### [`tests/test_perks_relics_rep.py`](tests/test_perks_relics_rep.py)
 > *Regression tests for faction perks, enemy reputation rewards, and multi-stat relics.*
 
-**Size**: `219` lines (`9594` bytes)
+**Size**: `249` lines (`10807` bytes)
 
 **Classes:**
 - `class RelicSetBonusTest`
@@ -1774,6 +1775,7 @@
   - Method `.test_warlord_rep_rewards_are_applied()`
   - Method `.test_corporate_rep_rewards_update_corp_standings()`
   - Method `.test_precursor_kill_reduces_precursor_standing()`
+  - Method `.test_legacy_precursor_payload_uses_the_same_sign_as_the_archetype()`
 - `class Tier2TalentTest`
   - Method `._mults(specs)`
   - Method `.test_tier2_talents_apply_to_passives()`
@@ -2940,7 +2942,7 @@
 ### [`voidfarer/enemies.py`](voidfarer/enemies.py)
 > *Hostile Enemy Archetypes, Tactical Combat AI, and Procedural Intercept Generation.*
 
-**Size**: `284` lines (`11188` bytes)
+**Size**: `287` lines (`11370` bytes)
 
 **Classes:**
 - `class EnemyArchetype` - *Blueprint for procedural hostile intercepts across galactic territories.*
@@ -2955,7 +2957,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10352` lines (`510885` bytes)
+**Size**: `10353` lines (`511031` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

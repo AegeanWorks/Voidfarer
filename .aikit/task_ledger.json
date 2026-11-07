@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-cycle3-engines-collapse",
+    "task_id": "voidfarer-cycle4-enemy-rep-boss-ai",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794070194.1442113,
+    "updated_at": 1794071713.7333336,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794070194.6186438
+    "completed_at": 1794071714.8584342
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-wave5-shipmodule",
-      "phase": "superseded",
-      "phase_num": 4,
-      "description": "Superseded by 'voidfarer-wave6-blockguards' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1793998126.0562508,
-      "timestamp_str": "2026-11-06 23:48:46",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-wave6-blockguards",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: block guards unified, 3 tests fail-3/3-baseline pass-fixed, inventory 1145, check 5/5. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793998363.434184,
-      "timestamp_str": "2026-11-06 23:52:43",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-wave7-saves-verbs",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: saves new-game/reset parity verbs",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794037406.7431736,
-      "timestamp_str": "2026-11-07 10:43:26",
-      "agent": "unidentified",
-      "impact_assessment": {
-        "why": "REST new-game/reset unreachable from terminal",
-        "benefits": "full lifecycle parity, no new surface",
-        "risks": "contract: cli saves dispatch only, engine/server untouched; dependency: none new; concurrency: none; state: destructive verbs confirm-less like existing delete",
-        "mitigation": "mirror server seed/slot semantics, explicit seed parsing, new saves tests, full check"
-      },
-      "plan_digest": "d8cfbda4414629b85deb7e0b466c5341ce0b1109f141afe52d4b27ab19d30c58"
-    },
     {
       "task_id": "voidfarer-wave6-blockguards",
       "phase": "superseded",
@@ -279,6 +240,50 @@
       "status": "completed",
       "timestamp": 1794070194.6186457,
       "timestamp_str": "2026-11-07 19:49:54",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cycle4-enemy-rep-boss-ai",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan: fix legacy precursor victory rep sign and stop dead nanite intents with shields down",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794071023.6470292,
+      "timestamp_str": "2026-11-07 20:03:43",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "A legacy/custom Precursor Sentinel encounter (no archetype_id) awarded Precursor Watch +8 on victory, and the Warlord AI telegraphs nanite repair with its shields at zero even though the ability only works while shields hold.",
+        "benefits": "Enemy kills consistently punish the victim faction and the dreadnought stops wasting its special-ability turn; the victory log matches the standing delta.",
+        "risks": "contract: none (fallback string and intent policy only); dependency: none; concurrency: engine lock held; state: no new save fields; balance: warlord will fire/brace instead of a dead ability.",
+        "mitigation": "Failing-first probes saved before the fix, unit tests for both, before/after cockpit plays for boss intent and victory rep."
+      },
+      "plan_digest": "77daf2afe28270ca23215f4cdf931262185fa0e0fc0d0d276a1a61f4c9fd0afc"
+    },
+    {
+      "task_id": "voidfarer-cycle4-enemy-rep-boss-ai",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Cycle 4 verified: legacy precursor rep -8/+4 and warlord nanite gated off at zero shields; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794071713.7333336,
+      "timestamp_str": "2026-11-07 20:15:13",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-184 and campaign cycle 4",
+        "evidence": "ui-review/cycle04-before-boss/02-after-action.png, cycle04-after-boss/02-after-action.png, cycle04-before-rep/02-after-action.png, cycle04-after-rep/02-after-action.png"
+      }
+    },
+    {
+      "task_id": "voidfarer-cycle4-enemy-rep-boss-ai",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cycle4-enemy-rep-boss-ai' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794071714.8584363,
+      "timestamp_str": "2026-11-07 20:15:14",
       "agent": "opencode:campaign"
     }
   ]

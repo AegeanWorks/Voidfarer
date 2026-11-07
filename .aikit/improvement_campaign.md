@@ -11,8 +11,9 @@ does not repeat one.
 | 1 | UI readability (1280x720 onboarding ribbon) | fixed, proven |
 | 2 | Progression and saves (transit academy step) | fixed, proven |
 | 3 | Combat feel (engines collapse + DRIVES gauge) | fixed, proven |
+| 4 | Enemies/bosses (legacy rep sign + dead nanite telegraph) | fixed, proven |
 
-Queue after Cycle 3: enemies/bosses, levels, graphics and effects, audio cues.
+Queue after Cycle 4: levels, graphics and effects, audio cues.
 
 ---
 
@@ -171,5 +172,58 @@ python -m unittest discover                                                    #
 python aikit.py ui begin/verify/finish voidfarer --surface cockpit             # OK
 python aikit.py check voidfarer                                                # 5/5
 ```
+
+---
+
+## Cycle 4 — Enemies/bosses: legacy precursor rep sign and dead nanite telegraphs
+
+**Find.** A legacy/custom Precursor Sentinel (no `archetype_id`) awarded `Precursor Watch
+(+8)` on victory. The Warlord AI telegraphed `Nanite repair matrix deployed in automated
+standby` with its shields at `0/100`, where the repair branch cannot fire.
+
+**Analyze.** The faction fallback at the end of the victory path was never updated when
+ADR-173 fixed the archetype payload; it kept the old `+8` sign and omitted the rival gain.
+The boss policy treated `nanite_regen` as always usable; `combat_action` requires
+`enemy_shield > 0`, so the telegraph was a dead ability. Killed: a UI-only fix (the state
+was already wrong). Survivors: align the fallback with `precursor_sentinel.rep_rewards`, and
+gate nanite out of `has_ability` when shields are zero.
+
+**Fix.** `engine.py`: precursor fallback is `-8` Precursor / `+4` Void Corsairs with a
+two-sided note. `enemies.py`: `has_ability` is false for `nanite_regen` when `enemy_sh <= 0`,
+so all profile branches fall through. Tests: legacy payload rep delta, shields-down warlord
+intent. Pre-fix probes saved in `ui-review/probe_enemies.py` output and in the before plays.
+
+**Visual proof (same 1280x720 state and action).**
+- Boss before: `ui-review/cycle04-before-boss/02-after-action.png` — telegraph
+  `Nanite repair matrix deployed in automated standby`, shields `✕ OFFLINE`.
+- Boss after: `ui-review/cycle04-after-boss/02-after-action.png` — telegraph
+  `Weapons locked; charging main batteries`.
+- Rep before: `ui-review/cycle04-before-rep/02-after-action.png` — flight log
+  `[Faction Standing: Precursor Watch (+8)]`.
+- Rep after: `ui-review/cycle04-after-rep/02-after-action.png` — flight log
+  `[Faction Standing: Precursor Watch (-8), Void Corsairs (+4)]`.
+- Vision review: `opencode-go/gemini-4-argon` quoted both pairs and found no new clipping.
+
+**Play report.** `python ui-review/play_cycle4.py boss ...` (real Edge, seeded Void Warlord,
+40/200 hull, 0 shields): clicked `SHIELD OVERCHARGE`; before intent `ability` / nanite
+telegraph, after intent `fire` / weapon telegraph. `... rep ...` (seeded legacy Sentinel,
+1 hull): clicked `FIRE LASER ARRAY`; before victory `+8`, after `-8` Precursor and `+4`
+Void Corsairs, standing 0 -> -8 and -15 -> -11. Both 25 frames/~413ms, zero errors.
+
+**Gates.** `python -m unittest discover` -> `Ran 1251 tests ... OK`; `python aikit.py check
+voidfarer` -> 5/5. No save-schema change.
+
+**Commands.**
+```text
+python ui-review/probe_enemies.py                                             # pre-fix: precursor +8, warlord ability with 0 shields
+python ui-review/play_cycle4.py boss cycle04-before-boss                      # in HEAD worktree, ok false as expected
+python ui-review/play_cycle4.py rep cycle04-before-rep                        # in HEAD worktree, ok false as expected
+python ui-review/play_cycle4.py boss cycle04-after-boss                       # ok true
+python ui-review/play_cycle4.py rep cycle04-after-rep                         # ok true
+python -m unittest discover                                                    # Ran 1251 OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py check voidfarer                                                # 5/5
+```
+
 
 
