@@ -19,8 +19,7 @@ does not repeat one.
 | 9 | UI readability re-sweep (Commander vs Pilot Mastery labels) | fixed, proven |
 | 10 | Saving/load re-sweep (legacy landable migration) | fixed, proven |
 | 11 | Economy re-sweep (one-time landing survey reward) | fixed, proven |
-
-Queue after Cycle 11: re-sweep all areas for new verified findings.
+| 12 | Final re-sweep | zero verified improvements |
 
 ---
 
@@ -552,6 +551,31 @@ python -m unittest discover                                                    #
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py check voidfarer                                                # 5/5
 ```
+
+---
+
+## Cycle 12 — Final re-sweep: zero verified improvements
+
+No code changed. Every candidate was checked and killed on the record:
+
+- **Flight-log top line partially clipped at 720p** — the log is a deliberately scrollable
+  viewport; all visible lines are readable, older lines remain reachable, and no state or
+  action is hidden. Terminal scroll behavior, not a defect.
+- **Surface-operations list starts below the fold at 720p** — clicking a site marker
+  auto-scrolls the selected operation row into view; the played Cloud Scoop run proves the
+  path. Intended scroll behavior.
+- **Faint radar axis tick text behind a body label** — decorative backdrop; body labels
+  carry opaque backplates and remain legible. Cosmetic, not an information defect.
+- **Dead audio cues** — a definition/call sweep finds every `play*` method has a call site;
+  jump/dock/warp use optional chaining. No remaining silent cue.
+- **Surface-operation reachability** — all 13 operations are offered on the seed-42 galaxy;
+  old saves normalize the landable flag and the reward is one-time. No gap.
+- **Combat/AI persistence** — engines disable, intent shifts and enemy telegraphs pass the
+  two-turn tests and the played runs; no contradictory state found.
+
+Final gates: `python -m unittest discover` -> `Ran 1261 tests ... OK`; `python aikit.py
+check voidfarer` -> 5/5 (test, mechanics, hygiene, guidelines, secrets). Campaign complete
+under the zero-verified-improvement stop rule.
 
 
 
