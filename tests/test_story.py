@@ -128,6 +128,36 @@ class TestStoryAndTutorial(unittest.TestCase):
         self.assertEqual(self.engine.state.ship.max_hull, 115)
         self.assertEqual(self.engine.state.ship.hull, 115)
 
+    def test_transit_arrival_advances_orbit_milestone(self):
+        """Timed transit is an orbit action and must advance the academy once."""
+        start_credits = self.engine.state.ship.credits
+        start_xp = self.engine.state.ship.mastery.xp
+        target = self.engine.current_system.bodies[2]
+        ok, msg = self.engine.start_travel(target.id, mode="sublight")
+        self.assertTrue(ok, msg)
+        travel = self.engine.state.ship.travel
+        self.assertIsNotNone(travel)
+        self.engine.tick(max(1, travel.arrival_tick - self.engine.state.time.tick))
+        self.assertEqual(self.engine.state.ship.orbiting_body_id, target.id)
+        tut = self.engine.state.ship.tutorial
+        self.assertEqual(tut.current_step_index, 1)
+        self.assertTrue(tut.steps[0].completed)
+        self.assertGreater(self.engine.state.ship.credits, start_credits)
+        self.assertGreater(self.engine.state.ship.mastery.xp, start_xp)
+        self.engine.tick(1)
+        self.assertEqual(self.engine.state.ship.tutorial.current_step_index, 1)
+        self.assertEqual(
+            sum("ACADEMY STEP COMPLETE" in line for line in self.engine.state.ship.flight_log),
+            1,
+        )
+
+    def test_tutorial_hints_name_live_cockpit_controls(self):
+        hints = " ".join(step.hint for step in self.engine.state.ship.tutorial.steps)
+        self.assertIn("TRANSIT & ORBIT", hints)
+        self.assertNotIn("ENTER ORBIT", hints)
+        self.assertIn("'SCAN' in the radar map controls", hints)
+        self.assertNotIn("SENSOR SCAN", hints)
+
     def test_tutorial_skip_and_reset(self):
         self.assertTrue(self.engine.state.ship.tutorial.is_active)
 

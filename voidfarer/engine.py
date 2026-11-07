@@ -9697,6 +9697,9 @@ class SimulationEngine:
             new_waypoint_au = cur_ship.waypoint_au
             new_waypoint_angle = cur_ship.waypoint_angle
             new_events = list(self.state.events)
+            new_tutorial = cur_ship.tutorial
+            tutorial_credits = 0
+            tutorial_xp = 0
             if cur_ship.travel is not None and new_tick >= cur_ship.travel.arrival_tick:
                 new_orbiting_body_id = cur_ship.travel.destination_body_id
                 new_landed_body_id = None
@@ -9720,6 +9723,14 @@ class SimulationEngine:
                             break
                     arr_msg = f"Orbital capture achieved around {dest_name} after {cur_ship.travel.mode} transit."
                 new_flight_log.append(arr_msg)
+                if new_orbiting_body_id is not None:
+                    # Arrival establishes orbit, so it is an orbit action for the academy.
+                    new_tutorial, tut_cr, tut_xp, _tut_relics, tut_logs = (
+                        self._progress_tutorial("orbit")
+                    )
+                    tutorial_credits += tut_cr
+                    tutorial_xp += tut_xp
+                    new_flight_log.extend(tut_logs)
                 evt_id = f"evt_{new_tick}_{len(new_events) + 1}"
                 new_events.append(
                     GameEvent(
@@ -9741,6 +9752,9 @@ class SimulationEngine:
             new_current_system_id = cur_ship.current_system_id
             new_visited_systems = self.state.visited_systems
             new_mastery = cur_ship.mastery
+            if tutorial_xp > 0:
+                new_mastery, tutorial_xp_logs = self._award_pilot_xp(tutorial_xp, new_mastery)
+                new_flight_log.extend(tutorial_xp_logs)
             new_credits_delta = 0
             # new_stats_tick is initialized as dict(self.state.stats) at tick start
             if new_void is not None:
@@ -10107,6 +10121,7 @@ class SimulationEngine:
                 + outpost_credits
                 - wage_cost
                 + new_credits_delta
+                + tutorial_credits
                 + away_credits
                 + delivery_credits
                 + patrol_credits
@@ -10165,6 +10180,7 @@ class SimulationEngine:
                 fleet_ships=new_fleet_ships,
                 faction_standings=new_standings,
                 active_contracts=new_contracts,
+                tutorial=new_tutorial,
                 flight_log=tuple(trim_log(new_flight_log)),
             )
 

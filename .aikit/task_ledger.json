@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-cycle1-cadet-ribbon",
+    "task_id": "voidfarer-cycle2-transit-academy",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794065042.7121937,
+    "updated_at": 1794067047.0519135,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794065043.039438
+    "completed_at": 1794067047.4370909
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-wave3-cli-guards",
-      "phase": "superseded",
-      "phase_num": 4,
-      "description": "Superseded by 'voidfarer-wave4-agent-catalog' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1793992106.0824804,
-      "timestamp_str": "2026-11-06 22:08:26",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-wave4-agent-catalog",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] Verify: slot injection plus step doc fix, catalog tests OK, inventory 1145, check 5/5. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793992259.2641895,
-      "timestamp_str": "2026-11-06 22:10:59",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-wave5-shipmodule",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: refit module parity for ship/module API",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1793992354.6636841,
-      "timestamp_str": "2026-11-06 22:12:34",
-      "agent": "unidentified",
-      "impact_assessment": {
-        "why": "REST-only endpoint unreachable from terminal",
-        "benefits": "full POST-CLI parity, guarded remove-by-id",
-        "risks": "contract: cli refit extension only, engine/server untouched; dependency: none new; concurrency: none; state: no schema change",
-        "mitigation": "mirror server install/remove-by-id semantics, new refit module tests, full check"
-      },
-      "plan_digest": "605bdee69e07bb132f0cda6d021062046166e601115c6442a7c4a19a6e943056"
-    },
     {
       "task_id": "voidfarer-wave4-agent-catalog",
       "phase": "superseded",
@@ -269,6 +230,50 @@
       "status": "completed",
       "timestamp": 1794065043.0394397,
       "timestamp_str": "2026-11-07 18:24:03",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cycle2-transit-academy",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan: make timed transit arrival advance the Orbital Insertion academy step once",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794065798.3552284,
+      "timestamp_str": "2026-11-07 18:36:38",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The cockpit's TRANSIT & ORBIT control establishes orbit on arrival but the tick path never calls _progress_tutorial('orbit'), so the academy stays on step 0 while the hint's orbit verb advances it.",
+        "benefits": "Cockpit, CLI travel and REST time-step all share the same arrival path; the first academy reward becomes reachable without a hidden verb.",
+        "risks": "contract: tutorial/credit XP awards could double if arrival retriggers; dependency: none; concurrency: engine lock already held; state: existing TutorialState/credits fields only.",
+        "mitigation": "Failing-first engine test with a second tick to prove a single award; full suite, mechanics captain and browser play."
+      },
+      "plan_digest": "35fd624cf177c6495f91b8aceb91f2d22ae4c1e130ab82b9e6d0f39cf5502237"
+    },
+    {
+      "task_id": "voidfarer-cycle2-transit-academy",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Cycle 2 verified: transit arrival advances academy once, hints point at live controls; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794067047.0519135,
+      "timestamp_str": "2026-11-07 18:57:27",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-182 and campaign cycle 2",
+        "evidence": "ui-review/cycle01-play/03-orbit-establishing.png, ui-review/cycle02-play/03b-after-arrival-clean.png, ui-review/cycle02-play/play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-cycle2-transit-academy",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cycle2-transit-academy' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794067047.4370923,
+      "timestamp_str": "2026-11-07 18:57:27",
       "agent": "opencode:campaign"
     }
   ]

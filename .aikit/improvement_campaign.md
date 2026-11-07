@@ -9,9 +9,9 @@ does not repeat one.
 | Cycle | Area | Result |
 |---|---|---|
 | 1 | UI readability (1280x720 onboarding ribbon) | fixed, proven |
+| 2 | Progression and saves (transit academy step) | fixed, proven |
 
-Queue after Cycle 1: combat feel, enemies/bosses, levels, graphics and effects, audio cues,
-progression and saves. Known candidate: transit arrival does not advance the academy step.
+Queue after Cycle 2: combat feel, enemies/bosses, levels, graphics and effects, audio cues.
 
 ---
 
@@ -62,3 +62,59 @@ python aikit.py ui verify voidfarer                                            #
 python aikit.py ui finish voidfarer --reviewed --reviewer ...                  # OK
 python aikit.py check voidfarer                                                # 5/5
 ```
+
+---
+
+## Cycle 2 — Progression and saves: transit arrival completes Orbital Insertion
+
+**Find.** Cycle 1's played arrival at Sol B (via `TRANSIT & ORBIT`) left the academy on
+milestone 1, while the hint's CLI `orbit` verb advanced it. Evidence:
+`ui-review/cycle01-play/03-orbit-establishing.png` shows `Milestone 1/6` after arrival.
+
+**Analyze.** `engine.orbit()` calls `_progress_tutorial("orbit")`; the tick arrival branch
+(`engine.py:9700`) only set `orbiting_body_id` and queued the arrival event. The milestone
+hints also named `ENTER ORBIT` / `SENSOR SCAN`, controls that do not exist. Killed: no
+alternative arrival path (quantum and sublight share this branch). Survivor: call the same
+tutorial hook on body arrival, thread tutorial/credits/XP through the tick state, and point
+the hints at the live controls.
+
+**Fix.** `voidfarer/engine.py`: body arrival advances `_progress_tutorial("orbit")`, appends
+its logs, adds credits to `gross_credits`, and awards XP after mastery initialisation; the
+final ship receives `tutorial=new_tutorial`. `voidfarer/story.py`: hints now say
+`TRANSIT & ORBIT` and `SCAN`. Tests: `test_transit_arrival_advances_orbit_milestone`
+(one award across an extra tick) and `test_tutorial_hints_name_live_cockpit_controls`.
+The transit test failed-first with `0 != 1` on the baseline.
+
+**Visual proof (same 1280x720 play, same default save, same action sequence).**
+- Before: `ui-review/cycle01-play/03-orbit-establishing.png` — arrived at Sol B, ribbon
+  still `Milestone 1/6: Orbital Insertion`, academy log absent.
+- After: `ui-review/cycle02-play/03b-after-arrival-clean.png` — arrived at Sol B, ribbon
+  `Milestone 2/6: Planetary Sensor Sweep`, pip 1 checked, credits `2.197 CR`, `80/500 XP`,
+  hint `Run 'scan' or click 'SCAN' in the radar map controls.`
+- Hint pair: `ui-review/cycle02-play/01-before-transit.png` shows the new
+  `TRANSIT & ORBIT` hint; the old `ENTER ORBIT` hint is in `cycle01-play/01-cockpit-start.png`.
+- Vision review: `opencode/nemotron-3.5-super-vl-free` quoted both ribbons, confirmed the
+  step advanced, the pips changed, and no new clipping/overlap at 1280x720.
+
+**Play report.** `python ui-review/play_cycle2.py` (real Edge, 1280x720, default save):
+selected Sol B, clicked `TRANSIT & ORBIT (4T)`, advanced with the real `+1` control to tick
+6. Arrival: `sol_body_2`, milestone 2/6, credits 2,000 -> 2,197, XP 0 -> 80, exactly one
+`ACADEMY STEP COMPLETE: [Orbital Insertion] (+200 cr, +80 XP)`; one extra tick kept one
+award. Clicked the real `SCAN` control: milestone 3/6, credits 2,546, XP 230, second academy
+log (`Planetary Sensor Sweep +250 cr, +100 XP`). 25 frames/414ms, zero console/page/HTTP
+errors.
+
+**Gates.** `python -m unittest discover` -> `Ran 1246 tests ... OK`; mechanics captain
+stays green inside `aikit check`; `python aikit.py check voidfarer` -> 5/5. No save-schema
+change.
+
+**Commands.**
+```text
+python -m unittest tests.test_story.TestStoryAndTutorial.test_transit_arrival_advances_orbit_milestone  # fails first: 0 != 1
+python -m unittest tests.test_story.TestStoryAndTutorial.test_transit_arrival_advances_orbit_milestone tests.test_story.TestStoryAndTutorial.test_tutorial_hints_name_live_cockpit_controls  # OK
+python ui-review/play_cycle2.py                                                # exit 0, ok true
+python -m unittest discover                                                    # Ran 1246 OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer         # map + README
+python aikit.py check voidfarer                                                # 5/5
+```
+

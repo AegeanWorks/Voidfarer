@@ -9,8 +9,8 @@
 - **Total Python Modules**: `127`
 - **Total Classes**: `345`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1960`
-- **Total Source Lines**: `49969`
+- **Total Class Methods**: `1962`
+- **Total Source Lines**: `50015`
 
 ---
 
@@ -2186,7 +2186,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `755` lines (`32115` bytes)
+**Size**: `785` lines (`33673` bytes)
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -2194,6 +2194,8 @@
   - Method `.tearDown()`
   - Method `.test_tutorial_initial_state()`
   - Method `.test_tutorial_progressive_milestones()`
+  - Method `.test_transit_arrival_advances_orbit_milestone()` - *Timed transit is an orbit action and must advance the academy once.*
+  - Method `.test_tutorial_hints_name_live_cockpit_controls()`
   - Method `.test_tutorial_skip_and_reset()`
   - Method `.test_story_initialization_and_first_chapter()`
   - Method `.test_story_arrival_transmissions()`
@@ -2948,7 +2950,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10324` lines (`509550` bytes)
+**Size**: `10340` lines (`510353` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3817,7 +3819,7 @@
 ### [`voidfarer/story.py`](voidfarer/story.py)
 > *Interactive Cadet Flight Academy tutorial and branching narrative campaign systems.*
 
-**Size**: `541` lines (`24651` bytes)
+**Size**: `541` lines (`24671` bytes)
 
 **Functions:**
 - `def generate_initial_tutorial()` - *Construct a fresh Cadet Flight Academy tutorial state.*
