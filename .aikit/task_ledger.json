@@ -1,61 +1,22 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-condense-rail-focus",
-    "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794092551.1446147,
+    "task_id": "voidfarer-dedupe-player-abilities",
+    "last_phase": "phase 2",
+    "active_phase": 2,
+    "status": "in_progress",
+    "updated_at": 1794094203.3825996,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794092552.6228657
+    "impact_assessment": {
+      "why": "PLAYER renders six ability cards with USE buttons while the bottom command strip already exposes the same six with hotkeys and cooldowns; G-013 forbids the duplicate.",
+      "benefits": "PLAYER content height roughly halves, duplicate controls disappear, and one ability surface remains authoritative.",
+      "risks": "contract: G-013-aligned UI; dependency: none; concurrency: none; state: none; regression: bottom strip must keep firing.",
+      "mitigation": "Static dedup test, before/after control counts, bottom-strip Overclock play, vision review."
+    }
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cycle7-audio-mute",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan: persist the SOUND FX toggle and mute the master gain immediately",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794079554.7584202,
-      "timestamp_str": "2026-11-07 22:25:54",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The top-bar SOUND FX toggle flips sound.enabled but never saves settings or lowers the master gain, so a reload restores audio and any already-playing cue continues after MUTE.",
-        "benefits": "Mute survives reload, the settings panel and top bar agree, and the master gain silences current and future voices.",
-        "risks": "contract: none; dependency: none; concurrency: AudioContext creation stays on the first user gesture; state: existing localStorage key, no save schema.",
-        "mitigation": "Real browser mute/reload/unmute play with master-gain assertions, static contract test, before/after reload captures."
-      },
-      "plan_digest": "a1f41e5f30b61f1be5f6b8ed499054bb7b979e2631e47b65514958977292be3d"
-    },
-    {
-      "task_id": "voidfarer-cycle6-radar-labels",
-      "phase": "superseded",
-      "phase_num": 2,
-      "description": "Superseded by 'voidfarer-cycle7-audio-mute' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1794079554.7584202,
-      "timestamp_str": "2026-11-07 22:25:54",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-cycle7-audio-mute",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Cycle 7 verified: SOUND FX mute persists, master gain goes silent, unmute restores; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794081325.1011028,
-      "timestamp_str": "2026-11-07 22:55:25",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-187 and campaign cycle 7",
-        "evidence": "ui-review/cycle07-before/02-after-reload.png, cycle07-after/02-after-reload.png, cycle07-after/play-report.json"
-      }
-    },
     {
       "task_id": "voidfarer-cycle7-audio-mute",
       "phase": "completed",
@@ -295,6 +256,50 @@
       "timestamp": 1794092552.622868,
       "timestamp_str": "2026-11-08 02:02:32",
       "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-dedupe-player-abilities",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Player ability dedup verified: six duplicate USE buttons removed, command strip still fires; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794094180.1808999,
+      "timestamp_str": "2026-11-08 02:29:40",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit PLAYER dedup",
+        "evidence": "ui-review/abilities-before/01-player-tab.png, abilities-after/01..02, click-map 157/47/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-dedupe-player-abilities",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-dedupe-player-abilities' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794094180.8013656,
+      "timestamp_str": "2026-11-08 02:29:40",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-dedupe-player-abilities",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: remove the duplicated PLAYER ability set and point to the command strip",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794094203.3825996,
+      "timestamp_str": "2026-11-08 02:30:03",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "PLAYER renders six ability cards with USE buttons while the bottom command strip already exposes the same six with hotkeys and cooldowns; G-013 forbids the duplicate.",
+        "benefits": "PLAYER content height roughly halves, duplicate controls disappear, and one ability surface remains authoritative.",
+        "risks": "contract: G-013-aligned UI; dependency: none; concurrency: none; state: none; regression: bottom strip must keep firing.",
+        "mitigation": "Static dedup test, before/after control counts, bottom-strip Overclock play, vision review."
+      },
+      "plan_digest": "21f430aad2811fd983d3b3f61109310b99fdb9b13f8a4a9e1e98f23466a520b6"
     }
   ]
 }
