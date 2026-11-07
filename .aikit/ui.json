@@ -24,6 +24,7 @@
   ],
   "commands": {
     "fast": "python -m unittest discover",
+    "fast_timeout": 300,
     "snapshot": "python tools/ui_inventory.py"
   },
   "style": {
