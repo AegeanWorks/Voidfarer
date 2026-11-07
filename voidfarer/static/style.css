@@ -7006,6 +7006,27 @@ body.cockpit-theme {
 .panel-left .deck-tab-btn:hover { background: rgba(201, 163, 90, 0.06); color: var(--console-ivory); }
 .panel-left .deck-tab-btn.active { border-left-color: var(--console-gold); background: rgba(201, 163, 90, 0.1); color: var(--console-ivory); box-shadow: none; }
 .panel-left .deck-tab-btn:nth-child(4n) { margin-bottom: 4px; }
+.deck-tabs-header:not(.show-advanced) .deck-tab-btn[data-advanced="true"] { display: none; }
+.panel-left .deck-more-btn {
+    min-height: 26px;
+    margin-top: 4px;
+    padding: 3px 8px;
+    border: 1px solid rgba(201, 163, 90, 0.24);
+    border-left: 2px solid var(--console-gold);
+    background: rgba(201, 163, 90, 0.06);
+    color: var(--console-gold);
+    flex: 0 0 auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    cursor: pointer;
+}
+.panel-left .deck-more-btn:hover { background: rgba(201, 163, 90, 0.14); color: var(--console-ivory); }
+.panel-left .deck-more-count { color: var(--console-muted); margin-left: 3px; font-size: 12px; }
 
 .terminal-content-stack { gap: 10px; font-size: 13px; line-height: 1.45; }
 .tab-content { display: flex; flex-direction: column; gap: 10px; padding: 0 2px 10px; min-width: 0; }
@@ -8832,8 +8853,9 @@ body.cockpit-theme .panel-center {
 /* Compact outliner rows at short viewports so every tab reaches the last row without clipping. */
 @media (max-height: 800px) {
   .panel-left .deck-tabs-header { padding-top: 28px; padding-bottom: 4px; gap: 0; }
-  .panel-left .deck-tab-btn { min-height: 24px; padding: 3px 8px; font-size: 12px; }
+  .panel-left .deck-tab-btn { min-height: 23px; padding: 2px 8px; font-size: 12px; }
   .panel-left .deck-tab-btn:nth-child(4n) { margin-bottom: 2px; }
+  .panel-left .deck-more-btn { min-height: 24px; margin-top: 2px; }
   .panel-left .deck-tabs-header::before { top: 6px; padding-bottom: 4px; }
   .panel-left .deck-tabs-header::after { padding: 4px 4px 0; line-height: 1.35; }
 }

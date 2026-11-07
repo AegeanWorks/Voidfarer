@@ -380,7 +380,9 @@ gaps**: every POST route in `/api/agent/actions` is either exercised or listed i
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
 The click-map enumerates every rendered control via `window.voidfarerClickMap()` and fails
-on a missing or duplicate handle (desktop: 162 controls, 0 missing, 0 duplicates).
+on a missing or duplicate handle (desktop: 163 controls, 53 visible in the default focus
+rail, 0 missing, 0 duplicates). The left console starts with five core systems and a
+`MORE SYSTEMS` disclosure; expanding it restores all sixteen tabs.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -565,7 +567,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,261-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,262-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

@@ -2100,3 +2100,14 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. `land_on_body` pays the survey reward only when the body id is not already surveyed, appends the id once, and logs `Already surveyed; no new survey reward.` on repeat landings. Surface operations still open on every landing.
   3. Tests: repeat-landing reward is zero while the first landing pays; `GameState` round-trip preserves the set and an old payload defaults empty.
 - **Consequences**: Real Edge leave-and-return play: before +450 on the second landing (credits 2,897), after +0 (credits 2,447), with the log `Already surveyed; no new survey reward.` 25 frames/413ms, zero errors; the vision reviewer quoted both logs and credits and found no new clipping. Full suite `Ran 1261 OK`; additive save field with a backward-compatible default.
+
+### ADR-192: Mechanics condensation — the terminal defaults to a five-tab focus rail
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The left console exposed all 16 terminal tabs at once (PLAYER, SKILLS, CREW, SHIP, COMMERCE, ARSENAL, FLEET, CONTRACTS, EMPIRE, QUESTS, AI COMMAND, DEPOT, MESSAGES, COMMS LOG, FACTIONS, CAPTAIN'S LOG). At 1280x720 the rail consumed 463px and presented advanced logistics, empire and archive systems beside the core flight loop. This is an information-architecture overload, not a missing feature.
+- **Decision**:
+  1. Keep `PLAYER`, `SHIP`, `COMMERCE`, `FLEET` and `CONTRACTS` as the default core rail; mark the other 11 buttons `data-advanced="true"`.
+  2. Add one `MORE SYSTEMS 11 ▾` / `FEWER 11 ▴` disclosure. CSS hides advanced buttons unless `#deckTabsHeader.show-advanced` is set; `setAdvancedTabsVisible` owns the class, ARIA state and label.
+  3. `switchRightTab` auto-reveals the advanced set for deep links and `[`/`]` cycling; collapsing while an advanced tab is active returns to PLAYER so content never stays invisible.
+  4. Compact the 720p rail by 1px per tab and keep the disclosure on one line; the footer stays inside the frame.
+- **Consequences**: Default visible tabs drop 16 -> 5; rail height drops 463px -> 216px (expanded 473px, `scrollHeight 471 <= 473`, no footer clipping). Browser play: `MORE` expands to 16 tabs, FACTIONS opens its geopolitics pane, `FEWER 11` restores the five core tabs and PLAYER; 25 frames/414ms, zero errors. Click-map: 163 controls, 53 visible in focus mode, 0 missing/0 duplicate; `ui_inventory.py` 1150 lines; full suite `Ran 1262 OK`; no save-schema change. Before/after captures `condense-before/01-focus-rail.png` and `condense-after/01..03` were vision-reviewed with no new clipping.

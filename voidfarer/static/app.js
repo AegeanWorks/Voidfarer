@@ -794,6 +794,9 @@ class CockpitApp {
         this.tabBtnAI = document.getElementById("tabBtnAI");
         this.tabBtnDepot = document.getElementById("tabBtnDepot");
         this.tabBtnMessages = document.getElementById("tabBtnMessages");
+        this.btnToggleAdvancedTabs = document.getElementById("btnToggleAdvancedTabs");
+        this.advancedTabsVisible = false;
+        this.advancedTabCount = document.querySelectorAll('.deck-tab-btn[data-advanced="true"]').length;
         this.contractsBadge = document.getElementById("contractsBadge");
         this.storyBadge = document.getElementById("storyBadge");
         this.messagesBadge = document.getElementById("messagesBadge");
@@ -1115,6 +1118,11 @@ class CockpitApp {
         if (this.tabBtnAI) this.tabBtnAI.addEventListener("click", () => this.switchRightTab("ai"));
         if (this.tabBtnDepot) this.tabBtnDepot.addEventListener("click", () => this.switchRightTab("depot"));
 if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => this.switchRightTab("messages"));
+        if (this.btnToggleAdvancedTabs) {
+            this.btnToggleAdvancedTabs.addEventListener("click", () => {
+                this.setAdvancedTabsVisible(!this.advancedTabsVisible);
+            });
+        }
 
         // Map Controls (in right panel)
         this.btnToggleGrid.addEventListener("click", () => {
@@ -1598,6 +1606,29 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         });
     }
 
+    setAdvancedTabsVisible(visible, options = {}) {
+        const header = document.getElementById("deckTabsHeader");
+        if (!header) return;
+        const show = Boolean(visible);
+        this.advancedTabsVisible = show;
+        header.classList.toggle("show-advanced", show);
+        if (this.btnToggleAdvancedTabs) {
+            const count = Number(this.advancedTabCount || 0);
+            this.btnToggleAdvancedTabs.setAttribute("aria-expanded", String(show));
+            this.btnToggleAdvancedTabs.innerHTML = show
+                ? `FEWER <span class="deck-more-count">${count}</span> ▴`
+                : `MORE SYSTEMS <span class="deck-more-count">${count}</span> ▾`;
+        }
+        // Hiding the advanced set while one of its tabs is open returns the
+        // player to the core bridge rather than leaving invisible content.
+        if (!show && !options.keepActive) {
+            const activeButton = document.querySelector(".deck-tab-btn.active");
+            if (activeButton && activeButton.getAttribute("data-advanced") === "true") {
+                this.switchRightTab("player", { quiet: true });
+            }
+        }
+    }
+
     switchRightTab(tabName, options = {}) {
         if (!options.quiet) {
             this.drawerUserToggled = true;
@@ -1609,6 +1640,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             quests: this.tabBtnQuests, ai: this.tabBtnAI, depot: this.tabBtnDepot, messages: this.tabBtnMessages,
             player: this.tabBtnPlayer, skills: this.tabBtnSkills, crew: this.tabBtnCrew, empire: this.tabBtnEmpire, codex: this.tabBtnCodex,
         };
+        const targetButton = tabButtons[tabName];
+        if (targetButton && targetButton.getAttribute("data-advanced") === "true"
+            && !this.advancedTabsVisible) {
+            this.setAdvancedTabsVisible(true, { quiet: true, keepActive: true });
+        }
 
         const tabContents = {
             market: this.tabContentMarket, arsenal: this.tabContentArsenal, ship: this.tabContentShip, fleet: this.tabContentFleet,

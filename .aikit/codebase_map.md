@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `350`
+- **Total Classes**: `351`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1982`
-- **Total Source Lines**: `50371`
+- **Total Class Methods**: `1984`
+- **Total Source Lines**: `50393`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `1972` lines (`86557` bytes)
+**Size**: `1994` lines (`87507` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -600,6 +600,9 @@
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
   - Method `.test_outliner_panel_ends_with_its_sections()`
+- `class TestFocusRail` - *The default terminal rail shows the five core systems plus one disclosure.*
+  - Method `.setUpClass()`
+  - Method `.test_advanced_systems_are_disclosed_by_one_control()`
 - `class TestProgressionTrackLabels` - *The PLAYER card must name Commander and Pilot Mastery as separate tracks.*
   - Method `.setUpClass()`
   - Method `.test_player_card_labels_both_tracks()`

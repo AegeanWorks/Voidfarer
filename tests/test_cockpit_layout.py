@@ -1446,6 +1446,28 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestFocusRail(unittest.TestCase):
+    """The default terminal rail shows the five core systems plus one disclosure."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_advanced_systems_are_disclosed_by_one_control(self):
+        self.assertEqual(self.html.count('data-advanced="true"'), 11)
+        self.assertIn('id="btnToggleAdvancedTabs"', self.html)
+        self.assertIn('MORE SYSTEMS', self.html)
+        self.assertIn(
+            '.deck-tabs-header:not(.show-advanced) .deck-tab-btn[data-advanced="true"]',
+            self.css,
+        )
+        self.assertIn("setAdvancedTabsVisible", self.js)
+        self.assertIn("this.setAdvancedTabsVisible(!this.advancedTabsVisible)", self.js)
+        self.assertIn('getAttribute("data-advanced") === "true"', self.js)
+
+
 class TestProgressionTrackLabels(unittest.TestCase):
     """The PLAYER card must name Commander and Pilot Mastery as separate tracks."""
 

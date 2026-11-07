@@ -593,3 +593,22 @@ under the zero-verified-improvement stop rule.
 After the End push, the base window is re-checked read-only from the pushed origin; the
 final suite and gate are green. The only code-review survivor across the windows was the
 trailing blank line at EOF in this campaign file, fixed in the End window.
+
+---
+
+## Mechanics condensation — five-tab focus rail
+
+**Find.** 16 first-level terminal tabs were visible at once; the rail consumed 463px and
+buried the core loop among advanced systems. `condense-before/01-focus-rail.png` records the
+full list.
+
+**Fix.** Mark 11 advanced tabs `data-advanced`; default to PLAYER, SHIP, COMMERCE, FLEET,
+CONTRACTS plus one `MORE SYSTEMS 11 ▾` disclosure. Deep links and `[`/`]` cycling reveal the
+advanced set; collapsing an advanced tab returns to PLAYER. The 720p rail is 1px tighter per
+tab and the disclosure/no-wrap footer fit.
+
+**Proof.** `play_condense.py` before: 16 visible, no disclosure. After: 5 visible, rail
+216px; MORE shows 16; FACTIONS opens `GEOPOLITICS / GALACTIC FACTIONS & CORPORATIONS`;
+FEWER restores 5 and PLAYER. 25 frames/414ms, zero errors. Click-map: 163 controls
+(53 visible), 0 missing, 0 duplicate; `ui_inventory.py` 1150 lines. Vision review found no
+new clipping; expanded rail `scrollHeight 471 <= 473`. Suite `Ran 1262 OK`; gate 5/5.
