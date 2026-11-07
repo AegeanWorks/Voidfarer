@@ -1446,6 +1446,23 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestAudioMuteControl(unittest.TestCase):
+    """The top-bar mute must persist and silence the master gain immediately."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_toggle_persists_and_mutes_the_master_gain(self):
+        self.assertIn("setEnabled(on)", self.js)
+        self.assertIn("this.setEnabled(!this.enabled)", self.js)
+        self.assertIn("this.enabled ? this.volume : 0", self.js)
+        self.assertRegex(
+            self.js,
+            r'audioToggleBtn\.addEventListener\("click",[\s\S]{0,700}this\.saveSettings\(\)',
+        )
+
+
 class TestRadarTrafficLabels(unittest.TestCase):
     """NPC names must share the body-label collision map, not paint over it."""
 

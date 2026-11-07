@@ -14,8 +14,9 @@ does not repeat one.
 | 4 | Enemies/bosses (legacy rep sign + dead nanite telegraph) | fixed, proven |
 | 5 | Levels (gas/lava landings + full surface catalog) | fixed, proven |
 | 6 | Graphics and effects (NPC radar label collision) | fixed, proven |
+| 7 | Audio cues (SOUND FX mute persistence + master gain) | fixed, proven |
 
-Queue after Cycle 6: audio cues.
+Queue after Cycle 7: re-sweep all areas for new verified findings.
 
 ---
 
@@ -327,6 +328,52 @@ python -m unittest tests.test_cockpit_layout.TestRadarTrafficLabels           # 
 python scripts/update_knowledge_base.py --workspace projects/voidfarer
 python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
 python -m unittest discover                                                    # Ran 1256 OK
+python aikit.py check voidfarer                                                # 5/5
+```
+
+---
+
+## Cycle 7 — Audio cues: SOUND FX mute persists and silences the master gain
+
+**Find.** The top-bar `SOUND FX` toggle changed the flag/icon but not the master gain or
+saved settings. A real browser play showed `enabled=false` with `masterGain=0.8` and no
+stored setting; after reload the button reverted to `◉ SOUND FX`.
+
+**Analyze.** `SoundController.toggle()` only flipped a boolean; the audio toggle handler
+never called `saveSettings()`, and `setVolume()` kept the master gain live while muted.
+Killed: a UI-only icon change (audio kept playing and the state reset). Survivor:
+`setEnabled()` owns the flag and master gain, the toggle saves, and both settings paths go
+through the same setter.
+
+**Fix.** `app.js`: `setEnabled(on)` drives `master` to `volume`/`0`; `init` creates the gain
+at the correct level; `setVolume` respects mute; the top-bar handler saves settings and
+syncs the checkbox; load fixes icon/opacity. Test: `TestAudioMuteControl`.
+
+**Visual proof (same 1920x1080 default save, mute then reload).**
+- Before: `ui-review/cycle07-before/02-after-reload.png` — `◉ SOUND FX` after reload.
+- After: `ui-review/cycle07-after/02-after-reload.png` — `MUTED SOUND FX` after reload.
+- Immediate mute: `ui-review/cycle07-after/01-muted-now.png` — `○ SOUND FX`.
+- Vision review: `opencode-go/gemini-4-argon` quoted both reload states and confirmed no
+  header overlap or clipping.
+
+**Play report.** `python ui-review/play_cycle7.py cycle07-after` (real Edge, 1920x1080):
+clicked SOUND FX; `masterGain` went 0.8 -> 0 and `storedSound` became false; reload kept
+`enabled=false` and icon `MUTED`; clicking again restored `masterGain≈0.8` and
+`storedSound=true`. 25 frames/408ms, zero console/page/HTTP errors. Before run:
+`ui-review/cycle07-before/play-report.json` shows the reset.
+
+**Gates.** `python -m unittest discover` -> `Ran 1257 tests ... OK` (a transient host-load
+run had 5 socket-timeout errors and a 205s fast proof; an immediate rerun was green with no
+code change); `python aikit.py check voidfarer` -> 5/5. UI task verified/finished.
+
+**Commands.**
+```text
+python ui-review/play_cycle7.py cycle07-before                               # muted state lost on reload
+python ui-review/play_cycle7.py cycle07-after                                # ok true, mute persists
+python -m unittest tests.test_cockpit_layout.TestAudioMuteControl             # OK
+python scripts/update_knowledge_base.py --workspace projects/voidfarer
+python aikit.py ui begin/verify/finish voidfarer --surface cockpit            # OK
+python -m unittest discover                                                    # Ran 1257 OK
 python aikit.py check voidfarer                                                # 5/5
 ```
 

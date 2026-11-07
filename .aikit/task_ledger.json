@@ -1,77 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-cycle6-radar-labels",
-    "last_phase": "phase 2",
-    "active_phase": 2,
-    "status": "in_progress",
-    "updated_at": 1794078916.1791058,
+    "task_id": "voidfarer-cycle7-audio-mute",
+    "last_phase": "phase 4",
+    "active_phase": 5,
+    "status": "completed",
+    "updated_at": 1794081325.1011028,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "impact_assessment": {
-      "why": "NPC captain names were painted after body labels and could overlap them, making both unreadable at deterministic radar frames.",
-      "benefits": "NPC names avoid body/flagship labels, remain clickable, and selected names are forced visible.",
-      "risks": "contract: none; dependency: none; concurrency: none; state: none (canvas-only); regression: unselected NPC names may drop on a crowded map.",
-      "mitigation": "Static contract test, frozen-clock before/after captures, real marker click, vision review."
-    }
+    "completed_at": 1794081326.6758397
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-wave8-fixbatch",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Verify: pirate flee, evasion cap, drone ids, seed guard landed, 1243 OK, inventory 1145, check 5/5. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794039420.265505,
-      "timestamp_str": "2026-11-07 11:17:00",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-wave8-fixbatch",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-wave8-fixbatch' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794039426.6496913,
-      "timestamp_str": "2026-11-07 11:17:06",
-      "agent": "unidentified"
-    },
-    {
-      "task_id": "voidfarer-cycle1-cadet-ribbon",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan: keep the onboarding ribbon at content height at 1280x720",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794062000.5131135,
-      "timestamp_str": "2026-11-07 17:33:20",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "At the minimum supported viewport the flex column shrinks the cadet ribbon to 38px while its badge needs 59px, so the ribbon overlaps the top bar and clips the milestone pips.",
-        "benefits": "Onboarding stays readable and non-overlapping at 1280x720; no control or state changes.",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none (CSS only); regression: 31px less cockpit grid height at 720p.",
-        "mitigation": "Failing-first CSS contract test, before/after Playwright captures at 1280x720, and a scripted browser onboarding run that advances a milestone."
-      },
-      "plan_digest": "5c6ada8f8b264161588766e653292bc8e8cb17605f9254238f5fcc0acd3cbc98"
-    },
-    {
-      "task_id": "voidfarer-cycle1-cadet-ribbon",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Cycle 1 verified: ribbon flex-shrink fix, screenshot pair and orbit play; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794065042.7121937,
-      "timestamp_str": "2026-11-07 18:24:02",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-181 and campaign record",
-        "evidence": "ui-review/cycle00-baseline/short.png, ui-review/cycle01-after/short.png, ui-review/cycle01-play/play-report.json"
-      }
-    },
     {
       "task_id": "voidfarer-cycle1-cadet-ribbon",
       "phase": "completed",
@@ -301,6 +241,60 @@
         "mitigation": "Static contract test, frozen-clock before/after captures, real marker click, vision review."
       },
       "plan_digest": "41f70eb274e8dd7c0de07a7fe30d4b674b754d6a4c8c70501a460f09b4a60f07"
+    },
+    {
+      "task_id": "voidfarer-cycle7-audio-mute",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan: persist the SOUND FX toggle and mute the master gain immediately",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794079554.7584202,
+      "timestamp_str": "2026-11-07 22:25:54",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The top-bar SOUND FX toggle flips sound.enabled but never saves settings or lowers the master gain, so a reload restores audio and any already-playing cue continues after MUTE.",
+        "benefits": "Mute survives reload, the settings panel and top bar agree, and the master gain silences current and future voices.",
+        "risks": "contract: none; dependency: none; concurrency: AudioContext creation stays on the first user gesture; state: existing localStorage key, no save schema.",
+        "mitigation": "Real browser mute/reload/unmute play with master-gain assertions, static contract test, before/after reload captures."
+      },
+      "plan_digest": "a1f41e5f30b61f1be5f6b8ed499054bb7b979e2631e47b65514958977292be3d"
+    },
+    {
+      "task_id": "voidfarer-cycle6-radar-labels",
+      "phase": "superseded",
+      "phase_num": 2,
+      "description": "Superseded by 'voidfarer-cycle7-audio-mute' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1794079554.7584202,
+      "timestamp_str": "2026-11-07 22:25:54",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cycle7-audio-mute",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Cycle 7 verified: SOUND FX mute persists, master gain goes silent, unmute restores; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794081325.1011028,
+      "timestamp_str": "2026-11-07 22:55:25",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-187 and campaign cycle 7",
+        "evidence": "ui-review/cycle07-before/02-after-reload.png, cycle07-after/02-after-reload.png, cycle07-after/play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-cycle7-audio-mute",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cycle7-audio-mute' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794081326.6758423,
+      "timestamp_str": "2026-11-07 22:55:26",
+      "agent": "opencode:campaign"
     }
   ]
 }

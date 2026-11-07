@@ -2051,3 +2051,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `TestRadarTrafficLabels` to `tests/test_cockpit_layout.py`: the traffic path must call `placeRadarLabel` and must not call `ctx.fillText(captain.name, ...)`.
   3. The UI fast proof timed out under heavy host load (the full suite rose to ~134s), so the cockpit contract's `commands.fast_timeout` was raised to 300s in a separate `chore(ui)` commit before reopening the task.
 - **Consequences**: Frozen-clock before/after captures (`cycle06-before/01-radar-labels.png`, `cycle06-after/01-radar-labels.png`) show `Rorik Ironjaw` over `VF-FLAGSHIP` before and a boxed, clear label after; every body label remains present. The vision reviewer quoted both and found no new clipping. A real browser click on the marker still selects Rorik Ironjaw and opens the mercenary target card; 25 frames/409ms, zero console/page/HTTP errors. Full suite `Ran 1256 OK`; UI task finished on the cockpit surface; no save-schema change.
+
+### ADR-187: Cycle 7 audio cues — SOUND FX mute persists and silences the master gain
+- **Date**: 2026-11-07
+- **Status**: Accepted
+- **Context**: The top-bar `SOUND FX` button flipped `sound.enabled` and the local icon, but never called `saveSettings()` or changed the master gain. A browser play showed: after mute `enabled=false` while `masterGain=0.8` and `localStorage.voidfarer_settings` stayed `null`; after reload `enabled=true` and the button reverted to `◉ SOUND FX`. Already-scheduled cues therefore kept playing through MUTE, and the setting was lost on reload.
+- **Decision**:
+  1. `SoundController.setEnabled(on)` sets the flag and drives the master gain to `volume` or `0`; `init()` creates the gain at the correct level, `setVolume()` respects mute, and `toggle()` delegates to `setEnabled`.
+  2. The top-bar handler writes `saveSettings()`, syncs the settings checkbox, and the load path fixes the icon/opacity; `applySettingsProfile` and `applySettingsFromUI` use `setEnabled`.
+  3. Add `TestAudioMuteControl` to `tests/test_cockpit_layout.py` pinning the setter, the saved toggle, and the gain-selection expression.
+- **Consequences**: Browser play: mute gives `masterGain=0` and `storedSound=false`; reload keeps `enabled=false`, icon `MUTED`; unmute restores `masterGain≈0.8` and `storedSound=true`. 25 frames/408ms, zero console/page/HTTP errors. Frozen-state captures `cycle07-before/02-after-reload.png` (`◉ SOUND FX`) and `cycle07-after/02-after-reload.png` (`MUTED SOUND FX`) show the persisted state; the vision reviewer quoted both and found no layout break. Full suite `Ran 1257 OK`; UI task finished on cockpit. Host load caused a transient 5-error socket-timeout suite run and a 205s fast proof; an immediate rerun was green and no code changed.

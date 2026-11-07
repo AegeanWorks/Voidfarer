@@ -146,7 +146,7 @@ class SoundController {
                 this.ctx = new AudioContext();
                 // Every voice connects here, so one gain is the master volume.
                 this.master = this.ctx.createGain();
-                this.master.gain.value = this.volume;
+                this.master.gain.value = this.enabled ? this.volume : 0;
                 this.master.connect(this.ctx.destination);
             }
         }
@@ -155,14 +155,19 @@ class SoundController {
         }
     }
 
+    setEnabled(on) {
+        this.enabled = Boolean(on);
+        if (this.master) this.master.gain.value = this.enabled ? this.volume : 0;
+    }
+
     toggle() {
-        this.enabled = !this.enabled;
+        this.setEnabled(!this.enabled);
         return this.enabled;
     }
 
     setVolume(volume) {
         this.volume = Math.min(1, Math.max(0, Number(volume)));
-        if (this.master) this.master.gain.value = this.volume;
+        if (this.master) this.master.gain.value = this.enabled ? this.volume : 0;
     }
 
     playBeep(freq = 880, duration = 0.08, type = "sine") {
@@ -958,6 +963,9 @@ class CockpitApp {
             const on = this.sound.toggle();
             this.audioIcon.textContent = on ? "◉" : "◌";
             this.audioToggleBtn.style.opacity = on ? "1" : "0.5";
+            const settingSound = document.getElementById("settingSound");
+            if (settingSound) settingSound.checked = on;
+            this.saveSettings();
             if (on) this.sound.playBeep(900);
         });
 
@@ -8075,15 +8083,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             saved = JSON.parse(localStorage.getItem("voidfarer_settings") || "{}") || {};
         } catch (e) {}
         this.applySettingsProfile({ ...SETTINGS_DEFAULTS, ...saved });
-        if (!this.sound.enabled) {
-            const audioIcon = document.getElementById("audioIcon");
-            if (audioIcon) audioIcon.textContent = "MUTED";
-        }
+        const audioIcon = document.getElementById("audioIcon");
+        if (audioIcon) audioIcon.textContent = this.sound.enabled ? "◉" : "MUTED";
+        const audioButton = document.getElementById("audioToggleBtn");
+        if (audioButton) audioButton.style.opacity = this.sound.enabled ? "1" : "0.5";
     }
 
     applySettingsProfile(profile) {
         const volume = Number(profile.volume);
-        this.sound.enabled = profile.sound !== false;
+        this.sound.setEnabled(profile.sound !== false);
         this.sound.setVolume(Number.isFinite(volume) ? volume : SETTINGS_DEFAULTS.volume);
         this.radarGrid = profile.radarGrid !== false;
         this.radarLabels = profile.radarLabels !== false;
@@ -8118,7 +8126,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     applySettingsFromUI() {
-        this.sound.enabled = document.getElementById("settingSound")?.checked !== false;
+        this.sound.setEnabled(document.getElementById("settingSound")?.checked !== false);
         this.sound.setVolume(Number(document.getElementById("settingVolume")?.value ?? 80) / 100);
         this.radarGrid = document.getElementById("settingGrid")?.checked !== false;
         this.radarLabels = document.getElementById("settingLabels")?.checked !== false;
