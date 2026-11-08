@@ -763,3 +763,29 @@ offscreen actions; `SHOW MORE TACTICS` reveals 148px of secondary controls. Fire
 `02-combat-more-tactics.png`, and `combat-after-720/01-combat-collapsed.png`; vision review
 quoted the before 13 controls and the after four core actions + disclosure, confirmed the
 720p fit, and noted only a pre-existing canvas label collision.
+
+### Eleventh pass — unlocked-first abilities and a full academy play
+
+The powers strip still showed six chips while two were locked, and the onboarding path had
+not been played end to end after the reactor/combat work. The strip now renders four
+unlocked chips (`Overclock`, `Repair`, `Focus`, `Science`) plus `SHOW LOCKED 2`; opening it
+reveals `Diplomacy` and `Trade` and becomes `HIDE LOCKED 2`. Arrival and anomaly cards were
+also moved below the cadet ribbon so they cannot cover the hint or graduation text.
+
+A fresh save was played through all six academy steps with real Edge controls:
+
+| Step | Control | Result |
+|---|---|---|
+| 1 | `TRANSIT & ORBIT` Sol B | 0→1, +197 cr, 80 XP |
+| 2 | `SCAN` | 1→2, +350 cr, 230 XP |
+| 3 | `ECONOMY` preset | 2→3, +200 cr, 310 XP |
+| 4 | `BUY 1` at Sol A | 3→4, +240 cr, 455 XP |
+| 5 | `COMMISSION SCOUT` | 4→5, 105 XP |
+| 6 | `HYPERSPACE JUMP` | 5→6, graduated, +1,900 cr, 740 XP |
+
+Final: all six steps completed, `ACADEMY GRADUATION: Flight Wings Conferred!`, +2,737
+credits, +740 XP, 24-26 frames/~407-417ms, zero errors. Suite `Ran 1286 OK`; click-map
+171/39/0/0; `ui_inventory.py` 1203 lines; gate 5/5. Screenshots:
+`academy-play/00-academy-start.png` through `07-step-jump.png`; vision review quoted the
+four chips, the two locked chips and each milestone through graduation, and the arrival/
+anomaly overlap it flagged was fixed by the top offset and re-captured.

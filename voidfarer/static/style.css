@@ -9879,13 +9879,37 @@ body.cockpit-theme .nav-panel > .panel-header {
 .codex-stats-grid { max-height: 144px; }
 #arsenalUpgradeDetails[hidden], #chassisDetails[hidden], #ordnanceDetails[hidden],
 #factionDetails[hidden], #corpDetails[hidden], #codexMilestoneDetails[hidden],
-#powerDetails[hidden], #combatTacticsDetails[hidden] { display: none; }
+#powerDetails[hidden], #combatTacticsDetails[hidden],
+#lockedAbilitiesDetails[hidden] { display: none; }
 .combat-more-btn { width: 100%; margin-top: 4px; }
 .combat-tactics-secondary { margin-top: 5px; }
+.skills-locked-toggle {
+    width: 100%;
+    min-height: 24px;
+    margin-top: 3px;
+    padding: 2px 6px;
+    border: 1px solid rgba(201, 163, 90, 0.28);
+    background: #0a1424;
+    color: var(--console-text);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    cursor: pointer;
+}
+.skills-locked-toggle:hover {
+    border-color: var(--console-gold);
+    background: rgba(201, 163, 90, 0.1);
+    color: var(--console-ivory);
+}
+.skills-locked-grid { margin-top: 4px; }
+/* Arrival/anomaly cards must sit below the cadet onboarding ribbon, not over its hint. */
+.event-popup-container,
+.anomaly-alert-card { top: 198px; }
 @media (max-height: 800px) {
     /* At 720p the decorative combat canvas would push the core actions and
        the MORE TACTICS control below the card's scroll edge. */
     .combat-alert-card .combat-visual { display: none; }
+    .event-popup-container,
+    .anomaly-alert-card { top: 188px; }
 }
 .power-fine-tune-btn {
     width: 100%;

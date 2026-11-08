@@ -764,5 +764,19 @@
     "final_snapshot_digest": "fba10fb1c22c8c716681db33dcd598b92e45024edbb270f21de677854050c2df",
     "final_snapshot_entries": 1199,
     "surface_digest": "b4cff9ef6a4fada094566bd6a755cfe17a23d4ac9773f1f502b573b45db89e6f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "6596b65e24f8a74bbeb1282be8a480114e272f4f",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794136313.0066674,
+    "finished_at": 1794136444.726633,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; four unlocked chips + LOCKED 2, six-step academy to graduation)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "aa845addf6bdf129633629a47896c10f660a923a64e648753d08888da0415348",
+    "final_snapshot_entries": 1203,
+    "surface_digest": "7dc5040beb0c7bd209a2d10f30637c5a9b745b560a8246b8893f3a5c2bb0a67b"
   }
 ]

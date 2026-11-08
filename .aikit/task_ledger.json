@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-combat-tactics-disclosure",
+    "task_id": "voidfarer-locked-abilities-academy",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794134007.9766057,
+    "updated_at": 1794137025.905497,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794134008.825375
+    "completed_at": 1794137026.2668512
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-commerce-disclosures",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "COMMERCE condensation verified: 2076px to 1004px, broker/freight disclosures below the table, no horizontal overflow; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794100216.0247643,
-      "timestamp_str": "2026-11-08 04:10:16",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-195 and COMMERCE proof",
-        "evidence": "ui-review/commerce-before/01-commerce-collapsed.png, commerce-after/01..03, commerce-after/play-report.json, click-map 161/47/0/0"
-      }
-    },
-    {
-      "task_id": "voidfarer-commerce-disclosures",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-commerce-disclosures' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794100216.7815351,
-      "timestamp_str": "2026-11-08 04:10:16",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-fleet-disclosures",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: collapse FLEET mercenary contracts and procurement, and keep contracts available with zero drones",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794101876.4985685,
-      "timestamp_str": "2026-11-08 04:37:56",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "FLEET is the last dense core tab at 1271px; mercenary contracts and the commission catalog are always expanded and push the escort manager below the fold, and renderFleet returns early with zero drones so the hiring contracts vanish.",
-        "benefits": "The default FLEET view drops below 1000px with the active fleet and escort manager visible; contracts and procurement stay one click away; hiring survives an empty drone roster.",
-        "risks": "contract: UI surface plus one render-path fix; dependency: none; concurrency: none; state: hidden attributes and existing fleet state only, no save change; regression: both disclosures and the zero-drone roster must stay reachable.",
-        "mitigation": "Static disclosure/zero-drone tests, before/after height and overflow measurements, real-browser reveals and a drone-dismissal play, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "4167052a9b8205607f6dcad3c41d5e9c1733845a38c202107a86ab47eb81f3ad"
-    },
     {
       "task_id": "voidfarer-fleet-disclosures",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794134008.8253775,
       "timestamp_str": "2026-11-08 13:33:28",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-locked-abilities-academy",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: show unlocked ability chips plus a LOCKED count disclosure, and prove all six academy steps in a real browser",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794137025.537752,
+      "timestamp_str": "2026-11-08 14:23:45",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The powers strip shows six chips while two are still locked; onboarding has not been played end-to-end after the reactor/combat condensation, and arrival/anomaly cards can cover the academy hint.",
+        "benefits": "The default ability strip shows only four usable powers with the locked count one click away; the academy is proven from step 0 through graduation with visible controls and completion recorded at every step.",
+        "risks": "contract: ability strip and notification placement; dependency: none; concurrency: render stays synchronous; state: locked-open UI flag only, no save field; regression: locked chips must remain reachable and count must update when abilities unlock.",
+        "mitigation": "Static disclosure test, six-step real-browser play with step/completion assertions, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "e2ce849f2411b279bb76dddbad789c8de278f030587c96e6f4d8ee455967d540"
+    },
+    {
+      "task_id": "voidfarer-locked-abilities-academy",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Unlocked-first abilities and academy play verified: 4 chips + LOCKED 2, all six steps to graduation, cards below ribbon; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794137025.905497,
+      "timestamp_str": "2026-11-08 14:23:45",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-202 and academy proof",
+        "evidence": "ui-review/academy-play/00..07, play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-locked-abilities-academy",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-locked-abilities-academy' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794137026.2668524,
+      "timestamp_str": "2026-11-08 14:23:46",
       "agent": "opencode:campaign"
     }
   ]

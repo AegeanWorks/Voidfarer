@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `360`
+- **Total Classes**: `361`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2015`
-- **Total Source Lines**: `50737`
+- **Total Class Methods**: `2018`
+- **Total Source Lines**: `50762`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2288` lines (`101188` bytes)
+**Size**: `2313` lines (`102373` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,10 @@
   - Method `.setUpClass()`
   - Method `.test_manual_sliders_default_to_hidden()`
   - Method `.test_power_hint_names_the_visible_presets()`
+- `class TestLockedAbilityDisclosure` - *The strip shows unlocked powers first and hides locked chips by default.*
+  - Method `.setUpClass()`
+  - Method `.test_locked_chips_default_to_hidden()`
+  - Method `.test_render_splits_unlocked_and_locked_abilities()`
 - `class TestCombatTacticsDisclosure` - *Only four core combat actions stay visible; the rest are disclosed.*
   - Method `.setUpClass()`
   - Method `.test_core_actions_stay_visible_and_secondary_actions_are_hidden()`

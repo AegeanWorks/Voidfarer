@@ -943,6 +943,10 @@ class CockpitApp {
         this.skillsPointsAvailable = document.getElementById("skillsPointsAvailable");
         this.hudSkillsPanel = document.getElementById("hudSkillsPanel");
         this.hudSkillsGrid = document.getElementById("hudSkillsGrid");
+        this.hudLockedSkillsGrid = document.getElementById("hudLockedSkillsGrid");
+        this.btnToggleLockedAbilities = document.getElementById("btnToggleLockedAbilities");
+        this.lockedAbilitiesDetails = document.getElementById("lockedAbilitiesDetails");
+        this.lockedAbilitiesOpen = false;
         this.hudSkillsReady = document.getElementById("hudSkillsReady");
         this.btnOpenSkillsTab = document.getElementById("btnOpenSkillsTab");
         this.btnToggleSkills = document.getElementById("btnToggleSkills");
@@ -1525,6 +1529,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
         if (this.btnToggleSkills) {
             this.btnToggleSkills.addEventListener("click", () => this.toggleSkillsPanel());
+        }
+        if (this.btnToggleLockedAbilities && this.lockedAbilitiesDetails) {
+            this.btnToggleLockedAbilities.addEventListener("click", () => {
+                this.toggleSectionDisclosure(this.btnToggleLockedAbilities, this.lockedAbilitiesDetails);
+                this.lockedAbilitiesOpen = !this.lockedAbilitiesDetails.hidden;
+            });
         }
 
         // Time & Ticks Chrono Controls
@@ -3724,10 +3734,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.hudSkillsReady) this.hudSkillsReady.textContent = String(ready);
         const signature = ABILITY_ORDER.map(id => `${id}:${(abilities[id] || {}).unlocked ? 1 : 0}:${(abilities[id] || {}).cooldown || 0}`).join("|")
             + `|${inCombat}|${ship.hull}|${ship.max_hull}|${charmTarget || ""}`;
-        if (this.skillsPointerDown || this.hudSkillsGrid.contains(document.activeElement)) return;
+        if (this.skillsPointerDown
+            || this.hudSkillsGrid.contains(document.activeElement)
+            || this.hudLockedSkillsGrid?.contains(document.activeElement)) return;
         if (signature === this.abilitySignature && this.hudSkillsGrid.childElementCount) return;
         this.abilitySignature = signature;
-        this.hudSkillsGrid.innerHTML = ABILITY_ORDER.map((id, index) => {
+        const chipHtml = (id, index) => {
             const info = abilities[id] || {};
             const meta = ABILITY_META[id] || { name: id, icon: "✦" };
             const unlocked = Boolean(info.unlocked);
@@ -3753,11 +3765,40 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <span class="skill-quick-bar"><i style="width:${percent}%"></i></span>
                 </button>
             `;
-        }).join("");
-
-        this.hudSkillsGrid.querySelectorAll("[data-quick-ability]").forEach(btn =>
-            btn.addEventListener("click", () => this.useAbilityQuick(btn.getAttribute("data-quick-ability")))
-        );
+        };
+        const unlockedIds = ABILITY_ORDER.filter(id => Boolean((abilities[id] || {}).unlocked));
+        const lockedIds = ABILITY_ORDER.filter(id => !Boolean((abilities[id] || {}).unlocked));
+        this.hudSkillsGrid.innerHTML = unlockedIds
+            .map(id => chipHtml(id, ABILITY_ORDER.indexOf(id))).join("");
+        if (this.hudLockedSkillsGrid) {
+            this.hudLockedSkillsGrid.innerHTML = lockedIds
+                .map(id => chipHtml(id, ABILITY_ORDER.indexOf(id))).join("");
+        }
+        const lockedCount = lockedIds.length;
+        if (this.btnToggleLockedAbilities) {
+            this.btnToggleLockedAbilities.style.display = lockedCount ? "" : "none";
+            this.btnToggleLockedAbilities.dataset.label = `LOCKED ${lockedCount}`;
+            this.btnToggleLockedAbilities.textContent = this.lockedAbilitiesOpen && lockedCount
+                ? `HIDE LOCKED ${lockedCount}` : `SHOW LOCKED ${lockedCount}`;
+            this.btnToggleLockedAbilities.setAttribute(
+                "aria-expanded", String(this.lockedAbilitiesOpen && Boolean(lockedCount))
+            );
+        }
+        if (this.lockedAbilitiesDetails) {
+            if (!lockedCount) {
+                this.lockedAbilitiesDetails.hidden = true;
+                this.lockedAbilitiesOpen = false;
+            } else {
+                this.lockedAbilitiesDetails.hidden = !this.lockedAbilitiesOpen;
+            }
+        }
+        const bindChips = (grid) => {
+            grid.querySelectorAll("[data-quick-ability]").forEach(btn =>
+                btn.addEventListener("click", () => this.useAbilityQuick(btn.getAttribute("data-quick-ability")))
+            );
+        };
+        bindChips(this.hudSkillsGrid);
+        if (this.hudLockedSkillsGrid) bindChips(this.hudLockedSkillsGrid);
     }
 
     async useAbilityQuick(abilityId, factionOverride = null) {

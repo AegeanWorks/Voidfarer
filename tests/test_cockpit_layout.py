@@ -1517,6 +1517,31 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestLockedAbilityDisclosure(unittest.TestCase):
+    """The strip shows unlocked powers first and hides locked chips by default."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_locked_chips_default_to_hidden(self):
+        self.assertIn('id="btnToggleLockedAbilities"', self.html)
+        self.assertIn('id="lockedAbilitiesDetails" hidden', self.html)
+        self.assertIn('id="hudLockedSkillsGrid"', self.html)
+        self.assertIn("#lockedAbilitiesDetails[hidden]", self.css)
+        self.assertIn(".skills-locked-toggle", self.css)
+
+    def test_render_splits_unlocked_and_locked_abilities(self):
+        self.assertIn("const unlockedIds = ABILITY_ORDER.filter", self.js)
+        self.assertIn("const lockedIds = ABILITY_ORDER.filter", self.js)
+        self.assertIn("this.hudLockedSkillsGrid.innerHTML", self.js)
+        self.assertIn("SHOW LOCKED ${lockedCount}", self.js)
+        self.assertIn("HIDE LOCKED ${lockedCount}", self.js)
+        self.assertIn("this.lockedAbilitiesOpen", self.js)
+
+
 class TestCombatTacticsDisclosure(unittest.TestCase):
     """Only four core combat actions stay visible; the rest are disclosed."""
 
