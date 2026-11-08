@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `362`
+- **Total Classes**: `363`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2022`
-- **Total Source Lines**: `50815`
+- **Total Class Methods**: `2026`
+- **Total Source Lines**: `50857`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2366` lines (`105133` bytes)
+**Size**: `2408` lines (`107187` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,11 @@
   - Method `.setUpClass()`
   - Method `.test_manual_sliders_default_to_hidden()`
   - Method `.test_power_hint_names_the_visible_presets()`
+- `class TestSurfaceOperationsCondensation` - *Surface work leads with a site strip and one selected operation.*
+  - Method `.setUpClass()`
+  - Method `.test_default_view_is_a_site_strip_and_selected_operation()`
+  - Method `.test_map_and_full_catalog_default_to_hidden()`
+  - Method `.test_disclosure_css_and_description_clamp()`
 - `class TestTargetDossierCondensation` - *The radar dossier leads with identity, key stats and primary actions.*
   - Method `.setUpClass()`
   - Method `.test_full_stat_grid_and_panels_sit_behind_details()`

@@ -379,19 +379,19 @@ mechanic families, succeeds on 38 endpoints, attempts 51 and reports **zero cove
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
-The click-map enumerates every rendered control via `window.voidfarerClickMap()` and fails
-on a missing or duplicate handle (desktop: 173 controls, 39 visible, 0 missing, 0 duplicates).
-The left console starts with five core systems; `MORE SYSTEMS` restores all sixteen tabs.
-The PLAYER card points at the bottom strip instead of repeating six USE buttons. SHIP
-collapses `ROOMS & CREW STATIONS` and `MODULE CATALOG` (2,390->917px), COMMERCE moves the
-auto-trade broker and quantum freight below the market table (2,076->932px), and FLEET
-collapses mercenary contracts and procurement (1,271->831px). Contracts survive an empty
-fleet. Left tabs share a 56px header, one heading style and stacking rows (DEPOT, EMPIRE,
-story). Advanced tabs start closed. Reactor presets are default; sliders sit under
-`SHOW FINE TUNE`. Combat keeps four core actions; tactics sit under `SHOW MORE TACTICS`.
-Unlocked ability chips only; locked powers sit behind `SHOW LOCKED n`. The target dossier
-keeps key-stat chips and primary actions above the fold; full stats and rare actions sit
-behind `SHOW DETAILS` / `SHOW MORE ACTIONS`.
+The click-map enumerates every control via `window.voidfarerClickMap()`; a missing or duplicate handle fails (desktop: 173 controls, 39 visible, 0 missing/duplicate).
+The console starts with five systems; `MORE SYSTEMS` restores all sixteen. PLAYER
+points at the bottom strip instead of repeating six USE buttons. SHIP collapses `ROOMS &
+CREW STATIONS` and `MODULE CATALOG` (2,390->917px), COMMERCE moves the auto-trade broker
+and quantum freight below the market table (2,076->932px), and FLEET collapses mercenary
+contracts and procurement (1,271->831px). Contracts survive no drones. Left tabs share a
+56px header, one heading style and stacking rows. Advanced tabs start closed. Reactor
+presets are default; sliders sit under `SHOW FINE TUNE`. Combat keeps four core actions;
+tactics sit under `SHOW MORE TACTICS`. Unlocked ability chips only; locked powers sit
+behind `SHOW LOCKED n`. The target dossier keeps key stats and actions above the
+fold; full stats and rare actions sit behind `SHOW DETAILS` / `SHOW MORE ACTIONS`. The
+surface panel keeps the site strip and selected operation with RUN; map and full
+list sit under `SHOW SURFACE MAP` / `SHOW ALL OPERATIONS`.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -576,7 +576,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,289-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,292-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

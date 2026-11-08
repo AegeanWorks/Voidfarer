@@ -817,3 +817,29 @@ reveals 11 stats and the derelict panel (risk 38%→19% on CAUTIOUS); the scoop 
 `target-after/01-station.png`, `03-derelict.png`, `03b-derelict-details.png`,
 `04-system.png`, `08b-scoop-more.png`; vision review confirmed the actions are above the
 fold and flagged only the long-name/distance collision, fixed before the final play.
+
+### Thirteenth pass — surface operations stop burying the action
+
+Landing used to open a 714px surface panel inside the 246px target card: a 205px map
+first, then nine 46–51px operation rows. The map filled the card viewport, so **no
+operation name, reward or RUN button was visible without scrolling**, and the card grew to
+921px of scroll content.
+
+The surface panel now leads with a compact `S1`–`S9` site strip and one selected-operation
+card: name, two-line description, risk, rewards and `RUN`/`WORKED`. The map and the full
+catalog sit behind `SHOW SURFACE MAP` and `SHOW ALL OPERATIONS (9)`; both preserve their
+open state across refreshes, and opening one scrolls its HIDE control plus the revealed
+content into view. The first unworked operation is selected automatically, used sites are
+marked, and the panel is signature-guarded so polling does not rebuild it under a click.
+
+Measured: default surface panel **714 → 188px**, fully inside the 246px card with `S1
+Surface Survey`, `10%`, `+180 CR · +30 RES` and an enabled RUN. Map open 396px with the
+full 159px canvas, `SURFACE SCAN // LAVA WORLD · 9 SITES` and the RUN ABOVE hint visible;
+catalog open 644px with HIDE ALL OPERATIONS and four complete S1–S4 rows usable without
+scrolling. Real play: survey succeeded for +180 credits (2,385→2,565), `1/9 WORKED`, S1
+marked worked, `WORKED` disabled, S2 restores an enabled RUN; 24 frames/415ms, zero
+errors. Suite `Ran 1292 OK`; click-map 173/39/0/0; `ui_inventory.py` 1214 lines; gate 5/5.
+Screenshots: `surface-before/01-surface-ops.png` vs `surface-after/01-surface-ops.png`,
+`surface-play/02-ruin-selected.png`, `03-map-open.png`, `04-all-operations.png`,
+`05-after-run.png`, `06-next-site.png`; vision review found no new clipping, only the
+pre-existing radar-label and flight-log top-line slices.

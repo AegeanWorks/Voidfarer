@@ -528,6 +528,9 @@ class CockpitApp {
         this.particles = window.ParticleSystem ? new window.ParticleSystem() : null;
         this.surfaceMap = window.SurfaceMapRenderer ? new window.SurfaceMapRenderer() : null;
         this.surfaceSelectedOp = null;
+        this.surfaceMapOpen = false;
+        this.surfaceAllOpen = false;
+        this.surfaceSignature = "";
         this.combatFx = window.ParticleSystem ? new window.ParticleSystem(240) : null;
         this.combatCanvas = document.getElementById("combatVisual");
         this.combatScene = null;
@@ -4226,6 +4229,22 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    surfaceRewardItems(op) {
+        const rewards = [];
+        if (op.credits) rewards.push(`+${op.credits} CR`);
+        if (op.research) rewards.push(`+${op.research} RES`);
+        if (op.credit_cost) rewards.push(`-${op.credit_cost} CR`);
+        if (op.heal_injuries) rewards.push(`HEAL ${op.heal_injuries}`);
+        if (op.morale) rewards.push(`MORALE ${op.morale > 0 ? "+" : ""}${op.morale}`);
+        (op.cargo || []).forEach(item => rewards.push(`+${item.quantity} ${item.name || item.id}`));
+        return rewards;
+    }
+
+    surfaceRiskClass(risk) {
+        const value = Number(risk || 0);
+        return value >= 35 ? "risk-high" : (value >= 18 ? "risk-mid" : "risk-low");
+    }
+
     renderSurfaceOps() {
         if (!this.surfaceOps) return;
         const data = this.state?.surface_report;
@@ -4234,24 +4253,30 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             || String(this.selectedTarget?.id || "") !== String(data.body?.id || "")
         ) {
             this.surfaceOps.style.display = "none";
+            this.surfaceSignature = "";
+            this.surfaceSelectedOp = null;
+            this.surfaceMapOpen = false;
+            this.surfaceAllOpen = false;
             return;
         }
         const body = data.body || {};
         const operations = data.operations || [];
-        if (this.surfaceSelectedOp && !operations.some(op => op.id === this.surfaceSelectedOp)) {
-            this.surfaceSelectedOp = null;
+        if (!operations.some(op => op.id === this.surfaceSelectedOp)) {
+            this.surfaceSelectedOp = (operations.find(op => !op.used) || operations[0] || {}).id || null;
         }
-        const selectedOp = operations.find(op => op.id === this.surfaceSelectedOp);
+        const selectedOp = operations.find(op => op.id === this.surfaceSelectedOp) || null;
         const wasHidden = this.surfaceOps.style.display === "none";
+        const signature = [
+            data.used_count, data.total_count, this.surfaceSelectedOp,
+            this.surfaceMapOpen ? 1 : 0, this.surfaceAllOpen ? 1 : 0,
+            operations.map(op => `${op.id}:${op.used ? 1 : 0}`).join(","),
+        ].join("|");
+        if (!wasHidden && signature === this.surfaceSignature) return;
+        this.surfaceSignature = signature;
+
         const rows = operations.map((op, index) => {
-            const riskClass = op.risk >= 35 ? "risk-high" : (op.risk >= 18 ? "risk-mid" : "risk-low");
-            const rewards = [];
-            if (op.credits) rewards.push(`+${op.credits} CR`);
-            if (op.research) rewards.push(`+${op.research} RES`);
-            if (op.credit_cost) rewards.push(`-${op.credit_cost} CR`);
-            if (op.heal_injuries) rewards.push(`HEAL ${op.heal_injuries}`);
-            if (op.morale) rewards.push(`MORALE ${op.morale > 0 ? "+" : ""}${op.morale}`);
-            (op.cargo || []).forEach(item => rewards.push(`+${item.quantity} ${item.name || item.id}`));
+            const riskClass = this.surfaceRiskClass(op.risk);
+            const rewards = this.surfaceRewardItems(op);
             return `<div class="surface-op-row ${op.used ? "is-worked" : ""} ${op.id === this.surfaceSelectedOp ? "is-selected" : ""}">
                 <div class="surface-op-main">
                     <strong><span class="surface-site-index">S${index + 1}</span>${this.escapeHtml(op.name)}</strong>
@@ -4264,6 +4289,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 </div>
             </div>`;
         }).join("");
+        const siteChips = operations.map((op, index) => `
+            <button class="surface-site-chip ${op.used ? "is-worked" : ""} ${op.id === this.surfaceSelectedOp ? "is-selected" : ""}"
+                    data-surface-select="${this.escapeHtml(op.id)}"
+                    title="${this.escapeHtml(`S${index + 1} ${op.name} // ${op.risk}% // ${this.surfaceRewardItems(op).join(" · ") || "no direct payout"}`)}"
+                    aria-pressed="${op.id === this.surfaceSelectedOp}">S${index + 1}</button>`).join("");
+        const selectedMarkup = selectedOp ? `
+            <div class="surface-selected-op ${selectedOp.used ? "is-worked" : ""}">
+                <div class="surface-selected-head">
+                    <span class="surface-site-index">S${operations.indexOf(selectedOp) + 1}</span>
+                    <strong>${this.escapeHtml(selectedOp.name)}</strong>
+                    <span class="away-risk ${this.surfaceRiskClass(selectedOp.risk)}">${selectedOp.risk}%</span>
+                </div>
+                <p class="surface-selected-desc" title="${this.escapeHtml(selectedOp.description)}">${this.escapeHtml(selectedOp.description)}</p>
+                <div class="surface-selected-foot">
+                    <span class="surface-op-reward">${this.escapeHtml(this.surfaceRewardItems(selectedOp).join(" · ") || "NO DIRECT PAYOUT")}</span>
+                    <button class="btn-hud" data-surface-op="${this.escapeHtml(selectedOp.id)}" ${selectedOp.used ? "disabled" : ""}>${selectedOp.used ? "WORKED" : "RUN"}</button>
+                </div>
+            </div>` : "";
         const mapMarkup = this.surfaceMap ? `
             <div class="surface-map-wrap">
                 <canvas class="surface-map-canvas" id="surfaceMapCanvas" aria-label="Surface map of ${this.escapeHtml(body.name || "world")}"></canvas>
@@ -4272,17 +4315,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <span>${operations.length} SITES</span>
                 </div>
                 <div class="surface-map-hint">${selectedOp
-                    ? `SELECTED // ${this.escapeHtml(selectedOp.name)} - RUN BELOW`
+                    ? `SELECTED // ${this.escapeHtml(selectedOp.name)} - RUN ABOVE`
                     : "CLICK A SITE TO SELECT ITS OPERATION"}</div>
             </div>` : "";
+        const controls = operations.length ? `
+            <div class="surface-site-strip" role="group" aria-label="Surface sites">${siteChips}</div>
+            ${selectedMarkup}
+            ${this.surfaceMap ? `
+                <button class="surface-disclosure-toggle" data-surface-toggle="map" aria-expanded="${this.surfaceMapOpen ? "true" : "false"}" aria-controls="surfaceMapDetails">${this.surfaceMapOpen ? "HIDE" : "SHOW"} SURFACE MAP</button>
+                <div id="surfaceMapDetails" ${this.surfaceMapOpen ? "" : "hidden"}>${mapMarkup}</div>` : ""}
+            <button class="surface-disclosure-toggle" data-surface-toggle="operations" aria-expanded="${this.surfaceAllOpen ? "true" : "false"}" aria-controls="surfaceAllDetails">${this.surfaceAllOpen ? "HIDE" : "SHOW"} ALL OPERATIONS (${operations.length})</button>
+            <div id="surfaceAllDetails" ${this.surfaceAllOpen ? "" : "hidden"}><div class="surface-op-list">${rows}</div></div>
+        ` : '<p class="panel-intro-text">No operations available.</p>';
         this.surfaceOps.style.display = "block";
         this.surfaceOps.innerHTML = `
             <div class="surface-header">
                 <h4>SURFACE OPERATIONS // ${this.escapeHtml(body.name || "")}</h4>
                 <span>${data.used_count}/${data.total_count} WORKED</span>
             </div>
-            ${mapMarkup}
-            <div class="surface-op-list">${rows || '<p class="panel-intro-text">No operations available.</p>'}</div>
+            ${controls}
         `;
         const mapCanvas = this.surfaceOps.querySelector("#surfaceMapCanvas");
         if (mapCanvas && this.surfaceMap) {
@@ -4292,19 +4343,41 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 if (!site) return;
                 this.surfaceSelectedOp = site.id;
                 this.renderSurfaceOps();
-                const row = this.surfaceOps.querySelector(`[data-surface-op="${site.id}"]`)?.closest(".surface-op-row");
-                const card = this.surfaceOps.closest(".nav-target-card");
-                if (row && card) {
-                    const cardRect = card.getBoundingClientRect();
-                    const rowRect = row.getBoundingClientRect();
-                    if (rowRect.bottom > cardRect.bottom - 6) card.scrollTop += rowRect.bottom - cardRect.bottom + 6;
-                    else if (rowRect.top < cardRect.top + 6) card.scrollTop -= cardRect.top - rowRect.top + 6;
-                }
             });
             mapCanvas.addEventListener("mousemove", event => {
                 mapCanvas.style.cursor = this.surfaceMap.hitTest(mapCanvas, event) ? "pointer" : "crosshair";
             });
         }
+        this.surfaceOps.querySelectorAll("[data-surface-select]").forEach(button => {
+            button.addEventListener("click", () => {
+                this.surfaceSelectedOp = button.getAttribute("data-surface-select");
+                this.renderSurfaceOps();
+            });
+        });
+        this.surfaceOps.querySelectorAll("[data-surface-toggle]").forEach(button => {
+            button.addEventListener("click", () => {
+                const kind = button.getAttribute("data-surface-toggle");
+                if (kind === "map") {
+                    this.surfaceMapOpen = !this.surfaceMapOpen;
+                } else {
+                    this.surfaceAllOpen = !this.surfaceAllOpen;
+                }
+                this.renderSurfaceOps();
+                const open = kind === "map" ? this.surfaceMapOpen : this.surfaceAllOpen;
+                if (open) {
+                    // Keep the HIDE control and the revealed content in view
+                    // instead of leaving the new rows below the card edge.
+                    requestAnimationFrame(() => {
+                        const card = this.surfaceOps.closest(".nav-target-card");
+                        const toggle = this.surfaceOps.querySelector(`[data-surface-toggle="${kind}"]`);
+                        if (card && toggle) {
+                            card.scrollTop += toggle.getBoundingClientRect().top
+                                - card.getBoundingClientRect().top - 4;
+                        }
+                    });
+                }
+            });
+        });
         this.surfaceOps.querySelectorAll("[data-surface-op]").forEach(button => {
             button.addEventListener("click", () => this.handleSurfaceOp(button.getAttribute("data-surface-op")));
         });

@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-target-dossier",
+    "task_id": "voidfarer-surface-ops",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794140289.893181,
+    "updated_at": 1794144321.3087265,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794140292.4919558
+    "completed_at": 1794144321.9481685
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-left-panel-uniformity",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Left-panel uniformity verified: 16/56px headers, 16/16 one-line titles, readable depot/research/story rows; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794110308.8602235,
-      "timestamp_str": "2026-11-08 06:58:28",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-197 and uniformity proof",
-        "evidence": "ui-review/left-tabs-before/*.png, left-tabs-after/*.png, left-tabs-after/play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-left-panel-uniformity",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-left-panel-uniformity' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794110309.7135355,
-      "timestamp_str": "2026-11-08 06:58:29",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-advanced-left-condense",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: make ARSENAL, FACTIONS and CODEX summary-first and give small-card lists a shared rhythm",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794113631.9817042,
-      "timestamp_str": "2026-11-08 07:53:51",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The largest left surfaces are ARSENAL 6509px, FACTIONS 4594px and CODEX 10683px, and QUESTS/AI/MESSAGES cards range from 44px to 436px, so the advanced terminal still overwhelms at a glance.",
-        "benefits": "Each advanced tab opens at under 600px with counts and section headers visible; catalogs stay one click away; small cards share minimum heights and compact actions.",
-        "risks": "contract: UI surface and static counts; dependency: none; concurrency: none; state: hidden attributes only, no save change; regression: filters, counts and all list controls must stay reachable.",
-        "mitigation": "Static condensation test, a browser sweep of all six disclosures and card distributions, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "05ca98ef254552731b363ef8a94e2f7de9aef8c603ab75cc7907796c7a12d45c"
-    },
     {
       "task_id": "voidfarer-advanced-left-condense",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794140292.4919589,
       "timestamp_str": "2026-11-08 15:18:12",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-surface-ops",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: lead surface operations with a site strip and one selected RUN card, with map and catalog disclosed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794144320.6595712,
+      "timestamp_str": "2026-11-08 16:25:20",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The landed surface panel renders a 205px map plus nine 46-51px rows (714px) inside the 246px target card, so the map fills the whole viewport and no operation name, reward or RUN button is visible without scrolling.",
+        "benefits": "The default surface view shows all nine sites as compact chips and the selected operation with risk, rewards and RUN above the fold; the map and full nine-row catalog stay one click away.",
+        "risks": "contract: surface operations UI; dependency: none; concurrency: none; state: disclosure flags and selected-site UI only, no save change; regression: map selection, direct RUN rows, used-state marking and the full catalog must stay reachable.",
+        "mitigation": "Static condensation test, real-browser play covering selection, map/list reveals, a successful operation and the worked state, before/after measurement, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "bc07d741039d76eafc8976b811adc4f443b4ef0560399ca69c048147ee5d0b38"
+    },
+    {
+      "task_id": "voidfarer-surface-ops",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Surface ops verified: 714->188px default with RUN above the fold, map/list reveals, real survey +180 cr and 1/9 worked; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794144321.3087265,
+      "timestamp_str": "2026-11-08 16:25:21",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-204 and surface proof",
+        "evidence": "ui-review/surface-before/01, surface-after/01, surface-play/01..06, play-report.json, click-map 173/39/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-surface-ops",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-surface-ops' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794144321.9481702,
+      "timestamp_str": "2026-11-08 16:25:21",
       "agent": "opencode:campaign"
     }
   ]

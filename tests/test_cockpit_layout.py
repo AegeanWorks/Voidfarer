@@ -1517,6 +1517,48 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestSurfaceOperationsCondensation(unittest.TestCase):
+    """Surface work leads with a site strip and one selected operation."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_default_view_is_a_site_strip_and_selected_operation(self):
+        self.assertIn("surface-site-strip", self.js)
+        self.assertIn("surface-selected-op", self.js)
+        self.assertIn("data-surface-select=", self.js)
+        self.assertIn("data-surface-toggle=", self.js)
+        self.assertIn("surfaceRewardItems(op)", self.js)
+        self.assertIn("surfaceRiskClass(risk)", self.js)
+        self.assertIn("RUN ABOVE", self.js)
+        self.assertIn("this.surfaceMapOpen", self.js)
+        self.assertIn("this.surfaceAllOpen", self.js)
+        self.assertIn("this.surfaceSignature", self.js)
+
+    def test_map_and_full_catalog_default_to_hidden(self):
+        self.assertIn('id="surfaceMapDetails" ${this.surfaceMapOpen ? "" : "hidden"}', self.js)
+        self.assertIn('id="surfaceAllDetails" ${this.surfaceAllOpen ? "" : "hidden"}', self.js)
+        self.assertIn('>${mapMarkup}</div>', self.js)
+        self.assertLess(
+            self.js.index('id="surfaceAllDetails"'),
+            self.js.index('class="surface-op-list"'),
+        )
+        self.assertIn('this.surfaceMapOpen ? "HIDE" : "SHOW"', self.js)
+        self.assertIn('this.surfaceAllOpen ? "HIDE" : "SHOW"', self.js)
+
+    def test_disclosure_css_and_description_clamp(self):
+        self.assertIn(".surface-site-strip", self.css)
+        self.assertIn(".surface-selected-op", self.css)
+        self.assertIn(".surface-disclosure-toggle", self.css)
+        self.assertIn("#surfaceMapDetails[hidden]", self.css)
+        self.assertIn("#surfaceAllDetails[hidden]", self.css)
+        selected_rule = self.css.split(".surface-selected-desc", 1)[1].split("}", 1)[0]
+        self.assertIn("-webkit-line-clamp: 2", selected_rule)
+        self.assertIn("overflow: hidden", selected_rule)
+
+
 class TestTargetDossierCondensation(unittest.TestCase):
     """The radar dossier leads with identity, key stats and primary actions."""
 
