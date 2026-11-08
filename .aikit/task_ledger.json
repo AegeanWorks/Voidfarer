@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-quests-condense",
-    "last_phase": "in_progress",
+    "task_id": "voidfarer-ai-condense",
+    "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794154511.3653643,
+    "updated_at": 1794156998.1154716,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794154517.8273566
+    "completed_at": 1794157281.2831116
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-locked-abilities-academy",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Unlocked-first abilities and academy play verified: 4 chips + LOCKED 2, all six steps to graduation, cards below ribbon; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794137025.905497,
-      "timestamp_str": "2026-11-08 14:23:45",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-202 and academy proof",
-        "evidence": "ui-review/academy-play/00..07, play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-locked-abilities-academy",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-locked-abilities-academy' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794137026.2668524,
-      "timestamp_str": "2026-11-08 14:23:46",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-target-dossier",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: make the radar target dossier summary-first with details and rare actions disclosed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794140286.4650426,
-      "timestamp_str": "2026-11-08 15:18:06",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "At 1280x720 the selected-target card is 249px tall but its content is 314-507px in every state, so the 11-field stat grid clips mid-row and the primary actions (including BOARD DERELICT) sit below the internal scroll edge; system/captain/point states also fill the grid with placeholder dashes.",
-        "benefits": "Every selected target shows four key-stat chips and its primary actions above the fold without scrolling, full stats and salvage stay one click away, and rare actions appear only when they apply.",
-        "risks": "contract: target dossier UI; dependency: none; concurrency: none; state: disclosure DOM flags only, no save change; regression: transit, land, board, jump, hail, salvage strategy and scoop must remain reachable and functional.",
-        "mitigation": "Static condensation test, multi-state browser play with real quantum transit and salvage strategy selection, before/after measurement, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "e76de55624d210ba10ccb9e8a1bb978ec8b467ae6b88ed14930e5557b6ad3d61"
-    },
     {
       "task_id": "voidfarer-target-dossier",
       "phase": "phase 4",
@@ -295,6 +251,45 @@
       "status": "completed",
       "timestamp": 1794154517.8273592,
       "timestamp_str": "2026-11-08 19:15:17",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-ai-condense",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: lead AI CAPTAINS with a count strip and one headline row per captain, disclose the full dossiers and actions",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794154889.5084558,
+      "timestamp_str": "2026-11-08 19:21:29",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "AI CAPTAINS is 1,131px: five 200px cards each with description, cargo, system line and five action buttons; at 1280x720 only the first two cards fit, so trust/standing for the other three captains and their HAIL/BUY/SELL/HIRE/ALLY path sit below the fold.",
+        "benefits": "The default view shows 5 CAPTAINS / 0 HIRED / 0 ALLIED and five one-line headlines with archetype, system, trust and standing; every captain's full dossier and actions stay one click away behind SHOW CAPTAIN DOSSIERS (5).",
+        "risks": "contract: AI CAPTAINS right-tab UI; dependency: none; concurrency: render stays synchronous; state: disclosure DOM only, no save change; regression: HAIL, BUY FUEL, SELL FUEL, HIRE, ALLY and the empty state must stay reachable and functional.",
+        "mitigation": "Static condensation test, same-harness before/after measurement, real-browser dossier reveal and a real HAIL action, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "3ecb76fdad576654c6ed09f0d0072444a216f9a8b248c3424913b82d38879542"
+    },
+    {
+      "task_id": "voidfarer-ai-condense",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "AI CAPTAINS verified: 1,131->474px, count strip and five headlines fit, dossiers reveal 5 cards/21 actions, live HAIL trust 37->39; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794156998.1154716,
+      "timestamp_str": "2026-11-08 19:56:38",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-ai-condense",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-ai-condense' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794157281.2831144,
+      "timestamp_str": "2026-11-08 20:01:21",
       "agent": "opencode:campaign"
     }
   ]

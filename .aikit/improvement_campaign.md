@@ -931,3 +931,25 @@ the relic; 25 frames/402ms, zero errors. Suite `Ran 1304 OK`; click-map 182/39/0
 `03-completed-empty.png`, `04-after-claim.png`, `05-completed-after.png`; vision review
 confirmed the two-card before stack versus the counts/claim surface and both readable
 reveals, with no new clipping or overlap.
+
+### Eighteenth pass — AI CAPTAINS becomes a count strip plus captain headlines
+
+AI CAPTAINS was 1,131px: five roughly 200px cards, each carrying description, system/trust/
+standing, cargo and up to five action buttons. At 1280×720 only the first card and part of
+the second fit, so trust/standing for three captains and their HAIL/BUY/SELL/HIRE/ALLY
+paths sat below the fold. The tab now opens with a `CAPTAINS IN RANGE` head and live count
+(`5 CAPTAINS · 0 HIRED · 0 ALLIED`), one two-line headline per captain (name + archetype,
+then system · trust · standing · status), and `SHOW CAPTAIN DOSSIERS (5)`. The full
+dossiers and actions sit behind the disclosure, whose label and `aria-expanded` track the
+live count; the toggle hides when no captains are in range.
+
+Measured with the same harness, save and 1280×720 viewport: AI CAPTAINS **1,131 → 474px**,
+fitting the 474px viewport with all five headlines and the disclosure; all other 15 tabs
+unchanged. Dossiers open 1,532px with five cards and 21 visible actions. Real play: HAIL
+raised Captain Vega's trust 37 → 39 and standing 9 → 10, the headline changed to `TRUST
+39`, the log recorded `Quantum link trust increased.`, and the dossiers stayed open; 25
+frames/413ms, zero errors. Suite `Ran 1306 OK`; click-map 183/39/0/0; `ui_inventory.py`
+1250 lines; gate 5/5. Screenshots: `ai-unified-before/ai.png` vs `ai-unified-after/ai.png`,
+`ai-play/01-ai-default.png`, `02-dossiers-open.png`, `03-after-hail.png`; vision review
+confirmed the count/headline deck, the readable five-card reveal, the live trust update,
+and no new clipping or overlap.

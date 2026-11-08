@@ -850,6 +850,10 @@ class CockpitApp {
         this.btnToggleCompletedQuests = document.getElementById("btnToggleCompletedQuests");
         this.completedQuestsDetails = document.getElementById("completedQuestsDetails");
         this.aiList = document.getElementById("aiList");
+        this.aiCount = document.getElementById("aiCount");
+        this.aiSummary = document.getElementById("aiSummary");
+        this.btnToggleAI = document.getElementById("btnToggleAI");
+        this.aiDetails = document.getElementById("aiDetails");
         this.depotSummary = document.getElementById("depotSummary");
         this.depotList = document.getElementById("depotList");
         this.messageList = document.getElementById("messageList");
@@ -1474,6 +1478,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleCrewAssignments, this.crewAssignmentsDetails],
             [this.btnToggleActiveQuests, this.activeQuestsDetails],
             [this.btnToggleCompletedQuests, this.completedQuestsDetails],
+            [this.btnToggleAI, this.aiDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -9041,10 +9046,35 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
     }
 
+    syncAIDisclosureLabel(count) {
+        const button = this.btnToggleAI;
+        if (!button || !this.aiDetails) return;
+        button.dataset.label = `CAPTAIN DOSSIERS (${count})`;
+        button.textContent = `${this.aiDetails.hidden ? "SHOW" : "HIDE"} CAPTAIN DOSSIERS (${count})`;
+        button.setAttribute("aria-expanded", String(!this.aiDetails.hidden));
+        button.style.display = count > 0 ? "" : "none";
+    }
+
     renderAICaptains() {
         if (!this.state || !this.aiList) return;
         const captains = this.state.ai_captains || [];
         const credits = Number((this.state.ship || {}).credits || 0);
+        const hired = captains.filter(c => c.hired).length;
+        const allied = captains.filter(c => c.ally).length;
+        if (this.aiCount) {
+            this.aiCount.textContent = `${captains.length} CAPTAINS · ${hired} HIRED · ${allied} ALLIED`;
+        }
+        if (this.aiSummary) {
+            this.aiSummary.innerHTML = captains.length ? captains.map(c => {
+                const trust = Number(c.trust || 0);
+                const status = c.hired ? "HIRED" : (c.ally ? "ALLY" : "OPEN");
+                return `<div class="ai-summary-row">
+                    <strong>${this.escapeHtml(c.name)} <small>[${this.escapeHtml(c.archetype.toUpperCase())}]</small></strong>
+                    <span>${this.escapeHtml(c.system_id)} · TRUST ${trust} · STANDING ${c.standing} · ${status}</span>
+                </div>`;
+            }).join("") : `<p class="panel-intro-text">No AI captains in range.</p>`;
+        }
+        this.syncAIDisclosureLabel(captains.length);
         this.aiList.innerHTML = captains.map(c => {
             const trust = Number(c.trust || 0);
             const hireCost = 2500;

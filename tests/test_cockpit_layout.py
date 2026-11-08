@@ -1554,6 +1554,37 @@ class TestQuestsCondensation(unittest.TestCase):
         self.assertIn(".quest-claim-empty", self.css)
 
 
+class TestAICaptainsCondensation(unittest.TestCase):
+    """AI CAPTAINS keeps the count strip and headline rows before full dossiers."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_headlines_and_counts_precede_hidden_dossiers(self):
+        self.assertIn('id="aiSummary"', self.html)
+        self.assertIn('id="aiCount"', self.html)
+        self.assertIn('id="btnToggleAI"', self.html)
+        self.assertIn('data-label="CAPTAIN DOSSIERS"', self.html)
+        self.assertLess(
+            self.html.index('id="aiSummary"'),
+            self.html.index('id="aiDetails"'),
+        )
+        self.assertIn('id="aiDetails" hidden', self.html)
+        self.assertIn("#aiDetails[hidden]", self.css)
+
+    def test_count_and_headline_rows_are_rendered(self):
+        self.assertIn("this.aiSummary.innerHTML", self.js)
+        self.assertIn("this.aiCount.textContent", self.js)
+        self.assertIn("syncAIDisclosureLabel", self.js)
+        self.assertIn("CAPTAIN DOSSIERS", self.js)
+        self.assertIn("ai-summary-row", self.js)
+        self.assertIn("TRUST ${trust}", self.js)
+        self.assertIn(".ai-summary-row", self.css)
+
+
 class TestCrewCondensation(unittest.TestCase):
     """CREW keeps cash flow and officer headlines before full rosters."""
 

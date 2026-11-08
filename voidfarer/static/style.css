@@ -10620,3 +10620,64 @@ body.cockpit-theme .nav-panel > .panel-header {
 }
 #activeQuestsDetails[hidden],
 #completedQuestsDetails[hidden] { display: none; }
+
+/* =====================================================================
+   AI CAPTAINS — COUNT STRIP AND HEADLINE ROWS, DOSSIERS DISCLOSED
+   ===================================================================== */
+.ai-summary-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1px 8px;
+    margin: 2px 0 3px;
+}
+.ai-summary-head h4 {
+    margin: 0;
+    color: var(--console-gold);
+    font-family: var(--console-ui);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.ai-summary-count {
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: normal;
+    text-align: right;
+}
+.ai-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+.ai-summary-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 3px 6px;
+    border: 1px solid rgba(143, 191, 159, 0.2);
+    border-left: 2px solid rgba(143, 191, 159, 0.5);
+    background: rgba(127, 183, 201, 0.03);
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+.ai-summary-row strong {
+    min-width: 0;
+    color: var(--console-ivory);
+    white-space: normal;
+    overflow: visible;
+}
+.ai-summary-row strong small {
+    color: var(--console-muted);
+    font-size: 11px;
+}
+.ai-summary-row span {
+    min-width: 0;
+    color: var(--console-muted);
+    white-space: normal;
+    overflow: visible;
+}
+#aiDetails[hidden] { display: none; }

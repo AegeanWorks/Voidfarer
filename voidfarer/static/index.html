@@ -658,7 +658,15 @@
                             <div class="panel-tag"><span class="badge-dot dot-purple"></span> QUANTUM DIPLOMACY</div>
                             <h2 class="panel-title">AI CAPTAINS</h2>
                         </div>
-                        <div class="ai-list" id="aiList"></div>
+                        <div class="ai-summary-head">
+                            <h4>CAPTAINS IN RANGE</h4>
+                            <span class="ai-summary-count" id="aiCount">--</span>
+                        </div>
+                        <div class="ai-summary" id="aiSummary"></div>
+                        <button class="fleet-disclosure-toggle" id="btnToggleAI" data-label="CAPTAIN DOSSIERS" aria-expanded="false" aria-controls="aiDetails" title="Show or hide full captain dossiers and actions">SHOW CAPTAIN DOSSIERS</button>
+                        <div id="aiDetails" hidden>
+                            <div class="ai-list" id="aiList"></div>
+                        </div>
                     </div>
 
                     <!-- Tab 4d: System Depot -->

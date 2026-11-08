@@ -890,5 +890,19 @@
     "final_snapshot_digest": "54a8ae9a6c507e31a7f35f93b3b911c08444cc561d52ec2d9ba2bc2c59baa3c0",
     "final_snapshot_entries": 1245,
     "surface_digest": "caec24a5be863482d2cce6e3fc5ce5f7f599be23eb62baa8ee6b0eb70dbfa5f8"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "c22b44fd872aa46c4cc8b599d5c721138a156afc",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794155539.4324143,
+    "finished_at": 1794156938.8696127,
+    "strikes": 1,
+    "reviewer": "commandcode-vision (main multimodal agent; AI counts/headline rows, dossier reveal, live HAIL)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "84a0061fdf204f82e4ea86f302371c8f645e483acb01783c11d87646c8372e0d",
+    "final_snapshot_entries": 1250,
+    "surface_digest": "3fcd5c85f4e12ac5e9ccf6da2224e9f893eb8a823f5317776c9fff41b4387f2f"
   }
 ]
