@@ -3390,19 +3390,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--json", action="store_true", help="Emit the full registry and current state as JSON"
     )
     subparsers.add_parser("chart", help="Display star systems and orbital bodies")
-    subparsers.add_parser("market", help="Display local commodity exchange quotes")
+    subparsers.add_parser("market", help=argparse.SUPPRESS)
     subparsers.add_parser("economy", help="Display galactic economy shocks and trade routes")
-    autotrade_p = subparsers.add_parser("autotrade", help="Configure the docked buy-low/sell-high broker")
+    autotrade_p = subparsers.add_parser("autotrade", help=argparse.SUPPRESS)
     autotrade_p.add_argument("action", nargs="?", default="status", choices=["status", "on", "off", "quantum"])
     autotrade_p.add_argument("commodity_id", nargs="?", help="Commodity id")
     autotrade_p.add_argument("buy_below", nargs="?", type=int, help="Buy at or below this price")
     autotrade_p.add_argument("sell_above", nargs="?", type=int, help="Sell at or above this price")
     autotrade_p.add_argument("quantity", nargs="?", type=int, default=1, help="Units per automated trade")
-    inv_p = subparsers.add_parser("inventory", help="Inspect cargo hold manifest, buy consumables, and use items")
+    inv_p = subparsers.add_parser("inventory", help=argparse.SUPPRESS)
     inv_p.add_argument("action", nargs="?", default="list", choices=["list", "buy", "use", "jettison"])
     inv_p.add_argument("arg1", nargs="?", help="Item ID")
     inv_p.add_argument("arg2", nargs="?", help="Quantity")
-    shipyard_p = subparsers.add_parser("shipyard", help="Orbital shipyard chassis and module sales")
+    shipyard_p = subparsers.add_parser("shipyard", help=argparse.SUPPRESS)
     shipyard_p.add_argument("action", nargs="?", default="list", choices=["list", "catalog", "status", "chassis", "buy_chassis", "sell", "uninstall"])
     shipyard_p.add_argument("target", nargs="?", help="Chassis ID or module slot")
     subparsers.add_parser("scan", help="Execute sensor scan on orbiting body")
@@ -3430,7 +3430,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     msg_p.add_argument("action", nargs="?", default="list", choices=["list", "send", "read", "tree", "trees", "choose"])
     msg_p.add_argument("args", nargs="*", help="Message arguments")
 
-    depot_p = subparsers.add_parser("depot", help="System cargo depot operations")
+    depot_p = subparsers.add_parser("depot", help=argparse.SUPPRESS)
     depot_p.add_argument("action", nargs="?", default="status", choices=["status", "deposit", "withdraw", "sell"])
     depot_p.add_argument("item_id", nargs="?", help="Item ID")
     depot_p.add_argument("quantity", nargs="?", type=int, default=1)
@@ -3446,15 +3446,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--relief", action="store_true", help="Use medicines, hydroponics and fuel instead of credits"
     )
 
-    merc_p = subparsers.add_parser("mercs", help="Mercenary contracts and fleet refits")
+    merc_p = subparsers.add_parser("mercs", help=argparse.SUPPRESS)
     merc_p.add_argument("action", nargs="?", default="list", choices=["list", "hire", "dismiss", "refit"])
     merc_p.add_argument("target_id", nargs="?", help="Mercenary catalog ID or fleet drone ID")
 
-    allies_p = subparsers.add_parser("allies", help="Alliance roster and formation")
+    allies_p = subparsers.add_parser("allies", help=argparse.SUPPRESS)
     allies_p.add_argument("action", nargs="?", default="list", choices=["list", "form"])
     allies_p.add_argument("captain_id", nargs="?", help="AI captain ID")
 
-    upg_p = subparsers.add_parser("upgrades", help="Station hardware modules arsenal")
+    upg_p = subparsers.add_parser("upgrades", help=argparse.SUPPRESS)
     upg_p.add_argument("action", nargs="?", default="list", choices=["list", "buy"])
     upg_p.add_argument("upgrade_id", nargs="?", help="Upgrade ID to purchase")
 
@@ -3479,14 +3479,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     contracts_p.add_argument("contract_id", nargs="?", help="Contract ID to claim, or offer ID to swap")
     contracts_p.add_argument("drop_id", nargs="?", help="Active contract ID to drop for a swap")
 
-    mastery_p = subparsers.add_parser("mastery", help="Pilot rank progression and talent specializations")
+    mastery_p = subparsers.add_parser("mastery", help=argparse.SUPPRESS)
     mastery_p.add_argument("action", nargs="?", default="status", choices=["status", "list", "unlock"])
     mastery_p.add_argument("talent_id", nargs="?", help="Talent ID to unlock")
 
-    relics_p = subparsers.add_parser("relics", help="Display ancient Precursor Relics and passive modifiers")
+    relics_p = subparsers.add_parser("relics", help=argparse.SUPPRESS)
     relics_p.add_argument("action", nargs="?", default="status", choices=["status", "fuse"])
     relics_p.add_argument("rarity", nargs="?", help="Rarity to fuse (common/rare/epic)")
-    subparsers.add_parser("streak", help="Display expedition jump streak and multiplier")
+    subparsers.add_parser("streak", help=argparse.SUPPRESS)
 
     tut_p = subparsers.add_parser("tutorial", help="Cadet Flight Academy onboarding and guidance")
     tut_p.add_argument("action", nargs="?", default="status", choices=["status", "skip", "reset"])
@@ -3532,7 +3532,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     sell_p.add_argument("commodity_id", help="Commodity identifier")
     sell_p.add_argument("quantity", type=_trade_quantity, help="Quantity to sell, or all")
 
-    anom_p = subparsers.add_parser("anomaly", help="Resolve active anomaly encounter")
+    anom_p = subparsers.add_parser("anomaly", help=argparse.SUPPRESS)
     anom_p.add_argument("choice_id", help="Selected choice ID")
 
     rep_p = subparsers.add_parser("repair", help="Repair hull integrity")
@@ -3567,10 +3567,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     away_p.add_argument("action", nargs="?", default="list", choices=["list", "launch", "recall"])
     away_p.add_argument("values", nargs="*", help="Mission type, crew ids, or mission id")
 
-    pirate_p = subparsers.add_parser("pirate", help="Inspect or resolve a pirate toll encounter")
+    pirate_p = subparsers.add_parser("pirate", help=argparse.SUPPRESS)
     pirate_p.add_argument("action", nargs="?", default="status", choices=["status", "pay", "fight", "evade", "flee"])
 
-    decision_p = subparsers.add_parser("decision", help="Inspect or resolve the pending real-time decision")
+    decision_p = subparsers.add_parser("decision", help=argparse.SUPPRESS)
     decision_p.add_argument("action", nargs="?", default="status", choices=["status", "choose"])
     decision_p.add_argument("choice_id", nargs="?", help="Choice id to resolve")
 
@@ -3582,13 +3582,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     encounter_p.add_argument("value", nargs="?", help="kind or action")
     encounter_p.add_argument("choice", nargs="?", help="action when a kind is given")
 
-    customs_p = subparsers.add_parser("customs", help="Inspect or resolve a customs interdiction")
+    customs_p = subparsers.add_parser("customs", help=argparse.SUPPRESS)
     customs_p.add_argument(
         "action", nargs="?", default="status",
         choices=["status", "bribe", "jettison", "confiscate", "flee"],
     )
 
-    quantum_p = subparsers.add_parser("quantum", help="Quantum freight routes, orders, and shipping")
+    quantum_p = subparsers.add_parser("quantum", help=argparse.SUPPRESS)
     quantum_p.add_argument("action", nargs="?", default="routes", choices=["routes", "orders", "ship"])
     quantum_p.add_argument("values", nargs="*", help="commodity, quantity, destination_system_id")
 
@@ -3611,11 +3611,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     fabricate_p = subparsers.add_parser("fabricate", help="Field-fabricate repairs from salvaged titanium")
     fabricate_p.add_argument("blueprint", nargs="?", default="patch_kit", choices=["patch_kit", "fuel_cell"])
 
-    weapons_p = subparsers.add_parser("weapons", help="Weapon types, installation, and primary selection")
+    weapons_p = subparsers.add_parser("weapons", help=argparse.SUPPRESS)
     weapons_p.add_argument("action", nargs="?", default="list", choices=["list", "install", "set"])
     weapons_p.add_argument("weapon_id", nargs="?", help="Weapon id")
 
-    character_p = subparsers.add_parser("character", help="Commander profile, skills, age, and abilities")
+    character_p = subparsers.add_parser("character", help=argparse.SUPPRESS)
     character_p.add_argument("action", nargs="?", default="status", choices=["status", "train", "use"])
     character_p.add_argument("value", nargs="?", help="Skill or ability id")
     character_p.add_argument("target", nargs="?", help="Optional faction target")
@@ -3651,7 +3651,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     map_p = subparsers.add_parser("mapmods", help="Display active sector map modifiers and effects")
     map_p.add_argument("action", nargs="?", default="list", choices=["list", "mods"])
 
-    refit_p = subparsers.add_parser("refit", help="Ship modification section: structural refits")
+    refit_p = subparsers.add_parser("refit", help=argparse.SUPPRESS)
     refit_p.add_argument("action", nargs="?", default="list", choices=["list", "install", "remove", "info", "module"])
     refit_p.add_argument("target", nargs="?", help="Modification ID or slot (module action for 'module')")
     refit_p.add_argument("extra", nargs="?", help="Module ID for 'refit module <install|remove>'")
@@ -3683,14 +3683,32 @@ def main(argv: Sequence[str] | None = None) -> int:
     progress_p.add_argument("arg2", nargs="?")
 
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
-    subparsers.add_parser("log", help="Captain's log: career statistics, milestones, and flight record")
-    codex_p = subparsers.add_parser("codex", help="Discovery codex progress and achievement rewards")
+    subparsers.add_parser("log", help=argparse.SUPPRESS)
+    codex_p = subparsers.add_parser("codex", help=argparse.SUPPRESS)
     codex_p.add_argument("action", nargs="?", default="list", help="list, show <id>, claim <id>, or a category id")
     codex_p.add_argument("entry_id", nargs="?", help="Codex entry id for show/claim")
 
     time_p = subparsers.add_parser("time", help="Inspect and control simulation time and ticks")
     time_p.add_argument("action", nargs="?", default="status", choices=["status", "pause", "resume", "play", "speed", "step", "wait", "tick"])
     time_p.add_argument("value", nargs="?", help="Speed multiplier or tick count")
+
+    # Merged mechanics keep their legacy verbs callable but hide them from the
+    # help listing so the preferred facade commands (encounter, fitting, fleet,
+    # logistics, progress) are the visible learning surface.
+    _legacy_merged = frozenset({
+        "anomaly", "pirate", "customs", "decision",
+        "upgrades", "refit", "weapons", "shipyard",
+        "mercs", "allies",
+        "market", "autotrade", "quantum", "depot", "inventory",
+        "character", "mastery", "relics", "codex", "log", "streak",
+    })
+    subparsers._choices_actions[:] = [
+        action for action in getattr(subparsers, "_choices_actions", ())
+        if action.dest not in _legacy_merged
+    ]
+    subparsers.metavar = "{" + ",".join(
+        choice for choice in subparsers.choices if choice not in _legacy_merged
+    ) + "}"
 
     args = parser.parse_args(argv)
     if not args.command:

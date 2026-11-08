@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-progress-merge",
+    "task_id": "voidfarer-cli-help-consolidation",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794176958.4973865,
+    "updated_at": 1794177618.2679036,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794176984.2979844
+    "completed_at": 1794177646.236211
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-state-machine-completeness",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: add the four lifecycle machines found during the verification pass (quantum freight, AI captain, megastructure, popup event)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794164669.2707086,
-      "timestamp_str": "2026-11-08 22:04:29",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The first registry covered 24 machines; re-checking the models found four real lifecycles still unnamed: TradeOrder delivered on tick, AI captain hired/allied flags, body.restoration_complete, and GameEvent dismissed.",
-        "benefits": "The inventory is genuinely complete at 28 machines; the inspector reports in-transit freight, hired/allied captains, restored megastructures and visible popups.",
-        "risks": "contract: registry/inspector only; dependency: megastructures catalog import; concurrency: read-only under lock; state: no save change; regression: snapshot grows by four small entries.",
-        "mitigation": "New inspector test, 22 state-machine tests, full 1334 suite and the 5/5 gate."
-      },
-      "plan_digest": "c643cbcca36a6edae78071c5068ca0f32a7f307aed0d4985faa74c84a37a52bb"
-    },
-    {
-      "task_id": "voidfarer-state-machine-completeness",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Inventory complete: 28 machines, secondary lifecycle inspector test, 22 state-machine tests, 1334 suite, gate 5/5; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794164801.023579,
-      "timestamp_str": "2026-11-08 22:06:41",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-state-machine-completeness",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-state-machine-completeness' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794164819.4444995,
-      "timestamp_str": "2026-11-08 22:06:59",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-encounter-merge",
       "phase": "phase 2",
@@ -266,6 +227,45 @@
       "status": "completed",
       "timestamp": 1794176984.297987,
       "timestamp_str": "2026-11-09 01:29:44",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cli-help-consolidation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: hide 21 legacy merged verbs from CLI help and usage while keeping them callable",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794177596.010606,
+      "timestamp_str": "2026-11-09 01:39:56",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "Five facade merges added preferred verbs, but the legacy aliases remained visible, so the CLI help grew to 75 entries.",
+        "benefits": "The visible help lists the five facades; legacy invocations still parse; no API change.",
+        "risks": "contract: CLI help only; dependency: none; concurrency: none; state: none; regression: hidden verbs must still execute and tests must stay green.",
+        "mitigation": "Full 1389 suite, targeted hidden-verb invocation, gate."
+      },
+      "plan_digest": "c950778a2af023659ab1edfc7c9264c7691dc344c0824af317fd0f99163319f5"
+    },
+    {
+      "task_id": "voidfarer-cli-help-consolidation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Help consolidation verified: 21 legacy verbs hidden from help/usage, hidden verbs still execute, 1389 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794177618.2679036,
+      "timestamp_str": "2026-11-09 01:40:18",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-cli-help-consolidation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cli-help-consolidation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794177646.2362123,
+      "timestamp_str": "2026-11-09 01:40:46",
       "agent": "opencode:campaign"
     }
   ]

@@ -2401,3 +2401,12 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/progress`, `POST /api/progress/action` and a compact `progress` summary to `/api/state`.
   3. Add the `progress` CLI with `status`, `commander`, `pilot`, `skills`, `abilities`, `relics`, `codex`, `streak` and the train/use/unlock/claim/fuse actions; legacy commands and routes remain.
 - **Consequences**: An agent can read one progression report and issue any progression action through one route; the CLI has one preferred progression verb. `tests/test_progress.py` adds 9 tests for the report, summary, skill training, ability use, invalid actions, REST and CLI sections. Full suite `Ran 1389 OK`; no save-schema change.
+
+### ADR-220: Legacy merged verbs are hidden from the CLI help surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Five facade merges added preferred verbs, but the legacy verbs stayed in `--help`, so the visible command list grew to 75 entries and the learning surface got no smaller.
+- **Decision**:
+  1. Hide 21 legacy verbs from the subparser help list and the usage metavar: encounter (`anomaly`, `pirate`, `customs`, `decision`), fitting (`upgrades`, `refit`, `weapons`, `shipyard`), fleet (`mercs`, `allies`), logistics (`market`, `autotrade`, `quantum`, `depot`, `inventory`), and progression (`character`, `mastery`, `relics`, `codex`, `log`, `streak`).
+  2. Keep every hidden verb in `subparsers.choices`, so existing scripts and the compatibility paths still parse; only the help listing and usage line shrink.
+- **Consequences**: `voidfarer --help` now lists the facade verbs (`encounter`, `fitting`, `fleet`, `logistics`, `progress`) without the 21 legacy aliases; `weapons list` and the other hidden verbs still execute. The full 1389-test suite stays green, so no invocation or API contract changed.

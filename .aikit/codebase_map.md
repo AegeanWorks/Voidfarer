@@ -10,7 +10,7 @@
 - **Total Classes**: `394`
 - **Total Top-Level Functions**: `438`
 - **Total Class Methods**: `2163`
-- **Total Source Lines**: `55301`
+- **Total Source Lines**: `55319`
 
 ---
 
@@ -3087,7 +3087,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4067` lines (`203231` bytes)
+**Size**: `4085` lines (`203451` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
