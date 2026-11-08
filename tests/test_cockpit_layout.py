@@ -1517,6 +1517,43 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestQuestsCondensation(unittest.TestCase):
+    """QUESTS keeps heads-up counts and claimable rewards before the logs."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_claimables_and_counts_precede_hidden_logs(self):
+        self.assertIn('id="questsSummary"', self.html)
+        self.assertIn('id="questsClaimable"', self.html)
+        self.assertIn('id="questsClaimCount"', self.html)
+        self.assertLess(
+            self.html.index('id="questsClaimable"'),
+            self.html.index('id="activeQuestsDetails"'),
+        )
+        self.assertIn('id="activeQuestsDetails" hidden', self.html)
+        self.assertIn('id="completedQuestsDetails" hidden', self.html)
+        self.assertIn('id="btnToggleActiveQuests"', self.html)
+        self.assertIn('id="btnToggleCompletedQuests"', self.html)
+        self.assertIn("#activeQuestsDetails[hidden]", self.css)
+        self.assertIn("#completedQuestsDetails[hidden]", self.css)
+
+    def test_summary_and_claim_cards_are_rendered(self):
+        self.assertIn("this.questsSummary.innerHTML", self.js)
+        self.assertIn("this.questsClaimable.innerHTML", self.js)
+        self.assertIn("this.questsClaimCount.textContent", self.js)
+        self.assertIn("syncQuestDisclosureLabels", self.js)
+        self.assertIn('"ACTIVE QUESTS", activeCount', self.js)
+        self.assertIn('"COMPLETED QUESTS", completedCount', self.js)
+        self.assertIn("quest-claim-card", self.js)
+        self.assertIn("data-claim-quest", self.js)
+        self.assertIn(".quest-claim-card", self.css)
+        self.assertIn(".quest-claim-empty", self.css)
+
+
 class TestCrewCondensation(unittest.TestCase):
     """CREW keeps cash flow and officer headlines before full rosters."""
 

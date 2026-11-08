@@ -842,6 +842,13 @@ class CockpitApp {
         this.tabContentMessages = document.getElementById("tabContentMessages");
         this.questsList = document.getElementById("questsList");
         this.questsCompletedList = document.getElementById("questsCompletedList");
+        this.questsSummary = document.getElementById("questsSummary");
+        this.questsClaimCount = document.getElementById("questsClaimCount");
+        this.questsClaimable = document.getElementById("questsClaimable");
+        this.btnToggleActiveQuests = document.getElementById("btnToggleActiveQuests");
+        this.activeQuestsDetails = document.getElementById("activeQuestsDetails");
+        this.btnToggleCompletedQuests = document.getElementById("btnToggleCompletedQuests");
+        this.completedQuestsDetails = document.getElementById("completedQuestsDetails");
         this.aiList = document.getElementById("aiList");
         this.depotSummary = document.getElementById("depotSummary");
         this.depotList = document.getElementById("depotList");
@@ -1465,6 +1472,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleRelics, this.relicsDetails],
             [this.btnToggleCrewRoster, this.crewRosterDetails],
             [this.btnToggleCrewAssignments, this.crewAssignmentsDetails],
+            [this.btnToggleActiveQuests, this.activeQuestsDetails],
+            [this.btnToggleCompletedQuests, this.completedQuestsDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -8939,10 +8948,48 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    syncQuestDisclosureLabels(activeCount, completedCount) {
+        const sync = (button, details, base, count) => {
+            if (!button || !details) return;
+            button.dataset.label = `${base} (${count})`;
+            button.textContent = `${details.hidden ? "SHOW" : "HIDE"} ${base} (${count})`;
+            button.setAttribute("aria-expanded", String(!details.hidden));
+        };
+        sync(this.btnToggleActiveQuests, this.activeQuestsDetails, "ACTIVE QUESTS", activeCount);
+        sync(this.btnToggleCompletedQuests, this.completedQuestsDetails, "COMPLETED QUESTS", completedCount);
+    }
+
     renderQuests() {
         if (!this.state) return;
         const quests = this.state.quests || [];
         const completed = this.state.quests_completed || [];
+        const claimable = quests.filter(q => q.kind === "contract" && q.completed);
+
+        if (this.questsSummary) {
+            this.questsSummary.innerHTML = `
+                <span><strong>${quests.length}</strong> ACTIVE</span>
+                <span><strong>${completed.length}</strong> COMPLETED</span>
+                <span><strong>${claimable.length}</strong> READY TO CLAIM</span>
+            `;
+        }
+        if (this.questsClaimCount) {
+            this.questsClaimCount.textContent = `${claimable.length} READY`;
+        }
+        if (this.questsClaimable) {
+            this.questsClaimable.innerHTML = claimable.length ? claimable.map(q => `
+                <div class="quest-claim-card">
+                    <div class="quest-claim-main">
+                        <strong>${this.escapeHtml(q.title)}</strong>
+                        <small>${this.escapeHtml(q.reward)} · ${q.progress}/${q.target_count} COMPLETE</small>
+                    </div>
+                    <button class="btn-claim-contract" data-claim-quest="${this.escapeHtml(q.id)}">CLAIM REWARD</button>
+                </div>
+            `).join("") : '<p class="quest-claim-empty">No rewards ready to claim. Complete a contract to surface it here.</p>';
+            this.questsClaimable.querySelectorAll("[data-claim-quest]").forEach(btn => {
+                btn.addEventListener("click", () => this.handleClaimContract(btn.getAttribute("data-claim-quest")));
+            });
+        }
+        this.syncQuestDisclosureLabels(quests.length, completed.length);
 
         // Active quests
         if (this.questsList) {

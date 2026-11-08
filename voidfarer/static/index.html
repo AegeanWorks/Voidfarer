@@ -636,12 +636,18 @@
                             <div class="panel-tag"><span class="badge-dot dot-amber"></span> MISSION CONTROL</div>
                             <h2 class="panel-title">QUEST PANEL</h2>
                         </div>
-                        <div class="quests-section">
-                            <h3 class="subpanel-title">ACTIVE QUESTS</h3>
+                        <div class="quests-summary" id="questsSummary"></div>
+                        <div class="quests-claim-head">
+                            <h4>READY TO CLAIM</h4>
+                            <span class="quests-claim-count" id="questsClaimCount">0 READY</span>
+                        </div>
+                        <div class="quests-claimable" id="questsClaimable"></div>
+                        <button class="fleet-disclosure-toggle" id="btnToggleActiveQuests" data-label="ACTIVE QUESTS" aria-expanded="false" aria-controls="activeQuestsDetails" title="Show or hide the full active quest log">SHOW ACTIVE QUESTS</button>
+                        <div id="activeQuestsDetails" hidden>
                             <div class="quests-list" id="questsList"></div>
                         </div>
-                        <div class="quests-section">
-                            <h3 class="subpanel-title">COMPLETED QUESTS</h3>
+                        <button class="fleet-disclosure-toggle" id="btnToggleCompletedQuests" data-label="COMPLETED QUESTS" aria-expanded="false" aria-controls="completedQuestsDetails" title="Show or hide the completed quest log">SHOW COMPLETED QUESTS</button>
+                        <div id="completedQuestsDetails" hidden>
                             <div class="quests-completed-list" id="questsCompletedList"></div>
                         </div>
                     </div>

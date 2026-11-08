@@ -905,3 +905,29 @@ frames/417ms, zero errors. Suite `Ran 1302 OK`; click-map 180/39/0/0; `ui_invent
 `crew-play/01-crew-default.png`, `02-roster-open.png`, `03-after-drill.png`,
 `04-roles-open.png`, `05-away-view.png`; vision review confirmed the default fit and
 readable roster/role reveals.
+
+### Seventeenth pass — QUESTS counts and claimable rewards lead the tab
+
+QUESTS was the tallest right-terminal tab at 1,172px: a roughly 920px active-quest
+section with seven full cards (44–165px) followed by a 77px completed section. At
+1280×720 the 473px viewport showed one card and a clipped second card; a completed
+contract's `CLAIM REWARD` button could sit below the fold with no count or shortcut above
+it. The tab now opens with three live counts (`6 ACTIVE`, `0 COMPLETED`, `0 READY TO
+CLAIM`), a `READY TO CLAIM` headline and one compact claim card per completed contract
+(title, reward, progress, `CLAIM REWARD`). The full active and completed logs sit behind
+`SHOW ACTIVE QUESTS (n)` / `SHOW COMPLETED QUESTS (n)`, whose labels and `aria-expanded`
+stay in sync with live counts.
+
+Measured with the same harness, save and 1280×720 viewport: QUESTS **1,172 → 308px**
+(339px with one ready-to-claim card), fitting the 473px viewport with both disclosures
+visible; all other 15 tabs unchanged. Active log open 1,246px with six readable cards and
+`HIDE ACTIVE QUESTS (6)`; completed log open 445px with the empty-state message. Real
+play: claiming `Cartographic Stellar Sweep` paid +1,100 cr (2,000 → 3,100), moved the
+summary to `6 ACTIVE 1 COMPLETED 0 READY TO CLAIM`, showed the empty claim hint, logged
+`Claimed Cartographic Stellar Sweep: +1100 cr, +320 XP`, and the completed log then showed
+the relic; 25 frames/402ms, zero errors. Suite `Ran 1304 OK`; click-map 182/39/0/0;
+`ui_inventory.py` 1245 lines; gate 5/5. Screenshots: `quests-unified-before/quests.png` vs
+`quests-unified-after/quests.png`, `quests-play/02-active-quests.png`,
+`03-completed-empty.png`, `04-after-claim.png`, `05-completed-after.png`; vision review
+confirmed the two-card before stack versus the counts/claim surface and both readable
+reveals, with no new clipping or overlap.

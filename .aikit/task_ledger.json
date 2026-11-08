@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-crew-condense",
-    "last_phase": "phase 4",
+    "task_id": "voidfarer-quests-condense",
+    "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794151653.0835373,
+    "updated_at": 1794154511.3653643,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794151655.5406258
+    "completed_at": 1794154517.8273566
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-combat-tactics-disclosure",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Combat condensation verified: 13->5 controls, 713->564px at 1080 and 442px at 720, fire still hits; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794134007.9766057,
-      "timestamp_str": "2026-11-08 13:33:27",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-201 and combat proof",
-        "evidence": "ui-review/combat-before/01-combat-collapsed.png, combat-after/01..03, combat-after-720/01..03"
-      }
-    },
-    {
-      "task_id": "voidfarer-combat-tactics-disclosure",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-combat-tactics-disclosure' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794134008.8253775,
-      "timestamp_str": "2026-11-08 13:33:28",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-locked-abilities-academy",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: show unlocked ability chips plus a LOCKED count disclosure, and prove all six academy steps in a real browser",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794137025.537752,
-      "timestamp_str": "2026-11-08 14:23:45",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The powers strip shows six chips while two are still locked; onboarding has not been played end-to-end after the reactor/combat condensation, and arrival/anomaly cards can cover the academy hint.",
-        "benefits": "The default ability strip shows only four usable powers with the locked count one click away; the academy is proven from step 0 through graduation with visible controls and completion recorded at every step.",
-        "risks": "contract: ability strip and notification placement; dependency: none; concurrency: render stays synchronous; state: locked-open UI flag only, no save field; regression: locked chips must remain reachable and count must update when abilities unlock.",
-        "mitigation": "Static disclosure test, six-step real-browser play with step/completion assertions, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "e2ce849f2411b279bb76dddbad789c8de278f030587c96e6f4d8ee455967d540"
-    },
     {
       "task_id": "voidfarer-locked-abilities-academy",
       "phase": "phase 4",
@@ -300,6 +256,45 @@
       "status": "completed",
       "timestamp": 1794151655.5406284,
       "timestamp_str": "2026-11-08 18:27:35",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-quests-condense",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: lead QUESTS with live counts and ready-to-claim rewards, disclose the active and completed logs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794154501.773733,
+      "timestamp_str": "2026-11-08 19:15:01",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "QUESTS is 1,172px: a roughly 920px active log of seven cards plus a 77px completed log; at 1280x720 only one card and a clipped second are visible, and a completed contract's CLAIM REWARD can sit below the fold with no count or shortcut above it.",
+        "benefits": "The default view shows 6 ACTIVE / 0 COMPLETED / 0 READY TO CLAIM, a READY TO CLAIM surface and both log disclosures inside the 473px viewport; the full logs stay one click away and the claim flow stays reachable.",
+        "risks": "contract: QUESTS right-tab UI; dependency: none; concurrency: render stays synchronous; state: disclosure DOM only, no save change; regression: active cards, completed cards, story links and CLAIM REWARD must stay reachable and functional.",
+        "mitigation": "Static condensation test, same-harness before/after measurement, real-browser play of both reveals and a real claim, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "1cee88928dcce7a2fc204d72c26cabbeb5786f52baca1e30a47832f4fd0ab5d5"
+    },
+    {
+      "task_id": "voidfarer-quests-condense",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "QUESTS verified: 1,172->308px, counts and claim cards fit, both logs readable, real claim pays +1,100 cr; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794154511.3653643,
+      "timestamp_str": "2026-11-08 19:15:11",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-quests-condense",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-quests-condense' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794154517.8273592,
+      "timestamp_str": "2026-11-08 19:15:17",
       "agent": "opencode:campaign"
     }
   ]

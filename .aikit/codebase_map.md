@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `366`
+- **Total Classes**: `367`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2039`
-- **Total Source Lines**: `51000`
+- **Total Class Methods**: `2042`
+- **Total Source Lines**: `51037`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2551` lines (`114008` bytes)
+**Size**: `2588` lines (`115778` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,10 @@
   - Method `.setUpClass()`
   - Method `.test_manual_sliders_default_to_hidden()`
   - Method `.test_power_hint_names_the_visible_presets()`
+- `class TestQuestsCondensation` - *QUESTS keeps heads-up counts and claimable rewards before the logs.*
+  - Method `.setUpClass()`
+  - Method `.test_claimables_and_counts_precede_hidden_logs()`
+  - Method `.test_summary_and_claim_cards_are_rendered()`
 - `class TestCrewCondensation` - *CREW keeps cash flow and officer headlines before full rosters.*
   - Method `.setUpClass()`
   - Method `.test_roster_and_recruitment_default_to_disclosures()`
