@@ -1111,54 +1111,18 @@
                     <div class="combat-stance-line" id="combatStanceLine">FLEET STANCE: BALANCED</div>
                 </div>
 
-                <!-- Anomaly Modal / Card (Prominent when active) -->
-                <div class="anomaly-alert-card" id="anomalyCard" style="display: none;">
+                <!-- One blocking encounter card: decision/pirate/customs/anomaly -->
+                <div class="anomaly-alert-card" id="anomalyCard" style="display: none;" data-encounter-card="1" aria-live="assertive" aria-label="Blocking encounter">
                     <div class="anomaly-header">
                         <span class="alert-icon">⚠</span>
                         <div class="alert-text">
-                            <span class="alert-tag">PROXIMITY HAZARD</span>
-                            <h3 class="alert-title" id="anomalyTitle">Anomaly Detected</h3>
+                            <span class="alert-tag" id="encounterTag">ENCOUNTER</span>
+                            <h3 class="alert-title" id="anomalyTitle">Encounter</h3>
                         </div>
                     </div>
-                    <p class="anomaly-desc" id="anomalyDesc">Spatial sensors detected an exotic spatial disruption.</p>
+                    <p class="anomaly-desc" id="anomalyDesc"></p>
+                    <div class="encounter-detail" id="encounterDetail"></div>
                     <div class="anomaly-choices" id="anomalyChoices"></div>
-                </div>
-
-                <!-- Customs Security Interdiction Card (blocks flight until resolved) -->
-                <div class="anomaly-alert-card customs-alert-card" id="customsCard" style="display: none;" aria-live="assertive" aria-label="Customs interdiction">
-                    <div class="anomaly-header">
-                        <span class="alert-icon">⚠</span>
-                        <div class="alert-text">
-                            <span class="alert-tag">SECURITY PATROL // CONTRABAND DETECTED</span>
-                            <h3 class="alert-title" id="customsTitle">Customs Inspection</h3>
-                        </div>
-                    </div>
-                    <p class="anomaly-desc" id="customsDesc">Federal patrol cutters have surrounded your ship.</p>
-                    <div class="customs-manifest-line" id="customsManifest"></div>
-                    <div class="anomaly-choices customs-choices">
-                        <button class="anomaly-choice-btn btn-customs-bribe" id="btnCustomsBribe">BRIBE PATROL</button>
-                        <button class="anomaly-choice-btn btn-customs-jettison" id="btnCustomsJettison">JETTISON CONTRABAND</button>
-                        <button class="anomaly-choice-btn btn-customs-confiscate" id="btnCustomsConfiscate">SUBMIT TO CONFISCATION</button>
-                        <button class="anomaly-choice-btn btn-customs-flee" id="btnCustomsFlee">FLEE CORDON</button>
-                    </div>
-                </div>
-
-                <!-- Pirate Toll Card (blocks flight until resolved) -->
-                <div class="anomaly-alert-card pirate-alert-card" id="pirateCard" style="display: none;" aria-live="assertive" aria-label="Pirate intercept">
-                    <div class="anomaly-header">
-                        <span class="alert-icon">✖</span>
-                        <div class="alert-text">
-                            <span class="alert-tag">PIRATE INTERCEPT</span>
-                            <h3 class="alert-title" id="pirateTitle">Corsair Toll</h3>
-                        </div>
-                    </div>
-                    <p class="anomaly-desc" id="pirateDesc">A raider demands a toll for safe passage.</p>
-                    <div class="pirate-toll-line" id="pirateTollLine"></div>
-                    <div class="anomaly-choices pirate-choices">
-                        <button class="anomaly-choice-btn" id="btnPiratePay">PAY TOLL</button>
-                        <button class="anomaly-choice-btn" id="btnPirateFight">FIGHT</button>
-                        <button class="anomaly-choice-btn" id="btnPirateEvade">EVADE (-FUEL)</button>
-                    </div>
                 </div>
 
                 <div class="sub-panel nav-panel" id="panelNav">

@@ -10744,6 +10744,19 @@ body.cockpit-theme .nav-panel > .panel-header {
 }
 #messagesDetails[hidden] { display: none; }
 
+/* Unified blocking-encounter card */
+.encounter-detail {
+    margin: 2px 0 6px;
+    color: var(--console-gold-bright);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.35;
+}
+.anomaly-choice-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 /* =====================================================================
    FLEET — DOCKED DRONE CARD
    The ~291px drawer cannot hold a 103px text column beside the yield and

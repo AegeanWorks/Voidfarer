@@ -532,9 +532,9 @@ class FrontierUiContractTest(unittest.TestCase):
         html = (root / "voidfarer" / "static" / "index.html").read_text(encoding="utf-8")
         js = (root / "voidfarer" / "static" / "app.js").read_text(encoding="utf-8")
         css = (root / "voidfarer" / "static" / "style.css").read_text(encoding="utf-8")
-        for element in ("pirateCard", "decisionOverlay", "quantumFreight", "surfaceOps", "targetDevastation"):
+        for element in ("anomalyCard", "decisionOverlay", "quantumFreight", "surfaceOps", "targetDevastation"):
             self.assertIn(element, html)
-        for handler in ("handlePirateAction", "handleDecisionChoice", "handleQuantumOrder", "handleSurfaceOp", "renderSurfaceOps"):
+        for handler in ("handleEncounterAction", "handleDecisionChoice", "handleQuantumOrder", "handleSurfaceOp", "renderSurfaceOps"):
             self.assertIn(handler, js)
         self.assertIn("height: auto", css)
         self.assertIn("#targetDevastation.is-devastated", css)

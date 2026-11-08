@@ -988,5 +988,44 @@
     "final_snapshot_digest": "9732774330a5e3458d0d9d722cfb1c46ad383ca69ed1dfef985d1dab3a506b27",
     "final_snapshot_entries": 1258,
     "surface_digest": "8be267c4fb956ad3eaa2aeed8920ae4c2b6b63fa123983828012f08f2e20a85a"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "ad4b7b39d645e7378e4ed7c9ae57ba4bf094d869",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794166329.2415493,
+    "finished_at": 1794167202.1868467,
+    "strikes": 2,
+    "reviewer": "commandcode-vision (main multimodal agent; one encounter card for anomaly/pirate/customs, dynamic actions and disabled reasons; decision modal unchanged)",
+    "allowed_removals": [
+      {
+        "pattern": "*pirate*",
+        "reason": "pirate card folded into the unified encounter card; resolver/route remain on the backend"
+      },
+      {
+        "pattern": "*customs*",
+        "reason": "customs card folded into the unified encounter card; resolver/route remain on the backend"
+      },
+      {
+        "pattern": "handler handleResolveAnomaly",
+        "reason": "anomaly choices now run through handleEncounterAction"
+      },
+      {
+        "pattern": "api /api/anomaly",
+        "reason": "legacy anomaly route remains server-side; the cockpit now calls /api/encounter/resolve"
+      },
+      {
+        "pattern": "*Pirate*",
+        "reason": "pirate buttons removed with the folded card; unified encounter action list replaces them"
+      },
+      {
+        "pattern": "*Customs*",
+        "reason": "customs buttons removed with the folded card; unified encounter action list replaces them"
+      }
+    ],
+    "final_snapshot_digest": "27f9edff52c1bd729c0d528beecd9e5ed2e336aba2e2b1615ed735e4a951ec89",
+    "final_snapshot_entries": 1236,
+    "surface_digest": "8774b2411bde023d83020afc002dfdf3e5ff4e22e3baf6bc9205dac9aed591ba"
   }
 ]

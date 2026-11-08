@@ -729,26 +729,13 @@ class CockpitApp {
         this.combatStanceLine = document.getElementById("combatStanceLine");
         this.critReadyText = document.getElementById("critReadyText");
 
-        // Anomaly Card
+        // Unified blocking-encounter card
         this.anomalyCard = document.getElementById("anomalyCard");
+        this.encounterTag = document.getElementById("encounterTag");
         this.anomalyTitle = document.getElementById("anomalyTitle");
         this.anomalyDesc = document.getElementById("anomalyDesc");
+        this.encounterDetail = document.getElementById("encounterDetail");
         this.anomalyChoices = document.getElementById("anomalyChoices");
-        this.pirateCard = document.getElementById("pirateCard");
-        this.pirateTitle = document.getElementById("pirateTitle");
-        this.pirateDesc = document.getElementById("pirateDesc");
-        this.pirateTollLine = document.getElementById("pirateTollLine");
-        this.btnPiratePay = document.getElementById("btnPiratePay");
-        this.btnPirateFight = document.getElementById("btnPirateFight");
-        this.btnPirateEvade = document.getElementById("btnPirateEvade");
-        this.customsCard = document.getElementById("customsCard");
-        this.customsTitle = document.getElementById("customsTitle");
-        this.customsDesc = document.getElementById("customsDesc");
-        this.customsManifest = document.getElementById("customsManifest");
-        this.btnCustomsBribe = document.getElementById("btnCustomsBribe");
-        this.btnCustomsJettison = document.getElementById("btnCustomsJettison");
-        this.btnCustomsConfiscate = document.getElementById("btnCustomsConfiscate");
-        this.btnCustomsFlee = document.getElementById("btnCustomsFlee");
         this.btnDrydockOverhaul = document.getElementById("btnDrydockOverhaul");
         this.overhaulCostLabel = document.getElementById("overhaulCostLabel");
         this.repairCostLabel = document.getElementById("repairCostLabel");
@@ -1185,10 +1172,6 @@ class CockpitApp {
         // Station Services
         this.btnDrydockRepair.addEventListener("click", () => this.handleRepair());
         if (this.btnDrydockOverhaul) this.btnDrydockOverhaul.addEventListener("click", () => this.handleOverhaul());
-        if (this.btnCustomsBribe) this.btnCustomsBribe.addEventListener("click", () => this.handleCustomsResolve("bribe"));
-        if (this.btnCustomsJettison) this.btnCustomsJettison.addEventListener("click", () => this.handleCustomsResolve("jettison"));
-        if (this.btnCustomsConfiscate) this.btnCustomsConfiscate.addEventListener("click", () => this.handleCustomsResolve("confiscate"));
-        if (this.btnCustomsFlee) this.btnCustomsFlee.addEventListener("click", () => this.handleCustomsResolve("flee"));
         this.btnRefuelTanks.addEventListener("click", () => this.handleRefuel());
 
         // Right Deck Tabs
@@ -1499,9 +1482,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.btnCombatAbsorb.addEventListener("click", () => this.handleCombat("shield_absorb"));
         this.btnCombatEvade.addEventListener("click", () => this.handleCombat("evasive_burn"));
         this.btnCombatFlee.addEventListener("click", () => this.handleCombat("flee"));
-        if (this.btnPiratePay) this.btnPiratePay.addEventListener("click", () => this.handlePirateAction("pay"));
-        if (this.btnPirateFight) this.btnPirateFight.addEventListener("click", () => this.handlePirateAction("fight"));
-        if (this.btnPirateEvade) this.btnPirateEvade.addEventListener("click", () => this.handlePirateAction("evade"));
 
         // Harvest Fleet
         this.btnHarvestFleet.addEventListener("click", () => this.handleHarvestFleet());
@@ -1644,13 +1624,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const death = document.getElementById("deathOverlay");
             const creation = document.getElementById("characterCreationOverlay");
             const decision = document.getElementById("decisionOverlay");
-            const pirateCard = document.getElementById("pirateCard");
+            const encounter = document.getElementById("anomalyCard");
             const overlayOpen = (menu && !menu.classList.contains("hidden"))
                 || (settings && settings.style.display !== "none")
                 || (death && death.style.display === "flex")
                 || (creation && creation.style.display !== "none")
                 || (decision && decision.style.display !== "none")
-                || (pirateCard && pirateCard.style.display !== "none");
+                || (encounter && encounter.style.display !== "none");
             if (overlayOpen) return;
             const hotkey = String(e.key || "").toLowerCase();
             if (hotkey === "p") {
@@ -2454,71 +2434,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.combatCard.style.display = "none";
         }
 
-        // Render Anomaly Alert
-        if (this.state.active_anomaly && !this.state.active_combat) {
-            this.sound.playAlarm();
-            this.anomalyCard.style.display = "flex";
-            this.anomalyTitle.textContent = this.state.active_anomaly.title;
-            this.anomalyDesc.textContent = this.state.active_anomaly.description;
-            this.anomalyChoices.innerHTML = "";
-            this.state.active_anomaly.choices.forEach(ch => {
-                const btn = document.createElement("button");
-                btn.className = "anomaly-choice-btn";
-                const checkInfo = ch.required_power !== "none" 
-                    ? `[CHECK: ${ch.required_power.toUpperCase()} >= ${ch.min_power_threshold}%]`
-                    : `[SAFE HARVEST]`;
-                btn.innerHTML = `${this.escapeHtml(ch.text)} <span class="choice-check">${checkInfo}</span>`;
-                btn.addEventListener("click", () => this.handleResolveAnomaly(ch.choice_id));
-                this.anomalyChoices.appendChild(btn);
-            });
-        } else {
-            this.anomalyCard.style.display = "none";
-        }
-
-        if (this.state.active_pirate && !this.state.active_combat) {
-            const pirate = this.state.active_pirate;
-            this.sound.playAlarm();
-            this.pirateCard.style.display = "flex";
-            this.pirateTitle.textContent = `${pirate.band_name} // ${pirate.ship_class}`;
-            this.pirateDesc.textContent = pirate.description;
-            this.pirateTollLine.textContent = `DEMAND: ${pirate.toll_credits} CREDITS // THREAT ${pirate.threat} // ${pirate.system_name}`;
-            this.btnPiratePay.textContent = `PAY ${pirate.toll_credits} CR`;
-            this.btnPiratePay.disabled = (ship.credits || 0) < pirate.toll_credits;
-            this.btnPirateEvade.textContent = `EVADE (-${6 + pirate.threat} FUEL)`;
-        } else {
-            this.pirateCard.style.display = "none";
-        }
-
-        if (this.state.active_customs && !this.state.active_combat) {
-            const customs = this.state.active_customs;
-            this.sound.playAlarm();
-            if (this.customsCard) {
-                this.customsCard.style.display = "flex";
-                this.customsTitle.textContent = `${customs.patrol_vessel}`;
-                this.customsDesc.textContent = customs.description;
-                const itemsList = Object.entries(customs.contraband_found || {})
-                    .map(([cid, qty]) => `${qty}x ${cid.toUpperCase()}`).join(", ");
-                if (this.customsManifest) {
-                    this.customsManifest.textContent = `ILLICIT GOODS: ${itemsList || "UNREGISTERED CARGO"}`;
-                }
-                if (this.btnCustomsBribe) {
-                    this.btnCustomsBribe.textContent = `BRIBE PATROL (${customs.bribe_amount} CR)`;
-                    this.btnCustomsBribe.disabled = (ship.credits || 0) < customs.bribe_amount;
-                }
-                if (this.btnCustomsJettison) {
-                    this.btnCustomsJettison.textContent = `JETTISON ALL CONTRABAND`;
-                }
-                if (this.btnCustomsConfiscate) {
-                    this.btnCustomsConfiscate.textContent = `SUBMIT (FINE: ${customs.fine_amount} CR)`;
-                }
-                if (this.btnCustomsFlee) {
-                    this.btnCustomsFlee.textContent = `BURN ENGINES (-5 FUEL)`;
-                    this.btnCustomsFlee.disabled = (ship.fuel || 0) < 5;
-                }
-            }
-        } else if (this.customsCard) {
-            this.customsCard.style.display = "none";
-        }
+        // One card for every blocking encounter: decision/pirate/customs/anomaly.
+        this.renderEncounter();
 
         const drydock = this.state.drydock || null;
         if (drydock) {
@@ -5969,32 +5886,47 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
-    async handleResolveAnomaly(choiceId) {
-        this.sound.init();
-        try {
-            const res = await apiFetch("/api/anomaly", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ choice_id: choiceId })
-            });
-            const json = await res.json();
-            if (json.ok) {
-                this.sound.playChime();
-                this.appendLog(`[RESOLVED] ${json.message}`, "reward");
-            } else {
-                this.appendLog(`[FAILURE] ${json.message}`, "hazard");
-            }
-            this.state = json.state;
-            this.renderHUD();
-        } catch (e) {
-            this.appendLog(`[ERROR] Anomaly action failed: ${e.message}`, "hazard");
+    renderEncounter() {
+        if (!this.anomalyCard) return;
+        const payload = this.state?.encounter?.encounter || null;
+        if (!payload || this.state?.pending_decision) {
+            this.anomalyCard.style.display = "none";
+            this._lastEncounterId = null;
+            return;
         }
+        if (this._lastEncounterId !== payload.id) {
+            this.sound.playAlarm();
+            this._lastEncounterId = payload.id;
+        }
+        this.anomalyCard.style.display = "flex";
+        if (this.encounterTag) this.encounterTag.textContent = payload.tag || "ENCOUNTER";
+        this.anomalyTitle.textContent = payload.title || "Encounter";
+        this.anomalyDesc.textContent = payload.description || "";
+        if (this.encounterDetail) {
+            this.encounterDetail.textContent = payload.detail || "";
+            this.encounterDetail.style.display = payload.detail ? "block" : "none";
+        }
+        this.anomalyChoices.innerHTML = "";
+        (payload.actions || []).forEach(action => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "anomaly-choice-btn";
+            btn.dataset.encounterAction = action.id;
+            btn.disabled = Boolean(action.disabled);
+            if (action.reason) btn.title = action.reason;
+            const detail = action.detail
+                ? ` <span class="choice-check">${this.escapeHtml(action.detail)}</span>`
+                : "";
+            btn.innerHTML = `${this.escapeHtml(action.label)}${detail}`;
+            btn.addEventListener("click", () => this.handleEncounterAction(action.id));
+            this.anomalyChoices.appendChild(btn);
+        });
     }
 
-    async handlePirateAction(action) {
+    async handleEncounterAction(action) {
         this.sound.init();
         try {
-            const res = await apiFetch("/api/pirate/resolve", {
+            const res = await apiFetch("/api/encounter/resolve", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action })
@@ -6002,8 +5934,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const json = await res.json();
             if (json.ok) {
                 this.sound.playChime();
-                this.appendLog(json.message, action === "fight" ? "hazard" : "reward");
+                this.appendLog(json.message, "reward");
             } else {
+                this.sound.playAlarm();
                 this.appendLog(`[BLOCKED] ${json.message}`, "hazard");
             }
             if (json.state) {
@@ -6011,7 +5944,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.renderHUD();
             }
         } catch (e) {
-            this.appendLog(`[ERROR] Pirate action failed: ${e.message}`, "hazard");
+            this.appendLog(`[ERROR] Encounter action failed: ${e.message}`, "hazard");
         }
     }
 
@@ -6039,33 +5972,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
-    async handleCustomsResolve(action) {
-        this.sound.init();
-        this.sound.playBeep(440, 0.08, "triangle");
-        try {
-            const res = await apiFetch("/api/customs/resolve", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: action }),
-            });
-            const data = await res.json();
-            if (data.ok) {
-                if (action === "bribe") this.sound.playCashRegister();
-                else if (action === "flee") this.sound.playQuantumWarp();
-                else this.sound.playChime();
-                this.appendLog(data.message || "Customs encounter resolved.", "system");
-            } else {
-                this.sound.playAlarm();
-                this.appendLog(`[ERROR] ${data.message}`, "hazard");
-            }
-            if (data.state) {
-                this.state = data.state;
-                this.renderHUD();
-            }
-        } catch (e) {
-            this.appendLog(`[ERROR] Customs resolution failed: ${e.message}`, "hazard");
-        }
-    }
 
     async handleOverhaul() {
         this.sound.init();
