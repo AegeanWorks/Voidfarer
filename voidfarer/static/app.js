@@ -949,6 +949,13 @@ class CockpitApp {
         this.characterPerks = document.getElementById("characterPerks");
         this.skillsGrid = document.getElementById("skillsGrid");
         this.skillsPointsAvailable = document.getElementById("skillsPointsAvailable");
+        this.perksSummary = document.getElementById("perksSummary");
+        this.btnTogglePerks = document.getElementById("btnTogglePerks");
+        this.perksDetails = document.getElementById("perksDetails");
+        this.relicCount = document.getElementById("relicCount");
+        this.btnToggleRelics = document.getElementById("btnToggleRelics");
+        this.relicsDetails = document.getElementById("relicsDetails");
+        this.skillsTraining = false;
         this.hudSkillsPanel = document.getElementById("hudSkillsPanel");
         this.hudSkillsGrid = document.getElementById("hudSkillsGrid");
         this.hudLockedSkillsGrid = document.getElementById("hudLockedSkillsGrid");
@@ -1448,6 +1455,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleResearch, this.researchDetails],
             [this.btnToggleOutposts, this.outpostDetails],
             [this.btnToggleDiplomacy, this.diplomacyDetails],
+            [this.btnTogglePerks, this.perksDetails],
+            [this.btnToggleRelics, this.relicsDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -3703,7 +3712,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.state || !this.skillsGrid) return;
         const ch = this.state.character || {};
         const skillPoints = ch.skill_points || 0;
-        if (this.skillsGrid.contains(document.activeElement)) {
+        if (!this.skillsTraining && this.skillsGrid.contains(document.activeElement)) {
             if (this.skillsPointsAvailable) this.skillsPointsAvailable.textContent = skillPoints;
             return;
         }
@@ -3714,16 +3723,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const meta = SKILL_META[id] || { name: id, icon: "✦", desc: "" };
             const canTrain = skillPoints > 0 && level < maxRank;
             return `
-            <div class="skill-card">
-                <div class="skill-header">
-                    <span class="skill-name"><span class="skill-icon">${meta.icon}</span> ${this.escapeHtml(meta.name)}</span>
-                    <span class="skill-level">RANK ${level}/${maxRank}</span>
-                </div>
-                <div class="skill-bar">
-                    <div class="skill-bar-fill" style="width: ${(level / maxRank) * 100}%"></div>
-                </div>
-                <div class="skill-desc">${this.escapeHtml(meta.desc)}</div>
+            <div class="skill-row" title="${this.escapeHtml(meta.desc)}">
+                <span class="skill-name"><span class="skill-icon">${meta.icon}</span> ${this.escapeHtml(meta.name)}</span>
+                <span class="skill-level">RANK ${level}/${maxRank}</span>
                 <button class="btn-hud btn-amber skill-train-btn" data-train-skill="${this.escapeHtml(id)}" ${canTrain ? "" : "disabled"}>TRAIN 1 SP</button>
+                <div class="skill-bar"><div class="skill-bar-fill" style="width: ${(level / maxRank) * 100}%"></div></div>
             </div>
         `;
         }).join("");
@@ -3741,7 +3745,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async trainSkill(skillId) {
         if (!skillId || !this.state) return;
         this.sound.init();
-        await this.postAction("/api/character/train", { skill: skillId }, null);
+        this.skillsTraining = true;
+        try {
+            await this.postAction("/api/character/train", { skill: skillId }, null);
+        } finally {
+            this.skillsTraining = false;
+        }
         this.renderSkills();
     }
 
@@ -5273,6 +5282,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const branch = t.branch || (t.category || "OTHER").toUpperCase();
             (branches[branch] = branches[branch] || []).push(t);
         });
+        if (this.perksSummary) {
+            this.perksSummary.textContent = `${talents.length} perks · ${specs.length} taken`;
+        }
         container.innerHTML = Object.entries(branches).map(([branch, nodes]) => `
             <div class="perk-branch">
                 <h4>${this.escapeHtml(branch)}</h4>
@@ -5303,6 +5315,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.state) return;
         if (!this.relicsGrid) return;
         const relics = this.state.ship.relics || [];
+        if (this.relicCount) {
+            this.relicCount.textContent = `${relics.length} RELIC${relics.length === 1 ? "" : "S"}`;
+        }
         if (!relics.length) {
             this.relicsGrid.innerHTML = `<p class="panel-intro-text">No ancient Precursor Relics recovered yet. Recover them via planet sensor sweeps, anomalies and contracts.</p>`;
             return;

@@ -848,5 +848,19 @@
     "final_snapshot_digest": "5108ccb6f97a105533ae00434ef779f1809acd7a5b1055e555479f42accec267",
     "final_snapshot_entries": 1224,
     "surface_digest": "24ecbaa4e32401bc12b123b4150a8b485018b87f80b26265d30451a954d5f4ac"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "548b2267b76fd650ce30a196e9819079ba0560e4",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794148388.0610452,
+    "finished_at": 1794149403.0109015,
+    "strikes": 5,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; six compact training rows, PERKS/RELICS cards, training + perk/relic reveals)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "3f2b2ce7013b568a64cb6b94181face936886849a43116b31501b2aa986344c9",
+    "final_snapshot_entries": 1230,
+    "surface_digest": "cc50ba85fdc59c88b7b6cbfeebd0c8f342c6ae0bdcf0b10111d1a0d922b05888"
   }
 ]

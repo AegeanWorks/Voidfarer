@@ -696,19 +696,31 @@
                                 <span>SKILL POINTS</span>
                                 <strong id="skillsPointsAvailable">0</strong>
                             </div>
-                            <p class="skills-desc">Spend points with TRAIN below. Your six active abilities live in the bottom strip (SHIFT+1..6).</p>
+                            <p class="skills-desc">Spend points with TRAIN below.</p>
                         </div>
                         <div class="skills-grid" id="skillsGrid"></div>
-                        <div class="skills-perks-section">
-                            <div class="skills-section-head">
-                                <h3 class="subpanel-title">PILOT PERKS</h3>
-                                <span class="skills-talent-points"><strong id="skillsTalentPoints">0</strong> TALENT POINTS</span>
+                        <div class="skills-system-grid">
+                            <div class="skills-system-card">
+                                <div class="skills-section-head">
+                                    <h3 class="subpanel-title">PERKS</h3>
+                                    <span class="skills-card-meta"><strong id="skillsTalentPoints">0</strong> TP</span>
+                                </div>
+                                <p class="skills-summary" id="perksSummary"></p>
+                                <button class="skills-card-toggle" id="btnTogglePerks" data-label="PERKS" aria-expanded="false" aria-controls="perksDetails" title="Show or hide the pilot perk branches">SHOW PERKS</button>
                             </div>
+                            <div class="skills-system-card">
+                                <div class="skills-section-head">
+                                    <h3 class="subpanel-title">RELICS</h3>
+                                    <span class="skills-relic-count" id="relicCount">0 RELICS</span>
+                                </div>
+                                <p class="panel-intro-text" title="Alien artifacts recovered via sensor sweeps, hazardous anomalies and contracts. Provide permanent fleet bonuses.">Fleet bonuses</p>
+                                <button class="skills-card-toggle" id="btnToggleRelics" data-label="RELICS" aria-expanded="false" aria-controls="relicsDetails" title="Show or hide the recovered Precursor relics">SHOW RELICS</button>
+                            </div>
+                        </div>
+                        <div id="perksDetails" hidden>
                             <div class="perks-branches" id="skillsPerksBranches"></div>
                         </div>
-                        <div class="skills-relics-section">
-                            <h3 class="subpanel-title">PRECURSOR RELICS</h3>
-                            <p class="panel-intro-text" title="Alien artifacts recovered via sensor sweeps, hazardous anomalies and contracts. Provide permanent fleet bonuses.">Recover alien artifacts for permanent fleet bonuses.</p>
+                        <div id="relicsDetails" hidden>
                             <div class="relics-grid" id="relicsGrid"></div>
                         </div>
                     </div>

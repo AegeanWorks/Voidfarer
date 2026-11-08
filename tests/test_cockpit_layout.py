@@ -1517,6 +1517,53 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestSkillsCondensation(unittest.TestCase):
+    """SKILLS keeps six training rows and discloses perks and relics."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_training_rows_stay_visible_and_catalogs_are_disclosed(self):
+        self.assertIn('id="skillsGrid"', self.html)
+        self.assertLess(
+            self.html.index('id="skillsGrid"'),
+            self.html.index('id="perksDetails"'),
+        )
+        self.assertIn('id="perksDetails" hidden', self.html)
+        self.assertIn('id="relicsDetails" hidden', self.html)
+        self.assertIn('id="btnTogglePerks"', self.html)
+        self.assertIn('id="btnToggleRelics"', self.html)
+        self.assertIn("#perksDetails[hidden]", self.css)
+        self.assertIn("#relicsDetails[hidden]", self.css)
+
+    def test_current_skill_rows_are_compact_and_trainable(self):
+        self.assertIn('class="skill-row"', self.js)
+        self.assertIn('data-train-skill=', self.js)
+        self.assertIn("this.skillsTraining = true", self.js)
+        self.assertIn("this.skillsTraining = false", self.js)
+        self.assertIn("!this.skillsTraining && this.skillsGrid.contains", self.js)
+        self.assertIn(".skill-row", self.css)
+        self.assertIn("grid-template-areas:", self.css)
+
+    def test_headlines_show_perk_and_relic_counts(self):
+        self.assertIn('id="perksSummary"', self.html)
+        self.assertIn('id="relicCount"', self.html)
+        self.assertIn("this.perksSummary.textContent", self.js)
+        self.assertIn("this.relicCount.textContent", self.js)
+        self.assertIn('class="skills-system-grid"', self.html)
+        self.assertIn(".skills-card-toggle", self.css)
+
+    def test_narrow_perk_nodes_stack_instead_of_squeezing(self):
+        rule = self.css.split(".skills-panel .perk-node { grid-template-columns: minmax(0, 1fr); }", 1)
+        self.assertEqual(len(rule), 2, "missing narrow perk-node stack rule")
+        tail = rule[1]
+        self.assertIn("grid-row: 3", tail)
+        self.assertIn("width: 100%", tail)
+
+
 class TestEmpireCondensation(unittest.TestCase):
     """EMPIRE keeps research, outpost and faction headlines before catalogs."""
 

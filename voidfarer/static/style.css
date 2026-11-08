@@ -10244,3 +10244,165 @@ body.cockpit-theme .nav-panel > .panel-header {
         justify-content: flex-start;
     }
 }
+
+/* =====================================================================
+   SKILLS — COMPACT TRAINING + DISCLOSED CATALOGS
+   Six one-line training rows stay visible; perk branches and relics sit
+   behind their own SHOW controls.
+   ===================================================================== */
+.skills-panel .skills-points-banner {
+    padding: 4px 8px;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.skills-panel .skills-points {
+    min-width: 64px;
+    padding: 2px 7px;
+}
+.skills-panel .skills-points strong { font-size: 16px; }
+.skills-panel .skills-desc { font-size: 12px; line-height: 1.2; }
+.skills-panel .skills-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+    margin-bottom: 8px;
+}
+.skill-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+        "name rank train"
+        "bar bar bar";
+    align-items: center;
+    gap: 1px 5px;
+    padding: 1px 5px;
+    border: 1px solid var(--border-subtle);
+    border-left: 2px solid rgba(169, 139, 189, 0.45);
+    background: rgba(127, 183, 201, 0.03);
+}
+.skill-row:hover { border-color: rgba(169, 139, 189, 0.65); }
+.skill-row .skill-name {
+    grid-area: name;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--console-ivory);
+}
+.skill-row .skill-level {
+    grid-area: rank;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--console-gold-bright);
+    white-space: nowrap;
+}
+.skill-row .skill-train-btn {
+    grid-area: train;
+    min-height: 20px;
+    padding: 0 6px;
+    font-size: 12px;
+    line-height: 1.2;
+}
+.skill-row .skill-bar { grid-area: bar; height: 3px; }
+.skills-summary {
+    margin: 2px 0 3px;
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.25;
+}
+.skills-relic-count {
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+#perksDetails[hidden],
+#relicsDetails[hidden] { display: none; }
+.skills-panel .skills-system-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 4px;
+}
+.skills-system-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: 5px 6px;
+    border: 1px solid rgba(201, 163, 90, 0.18);
+    background: rgba(127, 183, 201, 0.03);
+}
+.skills-system-card .skills-section-head { gap: 4px; margin-bottom: 0; }
+.skills-system-card .subpanel-title { font-size: 12px; }
+.skills-system-card .skills-summary {
+    margin: 0;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.skills-system-card .panel-intro-text {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    max-height: none;
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.skills-card-meta {
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
+}
+.skills-card-meta strong { color: var(--console-gold-bright); }
+.skills-card-toggle {
+    width: 100%;
+    min-height: 22px;
+    margin-top: 1px;
+    padding: 1px 6px;
+    border: 1px solid rgba(201, 163, 90, 0.28);
+    background: rgba(201, 163, 90, 0.06);
+    color: var(--console-gold);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+}
+.skills-card-toggle:hover,
+.skills-card-toggle:focus-visible {
+    border-color: var(--console-gold);
+    background: rgba(201, 163, 90, 0.14);
+    color: var(--console-gold-bright);
+    outline: none;
+}
+#perksDetails,
+#relicsDetails { margin-top: 4px; }
+@media (max-width: 1599px) {
+    /* Perk nodes: title, description and a full-width unlock control stack
+       instead of a long requirement label squeezing the perk name. */
+    .skills-panel .perk-node { grid-template-columns: minmax(0, 1fr); }
+    .skills-panel .perk-node > strong { grid-column: 1; grid-row: 1; }
+    .skills-panel .perk-node > div { grid-column: 1; grid-row: 2; }
+    .skills-panel .perk-node > button {
+        grid-column: 1;
+        grid-row: 3;
+        width: 100%;
+        margin-top: 2px;
+    }
+}
+.skills-panel .skills-perks-section,
+.skills-panel .skills-relics-section { margin-top: 10px; padding-top: 8px; }
+@media (max-height: 800px) {
+    .skills-panel .skills-points-banner { padding: 3px 7px; margin-bottom: 5px; }
+    .skill-row { padding: 1px 5px; }
+    .skills-panel .skills-perks-section,
+    .skills-panel .skills-relics-section { margin-top: 8px; padding-top: 6px; }
+}

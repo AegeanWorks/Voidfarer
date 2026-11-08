@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-empire-condense",
+    "task_id": "voidfarer-skills-condense",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794146238.770809,
+    "updated_at": 1794150099.8783524,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794146239.150408
+    "completed_at": 1794150100.4962568
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-hud-polish",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "HUD polish verified: RANGE SCALE fully visible, six chips unclipped, Focus title retains Battle Focus; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794115414.4952192,
-      "timestamp_str": "2026-11-08 08:23:34",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-199 and polish proof",
-        "evidence": "ui-review/polish-before/01-cockpit-before.png, polish-after/01-cockpit.png, polish-after/play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-hud-polish",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-hud-polish' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794115415.0478299,
-      "timestamp_str": "2026-11-08 08:23:35",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-reactor-preset-first",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: make reactor doctrine presets the default onboarding path and tuck manual sliders behind FINE TUNE",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794131186.2172875,
-      "timestamp_str": "2026-11-08 12:46:26",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The always-visible reactor strip shows four sliders, four doctrine buttons, a duplicate BALANCED/SPEED/SCIENCE row and an APPLY ROUTE button that is not visible at 1280x720; the academy tells players to adjust sliders, and choosing a doctrine preset does not advance the power step.",
-        "benefits": "The default strip shows only heat, doctrine presets and output; one ECONOMY/OVERDRIVE click completes the power milestone with its reward; manual routing stays available under FINE TUNE.",
-        "risks": "contract: reactor tutorial progression and UI layout; dependency: none; concurrency: engine lock held; state: no new save field; regression: route_power and slider apply must still work and not double-award.",
-        "mitigation": "Failing-first engine test, one-click browser play with a second mode change, fine-tune open/close check, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "676e872b8e22912d44e7b70864c6306b32daf28780e11e560ebea5b57b6e7262"
-    },
     {
       "task_id": "voidfarer-reactor-preset-first",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794146239.1504092,
       "timestamp_str": "2026-11-08 16:57:19",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-skills-condense",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: turn SKILLS into six one-line TRAIN rows plus disclosed perk and relic catalogs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794150099.2360432,
+      "timestamp_str": "2026-11-08 18:01:39",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "SKILLS is 2471px: six 140px skill cards (922px), eight perk nodes (1108px) and the relic section; only the first TRAIN button is reachable without scrolling and perk/relic headlines are far below the fold.",
+        "benefits": "All six training actions, rank progress and the points banner fit in the docked view; PERKS and RELICS become side-by-side headline cards with one-click reveals; training updates rank and points immediately.",
+        "risks": "contract: SKILLS left-tab UI and training render path; dependency: none; concurrency: none; state: disclosure DOM only, no save change; regression: every TRAIN, UNLOCK and relic reveal must stay reachable.",
+        "mitigation": "Static condensation test, real-browser training action plus perk/relic reveals, before/after measurement, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "bb2b98122c96c66345d125cc352285c6caa07a16831a6b39c5c91153f5daa59f"
+    },
+    {
+      "task_id": "voidfarer-skills-condense",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "SKILLS verified: 2471->481px, six TRAIN rows and headline cards fit, training rank/points update; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794150099.8783524,
+      "timestamp_str": "2026-11-08 18:01:39",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-206 and skills proof",
+        "evidence": "ui-review/skills-final-tabs/*, skills-play/01..04, play-report.json, click-map 178/39/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-skills-condense",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-skills-condense' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794150100.4962585,
+      "timestamp_str": "2026-11-08 18:01:40",
       "agent": "opencode:campaign"
     }
   ]

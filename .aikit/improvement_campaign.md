@@ -864,3 +864,23 @@ zero errors. Suite `Ran 1295 OK`; click-map 176/39/0/0; `ui_inventory.py` 1224 l
 `empire-play/01-empire-default.png`, `02-research-open.png`, `03-research-started.png`,
 `04-outposts-open.png`, `05-factions-open.png`; vision review confirmed the default fits and
 the reveals are readable, with no new layout breaks.
+
+### Fifteenth pass — SKILLS becomes six training rows
+
+SKILLS was 2,471px: six large skill cards (922px), eight perk nodes (1,108px) and a relic
+section, with only the first TRAIN action reachable without scrolling. The tab now shows
+six one-line rows (`name`, `RANK 1/10`, `TRAIN 1 SP`) with progress bars, plus two headline
+cards: `PERKS` (`1 TP`, `8 perks · 0 taken`) and `RELICS` (`0 RELICS`, `Fleet bonuses`).
+Perk branches and the relic grid sit behind `SHOW PERKS` / `SHOW RELICS`; descriptions stay
+on the training-row tooltips. Perk nodes stack their title, description and unlock button
+at the docked width.
+
+Measured: SKILLS **2,471 → 481px**, fitting the 482px viewport exactly with no scroll and
+all six TRAIN buttons visible. Training Piloting with 3 points updates `RANK 1/10` →
+`RANK 2/10`, points `3` → `2`, and logs `Trained Piloting to rank 2.`; 25 frames/401ms,
+zero errors. Perks open to 1,635px with eight readable nodes; relics open to 568px with
+the empty-state message. Suite `Ran 1299 OK`; click-map 178/39/0/0; `ui_inventory.py`
+1230 lines; gate 5/5. Screenshots: `left-tabs-before/skills.png` vs
+`skills-play/01-skills-default.png`, `02-after-train.png`, `03-perks-open.png`,
+`04-relics-open.png`; vision review confirmed the fit, the rank/points update and readable
+perk/relic reveals.
