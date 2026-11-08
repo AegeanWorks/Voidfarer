@@ -57,7 +57,8 @@ voidfarer/
 ├── docs/                 <- comprehensive system design & research
 │   ├── COCKPIT.md        <- Windows cockpit panels, controls and launch options
 │   ├── ATTENTION_MECHANICS_LITERATURE_REVIEW.md <- behavioral psychology review
-│   └── NARRATIVE_AND_TUTORIAL_LITERATURE_REVIEW.md <- cognitive load & narrative review
+│   ├── NARRATIVE_AND_TUTORIAL_LITERATURE_REVIEW.md <- cognitive load & narrative review
+│   └── state_machines.md <- implicit machines, findings and proposals
 ├── .gitignore            <- transient state & python caches excluded
 ├── LICENSE               <- Aegean Game License 1.1 (AGL-1.1): DRM-free personal play
 ├── LICENSES/             <- REUSE license texts
@@ -80,6 +81,7 @@ voidfarer/
 │   ├── galaxy.py         <- procedural star system & hyperlane generator
 │   ├── demographics.py   <- world capacity, tech limits & logistic population
 │   ├── engine.py         <- deterministic state machine & coordinator
+│   ├── state_machines.py <- canonical implicit machine registry & inspector
 │   ├── reactor.py        <- reactor modes, heat, cooling & derating
 │   ├── mapmods.py        <- procedural sector map modifiers
 │   ├── shipmods.py       <- structural ship modification catalog
