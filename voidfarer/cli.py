@@ -41,6 +41,12 @@ from voidfarer.logistics import (
     logistics_action,
     logistics_report,
 )
+from voidfarer.progress import (
+    PROGRESS_ACTIONS,
+    progress_action,
+    progress_report,
+    progress_summary,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -771,6 +777,97 @@ def cmd_logistics(engine: SimulationEngine, storage: StorageManager, parts: list
     elif action == "fabricate":
         kwargs["munitions_type"] = args[1] if len(args) > 1 else "patch_kit"
     ok, msg = logistics_action(engine, action, **kwargs)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
+
+
+def cmd_progress(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One progression surface: commander, pilot, skills, abilities, relics, codex, streak."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    sections = ("status", "commander", "pilot", "skills", "abilities", "relics", "codex", "streak")
+
+    if action in sections:
+        report = progress_report(engine)
+        if action == "status":
+            summary = progress_summary(engine.state)
+            print(f"\n{BOLD}{CYAN}=== PROGRESSION ==={RESET}")
+            print(
+                f"  Commander LVL {summary['commander_level']} "
+                f"({summary['commander_xp']}/{summary['commander_next_xp']} XP) | "
+                f"{summary['skill_points']} skill points"
+            )
+            print(
+                f"  Pilot LVL {summary['pilot_level']} "
+                f"({summary['pilot_xp']}/{summary['pilot_next_xp']} XP) | "
+                f"{summary['talent_points']} talent points"
+            )
+            print(
+                f"  {summary['relics']} relics | {summary['codex_claimed']} codex claims | "
+                f"streak {summary['streak']}"
+            )
+            print(f"{DIM}Inspect: progress commander | skills | abilities | relics | codex | streak{RESET}")
+            return 0
+        if action == "commander":
+            print(f"\n{BOLD}{CYAN}=== COMMANDER ==={RESET}")
+            print(f"  {report['commander']}")
+            return 0
+        if action == "pilot":
+            print(f"\n{BOLD}{CYAN}=== PILOT MASTERY ==={RESET}")
+            print(f"  {report['pilot']}")
+            return 0
+        if action == "skills":
+            print(f"\n{BOLD}{CYAN}=== SKILLS ==={RESET}")
+            for skill_id, skill in sorted(report["skills"].items()):
+                print(f"  {skill_id:<12} LVL {skill['level']:<2} {skill['name']}")
+            return 0
+        if action == "abilities":
+            print(f"\n{BOLD}{CYAN}=== ABILITIES ==={RESET}")
+            for ability_id, ability in sorted(report["abilities"].items()):
+                state = "READY" if ability["unlocked"] and ability["cooldown"] <= 0 else (
+                    "UNLOCKED" if ability["unlocked"] else "LOCKED"
+                )
+                print(f"  {ability_id:<18} {ability['name']:<24} {state}")
+            return 0
+        if action == "relics":
+            print(f"\n{BOLD}{CYAN}=== RELICS ==={RESET}")
+            if not report["relics"]["owned"]:
+                print(f"{DIM}No relics recovered.{RESET}")
+            for relic in report["relics"]["owned"]:
+                print(f"  {relic['name']:<28} {relic['rarity']}")
+            print(f"  Set bonuses: {report['relics']['set_bonuses']}")
+            return 0
+        if action == "codex":
+            codex = report["codex"]
+            entries = codex.get("entries", [])
+            completed = sum(1 for entry in entries if entry.get("completed"))
+            print(f"\n{BOLD}{CYAN}=== CODEX ==={RESET}")
+            print(f"  {completed}/{len(entries)} milestones complete | "
+                  f"{len(codex.get('claimed', []))} rewards claimed")
+            return 0
+        print(f"\n{BOLD}{CYAN}=== STREAK ==={RESET}")
+        print(f"  {report['streak']['count']} jumps | x{report['streak']['multiplier']}")
+        return 0
+
+    if action not in PROGRESS_ACTIONS:
+        print(f"{RED}Unknown progress action '{action}'.{RESET}")
+        return 1
+    kwargs: dict[str, object] = {}
+    if action == "train":
+        kwargs["skill"] = args[1] if len(args) > 1 else ""
+    elif action == "use":
+        kwargs["ability_id"] = args[1] if len(args) > 1 else ""
+        if len(args) > 2:
+            kwargs["target_faction_id"] = args[2]
+    elif action == "unlock":
+        kwargs["talent_id"] = args[1] if len(args) > 1 else ""
+    elif action == "claim":
+        kwargs["entry_id"] = args[1] if len(args) > 1 else ""
+    elif action == "fuse":
+        kwargs["rarity"] = args[1] if len(args) > 1 else ""
+    ok, msg = progress_action(engine, action, **kwargs)
     print((GREEN if ok else RED) + msg + RESET)
     if ok:
         storage.save(engine.state)
@@ -3577,6 +3674,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     logistics_p.add_argument("arg3", nargs="?")
     logistics_p.add_argument("arg4", nargs="?")
 
+    progress_p = subparsers.add_parser(
+        "progress",
+        help="One progression surface: commander, pilot, skills, abilities, relics, codex, streak",
+    )
+    progress_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    progress_p.add_argument("arg1", nargs="?")
+    progress_p.add_argument("arg2", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help="Captain's log: career statistics, milestones, and flight record")
     codex_p = subparsers.add_parser("codex", help="Discovery codex progress and achievement rewards")
@@ -3695,6 +3800,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "logistics":
         return cmd_logistics(engine, storage, [
             "logistics", args.action, args.arg1, args.arg2, args.arg3, args.arg4,
+        ])
+    elif args.command == "progress":
+        return cmd_progress(engine, storage, [
+            "progress", args.action, args.arg1, args.arg2,
         ])
     elif args.command == "refit":
         parts = ["refit", args.action]

@@ -37,6 +37,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/fitting/remove": "alias: routes to the existing upgrade/module removals",
     "/api/fleet/action": "alias: routes to the existing drone/escort/mercenary/alliance actions",
     "/api/logistics/action": "alias: routes to the existing trade/automation/freight/depot/inventory actions",
+    "/api/progress/action": "alias: routes to the existing skill/talent/ability/relic/codex actions",
     "/api/reconstruct": "needs a devastated inhabited world in orbit",
     "/api/void/dive": "needs a black-hole horizon",
     "/api/void/emerge": "needs an active void traversal",

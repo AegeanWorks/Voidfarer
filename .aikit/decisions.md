@@ -2391,3 +2391,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/logistics`, `POST /api/logistics/action` and a compact `logistics` summary to `/api/state`.
   3. Add the `logistics` CLI with `status`, `market`, `cargo`, `depot`, `freight`, `automation`, and the buy/sell/deposit/withdraw/automate/freight/item/fabricate actions; legacy commands and routes remain.
 - **Consequences**: An agent can read one logistics report and issue any logistics action through one route; the CLI has one preferred logistics verb. `tests/test_logistics.py` adds 10 tests for the report, summary, buy/sell/deposit/withdraw, automation toggles, quantum freight, invalid actions, REST and CLI. Full suite `Ran 1380 OK`; no save-schema change.
+
+### ADR-219: Commander, pilot and collection progress become one surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Commander skills, pilot mastery, abilities, relics, the codex and the jump streak were six CLI surfaces (`character`, `mastery`, `relics`, `codex`, `log`, `streak`) and eight routes, each assembling its own slice of the same progression state.
+- **Decision**:
+  1. Add `voidfarer/progress.py`: `progress_report()` returns commander skills/abilities, pilot mastery, relics plus set bonuses, the codex report and the streak in one payload; `progress_action()` routes to the existing train/use/unlock/claim/fuse methods.
+  2. Add `GET /api/progress`, `POST /api/progress/action` and a compact `progress` summary to `/api/state`.
+  3. Add the `progress` CLI with `status`, `commander`, `pilot`, `skills`, `abilities`, `relics`, `codex`, `streak` and the train/use/unlock/claim/fuse actions; legacy commands and routes remain.
+- **Consequences**: An agent can read one progression report and issue any progression action through one route; the CLI has one preferred progression verb. `tests/test_progress.py` adds 9 tests for the report, summary, skill training, ability use, invalid actions, REST and CLI sections. Full suite `Ran 1389 OK`; no save-schema change.

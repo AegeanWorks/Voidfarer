@@ -331,6 +331,7 @@ from voidfarer.encounters import encounter_report
 from voidfarer.fitting import fitting_summary
 from voidfarer.fleet_command import fleet_summary
 from voidfarer.logistics import logistics_summary
+from voidfarer.progress import progress_summary
 from voidfarer.state_machines import situation as state_machine_situation
 from voidfarer.upgrades import (
     CATALOG_CHASSIS,
@@ -7964,6 +7965,7 @@ class SimulationEngine:
                 "fitting": fitting_summary(self.state),
                 "fleet": fleet_summary(self.state),
                 "logistics": logistics_summary(self.state),
+                "progress": progress_summary(self.state),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),
