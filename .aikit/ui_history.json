@@ -689,5 +689,19 @@
     "final_snapshot_digest": "46719fd986d085391d9d00b1f568043726bce9dc83f83fc53f4bd7bab77a6877",
     "final_snapshot_entries": 1176,
     "surface_digest": "19db37d069cf4f0606fe1a8a3bfca445fb3636cff11cd65a7ed9b215e2ca24d3"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "609ff316b6937284fd3bb272423ed6f6b8b280e3",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794112594.7921338,
+    "finished_at": 1794112943.7704713,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; summary-first ARSENAL/FACTIONS/CODEX, card rhythm, codex stats re-review)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "bc4492b543b840e02c92072f0058452a2f253b3ddf7b5d2c079aa8024f65c231",
+    "final_snapshot_entries": 1195,
+    "surface_digest": "f9fd223699c52c424bf4278c8d039996cfad76c017ac4bba65f14b753e4f9896"
   }
 ]

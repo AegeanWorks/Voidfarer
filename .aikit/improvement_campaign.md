@@ -692,3 +692,21 @@ SKILLS 2,575→2,453. Play: 23 frames/412ms, zero errors, no clipped intro. Clic
 163/47/0/0; `ui_inventory.py` 1176 lines; suite `Ran 1273 OK`; gate 5/5. Screenshots:
 `left-tabs-before/*.png` vs `left-tabs-after/*.png`; vision review quoted the uniform
 headers, readable DEPOT/EMPIRE/STORY rows and complete intros.
+
+### Seventh pass — advanced tabs become summary-first
+
+The three largest left surfaces were ARSENAL 6,509px (23 upgrades + 5 chassis + 8
+weapons), FACTIONS 4,594px (9 faction dossiers + 7 corporations) and CODEX 10,683px (62
+milestones). Each now keeps its counts and section headers visible and hides the catalog
+behind `SHOW UPGRADES` / `SHOW CHASSIS` / `SHOW ORDNANCE`, `SHOW FACTIONS` /
+`SHOW CORPORATIONS`, or `SHOW MILESTONES`. CODEX also moves its category filters inside
+the milestone disclosure so the button stays above the fold.
+
+Measured initial heights: ARSENAL 6,509→473px, FACTIONS 4,594→380px, CODEX 10,683→580px.
+Open states: upgrades 3,783; chassis 5,219; ordnance 6,599; factions 3,325; corporations
+4,669; milestones 10,787. All re-collapse exactly. Quests/AI/messages cards share 96/200/168
+minimum heights; message choice descriptions clamp to two lines. CODEX summary is a 2×2 grid
+and career stats show three full rows (144px scroll box). Play: 23 frames/401ms, zero
+errors. Click-map 169/47/0/0; `ui_inventory.py` 1195 lines; suite `Ran 1277 OK`; gate 5/5.
+Screenshots: `advanced-after/*.png`; vision review approved the collapsed/open states and
+the card rhythm, and the codex stats row fix was re-reviewed.

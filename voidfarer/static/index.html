@@ -509,28 +509,44 @@
                         <div class="panel-header">
                             <div class="panel-tag"><span class="badge-dot dot-amber"></span> ARSENAL</div>
                             <h2 class="panel-title">STATION HARDWARE UPGRADES</h2>
+                            <span class="fleet-optional-count" id="arsenalUpgradeCount">--</span>
                         </div>
-                        <div class="arsenal-list" id="arsenalList">
-                            <!-- Populated dynamically -->
-                        </div>
-
-                        <div class="arsenal-sub-section">
-                            <div class="panel-header" style="margin-top: 1.25rem;">
-                                <div class="panel-tag"><span class="badge-dot dot-cyan"></span> SHIPYARD</div>
-                                <h3 class="panel-title">CHASSIS COMMISSIONING SHOWROOM</h3>
-                            </div>
-                            <div class="chassis-showroom" id="shipyardChassisList">
+                        <button class="fleet-disclosure-toggle" id="btnToggleArsenalUpgrades" data-label="UPGRADES" aria-expanded="false" aria-controls="arsenalUpgradeDetails" title="Show or hide station hardware upgrades">SHOW UPGRADES</button>
+                        <div id="arsenalUpgradeDetails" hidden>
+                            <div class="arsenal-list" id="arsenalList">
                                 <!-- Populated dynamically -->
                             </div>
                         </div>
 
                         <div class="arsenal-sub-section">
-                            <div class="panel-header" style="margin-top: 1.25rem;">
-                                <div class="panel-tag"><span class="badge-dot dot-red"></span> ORDNANCE</div>
-                                <h3 class="panel-title">WEAPONS & ORDNANCE BAY</h3>
+                            <div class="fleet-optional-header">
+                                <div>
+                                    <div class="panel-tag"><span class="badge-dot dot-cyan"></span> SHIPYARD</div>
+                                    <h3 class="subpanel-title">CHASSIS COMMISSIONING SHOWROOM</h3>
+                                </div>
+                                <span class="fleet-optional-count" id="chassisCount">--</span>
                             </div>
-                            <div class="weapons-bay" id="weaponsBayList">
-                                <!-- Populated dynamically -->
+                            <button class="fleet-disclosure-toggle" id="btnToggleChassis" data-label="CHASSIS" aria-expanded="false" aria-controls="chassisDetails" title="Show or hide the chassis showroom">SHOW CHASSIS</button>
+                            <div id="chassisDetails" hidden>
+                                <div class="chassis-showroom" id="shipyardChassisList">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arsenal-sub-section">
+                            <div class="fleet-optional-header">
+                                <div>
+                                    <div class="panel-tag"><span class="badge-dot dot-red"></span> ORDNANCE</div>
+                                    <h3 class="subpanel-title">WEAPONS &amp; ORDNANCE BAY</h3>
+                                </div>
+                                <span class="fleet-optional-count" id="weaponsCount">--</span>
+                            </div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleOrdnance" data-label="ORDNANCE" aria-expanded="false" aria-controls="ordnanceDetails" title="Show or hide the weapons and ordnance bay">SHOW ORDNANCE</button>
+                            <div id="ordnanceDetails" hidden>
+                                <div class="weapons-bay" id="weaponsBayList">
+                                    <!-- Populated dynamically -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -811,10 +827,16 @@
 
                         <div class="codex-section">
                             <div class="codex-section-header">
-                                <h3 class="subpanel-title">DISCOVERY MILESTONES</h3>
-                                <div class="codex-category-filters" id="codexCategoryFilters"></div>
+                                <div class="codex-section-title-row">
+                                    <h3 class="subpanel-title">DISCOVERY MILESTONES</h3>
+                                    <span class="fleet-optional-count" id="codexMilestoneCount">--</span>
+                                </div>
                             </div>
-                            <div class="codex-entry-list" id="codexEntryList"></div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleCodexMilestones" data-label="MILESTONES" aria-expanded="false" aria-controls="codexMilestoneDetails" title="Show or hide discovery milestones">SHOW MILESTONES</button>
+                            <div id="codexMilestoneDetails" hidden>
+                                <div class="codex-category-filters" id="codexCategoryFilters"></div>
+                                <div class="codex-entry-list" id="codexEntryList"></div>
+                            </div>
                         </div>
 
                         <div class="codex-section">
@@ -916,15 +938,27 @@
                             <div class="wars-list" id="warsList"></div>
                         </div>
                         <div class="factions-section">
-                            <h3 class="subpanel-title">SOVEREIGN FACTIONS</h3>
-                            <div class="factions-grid" id="factionsGrid">
-                                <!-- Populated dynamically by app.js -->
+                            <div class="fleet-optional-header">
+                                <h3 class="subpanel-title">SOVEREIGN FACTIONS</h3>
+                                <span class="fleet-optional-count" id="factionsCount">--</span>
+                            </div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleFactionDossiers" data-label="FACTIONS" aria-expanded="false" aria-controls="factionDetails" title="Show or hide sovereign faction dossiers">SHOW FACTIONS</button>
+                            <div id="factionDetails" hidden>
+                                <div class="factions-grid" id="factionsGrid">
+                                    <!-- Populated dynamically by app.js -->
+                                </div>
                             </div>
                         </div>
                         <div class="corps-section" style="margin-top: 18px;">
-                            <h3 class="subpanel-title">INTERSTELLAR MEGACORPORATIONS</h3>
-                            <div class="corps-grid" id="corpsGrid">
-                                <!-- Populated dynamically by app.js -->
+                            <div class="fleet-optional-header">
+                                <h3 class="subpanel-title">INTERSTELLAR MEGACORPORATIONS</h3>
+                                <span class="fleet-optional-count" id="corpsCount">--</span>
+                            </div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleCorpDossiers" data-label="CORPORATIONS" aria-expanded="false" aria-controls="corpDetails" title="Show or hide megacorporation dossiers">SHOW CORPORATIONS</button>
+                            <div id="corpDetails" hidden>
+                                <div class="corps-grid" id="corpsGrid">
+                                    <!-- Populated dynamically by app.js -->
+                                </div>
                             </div>
                         </div>
                     </div>

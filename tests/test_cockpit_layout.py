@@ -1468,6 +1468,64 @@ class TestShipDisclosures(unittest.TestCase):
         self.assertIn(".ship-room-details[hidden], .ship-modules-grid[hidden]", self.css)
 
 
+class TestAdvancedLeftCondensation(unittest.TestCase):
+    """The three largest advanced tabs start with summary-first disclosures."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_large_catalogs_default_to_hidden_details(self):
+        cases = (
+            ("arsenalUpgradeDetails", "arsenalList"),
+            ("chassisDetails", "shipyardChassisList"),
+            ("ordnanceDetails", "weaponsBayList"),
+            ("factionDetails", "factionsGrid"),
+            ("corpDetails", "corpsGrid"),
+            ("codexMilestoneDetails", "codexEntryList"),
+        )
+        for details_id, list_id in cases:
+            self.assertIn(f'id="{details_id}" hidden', self.html)
+            self.assertLess(
+                self.html.index(f'id="{details_id}"'),
+                self.html.index(f'id="{list_id}"'),
+                f"{list_id} must sit inside its hidden details",
+            )
+            self.assertIn(f"#{details_id}[hidden]", self.css)
+
+    def test_disclosure_buttons_and_counts_exist(self):
+        pairs = (
+            ("btnToggleArsenalUpgrades", "arsenalUpgradeCount", "UPGRADES"),
+            ("btnToggleChassis", "chassisCount", "CHASSIS"),
+            ("btnToggleOrdnance", "weaponsCount", "WEAPONS"),
+            ("btnToggleFactionDossiers", "factionsCount", "FACTIONS"),
+            ("btnToggleCorpDossiers", "corpsCount", "CORPORATIONS"),
+            ("btnToggleCodexMilestones", "codexMilestoneCount", "SHOWN"),
+        )
+        for button_id, count_id, word in pairs:
+            self.assertIn(f'id="{button_id}"', self.html)
+            self.assertIn(f'id="{count_id}"', self.html)
+            self.assertIn(word, self.js)
+        self.assertIn("toggleSectionDisclosure", self.js)
+        self.assertIn("sectionDisclosures", self.js)
+
+    def test_small_card_lists_share_a_rhythm(self):
+        self.assertIn(".quest-card { min-height: 96px; }", self.css)
+        self.assertIn(".ai-list .ai-card { min-height: 200px; }", self.css)
+        self.assertIn(".message-list .message-card { min-height: 168px; }", self.css)
+        self.assertIn(".message-choice-btn span {", self.css)
+        self.assertIn("-webkit-line-clamp: 2", self.css)
+
+    def test_codex_filters_live_inside_the_milestone_disclosure(self):
+        self.assertLess(
+            self.html.index('id="codexMilestoneDetails"'),
+            self.html.index('id="codexCategoryFilters"'),
+        )
+        self.assertIn(".codex-summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }", self.css)
+
+
 class TestLeftPanelUniformity(unittest.TestCase):
     """Every left tab shares one header height and one section rhythm."""
 

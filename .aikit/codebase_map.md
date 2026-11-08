@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `356`
+- **Total Classes**: `357`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2000`
-- **Total Source Lines**: `50544`
+- **Total Class Methods**: `2005`
+- **Total Source Lines**: `50602`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2145` lines (`94755` bytes)
+**Size**: `2203` lines (`97434` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -603,6 +603,12 @@
 - `class TestShipDisclosures` - *The dense SHIP tab defaults to collapsed rooms and module catalog.*
   - Method `.setUpClass()`
   - Method `.test_rooms_and_catalog_use_named_disclosures()`
+- `class TestAdvancedLeftCondensation` - *The three largest advanced tabs start with summary-first disclosures.*
+  - Method `.setUpClass()`
+  - Method `.test_large_catalogs_default_to_hidden_details()`
+  - Method `.test_disclosure_buttons_and_counts_exist()`
+  - Method `.test_small_card_lists_share_a_rhythm()`
+  - Method `.test_codex_filters_live_inside_the_milestone_disclosure()`
 - `class TestLeftPanelUniformity` - *Every left tab shares one header height and one section rhythm.*
   - Method `.setUpClass()`
   - Method `.test_every_tab_header_is_one_compact_block()`

@@ -380,7 +380,7 @@ gaps**: every POST route in `/api/agent/actions` is either exercised or listed i
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
 The click-map enumerates every rendered control via `window.voidfarerClickMap()` and fails
-on a missing or duplicate handle (desktop: 163 controls, 47 visible in the default focus
+on a missing or duplicate handle (desktop: 169 controls, 47 visible in the default focus
 rail, 0 missing, 0 duplicates). The left console starts with five core systems and a
 `MORE SYSTEMS` disclosure; expanding it restores all sixteen tabs. The PLAYER card points
 at the bottom command strip for abilities instead of repeating its six USE buttons, the
@@ -388,11 +388,11 @@ SHIP tab collapses `ROOMS & CREW STATIONS` and the `MODULE CATALOG` behind SHOW/
 disclosures (initial SHIP content 2,390px -> 917px), COMMERCE collapses the auto-trade
 broker and quantum freight below the market table (initial COMMERCE content 2,076px ->
 932px), and FLEET collapses mercenary contracts and fleet procurement behind SHOW/HIDE
-controls (initial FLEET content 1,271px -> 831px). Mercenary contracts stay available even
-when the player owns no drones. Every left tab now shares one 56px header (tag plus an
-optional action on the first row, a single-line title below), one section-heading style,
-and narrow list rows that stack instead of squeezing (DEPOT holds, EMPIRE research,
-story alignment).
+controls (initial FLEET content 1,271px -> 831px). Mercenary contracts stay available with
+no drones. Every left tab shares one 56px header (tag/action row, one-line title), one
+section-heading style, and stacking narrow rows (DEPOT holds, EMPIRE research, story
+alignment). Advanced tabs are summary-first: ARSENAL 6,509->473, FACTIONS 4,594->380,
+CODEX 10,683->580.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -577,7 +577,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,273-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,277-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

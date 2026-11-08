@@ -9867,7 +9867,30 @@ body.cockpit-theme .nav-panel > .panel-header {
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
-.tab-content .fleet-optional-header .commission-title { margin: 0; }
+.tab-content .fleet-optional-header { flex-wrap: wrap; gap: 4px 8px; }
+.tab-content .fleet-optional-header .commission-title,
+.tab-content .fleet-optional-header .subpanel-title { margin: 0; }
+.codex-section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.codex-stats-grid { max-height: 144px; }
+#arsenalUpgradeDetails[hidden], #chassisDetails[hidden], #ordnanceDetails[hidden],
+#factionDetails[hidden], #corpDetails[hidden], #codexMilestoneDetails[hidden] { display: none; }
+
+/* Small-card rhythm: minimum sizes and one compact action treatment. */
+.quest-card { min-height: 96px; }
+.ai-list .ai-card { min-height: 200px; }
+.message-list .message-card { min-height: 168px; }
+.message-choice-btn { padding: 6px 8px; }
+.message-choice-btn span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 .tab-content > .panel-intro-text {
     display: block;
     max-height: calc(2 * 1.45em + 9px);
@@ -9929,4 +9952,15 @@ body.cockpit-theme .nav-panel > .panel-header {
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    /* Codex summary stays inside the drawer: two columns, not four slivers. */
+    .codex-summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .codex-section-title-row .subpanel-title {
+        flex: 1 1 auto;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .codex-section-title-row .fleet-optional-count { flex: 0 0 auto; }
 }

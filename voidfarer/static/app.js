@@ -786,6 +786,9 @@ class CockpitApp {
         this.codexStatsGrid = document.getElementById("codexStatsGrid");
         this.codexCategoryFilters = document.getElementById("codexCategoryFilters");
         this.codexEntryList = document.getElementById("codexEntryList");
+        this.codexMilestoneDetails = document.getElementById("codexMilestoneDetails");
+        this.btnToggleCodexMilestones = document.getElementById("btnToggleCodexMilestones");
+        this.codexMilestoneCount = document.getElementById("codexMilestoneCount");
         this.codexLog = document.getElementById("codexLog");
         this.activeCodexCategory = "all";
         this.tabBtnStory = document.getElementById("tabBtnStory");
@@ -834,6 +837,12 @@ class CockpitApp {
         this.messageList = document.getElementById("messageList");
         this.factionsGrid = document.getElementById("factionsGrid");
         this.corpsGrid = document.getElementById("corpsGrid");
+        this.btnToggleFactionDossiers = document.getElementById("btnToggleFactionDossiers");
+        this.factionDetails = document.getElementById("factionDetails");
+        this.factionsCount = document.getElementById("factionsCount");
+        this.btnToggleCorpDossiers = document.getElementById("btnToggleCorpDossiers");
+        this.corpDetails = document.getElementById("corpDetails");
+        this.corpsCount = document.getElementById("corpsCount");
 
         // Map Controls (moved to right panel)
         this.viewOrbitBtn = document.getElementById("viewOrbitBtn");
@@ -907,6 +916,15 @@ class CockpitApp {
         this.arsenalList = document.getElementById("arsenalList");
         this.shipyardChassisList = document.getElementById("shipyardChassisList");
         this.weaponsBayList = document.getElementById("weaponsBayList");
+        this.btnToggleArsenalUpgrades = document.getElementById("btnToggleArsenalUpgrades");
+        this.arsenalUpgradeDetails = document.getElementById("arsenalUpgradeDetails");
+        this.arsenalUpgradeCount = document.getElementById("arsenalUpgradeCount");
+        this.btnToggleChassis = document.getElementById("btnToggleChassis");
+        this.chassisDetails = document.getElementById("chassisDetails");
+        this.chassisCount = document.getElementById("chassisCount");
+        this.btnToggleOrdnance = document.getElementById("btnToggleOrdnance");
+        this.ordnanceDetails = document.getElementById("ordnanceDetails");
+        this.weaponsCount = document.getElementById("weaponsCount");
         this.fleetRoster = document.getElementById("fleetRoster");
         this.fleetShipRoster = document.getElementById("fleetShipRoster");
         this.escortShopGrid = document.getElementById("escortShopGrid");
@@ -1379,6 +1397,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.btnToggleCommission, this.commissionDetails,
             ));
         }
+        const sectionDisclosures = [
+            [this.btnToggleArsenalUpgrades, this.arsenalUpgradeDetails],
+            [this.btnToggleChassis, this.chassisDetails],
+            [this.btnToggleOrdnance, this.ordnanceDetails],
+            [this.btnToggleFactionDossiers, this.factionDetails],
+            [this.btnToggleCorpDossiers, this.corpDetails],
+            [this.btnToggleCodexMilestones, this.codexMilestoneDetails],
+        ];
+        sectionDisclosures.forEach(([button, target]) => {
+            if (button && target) {
+                button.addEventListener("click", () => this.toggleSectionDisclosure(button, target));
+            }
+        });
         if (this.btnFabricatePatch) {
             this.btnFabricatePatch.addEventListener("click", () => this.handleFabricate("patch_kit"));
         }
@@ -3411,6 +3442,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
                 this.arsenalList.appendChild(card);
             });
+            if (this.arsenalUpgradeCount) {
+                this.arsenalUpgradeCount.textContent = `${upgrades.length} UPGRADES`;
+            }
         }
 
         // Render Shipyard Chassis Showroom
@@ -3476,6 +3510,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 }
                 this.shipyardChassisList.appendChild(card);
             });
+            if (this.chassisCount) {
+                this.chassisCount.textContent = `${chassisList.length} CHASSIS`;
+            }
         }
 
         // Render Weapons & Ordnance Bay
@@ -3519,6 +3556,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 }
                 this.weaponsBayList.appendChild(card);
             });
+            if (this.weaponsCount) {
+                this.weaponsCount.textContent = `${weaponsList.length} WEAPONS`;
+            }
         }
     }
 
@@ -3759,6 +3799,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     toggleFleetDisclosure(button, target) {
+        this.applyDisclosure(button, target, null);
+    }
+
+    toggleSectionDisclosure(button, target) {
         this.applyDisclosure(button, target, null);
     }
 
@@ -4704,6 +4748,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         const activeCat = this.activeCodexCategory || "all";
         const entries = (codex.entries || []).filter(e => activeCat === "all" || e.category === activeCat);
+        if (this.codexMilestoneCount) {
+            this.codexMilestoneCount.textContent = `${entries.length} SHOWN`;
+            this.codexMilestoneCount.title = `${entries.length} milestones shown`;
+        }
 
         this.codexEntryList.innerHTML = entries.map(entry => {
             const pct = Math.min(100, Math.round((entry.progress / entry.target) * 100));
@@ -8182,6 +8230,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             `;
             this.factionsGrid.appendChild(card);
         });
+        if (this.factionsCount) {
+            this.factionsCount.textContent = `${this.factionsGrid.childElementCount} FACTIONS`;
+        }
 
         if (!this.state.corporations || !this.corpsGrid) return;
 
@@ -8205,6 +8256,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             `;
             this.corpsGrid.appendChild(card);
         });
+        if (this.corpsCount) {
+            this.corpsCount.textContent = `${this.corpsGrid.childElementCount} CORPORATIONS`;
+        }
     }
     escapeHtml(value) {
         return String(value ?? "").replace(/[&<>"']/g, ch => ({
