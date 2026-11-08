@@ -991,3 +991,20 @@ and zero errors; all three badges remain on the tag row with no wrap or overflow
 `badge-before-market/short-market.png` vs `badge-after-market/short-market.png`,
 `badge-before-codex/short-codex.png` vs `badge-after-codex/short-codex.png`; vision
 review confirmed the larger badges stay legible with no layout shift.
+
+### Twenty-first pass — FLEET docked drone and escort text stops clipping
+
+A 16-tab sweep at 1280×720 (one browser session, default save) found nine clipped text
+nodes, all in FLEET. The drone card's three-column ledger grid left about a 103px text
+column, so `Mining Drone Alpha`, `MINING // SOL [HARVESTING]` and the stats line ellipsized;
+the always-on escort shop rendered `Aegis Escort Co...` and truncated descriptions. The
+docked drone card now stacks its name, sub, stats and yield full width with `REFIT` and
+`DISMISS` on a final row, and `#escortShopGrid` joins the wrapping procurement override.
+
+Measured: the sweep moves from **9 clipped text nodes -> 0** across all 16 tabs with
+`tiny 0`, `hscroll 0` and zero errors. FLEET grows 831 → 877px because the drone identity
+and actions stack, but every line is readable and both actions stay visible; the >1599px
+layout is unchanged. Suite `Ran 1311 OK`; `ui_inventory.py` 1255 lines; gate 5/5.
+Screenshots: `fleet-clip-check/short-fleet.png` vs `fleet-drone-after/short-fleet.png`,
+`fleet-bottom-check/short-fleet-bottom.png` vs `fleet-bottom-after/short-fleet-bottom.png`;
+vision review confirmed the full drone card and wrapped escort rows, with no new clipping.

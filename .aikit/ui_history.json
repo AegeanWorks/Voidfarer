@@ -932,5 +932,19 @@
     "final_snapshot_digest": "684e8e9ae2834b7fc07f55e666f1afb1b1cbdb2fc8158ab9d2ec4c21a4762104",
     "final_snapshot_entries": 1255,
     "surface_digest": "ac9d4cbf9d4ac3143dd738fa5d9cd643e6ffa66012f579d68a735657a81caa8c"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "0f27f1652ade8d067739a41731694cf8683e8f8b",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794159094.0192902,
+    "finished_at": 1794159532.0256643,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (main multimodal agent; drone card stacked and escort names/descriptions wrapped at 1280px, sweep clipped 9->0)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "684e8e9ae2834b7fc07f55e666f1afb1b1cbdb2fc8158ab9d2ec4c21a4762104",
+    "final_snapshot_entries": 1255,
+    "surface_digest": "24700accd7aa134bdcfaaa6ee829e40c38c2de49321ff78f4840a0b596527f66"
   }
 ]

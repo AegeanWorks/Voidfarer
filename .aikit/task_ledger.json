@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-header-badge-legibility",
+    "task_id": "voidfarer-fleet-drone-legibility",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794158624.4179423,
+    "updated_at": 1794159694.371488,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794158637.189243
+    "completed_at": 1794159707.334832
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-empire-condense",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "EMPIRE verified: 2665->402px with all headlines visible, research START works, outpost/faction reveals readable; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794146238.770809,
-      "timestamp_str": "2026-11-08 16:57:18",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-205 and EMPIRE proof",
-        "evidence": "ui-review/empire-after/*, empire-play/01..05, play-report.json, click-map 176/39/0/0"
-      }
-    },
-    {
-      "task_id": "voidfarer-empire-condense",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-empire-condense' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794146239.1504092,
-      "timestamp_str": "2026-11-08 16:57:19",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-skills-condense",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: turn SKILLS into six one-line TRAIN rows plus disclosed perk and relic catalogs",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794150099.2360432,
-      "timestamp_str": "2026-11-08 18:01:39",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "SKILLS is 2471px: six 140px skill cards (922px), eight perk nodes (1108px) and the relic section; only the first TRAIN button is reachable without scrolling and perk/relic headlines are far below the fold.",
-        "benefits": "All six training actions, rank progress and the points banner fit in the docked view; PERKS and RELICS become side-by-side headline cards with one-click reveals; training updates rank and points immediately.",
-        "risks": "contract: SKILLS left-tab UI and training render path; dependency: none; concurrency: none; state: disclosure DOM only, no save change; regression: every TRAIN, UNLOCK and relic reveal must stay reachable.",
-        "mitigation": "Static condensation test, real-browser training action plus perk/relic reveals, before/after measurement, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "bb2b98122c96c66345d125cc352285c6caa07a16831a6b39c5c91153f5daa59f"
-    },
     {
       "task_id": "voidfarer-skills-condense",
       "phase": "phase 4",
@@ -280,6 +236,45 @@
       "status": "completed",
       "timestamp": 1794158637.1892457,
       "timestamp_str": "2026-11-08 20:23:57",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fleet-drone-legibility",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: stack the docked drone card text and actions so no name, status or stat line clips",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794159009.23879,
+      "timestamp_str": "2026-11-08 20:30:09",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "At 1280x720 the drone card's three-column ledger grid leaves about a 103px text column: Mining Drone Alpha, MINING // SOL [HARVESTING] and the stats line all ellipsize, and a 16-tab sweep flags nine clipped text nodes in FLEET only.",
+        "benefits": "The docked drone card shows its full name, role/system/status and stats on full-width lines with REFIT and DISMISS beneath; the sweep reports zero clipped drone text and the wider layout is unchanged.",
+        "risks": "contract: FLEET drone roster at <=1599px; dependency: none; concurrency: none; state: CSS only; regression: REFIT and DISMISS stay reachable, the card still shows yield and integrity, and the >1599px layout keeps its current grid.",
+        "mitigation": "Apply the reflow inside a max-width 1599px media query, rerun the tab sweep and FLEET browser capture, play a real refit, add a CSS contract test, and run full gates."
+      },
+      "plan_digest": "f2954da2a5d10a36a96d3542baba69439a4d1d6cf4e74a06ed1f5a911d0b1b62"
+    },
+    {
+      "task_id": "voidfarer-fleet-drone-legibility",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "FLEET docked text verified: drone card stacks, escort rows wrap, 16-tab sweep clipped 9->0 with tiny 0/hscroll 0; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794159694.371488,
+      "timestamp_str": "2026-11-08 20:41:34",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fleet-drone-legibility",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-fleet-drone-legibility' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794159707.3348331,
+      "timestamp_str": "2026-11-08 20:41:47",
       "agent": "opencode:campaign"
     }
   ]

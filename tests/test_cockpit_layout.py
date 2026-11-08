@@ -1631,6 +1631,32 @@ class TestHeaderBadgeLegibility(unittest.TestCase):
         self.assertNotIn("font-size: 11px;", rule)
 
 
+class TestFleetDockedLegibility(unittest.TestCase):
+    """FLEET keeps docked drone and escort text readable at 1280px."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_drone_card_stacks_its_identity_and_stats(self):
+        anchor = "#fleetRoster .drone-card {"
+        self.assertIn(anchor, self.css)
+        block = self.css.split(anchor, 1)[1].split("}", 1)[0]
+        self.assertIn("grid-template-columns: 24px minmax(0, 1fr);", block)
+        self.assertIn("grid-template-rows: auto auto auto auto auto;", block)
+        self.assertIn("#fleetRoster .drone-card .drone-stats {", self.css)
+        self.assertIn("#fleetRoster .drone-card .drone-actions {", self.css)
+
+    def test_escort_shop_and_procurement_wrap_at_docked_width(self):
+        self.assertIn("#escortShopGrid .fleet-procurement-row,", self.css)
+        anchor = "#escortShopGrid .procurement-info strong,"
+        self.assertIn(anchor, self.css)
+        block = self.css.split(anchor, 1)[1].split("}", 1)[0]
+        self.assertIn("white-space: normal;", block)
+        self.assertIn("text-overflow: clip;", block)
+        self.assertIn("#escortShopGrid .procurement-info small,", self.css)
+
+
 class TestCrewCondensation(unittest.TestCase):
     """CREW keeps cash flow and officer headlines before full rosters."""
 

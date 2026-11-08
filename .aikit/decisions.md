@@ -2319,3 +2319,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   1. Raise the shared header badge/button text to `font-size: 12px`, keeping `min-height: 22px`, the padding and the 56px header layout unchanged.
   2. Add `TestHeaderBadgeLegibility` pinning the 12px rule and rejecting the 11px value.
 - **Consequences**: Story, market and codex captures change from `tiny 1` to `tiny 0` with `hscroll 0` and zero errors; the tag/title/badge rows keep their 56px header with no wrapping or overflow (`TARGET: SOL`, `HIGH_TECH`, `0 / 62 CLAIMED (0%)` all remain on the tag row). Full suite `Ran 1309 OK`; `ui_inventory.py` 1255 lines; no save-schema or DOM change. Vision review compared the before/after story, market and codex headers and confirmed the 1px increase is legible with no layout shift.
+
+### ADR-212: FLEET docked drone and escort rows lose their clipped text
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: A 16-tab sweep at 1280x720 found nine clipped text nodes, all in FLEET: the drone card's three-column ledger grid left about a 103px text column, so `Mining Drone Alpha`, `MINING // SOL [HARVESTING]` and the stats line ellipsized; the always-on escort shop also rendered `Aegis Escort Co...` and one-line descriptions.
+- **Decision**:
+  1. Inside `max-width: 1599px`, reflow `#fleetRoster .drone-card` to two columns (icon plus a full-width stack): name, sub, stats and yield wrap on their own rows and `REFIT` / `DISMISS` share a final row.
+  2. Add the always-on `#escortShopGrid` to the existing docked procurement override, so escort names and descriptions wrap at whole words like the mercenary, commission and outpost rows.
+  3. Add `TestFleetDockedLegibility` for both contracts.
+- **Consequences**: The tab sweep reports **nine clipped text nodes -> zero** across all 16 tabs, with `tiny 0`, `hscroll 0` and zero errors. FLEET grows 831 -> 877px because the drone identity, stats and action row stack, but every line is readable and both actions remain visible; the >1599px layout keeps its existing grid. Full suite `Ran 1311 OK`; `ui_inventory.py` 1255 lines; no save-schema or DOM change. Vision review confirmed the full drone name/status/stats and the wrapped escort names/descriptions, with no new clipping.

@@ -8606,15 +8606,17 @@ body.cockpit-theme .panel-center {
 }
 .fleet-procurement-row:disabled { opacity: 0.55; cursor: not-allowed; }
 
-/* The docked drawer is ~290px wide: inside the optional disclosures give the
-   name/description the space the 124px price column was wasting. The always-on
-   escort shop keeps its compact single-line rows. */
+/* The docked drawer is ~290px wide: give every procurement row the name and
+   description space the 124px price column was wasting, including the always-on
+   escort shop, whose names previously ellipsized to `Aegis Escort Co...`. */
 @media (max-width: 1599px) {
+    #escortShopGrid .fleet-procurement-row,
     #mercenaryRoster .fleet-procurement-row,
     #commissionDetails .fleet-procurement-row,
     #outpostBuild .fleet-procurement-row {
         grid-template-columns: 20px minmax(0, 1fr) 96px;
     }
+    #escortShopGrid .procurement-info strong,
     #mercenaryRoster .procurement-info h4,
     #mercenaryRoster .procurement-info strong,
     #commissionDetails .procurement-info strong,
@@ -8623,6 +8625,7 @@ body.cockpit-theme .panel-center {
         overflow: visible;
         text-overflow: clip;
     }
+    #escortShopGrid .procurement-info small,
     #mercenaryRoster .procurement-info small,
     #commissionDetails .procurement-info small,
     #outpostBuild .procurement-info small {
@@ -10742,3 +10745,53 @@ body.cockpit-theme .nav-panel > .panel-header {
     overflow: visible;
 }
 #messagesDetails[hidden] { display: none; }
+
+/* =====================================================================
+   FLEET — DOCKED DRONE CARD
+   The ~291px drawer cannot hold a 103px text column beside the yield and
+   two actions. Stack the identity, status and stats full width and put
+   REFIT/DISMISS on their own row; the wider layout is unchanged.
+   ===================================================================== */
+@media (max-width: 1599px) {
+    #fleetRoster .drone-card {
+        grid-template-columns: 24px minmax(0, 1fr);
+        grid-template-rows: auto auto auto auto auto;
+    }
+    #fleetRoster .drone-card .drone-name {
+        grid-column: 2;
+        grid-row: 1;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+    #fleetRoster .drone-card .drone-sub {
+        grid-column: 2;
+        grid-row: 2;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+    #fleetRoster .drone-card .drone-stats {
+        display: block;
+        grid-column: 2;
+        grid-row: 3;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+    #fleetRoster .drone-card .drone-yield-badge {
+        grid-column: 2;
+        grid-row: 4;
+        align-self: start;
+        text-align: left;
+    }
+    #fleetRoster .drone-card .drone-actions {
+        grid-column: 2;
+        grid-row: 5;
+        flex-direction: row;
+    }
+    #fleetRoster .drone-card .drone-actions .btn-hud {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
