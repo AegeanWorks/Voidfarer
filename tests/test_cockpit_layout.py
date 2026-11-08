@@ -1657,6 +1657,21 @@ class TestFleetDockedLegibility(unittest.TestCase):
         self.assertIn("#escortShopGrid .procurement-info small,", self.css)
 
 
+class TestShipInteriorStatusLegibility(unittest.TestCase):
+    """The SHIP interior status wraps instead of truncating at a 12em cap."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_status_wraps_without_a_hard_cap(self):
+        rule = self.css.split(".ship-interior-status {", 1)[1].split("}", 1)[0]
+        self.assertIn("white-space: normal;", rule)
+        self.assertIn("overflow: visible;", rule)
+        self.assertNotIn("max-width:", rule)
+        self.assertNotIn("text-overflow: ellipsis;", rule)
+
+
 class TestCrewCondensation(unittest.TestCase):
     """CREW keeps cash flow and officer headlines before full rosters."""
 

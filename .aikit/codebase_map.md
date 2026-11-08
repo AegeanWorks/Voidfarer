@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `371`
+- **Total Classes**: `372`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2053`
-- **Total Source Lines**: `51140`
+- **Total Class Methods**: `2055`
+- **Total Source Lines**: `51155`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2691` lines (`120282` bytes)
+**Size**: `2706` lines (`120859` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -630,6 +630,9 @@
   - Method `.setUpClass()`
   - Method `.test_drone_card_stacks_its_identity_and_stats()`
   - Method `.test_escort_shop_and_procurement_wrap_at_docked_width()`
+- `class TestShipInteriorStatusLegibility` - *The SHIP interior status wraps instead of truncating at a 12em cap.*
+  - Method `.setUpClass()`
+  - Method `.test_status_wraps_without_a_hard_cap()`
 - `class TestCrewCondensation` - *CREW keeps cash flow and officer headlines before full rosters.*
   - Method `.setUpClass()`
   - Method `.test_roster_and_recruitment_default_to_disclosures()`

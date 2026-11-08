@@ -1008,3 +1008,20 @@ layout is unchanged. Suite `Ran 1311 OK`; `ui_inventory.py` 1255 lines; gate 5/5
 Screenshots: `fleet-clip-check/short-fleet.png` vs `fleet-drone-after/short-fleet.png`,
 `fleet-bottom-check/short-fleet-bottom.png` vs `fleet-bottom-after/short-fleet-bottom.png`;
 vision review confirmed the full drone card and wrapped escort rows, with no new clipping.
+
+### Twenty-second pass — SHIP status wraps and the viewport matrix goes clean
+
+The 16-tab sweep was extended to the rest of the G-011 matrix: 1280×720@1,
+1280×720@2 (200% scaling), 1920×1080@1 and 3840×2160@1. At 1920 and 4K the SHIP interior
+header rendered `CORVETTE SCOUT //...`, hiding `3/6 STAFFED`, because
+`.ship-interior-status` capped at `12em` with nowrap and an ellipsis (1280 hides the line
+entirely, which is why the minimum viewport never showed it). The status now wraps
+naturally with no cap, so the header grows a second line instead of dropping information.
+
+Measured across all 16 tabs: **1280×720@1 — none; 1280×720@2 — none; 3840×2160@1 —
+none; 1920×1080@1 — SHIP 1 → 0**, with the only remaining findings being three intentional
+FLEET ellipses (the secondary drone stats line and two tooltip-backed escort
+descriptions). `tiny 0`, `hscroll 0` and zero page/console errors at every size. Suite
+`Ran 1312 OK`; `ui_inventory.py` 1255 lines; gate 5/5. Screenshots:
+`ship-desktop-check/desktop-ship.png` vs `ship-status-after/desktop-ship.png`; vision
+review quoted `CORVETTE SCOUT // 3/6 STAFFED` on its own line with no header collision.

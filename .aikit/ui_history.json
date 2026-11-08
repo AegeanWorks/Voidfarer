@@ -946,5 +946,19 @@
     "final_snapshot_digest": "684e8e9ae2834b7fc07f55e666f1afb1b1cbdb2fc8158ab9d2ec4c21a4762104",
     "final_snapshot_entries": 1255,
     "surface_digest": "24700accd7aa134bdcfaaa6ee829e40c38c2de49321ff78f4840a0b596527f66"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "4aceb39e750f5a00af8932187cfe9624996471a3",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794160164.74192,
+    "finished_at": 1794160512.9466927,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (main multimodal agent; SHIP interior status wraps, full CORVETTE SCOUT // 3/6 STAFFED at 1920, 1280/4K sweeps clean)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "684e8e9ae2834b7fc07f55e666f1afb1b1cbdb2fc8158ab9d2ec4c21a4762104",
+    "final_snapshot_entries": 1255,
+    "surface_digest": "db34ce3870ed795a2808882b2ac852af0650e887f3fb809e6844ffc06c4f2e2c"
   }
 ]

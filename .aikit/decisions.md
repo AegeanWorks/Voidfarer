@@ -2329,3 +2329,12 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add the always-on `#escortShopGrid` to the existing docked procurement override, so escort names and descriptions wrap at whole words like the mercenary, commission and outpost rows.
   3. Add `TestFleetDockedLegibility` for both contracts.
 - **Consequences**: The tab sweep reports **nine clipped text nodes -> zero** across all 16 tabs, with `tiny 0`, `hscroll 0` and zero errors. FLEET grows 831 -> 877px because the drone identity, stats and action row stack, but every line is readable and both actions remain visible; the >1599px layout keeps its existing grid. Full suite `Ran 1311 OK`; `ui_inventory.py` 1255 lines; no save-schema or DOM change. Vision review confirmed the full drone name/status/stats and the wrapped escort names/descriptions, with no new clipping.
+
+### ADR-213: SHIP interior status wraps instead of hiding the staffing count
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: At 1920x1080 and 3840x2160 the SHIP interior header rendered `CORVETTE SCOUT //...`, hiding the `3/6 STAFFED` count. `.ship-interior-status` capped at `max-width: 12em` with `nowrap`, `overflow: hidden` and an ellipsis; the 1280x720 media query hides the status entirely, which is why the minimum viewport never showed it.
+- **Decision**:
+  1. Let `.ship-interior-status` wrap naturally (`white-space: normal; overflow: visible`) and remove the `12em` cap and the ellipsis, so the header grows a second line instead of dropping information.
+  2. Add `TestShipInteriorStatusLegibility` pinning the wrap and rejecting the cap.
+- **Consequences**: At 1920x1080 the header now shows `CORVETTE SCOUT // 3/6 STAFFED` on its own line under the title, right-aligned, with no overlap against `SHOW ROOMS`. The wide-viewport sweep clears the SHIP finding: 1280x720@1, 1280x720@2 and 3840x2160@1 report zero tiny/clipped/hscroll defects; 1920x1080 retains only three intentional FLEET ellipses (the secondary drone stats line and two tooltip-backed escort descriptions). Full suite `Ran 1312 OK`; `ui_inventory.py` 1255 lines; no save-schema or DOM change. Vision review quoted the restored status and confirmed no header collision.

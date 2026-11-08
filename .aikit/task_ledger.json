@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-fleet-drone-legibility",
+    "task_id": "voidfarer-ship-status-legibility",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794159694.371488,
+    "updated_at": 1794160732.7561595,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794159707.334832
+    "completed_at": 1794160748.2924526
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-skills-condense",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "SKILLS verified: 2471->481px, six TRAIN rows and headline cards fit, training rank/points update; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794150099.8783524,
-      "timestamp_str": "2026-11-08 18:01:39",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-206 and skills proof",
-        "evidence": "ui-review/skills-final-tabs/*, skills-play/01..04, play-report.json, click-map 178/39/0/0"
-      }
-    },
-    {
-      "task_id": "voidfarer-skills-condense",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-skills-condense' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794150100.4962585,
-      "timestamp_str": "2026-11-08 18:01:40",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-crew-condense",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: keep CREW cash flow and officer headlines visible, disclose the full roster and recruitment roles",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794151650.898288,
-      "timestamp_str": "2026-11-08 18:27:30",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "CREW is 1319px: two 200px officer cards plus a 600px recruitment catalog, with names squeezed into one-word columns and only the first DRILL action reachable without scrolling.",
-        "benefits": "Cash flow, officer count and one-line role/skill/station headlines fit the docked view; the detailed roster, shore leave and recruitment roles stay one click away and become readable.",
-        "risks": "contract: CREW left-tab UI; dependency: none; concurrency: none; state: disclosure DOM only, no save change; regression: DRILL, station assignment, shore leave, recruit and away-team views must stay reachable.",
-        "mitigation": "Static condensation test, real-browser roster/roles reveals plus a crew drill, before/after measurement, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "d450503187e3451c1b54772487036add1301d5893a826569e4aaf7a73b98a4e6"
-    },
     {
       "task_id": "voidfarer-crew-condense",
       "phase": "phase 4",
@@ -275,6 +231,45 @@
       "status": "completed",
       "timestamp": 1794159707.3348331,
       "timestamp_str": "2026-11-08 20:41:47",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-ship-status-legibility",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: let the SHIP interior status wrap instead of truncating at a 12em cap",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794160066.2050257,
+      "timestamp_str": "2026-11-08 20:47:46",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "At 1920x1080 and 4K the SHIP interior header shows `CORVETTE SCOUT //...`, hiding the 3/6 staffing count because `.ship-interior-status` caps at 12em with nowrap and ellipsis; the 16-tab sweep flags it at both wide viewports.",
+        "benefits": "The ship class and staffing line stays fully readable at every supported viewport and the 1920/4K sweep reports zero clipped text.",
+        "risks": "contract: SHIP interior header at >1599px; dependency: none; concurrency: none; state: CSS only; regression: the header must not overlap the SHIP ROOMS button or the panel edge, and the <=1599px hidden state stays unchanged.",
+        "mitigation": "Allow natural wrapping with no max-width, capture SHIP at 1920/4K, rerun the wide sweeps, add a CSS contract test, and run full gates."
+      },
+      "plan_digest": "1c796eab4addd31f352caa3fd9788c567ee260ee68deb5eb893a3dc0a1e076bd"
+    },
+    {
+      "task_id": "voidfarer-ship-status-legibility",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "SHIP status verified: wraps full CORVETTE SCOUT // 3/6 STAFFED at 1920/4K; viewport sweeps clear except three intentional FLEET ellipses; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794160732.7561595,
+      "timestamp_str": "2026-11-08 20:58:52",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-ship-status-legibility",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-ship-status-legibility' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794160748.2924552,
+      "timestamp_str": "2026-11-08 20:59:08",
       "agent": "opencode:campaign"
     }
   ]
