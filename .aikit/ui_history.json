@@ -1097,5 +1097,19 @@
     "final_snapshot_digest": "00602a867ecbec191e94b15a86eee76f7fd43f4471fe90b2c84ecf841e6ee322",
     "final_snapshot_entries": 1239,
     "surface_digest": "4841247068a07ac7dbe4a7632fa2b31b3359a29d392cad317c9cbf506d31c67b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "ef891a2293c631d6397bc198604d7e37fd25cdbb",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794176053.740072,
+    "finished_at": 1794176297.3731987,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (no visual change; logistics backend re-baseline)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "ab24f6c078c479cb0f6bfcc0ea59f65ca514245375c0d7a6a6bf75188f0e0a21",
+    "final_snapshot_entries": 1241,
+    "surface_digest": "7fee2468a0ce76f09d37fcb93efd1a7533a0d14574e54391b6b541a422b8a7ea"
   }
 ]
