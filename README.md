@@ -81,6 +81,7 @@ voidfarer/
 │   ├── galaxy.py         <- procedural star system & hyperlane generator
 │   ├── demographics.py   <- world capacity, tech limits & logistic population
 │   ├── engine.py         <- deterministic state machine & coordinator
+│   ├── encounters.py     <- one normalized view/resolver for blocking encounters
 │   ├── state_machines.py <- canonical implicit machine registry & inspector
 │   ├── reactor.py        <- reactor modes, heat, cooling & derating
 │   ├── mapmods.py        <- procedural sector map modifiers
@@ -392,16 +393,13 @@ dossiers behind SHOW.
 
 ### 14d. Implicit State-Machine Contract
 
-`voidfarer/state_machines.py` names 28 machines;
-`GET /api/state-machines` serves the registry plus the current state, and `/api/state`
-carries a compact `state_machines` situation.
+`state_machines.py` names 28 machines; `GET /api/state-machines` and
+`voidfarer state-machines [--json]` expose them. `/api/encounter` and the `encounter`
+command unify the four blocking encounters.
 
 ```bash
-python -m voidfarer.cli state-machines
 python -m voidfarer.cli state-machines --json
 ```
-
-`/api/encounter` and the `encounter` command unify the four blocking encounters.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash

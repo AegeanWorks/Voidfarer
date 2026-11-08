@@ -1370,7 +1370,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `673` lines (`33505` bytes)
+**Size**: `673` lines (`33509` bytes)
 
 **Classes:**
 - `class FrontierContentTest`
