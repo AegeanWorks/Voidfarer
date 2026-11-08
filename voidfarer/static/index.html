@@ -364,7 +364,7 @@
                     <button class="deck-tab-btn" id="tabBtnCrew" data-advanced="true">CREW <span class="tab-badge" id="crewBadge" style="display: none;">0</span></button>
                     <button class="deck-tab-btn" id="tabBtnShip">SHIP <span class="tab-badge" id="shipBadge" style="display: none;">!</span></button>
                     <button class="deck-tab-btn" id="tabBtnMarket">COMMERCE <span class="tab-badge" id="marketBadge" style="display: none;">0</span></button>
-                    <button class="deck-tab-btn" id="tabBtnArsenal" data-advanced="true">ARSENAL <span class="tab-badge" id="arsenalBadge" style="display: none;">0</span></button>
+                    <button class="deck-tab-btn" id="tabBtnArsenal" data-advanced="true">REFIT <span class="tab-badge" id="arsenalBadge" style="display: none;">0</span></button>
                     <button class="deck-tab-btn" id="tabBtnFleet">FLEET <span class="tab-badge" id="fleetBadge" style="display: none;">0</span></button>
                     <button class="deck-tab-btn" id="tabBtnContracts">CONTRACTS <span class="tab-badge" id="contractsBadge" style="display: none;">0</span></button>
                     <button class="deck-tab-btn" id="tabBtnEmpire" data-advanced="true">EMPIRE <span class="tab-badge" id="empireBadge" style="display: none;">0</span></button>
@@ -507,8 +507,8 @@
                     <!-- Tab 2: Station Arsenal & Modular Upgrades -->
                     <div class="arsenal-panel tab-content" id="tabContentArsenal" style="display: none;">
                         <div class="panel-header">
-                            <div class="panel-tag"><span class="badge-dot dot-amber"></span> ARSENAL</div>
-                            <h2 class="panel-title">STATION HARDWARE UPGRADES</h2>
+                            <div class="panel-tag"><span class="badge-dot dot-amber"></span> REFIT</div>
+                            <h2 class="panel-title">SHIP FITTING</h2>
                             <span class="fleet-optional-count" id="arsenalUpgradeCount">--</span>
                         </div>
                         <button class="fleet-disclosure-toggle" id="btnToggleArsenalUpgrades" data-label="UPGRADES" aria-expanded="false" aria-controls="arsenalUpgradeDetails" title="Show or hide station hardware upgrades">SHOW UPGRADES</button>
@@ -548,6 +548,17 @@
                                     <!-- Populated dynamically -->
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="arsenal-sub-section">
+                            <div class="fleet-optional-header">
+                                <div>
+                                    <div class="panel-tag"><span class="badge-dot dot-green"></span> REFIT BAY</div>
+                                    <h3 class="subpanel-title">STRUCTURAL MODULES</h3>
+                                </div>
+                            </div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleShipCatalog" data-label="MODULES" aria-expanded="false" aria-controls="shipModulesGrid" title="Show or hide the structural module catalog">SHOW MODULES</button>
+                            <div class="ship-modules-grid" id="shipModulesGrid" hidden></div>
                         </div>
                     </div>
 
@@ -822,14 +833,6 @@
                                 <button class="btn-fabricate" id="btnFabricateFuel" title="Synthesize an emergency quantum fuel pack from 1x titanium alloy (+25 Fuel)">⚡ FABRICATE FUEL PACK (1x Ti)</button>
                             </div>
                         </div>
-                        <div class="ship-catalog-header">
-                            <span>MODULE CATALOG</span>
-                            <div class="ship-catalog-actions">
-                                <small>// REFIT BAY</small>
-                            </div>
-                        </div>
-                        <button class="ship-disclosure-toggle" id="btnToggleShipCatalog" data-label="MODULES" aria-expanded="false" aria-controls="shipModulesGrid" title="Show or hide the structural module catalog">SHOW MODULES</button>
-                        <div class="ship-modules-grid" id="shipModulesGrid" hidden></div>
                     </div>
 
                     <!-- Tab: Empire (Research, Outposts, Diplomacy) -->

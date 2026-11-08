@@ -1055,5 +1055,19 @@
     "final_snapshot_digest": "ade3950df4063932a5635408becf294682d225774a6c4b536aafa14c0442b4c8",
     "final_snapshot_entries": 1237,
     "surface_digest": "5f2ad7fbb50cfaafa2bf863c2e374ced320df90ef38dfd445eca171d5245ca50"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "b1f3996e0f356d51b00c8cffbe92bd74d7baefe6",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794171197.426674,
+    "finished_at": 1794171716.187004,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (main multimodal agent; REFIT tab hosts upgrades, chassis, ordnance and structural modules; SHIP keeps rooms/stats)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "2c1e2fd94bf1f34df25c59c16660488bc9b7782ceee6ced23411f447f5f635d4",
+    "final_snapshot_entries": 1238,
+    "surface_digest": "e9a5d7c52cba46e23af0ab3d91751393744c30f7f0432188c147464ff2fb50e8"
   }
 ]

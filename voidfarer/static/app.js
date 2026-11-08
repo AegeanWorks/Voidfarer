@@ -3563,6 +3563,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.weaponsCount.textContent = `${weaponsList.length} WEAPONS`;
             }
         }
+        this.renderShipModules();
     }
 
     formatEffectLabel(key, value) {
@@ -3872,6 +3873,45 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         scroller.scrollTo({ top: Math.max(0, top), behavior: "auto" });
     }
 
+    renderShipModules() {
+        if (!this.shipModulesGrid || !this.state) return;
+        const ship = this.state.ship || {};
+        const report = this.state.ship_mods || {};
+        const labels = report.slot_labels || {};
+        const installed = report.installed || {};
+        const catalog = report.catalog || [];
+        const docked = !!(this.state.orbiting_body && this.state.orbiting_body.station_dockable);
+        const credits = ship.credits || 0;
+        this.shipModulesGrid.innerHTML = catalog.length ? catalog.map(mod => {
+            const isInstalled = installed[mod.slot] === mod.id;
+            const slotBusy = Boolean(installed[mod.slot]) && installed[mod.slot] !== mod.id;
+            const disabled = !docked || (!isInstalled && (slotBusy || credits < mod.cost));
+            const effects = Object.entries(mod.effects || {})
+                .map(([key, value]) => `<span class="ship-module-stat">${this.escapeHtml(this.formatEffectLabel(key, value))}</span>`)
+                .join("");
+            return `
+                <div class="ship-module-row ${isInstalled ? "installed" : ""}" data-module="${this.escapeHtml(mod.id)}">
+                    <span class="ship-module-glyph">${isInstalled ? "◆" : "◇"}</span>
+                    <div class="ship-module-info">
+                        <strong>${this.escapeHtml(mod.name)}</strong>
+                        <small>${this.escapeHtml(labels[mod.slot] || mod.slot)} // ${this.escapeHtml(mod.description)}</small>
+                    </div>
+                    <div class="ship-module-effects">
+                        ${effects}
+                        <span class="ship-module-cost">${isInstalled ? "INSTALLED" : (slotBusy ? "SLOT BUSY" : `${mod.cost} CR`)}</span>
+                    </div>
+                    <button class="btn-hud ${isInstalled ? "btn-amber" : "btn-cyan"}" data-action="${isInstalled ? "uninstall" : "install"}" ${disabled ? "disabled" : ""}>${isInstalled ? "REMOVE" : "INSTALL"}</button>
+                </div>
+            `;
+        }).join("") : `<p class="panel-intro-text">No structural refits are available.</p>`;
+        this.shipModulesGrid.querySelectorAll("[data-module]").forEach(card => {
+            const button = card.querySelector("[data-action]");
+            if (button) {
+                button.addEventListener("click", () => this.handleModuleAction(card.dataset.module, button.dataset.action));
+            }
+        });
+    }
+
     renderShip() {
         if (!this.state || !this.shipVisual) return;
         const ship = this.state.ship || {};
@@ -3882,7 +3922,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const installed = report.installed || {};
         const catalog = report.catalog || [];
         const docked = !!(this.state.orbiting_body && this.state.orbiting_body.station_dockable);
-        const credits = ship.credits || 0;
 
         const shipClass = String(ship.ship_class || "Corvette Scout");
         const silhouettes = {
@@ -3938,36 +3977,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.shipVisual.appendChild(slotDiv);
         });
 
-        if (this.shipModulesGrid) {
-            this.shipModulesGrid.innerHTML = catalog.length ? catalog.map(mod => {
-                const isInstalled = installed[mod.slot] === mod.id;
-                const slotBusy = Boolean(installed[mod.slot]) && installed[mod.slot] !== mod.id;
-                const disabled = !docked || (!isInstalled && (slotBusy || credits < mod.cost));
-                const effects = Object.entries(mod.effects || {})
-                    .map(([key, value]) => `<span class="ship-module-stat">${this.escapeHtml(this.formatEffectLabel(key, value))}</span>`)
-                    .join("");
-                return `
-                    <div class="ship-module-row ${isInstalled ? "installed" : ""}" data-module="${this.escapeHtml(mod.id)}">
-                        <span class="ship-module-glyph">${isInstalled ? "◆" : "◇"}</span>
-                        <div class="ship-module-info">
-                            <strong>${this.escapeHtml(mod.name)}</strong>
-                            <small>${this.escapeHtml(labels[mod.slot] || mod.slot)} // ${this.escapeHtml(mod.description)}</small>
-                        </div>
-                        <div class="ship-module-effects">
-                            ${effects}
-                            <span class="ship-module-cost">${isInstalled ? "INSTALLED" : (slotBusy ? "SLOT BUSY" : `${mod.cost} CR`)}</span>
-                        </div>
-                        <button class="btn-hud ${isInstalled ? "btn-amber" : "btn-cyan"}" data-action="${isInstalled ? "uninstall" : "install"}" ${disabled ? "disabled" : ""}>${isInstalled ? "REMOVE" : "INSTALL"}</button>
-                    </div>
-                `;
-            }).join("") : `<p class="panel-intro-text">No structural refits are available.</p>`;
-            this.shipModulesGrid.querySelectorAll("[data-module]").forEach(card => {
-                const button = card.querySelector("[data-action]");
-                if (button) {
-                    button.addEventListener("click", () => this.handleModuleAction(card.dataset.module, button.dataset.action));
-                }
-            });
-        }
+        this.renderShipModules();
 
         if (this.shipStatsPanel) {
             const cargo = (this.state.inventory_manifest || []).reduce(
