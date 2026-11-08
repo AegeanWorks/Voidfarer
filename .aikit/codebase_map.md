@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `355`
+- **Total Classes**: `356`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1994`
-- **Total Source Lines**: `50492`
+- **Total Class Methods**: `2000`
+- **Total Source Lines**: `50544`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2093` lines (`92267` bytes)
+**Size**: `2145` lines (`94755` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -603,6 +603,13 @@
 - `class TestShipDisclosures` - *The dense SHIP tab defaults to collapsed rooms and module catalog.*
   - Method `.setUpClass()`
   - Method `.test_rooms_and_catalog_use_named_disclosures()`
+- `class TestLeftPanelUniformity` - *Every left tab shares one header height and one section rhythm.*
+  - Method `.setUpClass()`
+  - Method `.test_every_tab_header_is_one_compact_block()`
+  - Method `.test_section_headings_share_one_style()`
+  - Method `.test_narrow_lists_stack_instead_of_squeezing()`
+  - Method `.test_story_title_drops_the_duplicated_act_prefix()`
+  - Method `.test_factions_title_and_intros_are_compacted()`
 - `class TestFleetDisclosures` - *The dense FLEET tab defaults to collapsed contracts and procurement.*
   - Method `.setUpClass()`
   - Method `.test_contracts_and_commission_use_named_disclosures()`

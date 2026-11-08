@@ -1744,6 +1744,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (tabName === "ai") this.renderAICaptains();
         if (tabName === "depot") this.renderDepots();
         if (tabName === "messages") this.renderMessages();
+        // A one-line header may ellipsize a long dynamic name; keep the full
+        // title available on hover after the tab's renderer has finished.
+        const activeTitle = tabContents[tabName]?.querySelector(
+            ":scope > .panel-header > .panel-title"
+        );
+        if (activeTitle) activeTitle.title = activeTitle.textContent.trim();
     }
 
     setPowerSliders(e, sh, se, w) {
@@ -2515,6 +2521,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (orbBody && orbBody.station_dockable) {
                 this.noMarketMsg.style.display = "none";
                 this.marketTitle.textContent = `${orbBody.name.toUpperCase()} EXCHANGE`;
+                this.marketTitle.title = this.marketTitle.textContent;
                 this.marketArch.textContent = orbBody.market_archetype.toUpperCase();
                 if (this.quantumFreightShell) this.quantumFreightShell.style.display = "";
                 this.renderMarketTable();
@@ -2696,13 +2703,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.storyChapterTitle.textContent = ending
                 ? `CAMPAIGN CONCLUDED: ${ending.title.toUpperCase()}`
                 : "CAMPAIGN CONCLUDED: THE PRECURSOR CIPHER";
+            this.storyChapterTitle.title = this.storyChapterTitle.textContent;
             this.storyTargetBadge.textContent = "★ ALL ACTS RESOLVED";
             this.storySynopsisText.textContent = ending
                 ? ending.epilogue
                 : "The mysteries of the ancient Precursor network have been unveiled. Your legacy echoes across the hyperlane corridors as First VoidFarer of the New Age.";
             this.storyChoiceContainer.style.display = "none";
         } else if (curChap) {
-            this.storyChapterTitle.textContent = `ACT ${story.active_act}: ${curChap.title.toUpperCase()}`;
+            // The chapter title already carries its act numeral ("Act I: ...").
+            this.storyChapterTitle.textContent = curChap.title.toUpperCase();
+            this.storyChapterTitle.title = this.storyChapterTitle.textContent;
             const targetText = curChap.completed
                 ? "ACT OBJECTIVE COMPLETE"
                 : (curChap.target_system_id ? `TARGET: ${curChap.target_system_id.toUpperCase()}` : "TARGET: DEEP SPACE");

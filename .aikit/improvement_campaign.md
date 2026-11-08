@@ -671,3 +671,24 @@ frames/410ms, zero errors; no element crosses the panel edge (stack 295/295). Cl
 `02-mercenaries-open.png`, `03-commission-open.png`, `04-zero-drones.png`; vision review
 quoted the sections, readable rows, single cost and the zero-drone contracts, with no
 horizontal break.
+
+### Sixth pass — left-terminal uniformity
+
+Measured all 16 left tabs at 1280x720. Headers ranged **46–136px**: 17px titles wrapped to
+two lines, FLEET's action fell to a third row, and COMMERCE's dynamic exchange name could
+make the header 128px. DEPOT squeezed item names into one word per line, EMPIRE research
+names into ~80px beside cost/actions, and STORY clipped `PRECURSOR WATCH`.
+
+Now every tab starts with the same **56px header** (tag/action row plus a one-line 13.5px
+title), one 12px gold section heading, and narrow list rows that stack instead of squeezing.
+DEPOT holds show full names with buttons below; EMPIRE research shows the full name and a
+two-line description with cost/START/QUEUE underneath; the three story alignment chips are
+full-width rows; the skills banner is compact; main intros are a complete two-line block.
+The story title drops the duplicated `ACT 1: ACT I:` prefix.
+
+Measured: headers `[56 x 16]`, spread 0; titles one line 16/16, fit 16/16. Content heights:
+SHIP 932→917, COMMERCE 1,004→932, FLEET 957→831, DEPOT 359→299, CONTRACTS 654→578,
+SKILLS 2,575→2,453. Play: 23 frames/412ms, zero errors, no clipped intro. Click-map
+163/47/0/0; `ui_inventory.py` 1176 lines; suite `Ran 1273 OK`; gate 5/5. Screenshots:
+`left-tabs-before/*.png` vs `left-tabs-after/*.png`; vision review quoted the uniform
+headers, readable DEPOT/EMPIRE/STORY rows and complete intros.

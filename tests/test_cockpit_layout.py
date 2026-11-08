@@ -1468,6 +1468,58 @@ class TestShipDisclosures(unittest.TestCase):
         self.assertIn(".ship-room-details[hidden], .ship-modules-grid[hidden]", self.css)
 
 
+class TestLeftPanelUniformity(unittest.TestCase):
+    """Every left tab shares one header height and one section rhythm."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_every_tab_header_is_one_compact_block(self):
+        headers = re.findall(r"\.tab-content > \.panel-header \{([^}]*)\}", self.css, re.S)
+        self.assertTrue(any("min-height: 56px" in body for body in headers))
+        self.assertTrue(any("flex-wrap: wrap" in body for body in headers))
+        titles = re.findall(
+            r"\.tab-content > \.panel-header > \.panel-title \{([^}]*)\}", self.css, re.S
+        )
+        self.assertTrue(any(
+            "font-size: 13.5px" in body and "text-overflow: ellipsis" in body
+            for body in titles
+        ))
+        self.assertIn("white-space: nowrap", self.css.split("#tabContentCrew .panel-title", 1)[1])
+
+    def test_section_headings_share_one_style(self):
+        rule = re.search(
+            r"\.tab-content \.subpanel-title,\s*"
+            r"\.tab-content \.commission-title,\s*"
+            r"\.tab-content \.research-queue-header \{([^}]*)\}",
+            self.css,
+            re.S,
+        )
+        self.assertIsNotNone(rule, "missing shared left-panel section heading rule")
+        body = rule.group(1)
+        self.assertIn("font-size: 12px", body)
+        self.assertIn("color: var(--console-gold)", body)
+        self.assertIn("text-transform: uppercase", body)
+
+    def test_narrow_lists_stack_instead_of_squeezing(self):
+        self.assertIn("#depotList .depot-card", self.css)
+        self.assertIn('"cost start queue"', self.css)
+        self.assertIn(".factions-meter-bar { grid-template-columns: minmax(0, 1fr); gap: 4px; }", self.css)
+
+    def test_story_title_drops_the_duplicated_act_prefix(self):
+        self.assertIn("this.storyChapterTitle.textContent = curChap.title.toUpperCase();", self.js)
+        self.assertNotIn("ACT ${story.active_act}: ${curChap.title.toUpperCase()}", self.js)
+        self.assertIn("activeTitle.title = activeTitle.textContent.trim();", self.js)
+
+    def test_factions_title_and_intros_are_compacted(self):
+        self.assertIn("FACTIONS & CORPORATIONS", self.html)
+        self.assertNotIn("GALACTIC FACTIONS & CORPORATIONS", self.html)
+        self.assertEqual(self.html.count('class="panel-intro-text" title='), 3)
+
+
 class TestFleetDisclosures(unittest.TestCase):
     """The dense FLEET tab defaults to collapsed contracts and procurement."""
 

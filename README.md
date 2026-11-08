@@ -385,11 +385,14 @@ rail, 0 missing, 0 duplicates). The left console starts with five core systems a
 `MORE SYSTEMS` disclosure; expanding it restores all sixteen tabs. The PLAYER card points
 at the bottom command strip for abilities instead of repeating its six USE buttons, the
 SHIP tab collapses `ROOMS & CREW STATIONS` and the `MODULE CATALOG` behind SHOW/HIDE
-disclosures (initial SHIP content 2,390px -> 932px), COMMERCE collapses the auto-trade
+disclosures (initial SHIP content 2,390px -> 917px), COMMERCE collapses the auto-trade
 broker and quantum freight below the market table (initial COMMERCE content 2,076px ->
-1,004px), and FLEET collapses mercenary contracts and fleet procurement behind SHOW/HIDE
-controls (initial FLEET content 1,271px -> 957px). Mercenary contracts stay available even
-when the player owns no drones.
+932px), and FLEET collapses mercenary contracts and fleet procurement behind SHOW/HIDE
+controls (initial FLEET content 1,271px -> 831px). Mercenary contracts stay available even
+when the player owns no drones. Every left tab now shares one 56px header (tag plus an
+optional action on the first row, a single-line title below), one section-heading style,
+and narrow list rows that stack instead of squeezing (DEPOT holds, EMPIRE research,
+story alignment).
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -574,7 +577,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,268-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,273-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

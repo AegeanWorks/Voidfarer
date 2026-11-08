@@ -9801,3 +9801,132 @@ body.cockpit-theme .nav-panel > .panel-header {
     width: 100%;
     height: 42px;
 }
+
+/* =====================================================================
+   LEFT TERMINAL UNIFORMITY
+   Every tab starts with the same compact header: tag + optional action on
+   the first row, a single-line title on the second. Section headings and
+   narrow list rows share one rhythm so tabs stop reading as different
+   sizes at the 290px docked drawer.
+   ===================================================================== */
+.tab-content > .panel-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    gap: 2px 8px;
+    min-height: 56px;
+    padding: 7px 8px;
+}
+.tab-content > .panel-header > .panel-tag {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tab-content > .panel-header > .panel-title {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tab-content > .panel-header > :not(.panel-tag):not(.panel-title) {
+    order: 2;
+    flex: 0 0 auto;
+}
+.tab-content > .panel-header > button,
+.tab-content > .panel-header > .badge-arch {
+    min-height: 22px;
+    padding: 1px 7px;
+    font-size: 11px;
+    line-height: 1.2;
+}
+#tabContentCrew .panel-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: normal;
+}
+
+.tab-content .subpanel-title,
+.tab-content .commission-title,
+.tab-content .research-queue-header {
+    margin: 2px 0 4px;
+    color: var(--console-gold);
+    font-family: var(--console-ui);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.tab-content .fleet-optional-header .commission-title { margin: 0; }
+.tab-content > .panel-intro-text {
+    display: block;
+    max-height: calc(2 * 1.45em + 9px);
+    padding-bottom: 0;
+    margin-bottom: 9px;
+    overflow: hidden;
+}
+
+@media (max-width: 1599px) {
+    /* Skills summary stays a compact strip instead of a second content block. */
+    .skills-points-banner { padding: 8px 10px; gap: 8px; }
+    .skills-points { min-width: 76px; padding: 4px 8px; }
+    .skills-points strong { font-size: 20px; }
+    .skills-desc { font-size: 12px; line-height: 1.35; }
+
+    /* Depot rows: name on its own line, actions below instead of a squeezed column. */
+    #depotList .depot-card {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto auto;
+        gap: 3px;
+        padding: 9px 10px;
+    }
+    #depotList .depot-card h4 { grid-column: 1; grid-row: 1; }
+    #depotList .depot-card > div:not(.depot-actions) { grid-column: 1; grid-row: 2; }
+    #depotList .depot-actions {
+        grid-column: 1;
+        grid-row: 3;
+        justify-self: start;
+        margin-top: 4px;
+    }
+    #depotList .depot-actions .btn-hud { width: auto; }
+
+    /* Research rows: name/description full width, cost and actions beneath. */
+    .research-projects .research-row {
+        grid-template-columns: minmax(0, 1fr) 54px auto;
+        grid-template-areas:
+            "name name name"
+            "cost start queue";
+        row-gap: 4px;
+    }
+    .research-projects .research-row > span:first-child { grid-area: name; }
+    .research-projects .research-row > span:nth-child(2) { grid-area: cost; text-align: left; }
+    .research-projects .research-row > button[data-research] { grid-area: start; }
+    .research-projects .research-row > button[data-research-queue] { grid-area: queue; }
+    .research-projects .research-row > button[data-research-cancel] { grid-area: start; }
+
+    /* The three story alignment chips read as one compact list, not three
+       squeezed columns with clipped names. */
+    .factions-meter-bar { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .factions-meter-bar .faction-chip {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 8px;
+    }
+    .factions-meter-bar .faction-name {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
