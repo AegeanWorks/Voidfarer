@@ -953,3 +953,26 @@ frames/413ms, zero errors. Suite `Ran 1306 OK`; click-map 183/39/0/0; `ui_invent
 `ai-play/01-ai-default.png`, `02-dossiers-open.png`, `03-after-hail.png`; vision review
 confirmed the count/headline deck, the readable five-card reveal, the live trust update,
 and no new clipping or overlap.
+
+### Nineteenth pass — MESSAGES becomes an inbox count plus message headlines
+
+MESSAGES was 842px: three cards of 168–406px each rendered the full body and branch
+choices at once, so the 473px viewport showed only the first message and the other
+senders/choices sat below the fold. The tab now opens with an `INBOX` head and live count
+(`3 MESSAGES · 3 UNREAD`), one two-line headline per message (subject, then sender · tick ·
+status), and `SHOW MESSAGE ARCHIVE (3)`. Full bodies, `MARK READ` and branch choices live
+behind the disclosure; unread rows carry the amber accent and the label/`aria-expanded`
+track the live count.
+
+Measured with the same harness, save and 1280×720 viewport: MESSAGES **842 → 321px**,
+fitting the 473px viewport with all three headlines and the toggle; all other 15 tabs
+unchanged. Archive open 1,089px with three cards, three choice buttons and three `MARK
+READ` controls. Real play: choosing `Decode the signal` resolved the Precursor tree
+message (read + `RESOLVED`), appended the `Decryption complete` follow-up (4 messages, 3
+unread), logged `Branch chosen: Decode the signal...`, kept the archive open, and the
+badge tracked live unread; 25 frames/402ms, zero errors. Suite `Ran 1308 OK`; click-map
+184/39/0/0; `ui_inventory.py` 1255 lines; gate 5/5. Screenshots:
+`messages-unified-before/messages.png` vs `messages-unified-after/messages.png`,
+`messages-play/01-messages-default.png`, `02-archive-open.png`, `03-after-choice.png`;
+vision review confirmed the inbox deck, the readable archive reveal, the live
+resolved/unread update, and no new clipping or overlap.

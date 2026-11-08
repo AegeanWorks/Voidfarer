@@ -685,7 +685,15 @@
                             <div class="panel-tag"><span class="badge-dot dot-cyan"></span> QUANTUM RELAY</div>
                             <h2 class="panel-title">INTERGALACTIC MESSAGES</h2>
                         </div>
-                        <div class="message-list" id="messageList"></div>
+                        <div class="messages-summary-head">
+                            <h4>INBOX</h4>
+                            <span class="messages-summary-count" id="messagesCount">--</span>
+                        </div>
+                        <div class="messages-summary" id="messagesSummary"></div>
+                        <button class="fleet-disclosure-toggle" id="btnToggleMessages" data-label="MESSAGE ARCHIVE" aria-expanded="false" aria-controls="messagesDetails" title="Show or hide full message bodies and choices">SHOW MESSAGE ARCHIVE</button>
+                        <div id="messagesDetails" hidden>
+                            <div class="message-list" id="messageList"></div>
+                        </div>
                     </div>
 
                     <!-- Tab: Player Character Sheet -->

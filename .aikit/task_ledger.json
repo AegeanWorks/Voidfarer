@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-ai-condense",
+    "task_id": "voidfarer-messages-condense",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794156998.1154716,
+    "updated_at": 1794157959.8843763,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794157281.2831116
+    "completed_at": 1794157968.2396922
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-target-dossier",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Target dossier verified: every collapsed state fits 246px with zero offscreen actions, details reveal 11 stats, MORE ACTIONS reveals scoop; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794140289.893181,
-      "timestamp_str": "2026-11-08 15:18:09",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-203 and target dossier proof",
-        "evidence": "ui-review/target-before/01,03, target-after/01,03,03b,04,08b, target-play/play-report.json, click-map 173/39/0/0"
-      }
-    },
-    {
-      "task_id": "voidfarer-target-dossier",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-target-dossier' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794140292.4919589,
-      "timestamp_str": "2026-11-08 15:18:12",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-surface-ops",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: lead surface operations with a site strip and one selected RUN card, with map and catalog disclosed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794144320.6595712,
-      "timestamp_str": "2026-11-08 16:25:20",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The landed surface panel renders a 205px map plus nine 46-51px rows (714px) inside the 246px target card, so the map fills the whole viewport and no operation name, reward or RUN button is visible without scrolling.",
-        "benefits": "The default surface view shows all nine sites as compact chips and the selected operation with risk, rewards and RUN above the fold; the map and full nine-row catalog stay one click away.",
-        "risks": "contract: surface operations UI; dependency: none; concurrency: none; state: disclosure flags and selected-site UI only, no save change; regression: map selection, direct RUN rows, used-state marking and the full catalog must stay reachable.",
-        "mitigation": "Static condensation test, real-browser play covering selection, map/list reveals, a successful operation and the worked state, before/after measurement, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "bc07d741039d76eafc8976b811adc4f443b4ef0560399ca69c048147ee5d0b38"
-    },
     {
       "task_id": "voidfarer-surface-ops",
       "phase": "phase 4",
@@ -290,6 +246,45 @@
       "status": "completed",
       "timestamp": 1794157281.2831144,
       "timestamp_str": "2026-11-08 20:01:21",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-messages-condense",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: lead QUANTUM RELAY with an inbox count and one headline per message, disclose the full message archive",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794157409.0006342,
+      "timestamp_str": "2026-11-08 20:03:29",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "MESSAGES is 842px: three cards (168-406px) render full bodies and choice buttons at once, so only the first message fits the 473px viewport and the other senders, bodies and branch choices sit below the fold.",
+        "benefits": "The default view shows 3 MESSAGES / 3 UNREAD and one headline per message with sender, tick and status; every body, MARK READ and branch choice stays one click away behind SHOW MESSAGE ARCHIVE (3).",
+        "risks": "contract: MESSAGES right-tab UI; dependency: none; concurrency: render stays synchronous; state: disclosure DOM only, no save change; regression: MARK READ, choice buttons, resolved/unread states and the empty inbox must stay reachable and functional.",
+        "mitigation": "Static condensation test, same-harness before/after measurement, real-browser archive reveal and a real read/choice action, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "4584d038e7f995c0f6f34fa79030cd4b3973d7f1869a5ac76572b57764871ac2"
+    },
+    {
+      "task_id": "voidfarer-messages-condense",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "MESSAGES verified: 842->321px, inbox counts and three headlines fit, archive reveals 3 cards/3 choices, live branch resolves and appends follow-up; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794157959.8843763,
+      "timestamp_str": "2026-11-08 20:12:39",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-messages-condense",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-messages-condense' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794157968.2396936,
+      "timestamp_str": "2026-11-08 20:12:48",
       "agent": "opencode:campaign"
     }
   ]

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `368`
+- **Total Classes**: `369`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2045`
-- **Total Source Lines**: `51068`
+- **Total Class Methods**: `2048`
+- **Total Source Lines**: `51100`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2619` lines (`117084` bytes)
+**Size**: `2651` lines (`118511` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -618,6 +618,10 @@
 - `class TestAICaptainsCondensation` - *AI CAPTAINS keeps the count strip and headline rows before full dossiers.*
   - Method `.setUpClass()`
   - Method `.test_headlines_and_counts_precede_hidden_dossiers()`
+  - Method `.test_count_and_headline_rows_are_rendered()`
+- `class TestMessagesCondensation` - *MESSAGES keeps the inbox counts and headline rows before the archive.*
+  - Method `.setUpClass()`
+  - Method `.test_headlines_and_counts_precede_hidden_archive()`
   - Method `.test_count_and_headline_rows_are_rendered()`
 - `class TestCrewCondensation` - *CREW keeps cash flow and officer headlines before full rosters.*
   - Method `.setUpClass()`

@@ -1585,6 +1585,38 @@ class TestAICaptainsCondensation(unittest.TestCase):
         self.assertIn(".ai-summary-row", self.css)
 
 
+class TestMessagesCondensation(unittest.TestCase):
+    """MESSAGES keeps the inbox counts and headline rows before the archive."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_headlines_and_counts_precede_hidden_archive(self):
+        self.assertIn('id="messagesSummary"', self.html)
+        self.assertIn('id="messagesCount"', self.html)
+        self.assertIn('id="btnToggleMessages"', self.html)
+        self.assertIn('data-label="MESSAGE ARCHIVE"', self.html)
+        self.assertLess(
+            self.html.index('id="messagesSummary"'),
+            self.html.index('id="messagesDetails"'),
+        )
+        self.assertIn('id="messagesDetails" hidden', self.html)
+        self.assertIn("#messagesDetails[hidden]", self.css)
+
+    def test_count_and_headline_rows_are_rendered(self):
+        self.assertIn("this.messagesSummary.innerHTML", self.js)
+        self.assertIn("this.messagesCount.textContent", self.js)
+        self.assertIn("syncMessagesDisclosureLabel", self.js)
+        self.assertIn("MESSAGE ARCHIVE", self.js)
+        self.assertIn("messages-summary-row", self.js)
+        self.assertIn("RESOLVED", self.js)
+        self.assertIn(".messages-summary-row", self.css)
+        self.assertIn(".messages-summary-row.unread", self.css)
+
+
 class TestCrewCondensation(unittest.TestCase):
     """CREW keeps cash flow and officer headlines before full rosters."""
 

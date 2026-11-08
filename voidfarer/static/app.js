@@ -857,6 +857,10 @@ class CockpitApp {
         this.depotSummary = document.getElementById("depotSummary");
         this.depotList = document.getElementById("depotList");
         this.messageList = document.getElementById("messageList");
+        this.messagesCount = document.getElementById("messagesCount");
+        this.messagesSummary = document.getElementById("messagesSummary");
+        this.btnToggleMessages = document.getElementById("btnToggleMessages");
+        this.messagesDetails = document.getElementById("messagesDetails");
         this.factionsGrid = document.getElementById("factionsGrid");
         this.corpsGrid = document.getElementById("corpsGrid");
         this.btnToggleFactionDossiers = document.getElementById("btnToggleFactionDossiers");
@@ -1479,6 +1483,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleActiveQuests, this.activeQuestsDetails],
             [this.btnToggleCompletedQuests, this.completedQuestsDetails],
             [this.btnToggleAI, this.aiDetails],
+            [this.btnToggleMessages, this.messagesDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -9163,9 +9168,32 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         await this.postAction(`/api/depot/${action}`, { item_id: itemId, quantity: quantity }, "depot");
     }
 
+    syncMessagesDisclosureLabel(count) {
+        const button = this.btnToggleMessages;
+        if (!button || !this.messagesDetails) return;
+        button.dataset.label = `MESSAGE ARCHIVE (${count})`;
+        button.textContent = `${this.messagesDetails.hidden ? "SHOW" : "HIDE"} MESSAGE ARCHIVE (${count})`;
+        button.setAttribute("aria-expanded", String(!this.messagesDetails.hidden));
+        button.style.display = count > 0 ? "" : "none";
+    }
+
     renderMessages() {
         if (!this.state || !this.messageList) return;
         const messages = this.state.messages || [];
+        const unread = messages.filter(m => !m.read).length;
+        if (this.messagesCount) {
+            this.messagesCount.textContent = `${messages.length} MESSAGES · ${unread} UNREAD`;
+        }
+        if (this.messagesSummary) {
+            this.messagesSummary.innerHTML = messages.length ? messages.slice().reverse().map(m => {
+                const status = m.resolved_choice ? "RESOLVED" : (m.read ? "READ" : "UNREAD");
+                return `<div class="messages-summary-row ${m.read ? "" : "unread"}">
+                    <strong>${this.escapeHtml(m.subject)}</strong>
+                    <span>${this.escapeHtml(m.sender)} · TICK ${m.tick} · ${status}</span>
+                </div>`;
+            }).join("") : `<p class="panel-intro-text">Inbox is empty.</p>`;
+        }
+        this.syncMessagesDisclosureLabel(messages.length);
         this.messageList.innerHTML = messages.slice().reverse().map(m => {
             const choices = (m.choices || []).map(choice => `
                 <button class="message-choice-btn" data-msg-choice="${this.escapeHtml(choice.id)}" data-msg-id="${this.escapeHtml(m.id)}"
@@ -9194,7 +9222,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 choice_id: btn.getAttribute("data-msg-choice"),
             }, "messages"));
         });
-        const unread = messages.filter(m => !m.read).length;
         if (this.messagesBadge) {
             this.messagesBadge.textContent = String(unread);
             this.messagesBadge.style.display = unread > 0 ? "inline-block" : "none";
