@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from voidfarer.megastructures import MEGASTRUCTURE_RESTORATION
 from voidfarer.models import GameState
 from voidfarer.reactor import CRITICAL_HEAT, MIN_MODE_HEAT
 
@@ -518,6 +519,64 @@ MACHINES: tuple[Machine, ...] = (
         ),
         evidence=("voidfarer/models.py:2265", "voidfarer/engine.py:2826"),
     ),
+    Machine(
+        id="quantum_freight",
+        title="Quantum freight order",
+        owner="ship.trade_orders",
+        states=("idle", "in_transit"),
+        initial="idle",
+        terminal=(),
+        transitions=(
+            Transition("place", "idle", "in_transit", guard="docked; cargo and fee paid"),
+            Transition("deliver", "in_transit", "idle", guard="tick >= arrival_tick",
+                       effect="sale revenue and destination stock"),
+            Transition("lost", "in_transit", "idle", guard="destination no longer valid"),
+        ),
+        evidence=("voidfarer/models.py:1691", "voidfarer/engine.py:5325"),
+    ),
+    Machine(
+        id="ai_captain",
+        title="AI captain relationship",
+        owner="GameState.ai_captains",
+        states=("neutral", "hired", "allied"),
+        initial="neutral",
+        terminal=(),
+        transitions=(
+            Transition("hail", "neutral", "neutral", effect="trust +2, standing +1"),
+            Transition("trade", "neutral", "neutral", effect="trust +1"),
+            Transition("hire", "neutral", "hired", guard="credits >= 2500"),
+            Transition("ally", "neutral", "allied", guard="trust >= 50"),
+        ),
+        evidence=("voidfarer/models.py:349", "voidfarer/engine.py:8183"),
+        note="Ally and hired are independent flags; the inspector reports hired first.",
+    ),
+    Machine(
+        id="megastructure",
+        title="Megastructure restoration",
+        owner="CelestialBody.restoration_complete",
+        states=("dormant", "restored"),
+        initial="dormant",
+        terminal=("restored",),
+        transitions=(
+            Transition("restore", "dormant", "restored",
+                       guard="orbit the structure and pay the restoration cost"),
+        ),
+        evidence=("voidfarer/models.py:71", "voidfarer/megastructures.py:9",
+                  "voidfarer/engine.py:965"),
+    ),
+    Machine(
+        id="event",
+        title="Popup event",
+        owner="GameState.events",
+        states=("visible", "dismissed"),
+        initial="visible",
+        terminal=("dismissed",),
+        transitions=(
+            Transition("emit", "dismissed", "visible", effect="new GameEvent"),
+            Transition("dismiss", "visible", "dismissed"),
+        ),
+        evidence=("voidfarer/models.py:1255", "voidfarer/engine.py:10301"),
+    ),
 )
 
 
@@ -855,6 +914,62 @@ def _codex_state(state: GameState) -> dict[str, Any]:
     )
 
 
+def _quantum_freight_state(state: GameState) -> dict[str, Any]:
+    orders = state.ship.trade_orders
+    if not orders:
+        return _entry("quantum_freight", "idle", orders=0)
+    return _entry(
+        "quantum_freight",
+        "in_transit",
+        orders=len(orders),
+        next_arrival_tick=min(order.arrival_tick for order in orders),
+        commodities=sorted({order.commodity_id for order in orders}),
+    )
+
+
+def _ai_captain_state(state: GameState) -> dict[str, Any]:
+    captains = state.ai_captains
+    if not captains:
+        return _entry("ai_captain", "neutral", total=0)
+    if any(captain.hired for captain in captains):
+        current = "hired"
+    elif any(captain.ally for captain in captains):
+        current = "allied"
+    else:
+        current = "neutral"
+    return _entry(
+        "ai_captain",
+        current,
+        total=len(captains),
+        hired=sum(1 for captain in captains if captain.hired),
+        allied=sum(1 for captain in captains if captain.ally),
+        hostile=sum(1 for captain in captains if captain.standing < 0),
+    )
+
+
+def _megastructure_state(state: GameState) -> dict[str, Any]:
+    restored = 0
+    available = 0
+    for system in state.systems.values():
+        for body in system.bodies:
+            if body.body_type not in MEGASTRUCTURE_RESTORATION:
+                continue
+            available += 1
+            if body.restoration_complete:
+                restored += 1
+    return _entry(
+        "megastructure",
+        "restored" if restored else "dormant",
+        restored=restored,
+        available=available,
+    )
+
+
+def _event_state(state: GameState) -> dict[str, Any]:
+    visible = sum(1 for event in state.events if not event.dismissed)
+    return _entry("event", "visible" if visible else "dismissed", visible=visible)
+
+
 def _save_state(state: GameState) -> dict[str, Any]:
     return _entry(
         "save",
@@ -910,6 +1025,10 @@ def inspect_state(state: GameState) -> dict[str, Any]:
         "automation": _automation_state(state),
         "diplomacy": _diplomacy_state(state),
         "codex": _codex_state(state),
+        "quantum_freight": _quantum_freight_state(state),
+        "ai_captain": _ai_captain_state(state),
+        "megastructure": _megastructure_state(state),
+        "event": _event_state(state),
         "save": _save_state(state),
     }
 

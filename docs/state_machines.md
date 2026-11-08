@@ -47,6 +47,10 @@ owner field is often the state (for example, `active_combat` being set means "en
 | 22 | `automation` | trade/quantum automation | off, armed, cooldown | — | models.py:1727, models.py:1757 |
 | 23 | `diplomacy` | `wars` + pacts | peace, war, ended | — | models.py:1549, engine.py:7968 |
 | 24 | `codex` | `GameState.codex` | unclaimed, claimed | — | models.py:2265, engine.py:2826 |
+| 25 | `quantum_freight` | `ship.trade_orders` | idle, in_transit | — | models.py:1691, engine.py:5325 |
+| 26 | `ai_captain` | `GameState.ai_captains` | neutral, hired, allied | — | models.py:349, engine.py:8183 |
+| 27 | `megastructure` | `body.restoration_complete` | dormant, restored | — | models.py:71, megastructures.py:9 |
+| 28 | `event` | `GameState.events` | visible, dismissed | — | models.py:1255, engine.py:10301 |
 
 ### Cross-machine precedence
 
@@ -170,8 +174,8 @@ so combat maneuvers remain available during an engagement.
 
 ## Verification
 
-- `python -m unittest tests.test_state_machines -v` → **21 tests, OK**.
-- `python -m unittest discover` → **1333 tests, OK** (see the delivery commit).
+- `python -m unittest tests.test_state_machines -v` → **22 tests, OK**.
+- `python -m unittest discover` → **1334 tests, OK** (see the delivery commit).
 - `python aikit.py check voidfarer` → **5/5** gates.
 - Live gate probe before the fix: combat/anomaly `orbit` and `travel` returned `True`;
   after the fix the same calls return `False` with the machine-specific message.

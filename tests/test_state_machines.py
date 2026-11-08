@@ -14,6 +14,7 @@ from pathlib import Path
 from voidfarer import cli
 from voidfarer.engine import SimulationEngine
 from voidfarer.models import (
+    AICaptain,
     AnomalyChoice,
     AnomalyEncounter,
     CombatEncounter,
@@ -21,9 +22,11 @@ from voidfarer.models import (
     CustomsEncounter,
     DecisionChoice,
     DecisionEvent,
+    GameEvent,
     PirateEncounter,
     ReactorState,
     ResearchState,
+    TradeOrder,
     TravelState,
     VoidTraversalState,
 )
@@ -267,6 +270,38 @@ class TestInspector(unittest.TestCase):
             research=ResearchState(queue=("advanced_cooling",))
         )
         self.assertEqual(inspect_state(engine.state)["research"]["state"], "queued")
+
+    def test_secondary_lifecycles_are_inspected(self):
+        engine = _engine()
+        order = TradeOrder(
+            id="order_1",
+            commodity_id="titanium",
+            quantity=4,
+            origin_system_id="sol",
+            destination_system_id="altair",
+            destination_body_id="altair_body_1",
+            destination_name="Altair Station",
+            fee_paid=50,
+            created_tick=0,
+            arrival_tick=5,
+            unit_price_at_launch=90,
+        )
+        captain = AICaptain(
+            id="captain_1", name="Vega", archetype="trader",
+            system_id="sol", credits=1000, hired=True,
+        )
+        event = GameEvent(id="event_1", kind="hazard", title="Warning", message="")
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(trade_orders=(order,)),
+            ai_captains=(captain,),
+            events=(event,),
+        )
+        state = inspect_state(engine.state)
+        self.assertEqual(state["quantum_freight"]["state"], "in_transit")
+        self.assertEqual(state["quantum_freight"]["detail"]["next_arrival_tick"], 5)
+        self.assertEqual(state["ai_captain"]["state"], "hired")
+        self.assertEqual(state["event"]["state"], "visible")
+        self.assertIn(state["megastructure"]["state"], ("dormant", "restored"))
 
     def test_snapshot_carries_the_situation(self):
         snapshot = _engine().get_status_snapshot(include_static=False)

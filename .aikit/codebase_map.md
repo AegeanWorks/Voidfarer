@@ -8,9 +8,9 @@
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `129`
 - **Total Classes**: `379`
-- **Total Top-Level Functions**: `386`
-- **Total Class Methods**: `2082`
-- **Total Source Lines**: `52648`
+- **Total Top-Level Functions**: `390`
+- **Total Class Methods**: `2083`
+- **Total Source Lines**: `52802`
 
 ---
 
@@ -2264,7 +2264,7 @@
 ### [`tests/test_state_machines.py`](tests/test_state_machines.py)
 > *Canonical state-machine registry, inspector, gate and surface tests.*
 
-**Size**: `405` lines (`16104` bytes)
+**Size**: `440` lines (`17478` bytes)
 
 **Classes:**
 - `class TestRegistryContract`
@@ -2280,6 +2280,7 @@
   - Method `.test_travel_and_void_states()`
   - Method `.test_reactor_thresholds()`
   - Method `.test_research_states()`
+  - Method `.test_secondary_lifecycles_are_inspected()`
   - Method `.test_snapshot_carries_the_situation()`
 - `class TestActionGate` - *The engine's flight gate covers every blocking machine.*
   - Method `._assert_locked(result, needle)`
@@ -3963,7 +3964,7 @@
 ### [`voidfarer/state_machines.py`](voidfarer/state_machines.py)
 > *Canonical contract for VoidFarer's implicit state machines.*
 
-**Size**: `992` lines (`39588` bytes)
+**Size**: `1111` lines (`44024` bytes)
 
 **Classes:**
 - `class Transition` - *One named edge in a state machine.*
@@ -3991,6 +3992,10 @@
 - `def _automation_state(state)`
 - `def _diplomacy_state(state)`
 - `def _codex_state(state)`
+- `def _quantum_freight_state(state)`
+- `def _ai_captain_state(state)`
+- `def _megastructure_state(state)`
+- `def _event_state(state)`
 - `def _save_state(state)`
 - `def inspect_state(state)` - *Return the current state of every machine that can be derived from GameState.*
 - `def _active(states, flag)`
