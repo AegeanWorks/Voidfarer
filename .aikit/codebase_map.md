@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `131`
-- **Total Classes**: `382`
-- **Total Top-Level Functions**: `404`
-- **Total Class Methods**: `2102`
-- **Total Source Lines**: `53409`
+- **Total Python Modules**: `133`
+- **Total Classes**: `385`
+- **Total Top-Level Functions**: `415`
+- **Total Class Methods**: `2118`
+- **Total Source Lines**: `53971`
 
 ---
 
@@ -1236,6 +1236,37 @@
   - Method `.test_ship_state_faction_standings_migration()`
   - Method `.test_tactical_combat_shield_and_actions()`
   - Method `.test_combat_victory_faction_standing_shift()`
+
+---
+
+### [`tests/test_fitting.py`](tests/test_fitting.py)
+> *Unified ship-fitting report, install/remove, REST and CLI tests.*
+
+**Size**: `209` lines (`8740` bytes)
+
+**Classes:**
+- `class TestFittingReport`
+  - Method `.test_report_covers_all_four_categories()`
+  - Method `.test_summary_is_compact_and_counts_are_named()`
+  - Method `.test_snapshot_carries_fitting_counts()`
+- `class TestFittingOperations`
+  - Method `.test_install_and_remove_upgrade()`
+  - Method `.test_install_and_remove_structural_module()`
+  - Method `.test_install_weapon_sets_primary()`
+  - Method `.test_buy_chassis_changes_ship_class()`
+  - Method `.test_invalid_requests_are_rejected()`
+- `class TestFittingSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_the_report()`
+  - Method `.test_install_endpoint_uses_the_facade()`
+  - Method `.test_cli_status_category_and_install()`
+
+**Functions:**
+- `def _engine()`
 
 ---
 
@@ -2849,7 +2880,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `790` lines (`34861` bytes)
+**Size**: `792` lines (`35047` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2966,7 +2997,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3693` lines (`186036` bytes)
+**Size**: `3767` lines (`189430` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2979,6 +3010,7 @@
 - `def cmd_market(engine)` - *Display commodity prices and supply/demand at the current orbital body.*
 - `def cmd_economy(engine)` - *Display galactic macroeconomic conditions, active events, and lucrative trade routes.*
 - `def cmd_inventory(engine, storage, parts)` - *Display and manage ship cargo manifest, usable consumables, and hold capacity.*
+- `def cmd_fitting(engine, storage, parts)` - *One ship-fitting surface: upgrades, structural modules, weapons and hulls.*
 - `def cmd_shipyard(engine, storage, parts)` - *Orbital shipyard: inspect ship chassis upgrades, purchase vessels, and sell modules.*
 - `def cmd_fleet(engine, storage, parts)` - *Manage autonomous fleet drones, mining escorts, and harvest yields.*
 - `def cmd_quests(engine)`
@@ -3175,7 +3207,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10423` lines (`514554` bytes)
+**Size**: `10425` lines (`514656` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3508,6 +3540,24 @@
 - `def calculate_faction_market_modifier(faction_id, standing)` - *Calculate purchase price multiplier based on faction standing.*
 - `def get_faction_id_from_name(name)` - *Resolve faction name to normalized faction ID.*
 - `def get_faction_service_perks(faction_id, standing)` - *Return concrete service modifiers for the current standing tier and faction.*
+
+---
+
+### [`voidfarer/fitting.py`](voidfarer/fitting.py)
+> *One fitting surface for every ship hardware catalog.*
+
+**Size**: `244` lines (`7918` bytes)
+
+**Functions:**
+- `def _service_dock(state)`
+- `def _upgrades(state)`
+- `def _modules(state)`
+- `def _weapons(state)`
+- `def _chassis(state)`
+- `def fitting_report(state)` - *Return every fitting catalog with installed/available/affordability state.*
+- `def fitting_summary(state)` - *Compact payload for /api/state: counts plus the fitted ship identity.*
+- `def install(engine, category, item_id)` - *Install or purchase one item through its existing engine method.*
+- `def remove(engine, category, target)` - *Remove/sell one fitted item where the engine supports it.*
 
 ---
 
@@ -3955,7 +4005,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1593` lines (`68632` bytes)
+**Size**: `1624` lines (`69752` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

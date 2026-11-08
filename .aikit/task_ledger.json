@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-encounter-merge",
+    "task_id": "voidfarer-fitting-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794165980.5918682,
+    "updated_at": 1794170639.3751948,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794169160.8652267
+    "completed_at": 1794170797.6977322
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-messages-condense",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "MESSAGES verified: 842->321px, inbox counts and three headlines fit, archive reveals 3 cards/3 choices, live branch resolves and appends follow-up; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794157959.8843763,
-      "timestamp_str": "2026-11-08 20:12:39",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-messages-condense",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-messages-condense' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794157968.2396936,
-      "timestamp_str": "2026-11-08 20:12:48",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-header-badge-legibility",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: raise terminal header badges to the 12px readability floor without changing header layout",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794158243.473414,
-      "timestamp_str": "2026-11-08 20:17:23",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The shared rule `.tab-content > .panel-header > .badge-arch` sets 11px, so story TARGET: SOL, market HIGH_TECH and codex progress badges render below the 12px floor; the story capture reports tiny 1 while every other control is at least 12px.",
-        "benefits": "Every terminal header badge meets the 12px floor, the story tab reports tiny 0, and the tag/title/badge rows keep their 56px header with no wrapping or overlap.",
-        "risks": "contract: shared header badge styling across tabs; dependency: none; concurrency: none; state: none, CSS only; regression: long headers (codex progress badge) must not overflow or wrap at 291px.",
-        "mitigation": "Static CSS contract test, before/after browser captures for story/market/codex at 1280x720, tiny-count check, vision review and full gates."
-      },
-      "plan_digest": "330a0090d9334d77c7eb7ef0b658fbe6198c06acc7d59ba0837a5787270faf8a"
-    },
     {
       "task_id": "voidfarer-header-badge-legibility",
       "phase": "phase 4",
@@ -265,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794169160.865229,
       "timestamp_str": "2026-11-08 23:19:20",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fitting-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: merge upgrades, structural modules, weapons and hulls behind one fitting report, installer, REST pair and CLI command",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794170612.4541037,
+      "timestamp_str": "2026-11-08 23:43:32",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "Four ship-hardware catalogs use four CLI verbs, four route families and two cockpit tabs for one player question; costs, slot rules and availability are learned four times.",
+        "benefits": "One fitting report with installed/available rows, costs, slot occupancy and affordability; one install/remove entry point; one REST pair; one CLI verb; legacy commands/routes unchanged.",
+        "risks": "contract: REST/CLI/snapshot and the fitting report; dependency: upgrades/shipmods/weapons catalogs; concurrency: report reads state, install delegates to lock-protected engine methods; state: no save change; regression: every legacy fitting command and route must keep working.",
+        "mitigation": "11 facade tests, full suite, gate, and a cockpit module move with its own UI task."
+      },
+      "plan_digest": "7c0088908453260a0c96e8cfe2ab0aa4f1d517a6b0d6ff4de6f9842a4aadf76a"
+    },
+    {
+      "task_id": "voidfarer-fitting-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Fitting facade verified: report/summary, four install paths, upgrade/module removal, REST+CLI, 11 tests, 1359 suite, gate 5/5; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794170639.3751948,
+      "timestamp_str": "2026-11-08 23:43:59",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fitting-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-fitting-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794170797.6977344,
+      "timestamp_str": "2026-11-08 23:46:37",
       "agent": "opencode:campaign"
     }
   ]

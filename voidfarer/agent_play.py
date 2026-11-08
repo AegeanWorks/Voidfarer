@@ -33,6 +33,8 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/relics/fuse": "needs three relics of one rarity",
     "/api/decision/resolve": "prompt-driven: a blocking decision must be pending",
     "/api/encounter/resolve": "alias: routes to the prompt-driven decision/pirate/customs/anomaly resolvers",
+    "/api/fitting/install": "alias: routes to the existing upgrade/module/weapon/chassis installers",
+    "/api/fitting/remove": "alias: routes to the existing upgrade/module removals",
     "/api/reconstruct": "needs a devastated inhabited world in orbit",
     "/api/void/dive": "needs a black-hole horizon",
     "/api/void/emerge": "needs an active void traversal",

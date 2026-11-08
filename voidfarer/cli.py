@@ -25,6 +25,12 @@ from voidfarer.encounters import (
     active_encounter,
     resolve as resolve_encounter,
 )
+from voidfarer.fitting import (
+    FITTING_CATEGORIES,
+    fitting_report,
+    install as install_fitting,
+    remove as remove_fitting,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -598,6 +604,64 @@ def cmd_inventory(engine: SimulationEngine, storage: StorageManager, parts: list
 
     print(f"{RED}Unknown inventory command '{sub}'. Options: list, buy <id> [qty], use <id>, jettison <id> [qty].{RESET}")
     return 1
+
+
+def cmd_fitting(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One ship-fitting surface: upgrades, structural modules, weapons and hulls."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    report = fitting_report(engine.state)
+
+    if action in FITTING_CATEGORIES:
+        category = report["categories"][action]
+        print(f"\n{BOLD}{CYAN}{category['label'].upper()}{RESET}")
+        installed = category.get("installed", [])
+        print(
+            f"  Installed: {len(installed)}"
+            + (f" — {', '.join(row['name'] for row in installed)}" if installed else "")
+        )
+        for row in category.get("available", []):
+            cost = row.get("cost", 0)
+            suffix = "" if row.get("affordable", True) else f" {RED}(need {cost} cr){RESET}"
+            slot = f" [{row.get('slot_label') or row.get('slot', '')}]" if row.get("slot") else ""
+            print(f"  {CYAN}{row['id']:<26}{RESET} {row['name']} — {cost} cr{slot}{suffix}")
+        print(f"{DIM}Install: fitting install {action} <id>{RESET}")
+        return 0
+
+    if action in ("install", "remove"):
+        if len(args) < 3:
+            print(f"{RED}Usage:{RESET} fitting {action} <category> <item-or-slot>")
+            return 1
+        category, item = args[1].lower(), args[2]
+        if category not in FITTING_CATEGORIES:
+            print(f"{RED}Unknown fitting category '{category}'.{RESET}")
+            return 1
+        resolver = install_fitting if action == "install" else remove_fitting
+        ok, msg = resolver(engine, category, item)
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+
+    if action not in ("status", "list", "show"):
+        print(f"{RED}Unknown fitting action '{action}'. Use status, a category, install, or remove.{RESET}")
+        return 1
+
+    print(f"\n{BOLD}{CYAN}SHIP FITTING{RESET} — {report['ship_class']}")
+    print(
+        f"  Service drydock: {'YES' if report['service_dock'] else 'NO'} | "
+        f"Credits: {report['credits']} cr"
+    )
+    for name, category in report["categories"].items():
+        installed = category.get("installed", [])
+        names = ", ".join(row["name"] for row in installed) or "none"
+        print(
+            f"  {BOLD}{name.upper():<9}{RESET} "
+            f"{category.get('installed_count', 0)} installed / "
+            f"{category.get('available_count', 0)} available — {DIM}{names}{RESET}"
+        )
+    print(f"{DIM}Inspect: fitting <upgrades|modules|weapons|chassis> | Install: fitting install <category> <id>{RESET}")
+    return 0
 
 
 def cmd_shipyard(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -3318,6 +3382,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     refit_p.add_argument("target", nargs="?", help="Modification ID or slot (module action for 'module')")
     refit_p.add_argument("extra", nargs="?", help="Module ID for 'refit module <install|remove>'")
 
+    fitting_p = subparsers.add_parser(
+        "fitting",
+        help="One ship-fitting surface: upgrades, structural modules, weapons and hulls",
+    )
+    fitting_p.add_argument("action", nargs="?", default="status", help="status, a category, install, or remove")
+    fitting_p.add_argument("category", nargs="?", help="category for install/remove")
+    fitting_p.add_argument("item", nargs="?", help="item id or slot")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help="Captain's log: career statistics, milestones, and flight record")
     codex_p = subparsers.add_parser("codex", help="Discovery codex progress and achievement rewards")
@@ -3431,6 +3503,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_reactor(engine, storage, parts)
     elif args.command == "mapmods":
         return cmd_mapmods(engine)
+    elif args.command == "fitting":
+        return cmd_fitting(engine, storage, ["fitting", args.action, args.category, args.item])
     elif args.command == "refit":
         parts = ["refit", args.action]
         if args.target:

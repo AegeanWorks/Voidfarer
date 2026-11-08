@@ -328,6 +328,7 @@ from voidfarer.story import (
     resolve_story_ending,
 )
 from voidfarer.encounters import encounter_report
+from voidfarer.fitting import fitting_summary
 from voidfarer.state_machines import situation as state_machine_situation
 from voidfarer.upgrades import (
     CATALOG_CHASSIS,
@@ -7958,6 +7959,7 @@ class SimulationEngine:
                 "story_status": self.story_status(),
                 "state_machines": state_machine_situation(self.state),
                 "encounter": encounter_report(self.state),
+                "fitting": fitting_summary(self.state),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),

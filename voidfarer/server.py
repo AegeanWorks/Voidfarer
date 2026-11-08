@@ -19,6 +19,11 @@ from voidfarer.agent_api import build_action_catalog
 from voidfarer.economy import get_galactic_trade_routes
 from voidfarer.encounters import encounter_report, resolve as resolve_encounter
 from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
+from voidfarer.fitting import (
+    fitting_report,
+    install as install_fitting,
+    remove as remove_fitting,
+)
 from voidfarer.frontier import MERCENARY_CATALOG
 from voidfarer.inventory import get_inventory_manifest
 from voidfarer.mapmods import MAP_MODIFIER_CATALOG, aggregate_map_modifiers, system_modifier_summary
@@ -201,6 +206,12 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         if path == "/api/encounter":
             with self.engine.lock:
                 report = encounter_report(self.engine.state)
+            self._send_json({"ok": True, **report})
+            return
+
+        if path == "/api/fitting":
+            with self.engine.lock:
+                report = fitting_report(self.engine.state)
             self._send_json({"ok": True, **report})
             return
 
@@ -716,6 +727,26 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             kind = str(raw_kind) if raw_kind else None
             action = str((body or {}).get("action", ""))
             ok, msg = resolve_encounter(self.engine, kind, action)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/fitting/install":
+            ok, msg = install_fitting(
+                self.engine,
+                str((body or {}).get("category", "")),
+                str((body or {}).get("item_id", "")),
+            )
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/fitting/remove":
+            ok, msg = remove_fitting(
+                self.engine,
+                str((body or {}).get("category", "")),
+                str((body or {}).get("target", "")),
+            )
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

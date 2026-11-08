@@ -2361,3 +2361,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   3. Add the normalized `encounter` object to `/api/state` and the `encounter [status|resolve|kind action]` CLI command, always allowed while blocked. Legacy `anomaly`, `pirate`, `customs` and `decision` commands remain as compatibility paths.
   4. Collapse the anomaly, pirate and customs cockpit cards into one card in the follow-up UI commit; the decision modal stays modal.
 - **Consequences**: An agent or client can read one payload and resolve any blocking encounter through one route; the player sees one encounter card instead of three. The four legacy resolvers and routes keep working, so existing saves, CLI scripts and tests are unaffected. `tests/test_encounters.py` adds 14 tests for payload priority, costs/disabled actions, resolution parity, the REST pair (including the blocked allowlist) and the CLI. Browser play (`ui-review/play_encounter_card.py`) loaded the one card for pirate (3 actions), customs (4) and anomaly (1), hid it for the decision modal, and resolved each by clicking PAY/BRIBE/HARVEST/Help (credits 500 -> 350 and 500 -> 380, no old cards in the DOM), 25 frames/413ms, zero console/page/HTTP errors. No save-schema change.
+
+### ADR-216: Ship hardware becomes one fitting surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Ship hardware lived in four catalogs with four CLI verbs (`upgrades`, `refit`, `weapons`, `shipyard`), four route families and two cockpit tabs. They all answer "what can I bolt onto this ship?", so learning the game required four separate surfaces and four sets of cost/availability rules.
+- **Decision**:
+  1. Add `voidfarer/fitting.py`: `fitting_report()` normalizes upgrades, structural modules, weapons and chassis with installed/available rows, costs, slot occupancy, affordability and service-dock state. `install()`/`remove()` route to the existing engine methods so effects, costs, logs and saves remain identical.
+  2. Add `GET /api/fitting`, `POST /api/fitting/install` and `POST /api/fitting/remove`; add a compact `fitting` summary to `/api/state`; add the `fitting [status|category|install|remove]` CLI command. Legacy commands and routes remain.
+  3. Move the structural module catalog from the SHIP tab into the ARSENAL tab in the follow-up UI commit, so all hardware lives in one cockpit surface.
+- **Consequences**: An agent can read one fitting report and install any hardware category through one pair of routes; the CLI has one preferred fitting verb. `tests/test_fitting.py` adds 11 tests for the report, summary, all four install paths, upgrade/module removal, invalid requests, REST and CLI. No save-schema change.
