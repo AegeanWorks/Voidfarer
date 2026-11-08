@@ -391,52 +391,27 @@
 
                         <!-- Station Services -->
                         <div class="station-services-bar" id="stationServicesBar">
-                            <button class="btn-service" id="btnDrydockRepair">
+                            <button class="btn-service" id="btnDrydockRepair" title="Repair hull +25">
                                 <span class="icon">✚</span>
                                 <div class="service-meta">
-                                    <span>REPAIR HULL (+25)</span>
+                                    <span>REPAIR</span>
                                     <small id="repairCostLabel">100 CR</small>
                                 </div>
                             </button>
-                            <button class="btn-service" id="btnRefuelTanks">
+                            <button class="btn-service" id="btnRefuelTanks" title="Refuel +20">
                                 <span class="icon">◆</span>
                                 <div class="service-meta">
-                                    <span>REFUEL (+20)</span>
+                                    <span>REFUEL</span>
                                     <small id="refuelCostLabel">120 CR</small>
                                 </div>
                             </button>
-                            <button class="btn-service" id="btnDrydockOverhaul">
+                            <button class="btn-service" id="btnDrydockOverhaul" title="Overhaul the frame to remove wear">
                                 <span class="icon">⚙</span>
                                 <div class="service-meta">
-                                    <span>OVERHAUL FRAME</span>
+                                    <span>OVERHAUL</span>
                                     <small id="overhaulCostLabel">0.0% WEAR</small>
                                 </div>
                             </button>
-                        </div>
-
-                        <!-- Automated docked broker -->
-                        <div class="trade-automation" id="tradeAutomationPanel">
-                            <div class="auto-trade-header">
-                                <span>AUTO-TRADE BROKER</span>
-                                <strong id="autoTradeStatus">OFF</strong>
-                            </div>
-                            <div class="auto-trade-grid">
-                                <label>COMMODITY
-                                    <select id="autoTradeCommodity"></select>
-                                </label>
-                                <label>BUY ≤
-                                    <input type="number" id="autoTradeBuy" min="0" step="1" placeholder="--">
-                                </label>
-                                <label>SELL ≥
-                                    <input type="number" id="autoTradeSell" min="0" step="1" placeholder="--">
-                                </label>
-                                <label>QTY
-                                    <input type="number" id="autoTradeQty" min="1" max="100" step="1" value="1">
-                                </label>
-                                <button class="btn-hud btn-green" id="btnAutoTradeEnable">ENABLE</button>
-                                <button class="btn-hud" id="btnAutoTradeDisable">DISABLE</button>
-                            </div>
-                            <p class="auto-trade-note" id="autoTradeNote">Dock at a station to configure the broker.</p>
                         </div>
 
                         <!-- Cargo Hold Meter -->
@@ -449,8 +424,6 @@
                                 <div class="cargo-meter-fill" id="cargoMeterFill" style="width: 37.5%;"></div>
                             </div>
                         </div>
-
-                        <div class="quantum-freight" id="quantumFreight" aria-live="polite"></div>
 
                         <!-- Order lot: every BUY/SELL in the table uses it; Shift+click is always MAX -->
                         <div class="market-lot-bar" id="marketLotBar" role="group" aria-label="Order lot size">
@@ -487,6 +460,41 @@
                                 <tbody id="marketTableBody"></tbody>
                             </table>
                         </div>
+
+                        <!-- Automated docked broker -->
+                        <div class="trade-automation" id="tradeAutomationPanel">
+                            <div class="auto-trade-header">
+                                <span>AUTO-TRADE BROKER</span>
+                                <strong id="autoTradeStatus">OFF</strong>
+                            </div>
+                            <button class="trade-disclosure-toggle" id="btnToggleAutoTrade" data-label="AUTO-TRADE" aria-expanded="false" aria-controls="autoTradeDetails" title="Show or hide the docked auto-trade broker">SHOW AUTO-TRADE</button>
+                            <div id="autoTradeDetails" hidden>
+                                <div class="auto-trade-grid">
+                                    <label>COMMODITY
+                                        <select id="autoTradeCommodity"></select>
+                                    </label>
+                                    <label>BUY ≤
+                                        <input type="number" id="autoTradeBuy" min="0" step="1" placeholder="--">
+                                    </label>
+                                    <label>SELL ≥
+                                        <input type="number" id="autoTradeSell" min="0" step="1" placeholder="--">
+                                    </label>
+                                    <label>QTY
+                                        <input type="number" id="autoTradeQty" min="1" max="100" step="1" value="1">
+                                    </label>
+                                    <button class="btn-hud btn-green" id="btnAutoTradeEnable">ENABLE</button>
+                                    <button class="btn-hud" id="btnAutoTradeDisable">DISABLE</button>
+                                </div>
+                                <p class="auto-trade-note" id="autoTradeNote">Dock at a station to configure the broker.</p>
+                            </div>
+                        </div>
+
+                        <section class="quantum-freight-shell" id="quantumFreightShell">
+                            <button class="trade-disclosure-toggle" id="btnToggleQuantumFreight" data-label="QUANTUM FREIGHT" aria-expanded="false" aria-controls="quantumFreightDetails" title="Show or hide quantum freight lanes">SHOW QUANTUM FREIGHT</button>
+                            <div id="quantumFreightDetails" hidden>
+                                <div class="quantum-freight" id="quantumFreight" aria-live="polite"></div>
+                            </div>
+                        </section>
 
                         <div class="no-market-message" id="noMarketMsg" style="display: none;">
                             <span class="big-icon">◉</span>

@@ -1464,7 +1464,37 @@ class TestShipDisclosures(unittest.TestCase):
         self.assertIn('id="shipModulesGrid" hidden', self.html)
         self.assertIn("is-collapsed", self.html)
         self.assertIn("toggleShipDisclosure", self.js)
+        self.assertIn("applyDisclosure", self.js)
         self.assertIn(".ship-room-details[hidden], .ship-modules-grid[hidden]", self.css)
+
+
+class TestCommerceDisclosures(unittest.TestCase):
+    """The dense COMMERCE tab defaults to collapsed broker and freight sections."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_auto_trade_and_freight_use_named_disclosures(self):
+        self.assertIn('id="btnToggleAutoTrade"', self.html)
+        self.assertIn('data-label="AUTO-TRADE"', self.html)
+        self.assertIn('id="autoTradeDetails" hidden', self.html)
+        self.assertIn('id="btnToggleQuantumFreight"', self.html)
+        self.assertIn('data-label="QUANTUM FREIGHT"', self.html)
+        self.assertIn('id="quantumFreightDetails" hidden', self.html)
+        self.assertIn(".trade-disclosure-toggle", self.css)
+        self.assertIn("#autoTradeDetails[hidden], #quantumFreightDetails[hidden]", self.css)
+        self.assertIn("toggleTradeDisclosure", self.js)
+        self.assertIn("applyDisclosure", self.js)
+
+    def test_market_table_stays_above_the_optional_broker_panels(self):
+        table = self.html.index('class="commodity-table-container"')
+        auto = self.html.index('id="tradeAutomationPanel"')
+        quantum = self.html.index('id="quantumFreightShell"')
+        self.assertLess(table, auto)
+        self.assertLess(auto, quantum)
 
 
 class TestPlayerAbilityDedup(unittest.TestCase):

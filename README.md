@@ -287,7 +287,7 @@ python -m voidfarer.cli autotrade on fuel_cells 55 85 1
 python -m voidfarer.cli autotrade status
 python -m voidfarer.cli autotrade off
 ```
-Auto-trade buys below its threshold or sells above it once per 3 ticks while docked, respecting cargo, credits, stock and faction pricing. Quantum auto-freight ships surplus cargo on the best net route every 6 ticks above a chosen minimum. The Commerce tab exposes both policies.
+Auto-trade buys below its threshold or sells above it once per 3 ticks while docked, respecting cargo, credits, stock and faction pricing. Quantum auto-freight ships surplus cargo on the best net route every 6 ticks above a chosen minimum. The Commerce tab exposes both policies below the market table behind `SHOW AUTO-TRADE` and `SHOW QUANTUM FREIGHT` disclosures, so the exchange stays the primary surface.
 
 ### 12. Cadet Flight Academy (Situated Scaffolding)
 ```bash
@@ -380,12 +380,14 @@ gaps**: every POST route in `/api/agent/actions` is either exercised or listed i
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
 The click-map enumerates every rendered control via `window.voidfarerClickMap()` and fails
-on a missing or duplicate handle (desktop: 159 controls, 47 visible in the default focus
+on a missing or duplicate handle (desktop: 161 controls, 47 visible in the default focus
 rail, 0 missing, 0 duplicates). The left console starts with five core systems and a
 `MORE SYSTEMS` disclosure; expanding it restores all sixteen tabs. The PLAYER card points
-at the bottom command strip for abilities instead of repeating its six USE buttons, and
-the SHIP tab collapses `ROOMS & CREW STATIONS` and the `MODULE CATALOG` behind SHOW/HIDE
-disclosures (initial SHIP content 2,390px -> 932px).
+at the bottom command strip for abilities instead of repeating its six USE buttons, the
+SHIP tab collapses `ROOMS & CREW STATIONS` and the `MODULE CATALOG` behind SHOW/HIDE
+disclosures (initial SHIP content 2,390px -> 932px), and COMMERCE collapses the auto-trade
+broker and quantum freight below the market table (initial COMMERCE content 2,076px ->
+1,004px).
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -570,7 +572,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,264-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,266-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

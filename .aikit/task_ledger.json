@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-ship-disclosures",
+    "task_id": "voidfarer-commerce-disclosures",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794097747.5267782,
+    "updated_at": 1794100216.0247643,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794097748.2827864
+    "completed_at": 1794100216.7815332
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cycle9-progression-labels",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Plan: distinguish Commander and Pilot Mastery tracks in the PLAYER card",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794083086.5424895,
-      "timestamp_str": "2026-11-07 23:24:46",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The PLAYER card labels the Commander track LEVEL/XP while the HUD labels the separate Pilot Mastery track LVL/XP; after a mastery promotion the card still reads LEVEL 1 0/400, which looks stale even though both values are correct.",
-        "benefits": "Players see both progression tracks and their separate currencies (SP vs talent points) in one place; a promotion no longer looks like a missed update.",
-        "risks": "contract: none; dependency: none; concurrency: renderPlayer stays synchronous; state: read-only from existing character/mastery fields.",
-        "mitigation": "Static label test, same promotion play capturing both tracks, vision review, no game-logic change."
-      },
-      "plan_digest": "15170b944b1344ab9e8c5652dfe7af13b6fd9746afd0e54d35be77e5e2291f12"
-    },
-    {
-      "task_id": "voidfarer-cycle9-progression-labels",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Cycle 9 verified: PLAYER card names Commander and Pilot Mastery tracks; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794084525.8742206,
-      "timestamp_str": "2026-11-07 23:48:45",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-189 and campaign cycle 9",
-        "evidence": "ui-review/cycle08-after/02-after-promotion.png, cycle09-after/02-after-promotion.png"
-      }
-    },
-    {
-      "task_id": "voidfarer-cycle9-progression-labels",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cycle9-progression-labels' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794084527.2052975,
-      "timestamp_str": "2026-11-07 23:48:47",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-cycle10-legacy-landable",
       "phase": "phase 4",
@@ -294,6 +250,50 @@
       "status": "completed",
       "timestamp": 1794097748.2827883,
       "timestamp_str": "2026-11-08 03:29:08",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-commerce-disclosures",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: keep the COMMERCE exchange first and collapse auto-trade plus quantum freight below it",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794100208.6870904,
+      "timestamp_str": "2026-11-08 04:10:08",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "COMMERCE is the next densest core tab at 2076px; the auto-trade broker and quantum freight sit between the services row and the market, so the exchange and its price rows never reach the first screen at 1280x720.",
+        "benefits": "The market table becomes the primary surface, the broker and freight stay one click away, and dense service/filter/market rows stop overflowing at 1280.",
+        "risks": "contract: UI surface; dependency: none; concurrency: none; state: hidden attributes and existing trade state only, no save change; regression: the exchange, services and both disclosures must stay reachable.",
+        "mitigation": "Static disclosure/order tests, before/after height and width measurements, open-state browser play, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "8455de912b7f4de6f4c7571ca2930d9c3575cdee017ae271364116588c9b91e3"
+    },
+    {
+      "task_id": "voidfarer-commerce-disclosures",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "COMMERCE condensation verified: 2076px to 1004px, broker/freight disclosures below the table, no horizontal overflow; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794100216.0247643,
+      "timestamp_str": "2026-11-08 04:10:16",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-195 and COMMERCE proof",
+        "evidence": "ui-review/commerce-before/01-commerce-collapsed.png, commerce-after/01..03, commerce-after/play-report.json, click-map 161/47/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-commerce-disclosures",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-commerce-disclosures' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794100216.7815351,
+      "timestamp_str": "2026-11-08 04:10:16",
       "agent": "opencode:campaign"
     }
   ]

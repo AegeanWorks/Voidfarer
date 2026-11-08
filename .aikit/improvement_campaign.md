@@ -632,3 +632,22 @@ cards; modules open 2,521px with no horizontal overflow. Click-map 159/47/0/0;
 `ui_inventory.py` 1158 lines; suite `Ran 1264 OK`; gate 5/5. Screenshots:
 `ship-before/01-ship-collapsed.png` vs `ship-after/01-ship-collapsed.png`,
 `02-ship-rooms-open.png`, `03-ship-modules-open.png`.
+
+### Fourth condensation — COMMERCE broker and quantum freight
+
+COMMERCE was 2,076px with the auto-trade broker and quantum freight expanded between the
+services row and the exchange, so the first screen never showed a price row. Move both below
+the market table and default-collapse them behind `SHOW AUTO-TRADE` / `SHOW QUANTUM
+FREIGHT`. At narrow width the services become one compact three-card row, the broker uses a
+three-column grid, the category filters wrap, and market rows drop the decorative sparkline
+and category word while keeping prices, holds and trade actions.
+
+Measured: initial COMMERCE 2,076px -> 1,004px; market table 477px with 6 rows and a visible
+first row; broker open 1,154px; freight open 1,914px; both collapse back to 1,004px. Widths
+291/291 content and 295/295 stack (no horizontal overflow). Click-map 161/47/0/0;
+`ui_inventory.py` 1167 lines; suite `Ran 1266 OK`; gate 5/5. Screenshots:
+`commerce-before/01-commerce-collapsed.png` vs `commerce-after/01-commerce-collapsed.png`,
+`02-auto-trade-open.png`, `03-quantum-freight-open.png`; vision review quoted
+`SHOW AUTO-TRADE`, `SHOW QUANTUM FREIGHT`, the six-row market table and the broker/freight
+reveals, with no horizontal clipping. The disclosure controls sit below the market by design
+and are reachable by scrolling.

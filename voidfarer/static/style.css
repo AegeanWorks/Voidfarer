@@ -4394,7 +4394,7 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
     flex-wrap: wrap;
     gap: 8px;
 }
-.ship-disclosure-toggle {
+.ship-disclosure-toggle, .trade-disclosure-toggle {
     display: block;
     width: 100%;
     margin-top: 6px;
@@ -4409,13 +4409,16 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
     letter-spacing: 0.04em;
     cursor: pointer;
 }
-.ship-disclosure-toggle:hover, .ship-disclosure-toggle:focus-visible {
+.ship-disclosure-toggle:hover, .ship-disclosure-toggle:focus-visible,
+.trade-disclosure-toggle:hover, .trade-disclosure-toggle:focus-visible {
     border-color: var(--console-gold);
     color: var(--console-gold-bright);
     background: rgba(201, 163, 90, 0.12);
     outline: none;
 }
-.ship-room-details[hidden], .ship-modules-grid[hidden] { display: none; }
+.ship-room-details[hidden], .ship-modules-grid[hidden],
+#autoTradeDetails[hidden], #quantumFreightDetails[hidden] { display: none; }
+.quantum-freight-shell { margin-top: 8px; }
 
 .ship-interior-header,
 .ship-room-card-top,
@@ -8377,6 +8380,15 @@ body.cockpit-theme .panel-center {
 @media (max-width: 1599px) {
     .ship-visual { flex: 1 1 100%; height: 200px; min-height: 200px; max-height: 200px; }
     .ship-stats-panel { flex: 1 1 100%; }
+    .auto-trade-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .auto-trade-grid .btn-hud { width: 100%; }
+    .station-services-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+    .btn-service { padding: 4px 5px; gap: 4px; }
+    .btn-service .icon { font-size: 14px; }
+    .service-meta span { font-size: 12px; line-height: 1.15; }
+    .service-meta small { font-size: 12px; }
+    .cargo-capacity-box { padding: 6px 8px; }
+    .cargo-meter { height: 6px; }
     .ship-module-row {
         grid-template-columns: 24px minmax(0, 1fr) 78px;
         grid-template-areas:
@@ -9239,6 +9251,20 @@ body.cockpit-theme .nav-panel > .panel-header {
 .auto-trade-grid label { display: flex; flex-direction: column; gap: 2px; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
 .auto-trade-grid select, .auto-trade-grid input { width: 100%; min-width: 0; height: 26px; font-size: 12px; }
 .auto-trade-grid .btn-hud { min-height: 26px; padding: 2px 7px; font-size: 12px; }
+@media (max-width: 1599px) {
+    .market-panel .auto-trade-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .market-panel .auto-trade-grid .btn-hud { width: 100%; }
+    /* Keep the exchange table about prices and actions at the narrow dock;
+       the sparkline and category word are repeated metadata, not trade data. */
+    .market-table .trend-sparkline,
+    .market-table .commodity-category { display: none; }
+    .market-table .commodity-meta-row { gap: 2px 4px; }
+    .market-table .commodity-info-cell { gap: 1px; }
+    .market-table td { padding-top: 5px; padding-bottom: 5px; }
+    .market-table .trade-btn-group { gap: 2px; }
+    .market-table .btn-trade { min-height: 22px; padding: 1px 4px; }
+    .market-category-filters { flex-wrap: wrap; row-gap: 4px; }
+}
 .auto-trade-note { margin: 4px 0 0; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
 
 /* Faction diplomacy: keep the four actions readable in the Empire drawer. */

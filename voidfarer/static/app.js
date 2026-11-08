@@ -889,6 +889,11 @@ class CockpitApp {
         this.autoTradeNote = document.getElementById("autoTradeNote");
         this.btnAutoTradeEnable = document.getElementById("btnAutoTradeEnable");
         this.btnAutoTradeDisable = document.getElementById("btnAutoTradeDisable");
+        this.btnToggleAutoTrade = document.getElementById("btnToggleAutoTrade");
+        this.autoTradeDetails = document.getElementById("autoTradeDetails");
+        this.quantumFreightShell = document.getElementById("quantumFreightShell");
+        this.btnToggleQuantumFreight = document.getElementById("btnToggleQuantumFreight");
+        this.quantumFreightDetails = document.getElementById("quantumFreightDetails");
         this.quantumFreight = document.getElementById("quantumFreight");
         this.quantumData = null;
         this.quantumBodyId = null;
@@ -1347,6 +1352,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.btnToggleShipCatalog) {
             this.btnToggleShipCatalog.addEventListener("click", () => this.toggleShipDisclosure(
                 this.btnToggleShipCatalog, this.shipModulesGrid, null,
+            ));
+        }
+        if (this.btnToggleAutoTrade) {
+            this.btnToggleAutoTrade.addEventListener("click", () => this.toggleTradeDisclosure(
+                this.btnToggleAutoTrade, this.autoTradeDetails,
+            ));
+        }
+        if (this.btnToggleQuantumFreight) {
+            this.btnToggleQuantumFreight.addEventListener("click", () => this.toggleTradeDisclosure(
+                this.btnToggleQuantumFreight, this.quantumFreightDetails,
             ));
         }
         if (this.btnFabricatePatch) {
@@ -2486,6 +2501,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.noMarketMsg.style.display = "none";
                 this.marketTitle.textContent = `${orbBody.name.toUpperCase()} EXCHANGE`;
                 this.marketArch.textContent = orbBody.market_archetype.toUpperCase();
+                if (this.quantumFreightShell) this.quantumFreightShell.style.display = "";
                 this.renderMarketTable();
                 if (this.quantumBodyId !== orbBody.id) {
                     this.quantumBodyId = orbBody.id;
@@ -2498,6 +2514,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.marketTableBody.innerHTML = "";
                 this.marketTitle.textContent = orbBody ? orbBody.name : "DEEP SPACE";
                 this.marketArch.textContent = "UNPOPULATED";
+                if (this.quantumFreightShell) this.quantumFreightShell.style.display = "none";
                 if (this.quantumFreight) this.quantumFreight.style.display = "none";
             }
         } else if (this.activeRightTab === "arsenal") {
@@ -3709,6 +3726,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     toggleShipDisclosure(button, target, section = null) {
+        this.applyDisclosure(button, target, section);
+    }
+
+    toggleTradeDisclosure(button, target) {
+        this.applyDisclosure(button, target, null);
+    }
+
+    applyDisclosure(button, target, section = null) {
         if (!button || !target) return;
         const open = Boolean(target.hidden);
         target.hidden = !open;
