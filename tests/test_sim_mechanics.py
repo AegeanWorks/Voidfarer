@@ -152,6 +152,9 @@ class TestEngineMoraleEvents(unittest.TestCase):
                 )
             ok, msg = self.engine.jump(step)
             self.assertTrue(ok, msg)
+        # A jump can spawn an intercept; this morale test needs a clear arrival.
+        with self.engine.lock:
+            self.engine.state = self.engine._clone_state(active_anomaly=None, active_combat=None)
         ok, msg = self.engine.orbit("cygnus_x1_black_hole")
         self.assertTrue(ok, msg)
         with self.engine.lock:

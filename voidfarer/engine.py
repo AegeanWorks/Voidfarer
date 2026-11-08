@@ -327,6 +327,7 @@ from voidfarer.story import (
     migrate_story_state,
     resolve_story_ending,
 )
+from voidfarer.state_machines import situation as state_machine_situation
 from voidfarer.upgrades import (
     CATALOG_CHASSIS,
     CATALOG_DRONE_TEMPLATES,
@@ -1367,6 +1368,9 @@ class SimulationEngine:
                 return False, "Void drive locked: unresolved spatial anomaly in proximity!"
             if self.state.ship.travel is not None:
                 return False, "Cannot dive while in sublight transit."
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
 
             cur_sys = self.current_system
             orbiting = self.orbiting_body
@@ -2957,6 +2961,8 @@ class SimulationEngine:
             missing = [p for p in project.prerequisites if p not in self.state.research.completed]
             if missing:
                 return False, f"Prerequisites incomplete: {', '.join(missing)}."
+            previous_id = self.state.research.active_project_id
+            previous_progress = self.state.research.progress
             research = replace(
                 self.state.research,
                 active_project_id=project_id,
@@ -2964,7 +2970,14 @@ class SimulationEngine:
                 queue=tuple(pid for pid in self.state.research.queue if pid != project_id),
             )
             self.state = self._clone_state(research=research)
-            return True, f"Research directed toward {project.name} ({project.cost} points)."
+            message = f"Research directed toward {project.name} ({project.cost} points)."
+            if previous_id and previous_id != project_id and previous_progress > 0:
+                previous = get_research_project(previous_id)
+                previous_name = previous.name if previous else previous_id
+                message += (
+                    f" Discarded {previous_progress} banked points on {previous_name}."
+                )
+            return True, message
 
     def queue_research(self, project_id: str) -> tuple[bool, str]:
         """Append a project to the automatic research queue."""
@@ -7942,6 +7955,7 @@ class SimulationEngine:
                     "decision_cadences": sorted(self.DECISION_CADENCE),
                 },
                 "story_status": self.story_status(),
+                "state_machines": state_machine_situation(self.state),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),
@@ -9120,7 +9134,13 @@ class SimulationEngine:
         return ""
 
     def _action_lock_reason(self) -> str:
-        """Reason flight or exploration actions are frozen (decision, pirate or void)."""
+        """Reason flight or exploration actions are frozen.
+
+        This is the engine's single flight gate. It mirrors the machines in
+        ``voidfarer/state_machines.py``: decision, pirate, customs, combat,
+        anomaly and void traversal all freeze flight/exploration actions until
+        they resolve. Tick blocking is a separate, narrower rule (see ``tick``).
+        """
         reason = self._decision_lock_reason()
         if reason:
             return reason
@@ -9135,6 +9155,18 @@ class SimulationEngine:
             return (
                 f"Customs interdiction unresolved: {customs.patrol_vessel} locked scanners on your hold. "
                 "Bribe, jettison, confiscate, or flee before continuing."
+            )
+        combat = self.state.active_combat
+        if combat is not None:
+            return (
+                f"Hostile combat active: {combat.enemy_name} is still in weapons range. "
+                "Resolve the engagement or flee before other flight actions."
+            )
+        anomaly = self.state.active_anomaly
+        if anomaly is not None:
+            return (
+                f"Unresolved spatial anomaly: {anomaly.title}. "
+                "Resolve it before other flight actions."
             )
         if self.state.ship.void_traversal is not None:
             return (

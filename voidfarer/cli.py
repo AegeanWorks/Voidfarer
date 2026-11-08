@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import threading
@@ -57,6 +58,11 @@ from voidfarer.inventory import (
 )
 from voidfarer.mapmods import describe_modifier_effects, get_map_modifier
 from voidfarer.reactor import REACTOR_MODES
+from voidfarer.state_machines import (
+    catalog as state_machine_catalog,
+    inspect_state as inspect_state_machines,
+    situation as state_machine_situation,
+)
 from voidfarer.shipmods import (
     CATALOG_SHIP_MODS,
     get_ship_mod,
@@ -88,13 +94,15 @@ RESET = "\033[0m"
 # (server.py _do_post gates) in terminal vocabulary: saves covers the whole
 # save family (save/load/delete plus new-game/reset equivalents), settings
 # only manages decision cadence (like /api/settings/decisions).
-_ALWAYS_ALLOWED = frozenset({"decision", "status", "saves", "serve", "time", "settings"})
+_ALWAYS_ALLOWED = frozenset({
+    "decision", "status", "saves", "serve", "time", "settings", "state-machines",
+})
 _PIRATE_ALLOWED = _ALWAYS_ALLOWED | {"pirate"}
 _CUSTOMS_ALLOWED = _ALWAYS_ALLOWED | {"customs", "pirate"}
 # REPL aliases for the same sets (REPL verbs differ from shell commands).
 _REPL_ALWAYS_ALLOWED = frozenset({
     "decision", "decide", "status", "saves", "save", "load",
-    "serve", "time", "settings", "options",
+    "serve", "time", "settings", "options", "state-machines",
     "help", "?", "exit", "quit", "q",
 })
 _REPL_PIRATE_ALLOWED = _REPL_ALWAYS_ALLOWED | {"pirate", "corsair"}
@@ -259,6 +267,28 @@ def cmd_status(engine: SimulationEngine) -> int:
             req = f"[{ch.required_power.upper()} >= {ch.min_power_threshold}%]" if ch.required_power != "none" else "[No Check]"
             print(f"  • {BOLD}{ch.choice_id}{RESET}: {ch.text} {DIM}{req}{RESET}")
 
+    return 0
+
+
+def cmd_state_machines(engine: SimulationEngine, as_json: bool = False) -> int:
+    """Print the canonical state-machine registry and the current state of each."""
+    current = inspect_state_machines(engine.state)
+    summary = state_machine_situation(engine.state)
+    if as_json:
+        print(json.dumps({
+            **state_machine_catalog(),
+            "current": current,
+            "situation": summary,
+        }, indent=2))
+        return 0
+    print(f"{BOLD}{CYAN}IMPLICIT STATE MACHINES{RESET}")
+    print(f"  {BOLD}Now:{RESET} {summary['summary']}")
+    print(f"  {BOLD}Blocking flight:{RESET} {', '.join(summary['blocking_flight']) or 'none'}")
+    print(f"  {BOLD}Blocking time:{RESET} {', '.join(summary['blocking_time']) or 'none'}")
+    print()
+    for machine_id, entry in current.items():
+        detail = ", ".join(f"{key}={value}" for key, value in entry["detail"].items())
+        print(f"  {machine_id:<12} {entry['state']:<20} {DIM}{detail}{RESET}")
     return 0
 
 
@@ -2975,6 +3005,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     subparsers = parser.add_subparsers(dest="command")
 
     subparsers.add_parser("status", help="Print ship telemetry and navigation status")
+    state_machines_p = subparsers.add_parser(
+        "state-machines", help="List implicit state machines and their current states"
+    )
+    state_machines_p.add_argument(
+        "--json", action="store_true", help="Emit the full registry and current state as JSON"
+    )
     subparsers.add_parser("chart", help="Display star systems and orbital bodies")
     subparsers.add_parser("market", help="Display local commodity exchange quotes")
     subparsers.add_parser("economy", help="Display galactic economy shocks and trade routes")
@@ -3270,6 +3306,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.command == "status":
         return cmd_status(engine)
+    elif args.command == "state-machines":
+        return cmd_state_machines(engine, as_json=args.json)
     elif args.command == "crew":
         parts = ["crew", args.action]
         if args.value:

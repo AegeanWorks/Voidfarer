@@ -120,6 +120,9 @@ class TestVoidDiveAndTraversal(unittest.TestCase):
                 )
             ok, msg = self.engine.jump(target)
             self.assertTrue(ok, msg)
+        # A jump can spawn an intercept; this fixture tests void traversal, so clear it.
+        with self.engine.lock:
+            self.engine.state = self.engine._clone_state(active_anomaly=None, active_combat=None)
         ok, msg = self.engine.orbit("cygnus_x1_black_hole")
         self.assertTrue(ok, msg)
         with self.engine.lock:

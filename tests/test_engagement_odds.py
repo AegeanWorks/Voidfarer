@@ -197,6 +197,8 @@ class TestVoidProjector(unittest.TestCase):
             )
             ok, msg = engine.jump(target)
             self.assertTrue(ok, msg)
+        # A jump can spawn an intercept; this projection test needs a clear arrival.
+        engine.state = engine._clone_state(active_anomaly=None, active_combat=None)
         ok, msg = engine.orbit("cygnus_x1_black_hole")
         self.assertTrue(ok, msg)
         engine.state = engine._clone_state(active_anomaly=None, active_combat=None)

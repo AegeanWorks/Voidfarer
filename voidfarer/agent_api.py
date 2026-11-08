@@ -80,6 +80,7 @@ def build_action_catalog(handler_cls: type) -> dict[str, Any]:
         "notes": [
             "POST every action with a JSON object of its listed fields.",
             "Read state from GET /api/state, or /api/agent/actions for this catalog.",
-            "A pending decision or pirate intercept blocks other actions until resolved.",
+            "GET /api/state-machines names every implicit state machine and its current state.",
+            "A pending decision, pirate, customs, combat or anomaly blocks flight actions until resolved.",
         ],
     }

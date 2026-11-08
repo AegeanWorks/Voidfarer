@@ -131,7 +131,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (80 suites)
+└── tests/                <- unit & integration test suite (81 suites)
 ```
 
 ---
@@ -379,20 +379,25 @@ mechanic families, succeeds on 38 endpoints, attempts 51 and reports **zero cove
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
-Click-map enumerates every control via `voidfarerClickMap()`; missing/duplicates fail
-(desktop: 184 controls, 39 visible, 0 missing/dup). 5 systems; `MORE SYSTEMS` restores
-sixteen. PLAYER sits at the bottom strip. SHIP collapses rooms and modules (2,390->917px),
-COMMERCE moves auto-trade/freight below the market (2,076->932px), FLEET collapses contracts
-and procurement (1,271->831px); contracts survive no drones. Tabs share 56px headers;
-advanced start closed. Reactor presets default; sliders under `SHOW FINE TUNE`. Combat
-keeps four actions; tactics under `SHOW MORE TACTICS`. Unlocked chips only; locked powers
-under `SHOW LOCKED n`. Target dossier keeps key stats/actions upfront; full stats/rare
-behind `SHOW DETAILS` / `SHOW MORE ACTIONS`. Surface keeps its site strip and selected RUN;
-map/list behind `SHOW SURFACE MAP` / `SHOW ALL OPERATIONS`. EMPIRE keeps research/outpost/
-faction headlines; catalogs behind SHOW. SKILLS keeps six TRAIN rows and PERKS/RELICS
-cards; branches/relics behind SHOW. CREW keeps cash flow and officer headlines; roster/
-recruitment behind SHOW. QUESTS/AI/MESSAGES keep counts/headlines; full logs and
+Click-map enumerates controls via `voidfarerClickMap()`; missing/duplicates fail (desktop:
+184 controls, 39 visible, 0 missing/dup). 5 systems; `MORE SYSTEMS` restores sixteen.
+PLAYER sits at the bottom strip. SHIP, COMMERCE and FLEET collapse their catalogs; tabs
+share 56px headers and advanced tabs start closed. Reactor presets default (sliders under
+FINE TUNE); combat keeps four actions (MORE TACTICS); unlocked chips only (LOCKED n).
+Target and surface keep key stats/actions upfront, details/map/catalog behind SHOW.
+EMPIRE, SKILLS, CREW, QUESTS, AI and MESSAGES keep headlines/counts; catalogs/logs/
 dossiers behind SHOW.
+
+### 14d. Implicit State-Machine Contract
+
+`voidfarer/state_machines.py` names 24 machines and their transitions;
+`GET /api/state-machines` serves the registry plus the current state, and `/api/state`
+carries a compact `state_machines` situation.
+
+```bash
+python -m voidfarer.cli state-machines
+python -m voidfarer.cli state-machines --json
+```
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -577,7 +582,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,312-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,333-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

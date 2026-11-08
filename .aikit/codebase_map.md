@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `127`
-- **Total Classes**: `372`
-- **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2055`
-- **Total Source Lines**: `51155`
+- **Total Python Modules**: `129`
+- **Total Classes**: `379`
+- **Total Top-Level Functions**: `386`
+- **Total Class Methods**: `2082`
+- **Total Source Lines**: `52648`
 
 ---
 
@@ -1002,7 +1002,7 @@
 ### [`tests/test_engagement_odds.py`](tests/test_engagement_odds.py)
 > *Stage 3 engagement odds: one tunable table, stated == coded.*
 
-**Size**: `247` lines (`10488` bytes)
+**Size**: `249` lines (`10657` bytes)
 
 **Classes:**
 - `class TestStreakMultiplier`
@@ -2163,7 +2163,7 @@
 ### [`tests/test_sim_mechanics.py`](tests/test_sim_mechanics.py)
 > *Unit and integration tests for the living crew, volume-aware market, and cash-flow mechanics.*
 
-**Size**: `399` lines (`16523` bytes)
+**Size**: `402` lines (`16733` bytes)
 
 **Classes:**
 - `class TestCrewMoraleCore`
@@ -2258,6 +2258,53 @@
   - Method `.test_catalog_endpoint_ignores_the_cache_header()`
   - Method `.test_state_poll_is_full_by_default_and_lite_when_cached()`
   - Method `.test_action_responses_honour_the_cache_header()`
+
+---
+
+### [`tests/test_state_machines.py`](tests/test_state_machines.py)
+> *Canonical state-machine registry, inspector, gate and surface tests.*
+
+**Size**: `405` lines (`16104` bytes)
+
+**Classes:**
+- `class TestRegistryContract`
+  - Method `.test_machines_are_unique_and_well_formed()`
+  - Method `.test_surface_gates_match_the_wired_layers()`
+  - Method `.test_catalog_serializes_every_machine()`
+- `class TestInspector`
+  - Method `.test_default_state_is_onboarding()`
+  - Method `.test_combat_blocks_flight_and_exposes_boarding()`
+  - Method `.test_anomaly_blocks_flight_and_has_priority()`
+  - Method `.test_decision_blocks_time_and_outranks_combat()`
+  - Method `.test_pirate_blocks_time_and_flight()`
+  - Method `.test_travel_and_void_states()`
+  - Method `.test_reactor_thresholds()`
+  - Method `.test_research_states()`
+  - Method `.test_snapshot_carries_the_situation()`
+- `class TestActionGate` - *The engine's flight gate covers every blocking machine.*
+  - Method `._assert_locked(result, needle)`
+  - Method `.test_combat_blocks_orbit_travel_point_and_landing()`
+  - Method `.test_anomaly_blocks_orbit_travel_and_landing()`
+  - Method `.test_customs_still_blocks_flight()`
+  - Method `.test_void_dive_respects_the_remaining_blockers()`
+  - Method `.test_combat_actions_stay_available()`
+- `class TestResearchTransitionMessage`
+  - Method `.test_switching_reports_discarded_points()`
+- `class TestStateMachineSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `._get(path)`
+  - Method `.test_rest_endpoint_lists_registry_and_current_state()`
+  - Method `.test_state_snapshot_carries_the_compact_situation()`
+  - Method `.test_cli_prints_json_and_stays_available_when_blocked()`
+
+**Functions:**
+- `def _engine()`
+- `def _combat(hull, shield)`
+- `def _anomaly()`
+- `def _pirate()`
+- `def _customs()`
+- `def _decision()`
 
 ---
 
@@ -2538,7 +2585,7 @@
 ### [`tests/test_void_traversal.py`](tests/test_void_traversal.py)
 > *Unit and integration tests for the Hollow Between void traversal mechanics.*
 
-**Size**: `452` lines (`18605` bytes)
+**Size**: `455` lines (`18823` bytes)
 
 **Classes:**
 - `class TestVoidLanes`
@@ -2750,7 +2797,7 @@
 ### [`voidfarer/agent_api.py`](voidfarer/agent_api.py)
 > *Discoverable action catalog so an AI can play every mechanic through the public API.*
 
-**Size**: `85` lines (`3117` bytes)
+**Size**: `86` lines (`3231` bytes)
 
 **Functions:**
 - `def _sections(source)` - *Split the handler source into the GET and POST halves.*
@@ -2880,12 +2927,13 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3600` lines (`181975` bytes)
+**Size**: `3638` lines (`183568` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
 - `def _bar(current, maximum, length, color)` - *Generate ANSI filled progress bar.*
 - `def cmd_status(engine)` - *Display current flagship telemetry, fleet roster, and star system status.*
+- `def cmd_state_machines(engine, as_json)` - *Print the canonical state-machine registry and the current state of each.*
 - `def cmd_time(engine, storage, argv)` - *Manage simulation cosmic time, ticks, and speed controls.*
 - `def cmd_chart(engine)` - *Print galaxy starmap and celestial bodies within current system.*
 - `def cmd_autotrade(engine, storage, parts)` - *Inspect or configure the docked buy-low/sell-high broker.*
@@ -3070,7 +3118,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10389` lines (`512883` bytes)
+**Size**: `10421` lines (`514445` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3281,7 +3329,7 @@
   - Method `.refit_fleet_unit(drone_id)`
   - Method `.form_alliance(captain_id)`
   - Method `._decision_lock_reason()`
-  - Method `._action_lock_reason()` - *Reason flight or exploration actions are frozen (decision, pirate or void).*
+  - Method `._action_lock_reason()` - *Reason flight or exploration actions are frozen.*
   - Method `._transit_lock_reason()` - *Body actions need a real orbit; mid-flight the ship has left the old body.*
   - Method `._cadence_from_state(state)` - *Read the saved cadence, falling back to the default for unknown values.*
   - Method `._decision_cooldown()`
@@ -3850,7 +3898,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1558` lines (`67185` bytes)
+**Size**: `1575` lines (`67775` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -3909,6 +3957,44 @@
 - `def get_contraband_in_cargo(cargo)` - *Extract all contraband goods and counts currently in the ship hold.*
 - `def calculate_customs_scan_risk(system, cargo, ship, power, equipment)` - *Compute detection probability and explanatory tactical factors.*
 - `def generate_customs_encounter(system, cargo, ship, seed)` - *Generate a deterministic customs inspection encounter.*
+
+---
+
+### [`voidfarer/state_machines.py`](voidfarer/state_machines.py)
+> *Canonical contract for VoidFarer's implicit state machines.*
+
+**Size**: `992` lines (`39588` bytes)
+
+**Classes:**
+- `class Transition` - *One named edge in a state machine.*
+  - Method `.to_dict()`
+- `class Machine` - *A named implicit state machine and the surfaces that enforce it.*
+  - Method `.to_dict()`
+
+**Functions:**
+- `def catalog()` - *Return the full machine registry and the surface gates it documents.*
+- `def _entry(machine_id, state, **detail)`
+- `def _tutorial_state(state)`
+- `def _campaign_state(state)`
+- `def _travel_state(state)`
+- `def _void_state(state)`
+- `def _combat_state(state)`
+- `def _encounter_state(machine_id, encounter, label_fields)`
+- `def _research_state(state)`
+- `def _contract_state(state)`
+- `def _away_state(state)`
+- `def _outpost_state(state)`
+- `def _reactor_state(state)`
+- `def _message_state(state)`
+- `def _fleet_state(state)`
+- `def _crew_state(state)`
+- `def _automation_state(state)`
+- `def _diplomacy_state(state)`
+- `def _codex_state(state)`
+- `def _save_state(state)`
+- `def inspect_state(state)` - *Return the current state of every machine that can be derived from GameState.*
+- `def _active(states, flag)`
+- `def situation(state)` - *Return one compact, priority-ordered summary for clients and agents.*
 
 ---
 

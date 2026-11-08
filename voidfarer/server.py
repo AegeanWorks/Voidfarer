@@ -22,6 +22,11 @@ from voidfarer.frontier import MERCENARY_CATALOG
 from voidfarer.inventory import get_inventory_manifest
 from voidfarer.mapmods import MAP_MODIFIER_CATALOG, aggregate_map_modifiers, system_modifier_summary
 from voidfarer.shipmods import get_ship_mod
+from voidfarer.state_machines import (
+    catalog as state_machine_catalog,
+    inspect_state as inspect_state_machines,
+    situation as state_machine_situation,
+)
 from voidfarer.storage import StorageManager, resolve_slot_name
 from voidfarer.retention import relic_set_bonuses
 from voidfarer.upgrades import (
@@ -178,6 +183,18 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/agent/actions":
             self._send_json(build_action_catalog(VoidFarerHandler))
+            return
+
+        if path == "/api/state-machines":
+            with self.engine.lock:
+                current = inspect_state_machines(self.engine.state)
+                summary = state_machine_situation(self.engine.state)
+            self._send_json({
+                "ok": True,
+                **state_machine_catalog(),
+                "current": current,
+                "situation": summary,
+            })
             return
 
         if path == "/api/catalogs":

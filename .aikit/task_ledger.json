@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-ship-status-legibility",
+    "task_id": "voidfarer-state-machine-contract",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794160732.7561595,
+    "updated_at": 1794163606.7592013,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794160748.2924526
+    "completed_at": 1794163629.9990582
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-crew-condense",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "CREW verified: 1319->343px, cashflow+headlines fit, roster/roles readable, drill updates skill and credits; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794151653.0835373,
-      "timestamp_str": "2026-11-08 18:27:33",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-207 and crew proof",
-        "evidence": "ui-review/crew-after/*, crew-play/01..05, play-report.json, click-map 180/39/0/0"
-      }
-    },
-    {
-      "task_id": "voidfarer-crew-condense",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-crew-condense' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794151655.5406284,
-      "timestamp_str": "2026-11-08 18:27:35",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-quests-condense",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: lead QUESTS with live counts and ready-to-claim rewards, disclose the active and completed logs",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794154501.773733,
-      "timestamp_str": "2026-11-08 19:15:01",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "QUESTS is 1,172px: a roughly 920px active log of seven cards plus a 77px completed log; at 1280x720 only one card and a clipped second are visible, and a completed contract's CLAIM REWARD can sit below the fold with no count or shortcut above it.",
-        "benefits": "The default view shows 6 ACTIVE / 0 COMPLETED / 0 READY TO CLAIM, a READY TO CLAIM surface and both log disclosures inside the 473px viewport; the full logs stay one click away and the claim flow stays reachable.",
-        "risks": "contract: QUESTS right-tab UI; dependency: none; concurrency: render stays synchronous; state: disclosure DOM only, no save change; regression: active cards, completed cards, story links and CLAIM REWARD must stay reachable and functional.",
-        "mitigation": "Static condensation test, same-harness before/after measurement, real-browser play of both reveals and a real claim, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "1cee88928dcce7a2fc204d72c26cabbeb5786f52baca1e30a47832f4fd0ab5d5"
-    },
     {
       "task_id": "voidfarer-quests-condense",
       "phase": "in_progress",
@@ -270,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794160748.2924552,
       "timestamp_str": "2026-11-08 20:59:08",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-state-machine-contract",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan: document the implicit state machines, add a canonical registry and inspector, unify the action gate, and expose it to REST/CLI",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794162393.2110088,
+      "timestamp_str": "2026-11-08 21:26:33",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The game encodes 20+ machines in fields and branches with no canonical contract; decision/pirate/customs gates are duplicated across engine, server and CLI; flight actions bypass combat and anomaly (proved: orbit/travel succeed during both), and void_dive bypasses decision/pirate/customs. Agents must reconstruct all of this from scattered fields.",
+        "benefits": "One registry documents every machine, state, transition and surface gate; /api/state-machines and `voidfarer state-machines` expose the current state and blockers; one engine action gate consistently blocks combat/anomaly/void/decision/pirate/customs; research switches report discarded progress.",
+        "risks": "contract: engine action gating, server GET surface, CLI command, state snapshot; dependency: none; concurrency: inspector reads under the engine lock; state: no save-schema change; regression: existing decision/pirate/customs gates, tests and 60fps cockpit stay intact; stricter combat/anomaly gating may reject previously allowed actions.",
+        "mitigation": "Failing-first tests for the gate holes and registry invariants, full suite and project gate, browser smoke test of the cockpit, and a documented deferral for tick-precedence changes."
+      },
+      "plan_digest": "685c384e5d73aeb82e808ab35f4dfe64c25d3ed6f8d993a390d35d508663770e"
+    },
+    {
+      "task_id": "voidfarer-state-machine-contract",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "State-machine contract verified: 24-machine registry/inspector, REST+CLI surfaces, combat/anomaly/void flight gates, research message; 21 new tests, 1333 suite, gate 5/5; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794163606.7592013,
+      "timestamp_str": "2026-11-08 21:46:46",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-state-machine-contract",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-state-machine-contract' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794163629.99906,
+      "timestamp_str": "2026-11-08 21:47:09",
       "agent": "opencode:campaign"
     }
   ]
