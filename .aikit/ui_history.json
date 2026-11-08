@@ -1027,5 +1027,19 @@
     "final_snapshot_digest": "27f9edff52c1bd729c0d528beecd9e5ed2e336aba2e2b1615ed735e4a951ec89",
     "final_snapshot_entries": 1236,
     "surface_digest": "8774b2411bde023d83020afc002dfdf3e5ff4e22e3baf6bc9205dac9aed591ba"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "c3bcf578f2a914621179ccddcbb7d0a31a94ee32",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794167520.2199168,
+    "finished_at": 1794167619.0640283,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (no visual change; re-baseline after folding the encounter cards)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "5066e27ba821c7f072fb5ddd8d883d109fe58822de43246cbba0e3e3b823248d",
+    "final_snapshot_entries": 1234,
+    "surface_digest": "50bbb5c8a2425e3c6e32833b5d1753f502492407ec11a39c3a4641ca79714bd0"
   }
 ]
