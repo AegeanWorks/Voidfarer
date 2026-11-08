@@ -2371,3 +2371,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/fitting`, `POST /api/fitting/install` and `POST /api/fitting/remove`; add a compact `fitting` summary to `/api/state`; add the `fitting [status|category|install|remove]` CLI command. Legacy commands and routes remain.
   3. Move the structural module catalog from the SHIP tab into the ARSENAL tab in the follow-up UI commit, so all hardware lives in one cockpit surface.
 - **Consequences**: An agent can read one fitting report and install any hardware category through one pair of routes; the CLI has one preferred fitting verb. `tests/test_fitting.py` adds 11 tests for the report, summary, all four install paths, upgrade/module removal, invalid requests, REST and CLI. The cockpit REFIT tab now hosts upgrades, chassis, ordnance and structural modules; SHIP keeps rooms, stats and fabrication. Browser play (`ui-review/play_refit.py`) confirmed the module grid moved into REFIT (12 rows, 9 installable), installed Reinforced Structural Spine for 1,400 cr (credits 2,000 -> 600, max hull 100 -> 160), kept the disclosure open, and left no grid in SHIP; 25 frames/410ms, zero console/page/HTTP errors. No save-schema change.
+
+### ADR-217: Fleet assets become one report/action surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Drones, escort warships, mercenaries and alliances are one FLEET cockpit tab, but three CLI commands (`fleet`, `mercs`, `allies`) and fifteen HTTP routes. The same roster, upkeep and alliance state was assembled separately by each surface.
+- **Decision**:
+  1. Add `voidfarer/fleet_command.py`: `fleet_report()` returns drones, mercenary units, escorts, mercenary offers, alliances, catalogs, counts, upkeep, damage and evasion in one payload; `fleet_action(action, **kwargs)` routes to the existing engine methods.
+  2. Extend `GET /api/fleet` with the full report and add `POST /api/fleet/action`; add a compact `fleet` summary to `/api/state`.
+  3. Extend the `fleet` CLI with `overview`, `mercs`, `allies`, `hire`, `dismiss`, `refit` and `ally`; keep the legacy `mercs`/`allies` commands and all routes.
+- **Consequences**: An agent can read one fleet report and issue any fleet action through one route; the CLI has one preferred fleet verb while the cockpit keeps its single FLEET tab. `tests/test_fleet_command.py` adds 11 tests for the report, summary, drone/escort/mercenary/alliance actions, invalid actions, REST and CLI. Full suite `Ran 1370 OK`; no save-schema change.

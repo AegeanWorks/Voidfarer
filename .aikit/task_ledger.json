@@ -1,67 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-fitting-merge",
+    "task_id": "voidfarer-fleet-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794170639.3751948,
+    "updated_at": 1794174389.0579202,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794170797.6977322
+    "completed_at": 1794174426.2345994
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-header-badge-legibility",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Header badges verified: 12px shared rule, story/market/codex tiny 1->0 with hscroll 0, no wrap or overflow; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794158624.4179423,
-      "timestamp_str": "2026-11-08 20:23:44",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-header-badge-legibility",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-header-badge-legibility' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794158637.1892457,
-      "timestamp_str": "2026-11-08 20:23:57",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-fleet-drone-legibility",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: stack the docked drone card text and actions so no name, status or stat line clips",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794159009.23879,
-      "timestamp_str": "2026-11-08 20:30:09",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "At 1280x720 the drone card's three-column ledger grid leaves about a 103px text column: Mining Drone Alpha, MINING // SOL [HARVESTING] and the stats line all ellipsize, and a 16-tab sweep flags nine clipped text nodes in FLEET only.",
-        "benefits": "The docked drone card shows its full name, role/system/status and stats on full-width lines with REFIT and DISMISS beneath; the sweep reports zero clipped drone text and the wider layout is unchanged.",
-        "risks": "contract: FLEET drone roster at <=1599px; dependency: none; concurrency: none; state: CSS only; regression: REFIT and DISMISS stay reachable, the card still shows yield and integrity, and the >1599px layout keeps its current grid.",
-        "mitigation": "Apply the reflow inside a max-width 1599px media query, rerun the tab sweep and FLEET browser capture, play a real refit, add a CSS contract test, and run full gates."
-      },
-      "plan_digest": "f2954da2a5d10a36a96d3542baba69439a4d1d6cf4e74a06ed1f5a911d0b1b62"
-    },
-    {
-      "task_id": "voidfarer-fleet-drone-legibility",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "FLEET docked text verified: drone card stacks, escort rows wrap, 16-tab sweep clipped 9->0 with tiny 0/hscroll 0; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794159694.371488,
-      "timestamp_str": "2026-11-08 20:41:34",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-fleet-drone-legibility",
       "phase": "completed",
@@ -265,6 +215,56 @@
       "status": "completed",
       "timestamp": 1794170797.6977344,
       "timestamp_str": "2026-11-08 23:46:37",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fleet-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge drones, escorts, mercenaries and alliances behind one fleet report/action and CLI verb",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794174351.255309,
+      "timestamp_str": "2026-11-09 00:45:51",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "One FLEET cockpit tab is backed by three CLI commands and fifteen routes; the roster, upkeep and alliance state are assembled separately.",
+        "benefits": "One report with drones, mercenary units, escorts, offers, alliances, catalogs and counts; one action route; one fleet CLI verb with overview/mercs/allies/hire/dismiss/refit/ally.",
+        "risks": "contract: REST/CLI/snapshot; dependency: fleet/frontier catalogs; concurrency: report reads under lock, actions delegate; state: no save change; regression: legacy fleet/mercs/allies commands and routes.",
+        "mitigation": "11 facade tests, full 1370 suite, gate, and the existing FLEET tab left intact."
+      },
+      "plan_digest": "69d0d9a9b73cb64f0c5c37a9694b3a47f12c11f7e0d0d312d36a02ea370159ab"
+    },
+    {
+      "task_id": "voidfarer-fleet-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Fleet facade verified: report/summary, drone/escort/mercenary/alliance actions, REST+CLI, 11 tests, 1370 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794174351.2647717,
+      "timestamp_str": "2026-11-09 00:45:51",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fleet-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Fleet facade verified: report/summary, drone/escort/mercenary/alliance actions, REST+CLI, 11 tests, 1370 suite, gate 5/5; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794174389.0579202,
+      "timestamp_str": "2026-11-09 00:46:29",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fleet-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-fleet-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794174426.2346017,
+      "timestamp_str": "2026-11-09 00:47:06",
       "agent": "opencode:campaign"
     }
   ]

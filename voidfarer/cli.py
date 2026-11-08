@@ -31,6 +31,11 @@ from voidfarer.fitting import (
     install as install_fitting,
     remove as remove_fitting,
 )
+from voidfarer.fleet_command import (
+    FLEET_ACTIONS,
+    fleet_action,
+    fleet_report,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -737,6 +742,65 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
         return 0
 
     sub = parts[1].lower()
+    if sub in ("overview", "report"):
+        report = fleet_report(engine.state)
+        counts = report["counts"]
+        print(f"\n{BOLD}{CYAN}=== FLEET OVERVIEW ==={RESET}")
+        print(
+            f"  {counts['drones']} drones | {counts['mercenary_units']} mercenary units | "
+            f"{counts['escorts']} escorts | {counts['allies']} allies"
+        )
+        print(
+            f"  Upkeep {report['upkeep_per_month']} cr/month | "
+            f"Damage {report['damage']} | Evasion +{report['evasion_bonus']:.0%} | "
+            f"Stance {report['battle_stance'].upper()}"
+        )
+        for drone in report["drones"]:
+            print(f"  {CYAN}{drone['name']:<24}{RESET} {drone['drone_type']:<10} {drone['assigned_system_id']:<12} {drone['status']:<10} +{drone['cargo_accumulated']} ore")
+        for escort in report["escorts"]:
+            print(f"  {CYAN}{escort['name']:<24}{RESET} {escort['ship_class']:<18} {escort['status']:<10} {escort['assigned_system_id']:<12} {escort['rank']}")
+        for merc in report["mercenaries"]:
+            if merc["hired"]:
+                print(f"  {MAGENTA}{merc['name']:<24}{RESET} mercenary ({merc['specialty']})")
+        for captain in report["alliances"]["captains"]:
+            if captain["ally"]:
+                print(f"  {GREEN}{captain['name']:<24}{RESET} ally (trust {captain['trust']})")
+        print(f"{DIM}Inspect: fleet mercs | fleet allies | fleet ships{RESET}")
+        return 0
+    if sub == "mercs":
+        report = fleet_report(engine.state)
+        print(f"\n{BOLD}{CYAN}=== MERCENARY CONTRACTS ==={RESET}")
+        for merc in report["mercenaries"]:
+            status = f"{GREEN}HIRED{RESET}" if merc["hired"] else f"{merc['cost']} cr"
+            print(f"  {merc['id']:<16} {merc['name']:<20} {status:<12} {DIM}{merc['description']}{RESET}")
+        print(f"{DIM}Hire: fleet hire <merc_id>{RESET}")
+        return 0
+    if sub == "allies":
+        report = fleet_report(engine.state)
+        print(f"\n{BOLD}{CYAN}=== ALLIANCES ==={RESET}")
+        print("  Allies:", ", ".join(report["alliances"]["allies"]) or "none")
+        for captain in report["alliances"]["captains"]:
+            print(
+                f"  {captain['id']:<18} {captain['name']:<20} "
+                f"trust={captain['trust']:<4} ally={captain['ally']}"
+            )
+        print(f"{DIM}Form: fleet ally <captain_id>{RESET}")
+        return 0
+    if sub in ("hire", "dismiss", "refit", "ally"):
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} fleet {sub} <id>")
+            return 1
+        key = {
+            "hire": "merc_id",
+            "dismiss": "unit_id",
+            "refit": "unit_id",
+            "ally": "captain_id",
+        }[sub]
+        ok, msg = fleet_action(engine, sub, **{key: parts[2]})
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
     if sub in ("ships", "escorts", "manager"):
         report = engine.get_fleet_manager_report()
         print(f"\n{BOLD}{CYAN}=== FLEET MANAGER: ESCORT WING ==={RESET}")
@@ -3139,8 +3203,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     subparsers.add_parser("scan", help="Execute sensor scan on orbiting body")
     subparsers.add_parser("repl", help="Launch interactive terminal cockpit")
 
-    fleet_p = subparsers.add_parser("fleet", help="Autonomous fleet and drone operations")
-    fleet_p.add_argument("action", nargs="?", default="list", choices=["list", "harvest", "buy", "deploy", "ships", "buy_escort", "assign", "train", "role", "captain", "recall_captain", "repair_escorts", "dismiss_escort", "sell_escort"])
+    fleet_p = subparsers.add_parser("fleet", help="One fleet surface: drones, escorts, mercenaries and alliances")
+    fleet_p.add_argument("action", nargs="?", default="list", choices=[
+        "list", "overview", "harvest", "buy", "deploy", "ships",
+        "buy_escort", "assign", "train", "role", "captain", "recall_captain",
+        "repair_escorts", "dismiss_escort", "sell_escort",
+        "mercs", "allies", "hire", "dismiss", "refit", "ally",
+    ])
     fleet_p.add_argument("arg1", nargs="?", help="Drone type or drone ID")
     fleet_p.add_argument("arg2", nargs="?", help="Target star system ID")
 

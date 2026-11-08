@@ -24,6 +24,7 @@ from voidfarer.fitting import (
     install as install_fitting,
     remove as remove_fitting,
 )
+from voidfarer.fleet_command import fleet_action, fleet_report
 from voidfarer.frontier import MERCENARY_CATALOG
 from voidfarer.inventory import get_inventory_manifest
 from voidfarer.mapmods import MAP_MODIFIER_CATALOG, aggregate_map_modifiers, system_modifier_summary
@@ -383,14 +384,13 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/fleet":
             with self.engine.lock:
-                fleet = [
-                    {
-                        **d.to_dict(),
-                        "yield_rate": round(d.efficiency * (0.5 + d.integrity / 200.0), 2),
-                    }
-                    for d in self.engine.state.ship.fleet_drones
-                ]
-            self._send_json({"ok": True, "fleet": fleet, "mercenaries": MERCENARY_CATALOG})
+                report = fleet_report(self.engine.state)
+            self._send_json({
+                "ok": True,
+                "fleet": report["drones"],
+                "mercenaries": MERCENARY_CATALOG,
+                "report": report,
+            })
             return
 
         if path == "/api/inventory":
@@ -811,6 +811,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         if path == "/api/fleet/refit":
             drone_id = str(body.get("drone_id", ""))
             ok, msg = self.engine.refit_fleet_unit(drone_id)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/fleet/action":
+            payload = dict(body or {})
+            action = str(payload.pop("action", ""))
+            ok, msg = fleet_action(self.engine, action, **payload)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

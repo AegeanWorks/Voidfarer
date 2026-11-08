@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `133`
-- **Total Classes**: `385`
-- **Total Top-Level Functions**: `415`
-- **Total Class Methods**: `2118`
-- **Total Source Lines**: `53971`
+- **Total Python Modules**: `135`
+- **Total Classes**: `388`
+- **Total Top-Level Functions**: `424`
+- **Total Class Methods**: `2134`
+- **Total Source Lines**: `54439`
 
 ---
 
@@ -1286,6 +1286,37 @@
   - Method `.test_outpost_and_away_crew_cannot_command()`
   - Method `.test_captain_is_excluded_from_ship_bonuses()`
   - Method `.test_captain_state_round_trips()`
+
+---
+
+### [`tests/test_fleet_command.py`](tests/test_fleet_command.py)
+> *Unified fleet report/action, REST and CLI tests.*
+
+**Size**: `208` lines (`8856` bytes)
+
+**Classes:**
+- `class TestFleetReport`
+  - Method `.test_report_normalizes_every_asset_kind()`
+  - Method `.test_summary_is_compact()`
+  - Method `.test_snapshot_carries_fleet_counts()`
+- `class TestFleetActions`
+  - Method `.test_buy_deploy_collect_refit_and_dismiss_drone()`
+  - Method `.test_buy_assign_role_train_and_sell_escort()`
+  - Method `.test_hire_and_dismiss_mercenary()`
+  - Method `.test_form_alliance()`
+  - Method `.test_invalid_action_is_rejected()`
+- `class TestFleetSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_the_report()`
+  - Method `.test_action_endpoint_buys_a_drone()`
+  - Method `.test_cli_overview_and_mercenary_hire()`
+
+**Functions:**
+- `def _engine()`
 
 ---
 
@@ -2880,7 +2911,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `792` lines (`35047` bytes)
+**Size**: `793` lines (`35145` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2997,7 +3028,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3767` lines (`189430` bytes)
+**Size**: `3836` lines (`192582` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3207,7 +3238,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10425` lines (`514656` bytes)
+**Size**: `10427` lines (`514758` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3584,6 +3615,23 @@
 - `def fleet_evasion_bonus(ships, formation)`
 - `def apply_fleet_casualties(ships, damage)` - *Distribute incoming damage across escorts, returning survivors and absorbed damage.*
 - `def repair_fleet_ships(ships, amount)`
+
+---
+
+### [`voidfarer/fleet_command.py`](voidfarer/fleet_command.py)
+> *One report and action surface for every fleet asset.*
+
+**Size**: `180` lines (`6766` bytes)
+
+**Functions:**
+- `def _drone_rows(state)`
+- `def _escort_rows(state)`
+- `def _mercenary_rows(state, mercenary_units)`
+- `def _alliance_rows(state)`
+- `def fleet_report(state)` - *Return the whole fleet roster, catalogs, upkeep and alliance state.*
+- `def fleet_summary(state)` - *Compact payload for /api/state.*
+- `def _text(value)`
+- `def fleet_action(engine, action, **kwargs)` - *Route one fleet command to its existing engine method.*
 
 ---
 
@@ -4005,7 +4053,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1624` lines (`69752` bytes)
+**Size**: `1632` lines (`70063` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

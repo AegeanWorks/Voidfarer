@@ -81,9 +81,10 @@ voidfarer/
 │   ├── galaxy.py         <- procedural star system & hyperlane generator
 │   ├── demographics.py   <- world capacity, tech limits & logistic population
 │   ├── engine.py         <- deterministic state machine & coordinator
-│   ├── encounters.py     <- one normalized view/resolver for blocking encounters
-│   ├── fitting.py        <- one report/install surface for all ship hardware
-│   ├── state_machines.py <- canonical implicit machine registry & inspector
+│   ├── encounters.py     <- blocking encounter facade
+│   ├── fitting.py        <- ship fitting facade
+│   ├── fleet_command.py  <- fleet report/action facade
+│   ├── state_machines.py <- implicit machine registry
 │   ├── reactor.py        <- reactor modes, heat, cooling & derating
 │   ├── mapmods.py        <- procedural sector map modifiers
 │   ├── shipmods.py       <- structural ship modification catalog
@@ -135,7 +136,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (83 suites)
+└── tests/                <- unit & integration test suite (84 suites)
 ```
 
 ---
@@ -383,7 +384,7 @@ mechanic families, succeeds on 38 endpoints, attempts 51 and reports **zero cove
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
-Click-map enumerates controls (`voidfarerClickMap()`); missing/duplicates fail (desktop:
+Click-map enumerates controls; missing/duplicates fail (desktop:
 184 controls, 39 visible, 0 missing/dup). 5 systems; `MORE SYSTEMS` restores sixteen.
 PLAYER sits in the strip. SHIP/COMMERCE/FLEET collapse their catalogs; tabs share
 56px headers. Reactor presets default (sliders under FINE TUNE); combat keeps four actions
@@ -584,7 +585,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,359-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,370-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 
