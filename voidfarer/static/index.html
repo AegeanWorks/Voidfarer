@@ -1112,34 +1112,43 @@
                             <span class="target-dist" id="targetDist">-- AU</span>
                         </div>
                         <p class="target-desc" id="targetDesc">Click on any celestial planet, orbital station, or star in the radar to plot trajectory.</p>
-                        <div class="target-info-grid" id="targetInfoGrid">
-                            <span>GRAVITY <strong id="targetGravity">--</strong></span>
-                            <span>ATMOSPHERE <strong id="targetAtmosphere">--</strong></span>
-                            <span>TEMP <strong id="targetTemp">--</strong></span>
-                            <span>HABITABILITY <strong id="targetHabitability">--</strong></span>
-                            <span>POP CAPACITY <strong id="targetCapacity">--</strong></span>
-                            <span>WORLD TECH <strong id="targetTech">--</strong></span>
-                            <span>MOONS <strong id="targetMoons">--</strong></span>
-                            <span>FACTION <strong id="targetFaction">--</strong></span>
-                            <span>POPULATION <strong id="targetPopulation">--</strong></span>
-                            <span>DEVASTATION <strong id="targetDevastation">--</strong></span>
-                            <span>GOVERNMENT <strong id="targetGovernment">--</strong></span>
-                        </div>
-                        <div class="target-resources" id="targetResources"></div>
-                        <div class="salvage-info" id="salvageInfo" style="display:none;"></div>
-                        <div class="transit-plan" id="transitPlan" style="display:none;"></div>
+                        <div class="target-summary-strip" id="targetSummary"></div>
                         <div class="target-actions" id="targetActions">
                             <button class="btn-action btn-cyan" id="btnOrbitTarget" title="Timed sublight transit; orbit is established on arrival" disabled>TRANSIT &amp; ORBIT</button>
                             <button class="btn-action btn-purple" id="btnQuantumTarget" title="One-tick micro-jump; costs quantum fuel" disabled>QUANTUM TRANSIT</button>
                             <button class="btn-action btn-green" id="btnLandTarget" style="display:none;" disabled>LAND ON SURFACE</button>
                             <button class="btn-action btn-red" id="btnSalvageTarget" style="display:none;" disabled>BOARD DERELICT</button>
-                            <button class="btn-action btn-amber" id="btnScoopFuel" style="display:none;" disabled>SCOOP FUEL</button>
-                            <button class="btn-action btn-amber" id="btnRebuildTarget" data-testid="rebuild-target" style="display:none;" disabled>REBUILD WORLD</button>
-                            <button class="btn-action btn-green" id="btnReliefTarget" data-testid="relief-target" style="display:none;" disabled>DELIVER RELIEF</button>
-                            <button class="btn-action btn-purple" id="btnRestoreTarget" data-testid="restore-target" style="display:none;" disabled>RESTORE MEGASTRUCTURE</button>
                             <button class="btn-action btn-purple" id="btnJumpTarget" style="display:none;" disabled>HYPERSPACE JUMP</button>
                             <button class="btn-action btn-cyan" id="btnHailTarget" style="display:none;" data-testid="hail-target" disabled>HAIL SHIP</button>
                             <button class="btn-action" id="btnClearTarget" style="display:none;" data-testid="clear-target" title="Clear the selected target">CLEAR</button>
+                        </div>
+                        <button class="target-disclosure-toggle" id="btnToggleTargetActions" data-label="MORE ACTIONS" aria-expanded="false" aria-controls="targetMoreActions" title="Show or hide situational target actions" hidden>SHOW MORE ACTIONS</button>
+                        <div id="targetMoreActions" hidden>
+                            <div class="target-actions target-actions-secondary">
+                                <button class="btn-action btn-amber" id="btnScoopFuel" style="display:none;" disabled>SCOOP FUEL</button>
+                                <button class="btn-action btn-amber" id="btnRebuildTarget" data-testid="rebuild-target" style="display:none;" disabled>REBUILD WORLD</button>
+                                <button class="btn-action btn-green" id="btnReliefTarget" data-testid="relief-target" style="display:none;" disabled>DELIVER RELIEF</button>
+                                <button class="btn-action btn-purple" id="btnRestoreTarget" data-testid="restore-target" style="display:none;" disabled>RESTORE MEGASTRUCTURE</button>
+                            </div>
+                        </div>
+                        <button class="target-disclosure-toggle" id="btnToggleTargetDetails" data-label="DETAILS" aria-expanded="false" aria-controls="targetDetails" title="Show or hide full target statistics">SHOW DETAILS</button>
+                        <div id="targetDetails" hidden>
+                            <div class="salvage-info" id="salvageInfo" style="display:none;"></div>
+                            <div class="transit-plan" id="transitPlan" style="display:none;"></div>
+                            <div class="target-resources" id="targetResources"></div>
+                            <div class="target-info-grid" id="targetInfoGrid">
+                                <span>GRAVITY <strong id="targetGravity">--</strong></span>
+                                <span>ATMOSPHERE <strong id="targetAtmosphere">--</strong></span>
+                                <span>TEMP <strong id="targetTemp">--</strong></span>
+                                <span>HABITABILITY <strong id="targetHabitability">--</strong></span>
+                                <span>POP CAPACITY <strong id="targetCapacity">--</strong></span>
+                                <span>WORLD TECH <strong id="targetTech">--</strong></span>
+                                <span>MOONS <strong id="targetMoons">--</strong></span>
+                                <span>FACTION <strong id="targetFaction">--</strong></span>
+                                <span>POPULATION <strong id="targetPopulation">--</strong></span>
+                                <span>DEVASTATION <strong id="targetDevastation">--</strong></span>
+                                <span>GOVERNMENT <strong id="targetGovernment">--</strong></span>
+                            </div>
                         </div>
                         <div class="surface-ops" id="surfaceOps" style="display:none;" aria-live="polite"></div>
                     </div>

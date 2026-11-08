@@ -1517,6 +1517,59 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestTargetDossierCondensation(unittest.TestCase):
+    """The radar dossier leads with identity, key stats and primary actions."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_full_stat_grid_and_panels_sit_behind_details(self):
+        details = self.html.index('id="targetDetails"')
+        for marker in (
+            'id="targetInfoGrid"',
+            'id="targetResources"',
+            'id="salvageInfo"',
+            'id="transitPlan"',
+        ):
+            self.assertGreater(self.html.index(marker), details)
+        self.assertIn('id="targetDetails" hidden', self.html)
+        self.assertIn('id="btnToggleTargetDetails"', self.html)
+        self.assertIn('data-label="DETAILS"', self.html)
+        self.assertIn("#targetDetails[hidden]", self.css)
+
+    def test_primary_actions_precede_details_and_secondary_actions_wait(self):
+        actions = self.html.index('id="targetActions"')
+        details = self.html.index('id="targetDetails"')
+        more = self.html.index('id="targetMoreActions"')
+        self.assertLess(actions, details)
+        self.assertLess(actions, more)
+        for primary in ("btnOrbitTarget", "btnQuantumTarget", "btnLandTarget",
+                        "btnSalvageTarget", "btnJumpTarget", "btnHailTarget", "btnClearTarget"):
+            self.assertLess(self.html.index(f'id="{primary}"'), details)
+        for situational in ("btnScoopFuel", "btnRebuildTarget", "btnReliefTarget", "btnRestoreTarget"):
+            self.assertGreater(self.html.index(f'id="{situational}"'), more)
+        self.assertIn('id="targetMoreActions" hidden', self.html)
+        self.assertIn('id="btnToggleTargetActions"', self.html)
+        self.assertIn("#targetMoreActions[hidden]", self.css)
+
+    def test_summary_and_disclosure_logic_is_wired(self):
+        self.assertIn('id="targetSummary"', self.html)
+        self.assertIn("setTargetSummary(items)", self.js)
+        self.assertIn("syncTargetActionDisclosure()", self.js)
+        self.assertIn("this.setTargetSummary([", self.js)
+        self.assertGreaterEqual(self.js.count("this.setTargetSummary(["), 4)
+        self.assertIn("btnToggleTargetDetails", self.js)
+        self.assertIn("btnToggleTargetActions", self.js)
+        self.assertIn("toggleSectionDisclosure", self.js)
+        self.assertIn(".target-summary-strip", self.css)
+        self.assertIn(".target-disclosure-toggle[hidden]", self.css)
+        self.assertIn("-webkit-line-clamp: 2", self.css.split(".nav-target-card .target-desc", 1)[1])
+        self.assertIn("this.targetDesc.title = this.targetDesc.textContent.trim()", self.js)
+
+
 class TestLockedAbilityDisclosure(unittest.TestCase):
     """The strip shows unlocked powers first and hides locked chips by default."""
 

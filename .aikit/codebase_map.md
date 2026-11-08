@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `361`
+- **Total Classes**: `362`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2018`
-- **Total Source Lines**: `50762`
+- **Total Class Methods**: `2022`
+- **Total Source Lines**: `50815`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2313` lines (`102373` bytes)
+**Size**: `2366` lines (`105133` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,11 @@
   - Method `.setUpClass()`
   - Method `.test_manual_sliders_default_to_hidden()`
   - Method `.test_power_hint_names_the_visible_presets()`
+- `class TestTargetDossierCondensation` - *The radar dossier leads with identity, key stats and primary actions.*
+  - Method `.setUpClass()`
+  - Method `.test_full_stat_grid_and_panels_sit_behind_details()`
+  - Method `.test_primary_actions_precede_details_and_secondary_actions_wait()`
+  - Method `.test_summary_and_disclosure_logic_is_wired()`
 - `class TestLockedAbilityDisclosure` - *The strip shows unlocked powers first and hides locked chips by default.*
   - Method `.setUpClass()`
   - Method `.test_locked_chips_default_to_hidden()`

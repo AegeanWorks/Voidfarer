@@ -789,3 +789,31 @@ credits, +740 XP, 24-26 frames/~407-417ms, zero errors. Suite `Ran 1286 OK`; cli
 `academy-play/00-academy-start.png` through `07-step-jump.png`; vision review quoted the
 four chips, the two locked chips and each milestone through graduation, and the arrival/
 anomaly overlap it flagged was fixed by the top offset and re-captured.
+
+### Twelfth pass — the target dossier looks before it tells
+
+The radar's selected-target card always showed the 11-field stat grid first, then resources
+and salvage, then up to 11 actions. At 1280×720 the card is 249px tall but its content was
+314–507px, so every state clipped mid-grid and the primary actions (including `BOARD
+DERELICT`) sat below the internal scroll edge. System, captain and open-space targets also
+rendered eight or more empty `--` fields.
+
+The dossier now keeps identity, distance, description, four summary chips and the primary
+actions above the fold. Full statistics, resources, salvage strategy and the transit plan
+move behind `SHOW DETAILS`; scoop/rebuild/relief/restore move behind `SHOW MORE ACTIONS`,
+which appears only when one of them applies. The distance line drops the target's own orbit
+radius to a tooltip so long names no longer collide with it.
+
+Measured: every collapsed state now fits exactly (card scrollHeight 246 = client height,
+zero offscreen actions). Summary examples: station `GRAV 0.50 g / TEMP 21 C / HAB 82%
+OPTIMAL / POP 3.2M` with `IN ORBIT / QUANTUM TRANSIT / CLEAR`; system `CLASS K-type / SEC
+90% / LINKS 4 / FACTION Sol Coalition` with `EXECUTE HYPERSPACE JUMP`; captain `HULL
+120/120 / DMG 10 / CREDITS 3554 cr / STATUS independent` with `HAIL SHIP`. SHOW DETAILS
+reveals 11 stats and the derelict panel (risk 38%→19% on CAUTIOUS); the scoop giant exposes
+`SHOW MORE ACTIONS` → `SCOOP FUEL`. Quantum transit still executes (fuel 60→54, orbit
+`sol_body_5`). Play: 25 frames/403ms, zero errors. Suite `Ran 1289 OK`; click-map
+173/39/0/0; `ui_inventory.py` 1210 lines; gate 5/5. Screenshots:
+`target-before/01-station.png`, `target-before/03-derelict.png` vs
+`target-after/01-station.png`, `03-derelict.png`, `03b-derelict-details.png`,
+`04-system.png`, `08b-scoop-more.png`; vision review confirmed the actions are above the
+fold and flagged only the long-name/distance collision, fixed before the final play.

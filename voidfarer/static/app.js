@@ -660,6 +660,11 @@ class CockpitApp {
         this.targetDevastation = document.getElementById("targetDevastation");
         this.targetGovernment = document.getElementById("targetGovernment");
         this.targetResources = document.getElementById("targetResources");
+        this.targetSummary = document.getElementById("targetSummary");
+        this.btnToggleTargetDetails = document.getElementById("btnToggleTargetDetails");
+        this.targetDetails = document.getElementById("targetDetails");
+        this.btnToggleTargetActions = document.getElementById("btnToggleTargetActions");
+        this.targetMoreActions = document.getElementById("targetMoreActions");
         this.transitPlan = document.getElementById("transitPlan");
         this.transitPreviewToken = 0;
         this.transitPreviewBodyId = null;
@@ -1083,6 +1088,15 @@ class CockpitApp {
             this.selectedTarget = null;
             this.selectedType = null;
             this.updateTargetCard();
+        });
+        const targetDisclosures = [
+            [this.btnToggleTargetDetails, this.targetDetails],
+            [this.btnToggleTargetActions, this.targetMoreActions],
+        ];
+        targetDisclosures.forEach(([button, target]) => {
+            if (button && target) {
+                button.addEventListener("click", () => this.toggleSectionDisclosure(button, target));
+            }
         });
 
         // Power Sliders
@@ -6031,6 +6045,39 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    setTargetSummary(items) {
+        if (!this.targetSummary) return;
+        this.targetSummary.innerHTML = (items || [])
+            .map(([label, value]) => {
+                const text = value === null || value === undefined ? "" : String(value).trim();
+                return text && text !== "--"
+                    ? `<span><em>${this.escapeHtml(label)}</em> ${this.escapeHtml(text)}</span>`
+                    : "";
+            })
+            .join("");
+    }
+
+    // Situational actions (fuel scoop, reconstruction, megastructure) only matter
+    // in rare states; keep their disclosure out of the way when none apply.
+    syncTargetActionDisclosure() {
+        const secondary = [
+            this.btnScoopFuel, this.btnRebuildTarget, this.btnReliefTarget, this.btnRestoreTarget,
+        ].filter(btn => btn && btn.style.display !== "none");
+        const hasSecondary = secondary.length > 0;
+        if (this.btnToggleTargetActions) {
+            this.btnToggleTargetActions.hidden = !hasSecondary;
+            if (!hasSecondary) {
+                this.btnToggleTargetActions.setAttribute("aria-expanded", "false");
+                // A state without situational actions must not leave a stale
+                // "HIDE" label on the toggle for the next applicable target.
+                this.btnToggleTargetActions.textContent = "SHOW MORE ACTIONS";
+            }
+        }
+        if (!hasSecondary && this.targetMoreActions) {
+            this.targetMoreActions.hidden = true;
+        }
+    }
+
     updateTargetCard() {
         if (!this.state) return;
         const travel = this.state.ship?.travel || this.state.travel || null;
@@ -6039,6 +6086,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!this.selectedTarget) {
             // Hide target card when nothing selected
             if (targetCard) targetCard.style.display = "none";
+            this.setTargetSummary([]);
             this.transitPreviewToken += 1;
             this.transitPreviewData = null;
             this.transitPreviewBodyId = null;
@@ -6071,10 +6119,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
             this.targetType.textContent = `TARGET: ${this.bodyTypeLabel(b)}`;
             this.targetName.textContent = b.name;
-            this.targetDist.textContent = `${distAu.toFixed(2)} AU (ORBIT ${b.orbit_radius.toFixed(2)} AU)`;
+            this.targetDist.textContent = `${distAu.toFixed(2)} AU`;
+            this.targetDist.title = `Orbit radius ${b.orbit_radius.toFixed(2)} AU`;
             const survey = this.state.survey;
             const surveyNote = survey && survey.total ? ` | SURVEY ${survey.scanned}/${survey.total}` : "";
             this.targetDesc.textContent = (b.scan_completed ? b.scan_discovery : "Uncharted body. Orbital sensor sweep required.") + surveyNote;
+            const hab = Number(b.habitability ?? 0);
+            const habLabel = b.body_type === "star"
+                ? "STELLAR"
+                : (hab >= 75 ? "OPTIMAL" : (hab >= 45 ? "MARGINAL" : (hab >= 15 ? "HOSTILE" : "BARREN")));
+            const population = Number(b.population || 0);
+            this.setTargetSummary([
+                ["GRAV", `${(b.gravity ?? 1).toFixed(2)} g`],
+                ["TEMP", `${b.temperature_c ?? 0} C`],
+                ["HAB", `${hab.toFixed(0)}% ${habLabel}`],
+                population > 0
+                    ? ["POP", this.compactCount(population)]
+                    : ["FACTION", b.faction || "Unclaimed"],
+            ]);
             this.btnOrbitTarget.style.display = "inline-block";
             this.btnJumpTarget.style.display = "none";
             if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
@@ -6108,10 +6170,6 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.targetAtmosphere.textContent = b.atmosphere || "none";
             this.targetTemp.textContent = `${b.temperature_c ?? 0} C`;
             if (this.targetHabitability) {
-                const hab = Number(b.habitability ?? 0);
-                const habLabel = b.body_type === "star"
-                    ? "STELLAR"
-                    : (hab >= 75 ? "OPTIMAL" : (hab >= 45 ? "MARGINAL" : (hab >= 15 ? "HOSTILE" : "BARREN")));
                 this.targetHabitability.textContent = `${hab.toFixed(1)}% (${habLabel})`;
             }
             if (this.targetCapacity) {
@@ -6266,6 +6324,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.targetName.textContent = captain.name;
             this.targetDist.textContent = `${String(captain.system_id).toUpperCase()} // TRUST ${captain.trust} // STANDING ${captain.standing}`;
             this.targetDesc.textContent = captain.description || "An independent hull running its own agenda.";
+            this.setTargetSummary([
+                ["HULL", `${captain.hull}/${captain.max_hull}`],
+                ["DMG", `${captain.damage}`],
+                ["CREDITS", `${captain.credits} cr`],
+                ["STATUS", captain.ally ? "allied" : (captain.hired ? "hired" : "independent")],
+            ]);
             const cargo = Object.entries(captain.cargo || {}).map(([k, v]) => `${k} x${v}`).join(", ") || "empty hold";
             this.targetGravity.textContent = `${captain.hull}/${captain.max_hull} hull`;
             this.targetAtmosphere.textContent = captain.ally ? "allied" : (captain.hired ? "hired" : "independent");
@@ -6314,6 +6378,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.targetName.textContent = `VECTOR ${p.au.toFixed(2)} AU`;
             this.targetDist.textContent = `${distAu.toFixed(2)} AU TRANSIT // BEARING ${(p.angle * 180 / Math.PI).toFixed(0)} DEG`;
             this.targetDesc.textContent = "Empty void: no body, no orbit. Hold station here to cut a lane, lie low, or wait out a patrol.";
+            this.setTargetSummary([
+                ["VECTOR", `${p.au.toFixed(2)} AU`],
+                ["BEARING", `${(p.angle * 180 / Math.PI).toFixed(0)} DEG`],
+                ["SPACE", "vacuum"],
+            ]);
             this.targetGravity.textContent = "--";
             this.targetAtmosphere.textContent = "vacuum";
             this.targetTemp.textContent = "--";
@@ -6371,6 +6440,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const dist = Math.hypot(s.x - curSys.x, s.y - curSys.y);
             this.targetDist.textContent = `${dist.toFixed(1)} LY`;
             this.targetDesc.textContent = `Faction: ${factionName} // Security: ${(s.security * 100).toFixed(0)}% // Linked: ${isConn ? 'YES' : 'NO'}`;
+            this.setTargetSummary([
+                ["CLASS", `${s.spectral_type}-type`],
+                ["SEC", `${(s.security * 100).toFixed(0)}%`],
+                ["LINKS", `${s.connections.length}`],
+                ["FACTION", factionName || "Unclaimed"],
+            ]);
             this.targetGravity.textContent = `${s.spectral_type}-class`;
             this.targetAtmosphere.textContent = `${(s.security * 100).toFixed(0)}% sec`;
             this.targetTemp.textContent = `${s.connections.length} links`;
@@ -6397,6 +6472,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
             if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
         }
+        // Long scan discoveries clamp to two lines; keep the full copy on hover.
+        if (this.targetDesc) this.targetDesc.title = this.targetDesc.textContent.trim();
+        this.syncTargetActionDisclosure();
     }
 
     // --- Canvas Radar Rendering ---

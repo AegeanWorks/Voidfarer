@@ -778,5 +778,47 @@
     "final_snapshot_digest": "aa845addf6bdf129633629a47896c10f660a923a64e648753d08888da0415348",
     "final_snapshot_entries": 1203,
     "surface_digest": "7dc5040beb0c7bd209a2d10f30637c5a9b745b560a8246b8893f3a5c2bb0a67b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "69aac77f8b15d08817021cf0940b842a2b324b3b",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794139419.061298,
+    "finished_at": 1794139690.5892522,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; summary chips + primary actions above the fold, details/salvage reveal, MORE ACTIONS scoop)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "8be788120f2a3d36be9d97bae67047834b89dd0ee62f77f303d93f1d64c231cb",
+    "final_snapshot_entries": 1210,
+    "surface_digest": "421b706c27bad4fad5fd1d60ce826e0712c6ad394c23417da3ec7b9614a4da0f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "f23430bf6f55949d8be40fd3b6f7fdb8ffb35b1d",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794140830.0395625,
+    "finished_at": 1794141039.3913362,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; dossier states previously reviewed; label reset verified by real-browser play)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "8be788120f2a3d36be9d97bae67047834b89dd0ee62f77f303d93f1d64c231cb",
+    "final_snapshot_entries": 1210,
+    "surface_digest": "c83b5a0dd30d53b07b2c736946861acbfd1ec574a267c6ceabff7b6f4e7dcf1b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "8289b1cb4b4e5ec872574b19415ea845a5241150",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794141672.267364,
+    "finished_at": 1794141872.4658356,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; dossier previously reviewed; description clamp and label reset verified by real-browser play)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "8be788120f2a3d36be9d97bae67047834b89dd0ee62f77f303d93f1d64c231cb",
+    "final_snapshot_entries": 1210,
+    "surface_digest": "7e4dc706acfce350d6509e76173c5704d5c5fa35625fbe127ccf97e97e36314f"
   }
 ]

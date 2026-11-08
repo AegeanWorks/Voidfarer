@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-locked-abilities-academy",
+    "task_id": "voidfarer-target-dossier",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794137025.905497,
+    "updated_at": 1794140289.893181,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794137026.2668512
+    "completed_at": 1794140292.4919558
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-fleet-disclosures",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "FLEET condensation verified: 1271px to 957px, contracts/procurement disclosures, zero-drone hiring preserved; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794101888.3384132,
-      "timestamp_str": "2026-11-08 04:38:08",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-196 and FLEET proof",
-        "evidence": "ui-review/fleet-before/01-fleet-collapsed.png, fleet-after/01..04, fleet-after/play-report.json, click-map 163/47/0/0"
-      }
-    },
-    {
-      "task_id": "voidfarer-fleet-disclosures",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-fleet-disclosures' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794101889.242008,
-      "timestamp_str": "2026-11-08 04:38:09",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-left-panel-uniformity",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: give every left tab the same compact header, section rhythm and readable narrow rows",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794110307.9498754,
-      "timestamp_str": "2026-11-08 06:58:27",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "All 16 left tabs were measured at 1280x720: headers ranged 46-136px because 17px titles wrapped and actions fell to extra rows, DEPOT squeezed item names into one-word columns, EMPIRE research names into ~80px, and STORY clipped a faction name.",
-        "benefits": "Every tab starts at the same 56px height with a single-line title; section headings match; depot, research and story rows become fully readable; three content tabs shrink further.",
-        "risks": "contract: UI surface and static copy; dependency: none; concurrency: none; state: none (CSS/HTML/JS layout only); regression: dynamic long titles ellipsize but keep a hover title, and shortened intros retain the full text in title attributes.",
-        "mitigation": "Static uniformity test, a 16-tab browser sweep with header/title/list assertions, before/after vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "7a1c5798127b4f22d29cc79bcfe7c7db733733a958f05491a3fec7c762ce3285"
-    },
     {
       "task_id": "voidfarer-left-panel-uniformity",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794137026.2668524,
       "timestamp_str": "2026-11-08 14:23:46",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-target-dossier",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: make the radar target dossier summary-first with details and rare actions disclosed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794140286.4650426,
+      "timestamp_str": "2026-11-08 15:18:06",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "At 1280x720 the selected-target card is 249px tall but its content is 314-507px in every state, so the 11-field stat grid clips mid-row and the primary actions (including BOARD DERELICT) sit below the internal scroll edge; system/captain/point states also fill the grid with placeholder dashes.",
+        "benefits": "Every selected target shows four key-stat chips and its primary actions above the fold without scrolling, full stats and salvage stay one click away, and rare actions appear only when they apply.",
+        "risks": "contract: target dossier UI; dependency: none; concurrency: none; state: disclosure DOM flags only, no save change; regression: transit, land, board, jump, hail, salvage strategy and scoop must remain reachable and functional.",
+        "mitigation": "Static condensation test, multi-state browser play with real quantum transit and salvage strategy selection, before/after measurement, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "e76de55624d210ba10ccb9e8a1bb978ec8b467ae6b88ed14930e5557b6ad3d61"
+    },
+    {
+      "task_id": "voidfarer-target-dossier",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Target dossier verified: every collapsed state fits 246px with zero offscreen actions, details reveal 11 stats, MORE ACTIONS reveals scoop; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794140289.893181,
+      "timestamp_str": "2026-11-08 15:18:09",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-203 and target dossier proof",
+        "evidence": "ui-review/target-before/01,03, target-after/01,03,03b,04,08b, target-play/play-report.json, click-map 173/39/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-target-dossier",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-target-dossier' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794140292.4919589,
+      "timestamp_str": "2026-11-08 15:18:12",
       "agent": "opencode:campaign"
     }
   ]
