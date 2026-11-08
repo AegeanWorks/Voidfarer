@@ -172,10 +172,21 @@ pirate or customs gate is blocking everything else.
 void. `void_dive()` calls it after its own specific checks. `combat_action()` is unchanged,
 so combat maneuvers remain available during an engagement.
 
+### Unified encounter surface
+
+The four blocking machines (decision, pirate, customs, anomaly) are also exposed
+as one normalized encounter payload. `voidfarer/encounters.py` returns
+`{kind, tag, title, description, detail, actions[]}` with costs and disabled
+reasons, and `resolve()` delegates to the existing resolvers. It is served by
+`GET /api/encounter` and `POST /api/encounter/resolve`, included as `encounter`
+in `/api/state`, and reachable through the `encounter` CLI command. The four
+legacy routes and commands remain as compatibility paths.
+
 ## Verification
 
 - `python -m unittest tests.test_state_machines -v` → **22 tests, OK**.
-- `python -m unittest discover` → **1334 tests, OK** (see the delivery commit).
+- `python -m unittest tests.test_encounters -v` → **14 tests, OK**.
+- `python -m unittest discover` → **1348 tests, OK** (see the delivery commit).
 - `python aikit.py check voidfarer` → **5/5** gates.
 - Live gate probe before the fix: combat/anomaly `orbit` and `travel` returned `True`;
   after the fix the same calls return `False` with the machine-specific message.

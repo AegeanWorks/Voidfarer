@@ -20,6 +20,11 @@ except (ValueError, OSError):  # hygiene: allow non-reconfigurable stdio streams
     pass
 
 from voidfarer import __version__
+from voidfarer.encounters import (
+    ENCOUNTER_KINDS,
+    active_encounter,
+    resolve as resolve_encounter,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -95,13 +100,14 @@ RESET = "\033[0m"
 # save family (save/load/delete plus new-game/reset equivalents), settings
 # only manages decision cadence (like /api/settings/decisions).
 _ALWAYS_ALLOWED = frozenset({
-    "decision", "status", "saves", "serve", "time", "settings", "state-machines",
+    "decision", "encounter", "status", "saves", "serve", "time", "settings",
+    "state-machines",
 })
 _PIRATE_ALLOWED = _ALWAYS_ALLOWED | {"pirate"}
 _CUSTOMS_ALLOWED = _ALWAYS_ALLOWED | {"customs", "pirate"}
 # REPL aliases for the same sets (REPL verbs differ from shell commands).
 _REPL_ALWAYS_ALLOWED = frozenset({
-    "decision", "decide", "status", "saves", "save", "load",
+    "decision", "decide", "encounter", "status", "saves", "save", "load",
     "serve", "time", "settings", "options", "state-machines",
     "help", "?", "exit", "quit", "q",
 })
@@ -2465,6 +2471,45 @@ def cmd_decision(engine: SimulationEngine, storage: StorageManager, parts: list[
     return 1
 
 
+def cmd_encounter(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """Inspect or resolve the single blocking encounter (decision/pirate/customs/anomaly)."""
+    args = [part for part in parts[1:] if part]
+    if not args or args[0].lower() in ("status", "show", "info"):
+        encounter = active_encounter(engine.state)
+        if encounter is None:
+            print(
+                f"\n{DIM}No blocking encounter. A decision, pirate toll, customs "
+                f"stop or anomaly will appear here.{RESET}"
+            )
+            return 0
+        print(f"\n{YELLOW}{BOLD}=== {encounter['tag']} ==={RESET}")
+        print(f"{BOLD}{encounter['title']}{RESET}")
+        if encounter["description"]:
+            print(encounter["description"])
+        if encounter["detail"]:
+            print(encounter["detail"])
+        for action in encounter["actions"]:
+            detail = f" {DIM}{action['detail']}{RESET}" if action.get("detail") else ""
+            blocked = f" {RED}({action['reason']}){RESET}" if action.get("disabled") else ""
+            print(f"  {CYAN}{action['id']:<16}{RESET} {action['label']}{detail}{blocked}")
+        print(f"{DIM}Resolve: encounter <action> | encounter {encounter['kind']} <action>{RESET}")
+        return 0
+    if args[0].lower() == "resolve":
+        args = args[1:]
+    kind = None
+    if args and args[0].lower() in ENCOUNTER_KINDS:
+        kind = args[0].lower()
+        args = args[1:]
+    if not args:
+        print(f"{RED}An encounter action is required.{RESET}")
+        return 1
+    ok, msg = resolve_encounter(engine, kind, args[0])
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
+
+
 def cmd_quantum(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
     action = parts[1].lower() if len(parts) > 1 else "routes"
     report = engine.get_quantum_trade_report()
@@ -3191,6 +3236,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     decision_p.add_argument("action", nargs="?", default="status", choices=["status", "choose"])
     decision_p.add_argument("choice_id", nargs="?", help="Choice id to resolve")
 
+    encounter_p = subparsers.add_parser(
+        "encounter",
+        help="One blocking encounter: status or resolve a decision, pirate, customs stop, or anomaly",
+    )
+    encounter_p.add_argument("action", nargs="?", default="status", help="status, resolve, a kind, or an action")
+    encounter_p.add_argument("value", nargs="?", help="kind or action")
+    encounter_p.add_argument("choice", nargs="?", help="action when a kind is given")
+
     customs_p = subparsers.add_parser("customs", help="Inspect or resolve a customs interdiction")
     customs_p.add_argument(
         "action", nargs="?", default="status",
@@ -3323,6 +3376,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_customs(engine, storage, ["customs", args.action])
     elif args.command == "decision":
         return cmd_decision(engine, storage, ["decision", args.action] + ([args.choice_id] if args.choice_id else []))
+    elif args.command == "encounter":
+        return cmd_encounter(engine, storage, ["encounter", args.action, args.value, args.choice])
     elif args.command == "quantum":
         return cmd_quantum(engine, storage, ["quantum", args.action] + list(args.values))
     elif args.command == "surface":

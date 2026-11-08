@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `129`
-- **Total Classes**: `379`
-- **Total Top-Level Functions**: `390`
-- **Total Class Methods**: `2083`
-- **Total Source Lines**: `52802`
+- **Total Python Modules**: `131`
+- **Total Classes**: `382`
+- **Total Top-Level Functions**: `404`
+- **Total Class Methods**: `2102`
+- **Total Source Lines**: `53409`
 
 ---
 
@@ -996,6 +996,44 @@
   - Method `.test_background_matching_is_case_insensitive()`
   - Method `.test_unknown_background_passes_through_without_bonus()`
   - Method `.test_background_bonuses_apply_after_budget_validation()`
+
+---
+
+### [`tests/test_encounters.py`](tests/test_encounters.py)
+> *Unified blocking-encounter payload, resolver, REST and CLI tests.*
+
+**Size**: `307` lines (`11661` bytes)
+
+**Classes:**
+- `class TestEncounterPayload`
+  - Method `.test_no_active_encounter()`
+  - Method `.test_decision_has_priority()`
+  - Method `.test_pirate_payload_reports_costs_and_disabled_actions()`
+  - Method `.test_customs_payload_reports_fine_bribe_and_fuel()`
+  - Method `.test_anomaly_and_decision_expose_their_choices()`
+- `class TestEncounterResolver`
+  - Method `.test_pirate_pay_matches_the_legacy_resolver()`
+  - Method `.test_customs_bribe_matches_the_legacy_resolver()`
+  - Method `.test_anomaly_and_decision_clear_through_the_facade()`
+  - Method `.test_kind_mismatch_and_empty_action_are_rejected()`
+  - Method `.test_snapshot_carries_the_encounter()`
+- `class TestEncounterSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_reports_the_active_encounter()`
+  - Method `.test_resolve_endpoint_works_while_blocked()`
+  - Method `.test_decision_allowlist_accepts_the_unified_route()`
+  - Method `.test_cli_inspects_and_resolves_while_blocked()`
+
+**Functions:**
+- `def _engine()`
+- `def _pirate()`
+- `def _customs()`
+- `def _anomaly()`
+- `def _decision()`
 
 ---
 
@@ -2811,7 +2849,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `789` lines (`34751` bytes)
+**Size**: `790` lines (`34861` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -2928,7 +2966,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3638` lines (`183568` bytes)
+**Size**: `3693` lines (`186036` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -2984,6 +3022,7 @@
 - `def cmd_overhaul(engine, storage)`
 - `def cmd_fabricate(engine, storage, blueprint)`
 - `def cmd_decision(engine, storage, parts)`
+- `def cmd_encounter(engine, storage, parts)` - *Inspect or resolve the single blocking encounter (decision/pirate/customs/anomaly).*
 - `def cmd_quantum(engine, storage, parts)`
 - `def cmd_surface(engine, storage, parts)`
 - `def cmd_weapons(engine, storage, parts)`
@@ -3101,6 +3140,23 @@
 
 ---
 
+### [`voidfarer/encounters.py`](voidfarer/encounters.py)
+> *Unified view and resolver for VoidFarer's blocking encounters.*
+
+**Size**: `224` lines (`7685` bytes)
+
+**Functions:**
+- `def _action(action_id, label, detail, *, cost, disabled, reason)`
+- `def _decision(state)`
+- `def _pirate(state)`
+- `def _customs(state)`
+- `def _anomaly(state)`
+- `def active_encounter(state)` - *Return the highest-priority blocking encounter, or None.*
+- `def encounter_report(state)` - *Compact payload for /api/state, the cockpit and agents.*
+- `def resolve(engine, kind, action)` - *Resolve the active encounter through its existing engine resolver.*
+
+---
+
 ### [`voidfarer/enemies.py`](voidfarer/enemies.py)
 > *Hostile Enemy Archetypes, Tactical Combat AI, and Procedural Intercept Generation.*
 
@@ -3119,7 +3175,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10421` lines (`514445` bytes)
+**Size**: `10423` lines (`514554` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3899,7 +3955,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1575` lines (`67775` bytes)
+**Size**: `1593` lines (`68632` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

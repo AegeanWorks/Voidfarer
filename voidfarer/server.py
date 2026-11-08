@@ -17,6 +17,7 @@ from typing import Any
 
 from voidfarer.agent_api import build_action_catalog
 from voidfarer.economy import get_galactic_trade_routes
+from voidfarer.encounters import encounter_report, resolve as resolve_encounter
 from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
 from voidfarer.frontier import MERCENARY_CATALOG
 from voidfarer.inventory import get_inventory_manifest
@@ -195,6 +196,12 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
                 "current": current,
                 "situation": summary,
             })
+            return
+
+        if path == "/api/encounter":
+            with self.engine.lock:
+                report = encounter_report(self.engine.state)
+            self._send_json({"ok": True, **report})
             return
 
         if path == "/api/catalogs":
@@ -462,7 +469,8 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         pending = self.engine.state.pending_decision
         if pending is not None and path not in (
-            "/api/decision/resolve",  "/api/save", "/api/settings/decisions",
+            "/api/decision/resolve", "/api/encounter/resolve",
+            "/api/save", "/api/settings/decisions",
             "/api/load", "/api/new-game", "/api/reset", "/api/delete-save",
         ):
             self._send_error_json(
@@ -475,7 +483,8 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         if (
             self.engine.state.active_customs is not None
             and path not in (
-                "/api/customs/resolve", "/api/pirate/resolve", "/api/decision/resolve",  "/api/save",
+                "/api/customs/resolve", "/api/pirate/resolve", "/api/decision/resolve",
+                "/api/encounter/resolve", "/api/save",
                 "/api/settings/decisions", "/api/load", "/api/new-game", "/api/reset",
                 "/api/delete-save",
             )
@@ -492,9 +501,9 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
         if (
             self.engine.state.active_pirate is not None
             and path not in (
-                "/api/pirate/resolve", "/api/decision/resolve",  "/api/save",
-                "/api/settings/decisions", "/api/load", "/api/new-game", "/api/reset",
-                "/api/delete-save",
+                "/api/pirate/resolve", "/api/decision/resolve", "/api/encounter/resolve",
+                "/api/save", "/api/settings/decisions", "/api/load", "/api/new-game",
+                "/api/reset", "/api/delete-save",
             )
         ):
             pirate = self.engine.state.active_pirate
@@ -698,6 +707,15 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/decision/resolve":
             ok, msg = self.engine.resolve_decision(str(body.get("choice_id", "")))
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/encounter/resolve":
+            raw_kind = body.get("kind") if isinstance(body, dict) else None
+            kind = str(raw_kind) if raw_kind else None
+            action = str((body or {}).get("action", ""))
+            ok, msg = resolve_encounter(self.engine, kind, action)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return
