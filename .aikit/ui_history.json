@@ -1069,5 +1069,19 @@
     "final_snapshot_digest": "2c1e2fd94bf1f34df25c59c16660488bc9b7782ceee6ced23411f447f5f635d4",
     "final_snapshot_entries": 1238,
     "surface_digest": "e9a5d7c52cba46e23af0ab3d91751393744c30f7f0432188c147464ff2fb50e8"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "1aed3c490715930737d57417b5d24688f75a3cb2",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794171991.6564407,
+    "finished_at": 1794172080.7207513,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (no visual change; re-baseline after moving modules into REFIT)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "2c1e2fd94bf1f34df25c59c16660488bc9b7782ceee6ced23411f447f5f635d4",
+    "final_snapshot_entries": 1238,
+    "surface_digest": "7a39ec97c577f1ab6cf6ec78767cd01b125e48321e39829999aee11239cbe5e9"
   }
 ]
