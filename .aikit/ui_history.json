@@ -960,5 +960,19 @@
     "final_snapshot_digest": "684e8e9ae2834b7fc07f55e666f1afb1b1cbdb2fc8158ab9d2ec4c21a4762104",
     "final_snapshot_entries": 1255,
     "surface_digest": "db34ce3870ed795a2808882b2ac852af0650e887f3fb809e6844ffc06c4f2e2c"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "d5d0d2337bf4ea06991aaf51239bbf859ae765c4",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794163803.165501,
+    "finished_at": 1794163864.2086456,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (no visual change; server-side state-machine endpoint re-baseline)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "43786b61ad22a8bf70b109f67a3959e81dfa279684f70277bb4d0af8bcb1b323",
+    "final_snapshot_entries": 1256,
+    "surface_digest": "45963ef857b63262cbd8ec22ae6c60eaeb6c851f165fe8303e9ea76918167574"
   }
 ]
