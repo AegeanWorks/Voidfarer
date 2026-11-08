@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `357`
+- **Total Classes**: `358`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2005`
-- **Total Source Lines**: `50602`
+- **Total Class Methods**: `2008`
+- **Total Source Lines**: `50619`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2203` lines (`97434` bytes)
+**Size**: `2220` lines (`98108` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -603,6 +603,10 @@
 - `class TestShipDisclosures` - *The dense SHIP tab defaults to collapsed rooms and module catalog.*
   - Method `.setUpClass()`
   - Method `.test_rooms_and_catalog_use_named_disclosures()`
+- `class TestHudLabelPolish` - *The radar scale label and the Battle Focus chip must not clip.*
+  - Method `.setUpClass()`
+  - Method `.test_range_scale_label_stays_right_of_the_drawer()`
+  - Method `.test_battle_focus_chip_uses_the_short_focus_label()`
 - `class TestAdvancedLeftCondensation` - *The three largest advanced tabs start with summary-first disclosures.*
   - Method `.setUpClass()`
   - Method `.test_large_catalogs_default_to_hidden_details()`

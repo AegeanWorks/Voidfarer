@@ -710,3 +710,19 @@ and career stats show three full rows (144px scroll box). Play: 23 frames/401ms,
 errors. Click-map 169/47/0/0; `ui_inventory.py` 1195 lines; suite `Ran 1277 OK`; gate 5/5.
 Screenshots: `advanced-after/*.png`; vision review approved the collapsed/open states and
 the card rhythm, and the codex stats row fix was re-reviewed.
+
+### Eighth pass — HUD label polish
+
+Two known 1280x720 defects remained after the left-panel work: the radar scale label was
+centered over a short bar and started under the left drawer (rendering `ANGE SCALE`), and
+the Battle Focus chip ellipsized to `Battle Fo...` in its 70px name column. The label center
+is now clamped to the map inset plus half the text width, and the chip displays the short
+`Focus` label while its title keeps `Battle Focus`.
+
+Measured: label left edge 500.3px vs map inset 478.3px; all six chip names 70/70px with
+`clipped: false`; 24 frames/410ms, zero errors. The 16-tab sweep still reports 16/16 56px
+headers and one-line titles, ok true. Suite `Ran 1279 OK`; click-map 169/47/0/0;
+`ui_inventory.py` 1195 lines; gate 5/5. Screenshots:
+`polish-before/01-cockpit-before.png` vs `polish-after/01-cockpit.png`; vision review quoted
+`ANGE SCALE`/`Battle Fo...` before and `RANGE SCALE [ 10 AU ]`/`Focus` after, with no new
+clipping.

@@ -1468,6 +1468,23 @@ class TestShipDisclosures(unittest.TestCase):
         self.assertIn(".ship-room-details[hidden], .ship-modules-grid[hidden]", self.css)
 
 
+class TestHudLabelPolish(unittest.TestCase):
+    """The radar scale label and the Battle Focus chip must not clip."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_range_scale_label_stays_right_of_the_drawer(self):
+        self.assertIn("const scaleLabelX = Math.max(", self.js)
+        self.assertIn("padX + ctx.measureText(scaleLabel).width / 2", self.js)
+        self.assertIn("padX + scalePx * 0.5", self.js)
+
+    def test_battle_focus_chip_uses_the_short_focus_label(self):
+        self.assertIn('name: "Battle Focus", label: "Focus"', self.js)
+        self.assertNotIn('label: "Battle Focus"', self.js)
+
+
 class TestAdvancedLeftCondensation(unittest.TestCase):
     """The three largest advanced tabs start with summary-first disclosures."""
 

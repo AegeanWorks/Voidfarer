@@ -703,5 +703,19 @@
     "final_snapshot_digest": "bc4492b543b840e02c92072f0058452a2f253b3ddf7b5d2c079aa8024f65c231",
     "final_snapshot_entries": 1195,
     "surface_digest": "f9fd223699c52c424bf4278c8d039996cfad76c017ac4bba65f14b753e4f9896"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "efc37629a414483b99c823cc6f557d7703dbd9ba",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794114722.3361728,
+    "finished_at": 1794114990.4833782,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; RANGE SCALE restored, Focus chip complete)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "bc4492b543b840e02c92072f0058452a2f253b3ddf7b5d2c079aa8024f65c231",
+    "final_snapshot_entries": 1195,
+    "surface_digest": "9ec0cb1462bdd682f805d9b740a6475b3fa3c7ad4f297debfd3209ae9a703663"
   }
 ]

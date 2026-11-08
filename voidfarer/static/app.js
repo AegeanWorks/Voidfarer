@@ -55,7 +55,7 @@ const ABILITY_ORDER = ["overclock", "emergency_repair", "battle_focus", "charm_o
 const ABILITY_META = {
     overclock: { icon: "↯", name: "Reactor Overclock", label: "Overclock" },
     emergency_repair: { icon: "✚", name: "Emergency Repair", label: "Repair" },
-    battle_focus: { icon: "◎", name: "Battle Focus", label: "Battle Focus" },
+    battle_focus: { icon: "◎", name: "Battle Focus", label: "Focus" },
     charm_offensive: { icon: "⚖", name: "Diplomatic Offensive", label: "Diplomacy" },
     science_burst: { icon: "⌬", name: "Science Burst", label: "Science" },
     trade_instinct: { icon: "¤", name: "Trade Instinct", label: "Trade" },
@@ -7222,7 +7222,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
                 ctx.fillStyle = "rgba(127, 183, 201, 0.65)";
                 ctx.textAlign = "center";
-                ctx.fillText(`RANGE SCALE [ ${scaleAu < 1 ? scaleAu.toFixed(1) : scaleAu.toFixed(0)} AU ]`, padX + scalePx * 0.5, padY - 6);
+                const scaleLabel = `RANGE SCALE [ ${scaleAu < 1 ? scaleAu.toFixed(1) : scaleAu.toFixed(0)} AU ]`;
+                // Center over the bar, but never let the text start under the
+                // left terminal drawer on a short scale.
+                const scaleLabelX = Math.max(
+                    padX + ctx.measureText(scaleLabel).width / 2,
+                    padX + scalePx * 0.5,
+                );
+                ctx.fillText(scaleLabel, scaleLabelX, padY - 6);
                 ctx.restore();
             }
         }
