@@ -976,3 +976,18 @@ badge tracked live unread; 25 frames/402ms, zero errors. Suite `Ran 1308 OK`; cl
 `messages-play/01-messages-default.png`, `02-archive-open.png`, `03-after-choice.png`;
 vision review confirmed the inbox deck, the readable archive reveal, the live
 resolved/unread update, and no new clipping or overlap.
+
+### Twentieth pass — header badges reach the 12px readability floor
+
+A fresh story capture at 1280×720 reported `tiny 1`: `TARGET: SOL` measured 11px. The
+shared header rule `.tab-content > .panel-header > button, … > .badge-arch` set 11px, so
+market `HIGH_TECH` and codex `0 / 62 CLAIMED (0%)` shared the same sub-floor size. The
+rule now uses 12px while keeping `min-height: 22px`, padding and the 56px header layout.
+
+Measured: story, market and codex captures move from `tiny 1` to `tiny 0` with `hscroll 0`
+and zero errors; all three badges remain on the tag row with no wrap or overflow. Suite
+`Ran 1309 OK`; `ui_inventory.py` 1255 lines; gate 5/5. Screenshots:
+`story-check/short-story.png` (before) vs `badge-after-story/short-story.png`,
+`badge-before-market/short-market.png` vs `badge-after-market/short-market.png`,
+`badge-before-codex/short-codex.png` vs `badge-after-codex/short-codex.png`; vision
+review confirmed the larger badges stay legible with no layout shift.

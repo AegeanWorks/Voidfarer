@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-messages-condense",
+    "task_id": "voidfarer-header-badge-legibility",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794157959.8843763,
+    "updated_at": 1794158624.4179423,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794157968.2396922
+    "completed_at": 1794158637.189243
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-surface-ops",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Surface ops verified: 714->188px default with RUN above the fold, map/list reveals, real survey +180 cr and 1/9 worked; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794144321.3087265,
-      "timestamp_str": "2026-11-08 16:25:21",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-204 and surface proof",
-        "evidence": "ui-review/surface-before/01, surface-after/01, surface-play/01..06, play-report.json, click-map 173/39/0/0"
-      }
-    },
-    {
-      "task_id": "voidfarer-surface-ops",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-surface-ops' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794144321.9481702,
-      "timestamp_str": "2026-11-08 16:25:21",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-empire-condense",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: make EMPIRE a headline deck for research, outposts and faction leaders, with catalogs disclosed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794146238.3556528,
-      "timestamp_str": "2026-11-08 16:57:18",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "EMPIRE is 2665px: research 573px, outposts 210px and faction leaders 1733px all render at once; nine leader rows with six or seven buttons squeeze names into unreadable columns at the 290px docked width.",
-        "benefits": "The tab becomes a 402px deck with three headlines, live counts and one-line summaries; project, outpost and faction catalogs stay one click away; diplomacy rows become readable cards.",
-        "risks": "contract: EMPIRE left-tab UI; dependency: none; concurrency: none; state: disclosure attributes and summaries only, no save change; regression: research START/QUEUE, outpost build, diplomacy actions and all counts must stay reachable.",
-        "mitigation": "Static condensation test, real-browser play of all three reveals plus a research START, before/after measurement, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "7726f8309eda40b49a170f191c7591e1b0a4299cfacd944f161af187866d0033"
-    },
     {
       "task_id": "voidfarer-empire-condense",
       "phase": "phase 4",
@@ -285,6 +241,45 @@
       "status": "completed",
       "timestamp": 1794157968.2396936,
       "timestamp_str": "2026-11-08 20:12:48",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-header-badge-legibility",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: raise terminal header badges to the 12px readability floor without changing header layout",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794158243.473414,
+      "timestamp_str": "2026-11-08 20:17:23",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The shared rule `.tab-content > .panel-header > .badge-arch` sets 11px, so story TARGET: SOL, market HIGH_TECH and codex progress badges render below the 12px floor; the story capture reports tiny 1 while every other control is at least 12px.",
+        "benefits": "Every terminal header badge meets the 12px floor, the story tab reports tiny 0, and the tag/title/badge rows keep their 56px header with no wrapping or overlap.",
+        "risks": "contract: shared header badge styling across tabs; dependency: none; concurrency: none; state: none, CSS only; regression: long headers (codex progress badge) must not overflow or wrap at 291px.",
+        "mitigation": "Static CSS contract test, before/after browser captures for story/market/codex at 1280x720, tiny-count check, vision review and full gates."
+      },
+      "plan_digest": "330a0090d9334d77c7eb7ef0b658fbe6198c06acc7d59ba0837a5787270faf8a"
+    },
+    {
+      "task_id": "voidfarer-header-badge-legibility",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Header badges verified: 12px shared rule, story/market/codex tiny 1->0 with hscroll 0, no wrap or overflow; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794158624.4179423,
+      "timestamp_str": "2026-11-08 20:23:44",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-header-badge-legibility",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-header-badge-legibility' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794158637.1892457,
+      "timestamp_str": "2026-11-08 20:23:57",
       "agent": "opencode:campaign"
     }
   ]

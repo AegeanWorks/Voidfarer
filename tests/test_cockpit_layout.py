@@ -1617,6 +1617,20 @@ class TestMessagesCondensation(unittest.TestCase):
         self.assertIn(".messages-summary-row.unread", self.css)
 
 
+class TestHeaderBadgeLegibility(unittest.TestCase):
+    """Terminal header badges meet the 12px readability floor."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_header_badges_use_twelve_pixel_text(self):
+        rule = self.css.split(".tab-content > .panel-header > button,")[1].split("}", 1)[0]
+        self.assertIn(".tab-content > .panel-header > .badge-arch", rule)
+        self.assertIn("font-size: 12px;", rule)
+        self.assertNotIn("font-size: 11px;", rule)
+
+
 class TestCrewCondensation(unittest.TestCase):
     """CREW keeps cash flow and officer headlines before full rosters."""
 

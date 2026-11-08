@@ -918,5 +918,19 @@
     "final_snapshot_digest": "684e8e9ae2834b7fc07f55e666f1afb1b1cbdb2fc8158ab9d2ec4c21a4762104",
     "final_snapshot_entries": 1255,
     "surface_digest": "ea96358461f89f0415a4f3611ed349fff1d86f3151927ba7d29db0441b078c03"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "30e72a13846b3c72aae087fe59ae0789b41e6d38",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794158278.6338058,
+    "finished_at": 1794158454.2428641,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (main multimodal agent; story/market/codex header badges at 12px, tiny 1->0, no wrap or overflow)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "684e8e9ae2834b7fc07f55e666f1afb1b1cbdb2fc8158ab9d2ec4c21a4762104",
+    "final_snapshot_entries": 1255,
+    "surface_digest": "ac9d4cbf9d4ac3143dd738fa5d9cd643e6ffa66012f579d68a735657a81caa8c"
   }
 ]

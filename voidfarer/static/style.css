@@ -9852,7 +9852,7 @@ body.cockpit-theme .nav-panel > .panel-header {
 .tab-content > .panel-header > .badge-arch {
     min-height: 22px;
     padding: 1px 7px;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.2;
 }
 #tabContentCrew .panel-title {
