@@ -651,3 +651,23 @@ first row; broker open 1,154px; freight open 1,914px; both collapse back to 1,00
 `SHOW AUTO-TRADE`, `SHOW QUANTUM FREIGHT`, the six-row market table and the broker/freight
 reveals, with no horizontal clipping. The disclosure controls sit below the market by design
 and are reachable by scrolling.
+
+### Fifth condensation — FLEET contracts and procurement
+
+FLEET was 1,271px with mercenary contracts and the commission catalog always expanded, so
+the escort manager sat below the fold. Collapse both behind `SHOW MERCENARY CONTRACTS` /
+`SHOW COMMISSION`, with a live contract count. Also fixed a gap found while wiring them:
+`renderFleet` returned early with zero drones, which hid the mercenary contracts even though
+hiring does not require owning a drone. The mercenary rows now show the price once, use a
+verb-only HIRE button, and wrap names/descriptions at whole words inside the disclosure;
+the always-on escort shop keeps its compact rows.
+
+Measured: initial FLEET 1,271px -> 957px; mercenaries open 1,295px; commission open
+1,486px; collapse returns to 957px. Real Edge play dismisses the only drone: the drawer
+stays open and `MERCENARY CONTRACTS 3 CONTRACTS` remains with all rows rendered. 25
+frames/410ms, zero errors; no element crosses the panel edge (stack 295/295). Click-map
+163/47/0/0; `ui_inventory.py` 1176 lines; suite `Ran 1268 OK`; gate 5/5. Screenshots:
+`fleet-before/01-fleet-collapsed.png` vs `fleet-after/01-fleet-collapsed.png`,
+`02-mercenaries-open.png`, `03-commission-open.png`, `04-zero-drones.png`; vision review
+quoted the sections, readable rows, single cost and the zero-drone contracts, with no
+horizontal break.

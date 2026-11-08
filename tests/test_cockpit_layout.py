@@ -1468,6 +1468,39 @@ class TestShipDisclosures(unittest.TestCase):
         self.assertIn(".ship-room-details[hidden], .ship-modules-grid[hidden]", self.css)
 
 
+class TestFleetDisclosures(unittest.TestCase):
+    """The dense FLEET tab defaults to collapsed contracts and procurement."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_contracts_and_commission_use_named_disclosures(self):
+        self.assertIn('id="btnToggleMercenaries"', self.html)
+        self.assertIn('data-label="MERCENARY CONTRACTS"', self.html)
+        self.assertIn('id="mercenaryDetails" hidden', self.html)
+        self.assertIn('id="btnToggleCommission"', self.html)
+        self.assertIn('data-label="COMMISSION"', self.html)
+        self.assertIn('id="commissionDetails" hidden', self.html)
+        self.assertIn("id=\"mercenaryCount\"", self.html)
+        self.assertIn(".fleet-disclosure-toggle", self.css)
+        self.assertIn("#mercenaryDetails[hidden], #commissionDetails[hidden]", self.css)
+        self.assertIn("toggleFleetDisclosure", self.js)
+        self.assertIn("applyDisclosure", self.js)
+
+    def test_mercenary_contracts_render_without_owned_drones(self):
+        body = self.js.split("    renderFleet() {", 1)[1].split("    renderContracts() {", 1)[0]
+        # After the drone list is read, no early return may skip the mercenary
+        # block: owning zero drones must not hide the hiring contracts.
+        after_drones = body.split("const drones = this.state.ship.fleet_drones || [];", 1)[1]
+        self.assertNotIn("return;", after_drones)
+        self.assertIn("if (this.mercenaryRoster)", after_drones)
+        self.assertIn("this.mercenaryCount.textContent", after_drones)
+        self.assertIn("No fleet drones active. Use SHOW COMMISSION", after_drones)
+
+
 class TestCommerceDisclosures(unittest.TestCase):
     """The dense COMMERCE tab defaults to collapsed broker and freight sections."""
 

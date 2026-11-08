@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-commerce-disclosures",
+    "task_id": "voidfarer-fleet-disclosures",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794100216.0247643,
+    "updated_at": 1794101888.3384132,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794100216.7815332
+    "completed_at": 1794101889.2420056
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cycle10-legacy-landable",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Cycle 10 verified: legacy gas-world save gains LAND and Cloud Scoop on load; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794085711.6647668,
-      "timestamp_str": "2026-11-08 00:08:31",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-190 and campaign cycle 10",
-        "evidence": "ui-review/cycle10-before/01-legacy-target-bottom.png, cycle10-after/01-legacy-target-bottom.png, cycle10-after/play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-cycle10-legacy-landable",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cycle10-legacy-landable' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794085713.0550287,
-      "timestamp_str": "2026-11-08 00:08:33",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-cycle10-legacy-landable",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: normalize legacy landable flags on load from one shared surface-type set",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794085739.5130572,
-      "timestamp_str": "2026-11-08 00:08:59",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Existing saves persist landable=false for gas/lava worlds, so they cannot use the operations unlocked in Cycle 5; generation and migration also duplicated the landable policy.",
-        "benefits": "Legacy saves gain LAND ON SURFACE, Cloud Scoop and Magma Tap on load without rewriting ownership or population; one policy constant.",
-        "risks": "contract: none; dependency: galaxy imports surface (no cycle); concurrency: constructor migration under existing load path; state: only the persisted landable boolean changes.",
-        "mitigation": "Legacy 474KB save play, ownership/government assertions, before/after target-card captures."
-      },
-      "plan_digest": "ab9b17a06068974d5eb817a8c94c59730d0bbcf9f73c190f31c4559ed9d8fbcb"
-    },
     {
       "task_id": "voidfarer-cycle11-landing-reward",
       "phase": "phase 2",
@@ -294,6 +250,50 @@
       "status": "completed",
       "timestamp": 1794100216.7815351,
       "timestamp_str": "2026-11-08 04:10:16",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-fleet-disclosures",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: collapse FLEET mercenary contracts and procurement, and keep contracts available with zero drones",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794101876.4985685,
+      "timestamp_str": "2026-11-08 04:37:56",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "FLEET is the last dense core tab at 1271px; mercenary contracts and the commission catalog are always expanded and push the escort manager below the fold, and renderFleet returns early with zero drones so the hiring contracts vanish.",
+        "benefits": "The default FLEET view drops below 1000px with the active fleet and escort manager visible; contracts and procurement stay one click away; hiring survives an empty drone roster.",
+        "risks": "contract: UI surface plus one render-path fix; dependency: none; concurrency: none; state: hidden attributes and existing fleet state only, no save change; regression: both disclosures and the zero-drone roster must stay reachable.",
+        "mitigation": "Static disclosure/zero-drone tests, before/after height and overflow measurements, real-browser reveals and a drone-dismissal play, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "4167052a9b8205607f6dcad3c41d5e9c1733845a38c202107a86ab47eb81f3ad"
+    },
+    {
+      "task_id": "voidfarer-fleet-disclosures",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "FLEET condensation verified: 1271px to 957px, contracts/procurement disclosures, zero-drone hiring preserved; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794101888.3384132,
+      "timestamp_str": "2026-11-08 04:38:08",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-196 and FLEET proof",
+        "evidence": "ui-review/fleet-before/01-fleet-collapsed.png, fleet-after/01..04, fleet-after/play-report.json, click-map 163/47/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-fleet-disclosures",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-fleet-disclosures' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794101889.242008,
+      "timestamp_str": "2026-11-08 04:38:09",
       "agent": "opencode:campaign"
     }
   ]

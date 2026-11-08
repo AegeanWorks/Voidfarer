@@ -661,5 +661,19 @@
     "final_snapshot_digest": "441c24868d26908f2a01d19eaabe437ff9e08ba54522a697123145e84a08db81",
     "final_snapshot_entries": 1167,
     "surface_digest": "ddff8d44f72ecbbc7618ce6ae006866f949a625c6a6e4f863ed72fed0c3edc86"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "f32883c1e1024459557048d436e2a934de1e9840",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794101271.7486165,
+    "finished_at": 1794101479.9066865,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; quoted FLEET disclosures, readable rows, zero-drone contracts)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "46719fd986d085391d9d00b1f568043726bce9dc83f83fc53f4bd7bab77a6877",
+    "final_snapshot_entries": 1176,
+    "surface_digest": "0f6a99a727e86eeae6745b70e2d9aee0de4eb6aa00649d9f7d51a1a7062663f7"
   }
 ]

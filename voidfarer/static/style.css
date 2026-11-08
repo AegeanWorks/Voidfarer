@@ -1467,6 +1467,9 @@ body.cockpit-theme {
     flex-direction: column;
     gap: 12px;
     flex: 1;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .fleet-roster {
@@ -4394,7 +4397,7 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
     flex-wrap: wrap;
     gap: 8px;
 }
-.ship-disclosure-toggle, .trade-disclosure-toggle {
+.ship-disclosure-toggle, .trade-disclosure-toggle, .fleet-disclosure-toggle {
     display: block;
     width: 100%;
     margin-top: 6px;
@@ -4410,15 +4413,27 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
     cursor: pointer;
 }
 .ship-disclosure-toggle:hover, .ship-disclosure-toggle:focus-visible,
-.trade-disclosure-toggle:hover, .trade-disclosure-toggle:focus-visible {
+.trade-disclosure-toggle:hover, .trade-disclosure-toggle:focus-visible,
+.fleet-disclosure-toggle:hover, .fleet-disclosure-toggle:focus-visible {
     border-color: var(--console-gold);
     color: var(--console-gold-bright);
     background: rgba(201, 163, 90, 0.12);
     outline: none;
 }
 .ship-room-details[hidden], .ship-modules-grid[hidden],
-#autoTradeDetails[hidden], #quantumFreightDetails[hidden] { display: none; }
+#autoTradeDetails[hidden], #quantumFreightDetails[hidden],
+#mercenaryDetails[hidden], #commissionDetails[hidden] { display: none; }
 .quantum-freight-shell { margin-top: 8px; }
+.fleet-optional-section { display: flex; flex-direction: column; min-width: 0; }
+.fleet-optional-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.fleet-optional-header .commission-title { margin-bottom: 0; }
+.fleet-optional-count {
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+}
+#mercenaryDetails, #commissionDetails { min-width: 0; }
 
 .ship-interior-header,
 .ship-room-card-top,
@@ -8587,6 +8602,29 @@ body.cockpit-theme .panel-center {
     color: var(--console-gold);
 }
 .fleet-procurement-row:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* The docked drawer is ~290px wide: inside the optional disclosures give the
+   name/description the space the 124px price column was wasting. The always-on
+   escort shop keeps its compact single-line rows. */
+@media (max-width: 1599px) {
+    #mercenaryRoster .fleet-procurement-row,
+    #commissionDetails .fleet-procurement-row {
+        grid-template-columns: 20px minmax(0, 1fr) 96px;
+    }
+    #mercenaryRoster .procurement-info h4,
+    #mercenaryRoster .procurement-info strong,
+    #commissionDetails .procurement-info strong {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+    #mercenaryRoster .procurement-info small,
+    #commissionDetails .procurement-info small {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+}
 .contract-cat-badge { border: 1px solid rgba(201, 163, 90, 0.4); text-transform: uppercase; }
 .contract-cat-badge.cat-mining { color: #d8c49a; background: rgba(169, 139, 189, 0.12); border-color: rgba(169, 139, 189, 0.4); }
 

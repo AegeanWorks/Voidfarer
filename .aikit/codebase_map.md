@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `354`
+- **Total Classes**: `355`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1991`
-- **Total Source Lines**: `50459`
+- **Total Class Methods**: `1994`
+- **Total Source Lines**: `50492`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2060` lines (`90486` bytes)
+**Size**: `2093` lines (`92267` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -603,6 +603,10 @@
 - `class TestShipDisclosures` - *The dense SHIP tab defaults to collapsed rooms and module catalog.*
   - Method `.setUpClass()`
   - Method `.test_rooms_and_catalog_use_named_disclosures()`
+- `class TestFleetDisclosures` - *The dense FLEET tab defaults to collapsed contracts and procurement.*
+  - Method `.setUpClass()`
+  - Method `.test_contracts_and_commission_use_named_disclosures()`
+  - Method `.test_mercenary_contracts_render_without_owned_drones()`
 - `class TestCommerceDisclosures` - *The dense COMMERCE tab defaults to collapsed broker and freight sections.*
   - Method `.setUpClass()`
   - Method `.test_auto_trade_and_freight_use_named_disclosures()`

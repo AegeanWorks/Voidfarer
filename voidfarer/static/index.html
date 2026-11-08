@@ -548,7 +548,16 @@
                             <!-- Populated dynamically -->
                         </div>
 
-                        <div class="mercenary-roster" id="mercenaryRoster"></div>
+                        <section class="fleet-optional-section" id="mercenarySection">
+                            <div class="fleet-optional-header">
+                                <h4 class="commission-title">MERCENARY CONTRACTS</h4>
+                                <span class="fleet-optional-count" id="mercenaryCount">--</span>
+                            </div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleMercenaries" data-label="MERCENARY CONTRACTS" aria-expanded="false" aria-controls="mercenaryDetails" title="Show or hide mercenary contracts">SHOW MERCENARY CONTRACTS</button>
+                            <div id="mercenaryDetails" hidden>
+                                <div class="mercenary-roster" id="mercenaryRoster"></div>
+                            </div>
+                        </section>
 
                         <div class="fleet-manager-box">
                             <h4 class="commission-title">FLEET MANAGER // ESCORT WING</h4>
@@ -569,22 +578,25 @@
                         <!-- Commission New Drone -->
                         <div class="commission-drone-box">
                             <h4 class="commission-title">COMMISSION FLEET ASSET</h4>
-                            <div class="drone-shop-grid">
-                                <button class="btn-drone-buy fleet-procurement-row" data-type="mining">
-                                    <span class="procurement-info"><strong>MINING DRONE</strong><small>Yields Titanium</small></span>
-                                    <span class="procurement-value">650 CR</span>
-                                    <span class="procurement-action">COMMISSION</span>
-                                </button>
-                                <button class="btn-drone-buy fleet-procurement-row" data-type="scout">
-                                    <span class="procurement-info"><strong>SCOUT DRONE</strong><small>Passive Credits</small></span>
-                                    <span class="procurement-value">500 CR</span>
-                                    <span class="procurement-action">COMMISSION</span>
-                                </button>
-                                <button class="btn-drone-buy fleet-procurement-row" data-type="combat_escort">
-                                    <span class="procurement-info"><strong>ESCORT FRIGATE</strong><small>Repels Pirates</small></span>
-                                    <span class="procurement-value">1,300 CR</span>
-                                    <span class="procurement-action">COMMISSION</span>
-                                </button>
+                            <button class="fleet-disclosure-toggle" id="btnToggleCommission" data-label="COMMISSION" aria-expanded="false" aria-controls="commissionDetails" title="Show or hide fleet procurement">SHOW COMMISSION</button>
+                            <div id="commissionDetails" hidden>
+                                <div class="drone-shop-grid">
+                                    <button class="btn-drone-buy fleet-procurement-row" data-type="mining">
+                                        <span class="procurement-info"><strong>MINING DRONE</strong><small>Yields Titanium</small></span>
+                                        <span class="procurement-value">650 CR</span>
+                                        <span class="procurement-action">COMMISSION</span>
+                                    </button>
+                                    <button class="btn-drone-buy fleet-procurement-row" data-type="scout">
+                                        <span class="procurement-info"><strong>SCOUT DRONE</strong><small>Passive Credits</small></span>
+                                        <span class="procurement-value">500 CR</span>
+                                        <span class="procurement-action">COMMISSION</span>
+                                    </button>
+                                    <button class="btn-drone-buy fleet-procurement-row" data-type="combat_escort">
+                                        <span class="procurement-info"><strong>ESCORT FRIGATE</strong><small>Repels Pirates</small></span>
+                                        <span class="procurement-value">1,300 CR</span>
+                                        <span class="procurement-action">COMMISSION</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

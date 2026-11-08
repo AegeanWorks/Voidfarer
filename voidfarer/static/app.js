@@ -910,6 +910,11 @@ class CockpitApp {
         this.fleetRoster = document.getElementById("fleetRoster");
         this.fleetShipRoster = document.getElementById("fleetShipRoster");
         this.escortShopGrid = document.getElementById("escortShopGrid");
+        this.btnToggleMercenaries = document.getElementById("btnToggleMercenaries");
+        this.mercenaryDetails = document.getElementById("mercenaryDetails");
+        this.mercenaryCount = document.getElementById("mercenaryCount");
+        this.btnToggleCommission = document.getElementById("btnToggleCommission");
+        this.commissionDetails = document.getElementById("commissionDetails");
         this.characterProfile = document.getElementById("characterProfile");
         this.characterAbilities = document.getElementById("characterAbilities");
         this.characterPerks = document.getElementById("characterPerks");
@@ -1362,6 +1367,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.btnToggleQuantumFreight) {
             this.btnToggleQuantumFreight.addEventListener("click", () => this.toggleTradeDisclosure(
                 this.btnToggleQuantumFreight, this.quantumFreightDetails,
+            ));
+        }
+        if (this.btnToggleMercenaries) {
+            this.btnToggleMercenaries.addEventListener("click", () => this.toggleFleetDisclosure(
+                this.btnToggleMercenaries, this.mercenaryDetails,
+            ));
+        }
+        if (this.btnToggleCommission) {
+            this.btnToggleCommission.addEventListener("click", () => this.toggleFleetDisclosure(
+                this.btnToggleCommission, this.commissionDetails,
             ));
         }
         if (this.btnFabricatePatch) {
@@ -3733,6 +3748,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.applyDisclosure(button, target, null);
     }
 
+    toggleFleetDisclosure(button, target) {
+        this.applyDisclosure(button, target, null);
+    }
+
     applyDisclosure(button, target, section = null) {
         if (!button || !target) return;
         const open = Boolean(target.hidden);
@@ -4889,46 +4908,49 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const drones = this.state.ship.fleet_drones || [];
 
         if (drones.length === 0) {
-            this.fleetRoster.innerHTML = `<p class="fleet-empty">No fleet drones active. Commission a drone below to start harvesting.</p>`;
-            return;
+            this.fleetRoster.innerHTML = `<p class="fleet-empty">No fleet drones active. Use SHOW COMMISSION below to procure one.</p>`;
+        } else {
+            drones.forEach(d => {
+                const card = document.createElement("div");
+                card.className = "drone-card";
+
+                const integrity = Math.max(0, Math.min(100, Number(d.integrity ?? 100)));
+                const roleGlyph = /combat|attack|fighter/i.test(d.drone_type) ? "▲" : /scout|survey/i.test(d.drone_type) ? "◈" : "⬡";
+                card.innerHTML = `
+                    <div class="drone-meta">
+                        <strong class="drone-name"><span style="color:var(--console-gold);margin-right:4px;">${roleGlyph}</span>${this.escapeHtml(d.name)}</strong>
+                        <span class="drone-sub">${this.escapeHtml(d.drone_type.toUpperCase())} // ${this.escapeHtml(d.assigned_system_id.toUpperCase())} [${this.escapeHtml(d.status.toUpperCase())}]</span>
+                    </div>
+                    <div class="vital-meter" style="margin:4px 0 6px;"><div class="meter-fill ${integrity > 50 ? 'fill-green' : 'fill-amber'}" style="width:${integrity}%;"></div></div>
+                    <div class="drone-stats">
+                        LVL ${d.level ?? 1} // EFF ${(d.efficiency ?? 1).toFixed(2)} // INTEGRITY ${integrity}% // SORTIES ${d.sorties ?? 0}${d.specialty ? " // " + this.escapeHtml(d.specialty.toUpperCase()) : ""}
+                    </div>
+                    <div class="drone-yield-badge">
+                        +${d.cargo_accumulated} Ore / +${d.credits_accumulated} CR
+                    </div>
+                    <div class="drone-actions" style="display:flex;gap:5px;margin-top:6px;">
+                        <button class="btn-hud" data-refit="${this.escapeHtml(d.id)}">REFIT (300 CR)</button>
+                        <button class="btn-hud" data-dismiss="${this.escapeHtml(d.id)}">DISMISS</button>
+                    </div>
+                `;
+                card.querySelector("[data-refit]")?.addEventListener("click", () => this.postAction("/api/fleet/refit", { drone_id: d.id }, "fleet"));
+                card.querySelector("[data-dismiss]")?.addEventListener("click", () => this.postAction("/api/fleet/dismiss", { drone_id: d.id }, "fleet"));
+                this.fleetRoster.appendChild(card);
+            });
         }
-
-        drones.forEach(d => {
-            const card = document.createElement("div");
-            card.className = "drone-card";
-
-            const integrity = Math.max(0, Math.min(100, Number(d.integrity ?? 100)));
-            const roleGlyph = /combat|attack|fighter/i.test(d.drone_type) ? "▲" : /scout|survey/i.test(d.drone_type) ? "◈" : "⬡";
-            card.innerHTML = `
-                <div class="drone-meta">
-                    <strong class="drone-name"><span style="color:var(--console-gold);margin-right:4px;">${roleGlyph}</span>${this.escapeHtml(d.name)}</strong>
-                    <span class="drone-sub">${this.escapeHtml(d.drone_type.toUpperCase())} // ${this.escapeHtml(d.assigned_system_id.toUpperCase())} [${this.escapeHtml(d.status.toUpperCase())}]</span>
-                </div>
-                <div class="vital-meter" style="margin:4px 0 6px;"><div class="meter-fill ${integrity > 50 ? 'fill-green' : 'fill-amber'}" style="width:${integrity}%;"></div></div>
-                <div class="drone-stats">
-                    LVL ${d.level ?? 1} // EFF ${(d.efficiency ?? 1).toFixed(2)} // INTEGRITY ${integrity}% // SORTIES ${d.sorties ?? 0}${d.specialty ? " // " + this.escapeHtml(d.specialty.toUpperCase()) : ""}
-                </div>
-                <div class="drone-yield-badge">
-                    +${d.cargo_accumulated} Ore / +${d.credits_accumulated} CR
-                </div>
-                <div class="drone-actions" style="display:flex;gap:5px;margin-top:6px;">
-                    <button class="btn-hud" data-refit="${this.escapeHtml(d.id)}">REFIT (300 CR)</button>
-                    <button class="btn-hud" data-dismiss="${this.escapeHtml(d.id)}">DISMISS</button>
-                </div>
-            `;
-            card.querySelector("[data-refit]")?.addEventListener("click", () => this.postAction("/api/fleet/refit", { drone_id: d.id }, "fleet"));
-            card.querySelector("[data-dismiss]")?.addEventListener("click", () => this.postAction("/api/fleet/dismiss", { drone_id: d.id }, "fleet"));
-            this.fleetRoster.appendChild(card);
-        });
 
         if (this.mercenaryRoster) {
             const catalog = Object.values(this.state.mercenary_catalog || {});
             const credits = Number((this.state.ship || {}).credits || 0);
             const hired = new Set((this.state.ship.fleet_drones || []).filter(d => d.drone_type === "mercenary").map(d => d.specialty));
-            this.mercenaryRoster.innerHTML = `<h4 class="commission-title">MERCENARY CONTRACTS</h4>` + catalog.map(m => {
+            if (this.mercenaryCount) {
+                this.mercenaryCount.textContent = `${catalog.length} CONTRACT${catalog.length === 1 ? "" : "S"}`;
+            }
+            this.mercenaryRoster.innerHTML = catalog.map(m => {
                 const contracted = hired.has(m.specialty);
                 const afford = credits >= Number(m.cost || 0);
-                const label = contracted ? "CONTRACTED" : (afford ? "HIRE" : `${m.cost} CR`);
+                // The cost chip already states the price; the action stays a verb.
+                const label = contracted ? "CONTRACTED" : "HIRE";
                 const title = contracted ? "Already contracted" : (afford ? `Hire for ${m.cost} CR` : `Needs ${m.cost} CR`);
                 return `
                 <div class="depot-card fleet-procurement-row">
