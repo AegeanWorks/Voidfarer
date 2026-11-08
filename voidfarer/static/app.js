@@ -704,7 +704,8 @@ class CockpitApp {
         this.btnCombatDrone = document.getElementById("btnCombatDrone");
         this.btnCombatBoard = document.getElementById("btnCombatBoard");
         this.btnCombatGambit = document.getElementById("btnCombatGambit");
-        this.btnCombatTarget = document.getElementById("btnCombatTarget");
+        this.btnToggleCombatTactics = document.getElementById("btnToggleCombatTactics");
+        this.combatTacticsDetails = document.getElementById("combatTacticsDetails");
         this.btnCombatPdc = document.getElementById("btnCombatPdc");
         this.btnSubsystemWeapons = document.getElementById("btnSubsystemWeapons");
         this.btnSubsystemShields = document.getElementById("btnSubsystemShields");
@@ -1356,8 +1357,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.btnCombatDrone) {
             this.btnCombatDrone.addEventListener("click", () => this.handleCombat("drone_strike"));
         }
-        if (this.btnCombatTarget) {
-            this.btnCombatTarget.addEventListener("click", () => this.handleCombat("target_subsystem"));
+        if (this.btnToggleCombatTactics && this.combatTacticsDetails) {
+            this.btnToggleCombatTactics.addEventListener("click", () => this.toggleSectionDisclosure(
+                this.btnToggleCombatTactics, this.combatTacticsDetails,
+            ));
         }
         if (this.btnCombatPdc) {
             this.btnCombatPdc.addEventListener("click", () => this.handleCombat("point_defense"));

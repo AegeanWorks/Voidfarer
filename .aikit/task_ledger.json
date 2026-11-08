@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-reactor-preset-first",
+    "task_id": "voidfarer-combat-tactics-disclosure",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794131186.9690323,
+    "updated_at": 1794134007.9766057,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794131187.6916885
+    "completed_at": 1794134008.825375
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-ship-disclosures",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "SHIP condensation verified: 2390px to 932px, rooms/catalog disclosures, no horizontal overflow; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794097747.5267782,
-      "timestamp_str": "2026-11-08 03:29:07",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-194 and SHIP proof",
-        "evidence": "ui-review/ship-before/01-ship-collapsed.png, ship-after/01..03, play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-ship-disclosures",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-ship-disclosures' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794097748.2827883,
-      "timestamp_str": "2026-11-08 03:29:08",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-commerce-disclosures",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: keep the COMMERCE exchange first and collapse auto-trade plus quantum freight below it",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794100208.6870904,
-      "timestamp_str": "2026-11-08 04:10:08",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "COMMERCE is the next densest core tab at 2076px; the auto-trade broker and quantum freight sit between the services row and the market, so the exchange and its price rows never reach the first screen at 1280x720.",
-        "benefits": "The market table becomes the primary surface, the broker and freight stay one click away, and dense service/filter/market rows stop overflowing at 1280.",
-        "risks": "contract: UI surface; dependency: none; concurrency: none; state: hidden attributes and existing trade state only, no save change; regression: the exchange, services and both disclosures must stay reachable.",
-        "mitigation": "Static disclosure/order tests, before/after height and width measurements, open-state browser play, vision review, UI snapshot and full gates."
-      },
-      "plan_digest": "8455de912b7f4de6f4c7571ca2930d9c3575cdee017ae271364116588c9b91e3"
-    },
     {
       "task_id": "voidfarer-commerce-disclosures",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794131187.6916904,
       "timestamp_str": "2026-11-08 12:46:27",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-combat-tactics-disclosure",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: keep four core combat actions visible and move secondary tactics plus subsystem targeting behind SHOW MORE TACTICS",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794134006.533156,
+      "timestamp_str": "2026-11-08 13:33:26",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The hostile-intercept card exposes nine actions and four subsystem buttons at once and reaches 713px; at 1280x720 the capped card pushes the disclosure and lower controls below its scroll edge, and the generic TARGET SUBSYSTEM button duplicates the specific controls.",
+        "benefits": "Combat starts with four clear choices, secondary tactics stay one click away, the card fits 720p without offscreen controls, and the duplicate path is removed while engine parity remains.",
+        "risks": "contract: combat UI and intended removal of btnCombatTarget; dependency: none; concurrency: engine lock held; state: hidden attributes only; regression: board/gambit/PDC/drone/subsystem actions must stay reachable and fire must still resolve.",
+        "mitigation": "Static disclosure test, 1920 and 1280 combat plays with an actual fire action, vision review, ui allow for the duplicate removal, and full gates."
+      },
+      "plan_digest": "13d754c8b5c5a7579ad0cd0ec265d350af374514ea2f8b9d18aa925da427786d"
+    },
+    {
+      "task_id": "voidfarer-combat-tactics-disclosure",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Combat condensation verified: 13->5 controls, 713->564px at 1080 and 442px at 720, fire still hits; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794134007.9766057,
+      "timestamp_str": "2026-11-08 13:33:27",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-201 and combat proof",
+        "evidence": "ui-review/combat-before/01-combat-collapsed.png, combat-after/01..03, combat-after-720/01..03"
+      }
+    },
+    {
+      "task_id": "voidfarer-combat-tactics-disclosure",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-combat-tactics-disclosure' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794134008.8253775,
+      "timestamp_str": "2026-11-08 13:33:28",
       "agent": "opencode:campaign"
     }
   ]

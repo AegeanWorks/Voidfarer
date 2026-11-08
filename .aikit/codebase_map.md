@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `359`
+- **Total Classes**: `360`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2012`
-- **Total Source Lines**: `50701`
+- **Total Class Methods**: `2015`
+- **Total Source Lines**: `50737`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2252` lines (`99466` bytes)
+**Size**: `2288` lines (`101188` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,10 @@
   - Method `.setUpClass()`
   - Method `.test_manual_sliders_default_to_hidden()`
   - Method `.test_power_hint_names_the_visible_presets()`
+- `class TestCombatTacticsDisclosure` - *Only four core combat actions stay visible; the rest are disclosed.*
+  - Method `.setUpClass()`
+  - Method `.test_core_actions_stay_visible_and_secondary_actions_are_hidden()`
+  - Method `.test_disclosure_css_and_binding_exist()`
 - `class TestAdvancedLeftCondensation` - *The three largest advanced tabs start with summary-first disclosures.*
   - Method `.setUpClass()`
   - Method `.test_large_catalogs_default_to_hidden_details()`

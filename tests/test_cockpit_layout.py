@@ -1517,6 +1517,42 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestCombatTacticsDisclosure(unittest.TestCase):
+    """Only four core combat actions stay visible; the rest are disclosed."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_core_actions_stay_visible_and_secondary_actions_are_hidden(self):
+        self.assertIn('id="btnToggleCombatTactics"', self.html)
+        self.assertIn('data-label="TACTICS"', self.html)
+        self.assertIn('id="combatTacticsDetails" hidden', self.html)
+        for core in ("btnCombatFire", "btnCombatAbsorb", "btnCombatEvade", "btnCombatFlee"):
+            self.assertLess(
+                self.html.index(f'id="{core}"'),
+                self.html.index('id="combatTacticsDetails"'),
+            )
+        for secondary in ("btnCombatDrone", "btnCombatPdc", "btnCombatBoard", "btnCombatGambit",
+                          "btnSubsystemWeapons", "btnSubsystemShields", "btnSubsystemEngines",
+                          "btnSubsystemBridge"):
+            self.assertGreater(
+                self.html.index(f'id="{secondary}"'),
+                self.html.index('id="combatTacticsDetails"'),
+            )
+        self.assertNotIn('id="btnCombatTarget"', self.html)
+        self.assertNotIn("btnCombatTarget", self.js)
+
+    def test_disclosure_css_and_binding_exist(self):
+        self.assertIn("#combatTacticsDetails[hidden]", self.css)
+        self.assertIn(".combat-more-btn", self.css)
+        self.assertIn("btnToggleCombatTactics", self.js)
+        self.assertIn("this.combatTacticsDetails", self.js)
+        self.assertIn("toggleSectionDisclosure", self.js)
+
+
 class TestAdvancedLeftCondensation(unittest.TestCase):
     """The three largest advanced tabs start with summary-first disclosures."""
 

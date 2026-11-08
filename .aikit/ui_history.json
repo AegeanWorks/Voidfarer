@@ -745,5 +745,24 @@
     "final_snapshot_digest": "0f7332d7d258ba548730589772367d36893e965ab435ea8d1e2b3a0b4e70be58",
     "final_snapshot_entries": 1198,
     "surface_digest": "1ed3fb03482553ed93d3edfc48ca2aafe0455b48614712814a3d31a44b244bdf"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "e25a96dc67d8ddb01a26dcbdd2d14ed4da36f96d",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794132861.4706697,
+    "finished_at": 1794133350.677098,
+    "strikes": 2,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; four core actions, MORE TACTICS, 720 fit)",
+    "allowed_removals": [
+      {
+        "pattern": "*btnCombatTarget*",
+        "reason": "The generic TARGET SUBSYSTEM button duplicated the four specific subsystem controls now inside SHOW MORE TACTICS; the engine action remains for CLI/API."
+      }
+    ],
+    "final_snapshot_digest": "fba10fb1c22c8c716681db33dcd598b92e45024edbb270f21de677854050c2df",
+    "final_snapshot_entries": 1199,
+    "surface_digest": "b4cff9ef6a4fada094566bd6a755cfe17a23d4ac9773f1f502b573b45db89e6f"
   }
 ]

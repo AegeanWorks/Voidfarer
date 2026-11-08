@@ -1021,21 +1021,25 @@
                     </div>
                     <div class="combat-tactics-grid">
                         <button class="btn-combat btn-red" id="btnCombatFire">◎ FIRE LASER ARRAY</button>
-                        <button class="btn-combat btn-cyan" id="btnCombatDrone">◇ DRONE STRIKE</button>
-                        <button class="btn-combat btn-amber" id="btnCombatTarget">↯ TARGET SUBSYSTEM</button>
-                        <button class="btn-combat btn-green" id="btnCombatPdc" title="Point Defense Cannons: intercept 70% incoming fire and shred enemy with tungsten flak">⛨ PDC FLAK SCREEN</button>
-                        <button class="btn-combat btn-purple" id="btnCombatBoard" data-testid="combat-board" disabled>⌁ BOARD &amp; CAPTURE</button>
-                        <button class="btn-combat btn-green" id="btnCombatGambit" disabled>✦ CAPTAIN'S GAMBIT</button>
                         <button class="btn-combat btn-blue" id="btnCombatAbsorb">⬡ SHIELD OVERCHARGE</button>
                         <button class="btn-combat btn-amber" id="btnCombatEvade">➤ EVASIVE BURN</button>
                         <button class="btn-combat btn-purple" id="btnCombatFlee">↯ FLEE SECTOR (-8 FUEL)</button>
                     </div>
-                    <div class="combat-subsystems-row" id="combatSubsystemsRow">
-                        <span class="subsystem-title">PINPOINT SUBSYSTEM TARGETING:</span>
-                        <button class="btn-subsystem" data-subsystem="weapons" id="btnSubsystemWeapons" title="Disable enemy fire control (-40% enemy firepower)">[ WEAPONS ]</button>
-                        <button class="btn-subsystem" data-subsystem="shields" id="btnSubsystemShields" title="Ion pulse cascade drains 40 MW enemy deflector shields">[ SHIELDS ]</button>
-                        <button class="btn-subsystem" data-subsystem="engines" id="btnSubsystemEngines" title="Strike drive manifolds to collapse enemy evasion rating (18 dmg)">[ ENGINES ]</button>
-                        <button class="btn-subsystem" data-subsystem="bridge" id="btnSubsystemBridge" title="High-risk shot to command bridge: cancels enemy counter-battery &amp; deals 50 dmg">[ BRIDGE ]</button>
+                    <button class="btn-combat combat-more-btn" id="btnToggleCombatTactics" data-label="TACTICS" aria-expanded="false" aria-controls="combatTacticsDetails" title="Show or hide secondary combat actions">SHOW MORE TACTICS</button>
+                    <div id="combatTacticsDetails" hidden>
+                        <div class="combat-tactics-grid combat-tactics-secondary">
+                            <button class="btn-combat btn-cyan" id="btnCombatDrone">◇ DRONE STRIKE</button>
+                            <button class="btn-combat btn-green" id="btnCombatPdc" title="Point Defense Cannons: intercept 70% incoming fire and shred enemy with tungsten flak">⛨ PDC FLAK SCREEN</button>
+                            <button class="btn-combat btn-purple" id="btnCombatBoard" data-testid="combat-board" disabled>⌁ BOARD &amp; CAPTURE</button>
+                            <button class="btn-combat btn-green" id="btnCombatGambit" disabled>✦ CAPTAIN'S GAMBIT</button>
+                        </div>
+                        <div class="combat-subsystems-row" id="combatSubsystemsRow">
+                            <span class="subsystem-title">PINPOINT SUBSYSTEM TARGETING:</span>
+                            <button class="btn-subsystem" data-subsystem="weapons" id="btnSubsystemWeapons" title="Disable enemy fire control (-40% enemy firepower)">[ WEAPONS ]</button>
+                            <button class="btn-subsystem" data-subsystem="shields" id="btnSubsystemShields" title="Ion pulse cascade drains 40 MW enemy deflector shields">[ SHIELDS ]</button>
+                            <button class="btn-subsystem" data-subsystem="engines" id="btnSubsystemEngines" title="Strike drive manifolds to collapse enemy evasion rating (18 dmg)">[ ENGINES ]</button>
+                            <button class="btn-subsystem" data-subsystem="bridge" id="btnSubsystemBridge" title="High-risk shot to command bridge: cancels enemy counter-battery &amp; deals 50 dmg">[ BRIDGE ]</button>
+                        </div>
                     </div>
                     <div class="combat-combo-badge" id="combatComboBadge" style="display: none;">
                         ↯ TACTICAL COMBO: <span id="combatComboCount">0</span> <strong class="crit-ready-text" id="critReadyText">(CRITICAL OVERCHARGE READY!)</strong>

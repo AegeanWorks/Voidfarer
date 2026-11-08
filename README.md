@@ -388,11 +388,11 @@ SHIP tab collapses `ROOMS & CREW STATIONS` and the `MODULE CATALOG` behind SHOW/
 disclosures (SHIP 2,390->917px), COMMERCE collapses the auto-trade broker and quantum
 freight below the market table (COMMERCE 2,076->932px), and FLEET collapses mercenary
 contracts and fleet procurement behind SHOW/HIDE controls (FLEET 1,271->831px).
-Contracts stay available with no drones. Every left tab shares one 56px header
-(tag/action row, one-line title), one section-heading style, and stacking narrow rows
-(DEPOT, EMPIRE, story). Advanced tabs are summary-first: ARSENAL 6,509->473, FACTIONS
-4,594->380, CODEX 10,683->580. Reactor doctrine presets are default; manual sliders sit
-behind `SHOW FINE TUNE`.
+Contracts stay available with no drones. Every left tab has a 56px header (tag/action
+row, one-line title), shared headings and stacking rows (DEPOT, EMPIRE, story).
+Advanced tabs start closed: ARSENAL 6,509->473, FACTIONS 4,594->380, CODEX 10,683->580.
+Reactor presets are default; sliders sit behind `SHOW FINE TUNE`. Combat keeps four core
+actions; secondary tactics sit under `SHOW MORE TACTICS`.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -577,7 +577,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,282-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,284-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

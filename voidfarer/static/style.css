@@ -9879,7 +9879,14 @@ body.cockpit-theme .nav-panel > .panel-header {
 .codex-stats-grid { max-height: 144px; }
 #arsenalUpgradeDetails[hidden], #chassisDetails[hidden], #ordnanceDetails[hidden],
 #factionDetails[hidden], #corpDetails[hidden], #codexMilestoneDetails[hidden],
-#powerDetails[hidden] { display: none; }
+#powerDetails[hidden], #combatTacticsDetails[hidden] { display: none; }
+.combat-more-btn { width: 100%; margin-top: 4px; }
+.combat-tactics-secondary { margin-top: 5px; }
+@media (max-height: 800px) {
+    /* At 720p the decorative combat canvas would push the core actions and
+       the MORE TACTICS control below the card's scroll edge. */
+    .combat-alert-card .combat-visual { display: none; }
+}
 .power-fine-tune-btn {
     width: 100%;
     min-height: 26px;

@@ -744,3 +744,22 @@ zero errors. Suite `Ran 1282 OK`; click-map 170/40/0/0; `ui_inventory.py` 1198 l
 5/5. Screenshots: `reactor-before/01-reactor.png` vs `reactor-play-after/01-preset-first.png`
 and `03-fine-tune-open.png`; vision review called the after state meaningfully simpler with
 no layout break.
+
+### Tenth pass — four core combat actions
+
+The hostile-intercept card exposed nine main actions plus four subsystem-target buttons at
+once (13 controls) and reached 713px at 1920×1080; at 1280×720 the capped card pushed the
+lower controls, including the new disclosure, below its scroll edge. The card now keeps
+`FIRE LASER ARRAY`, `SHIELD OVERCHARGE`, `EVASIVE BURN` and `FLEE SECTOR` visible; drone,
+PDC, boarding, gambit and subsystem targeting sit behind `SHOW MORE TACTICS`. The duplicate
+generic `TARGET SUBSYSTEM` button is removed (the engine action remains). At heights under
+800px the decorative combat canvas is hidden so the core controls fit.
+
+Measured: 1920 card 713→564px, visible controls 13→5; 1280×720 card 500→442px with no
+offscreen actions; `SHOW MORE TACTICS` reveals 148px of secondary controls. Fire still hits
+(enemy hull 200→183); 25 frames/~403ms, zero errors. Suite `Ran 1284 OK`; click-map
+170/40/0/0; `ui_inventory.py` 1199 lines; gate 5/5. Screenshots:
+`combat-before/01-combat-collapsed.png` vs `combat-after/01-combat-collapsed.png`,
+`02-combat-more-tactics.png`, and `combat-after-720/01-combat-collapsed.png`; vision review
+quoted the before 13 controls and the after four core actions + disclosure, confirmed the
+720p fit, and noted only a pre-existing canvas label collision.
