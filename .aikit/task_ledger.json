@@ -1,76 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-dedupe-player-abilities",
-    "last_phase": "phase 2",
-    "active_phase": 2,
-    "status": "in_progress",
-    "updated_at": 1794094203.3825996,
+    "task_id": "voidfarer-ship-disclosures",
+    "last_phase": "phase 4",
+    "active_phase": 5,
+    "status": "completed",
+    "updated_at": 1794097747.5267782,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "impact_assessment": {
-      "why": "PLAYER renders six ability cards with USE buttons while the bottom command strip already exposes the same six with hotkeys and cooldowns; G-013 forbids the duplicate.",
-      "benefits": "PLAYER content height roughly halves, duplicate controls disappear, and one ability surface remains authoritative.",
-      "risks": "contract: G-013-aligned UI; dependency: none; concurrency: none; state: none; regression: bottom strip must keep firing.",
-      "mitigation": "Static dedup test, before/after control counts, bottom-strip Overclock play, vision review."
-    }
+    "completed_at": 1794097748.2827864
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cycle7-audio-mute",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cycle7-audio-mute' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794081326.6758423,
-      "timestamp_str": "2026-11-07 22:55:26",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-cycle8-levelup-cue",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: fire the unused level-up cue when Pilot Mastery rises",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794081513.4963148,
-      "timestamp_str": "2026-11-07 22:58:33",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "SoundController.playLevelUp() is defined but never called; promotions render a log and a new LVL badge in silence, so a competence milestone lacks its audio cue.",
-        "benefits": "Pilot promotions gain the synthesized level-up sound; loaded saves do not spill a false cue.",
-        "risks": "contract: none; dependency: none; concurrency: renderHUD stays synchronous; state: one in-memory last-level tracker, no save field.",
-        "mitigation": "Instrumented real browser play crossing level 1->2, static contract test, initial-render guard."
-      },
-      "plan_digest": "961450eb9ee76eef48f982289f2730781c47ccf9bb6ff769ca4fa98b22d01634"
-    },
-    {
-      "task_id": "voidfarer-cycle8-levelup-cue",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Cycle 8 verified: promotion from 490 XP fires one level-up cue; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794082863.110292,
-      "timestamp_str": "2026-11-07 23:21:03",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-188 and campaign cycle 8",
-        "evidence": "ui-review/cycle08-before/play-report.json, cycle08-after/play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-cycle8-levelup-cue",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cycle8-levelup-cue' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794082864.0695152,
-      "timestamp_str": "2026-11-07 23:21:04",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-cycle9-progression-labels",
       "phase": "phase 2",
@@ -300,6 +241,60 @@
         "mitigation": "Static dedup test, before/after control counts, bottom-strip Overclock play, vision review."
       },
       "plan_digest": "21f430aad2811fd983d3b3f61109310b99fdb9b13f8a4a9e1e98f23466a520b6"
+    },
+    {
+      "task_id": "voidfarer-ship-disclosures",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: collapse the SHIP room schematic and module catalog behind SHOW controls",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794097507.30955,
+      "timestamp_str": "2026-11-08 03:25:07",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "SHIP is the largest core tab at 2,390px; the six-room schematic and 12-row catalog are always open, overflow horizontally at 1280, and bury the ship/stat overview.",
+        "benefits": "Initial SHIP content drops below 1,000px while all rooms and modules remain one click away with clear HIDE controls.",
+        "risks": "contract: UI surface; dependency: none; concurrency: none; state: in-memory hidden attributes only; regression: open panel must show all rooms and module rows.",
+        "mitigation": "Static disclosure test, before/after height and horizontal-width measurements, open-state play, vision review."
+      },
+      "plan_digest": "a0b7bd41a652b6c29d02cdc4fbb8fc10b456955eb4e728c67b2d642aa2ff98df"
+    },
+    {
+      "task_id": "voidfarer-dedupe-player-abilities",
+      "phase": "superseded",
+      "phase_num": 2,
+      "description": "Superseded by 'voidfarer-ship-disclosures' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1794097507.30955,
+      "timestamp_str": "2026-11-08 03:25:07",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-ship-disclosures",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "SHIP condensation verified: 2390px to 932px, rooms/catalog disclosures, no horizontal overflow; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794097747.5267782,
+      "timestamp_str": "2026-11-08 03:29:07",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-194 and SHIP proof",
+        "evidence": "ui-review/ship-before/01-ship-collapsed.png, ship-after/01..03, play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-ship-disclosures",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-ship-disclosures' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794097748.2827883,
+      "timestamp_str": "2026-11-08 03:29:08",
+      "agent": "opencode:campaign"
     }
   ]
 }

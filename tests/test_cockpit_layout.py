@@ -1446,6 +1446,27 @@ class TestTerminalDeckScrolling(unittest.TestCase):
                       "long tab content must still scroll inside the viewport")
 
 
+class TestShipDisclosures(unittest.TestCase):
+    """The dense SHIP tab defaults to collapsed rooms and module catalog."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_rooms_and_catalog_use_named_disclosures(self):
+        self.assertIn('id="btnToggleShipRooms"', self.html)
+        self.assertIn('data-label="ROOMS"', self.html)
+        self.assertIn('id="shipRoomDetails" hidden', self.html)
+        self.assertIn('id="btnToggleShipCatalog"', self.html)
+        self.assertIn('data-label="MODULES"', self.html)
+        self.assertIn('id="shipModulesGrid" hidden', self.html)
+        self.assertIn("is-collapsed", self.html)
+        self.assertIn("toggleShipDisclosure", self.js)
+        self.assertIn(".ship-room-details[hidden], .ship-modules-grid[hidden]", self.css)
+
+
 class TestPlayerAbilityDedup(unittest.TestCase):
     """The PLAYER card points at the command strip instead of duplicating its controls."""
 

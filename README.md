@@ -380,10 +380,12 @@ gaps**: every POST route in `/api/agent/actions` is either exercised or listed i
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
 The click-map enumerates every rendered control via `window.voidfarerClickMap()` and fails
-on a missing or duplicate handle (desktop: 157 controls, 47 visible in the default focus
+on a missing or duplicate handle (desktop: 159 controls, 47 visible in the default focus
 rail, 0 missing, 0 duplicates). The left console starts with five core systems and a
 `MORE SYSTEMS` disclosure; expanding it restores all sixteen tabs. The PLAYER card points
-at the bottom command strip for abilities instead of repeating its six USE buttons.
+at the bottom command strip for abilities instead of repeating its six USE buttons, and
+the SHIP tab collapses `ROOMS & CREW STATIONS` and the `MODULE CATALOG` behind SHOW/HIDE
+disclosures (initial SHIP content 2,390px -> 932px).
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -568,7 +570,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,263-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,264-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

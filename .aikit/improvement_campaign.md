@@ -621,3 +621,14 @@ after: 0, height 581px, six command chips still present, Overclock fires from th
 (surge 8, `+12 heat`). Click-map 157/47/0/0; suite `Ran 1263 OK`; gate 5/5.
 Screenshots: `abilities-before/01-player-tab.png` vs `abilities-after/01-player-tab.png`
 and `02-command-strip-ability.png`.
+
+### Third condensation — SHIP rooms and module catalog
+
+SHIP was the largest core tab at 2,390px, with the room grid and 12-row module catalog
+always open. Default collapse both behind full-width `SHOW ROOMS` / `SHOW MODULES`
+disclosures; open rooms to 360px so all six cards show; use a narrow two-line module row so
+names keep whole words. Measured: initial SHIP 2,390px -> 932px; rooms open 1,200px with six
+cards; modules open 2,521px with no horizontal overflow. Click-map 159/47/0/0;
+`ui_inventory.py` 1158 lines; suite `Ran 1264 OK`; gate 5/5. Screenshots:
+`ship-before/01-ship-collapsed.png` vs `ship-after/01-ship-collapsed.png`,
+`02-ship-rooms-open.png`, `03-ship-modules-open.png`.

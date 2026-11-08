@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `352`
+- **Total Classes**: `353`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `1986`
-- **Total Source Lines**: `50408`
+- **Total Class Methods**: `1988`
+- **Total Source Lines**: `50429`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2009` lines (`88090` bytes)
+**Size**: `2030` lines (`89041` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -600,6 +600,9 @@
   - Method `.test_more_below_cue_is_a_real_element_not_the_decorative_frame()`
   - Method `.test_cue_also_watches_inner_tab_scrollers()`
   - Method `.test_outliner_panel_ends_with_its_sections()`
+- `class TestShipDisclosures` - *The dense SHIP tab defaults to collapsed rooms and module catalog.*
+  - Method `.setUpClass()`
+  - Method `.test_rooms_and_catalog_use_named_disclosures()`
 - `class TestPlayerAbilityDedup` - *The PLAYER card points at the command strip instead of duplicating its controls.*
   - Method `.setUpClass()`
   - Method `.test_player_card_has_no_second_ability_use_set()`

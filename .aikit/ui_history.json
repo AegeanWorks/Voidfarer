@@ -633,5 +633,19 @@
     "final_snapshot_digest": "f23c2853c12913a6ba3d088aad47173ed371cc50e15738ec580deca991d463eb",
     "final_snapshot_entries": 1150,
     "surface_digest": "e5ef1298226d3fafa44713f112f44591d5c96bd057ef32b2949aaf05cd45416d"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "e75b2b154c7457e6bf650724829f6674770ca900",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794096955.2362754,
+    "finished_at": 1794097263.0293126,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; all six rooms, whole-word modules, no horizontal clipping)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "04239b25219553f277c07151cb8214400f941e6039c61404bee4d807587ec6d6",
+    "final_snapshot_entries": 1158,
+    "surface_digest": "be833afe4f853b167e310672df87f288c1c43fe2774656c1b3f34388f2aaeb7c"
   }
 ]

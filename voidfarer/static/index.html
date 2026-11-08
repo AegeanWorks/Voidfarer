@@ -707,19 +707,24 @@
                             <div class="panel-tag"><span class="badge-dot dot-amber"></span> SHIP</div>
                             <h2 class="panel-title">SHIP CONFIGURATION</h2>
                         </div>
-                        <section class="ship-interior-panel" aria-labelledby="shipInteriorTitle">
+                        <section class="ship-interior-panel is-collapsed" id="shipInteriorPanel" aria-labelledby="shipInteriorTitle">
                             <div class="ship-interior-header">
                                 <div>
                                     <div class="panel-tag"><span class="badge-dot dot-cyan"></span> INTERIOR SCHEMATIC</div>
                                     <h3 class="ship-interior-title" id="shipInteriorTitle">ROOMS &amp; CREW STATIONS</h3>
                                 </div>
-                                <span class="ship-interior-status" id="shipInteriorStatus">LIVE SHIP PLAN</span>
+                                <div class="ship-interior-actions">
+                                    <span class="ship-interior-status" id="shipInteriorStatus">LIVE SHIP PLAN</span>
+                                </div>
                             </div>
-                            <div class="ship-room-grid" id="shipRoomGrid" aria-live="polite"></div>
-                            <div class="ship-room-legend">
-                                <span><i class="room-legend-dot online"></i> ONLINE</span>
-                                <span><i class="room-legend-dot staffed"></i> STAFFED</span>
-                                <span><i class="room-legend-dot offline"></i> OFFLINE</span>
+                            <button class="ship-disclosure-toggle" id="btnToggleShipRooms" data-label="ROOMS" aria-expanded="false" aria-controls="shipRoomDetails" title="Show or hide the room and crew-station schematic">SHOW ROOMS</button>
+                            <div id="shipRoomDetails" hidden>
+                                <div class="ship-room-grid" id="shipRoomGrid" aria-live="polite"></div>
+                                <div class="ship-room-legend">
+                                    <span><i class="room-legend-dot online"></i> ONLINE</span>
+                                    <span><i class="room-legend-dot staffed"></i> STAFFED</span>
+                                    <span><i class="room-legend-dot offline"></i> OFFLINE</span>
+                                </div>
                             </div>
                         </section>
                         <div class="ship-top-row">
@@ -736,8 +741,14 @@
                                 <button class="btn-fabricate" id="btnFabricateFuel" title="Synthesize an emergency quantum fuel pack from 1x titanium alloy (+25 Fuel)">⚡ FABRICATE FUEL PACK (1x Ti)</button>
                             </div>
                         </div>
-                        <div class="ship-catalog-header"><span>MODULE CATALOG</span><small>// REFIT BAY</small></div>
-                        <div class="ship-modules-grid" id="shipModulesGrid"></div>
+                        <div class="ship-catalog-header">
+                            <span>MODULE CATALOG</span>
+                            <div class="ship-catalog-actions">
+                                <small>// REFIT BAY</small>
+                            </div>
+                        </div>
+                        <button class="ship-disclosure-toggle" id="btnToggleShipCatalog" data-label="MODULES" aria-expanded="false" aria-controls="shipModulesGrid" title="Show or hide the structural module catalog">SHOW MODULES</button>
+                        <div class="ship-modules-grid" id="shipModulesGrid" hidden></div>
                     </div>
 
                     <!-- Tab: Empire (Research, Outposts, Diplomacy) -->

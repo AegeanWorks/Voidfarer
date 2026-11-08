@@ -2121,3 +2121,14 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. The command strip remains the single ability surface; its existing state/hotkey/cooldown chips are unchanged.
   3. Add `TestPlayerAbilityDedup`; keep the legacy `.character-abilities .ability-row` CSS for the existing static contract.
 - **Consequences**: PLAYER duplicate controls 6 -> 0; bottom command chips remain 6; PLAYER content height 1,156px -> 581px (roughly half). Browser play: clicking the bottom-strip Overclock chip sets reactor surge to 8 ticks and logs `Overclock engaged: +25% output for 8 ticks (+12 heat).` 25 frames/405ms, zero errors. Click-map 163/53/0/0 -> 157/47/0/0; full suite `Ran 1263 OK`; before/after captures `abilities-before/01-player-tab.png` and `abilities-after/01..02` were vision-reviewed with no new clipping.
+
+### ADR-194: Mechanics condensation — the SHIP tab collapses rooms and module catalog
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: SHIP was the densest core tab at 2,390px of content. The six-card room schematic and 12-row module catalog were always expanded; at 1280x720 the three-column room grid and module header overflowed horizontally, and the first screen showed no clear action hierarchy.
+- **Decision**:
+  1. Default-collapse `ROOMS & CREW STATIONS` and `MODULE CATALOG`; add full-width `SHOW ROOMS` / `SHOW MODULES` disclosures that become `HIDE ...`, with `aria-expanded` and `aria-controls`.
+  2. Keep the ship wireframe, `SHIP STATISTICS`, and fabrication visible. Open the room panel to 360px so all six room cards and their `// 01..06` lines fit; use a two-line module row at narrow widths so names wrap at whole words instead of across a 3/4-column squeeze.
+  3. On open, scroll the disclosure button to just below the sticky tab header so the HIDE control and first rows stay visible.
+  4. Add `TestShipDisclosures` for the default-hidden state and the toggle contract.
+- **Consequences**: Initial SHIP content 2,390px -> 932px; SHOW ROOMS -> 1,200px with all six cards fully visible; SHOW MODULES -> 2,521px with whole-word module names and no horizontal overflow. Browser play: 25 frames/403ms, zero errors. Click-map 159 controls (47 visible by default), 0 missing/0 duplicate; `ui_inventory.py` 1158 lines; full suite `Ran 1264 OK`; no save-schema change. Before/after captures `ship-before/01-ship-collapsed.png`, `ship-after/01-ship-collapsed.png`, `02-ship-rooms-open.png`, `03-ship-modules-open.png` were vision-reviewed; remaining `SCROLL ▼` overlay is pre-existing.

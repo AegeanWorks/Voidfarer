@@ -928,6 +928,10 @@ class CockpitApp {
         this.shipVisual = document.getElementById("shipVisual");
         this.shipModulesGrid = document.getElementById("shipModulesGrid");
         this.shipStatsPanel = document.getElementById("shipStatsPanel");
+        this.shipInteriorPanel = document.getElementById("shipInteriorPanel");
+        this.shipRoomDetails = document.getElementById("shipRoomDetails");
+        this.btnToggleShipRooms = document.getElementById("btnToggleShipRooms");
+        this.btnToggleShipCatalog = document.getElementById("btnToggleShipCatalog");
         this.shipRoomGrid = document.getElementById("shipRoomGrid");
         this.shipInteriorStatus = document.getElementById("shipInteriorStatus");
         this.researchSummary = document.getElementById("researchSummary");
@@ -1334,6 +1338,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
         if (this.btnSubsystemBridge) {
             this.btnSubsystemBridge.addEventListener("click", () => this.handleCombat("target_bridge"));
+        }
+        if (this.btnToggleShipRooms) {
+            this.btnToggleShipRooms.addEventListener("click", () => this.toggleShipDisclosure(
+                this.btnToggleShipRooms, this.shipRoomDetails, this.shipInteriorPanel,
+            ));
+        }
+        if (this.btnToggleShipCatalog) {
+            this.btnToggleShipCatalog.addEventListener("click", () => this.toggleShipDisclosure(
+                this.btnToggleShipCatalog, this.shipModulesGrid, null,
+            ));
         }
         if (this.btnFabricatePatch) {
             this.btnFabricatePatch.addEventListener("click", () => this.handleFabricate("patch_kit"));
@@ -3692,6 +3706,38 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const factions = this.state.factions || {};
         const match = Object.entries(factions).find(([, f]) => f.name === name);
         return match ? match[0] : null;
+    }
+
+    toggleShipDisclosure(button, target, section = null) {
+        if (!button || !target) return;
+        const open = Boolean(target.hidden);
+        target.hidden = !open;
+        button.setAttribute("aria-expanded", String(open));
+        const label = button.dataset.label || button.textContent.trim().replace(/^SHOW\s+/i, "");
+        button.textContent = open ? `HIDE ${label}` : `SHOW ${label}`;
+        if (section) section.classList.toggle("is-collapsed", !open);
+        if (open) {
+            // Keep the disclosure (and its HIDE label) clear of the sticky tab
+            // header; the revealed rows start directly below it.
+            requestAnimationFrame(() => this.scrollDisclosureIntoView(button));
+        }
+    }
+
+    scrollDisclosureIntoView(button) {
+        const scroller = button.closest(".terminal-content-stack");
+        if (!scroller) {
+            button.scrollIntoView({ block: "nearest", inline: "nearest" });
+            return;
+        }
+        const tab = button.closest(".tab-content");
+        const sticky = tab ? tab.querySelector(":scope > .panel-header") : null;
+        const stickyHeight = sticky ? sticky.getBoundingClientRect().height : 0;
+        const top = button.getBoundingClientRect().top
+            - scroller.getBoundingClientRect().top
+            + scroller.scrollTop
+            - stickyHeight
+            - 8;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: "auto" });
     }
 
     renderShip() {
