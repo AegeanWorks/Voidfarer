@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `358`
+- **Total Classes**: `359`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2008`
-- **Total Source Lines**: `50619`
+- **Total Class Methods**: `2012`
+- **Total Source Lines**: `50701`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2220` lines (`98108` bytes)
+**Size**: `2252` lines (`99466` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -607,6 +607,10 @@
   - Method `.setUpClass()`
   - Method `.test_range_scale_label_stays_right_of_the_drawer()`
   - Method `.test_battle_focus_chip_uses_the_short_focus_label()`
+- `class TestReactorFineTune` - *The reactor doctrine presets stay visible; manual sliders are optional.*
+  - Method `.setUpClass()`
+  - Method `.test_manual_sliders_default_to_hidden()`
+  - Method `.test_power_hint_names_the_visible_presets()`
 - `class TestAdvancedLeftCondensation` - *The three largest advanced tabs start with summary-first disclosures.*
   - Method `.setUpClass()`
   - Method `.test_large_catalogs_default_to_hidden_details()`
@@ -2245,7 +2249,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `785` lines (`33673` bytes)
+**Size**: `819` lines (`35292` bytes)
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -2255,6 +2259,7 @@
   - Method `.test_tutorial_progressive_milestones()`
   - Method `.test_transit_arrival_advances_orbit_milestone()` - *Timed transit is an orbit action and must advance the academy once.*
   - Method `.test_tutorial_hints_name_live_cockpit_controls()`
+  - Method `.test_reactor_mode_preset_advances_power_milestone()`
   - Method `.test_tutorial_skip_and_reset()`
   - Method `.test_story_initialization_and_first_chapter()`
   - Method `.test_story_arrival_transmissions()`
@@ -3009,7 +3014,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10373` lines (`512125` bytes)
+**Size**: `10389` lines (`512883` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3878,7 +3883,7 @@
 ### [`voidfarer/story.py`](voidfarer/story.py)
 > *Interactive Cadet Flight Academy tutorial and branching narrative campaign systems.*
 
-**Size**: `541` lines (`24671` bytes)
+**Size**: `541` lines (`24681` bytes)
 
 **Functions:**
 - `def generate_initial_tutorial()` - *Construct a fresh Cadet Flight Academy tutorial state.*

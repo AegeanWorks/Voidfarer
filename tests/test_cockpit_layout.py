@@ -1485,6 +1485,38 @@ class TestHudLabelPolish(unittest.TestCase):
         self.assertNotIn('label: "Battle Focus"', self.js)
 
 
+class TestReactorFineTune(unittest.TestCase):
+    """The reactor doctrine presets stay visible; manual sliders are optional."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_manual_sliders_default_to_hidden(self):
+        self.assertIn('id="btnTogglePowerDetails"', self.html)
+        self.assertIn('data-label="FINE TUNE"', self.html)
+        self.assertIn('id="powerDetails" hidden', self.html)
+        self.assertLess(
+            self.html.index('id="powerDetails"'),
+            self.html.index('id="sliderEng"'),
+        )
+        self.assertLess(
+            self.html.index('id="reactorModeRow"'),
+            self.html.index('id="powerDetails"'),
+        )
+        self.assertIn("#powerDetails[hidden]", self.css)
+        self.assertIn(".power-fine-tune-btn", self.css)
+        self.assertIn("btnTogglePowerDetails", self.js)
+        self.assertIn("toggleSectionDisclosure", self.js)
+
+    def test_power_hint_names_the_visible_presets(self):
+        story_py = (STATIC_DIR.parent / "story.py").read_text(encoding="utf-8")
+        self.assertIn("click ECONOMY or OVERDRIVE in the reactor strip", story_py)
+        self.assertNotIn("adjust the reactor sliders", story_py)
+
+
 class TestAdvancedLeftCondensation(unittest.TestCase):
     """The three largest advanced tabs start with summary-first disclosures."""
 

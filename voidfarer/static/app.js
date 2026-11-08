@@ -678,6 +678,8 @@ class CockpitApp {
         this.pwrWepVal = document.getElementById("pwrWepVal");
         this.powerTotal = document.getElementById("powerTotal");
         this.applyPowerBtn = document.getElementById("applyPowerBtn");
+        this.btnTogglePowerDetails = document.getElementById("btnTogglePowerDetails");
+        this.powerDetails = document.getElementById("powerDetails");
         this.panelReactor = document.getElementById("panelReactor");
         this.btnToggleReactor = document.getElementById("btnToggleReactor");
         this.powerDirty = false;
@@ -1087,6 +1089,11 @@ class CockpitApp {
         // Releasing a slider routes power; APPLY ROUTE stays as an explicit retry.
         sliders.forEach(s => s.addEventListener("change", () => this.commitPowerRoute()));
         this.applyPowerBtn.addEventListener("click", () => this.handleApplyPower());
+        if (this.btnTogglePowerDetails && this.powerDetails) {
+            this.btnTogglePowerDetails.addEventListener("click", () => this.toggleSectionDisclosure(
+                this.btnTogglePowerDetails, this.powerDetails,
+            ));
+        }
 
         // Presets
         document.getElementById("presetBalanced").addEventListener("click", () => {
@@ -3811,7 +3818,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const open = Boolean(target.hidden);
         target.hidden = !open;
         button.setAttribute("aria-expanded", String(open));
-        const label = button.dataset.label || button.textContent.trim().replace(/^SHOW\s+/i, "");
+        const label = button.dataset.label || button.textContent.trim().replace(/^(?:SHOW|HIDE)\s+/i, "");
         button.textContent = open ? `HIDE ${label}` : `SHOW ${label}`;
         if (section) section.classList.toggle("is-collapsed", !open);
         if (open) {

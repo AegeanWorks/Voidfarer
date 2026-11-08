@@ -9878,7 +9878,15 @@ body.cockpit-theme .nav-panel > .panel-header {
 }
 .codex-stats-grid { max-height: 144px; }
 #arsenalUpgradeDetails[hidden], #chassisDetails[hidden], #ordnanceDetails[hidden],
-#factionDetails[hidden], #corpDetails[hidden], #codexMilestoneDetails[hidden] { display: none; }
+#factionDetails[hidden], #corpDetails[hidden], #codexMilestoneDetails[hidden],
+#powerDetails[hidden] { display: none; }
+.power-fine-tune-btn {
+    width: 100%;
+    min-height: 26px;
+    margin-top: 4px;
+    padding: 3px 6px;
+    font-size: 12px;
+}
 
 /* Small-card rhythm: minimum sizes and one compact action treatment. */
 .quest-card { min-height: 96px; }

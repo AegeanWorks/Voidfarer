@@ -1178,51 +1178,54 @@
                         </div>
                     </div>
 
-                    <div class="power-matrix">
-                        <div class="power-slider-row">
-                            <div class="power-header">
-                                <span class="pwr-label cyan-glow"><span class="pwr-icon">➤</span> ENGINES <kbd class="hotkey-chip">Q</kbd></span>
-                                <span class="pwr-val" id="pwrEngVal">25%</span>
+                    <button class="btn-hud power-fine-tune-btn" id="btnTogglePowerDetails" data-label="FINE TUNE" aria-expanded="false" aria-controls="powerDetails" title="Show or hide the manual power-routing sliders">SHOW FINE TUNE</button>
+                    <div id="powerDetails" hidden>
+                        <div class="power-matrix">
+                            <div class="power-slider-row">
+                                <div class="power-header">
+                                    <span class="pwr-label cyan-glow"><span class="pwr-icon">➤</span> ENGINES <kbd class="hotkey-chip">Q</kbd></span>
+                                    <span class="pwr-val" id="pwrEngVal">25%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider cyan-range" id="sliderEng">
+                                <span class="pwr-hint">Increases warp jump fuel efficiency</span>
                             </div>
-                            <input type="range" min="0" max="100" value="25" class="pwr-slider cyan-range" id="sliderEng">
-                            <span class="pwr-hint">Increases warp jump fuel efficiency</span>
+
+                            <div class="power-slider-row">
+                                <div class="power-header">
+                                    <span class="pwr-label blue-glow"><span class="pwr-icon">⬡</span> SHIELDS <kbd class="hotkey-chip">W</kbd></span>
+                                    <span class="pwr-val" id="pwrShdVal">25%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider blue-range" id="sliderShd">
+                                <span class="pwr-hint">Protects against solar flares & combat damage</span>
+                            </div>
+
+                            <div class="power-slider-row">
+                                <div class="power-header">
+                                    <span class="pwr-label magenta-glow"><span class="pwr-icon">◈</span> SENSORS <kbd class="hotkey-chip">E</kbd></span>
+                                    <span class="pwr-val" id="pwrSenVal">25%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider magenta-range" id="sliderSen">
+                                <span class="pwr-hint">Multiplies research credits earned from scans</span>
+                            </div>
+
+                            <div class="power-slider-row">
+                                <div class="power-header">
+                                    <span class="pwr-label red-glow"><span class="pwr-icon">◎</span> WEAPONS <kbd class="hotkey-chip">R</kbd></span>
+                                    <span class="pwr-val" id="pwrWepVal">25%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider red-range" id="sliderWep">
+                                <span class="pwr-hint">Amplifies strike damage against hostile corsairs</span>
+                            </div>
                         </div>
 
-                        <div class="power-slider-row">
-                            <div class="power-header">
-                                <span class="pwr-label blue-glow"><span class="pwr-icon">⬡</span> SHIELDS <kbd class="hotkey-chip">W</kbd></span>
-                                <span class="pwr-val" id="pwrShdVal">25%</span>
-                            </div>
-                            <input type="range" min="0" max="100" value="25" class="pwr-slider blue-range" id="sliderShd">
-                            <span class="pwr-hint">Protects against solar flares & combat damage</span>
-                        </div>
-
-                        <div class="power-slider-row">
-                            <div class="power-header">
-                                <span class="pwr-label magenta-glow"><span class="pwr-icon">◈</span> SENSORS <kbd class="hotkey-chip">E</kbd></span>
-                                <span class="pwr-val" id="pwrSenVal">25%</span>
-                            </div>
-                            <input type="range" min="0" max="100" value="25" class="pwr-slider magenta-range" id="sliderSen">
-                            <span class="pwr-hint">Multiplies research credits earned from scans</span>
-                        </div>
-
-                        <div class="power-slider-row">
-                            <div class="power-header">
-                                <span class="pwr-label red-glow"><span class="pwr-icon">◎</span> WEAPONS <kbd class="hotkey-chip">R</kbd></span>
-                                <span class="pwr-val" id="pwrWepVal">25%</span>
-                            </div>
-                            <input type="range" min="0" max="100" value="25" class="pwr-slider red-range" id="sliderWep">
-                            <span class="pwr-hint">Amplifies strike damage against hostile corsairs</span>
+                        <div class="power-action-row">
+                            <button class="btn-hud" id="presetBalanced">BALANCED</button>
+                            <button class="btn-hud" id="presetSprint">SPEED</button>
+                            <button class="btn-hud" id="presetScience">SCIENCE</button>
+                            <button class="btn-hud btn-green" id="applyPowerBtn">APPLY ROUTE</button>
                         </div>
                     </div>
-
-                            <div class="power-action-row">
-                                <button class="btn-hud" id="presetBalanced">BALANCED</button>
-                                <button class="btn-hud" id="presetSprint">SPEED</button>
-                                <button class="btn-hud" id="presetScience">SCIENCE</button>
-                                <button class="btn-hud btn-green" id="applyPowerBtn">APPLY ROUTE</button>
-                            </div>
-                        </div>
+                </div>
 
                         <div class="skills-quick-panel" id="hudSkillsPanel">
                             <div class="subsection-header">

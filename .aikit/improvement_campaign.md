@@ -726,3 +726,21 @@ headers and one-line titles, ok true. Suite `Ran 1279 OK`; click-map 169/47/0/0;
 `polish-before/01-cockpit-before.png` vs `polish-after/01-cockpit.png`; vision review quoted
 `ANGE SCALE`/`Battle Fo...` before and `RANGE SCALE [ 10 AU ]`/`Focus` after, with no new
 clipping.
+
+### Ninth pass — preset-first reactor and one-click academy power step
+
+The always-visible reactor strip was the densest mechanic: four manual sliders, four
+doctrine buttons, a second BALANCED/SPEED/SCIENCE row and an APPLY ROUTE button that was
+not visible at 1280×720. The academy's power step told players to adjust the sliders, but
+only `route_power` advanced it — choosing a doctrine preset did nothing. The strip now
+keeps heat, the four doctrine presets and the output line visible; the sliders and
+secondary presets sit behind `SHOW FINE TUNE`. `set_reactor_mode` now advances the power
+step once with its credits/XP, and the hint names `ECONOMY` or `OVERDRIVE`.
+
+Measured: default panel 275→242px; visible sliders 4→0; FINE TUNE opens to 305px and
+closes back to 242px. Play: academy 3/6, click ECONOMY → 4/6, credits 2,550→2,750 (+200),
+XP 230→310 (+80), one academy log; a second mode change paid nothing. 25 frames/408ms,
+zero errors. Suite `Ran 1282 OK`; click-map 170/40/0/0; `ui_inventory.py` 1198 lines; gate
+5/5. Screenshots: `reactor-before/01-reactor.png` vs `reactor-play-after/01-preset-first.png`
+and `03-fine-tune-open.png`; vision review called the after state meaningfully simpler with
+no layout break.

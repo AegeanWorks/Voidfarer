@@ -717,5 +717,33 @@
     "final_snapshot_digest": "bc4492b543b840e02c92072f0058452a2f253b3ddf7b5d2c079aa8024f65c231",
     "final_snapshot_entries": 1195,
     "surface_digest": "9ec0cb1462bdd682f805d9b740a6475b3fa3c7ad4f297debfd3209ae9a703663"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "33715f175bf39fa8c1bdeb969c01a766ce03242a",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794128880.2390609,
+    "finished_at": 1794129086.1556973,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; preset-first reactor, fine tune hidden, hint quoted)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "0f7332d7d258ba548730589772367d36893e965ab435ea8d1e2b3a0b4e70be58",
+    "final_snapshot_entries": 1198,
+    "surface_digest": "29e56f245236899a5c35c594f5a6ed2cd436b322b8f4c03639ec7eff7061cd0c"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "33715f175bf39fa8c1bdeb969c01a766ce03242a",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794129342.535584,
+    "finished_at": 1794130379.8410575,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; preset-first reactor, fine tune hidden, hint quoted)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "0f7332d7d258ba548730589772367d36893e965ab435ea8d1e2b3a0b4e70be58",
+    "final_snapshot_entries": 1198,
+    "surface_digest": "1ed3fb03482553ed93d3edfc48ca2aafe0455b48614712814a3d31a44b244bdf"
   }
 ]

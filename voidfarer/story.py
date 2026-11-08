@@ -39,7 +39,7 @@ INITIAL_TUTORIAL_STEPS: tuple[TutorialStep, ...] = (
         id="step_power",
         title="Reactor Power Routing",
         instruction="Re-route reactor core output across engines, shields, sensors, and weapons.",
-        hint="Run `power 30 25 25 20` or adjust the reactor sliders in Web HUD.",
+        hint="Run `power 30 25 25 20` or click ECONOMY or OVERDRIVE in the reactor strip.",
         reward_credits=200,
         reward_xp=80,
     ),

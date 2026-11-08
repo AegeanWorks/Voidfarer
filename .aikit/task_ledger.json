@@ -1,63 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-hud-polish",
+    "task_id": "voidfarer-reactor-preset-first",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794115414.4952192,
+    "updated_at": 1794131186.9690323,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794115415.0478277
+    "completed_at": 1794131187.6916885
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-dedupe-player-abilities",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: remove the duplicated PLAYER ability set and point to the command strip",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794094203.3825996,
-      "timestamp_str": "2026-11-08 02:30:03",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "PLAYER renders six ability cards with USE buttons while the bottom command strip already exposes the same six with hotkeys and cooldowns; G-013 forbids the duplicate.",
-        "benefits": "PLAYER content height roughly halves, duplicate controls disappear, and one ability surface remains authoritative.",
-        "risks": "contract: G-013-aligned UI; dependency: none; concurrency: none; state: none; regression: bottom strip must keep firing.",
-        "mitigation": "Static dedup test, before/after control counts, bottom-strip Overclock play, vision review."
-      },
-      "plan_digest": "21f430aad2811fd983d3b3f61109310b99fdb9b13f8a4a9e1e98f23466a520b6"
-    },
-    {
-      "task_id": "voidfarer-ship-disclosures",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: collapse the SHIP room schematic and module catalog behind SHOW controls",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794097507.30955,
-      "timestamp_str": "2026-11-08 03:25:07",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "SHIP is the largest core tab at 2,390px; the six-room schematic and 12-row catalog are always open, overflow horizontally at 1280, and bury the ship/stat overview.",
-        "benefits": "Initial SHIP content drops below 1,000px while all rooms and modules remain one click away with clear HIDE controls.",
-        "risks": "contract: UI surface; dependency: none; concurrency: none; state: in-memory hidden attributes only; regression: open panel must show all rooms and module rows.",
-        "mitigation": "Static disclosure test, before/after height and horizontal-width measurements, open-state play, vision review."
-      },
-      "plan_digest": "a0b7bd41a652b6c29d02cdc4fbb8fc10b456955eb4e728c67b2d642aa2ff98df"
-    },
-    {
-      "task_id": "voidfarer-dedupe-player-abilities",
-      "phase": "superseded",
-      "phase_num": 2,
-      "description": "Superseded by 'voidfarer-ship-disclosures' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1794097507.30955,
-      "timestamp_str": "2026-11-08 03:25:07",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-ship-disclosures",
       "phase": "phase 4",
@@ -302,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794115415.0478299,
       "timestamp_str": "2026-11-08 08:23:35",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-reactor-preset-first",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: make reactor doctrine presets the default onboarding path and tuck manual sliders behind FINE TUNE",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794131186.2172875,
+      "timestamp_str": "2026-11-08 12:46:26",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The always-visible reactor strip shows four sliders, four doctrine buttons, a duplicate BALANCED/SPEED/SCIENCE row and an APPLY ROUTE button that is not visible at 1280x720; the academy tells players to adjust sliders, and choosing a doctrine preset does not advance the power step.",
+        "benefits": "The default strip shows only heat, doctrine presets and output; one ECONOMY/OVERDRIVE click completes the power milestone with its reward; manual routing stays available under FINE TUNE.",
+        "risks": "contract: reactor tutorial progression and UI layout; dependency: none; concurrency: engine lock held; state: no new save field; regression: route_power and slider apply must still work and not double-award.",
+        "mitigation": "Failing-first engine test, one-click browser play with a second mode change, fine-tune open/close check, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "676e872b8e22912d44e7b70864c6306b32daf28780e11e560ebea5b57b6e7262"
+    },
+    {
+      "task_id": "voidfarer-reactor-preset-first",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Reactor preset-first verified: 275->242px default, one-click academy step, second mode no double award; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794131186.9690323,
+      "timestamp_str": "2026-11-08 12:46:26",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-200 and reactor proof",
+        "evidence": "ui-review/reactor-before/01-reactor.png, reactor-play-after/01-preset-first.png, 03-fine-tune-open.png, play-report.json"
+      }
+    },
+    {
+      "task_id": "voidfarer-reactor-preset-first",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-reactor-preset-first' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794131187.6916904,
+      "timestamp_str": "2026-11-08 12:46:27",
       "agent": "opencode:campaign"
     }
   ]

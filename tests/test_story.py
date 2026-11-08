@@ -157,6 +157,40 @@ class TestStoryAndTutorial(unittest.TestCase):
         self.assertNotIn("ENTER ORBIT", hints)
         self.assertIn("'SCAN' in the radar map controls", hints)
         self.assertNotIn("SENSOR SCAN", hints)
+        self.assertIn("ECONOMY or OVERDRIVE", hints)
+        self.assertNotIn("reactor sliders", hints)
+
+    def test_reactor_mode_preset_advances_power_milestone(self):
+        first_body = self.engine.current_system.bodies[1]
+        self.engine.orbit(first_body.id)
+        self.engine.scan()
+        self.assertEqual(self.engine.state.ship.tutorial.current_step_index, 2)
+        start_credits = self.engine.state.ship.credits
+        start_xp = self.engine.state.ship.mastery.xp
+        before_logs = sum(
+            "ACADEMY STEP COMPLETE" in line
+            for line in self.engine.state.ship.flight_log
+        )
+        ok, msg = self.engine.set_reactor_mode("economy")
+        self.assertTrue(ok, msg)
+        tut = self.engine.state.ship.tutorial
+        self.assertEqual(tut.current_step_index, 3)
+        self.assertTrue(tut.steps[2].completed)
+        self.assertEqual(self.engine.state.ship.credits, start_credits + 200)
+        self.assertEqual(self.engine.state.ship.mastery.xp, start_xp + 80)
+        self.assertEqual(
+            sum("ACADEMY STEP COMPLETE" in line for line in self.engine.state.ship.flight_log),
+            before_logs + 1,
+        )
+        # Another doctrine change must not pay the completed step again.
+        paid_credits = self.engine.state.ship.credits
+        ok, _ = self.engine.set_reactor_mode("overdrive")
+        self.assertTrue(ok)
+        self.assertEqual(self.engine.state.ship.credits, paid_credits)
+        self.assertEqual(
+            sum("ACADEMY STEP COMPLETE" in line for line in self.engine.state.ship.flight_log),
+            before_logs + 1,
+        )
 
     def test_tutorial_skip_and_reset(self):
         self.assertTrue(self.engine.state.ship.tutorial.is_active)

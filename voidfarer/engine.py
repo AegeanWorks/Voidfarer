@@ -2599,7 +2599,23 @@ class SimulationEngine:
             profile = get_reactor_mode(normalized)
             log_entry = f"Reactor mode set to {profile['name']}: {profile['description']}"
             new_log = list(self.state.ship.flight_log[-19:]) + [log_entry]
-            new_ship = self._clone_ship(reactor=reactor, flight_log=tuple(new_log))
+            # Choosing a doctrine is a valid power-routing action for the academy;
+            # the manual sliders remain an optional fine-tune path.
+            new_tut, tut_cr, tut_xp, tut_relics, tut_logs = self._progress_tutorial("power")
+            new_log.extend(tut_logs)
+            new_mastery, xp_logs = (
+                self._award_pilot_xp(tut_xp, self.state.ship.mastery)
+                if tut_xp > 0 else (self.state.ship.mastery, [])
+            )
+            new_log.extend(xp_logs)
+            new_ship = self._clone_ship(
+                reactor=reactor,
+                credits=self.state.ship.credits + tut_cr,
+                mastery=new_mastery,
+                relics=tuple(list(self.state.ship.relics) + tut_relics),
+                tutorial=new_tut,
+                flight_log=tuple(new_log[-20:]),
+            )
             self.state = self._clone_state(ship=new_ship)
             return True, log_entry
 
