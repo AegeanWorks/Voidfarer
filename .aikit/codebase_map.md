@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `135`
-- **Total Classes**: `388`
-- **Total Top-Level Functions**: `424`
-- **Total Class Methods**: `2134`
-- **Total Source Lines**: `54439`
+- **Total Python Modules**: `137`
+- **Total Classes**: `391`
+- **Total Top-Level Functions**: `432`
+- **Total Class Methods**: `2149`
+- **Total Source Lines**: `54926`
 
 ---
 
@@ -1723,6 +1723,36 @@
 
 ---
 
+### [`tests/test_logistics.py`](tests/test_logistics.py)
+> *Unified logistics report/action, REST and CLI tests.*
+
+**Size**: `200` lines (`7865` bytes)
+
+**Classes:**
+- `class TestLogisticsReport`
+  - Method `.test_report_has_market_cargo_depot_and_automation()`
+  - Method `.test_summary_is_compact()`
+  - Method `.test_snapshot_carries_logistics_summary()`
+- `class TestLogisticsActions`
+  - Method `.test_buy_sell_deposit_and_withdraw()`
+  - Method `.test_trade_and_quantum_automation_toggle()`
+  - Method `.test_quantum_freight_order()`
+  - Method `.test_invalid_action_is_rejected()`
+- `class TestLogisticsSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_the_report()`
+  - Method `.test_action_endpoint_buys_cargo()`
+  - Method `.test_cli_status_and_buy()`
+
+**Functions:**
+- `def _engine()`
+
+---
+
 ### [`tests/test_megastructure_restoration.py`](tests/test_megastructure_restoration.py)
 > *Megastructure restoration: orbit/cost gates, bonuses and persistence.*
 
@@ -2911,7 +2941,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `793` lines (`35145` bytes)
+**Size**: `794` lines (`35256` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -3028,7 +3058,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `3836` lines (`192582` bytes)
+**Size**: `3958` lines (`198357` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3042,6 +3072,7 @@
 - `def cmd_economy(engine)` - *Display galactic macroeconomic conditions, active events, and lucrative trade routes.*
 - `def cmd_inventory(engine, storage, parts)` - *Display and manage ship cargo manifest, usable consumables, and hold capacity.*
 - `def cmd_fitting(engine, storage, parts)` - *One ship-fitting surface: upgrades, structural modules, weapons and hulls.*
+- `def cmd_logistics(engine, storage, parts)` - *One logistics surface: market, cargo, depot, freight, automation and actions.*
 - `def cmd_shipyard(engine, storage, parts)` - *Orbital shipyard: inspect ship chassis upgrades, purchase vessels, and sell modules.*
 - `def cmd_fleet(engine, storage, parts)` - *Manage autonomous fleet drones, mining escorts, and harvest yields.*
 - `def cmd_quests(engine)`
@@ -3238,7 +3269,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10427` lines (`514758` bytes)
+**Size**: `10429` lines (`514868` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3702,6 +3733,21 @@
 
 ---
 
+### [`voidfarer/logistics.py`](voidfarer/logistics.py)
+> *One report and action surface for trade, freight, depots and inventory.*
+
+**Size**: `148` lines (`5727` bytes)
+
+**Functions:**
+- `def _depot_row(state)`
+- `def logistics_summary(state)` - *Compact payload for /api/state.*
+- `def logistics_report(engine)` - *Return market quotes, cargo, depot, automation and freight in one payload.*
+- `def _int(value, default)`
+- `def _text(value)`
+- `def logistics_action(engine, action, **kwargs)` - *Route one logistics command to its existing engine method.*
+
+---
+
 ### [`voidfarer/mapmods.py`](voidfarer/mapmods.py)
 > *Sector map modifiers: persistent environmental conditions that reshape simulation.*
 
@@ -4053,7 +4099,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1632` lines (`70063` bytes)
+**Size**: `1646` lines (`70665` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

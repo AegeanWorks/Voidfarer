@@ -84,6 +84,7 @@ voidfarer/
 │   ├── encounters.py     <- blocking encounter facade
 │   ├── fitting.py        <- ship fitting facade
 │   ├── fleet_command.py  <- fleet report/action facade
+│   ├── logistics.py      <- trade/freight/depot facade
 │   ├── state_machines.py <- implicit machine registry
 │   ├── reactor.py        <- reactor modes, heat, cooling & derating
 │   ├── mapmods.py        <- procedural sector map modifiers
@@ -136,7 +137,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (84 suites)
+└── tests/                <- unit & integration test suite (85 suites)
 ```
 
 ---
@@ -398,10 +399,6 @@ headlines; catalogs/logs/dossiers behind SHOW.
 `voidfarer state-machines [--json]` expose them. `/api/encounter` and the `encounter`
 command unify the four blocking encounters.
 
-```bash
-python -m voidfarer.cli state-machines --json
-```
-
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
 # Check the in-game calendar date, stardate, and active simulation tick
@@ -585,7 +582,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,370-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,380-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

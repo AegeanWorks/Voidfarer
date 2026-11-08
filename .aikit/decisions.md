@@ -2381,3 +2381,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Extend `GET /api/fleet` with the full report and add `POST /api/fleet/action`; add a compact `fleet` summary to `/api/state`.
   3. Extend the `fleet` CLI with `overview`, `mercs`, `allies`, `hire`, `dismiss`, `refit` and `ally`; keep the legacy `mercs`/`allies` commands and all routes.
 - **Consequences**: An agent can read one fleet report and issue any fleet action through one route; the CLI has one preferred fleet verb while the cockpit keeps its single FLEET tab. `tests/test_fleet_command.py` adds 11 tests for the report, summary, drone/escort/mercenary/alliance actions, invalid actions, REST and CLI. Full suite `Ran 1370 OK`; no save-schema change.
+
+### ADR-218: Trade, freight, depots and inventory become one logistics surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Manual trade, the auto-trade broker, quantum freight, depots and consumables were five CLI surfaces (`market`, `autotrade`, `quantum`, `depot`, `inventory`) and a dozen routes, each assembling its own slice of cargo, market and automation state.
+- **Decision**:
+  1. Add `voidfarer/logistics.py`: `logistics_report()` returns market quotes, cargo volume/manifest, the current depot, trade and quantum automation policies, and freight orders/routes in one payload; `logistics_action(action, **kwargs)` routes to the existing trade, automation, freight, depot, item and fabrication methods.
+  2. Add `GET /api/logistics`, `POST /api/logistics/action` and a compact `logistics` summary to `/api/state`.
+  3. Add the `logistics` CLI with `status`, `market`, `cargo`, `depot`, `freight`, `automation`, and the buy/sell/deposit/withdraw/automate/freight/item/fabricate actions; legacy commands and routes remain.
+- **Consequences**: An agent can read one logistics report and issue any logistics action through one route; the CLI has one preferred logistics verb. `tests/test_logistics.py` adds 10 tests for the report, summary, buy/sell/deposit/withdraw, automation toggles, quantum freight, invalid actions, REST and CLI. Full suite `Ran 1380 OK`; no save-schema change.

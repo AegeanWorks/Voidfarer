@@ -26,6 +26,7 @@ from voidfarer.fitting import (
 )
 from voidfarer.fleet_command import fleet_action, fleet_report
 from voidfarer.frontier import MERCENARY_CATALOG
+from voidfarer.logistics import logistics_action, logistics_report
 from voidfarer.inventory import get_inventory_manifest
 from voidfarer.mapmods import MAP_MODIFIER_CATALOG, aggregate_map_modifiers, system_modifier_summary
 from voidfarer.shipmods import get_ship_mod
@@ -391,6 +392,11 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
                 "mercenaries": MERCENARY_CATALOG,
                 "report": report,
             })
+            return
+
+        if path == "/api/logistics":
+            report = logistics_report(self.engine)
+            self._send_json({"ok": True, **report})
             return
 
         if path == "/api/inventory":
@@ -819,6 +825,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             payload = dict(body or {})
             action = str(payload.pop("action", ""))
             ok, msg = fleet_action(self.engine, action, **payload)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/logistics/action":
+            payload = dict(body or {})
+            action = str(payload.pop("action", ""))
+            ok, msg = logistics_action(self.engine, action, **payload)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

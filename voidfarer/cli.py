@@ -36,6 +36,11 @@ from voidfarer.fleet_command import (
     fleet_action,
     fleet_report,
 )
+from voidfarer.logistics import (
+    LOGISTICS_ACTIONS,
+    logistics_action,
+    logistics_report,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -667,6 +672,109 @@ def cmd_fitting(engine: SimulationEngine, storage: StorageManager, parts: list[s
         )
     print(f"{DIM}Inspect: fitting <upgrades|modules|weapons|chassis> | Install: fitting install <category> <id>{RESET}")
     return 0
+
+
+def cmd_logistics(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One logistics surface: market, cargo, depot, freight, automation and actions."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+
+    if action in ("status", "market", "cargo", "depot", "freight", "automation"):
+        report = logistics_report(engine)
+        if action == "status":
+            counts = report["counts"]
+            print(f"\n{BOLD}{CYAN}=== LOGISTICS ==={RESET}")
+            print(
+                f"  Credits {report['credits']} | Cargo {report['cargo']['volume']}/"
+                f"{report['cargo']['capacity']} | Depot "
+                f"{'YES' if report['depot'] else 'NO'} | "
+                f"Trade auto {'ON' if report['automation']['trade']['enabled'] else 'OFF'} | "
+                f"Quantum auto {'ON' if report['automation']['quantum']['enabled'] else 'OFF'}"
+            )
+            print(f"  Market {counts['market_lines']} lines | {counts['freight_orders']} freight orders")
+            print(f"{DIM}Inspect: logistics market | cargo | depot | freight | automation{RESET}")
+            return 0
+        if action == "market":
+            print(f"\n{BOLD}{CYAN}=== LOCAL EXCHANGE ==={RESET}")
+            for quote in report["market"]:
+                print(
+                    f"  {quote['name']:<24} BUY {quote['buy_price']:>5} | "
+                    f"SELL {quote['sell_price']:>5} | SUPPLY {quote['supply']:>4} | "
+                    f"DEMAND {quote['demand']:>4}"
+                )
+            return 0
+        if action == "cargo":
+            print(f"\n{BOLD}{CYAN}=== CARGO HOLD ==={RESET}")
+            print(f"  Volume {report['cargo']['volume']}/{report['cargo']['capacity']}")
+            for item in report["cargo"]["manifest"]:
+                print(f"  {item.get('name', item.get('id')):<24} x{item.get('total_quantity', 0)}")
+            return 0
+        if action == "depot":
+            depot = report["depot"]
+            print(f"\n{BOLD}{CYAN}=== DEPOT ==={RESET}")
+            if not depot:
+                print(f"{DIM}No depot in this system.{RESET}")
+                return 0
+            print(f"  {depot['name']} — {depot['used_volume']}/{depot['capacity']} volume")
+            for item, quantity in sorted((depot.get("cargo") or {}).items()):
+                print(f"  {item:<24} x{quantity}")
+            return 0
+        if action == "freight":
+            print(f"\n{BOLD}{CYAN}=== QUANTUM FREIGHT ==={RESET}")
+            orders = report["freight"]["orders"]
+            if not orders:
+                print(f"{DIM}No freight orders in transit.{RESET}")
+            for order in orders:
+                print(
+                    f"  {order['commodity_id']:<16} x{order['quantity']:<4} -> "
+                    f"{order['destination_name']} arriving tick {order['arrival_tick']}"
+                )
+            for route in report["freight"]["routes"][:8]:
+                print(
+                    f"  {DIM}ROUTE {route.get('commodity_id', '?'):<16} "
+                    f"net {route.get('net', 0)} cr -> {route.get('destination_system_id', '?')}{RESET}"
+                )
+            return 0
+        print(f"\n{BOLD}{CYAN}=== AUTOMATION ==={RESET}")
+        print(f"  Trade: {report['automation']['trade']}")
+        print(f"  Quantum: {report['automation']['quantum']}")
+        return 0
+
+    if action not in LOGISTICS_ACTIONS:
+        print(f"{RED}Unknown logistics action '{action}'.{RESET}")
+        return 1
+    kwargs: dict[str, object] = {}
+    if action in ("buy", "sell", "buy_max", "sell_max"):
+        kwargs["commodity_id"] = args[1] if len(args) > 1 else ""
+        if len(args) > 2:
+            kwargs["quantity"] = args[2]
+    elif action == "automation_on":
+        kwargs.update({
+            "commodity_id": args[1] if len(args) > 1 else "",
+            "buy_below": args[2] if len(args) > 2 else 0,
+            "sell_above": args[3] if len(args) > 3 else 0,
+            "quantity": args[4] if len(args) > 4 else 1,
+        })
+    elif action == "quantum_automation_on":
+        kwargs["min_net"] = args[1] if len(args) > 1 else 100
+    elif action == "quantum_order":
+        kwargs.update({
+            "commodity_id": args[1] if len(args) > 1 else "",
+            "quantity": args[2] if len(args) > 2 else 1,
+            "destination_system_id": args[3] if len(args) > 3 else "",
+        })
+    elif action in ("deposit", "withdraw", "depot_sell", "item_buy", "jettison"):
+        kwargs["item_id"] = args[1] if len(args) > 1 else ""
+        kwargs["quantity"] = args[2] if len(args) > 2 else 1
+    elif action == "item_use":
+        kwargs["item_id"] = args[1] if len(args) > 1 else ""
+    elif action == "fabricate":
+        kwargs["munitions_type"] = args[1] if len(args) > 1 else "patch_kit"
+    ok, msg = logistics_action(engine, action, **kwargs)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
 
 
 def cmd_shipyard(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -3459,6 +3567,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     fitting_p.add_argument("category", nargs="?", help="category for install/remove")
     fitting_p.add_argument("item", nargs="?", help="item id or slot")
 
+    logistics_p = subparsers.add_parser(
+        "logistics",
+        help="One logistics surface: market, cargo, depot, freight, automation and actions",
+    )
+    logistics_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    logistics_p.add_argument("arg1", nargs="?")
+    logistics_p.add_argument("arg2", nargs="?")
+    logistics_p.add_argument("arg3", nargs="?")
+    logistics_p.add_argument("arg4", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help="Captain's log: career statistics, milestones, and flight record")
     codex_p = subparsers.add_parser("codex", help="Discovery codex progress and achievement rewards")
@@ -3574,6 +3692,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_mapmods(engine)
     elif args.command == "fitting":
         return cmd_fitting(engine, storage, ["fitting", args.action, args.category, args.item])
+    elif args.command == "logistics":
+        return cmd_logistics(engine, storage, [
+            "logistics", args.action, args.arg1, args.arg2, args.arg3, args.arg4,
+        ])
     elif args.command == "refit":
         parts = ["refit", args.action]
         if args.target:
