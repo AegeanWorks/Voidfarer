@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-skills-condense",
+    "task_id": "voidfarer-crew-condense",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794150099.8783524,
+    "updated_at": 1794151653.0835373,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794150100.4962568
+    "completed_at": 1794151655.5406258
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-reactor-preset-first",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Reactor preset-first verified: 275->242px default, one-click academy step, second mode no double award; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794131186.9690323,
-      "timestamp_str": "2026-11-08 12:46:26",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-200 and reactor proof",
-        "evidence": "ui-review/reactor-before/01-reactor.png, reactor-play-after/01-preset-first.png, 03-fine-tune-open.png, play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-reactor-preset-first",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-reactor-preset-first' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794131187.6916904,
-      "timestamp_str": "2026-11-08 12:46:27",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-combat-tactics-disclosure",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: keep four core combat actions visible and move secondary tactics plus subsystem targeting behind SHOW MORE TACTICS",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794134006.533156,
-      "timestamp_str": "2026-11-08 13:33:26",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The hostile-intercept card exposes nine actions and four subsystem buttons at once and reaches 713px; at 1280x720 the capped card pushes the disclosure and lower controls below its scroll edge, and the generic TARGET SUBSYSTEM button duplicates the specific controls.",
-        "benefits": "Combat starts with four clear choices, secondary tactics stay one click away, the card fits 720p without offscreen controls, and the duplicate path is removed while engine parity remains.",
-        "risks": "contract: combat UI and intended removal of btnCombatTarget; dependency: none; concurrency: engine lock held; state: hidden attributes only; regression: board/gambit/PDC/drone/subsystem actions must stay reachable and fire must still resolve.",
-        "mitigation": "Static disclosure test, 1920 and 1280 combat plays with an actual fire action, vision review, ui allow for the duplicate removal, and full gates."
-      },
-      "plan_digest": "13d754c8b5c5a7579ad0cd0ec265d350af374514ea2f8b9d18aa925da427786d"
-    },
     {
       "task_id": "voidfarer-combat-tactics-disclosure",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794150100.4962585,
       "timestamp_str": "2026-11-08 18:01:40",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-crew-condense",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: keep CREW cash flow and officer headlines visible, disclose the full roster and recruitment roles",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794151650.898288,
+      "timestamp_str": "2026-11-08 18:27:30",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "CREW is 1319px: two 200px officer cards plus a 600px recruitment catalog, with names squeezed into one-word columns and only the first DRILL action reachable without scrolling.",
+        "benefits": "Cash flow, officer count and one-line role/skill/station headlines fit the docked view; the detailed roster, shore leave and recruitment roles stay one click away and become readable.",
+        "risks": "contract: CREW left-tab UI; dependency: none; concurrency: none; state: disclosure DOM only, no save change; regression: DRILL, station assignment, shore leave, recruit and away-team views must stay reachable.",
+        "mitigation": "Static condensation test, real-browser roster/roles reveals plus a crew drill, before/after measurement, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "d450503187e3451c1b54772487036add1301d5893a826569e4aaf7a73b98a4e6"
+    },
+    {
+      "task_id": "voidfarer-crew-condense",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "CREW verified: 1319->343px, cashflow+headlines fit, roster/roles readable, drill updates skill and credits; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794151653.0835373,
+      "timestamp_str": "2026-11-08 18:27:33",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-207 and crew proof",
+        "evidence": "ui-review/crew-after/*, crew-play/01..05, play-report.json, click-map 180/39/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-crew-condense",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-crew-condense' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794151655.5406284,
+      "timestamp_str": "2026-11-08 18:27:35",
       "agent": "opencode:campaign"
     }
   ]

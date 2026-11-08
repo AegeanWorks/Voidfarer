@@ -1517,6 +1517,53 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestCrewCondensation(unittest.TestCase):
+    """CREW keeps cash flow and officer headlines before full rosters."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_roster_and_recruitment_default_to_disclosures(self):
+        self.assertIn('id="crewSummary"', self.html)
+        self.assertIn('id="crewCount"', self.html)
+        self.assertIn('id="crewRosterDetails" hidden', self.html)
+        self.assertLess(
+            self.html.index('id="crewRosterDetails"'),
+            self.html.index('id="crewRoster"'),
+        )
+        self.assertIn('id="btnToggleCrewRoster"', self.html)
+        self.assertIn('id="crewAssignmentsDetails" hidden', self.html)
+        self.assertLess(
+            self.html.index('id="crewAssignmentsDetails"'),
+            self.html.index('id="crewAssignments"'),
+        )
+        self.assertIn('id="btnToggleCrewAssignments"', self.html)
+        self.assertIn("#crewRosterDetails[hidden]", self.css)
+        self.assertIn("#crewAssignmentsDetails[hidden]", self.css)
+
+    def test_headline_rows_and_counts_are_rendered(self):
+        self.assertIn("this.crewSummary.innerHTML", self.js)
+        self.assertIn("this.crewCount.textContent", self.js)
+        self.assertIn("syncCrewDisclosureLabels", self.js)
+        self.assertIn('"ROSTER", crewCount', self.js)
+        self.assertIn('"RECRUIT & ROLES", roleCount', self.js)
+        self.assertIn(".crew-summary-row", self.css)
+        self.assertIn("this.btnToggleCrewRoster", self.js)
+        self.assertIn("this.btnToggleCrewAssignments", self.js)
+
+    def test_detailed_crew_and_role_rows_stack(self):
+        crew_rule = self.css.split("#crewRoster .crew-row {", 1)[1].split("}", 1)[0]
+        self.assertIn('"portrait info"', crew_rule)
+        self.assertIn('"morale morale"', crew_rule)
+        self.assertIn('"actions actions"', crew_rule)
+        role_rule = self.css.split("#crewAssignments .crew-role-row {", 1)[1].split("}", 1)[0]
+        self.assertIn('"info info"', role_rule)
+        self.assertIn('"cost recruit"', role_rule)
+
+
 class TestSkillsCondensation(unittest.TestCase):
     """SKILLS keeps six training rows and discloses perks and relics."""
 

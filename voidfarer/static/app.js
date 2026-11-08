@@ -967,6 +967,12 @@ class CockpitApp {
         this.btnToggleSkills = document.getElementById("btnToggleSkills");
         this.crewAssignments = document.getElementById("crewAssignments");
         this.crewCashFlow = document.getElementById("crewCashFlow");
+        this.crewSummary = document.getElementById("crewSummary");
+        this.crewCount = document.getElementById("crewCount");
+        this.btnToggleCrewRoster = document.getElementById("btnToggleCrewRoster");
+        this.crewRosterDetails = document.getElementById("crewRosterDetails");
+        this.btnToggleCrewAssignments = document.getElementById("btnToggleCrewAssignments");
+        this.crewAssignmentsDetails = document.getElementById("crewAssignmentsDetails");
         this.awaySection = document.getElementById("awaySection");
         this.crewRosterView = document.getElementById("crewRosterView");
         this.crewAwayView = document.getElementById("crewAwayView");
@@ -1457,6 +1463,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleDiplomacy, this.diplomacyDetails],
             [this.btnTogglePerks, this.perksDetails],
             [this.btnToggleRelics, this.relicsDetails],
+            [this.btnToggleCrewRoster, this.crewRosterDetails],
+            [this.btnToggleCrewAssignments, this.crewAssignmentsDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -4113,6 +4121,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.postAction("/api/ship/module", { module_id: modId, action }, "ship");
     }
 
+    syncCrewDisclosureLabels(crewCount, roleCount) {
+        const sync = (button, details, base, count) => {
+            if (!button || !details) return;
+            button.dataset.label = `${base} (${count})`;
+            button.textContent = `${details.hidden ? "SHOW" : "HIDE"} ${base} (${count})`;
+            button.setAttribute("aria-expanded", String(!details.hidden));
+        };
+        sync(this.btnToggleCrewRoster, this.crewRosterDetails, "ROSTER", crewCount);
+        sync(this.btnToggleCrewAssignments, this.crewAssignmentsDetails, "RECRUIT & ROLES", roleCount);
+    }
+
     renderCrew() {
         if (!this.state) return;
         const crew = this.state.crew || [];
@@ -4142,6 +4161,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 <span class="cashflow-value">NET <strong style="color:${netColor}">${net >= 0 ? "+" : ""}${net}</strong> CR</span>
             `;
         }
+
+        if (this.crewCount) {
+            this.crewCount.textContent = `${crew.length} CREW`;
+        }
+        if (this.crewSummary) {
+            this.crewSummary.innerHTML = crew.length ? crew.map(m => {
+                const station = String(m.station || "").toLowerCase();
+                const stationLabel = station ? station.toUpperCase() : "NO STATION";
+                return `<div class="crew-summary-row">
+                    <strong>${this.escapeHtml(m.name)}</strong>
+                    <span>${this.escapeHtml(m.role)} · S${m.skill} · ${this.escapeHtml(stationLabel)}</span>
+                </div>`;
+            }).join("") : `<p class="panel-intro-text">No crew aboard. Dock at a station and recruit specialists.</p>`;
+        }
+        this.syncCrewDisclosureLabels(crew.length, roles.length);
 
         if (this.crewAssignments) {
             const bonusChips = Object.entries(bonuses)

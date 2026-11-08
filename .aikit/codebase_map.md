@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `365`
+- **Total Classes**: `366`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2035`
-- **Total Source Lines**: `50953`
+- **Total Class Methods**: `2039`
+- **Total Source Lines**: `51000`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2504` lines (`111801` bytes)
+**Size**: `2551` lines (`114008` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,11 @@
   - Method `.setUpClass()`
   - Method `.test_manual_sliders_default_to_hidden()`
   - Method `.test_power_hint_names_the_visible_presets()`
+- `class TestCrewCondensation` - *CREW keeps cash flow and officer headlines before full rosters.*
+  - Method `.setUpClass()`
+  - Method `.test_roster_and_recruitment_default_to_disclosures()`
+  - Method `.test_headline_rows_and_counts_are_rendered()`
+  - Method `.test_detailed_crew_and_role_rows_stack()`
 - `class TestSkillsCondensation` - *SKILLS keeps six training rows and discloses perks and relics.*
   - Method `.setUpClass()`
   - Method `.test_training_rows_stay_visible_and_catalogs_are_disclosed()`

@@ -10406,3 +10406,126 @@ body.cockpit-theme .nav-panel > .panel-header {
     .skills-panel .skills-perks-section,
     .skills-panel .skills-relics-section { margin-top: 8px; padding-top: 6px; }
 }
+
+/* =====================================================================
+   CREW — SUMMARY-FIRST
+   Cash flow and a compact per-officer headline stay visible; the detailed
+   roster and recruitment catalog are one click away.
+   ===================================================================== */
+.crew-summary-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 2px 0 3px;
+}
+.crew-summary-head h4 {
+    margin: 0;
+    color: var(--console-gold);
+    font-family: var(--console-ui);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.crew-summary-count {
+    color: var(--console-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
+}
+.crew-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+.crew-summary-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 3px 6px;
+    border: 1px solid rgba(143, 191, 159, 0.2);
+    border-left: 2px solid rgba(143, 191, 159, 0.5);
+    background: rgba(127, 183, 201, 0.03);
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+.crew-summary-row strong {
+    min-width: 0;
+    color: var(--console-ivory);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.crew-summary-row span {
+    min-width: 0;
+    color: var(--console-muted);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#crewRosterDetails[hidden],
+#crewAssignmentsDetails[hidden] { display: none; }
+@media (max-width: 1599px) {
+    /* Detailed crew cards: identity first, morale and actions beneath,
+       instead of crushing the name beside a station select and two buttons. */
+    #crewRoster .crew-row {
+        grid-template-columns: 40px minmax(0, 1fr);
+        grid-template-areas:
+            "portrait info"
+            "morale morale"
+            "actions actions";
+        align-items: start;
+        row-gap: 5px;
+    }
+    #crewRoster .crew-row .crew-portrait {
+        grid-area: portrait;
+        grid-column: 1;
+        grid-row: 1;
+    }
+    #crewRoster .crew-row .crew-info-block {
+        grid-area: info;
+        grid-column: 2;
+        grid-row: 1;
+    }
+    #crewRoster .crew-row .crew-morale-bar {
+        grid-area: morale;
+        grid-column: 1 / -1;
+        grid-row: 2;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+    }
+    #crewRoster .crew-row .crew-actions {
+        grid-area: actions;
+        grid-column: 1 / -1;
+        grid-row: 3;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    #crewRoster .crew-row .crew-actions .crew-station-select { flex: 1 1 100%; }
+    #crewRoster .crew-row .crew-actions .btn-hud { flex: 1 1 0; }
+    /* Recruitment rows: full-width name/description, cost and RECRUIT beneath. */
+    #crewAssignments .crew-role-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "info info"
+            "cost recruit";
+        row-gap: 4px;
+    }
+    #crewAssignments .crew-role-info { grid-area: info; }
+    #crewAssignments .crew-role-cost { grid-area: cost; }
+    #crewAssignments .crew-role-row [data-recruit-crew] {
+        grid-area: recruit;
+        justify-self: end;
+    }
+    #crewAssignments .crew-role-info small {
+        display: block;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.3;
+    }
+}

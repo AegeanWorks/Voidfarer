@@ -884,3 +884,24 @@ the empty-state message. Suite `Ran 1299 OK`; click-map 178/39/0/0; `ui_inventor
 `skills-play/01-skills-default.png`, `02-after-train.png`, `03-perks-open.png`,
 `04-relics-open.png`; vision review confirmed the fit, the rank/points update and readable
 perk/relic reveals.
+
+### Sixteenth pass — CREW becomes cash flow plus officer headlines
+
+CREW was 1,319px, almost all in a roster view whose two 200px officer cards squeezed names
+into one-word columns, flattened morale bars into slivers and pushed the second officer
+below the fold. The tab now keeps the cash-flow row, an `ACTIVE CREW` count and one
+headline row per officer (`Imani Vale · engineer · S3 · NO STATION`) plus
+`SHOW ROSTER (2)` and `SHOW RECRUIT & ROLES (6)` disclosures. The full roster and shore
+leave sit behind the first; bonuses and recruitment roles behind the second. Detailed
+officer cards stack identity, a full-width morale bar and the station/actions row; role
+rows give the description the full width with cost and RECRUIT beneath.
+
+Measured: CREW **1,319 → 343px**, fitting the 473px viewport with both headlines and both
+disclosures visible. Roster open 784px with two readable cards; drilling Rook Calder
+raises skill 2→3, spends 2,000→1,600 credits and logs the drill. Roles open 1,006px with
+six readable rows. Away teams stay behind the `AWAY TEAMS` view tab (709px). Play: 24
+frames/417ms, zero errors. Suite `Ran 1302 OK`; click-map 180/39/0/0; `ui_inventory.py`
+1237 lines; gate 5/5. Screenshots: `skills-verify-tabs/crew.png` vs
+`crew-play/01-crew-default.png`, `02-roster-open.png`, `03-after-drill.png`,
+`04-roles-open.png`, `05-away-view.png`; vision review confirmed the default fit and
+readable roster/role reveals.

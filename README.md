@@ -379,20 +379,20 @@ mechanic families, succeeds on 38 endpoints, attempts 51 and reports **zero cove
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
-The click-map enumerates every control via `window.voidfarerClickMap()`; missing/duplicate
-handles fail (desktop: 178 controls, 39 visible, 0 missing/dup). Five systems;
+Click-map enumerates every control via `window.voidfarerClickMap()`; missing/duplicate
+handles fail (desktop: 180 controls, 39 visible, 0 missing/dup). Five systems;
 `MORE SYSTEMS` restores sixteen. PLAYER points at the bottom strip, not six USE buttons.
 SHIP collapses `ROOMS & CREW STATIONS` and `MODULE CATALOG` (2,390->917px), COMMERCE moves
-auto-trade and quantum freight below the market table (2,076->932px), and FLEET collapses
-mercenary contracts and procurement (1,271->831px). Contracts survive no drones. Tabs share a
-56px header, stacking rows. Advanced tabs start closed. Reactor presets are
-default; sliders under `SHOW FINE TUNE`. Combat keeps four core actions; tactics under
-`SHOW MORE TACTICS`. Unlocked ability chips only; locked powers under `SHOW LOCKED n`. The
-target dossier keeps key stats/actions upfront; full stats/rare actions behind `SHOW
-DETAILS` / `SHOW MORE ACTIONS`. Surface keeps its site strip and selected RUN; map/list
-under `SHOW SURFACE MAP` / `SHOW ALL OPERATIONS`. EMPIRE keeps research, outpost and faction
-headlines; catalogs behind SHOW. SKILLS keeps six one-line TRAIN rows and PERKS/RELICS
-cards; branches and relics behind SHOW.
+auto-trade/quantum freight below the market (2,076->932px), and FLEET collapses contracts
+and procurement (1,271->831px). Contracts survive no drones. Tabs share a 56px header.
+Advanced tabs start closed. Reactor presets default; sliders under `SHOW FINE TUNE`. Combat
+keeps four actions; tactics under `SHOW MORE TACTICS`. Unlocked chips only; locked powers
+under `SHOW LOCKED n`. Target dossier keeps key stats/actions upfront; full stats/rare
+behind `SHOW DETAILS` / `SHOW MORE ACTIONS`. Surface keeps its site strip and selected RUN;
+map/list under `SHOW SURFACE MAP` / `SHOW ALL OPERATIONS`. EMPIRE keeps
+research/outpost/faction headlines; catalogs behind SHOW. SKILLS keeps six TRAIN rows and
+PERKS/RELICS cards; branches/relics behind SHOW. CREW keeps cash flow and officer
+headlines; roster and recruitment sit behind SHOW.
 
 ### 15. Cosmic Calendar & Temporal Clock Controls
 ```bash
@@ -577,7 +577,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,299-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,302-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 
