@@ -834,5 +834,19 @@
     "final_snapshot_digest": "6aafc9bad5e21cae2249bbabbb7a92bc8831cdd9d61a466f1b0c6af24e4ac406",
     "final_snapshot_entries": 1214,
     "surface_digest": "6ac0874df3bede81028275b3c2a6df5732c200d0c7c9cf9abad3a579453daaf9"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "0090a115d01f4313b86ecdbde093fed29b5ee18b",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794145557.1348124,
+    "finished_at": 1794145743.7158008,
+    "strikes": 0,
+    "reviewer": "opencode-go/gemini-4-argon (vision subagent; EMPIRE headlines+counts, research/outpost/faction reveals, readable diplomacy rows)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "5108ccb6f97a105533ae00434ef779f1809acd7a5b1055e555479f42accec267",
+    "final_snapshot_entries": 1224,
+    "surface_digest": "24ecbaa4e32401bc12b123b4150a8b485018b87f80b26265d30451a954d5f4ac"
   }
 ]

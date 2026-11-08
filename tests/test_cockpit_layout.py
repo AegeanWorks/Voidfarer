@@ -1517,6 +1517,55 @@ class TestReactorFineTune(unittest.TestCase):
         self.assertNotIn("adjust the reactor sliders", story_py)
 
 
+class TestEmpireCondensation(unittest.TestCase):
+    """EMPIRE keeps research, outpost and faction headlines before catalogs."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_catalogs_default_to_hidden_disclosures(self):
+        cases = (
+            ("researchDetails", "researchProjects", "btnToggleResearch", "RESEARCH"),
+            ("outpostDetails", "outpostList", "btnToggleOutposts", "OUTPOSTS"),
+            ("diplomacyDetails", "diplomacyList", "btnToggleDiplomacy", "FACTIONS"),
+        )
+        for details_id, list_id, button_id, label in cases:
+            self.assertIn(f'id="{details_id}" hidden', self.html)
+            self.assertLess(
+                self.html.index(f'id="{details_id}"'),
+                self.html.index(f'id="{list_id}"'),
+                f"{list_id} must sit inside its hidden details",
+            )
+            self.assertIn(f'id="{button_id}"', self.html)
+            self.assertIn(f'data-label="{label}"', self.html)
+            self.assertIn(f"#{details_id}[hidden]", self.css)
+
+    def test_headlines_carry_counts_and_summaries(self):
+        for marker in ("researchCount", "outpostCount", "diplomacyCount", "diplomacySummary"):
+            self.assertIn(f'id="{marker}"', self.html)
+        self.assertIn("this.researchCount.textContent", self.js)
+        self.assertIn("this.outpostCount.textContent", self.js)
+        self.assertIn("this.diplomacyCount.textContent", self.js)
+        self.assertIn("this.diplomacySummary.textContent", self.js)
+        self.assertIn("alliedCount", self.js)
+        self.assertIn("activeWars", self.js)
+        self.assertIn("this.btnToggleResearch", self.js)
+        self.assertIn("this.btnToggleOutposts", self.js)
+        self.assertIn("this.btnToggleDiplomacy", self.js)
+        self.assertIn("toggleSectionDisclosure", self.js)
+
+    def test_diplomacy_rows_stack_instead_of_squeezing(self):
+        self.assertIn(".empire-section-head", self.css)
+        self.assertIn(".empire-summary", self.css)
+        rule = self.css.split("#tabContentEmpire .diplomacy-row {", 1)[1].split("}", 1)[0]
+        self.assertIn('"identity standing"', rule)
+        self.assertIn('"actions actions"', rule)
+        self.assertIn("#tabContentEmpire .diplomacy-actions", self.css)
+
+
 class TestSurfaceOperationsCondensation(unittest.TestCase):
     """Surface work leads with a site strip and one selected operation."""
 

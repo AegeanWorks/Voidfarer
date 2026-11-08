@@ -1,61 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-surface-ops",
+    "task_id": "voidfarer-empire-condense",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794144321.3087265,
+    "updated_at": 1794146238.770809,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794144321.9481685
+    "completed_at": 1794146239.150408
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-advanced-left-condense",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Advanced condensation verified: ARSENAL/FACTIONS/CODEX under 600px collapsed, all lists reopen, cards share rhythm; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794113633.4588225,
-      "timestamp_str": "2026-11-08 07:53:53",
-      "agent": "opencode:campaign",
-      "handoff": {
-        "state": "gates 5/5",
-        "next": "commit ADR-198 and advanced proof",
-        "evidence": "ui-review/advanced-after/*.png, advanced-after/play-report.json"
-      }
-    },
-    {
-      "task_id": "voidfarer-advanced-left-condense",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-advanced-left-condense' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794113634.3888547,
-      "timestamp_str": "2026-11-08 07:53:54",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-hud-polish",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: clamp the radar scale label and shorten only the Battle Focus chip display label",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794115413.9157238,
-      "timestamp_str": "2026-11-08 08:23:33",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "At 1280x720 the scale label centers under the left drawer and loses its R, while the Battle Focus chip name ellipsizes to 'Battle Fo...' in the 70px ability column.",
-        "benefits": "The radar label is fully readable on short scale bars and the sixth ability set has no truncated chip, with the full Battle Focus name retained in the tooltip.",
-        "risks": "contract: HUD canvas/JS; dependency: none; concurrency: none; state: none; regression: the label must stay within the map inset and the chip label must remain understandable.",
-        "mitigation": "Static label test, canvas instrumentation in a real-browser play, before/after vision review, 16-tab sweep and full gates."
-      },
-      "plan_digest": "ca981e5008c1f4ed0762bd028a15d931d469edfe1db0c2b7312e311c94c272d3"
-    },
     {
       "task_id": "voidfarer-hud-polish",
       "phase": "phase 4",
@@ -300,6 +256,50 @@
       "status": "completed",
       "timestamp": 1794144321.9481702,
       "timestamp_str": "2026-11-08 16:25:21",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-empire-condense",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: make EMPIRE a headline deck for research, outposts and faction leaders, with catalogs disclosed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794146238.3556528,
+      "timestamp_str": "2026-11-08 16:57:18",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "EMPIRE is 2665px: research 573px, outposts 210px and faction leaders 1733px all render at once; nine leader rows with six or seven buttons squeeze names into unreadable columns at the 290px docked width.",
+        "benefits": "The tab becomes a 402px deck with three headlines, live counts and one-line summaries; project, outpost and faction catalogs stay one click away; diplomacy rows become readable cards.",
+        "risks": "contract: EMPIRE left-tab UI; dependency: none; concurrency: none; state: disclosure attributes and summaries only, no save change; regression: research START/QUEUE, outpost build, diplomacy actions and all counts must stay reachable.",
+        "mitigation": "Static condensation test, real-browser play of all three reveals plus a research START, before/after measurement, vision review, UI snapshot and full gates."
+      },
+      "plan_digest": "7726f8309eda40b49a170f191c7591e1b0a4299cfacd944f161af187866d0033"
+    },
+    {
+      "task_id": "voidfarer-empire-condense",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "EMPIRE verified: 2665->402px with all headlines visible, research START works, outpost/faction reveals readable; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794146238.770809,
+      "timestamp_str": "2026-11-08 16:57:18",
+      "agent": "opencode:campaign",
+      "handoff": {
+        "state": "gates 5/5",
+        "next": "commit ADR-205 and EMPIRE proof",
+        "evidence": "ui-review/empire-after/*, empire-play/01..05, play-report.json, click-map 176/39/0/0"
+      }
+    },
+    {
+      "task_id": "voidfarer-empire-condense",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-empire-condense' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794146239.1504092,
+      "timestamp_str": "2026-11-08 16:57:19",
       "agent": "opencode:campaign"
     }
   ]

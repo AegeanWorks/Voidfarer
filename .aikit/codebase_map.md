@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `127`
-- **Total Classes**: `363`
+- **Total Classes**: `364`
 - **Total Top-Level Functions**: `356`
-- **Total Class Methods**: `2026`
-- **Total Source Lines**: `50857`
+- **Total Class Methods**: `2030`
+- **Total Source Lines**: `50906`
 
 ---
 
@@ -382,7 +382,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2408` lines (`107187` bytes)
+**Size**: `2457` lines (`109614` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,11 @@
   - Method `.setUpClass()`
   - Method `.test_manual_sliders_default_to_hidden()`
   - Method `.test_power_hint_names_the_visible_presets()`
+- `class TestEmpireCondensation` - *EMPIRE keeps research, outpost and faction headlines before catalogs.*
+  - Method `.setUpClass()`
+  - Method `.test_catalogs_default_to_hidden_disclosures()`
+  - Method `.test_headlines_carry_counts_and_summaries()`
+  - Method `.test_diplomacy_rows_stack_instead_of_squeezing()`
 - `class TestSurfaceOperationsCondensation` - *Surface work leads with a site strip and one selected operation.*
   - Method `.setUpClass()`
   - Method `.test_default_view_is_a_site_strip_and_selected_operation()`

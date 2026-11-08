@@ -8611,18 +8611,21 @@ body.cockpit-theme .panel-center {
    escort shop keeps its compact single-line rows. */
 @media (max-width: 1599px) {
     #mercenaryRoster .fleet-procurement-row,
-    #commissionDetails .fleet-procurement-row {
+    #commissionDetails .fleet-procurement-row,
+    #outpostBuild .fleet-procurement-row {
         grid-template-columns: 20px minmax(0, 1fr) 96px;
     }
     #mercenaryRoster .procurement-info h4,
     #mercenaryRoster .procurement-info strong,
-    #commissionDetails .procurement-info strong {
+    #commissionDetails .procurement-info strong,
+    #outpostBuild .procurement-info strong {
         white-space: normal;
         overflow: visible;
         text-overflow: clip;
     }
     #mercenaryRoster .procurement-info small,
-    #commissionDetails .procurement-info small {
+    #commissionDetails .procurement-info small,
+    #outpostBuild .procurement-info small {
         white-space: normal;
         overflow: visible;
         text-overflow: clip;
@@ -10186,4 +10189,58 @@ body.cockpit-theme .nav-panel > .panel-header {
     .surface-selected-desc { margin: 1px 0 3px; }
     .surface-selected-foot .btn-hud { min-height: 24px; }
     .surface-disclosure-toggle { min-height: 20px; }
+}
+
+/* =====================================================================
+   EMPIRE — SUMMARY-FIRST
+   Research, outposts and faction relations keep their headline status
+   and counts visible; the catalogs and dossiers are one click away.
+   ===================================================================== */
+.empire-panel .empire-section { margin-bottom: 10px; }
+.empire-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+.empire-section-head .subpanel-title { margin-bottom: 0; }
+.empire-summary,
+#researchSummary,
+#outpostSummary {
+    margin: 3px 0 4px;
+    color: var(--console-text);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.3;
+}
+.empire-summary { color: var(--console-muted); }
+#researchDetails[hidden],
+#outpostDetails[hidden],
+#diplomacyDetails[hidden] { display: none; }
+@media (max-width: 1599px) {
+    /* Diplomacy rows: identity and standing share the first line, actions
+       wrap below instead of crushing the name into a 60px column. */
+    #tabContentEmpire .diplomacy-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "identity standing"
+            "actions actions";
+        align-items: start;
+        row-gap: 4px;
+    }
+    #tabContentEmpire .diplomacy-row > span:first-child {
+        grid-area: identity;
+        min-width: 0;
+    }
+    #tabContentEmpire .diplomacy-row > span:nth-child(2) {
+        grid-area: standing;
+        text-align: right;
+        white-space: nowrap;
+    }
+    #tabContentEmpire .diplomacy-actions {
+        grid-area: actions;
+        max-width: none;
+        justify-content: flex-start;
+    }
 }

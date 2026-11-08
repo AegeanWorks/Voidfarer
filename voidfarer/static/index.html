@@ -794,19 +794,38 @@
                             <h2 class="panel-title">RESEARCH, OUTPOSTS & DIPLOMACY</h2>
                         </div>
                         <div class="empire-section">
-                            <h3 class="subpanel-title">RESEARCH DIRECTORATE</h3>
+                            <div class="empire-section-head">
+                                <h3 class="subpanel-title">RESEARCH DIRECTORATE</h3>
+                                <span class="fleet-optional-count" id="researchCount">--</span>
+                            </div>
                             <div id="researchSummary"></div>
-                            <div class="research-projects" id="researchProjects"></div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleResearch" data-label="RESEARCH" aria-expanded="false" aria-controls="researchDetails" title="Show or hide the research project catalog">SHOW RESEARCH</button>
+                            <div id="researchDetails" hidden>
+                                <div class="research-projects" id="researchProjects"></div>
+                            </div>
                         </div>
                         <div class="empire-section">
-                            <h3 class="subpanel-title">OUTPOSTS</h3>
+                            <div class="empire-section-head">
+                                <h3 class="subpanel-title">OUTPOSTS</h3>
+                                <span class="fleet-optional-count" id="outpostCount">--</span>
+                            </div>
                             <div id="outpostSummary"></div>
-                            <div class="outpost-list" id="outpostList"></div>
-                            <div class="outpost-build" id="outpostBuild"></div>
+                            <button class="fleet-disclosure-toggle" id="btnToggleOutposts" data-label="OUTPOSTS" aria-expanded="false" aria-controls="outpostDetails" title="Show or hide outpost management">SHOW OUTPOSTS</button>
+                            <div id="outpostDetails" hidden>
+                                <div class="outpost-list" id="outpostList"></div>
+                                <div class="outpost-build" id="outpostBuild"></div>
+                            </div>
                         </div>
                         <div class="empire-section">
-                            <h3 class="subpanel-title">FACTION LEADERS & WARS</h3>
-                            <div class="diplomacy-list" id="diplomacyList"></div>
+                            <div class="empire-section-head">
+                                <h3 class="subpanel-title">FACTION LEADERS &amp; WARS</h3>
+                                <span class="fleet-optional-count" id="diplomacyCount">--</span>
+                            </div>
+                            <p class="empire-summary" id="diplomacySummary"></p>
+                            <button class="fleet-disclosure-toggle" id="btnToggleDiplomacy" data-label="FACTIONS" aria-expanded="false" aria-controls="diplomacyDetails" title="Show or hide faction leaders and diplomacy">SHOW FACTIONS</button>
+                            <div id="diplomacyDetails" hidden>
+                                <div class="diplomacy-list" id="diplomacyList"></div>
+                            </div>
                         </div>
                     </div>
 

@@ -843,3 +843,24 @@ Screenshots: `surface-before/01-surface-ops.png` vs `surface-after/01-surface-op
 `surface-play/02-ruin-selected.png`, `03-map-open.png`, `04-all-operations.png`,
 `05-after-run.png`, `06-next-site.png`; vision review found no new clipping, only the
 pre-existing radar-label and flight-log top-line slices.
+
+### Fourteenth pass — EMPIRE becomes a headline deck
+
+EMPIRE was 2,665px: research 573px, outposts 210px and faction leaders 1,733px, all open at
+once. The nine leader rows each carried six or seven diplomacy buttons, squeezing names
+into a 60px column and breaking descriptions into 6–11-character lines. The tab now opens
+with three section headlines and live counts (`5 PROJECTS`, `NONE`, `9 LEADERS`), a
+one-line status summary, and `SHOW RESEARCH` / `SHOW OUTPOSTS` / `SHOW FACTIONS`
+disclosures. Diplomacy rows became two-column cards (identity + standing, actions wrapped
+below), and outpost build yields wrap whole-word.
+
+Measured: EMPIRE **2,665 → 402px**, fitting the 473px left-terminal viewport with no
+scroll. Research opens to 958px with five readable rows; START sets `Advanced Coolant
+Loops — 0/120 points` with `Banked: 500` and logs the research action. Outposts open to
+540px with the full `+3 credits · +1 titanium per tick` Mining Outpost yield. Factions open
+to 2,169px with nine readable leader cards and six actions each. Play: 25 frames/407ms,
+zero errors. Suite `Ran 1295 OK`; click-map 176/39/0/0; `ui_inventory.py` 1224 lines; gate
+5/5. Screenshots: `left-tabs-before/empire.png` vs
+`empire-play/01-empire-default.png`, `02-research-open.png`, `03-research-started.png`,
+`04-outposts-open.png`, `05-factions-open.png`; vision review confirmed the default fits and
+the reveals are readable, with no new layout breaks.

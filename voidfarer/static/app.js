@@ -979,9 +979,19 @@ class CockpitApp {
         this.shipInteriorStatus = document.getElementById("shipInteriorStatus");
         this.researchSummary = document.getElementById("researchSummary");
         this.researchProjects = document.getElementById("researchProjects");
+        this.researchCount = document.getElementById("researchCount");
+        this.btnToggleResearch = document.getElementById("btnToggleResearch");
+        this.researchDetails = document.getElementById("researchDetails");
         this.outpostSummary = document.getElementById("outpostSummary");
         this.outpostList = document.getElementById("outpostList");
+        this.outpostCount = document.getElementById("outpostCount");
+        this.btnToggleOutposts = document.getElementById("btnToggleOutposts");
+        this.outpostDetails = document.getElementById("outpostDetails");
         this.diplomacyList = document.getElementById("diplomacyList");
+        this.diplomacySummary = document.getElementById("diplomacySummary");
+        this.diplomacyCount = document.getElementById("diplomacyCount");
+        this.btnToggleDiplomacy = document.getElementById("btnToggleDiplomacy");
+        this.diplomacyDetails = document.getElementById("diplomacyDetails");
         this.crewRoster = document.getElementById("crewRoster");
 
         // Reactor simulation strip
@@ -1435,6 +1445,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleFactionDossiers, this.factionDetails],
             [this.btnToggleCorpDossiers, this.corpDetails],
             [this.btnToggleCodexMilestones, this.codexMilestoneDetails],
+            [this.btnToggleResearch, this.researchDetails],
+            [this.btnToggleOutposts, this.outpostDetails],
+            [this.btnToggleDiplomacy, this.diplomacyDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -4577,8 +4590,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const queuedProject = queued.find(project => project.id === id);
                 return this.escapeHtml(queuedProject ? queuedProject.name : id);
             }).join(" → ")}` : "");
-        this.researchProjects.innerHTML = (research.available || []).map(p => `
-            <div class="research-row">
+        const availableProjects = research.available || [];
+        if (this.researchCount) {
+            this.researchCount.textContent = `${availableProjects.length} PROJECT${availableProjects.length === 1 ? "" : "S"}`;
+        }
+        this.researchProjects.innerHTML = (research.available || []).map(p => `            <div class="research-row">
                 <span>${this.escapeHtml(p.name)}<br><small>${this.escapeHtml(p.description)}</small></span>
                 <span>${p.cost} pts</span>
                 <button class="btn-hud" data-research="${this.escapeHtml(p.id)}">START</button>
@@ -4605,6 +4621,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         );
 
         const outposts = this.state.outposts || [];
+        if (this.outpostCount) {
+            this.outpostCount.textContent = outposts.length
+                ? `${outposts.length} OUTPOST${outposts.length === 1 ? "" : "S"}`
+                : "NONE";
+        }
         this.outpostSummary.textContent = outposts.length
             ? `${outposts.length} outpost(s) producing each tick.`
             : "No outposts founded yet. Orbit a world and found one below.";
@@ -4775,6 +4796,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const napUntil = this.state.ship.non_aggression_until || {};
         const currentTick = Number(this.state.time?.tick || 0);
         const eliminated = new Set(this.state.eliminated_factions || []);
+        if (this.diplomacyCount) {
+            this.diplomacyCount.textContent = `${leaders.length} LEADER${leaders.length === 1 ? "" : "S"}`;
+        }
+        if (this.diplomacySummary) {
+            const activeWars = wars.filter(w => w.active).length;
+            const alliedCount = leaders.filter(l => allied.has(l.faction_id)).length;
+            const pactCount = leaders.filter(l => tradePacts.has(l.faction_id)).length;
+            this.diplomacySummary.textContent = [
+                `${alliedCount} allied`,
+                `${pactCount} trade pact${pactCount === 1 ? "" : "s"}`,
+                `${activeWars} active war${activeWars === 1 ? "" : "s"}`,
+            ].join(" · ");
+        }
         this.diplomacyList.innerHTML = leaders.map(l => {
             const standing = Number(standings[l.faction_id] || 0);
             const isEliminated = eliminated.has(l.faction_id);
