@@ -334,6 +334,7 @@ from voidfarer.encounters import encounter_report
 from voidfarer.engineering import engineering_summary
 from voidfarer.fitting import fitting_summary
 from voidfarer.fleet_command import fleet_summary
+from voidfarer.flight import flight_summary
 from voidfarer.intel import intel_summary
 from voidfarer.logistics import logistics_summary
 from voidfarer.narrative import narrative_summary
@@ -7980,6 +7981,7 @@ class SimulationEngine:
                 "narrative": narrative_summary(self.state),
                 "comms": comms_summary(self.state),
                 "surface": surface_summary(self.state),
+                "flight": flight_summary(self.state),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),

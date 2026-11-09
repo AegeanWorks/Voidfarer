@@ -24,6 +24,7 @@ from voidfarer.encounters import encounter_report, resolve as resolve_encounter
 from voidfarer.engineering import engineering_action, engineering_report
 from voidfarer.intel import intel_action, intel_report
 from voidfarer.narrative import narrative_action, narrative_report
+from voidfarer.flight import flight_action, flight_report
 from voidfarer.surface_ops import surface_action, surface_report
 from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
 from voidfarer.fitting import (
@@ -333,6 +334,11 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
                 "report": report,
                 "state": self.engine.get_status_snapshot(),
             })
+            return
+
+        if path == "/api/flight":
+            report = flight_report(self.engine)
+            self._send_json({"ok": True, **report})
             return
 
         if path == "/api/weapons":
@@ -764,6 +770,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             payload = dict(body or {})
             action = str(payload.pop("action", ""))
             ok, msg = surface_action(self.engine, action, **payload)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/flight/action":
+            payload = dict(body or {})
+            action = str(payload.pop("action", ""))
+            ok, msg = flight_action(self.engine, action, **payload)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

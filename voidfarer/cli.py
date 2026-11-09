@@ -66,6 +66,7 @@ from voidfarer.narrative import (
 )
 from voidfarer.comms import COMMS_ACTIONS, comms_action, comms_report
 from voidfarer.surface_ops import SURFACE_ACTIONS, surface_action, surface_report
+from voidfarer.flight import FLIGHT_ACTIONS, flight_action, flight_report
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -1087,6 +1088,76 @@ def cmd_intel(engine: SimulationEngine, storage: StorageManager, parts: list[str
             f"{corp['standing']:+4d} | {corp['specialty_commodity']} | {corp['perk']}"
         )
     return 0
+
+
+def cmd_flight(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One flight surface: route plot, auto-route, jump, orbit and local travel."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    sections = ("status", "system", "bodies", "routes")
+
+    if action in sections:
+        report = flight_report(engine)
+        system = report["system"]
+        ship = report["ship"]
+        if action == "status":
+            print(f"\n{BOLD}{CYAN}=== FLIGHT: {system['name']} ==={RESET}")
+            print(
+                f"  Fuel {ship['fuel']}/{ship['max_fuel']} | "
+                f"orbit {ship['orbiting_body'] or '--'} | "
+                f"landed {ship['landed_body'] or '--'} | "
+                f"travel {'ACTIVE' if ship['traveling'] else 'none'}"
+            )
+            print(
+                f"  {report['counts']['connections']} lanes "
+                f"({report['counts']['reachable']} reachable) | "
+                f"{report['counts']['bodies']} bodies "
+                f"({report['counts']['landable_bodies']} landable)"
+            )
+            print(f"{DIM}Inspect: flight system | routes | Plot: flight plot <system_id>{RESET}")
+            return 0
+        if action in ("system", "bodies"):
+            print(f"\n{BOLD}{CYAN}=== BODIES IN {system['name'].upper()} ==={RESET}")
+            for body in report["bodies"]:
+                print(
+                    f"  {body['name']:<26} {body['body_type']:<16} "
+                    f"{body['orbit_radius']:.2f} AU | "
+                    f"{'LANDABLE' if body['landable'] else 'NO LAND'} | "
+                    f"{'SCANNED' if body['scanned'] else 'UNSCANNED'}"
+                    + (" [ORBIT]" if body["orbiting"] else "")
+                    + (" [LANDED]" if body["landed"] else "")
+                )
+            print(f"{DIM}Orbit: flight orbit <body_id> | Travel: flight travel <body_id> [sublight|quantum]{RESET}")
+            return 0
+        print(f"\n{BOLD}{CYAN}=== ROUTES FROM {system['name'].upper()} ==={RESET}")
+        for route in report["connections"]:
+            print(
+                f"  {route['name']:<24} ({route['id']}) "
+                f"{route['jumps']} jumps | {route['distance_ly']} ly | "
+                f"~{route['fuel_estimate']} fuel | "
+                f"{'READY' if route['reachable'] else 'UNREACHABLE'}"
+            )
+        print(f"{DIM}Plot: flight plot <system_id> | Go: flight navigate <system_id>{RESET}")
+        return 0
+
+    if action not in FLIGHT_ACTIONS:
+        print(f"{RED}Unknown flight action '{action}'.{RESET}")
+        return 1
+    kwargs: dict[str, object] = {}
+    if action in ("plot", "navigate"):
+        kwargs["target"] = args[1] if len(args) > 1 else ""
+    elif action == "jump":
+        kwargs["system_id"] = args[1] if len(args) > 1 else ""
+    elif action == "orbit":
+        kwargs["body_id"] = args[1] if len(args) > 1 else ""
+    elif action == "travel":
+        kwargs["body_id"] = args[1] if len(args) > 1 else ""
+        kwargs["mode"] = args[2] if len(args) > 2 else "sublight"
+    ok, msg = flight_action(engine, action, **kwargs)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
 
 
 def cmd_comms(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -4317,6 +4388,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     comms_p.add_argument("arg2", nargs="?")
     comms_p.add_argument("arg3", nargs="?")
 
+    flight_p = subparsers.add_parser(
+        "flight",
+        help="One flight surface: route plot, auto-route, jump, orbit and travel",
+    )
+    flight_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    flight_p.add_argument("arg1", nargs="?")
+    flight_p.add_argument("arg2", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help=argparse.SUPPRESS)
     codex_p = subparsers.add_parser("codex", help=argparse.SUPPRESS)
@@ -4341,6 +4420,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "power", "reactor", "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop",
         "story", "tutorial", "quests", "contracts", "events",
         "buy", "sell", "ai", "messages", "land", "reconstruct",
+        "route", "navigate", "jump", "orbit", "travel",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
@@ -4487,6 +4567,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "comms":
         return cmd_comms(engine, storage, [
             "comms", args.action, args.arg1, args.arg2, args.arg3,
+        ])
+    elif args.command == "flight":
+        return cmd_flight(engine, storage, [
+            "flight", args.action, args.arg1, args.arg2,
         ])
     elif args.command == "refit":
         parts = ["refit", args.action]

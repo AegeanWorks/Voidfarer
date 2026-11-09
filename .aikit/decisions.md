@@ -2487,3 +2487,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Extend `GET /api/surface` with the unified report, add `POST /api/surface/action`, and add a compact `surface` summary to `/api/state`.
   3. Add `surface land <body_id>` and `surface reconstruct <body_id> [credits|relief]`; hide `land` and `reconstruct` from help while keeping them callable.
 - **Consequences**: One read shows whether the team is on the ground, which operations remain, and whether the world can be rebuilt; one action route lands, runs an operation or reconstructs. The visible CLI is 28 commands. `tests/test_surface_ops.py` adds 9 tests for the report, body/operations, summary, landing, operations, reconstruction, invalid actions, REST and CLI. Full suite `Ran 1461 OK`; no save-schema change.
+
+### ADR-229: Route, navigate, jump, orbit and travel become one flight surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Flight is one cockpit workflow (map, plot, auto-route, jump, orbit, local travel), but the CLI exposed five verbs and six routes with no shared report of the current system, bodies and lane options.
+- **Decision**:
+  1. Add `voidfarer/flight.py`: `flight_report()` returns the current system, bodies, lane connections with jump/fuel estimates, ship fuel and travel state; `flight_action()` routes plot, navigate, jump, orbit and travel to the existing engine methods.
+  2. Add `GET /api/flight`, `POST /api/flight/action` and a compact `flight` summary to `/api/state`.
+  3. Add `flight status|system|routes` plus `plot|navigate|jump|orbit|travel`; hide the five legacy verbs from help while keeping them callable.
+- **Consequences**: One read shows where the ship is, what is in system and which lanes are affordable; one action route plots, auto-routes, jumps, orbits or travels. The visible CLI is 24 commands. `tests/test_flight.py` adds 11 tests for the report, system/bodies, summary, plot, unknown target, orbit/travel, jump, invalid actions, REST and CLI. Full suite `Ran 1472 OK`; no save-schema change.

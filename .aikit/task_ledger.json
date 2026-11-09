@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-surface-merge",
+    "task_id": "voidfarer-flight-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794249938.3872519,
+    "updated_at": 1794251362.620502,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794250041.0072773
+    "completed_at": 1794251456.5307384
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-crew-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Crew facade verified: report/summary, recruit/train/dismiss, station, shore leave, away launch/recall, REST+CLI, 10 tests, 1409 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794239544.6807349,
-      "timestamp_str": "2026-11-09 18:52:24",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-crew-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-crew-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794239647.779231,
-      "timestamp_str": "2026-11-09 18:54:07",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-intel-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge chart, economy, factions, wars and corporations behind one intel report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794240014.1592193,
-      "timestamp_str": "2026-11-09 19:00:14",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Seven read-only verbs each assemble a slice of the same strategic picture; agents must call several to learn one system's state.",
-        "benefits": "One report with chart, economy shocks/routes, rated factions, wars and corporations; one action route for scan and war support; seven legacy verbs hidden but callable.",
-        "risks": "contract: REST/CLI/snapshot; dependency: economy/factions/politics/scan; concurrency: report reads under engine lock where required; state: no save change; regression: legacy intel commands and routes stay callable.",
-        "mitigation": "10 facade tests, full 1419 suite, gate."
-      },
-      "plan_digest": "5c2d8fd33fdaf85daa19db734c95c920dc2bb186b5a93aeb0e5419c7a1321b97"
-    },
     {
       "task_id": "voidfarer-intel-merge",
       "phase": "phase 4",
@@ -265,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794250041.0072799,
       "timestamp_str": "2026-11-09 21:47:21",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-flight-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge route, navigate, jump, orbit and travel behind one flight report/action and CLI verb",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794251357.9827316,
+      "timestamp_str": "2026-11-09 22:09:17",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "Flight is one cockpit workflow, but the CLI exposes five movement verbs and six routes with no shared current-system report.",
+        "benefits": "One report with system bodies, lane options, fuel and travel state; one action route for plot/navigate/jump/orbit/travel; five legacy verbs hidden but callable.",
+        "risks": "contract: REST/CLI/snapshot; dependency: plan/navigate/jump/orbit/travel engine methods; concurrency: report plans routes read-only; state: no save change; regression: legacy verbs and routes stay callable.",
+        "mitigation": "11 facade tests, full 1472 suite, gate."
+      },
+      "plan_digest": "6d23f71421057a2103c8904fed7f602ac95fb30e94e3cb97c9d34edb28f54731"
+    },
+    {
+      "task_id": "voidfarer-flight-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Flight facade verified: report/summary, plot, unknown route, orbit/travel, jump, invalid action, REST+CLI, 11 tests, 1472 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794251362.620502,
+      "timestamp_str": "2026-11-09 22:09:22",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-flight-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-flight-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794251456.5307412,
+      "timestamp_str": "2026-11-09 22:10:56",
       "agent": "opencode:campaign"
     }
   ]

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `153`
-- **Total Classes**: `415`
-- **Total Top-Level Functions**: `490`
-- **Total Class Methods**: `2270`
-- **Total Source Lines**: `58213`
+- **Total Python Modules**: `155`
+- **Total Classes**: `418`
+- **Total Top-Level Functions**: `496`
+- **Total Class Methods**: `2286`
+- **Total Source Lines**: `58599`
 
 ---
 
@@ -1548,6 +1548,37 @@
   - Method `.test_training_refuses_a_destroyed_or_maxed_escort()`
   - Method `.test_training_refuses_when_credits_are_short()`
   - Method `.test_report_exposes_rank_fields()`
+
+---
+
+### [`tests/test_flight.py`](tests/test_flight.py)
+> *Unified flight report/action, REST and CLI tests.*
+
+**Size**: `164` lines (`6023` bytes)
+
+**Classes:**
+- `class TestFlightReport`
+  - Method `.test_report_has_every_section()`
+  - Method `.test_system_bodies_and_routes()`
+  - Method `.test_summary_and_snapshot()`
+- `class TestFlightActions`
+  - Method `.test_plot_route()`
+  - Method `.test_plot_unknown_target()`
+  - Method `.test_orbit_and_travel()`
+  - Method `.test_jump()`
+  - Method `.test_invalid_action_is_rejected()`
+- `class TestFlightSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_report()`
+  - Method `.test_action_endpoint_orbits()`
+  - Method `.test_cli_sections()`
+
+**Functions:**
+- `def _base()`
 
 ---
 
@@ -3183,7 +3214,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `802` lines (`36051` bytes)
+**Size**: `803` lines (`36147` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -3300,7 +3331,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4750` lines (`234331` bytes)
+**Size**: `4834` lines (`238243` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3318,6 +3349,7 @@
 - `def cmd_progress(engine, storage, parts)` - *One progression surface: commander, pilot, skills, abilities, relics, codex, streak.*
 - `def cmd_empire(engine, storage, parts)` - *One empire surface: research, outposts, megastructures and diplomacy.*
 - `def cmd_intel(engine, storage, parts)` - *One intel surface: chart, economy, factions, wars and corporations.*
+- `def cmd_flight(engine, storage, parts)` - *One flight surface: route plot, auto-route, jump, orbit and local travel.*
 - `def cmd_comms(engine, storage, parts)` - *One comms surface: AI captains, quantum inbox and message trees.*
 - `def cmd_narrative(engine, storage, parts)` - *One narrative surface: story, tutorial, quests, contracts and events.*
 - `def cmd_engineering(engine, storage, parts)` - *One engineering surface: power, reactor, repair, refuel, fabrication, salvage.*
@@ -3559,7 +3591,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10445` lines (`515701` bytes)
+**Size**: `10447` lines (`515799` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3967,6 +3999,19 @@
 - `def fleet_summary(state)` - *Compact payload for /api/state.*
 - `def _text(value)`
 - `def fleet_action(engine, action, **kwargs)` - *Route one fleet command to its existing engine method.*
+
+---
+
+### [`voidfarer/flight.py`](voidfarer/flight.py)
+> *One report and action surface for route plotting, navigation and local flight.*
+
+**Size**: `121` lines (`4471` bytes)
+
+**Functions:**
+- `def flight_summary(state)` - *Compact payload for /api/state.*
+- `def flight_report(engine)` - *Return the current system, bodies, travel state and route options.*
+- `def _text(value)`
+- `def flight_action(engine, action, **kwargs)` - *Route one flight command to its existing engine method.*
 
 ---
 
@@ -4448,7 +4493,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1760` lines (`75329` bytes)
+**Size**: `1774` lines (`75910` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
