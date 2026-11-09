@@ -1223,5 +1223,19 @@
     "final_snapshot_digest": "cb678b32d88984977beef5039b0186adc80e2d2889077a4d01dd26ee502be709",
     "final_snapshot_entries": 1255,
     "surface_digest": "2c329dae18993c0fd88192479fb290c15e4350e61243101baf5e7269b88db2b3"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "e775dbc0740baad6615b5052409e6e04d16ca097",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794251558.5636528,
+    "finished_at": 1794251639.4110038,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (no visual change; flight backend re-baseline)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
+    "final_snapshot_entries": 1257,
+    "surface_digest": "ec16bd70ef4835a514b969ce7485975e60933d5612e32bf68f26f22b0c75a2e9"
   }
 ]
