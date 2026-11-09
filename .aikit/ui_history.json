@@ -1153,5 +1153,19 @@
     "final_snapshot_digest": "ae213fe4b8763f5e9f756a3edf9dfc3fd5fb0f4447ff33c6feb0b1676bd64cb3",
     "final_snapshot_entries": 1246,
     "surface_digest": "850ec256397dff8e72e0db97eb8a04463a6ae23d2cd7f73dfc38560b57001a9c"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "3f89c8d4b86adc56e380b95ddc9c7f4e2b669902",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794240183.3457267,
+    "finished_at": 1794240246.706281,
+    "strikes": 0,
+    "reviewer": "commandcode-vision (no visual change; intel backend re-baseline)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "5a12e4a5ad387182b60b66dd1affc6d18c37ce33d9fb2e44332fda98adce70b9",
+    "final_snapshot_entries": 1248,
+    "surface_digest": "4882d58b02f187cc5f2f7aef6b0dcbafe0507ddea26cad6b2e7065f180671e6b"
   }
 ]
