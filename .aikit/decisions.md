@@ -2477,3 +2477,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/comms`, `POST /api/comms/action` and a compact `comms` summary to `/api/state`.
   3. Add `comms status|captains|inbox|trees` plus the action names; hide `ai` and `messages` from help while keeping them callable.
 - **Consequences**: One read lists every captain and every message; one action route hails, trades, hires, allies, sends, reads or resolves a branch. The visible CLI is 30 commands. `tests/test_comms.py` adds 10 tests for the report, summary, hail, send/read, branch choice, invalid actions, REST and CLI. Full suite `Ran 1452 OK`; no save-schema change.
+
+### ADR-228: Landing, surface operations and reconstruction become one surface command
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The SURFACE panel already combines the landing party and the world's condition, but the CLI split it across `land`, `surface` and `reconstruct`, with three routes and no shared report.
+- **Decision**:
+  1. Add `voidfarer/surface_ops.py`: `surface_report()` returns the landing party/operations, the current body (orbit, landability, hazards) and reconstruction cost/state in one payload; `surface_action()` routes land, surface operation and reconstruction to the existing engine methods.
+  2. Extend `GET /api/surface` with the unified report, add `POST /api/surface/action`, and add a compact `surface` summary to `/api/state`.
+  3. Add `surface land <body_id>` and `surface reconstruct <body_id> [credits|relief]`; hide `land` and `reconstruct` from help while keeping them callable.
+- **Consequences**: One read shows whether the team is on the ground, which operations remain, and whether the world can be rebuilt; one action route lands, runs an operation or reconstructs. The visible CLI is 28 commands. `tests/test_surface_ops.py` adds 9 tests for the report, body/operations, summary, landing, operations, reconstruction, invalid actions, REST and CLI. Full suite `Ran 1461 OK`; no save-schema change.

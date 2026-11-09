@@ -65,6 +65,7 @@ from voidfarer.narrative import (
     narrative_report,
 )
 from voidfarer.comms import COMMS_ACTIONS, comms_action, comms_report
+from voidfarer.surface_ops import SURFACE_ACTIONS, surface_action, surface_report
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -3436,37 +3437,78 @@ def cmd_quantum(engine: SimulationEngine, storage: StorageManager, parts: list[s
 
 
 def cmd_surface(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
-    action = parts[1].lower() if len(parts) > 1 else "list"
-    report = engine.get_surface_report()
+    """One surface command: landing, surface operations and world reconstruction."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "list"
+
     if action in ("list", "status", "ops"):
-        if not report.get("landed"):
-            print(f"\n{YELLOW}No surface team deployed. Orbit a landable body and run `land <body_id>`.{RESET}")
-            return 1
+        report = surface_report(engine)
+        surface = report["surface"]
         body = report["body"]
-        print(f"\n{BOLD}{CYAN}=== SURFACE OPERATIONS: {body['name']} ==={RESET}")
-        print(f"{body['body_type']} | gravity {body['gravity']} | hazards {', '.join(body['hazards']) or 'none'} | worked {report['used_count']}/{report['total_count']}")
-        for op in report["operations"]:
-            if op["used"]:
-                state = f"{DIM}WORKED{RESET}"
-            else:
-                state = f"{GREEN}READY{RESET}"
+        reconstruction = report["reconstruction"]
+        if not surface.get("landed"):
+            print(f"\n{YELLOW}No surface team deployed.{RESET}")
+            if body:
+                print(
+                    f"{DIM}{body['name']} is in orbit; landable={body['landable']}. "
+                    f"Run: surface land {body['id']}{RESET}"
+                )
+        else:
+            surface_body = surface["body"]
+            print(f"\n{BOLD}{CYAN}=== SURFACE OPERATIONS: {surface_body['name']} ==={RESET}")
             print(
-                f"  {BOLD}{op['id']:<18}{RESET} {op['name']:<20} RISK {op['risk']}% | "
-                f"{op['credits']} cr | {op['research']} res | {op['credit_cost']} cr cost | {state}"
+                f"{surface_body['body_type']} | gravity {surface_body['gravity']} | "
+                f"hazards {', '.join(surface_body['hazards']) or 'none'} | "
+                f"worked {surface['used_count']}/{surface['total_count']}"
             )
-            print(f"     {DIM}{op['description']}{RESET}")
-        print(f"{DIM}Run: surface op <operation_id>{RESET}")
+            for op in surface["operations"]:
+                state = f"{DIM}WORKED{RESET}" if op["used"] else f"{GREEN}READY{RESET}"
+                print(
+                    f"  {BOLD}{op['id']:<18}{RESET} {op['name']:<20} RISK {op['risk']}% | "
+                    f"{op['credits']} cr | {op['research']} res | {op['credit_cost']} cr cost | {state}"
+                )
+                print(f"     {DIM}{op['description']}{RESET}")
+            print(f"{DIM}Run: surface op <operation_id>{RESET}")
+        if reconstruction.get("available"):
+            print(
+                f"{DIM}Reconstruction: {reconstruction['body_name']} devastation "
+                f"{reconstruction['devastation']:.0f} | {reconstruction['cost_credits']} cr or relief cargo{RESET}"
+            )
+            print(f"{DIM}Run: surface reconstruct <body_id> [credits|relief]{RESET}")
         return 0
     if action in ("op", "run"):
-        if len(parts) < 3:
+        if len(args) < 2:
             print(f"{RED}Usage:{RESET} surface op <operation_id>")
             return 1
-        ok, msg = engine.perform_surface_operation(parts[2])
+        ok, msg = surface_action(engine, "operation", operation_id=args[1])
         print((GREEN if ok else RED) + msg + RESET)
         if ok:
             storage.save(engine.state)
         return 0 if ok else 1
-    print(f"{RED}Unknown surface action '{action}'. Use list or op.{RESET}")
+    if action == "land":
+        if len(args) < 2:
+            print(f"{RED}Usage:{RESET} surface land <body_id>")
+            return 1
+        ok, msg = surface_action(engine, "land", body_id=args[1])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if action == "reconstruct":
+        if len(args) < 2:
+            print(f"{RED}Usage:{RESET} surface reconstruct <body_id> [credits|relief]")
+            return 1
+        ok, msg = surface_action(
+            engine, "reconstruct", body_id=args[1], mode=args[2] if len(args) > 2 else "credits"
+        )
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    print(
+        f"{RED}Unknown surface action '{action}'. "
+        f"Use list, op, land, or reconstruct.{RESET}"
+    )
     return 1
 
 
@@ -4137,8 +4179,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     quantum_p.add_argument("values", nargs="*", help="commodity, quantity, destination_system_id")
 
     surface_p = subparsers.add_parser("surface", help="Inspect or run landing-party surface operations")
-    surface_p.add_argument("action", nargs="?", default="list", choices=["list", "op"])
-    surface_p.add_argument("operation_id", nargs="?", help="Surface operation id")
+    surface_p.add_argument(
+        "action", nargs="?", default="list",
+        choices=["list", "op", "land", "reconstruct"],
+    )
+    surface_p.add_argument("operation_id", nargs="?", help="Surface operation id or body id")
+    surface_p.add_argument("mode", nargs="?", help="credits or relief for reconstruction")
 
     settings_p = subparsers.add_parser("settings", help="Simulation options such as decision cadence")
     settings_p.add_argument("action", nargs="?", default="show", choices=["show", "decisions"])
@@ -4294,7 +4340,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "chart", "economy", "scan", "factions", "war", "corps", "corporations",
         "power", "reactor", "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop",
         "story", "tutorial", "quests", "contracts", "events",
-        "buy", "sell", "ai", "messages",
+        "buy", "sell", "ai", "messages", "land", "reconstruct",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
@@ -4357,7 +4403,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "quantum":
         return cmd_quantum(engine, storage, ["quantum", args.action] + list(args.values))
     elif args.command == "surface":
-        return cmd_surface(engine, storage, ["surface", args.action] + ([args.operation_id] if args.operation_id else []))
+        parts = ["surface", args.action]
+        if args.operation_id:
+            parts.append(args.operation_id)
+        if args.mode:
+            parts.append(args.mode)
+        return cmd_surface(engine, storage, parts)
     elif args.command == "weapons":
         parts = ["weapons", args.action]
         if args.weapon_id:

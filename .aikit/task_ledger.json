@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-comms-merge",
+    "task_id": "voidfarer-surface-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794248930.4901454,
+    "updated_at": 1794249938.3872519,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794249028.1920104
+    "completed_at": 1794250041.0072773
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-empire-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Empire facade verified: report/summary, research queue, outpost build/upgrade, megastructure restore, diplomacy gift, REST+CLI, 10 tests, 1399 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794203424.5776968,
-      "timestamp_str": "2026-11-09 08:50:24",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-empire-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-empire-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794203520.35531,
-      "timestamp_str": "2026-11-09 08:52:00",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-crew-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge crew, stations, shore leave and away teams behind one crew report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794239541.175567,
-      "timestamp_str": "2026-11-09 18:52:21",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The CREW tab is one surface, but the CLI splits roster and expeditions across crew and away with nine routes.",
-        "benefits": "One report with roster, roles, bonuses and away missions; one action route; crew overview/away sections and away_launch/away_recall; legacy away hidden but callable.",
-        "risks": "contract: REST/CLI/snapshot; dependency: crew/away reports and engine actions; concurrency: reports read under lock; state: no save change; regression: legacy crew/away commands and routes stay callable.",
-        "mitigation": "10 facade tests, full 1409 suite, gate."
-      },
-      "plan_digest": "ccabfebffea282594a61874578fca47cd6352a1c68f8cd903ea0bf39623db31b"
-    },
     {
       "task_id": "voidfarer-crew-merge",
       "phase": "phase 4",
@@ -265,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794249028.1920137,
       "timestamp_str": "2026-11-09 21:30:28",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-surface-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge landing, surface operations and reconstruction behind one surface report/action",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794249933.3920455,
+      "timestamp_str": "2026-11-09 21:45:33",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The SURFACE panel is one surface, but the CLI splits landing, operations and reconstruction across three verbs and three routes.",
+        "benefits": "One report with landing party, operations, body condition and reconstruction; one action route; land/reconstruct hidden but callable.",
+        "risks": "contract: REST/CLI/snapshot; dependency: land/perform/reconstruct engine methods; concurrency: report reads state and surface report; state: no save change; regression: legacy land/reconstruct commands and routes stay callable.",
+        "mitigation": "9 facade tests, full 1461 suite, gate."
+      },
+      "plan_digest": "9bfc91f555e2a6a16a2f82682a6b026d9acc520e71e2da404371c3e30f57ae61"
+    },
+    {
+      "task_id": "voidfarer-surface-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Surface facade verified: report/summary, landing, operation, reconstruction, invalid action, REST+CLI, 9 tests, 1461 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794249938.3872519,
+      "timestamp_str": "2026-11-09 21:45:38",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-surface-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-surface-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794250041.0072799,
+      "timestamp_str": "2026-11-09 21:47:21",
       "agent": "opencode:campaign"
     }
   ]

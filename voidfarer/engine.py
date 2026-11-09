@@ -339,6 +339,7 @@ from voidfarer.logistics import logistics_summary
 from voidfarer.narrative import narrative_summary
 from voidfarer.progress import progress_summary
 from voidfarer.state_machines import situation as state_machine_situation
+from voidfarer.surface_ops import surface_summary
 from voidfarer.upgrades import (
     CATALOG_CHASSIS,
     CATALOG_DRONE_TEMPLATES,
@@ -7978,6 +7979,7 @@ class SimulationEngine:
                 "engineering": engineering_summary(self.state),
                 "narrative": narrative_summary(self.state),
                 "comms": comms_summary(self.state),
+                "surface": surface_summary(self.state),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),

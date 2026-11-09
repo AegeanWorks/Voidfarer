@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `151`
-- **Total Classes**: `412`
-- **Total Top-Level Functions**: `484`
-- **Total Class Methods**: `2256`
-- **Total Source Lines**: `57865`
+- **Total Python Modules**: `153`
+- **Total Classes**: `415`
+- **Total Top-Level Functions**: `490`
+- **Total Class Methods**: `2270`
+- **Total Source Lines**: `58213`
 
 ---
 
@@ -2746,6 +2746,35 @@
 
 ---
 
+### [`tests/test_surface_ops.py`](tests/test_surface_ops.py)
+> *Unified surface report/action, REST and CLI tests.*
+
+**Size**: `177` lines (`6745` bytes)
+
+**Classes:**
+- `class TestSurfaceReport`
+  - Method `.test_report_has_every_section()`
+  - Method `.test_body_and_operations()`
+  - Method `.test_summary_and_snapshot()`
+- `class TestSurfaceActions`
+  - Method `.test_land_and_run_operation()`
+  - Method `.test_reconstruct_devastated_world()`
+  - Method `.test_invalid_action_is_rejected()`
+- `class TestSurfaceSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_report()`
+  - Method `.test_action_endpoint_lands()`
+  - Method `.test_cli_sections()`
+
+**Functions:**
+- `def _base(orbiting)`
+
+---
+
 ### [`tests/test_time_and_ticks.py`](tests/test_time_and_ticks.py)
 > *Comprehensive automated test suite for Time, Ticks, and Temporal Controls in VoidFarer.*
 
@@ -3154,7 +3183,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `801` lines (`35951` bytes)
+**Size**: `802` lines (`36051` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -3271,7 +3300,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4699` lines (`232276` bytes)
+**Size**: `4750` lines (`234331` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3337,7 +3366,7 @@
 - `def cmd_decision(engine, storage, parts)`
 - `def cmd_encounter(engine, storage, parts)` - *Inspect or resolve the single blocking encounter (decision/pirate/customs/anomaly).*
 - `def cmd_quantum(engine, storage, parts)`
-- `def cmd_surface(engine, storage, parts)`
+- `def cmd_surface(engine, storage, parts)` - *One surface command: landing, surface operations and world reconstruction.*
 - `def cmd_weapons(engine, storage, parts)`
 - `def cmd_repl(engine, storage)` - *Launch interactive terminal command session.*
 - `def cmd_events(engine, storage, parts)` - *List or dismiss cockpit popup events.*
@@ -3530,7 +3559,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10443` lines (`515595` bytes)
+**Size**: `10445` lines (`515701` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4419,7 +4448,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1745` lines (`74762` bytes)
+**Size**: `1760` lines (`75329` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -4576,6 +4605,20 @@
 - `def surface_risk(operation, body)`
 - `def surface_report(ship, body)`
 - `def resolve_surface_operation(operation, body, ship, galaxy_seed, tick)`
+
+---
+
+### [`voidfarer/surface_ops.py`](voidfarer/surface_ops.py)
+> *One report and action surface for landing, surface operations and reconstruction.*
+
+**Size**: `102` lines (`4112` bytes)
+
+**Functions:**
+- `def _current_body(state)`
+- `def surface_summary(state)` - *Compact payload for /api/state.*
+- `def surface_report(engine)` - *Return the landing party, surface operations and reconstruction state.*
+- `def _text(value)`
+- `def surface_action(engine, action, **kwargs)` - *Route one surface command to its existing engine method.*
 
 ---
 
