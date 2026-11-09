@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-intel-merge",
+    "task_id": "voidfarer-engineering-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794240019.154606,
+    "updated_at": 1794240472.7976584,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794240109.0988946
+    "completed_at": 1794240569.1022437
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-fleet-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-fleet-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794174426.2346017,
-      "timestamp_str": "2026-11-09 00:47:06",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-logistics-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge market, auto-trade, quantum freight, depot and inventory behind one logistics report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794175668.9231644,
-      "timestamp_str": "2026-11-09 01:07:48",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Five CLI surfaces and a dozen routes each assemble their own cargo, market and automation slice for one logistics loop.",
-        "benefits": "One report with market quotes, cargo, depot, automation and freight; one action route; one logistics CLI with sections and purchase/deposit/automation/freight actions.",
-        "risks": "contract: REST/CLI/snapshot; dependency: inventory/economy catalogs; concurrency: report reads state, actions delegate; state: no save change; regression: legacy market/autotrade/quantum/depot/inventory commands and routes.",
-        "mitigation": "10 facade tests, full 1380 suite, gate."
-      },
-      "plan_digest": "cf0f3838a68700d37b4428154794526c2b527c7e85f2ecb610bede9c31d5a94c"
-    },
-    {
-      "task_id": "voidfarer-logistics-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Logistics facade verified: report/summary, buy/sell/deposit/withdraw, automation toggles, quantum freight, REST+CLI, 10 tests, 1380 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794175698.882022,
-      "timestamp_str": "2026-11-09 01:08:18",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-logistics-merge",
       "phase": "completed",
@@ -265,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794240109.098897,
       "timestamp_str": "2026-11-09 19:01:49",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-engineering-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge power, reactor, repair, refuel, overhaul, fabrication, salvage and scoop behind one engineering report/action and CLI verb",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794240468.8527548,
+      "timestamp_str": "2026-11-09 19:07:48",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The SHIP tab shows engineering telemetry together, but the CLI spreads it across eight verbs and nine routes.",
+        "benefits": "One report with reactor/power/hull/fuel/salvage/scoop/fabrication; one action route for ten actions; engineering sections; eight legacy verbs hidden but callable.",
+        "risks": "contract: REST/CLI/snapshot; dependency: reactor/snapshot/salvage/fabrication methods; concurrency: report reads through the engine snapshot and reactor report; state: no save change; regression: legacy verbs and routes stay callable.",
+        "mitigation": "11 facade tests, full 1430 suite, gate."
+      },
+      "plan_digest": "e88935b6991396f811340503587b618ede66f4ee6ae130ab406b1d2bfe9d7be6"
+    },
+    {
+      "task_id": "voidfarer-engineering-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Engineering facade verified: report/summary, power, reactor mode, repair/refuel, fabrication, invalid action, REST+CLI, 11 tests, 1430 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794240472.7976584,
+      "timestamp_str": "2026-11-09 19:07:52",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-engineering-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-engineering-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794240569.1022463,
+      "timestamp_str": "2026-11-09 19:09:29",
       "agent": "opencode:campaign"
     }
   ]

@@ -2440,3 +2440,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/intel`, `POST /api/intel/action` and a compact `intel` summary to `/api/state`.
   3. Add `intel status|chart|economy|factions|war|corps|scan`; hide the seven legacy verbs from help while keeping them callable.
 - **Consequences**: One read gives an agent the map, prices, standings and wars; one action route scans or pledges war support. The visible CLI is 43 commands. `tests/test_intel.py` adds 10 tests for the report, chart, standings, summary, scan, war support, invalid actions, REST and CLI. Full suite `Ran 1419 OK`; no save-schema change.
+
+### ADR-224: Power, reactor, repair, refuel, fabrication and salvage become one engineering surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The SHIP tab shows reactor heat, power routing, hull, fuel and salvage together, but the CLI exposed eight verbs (`power`, `reactor`, `repair`, `refuel`, `overhaul`, `fabricate`, `salvage`, `scoop`) with nine routes and no shared telemetry.
+- **Decision**:
+  1. Add `voidfarer/engineering.py`: `engineering_report()` returns reactor telemetry, power allocation, hull/fuel, salvage site, scoop profile, fabrication stock and derived counts in one payload; `engineering_action()` routes all ten actions to the existing engine methods.
+  2. Add `GET /api/engineering`, `POST /api/engineering/action` and a compact `engineering` summary to `/api/state`.
+  3. Add `engineering status|reactor|power|hull|salvage|fabrication` plus the action names; hide the eight legacy verbs from help while keeping them callable.
+- **Consequences**: An agent reads the whole engineering state in one call and repairs, refuels, routes power, vents heat, fabricates or salvages through one route. The visible CLI is 35 commands. `tests/test_engineering.py` adds 11 tests for the report, counts, summary, power, reactor mode, repair/refuel, fabrication, invalid actions, REST and CLI. Full suite `Ran 1430 OK`; no save-schema change.

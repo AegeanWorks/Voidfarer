@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `145`
-- **Total Classes**: `403`
-- **Total Top-Level Functions**: `462`
-- **Total Class Methods**: `2208`
-- **Total Source Lines**: `56621`
+- **Total Python Modules**: `147`
+- **Total Classes**: `406`
+- **Total Top-Level Functions**: `470`
+- **Total Class Methods**: `2224`
+- **Total Source Lines**: `57044`
 
 ---
 
@@ -1188,6 +1188,38 @@
   - Method `.test_buy_drone_rejects_unknown_system()`
   - Method `.test_cargo_grant_clamps_to_free_volume()`
   - Method `.test_combat_salvage_respects_full_cargo_hold()`
+
+---
+
+### [`tests/test_engineering.py`](tests/test_engineering.py)
+> *Unified engineering report/action, REST and CLI tests.*
+
+**Size**: `175` lines (`6397` bytes)
+
+**Classes:**
+- `class TestEngineeringReport`
+  - Method `.test_report_has_every_section()`
+  - Method `.test_counts_track_hull_and_power()`
+  - Method `.test_summary_and_snapshot()`
+- `class TestEngineeringActions`
+  - Method `.test_power_routing()`
+  - Method `.test_reactor_mode()`
+  - Method `.test_repair_and_refuel()`
+  - Method `.test_fabricate_patch_kit()`
+  - Method `.test_invalid_action_is_rejected()`
+- `class TestEngineeringSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_report()`
+  - Method `.test_action_endpoint_routes_power()`
+  - Method `.test_cli_sections()`
+
+**Functions:**
+- `def _base()`
+- `def _damaged()`
 
 ---
 
@@ -3060,7 +3092,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `798` lines (`35648` bytes)
+**Size**: `799` lines (`35755` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -3177,7 +3209,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4370` lines (`216544` bytes)
+**Size**: `4476` lines (`221541` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3195,6 +3227,7 @@
 - `def cmd_progress(engine, storage, parts)` - *One progression surface: commander, pilot, skills, abilities, relics, codex, streak.*
 - `def cmd_empire(engine, storage, parts)` - *One empire surface: research, outposts, megastructures and diplomacy.*
 - `def cmd_intel(engine, storage, parts)` - *One intel surface: chart, economy, factions, wars and corporations.*
+- `def cmd_engineering(engine, storage, parts)` - *One engineering surface: power, reactor, repair, refuel, fabrication, salvage.*
 - `def cmd_shipyard(engine, storage, parts)` - *Orbital shipyard: inspect ship chassis upgrades, purchase vessels, and sell modules.*
 - `def cmd_fleet(engine, storage, parts)` - *Manage autonomous fleet drones, mining escorts, and harvest yields.*
 - `def cmd_quests(engine)`
@@ -3419,7 +3452,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10437` lines (`515273` bytes)
+**Size**: `10439` lines (`515391` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3651,6 +3684,20 @@
 **Functions:**
 - `def static_catalogs()` - *Build the code-constant catalogs once per process; callers must treat them as read-only.*
 - `def _cargo_cost_after(previous_cargo, previous_cost, cargo)` - *Carry the paid basis of held cargo through any mutation outside a market trade.*
+
+---
+
+### [`voidfarer/engineering.py`](voidfarer/engineering.py)
+> *One report and action surface for power, reactor, repair, salvage and fabrication.*
+
+**Size**: `125` lines (`4380` bytes)
+
+**Functions:**
+- `def engineering_summary(state)` - *Compact payload for /api/state.*
+- `def engineering_report(engine)` - *Return reactor, power, hull/fuel, salvage, scoop and fabrication in one payload.*
+- `def _text(value)`
+- `def _int(value, default)`
+- `def engineering_action(engine, action, **kwargs)` - *Route one engineering command to its existing engine method.*
 
 ---
 
@@ -4280,7 +4327,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1703` lines (`72970` bytes)
+**Size**: `1717` lines (`73586` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

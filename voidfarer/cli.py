@@ -54,6 +54,11 @@ from voidfarer.empire import (
 )
 from voidfarer.crew_command import crew_action, crew_report
 from voidfarer.intel import INTEL_ACTIONS, intel_action, intel_report
+from voidfarer.engineering import (
+    ENGINEERING_ACTIONS,
+    engineering_action,
+    engineering_report,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -1074,6 +1079,92 @@ def cmd_intel(engine: SimulationEngine, storage: StorageManager, parts: list[str
             f"{corp['standing']:+4d} | {corp['specialty_commodity']} | {corp['perk']}"
         )
     return 0
+
+
+def cmd_engineering(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One engineering surface: power, reactor, repair, refuel, fabrication, salvage."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    sections = ("status", "reactor", "power", "hull", "salvage", "fabrication")
+
+    if action in sections:
+        report = engineering_report(engine)
+        if action == "status":
+            counts = report["counts"]
+            print(f"\n{BOLD}{CYAN}=== ENGINEERING ==={RESET}")
+            print(
+                f"  Hull {counts['hull_percent']:.0f}% | Fuel {counts['fuel_percent']:.0f}% | "
+                f"Reactor {report['reactor']['mode_name']} {counts['heat_percent']:.0f}% heat | "
+                f"Power {counts['power_total']}"
+            )
+            print(f"{DIM}Inspect: engineering reactor | power | hull | salvage | fabrication{RESET}")
+            return 0
+        if action == "reactor":
+            reactor = report["reactor"]
+            print(f"\n{BOLD}{CYAN}=== REACTOR ==={RESET}")
+            print(
+                f"  Mode {reactor['mode_name']} | Heat {reactor['heat']}/{reactor['max_heat']} "
+                f"({reactor['heat_pct']:.0f}%) | Integrity {reactor['integrity']}/{reactor['max_integrity']}"
+            )
+            print(
+                f"  Cooling {reactor['cooling']} | Efficiency {reactor['efficiency']} | "
+                f"Vent ready {reactor['can_vent']}"
+            )
+            print(f"{DIM}Mode: engineering reactor_mode <mode> | Vent: reactor_vent | Repair: reactor_repair{RESET}")
+            return 0
+        if action == "power":
+            power = report["power"]
+            print(f"\n{BOLD}{CYAN}=== POWER ROUTING ==={RESET}")
+            print(
+                "  " + " | ".join(f"{name.title()} {value}" for name, value in power.items())
+            )
+            print(f"{DIM}Route: engineering power <engines> <shields> <sensors> <weapons>{RESET}")
+            return 0
+        if action == "hull":
+            hull = report["hull"]
+            fuel = report["fuel"]
+            print(f"\n{BOLD}{CYAN}=== HULL & FUEL ==={RESET}")
+            print(f"  Hull {hull['current']}/{hull['max']} ({hull['percent']:.0f}%)")
+            print(f"  Fuel {fuel['current']}/{fuel['max']} ({fuel['percent']:.0f}%)")
+            print(f"{DIM}Repair: engineering repair [amount] | Refuel: engineering refuel [amount]{RESET}")
+            return 0
+        if action == "salvage":
+            print(f"\n{BOLD}{CYAN}=== SALVAGE & SCOOP ==={RESET}")
+            print(f"  Salvage site: {report['salvage'] or 'none'}")
+            print(f"  Scoop: {report['scoop'] or 'none'}")
+            print(f"{DIM}Salvage: engineering salvage [strategy] | Scoop: engineering scoop{RESET}")
+            return 0
+        fabrication = report["fabrication"]
+        print(f"\n{BOLD}{CYAN}=== FABRICATION ==={RESET}")
+        print(
+            f"  Titanium {fabrication['titanium']} | Blueprints "
+            f"{', '.join(fabrication['blueprints'])}"
+        )
+        print(f"{DIM}Fabricate: engineering fabricate <patch_kit|fuel_cell>{RESET}")
+        return 0
+
+    if action not in ENGINEERING_ACTIONS:
+        print(f"{RED}Unknown engineering action '{action}'.{RESET}")
+        return 1
+    kwargs: dict[str, object] = {}
+    if action == "power":
+        for index, key in enumerate(("engines", "shields", "sensors", "weapons")):
+            if len(args) > index + 1:
+                kwargs[key] = args[index + 1]
+    elif action == "reactor_mode":
+        kwargs["mode"] = args[1] if len(args) > 1 else ""
+    elif action in ("repair", "refuel"):
+        if len(args) > 1:
+            kwargs["amount"] = args[1]
+    elif action == "fabricate":
+        kwargs["blueprint"] = args[1] if len(args) > 1 else "patch_kit"
+    elif action == "salvage":
+        kwargs["strategy"] = args[1] if len(args) > 1 else "balanced"
+    ok, msg = engineering_action(engine, action, **kwargs)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
 
 
 def cmd_shipyard(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -3957,6 +4048,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     intel_p.add_argument("arg2", nargs="?")
     intel_p.add_argument("arg3", nargs="?")
 
+    engineering_p = subparsers.add_parser(
+        "engineering",
+        help="One engineering surface: power, reactor, repair, refuel, fabrication, salvage",
+    )
+    engineering_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    engineering_p.add_argument("arg1", nargs="?")
+    engineering_p.add_argument("arg2", nargs="?")
+    engineering_p.add_argument("arg3", nargs="?")
+    engineering_p.add_argument("arg4", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help=argparse.SUPPRESS)
     codex_p = subparsers.add_parser("codex", help=argparse.SUPPRESS)
@@ -3978,6 +4079,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "character", "mastery", "relics", "codex", "log", "streak",
         "research", "outpost", "megastructure", "diplomacy", "away",
         "chart", "economy", "scan", "factions", "war", "corps", "corporations",
+        "power", "reactor", "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
@@ -4107,6 +4209,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "intel":
         return cmd_intel(engine, storage, [
             "intel", args.action, args.arg1, args.arg2, args.arg3,
+        ])
+    elif args.command == "engineering":
+        return cmd_engineering(engine, storage, [
+            "engineering", args.action, args.arg1, args.arg2, args.arg3, args.arg4,
         ])
     elif args.command == "refit":
         parts = ["refit", args.action]
