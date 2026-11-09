@@ -47,6 +47,11 @@ from voidfarer.progress import (
     progress_report,
     progress_summary,
 )
+from voidfarer.empire import (
+    EMPIRE_ACTIONS,
+    empire_action,
+    empire_report,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -868,6 +873,109 @@ def cmd_progress(engine: SimulationEngine, storage: StorageManager, parts: list[
     elif action == "fuse":
         kwargs["rarity"] = args[1] if len(args) > 1 else ""
     ok, msg = progress_action(engine, action, **kwargs)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
+
+
+def cmd_empire(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One empire surface: research, outposts, megastructures and diplomacy."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    sections = ("status", "research", "outposts", "outpost", "megastructure", "diplomacy", "war")
+
+    if action in sections:
+        report = empire_report(engine)
+        if action == "status":
+            counts = report["counts"]
+            print(f"\n{BOLD}{CYAN}=== EMPIRE ==={RESET}")
+            print(
+                f"  Research {counts['research_available']} available / "
+                f"{counts['research_completed']} complete | "
+                f"{counts['outposts']} outposts | {counts['leaders']} leaders | "
+                f"{counts['active_wars']} active wars"
+            )
+            print(f"{DIM}Inspect: empire research | outposts | megastructure | diplomacy | war{RESET}")
+            return 0
+        if action == "research":
+            research = report["research"]
+            print(f"\n{BOLD}{CYAN}=== RESEARCH ==={RESET}")
+            print(
+                f"  {research['points']} points | active {research['active_project_id'] or 'none'} | "
+                f"{len(research['completed'])} complete"
+            )
+            for project in research["available"]:
+                print(f"  {project['id']:<26} {project['name']} — {project['cost']} points")
+            print(f"{DIM}Start: empire research_start <id> | Queue: empire research_queue <id>{RESET}")
+            return 0
+        if action in ("outposts", "outpost"):
+            print(f"\n{BOLD}{CYAN}=== OUTPOSTS ==={RESET}")
+            outposts = report["outposts"]["outposts"]
+            if not outposts:
+                print(f"{DIM}No outposts founded.{RESET}")
+            for outpost in outposts:
+                print(
+                    f"  {outpost.get('id', '?'):<24} {outpost.get('outpost_type', '?')} "
+                    f"LVL {outpost.get('level', 1)} integrity {outpost.get('integrity', 0):.0f}%"
+                )
+            print(f"{DIM}Build: empire outpost_build <type> <body_id>{RESET}")
+            return 0
+        if action == "megastructure":
+            print(f"\n{BOLD}{CYAN}=== MEGASTRUCTURE ==={RESET}")
+            print(f"  {report['megastructure']}")
+            return 0
+        if action == "diplomacy":
+            print(f"\n{BOLD}{CYAN}=== DIPLOMACY ==={RESET}")
+            for leader in report["diplomacy"]["leaders"]:
+                status = "ALLIED" if leader["alliance"] else ("PACT" if leader["trade_pact"] else "")
+                print(
+                    f"  {leader['faction_id']:<18} {leader['name']:<18} standing "
+                    f"{leader['standing']:+4d} {status}"
+                )
+            return 0
+        print(f"\n{BOLD}{CYAN}=== WARS ==={RESET}")
+        for war in report["diplomacy"]["wars"]:
+            print(
+                f"  {war['attacker_id']} vs {war['defender_id']} | "
+                f"score {war.get('war_score', 0):+.1f} | active {war.get('active')}"
+            )
+        return 0
+
+    if action not in EMPIRE_ACTIONS:
+        print(f"{RED}Unknown empire action '{action}'.{RESET}")
+        return 1
+    kwargs: dict[str, object] = {}
+    if action in ("research_start", "research_queue", "research_cancel"):
+        kwargs["project_id"] = args[1] if len(args) > 1 else ""
+    elif action == "outpost_build":
+        kwargs["outpost_type_id"] = args[1] if len(args) > 1 else ""
+        kwargs["body_id"] = args[2] if len(args) > 2 else ""
+    elif action in ("outpost_upgrade", "outpost_repair", "outpost_unlink"):
+        kwargs["outpost_id"] = args[1] if len(args) > 1 else ""
+    elif action == "outpost_module":
+        kwargs["outpost_id"] = args[1] if len(args) > 1 else ""
+        kwargs["module_id"] = args[2] if len(args) > 2 else ""
+    elif action == "outpost_specialize":
+        kwargs["outpost_id"] = args[1] if len(args) > 1 else ""
+        kwargs["specialization"] = args[2] if len(args) > 2 else ""
+    elif action in ("outpost_crew", "outpost_recall"):
+        kwargs["outpost_id"] = args[1] if len(args) > 1 else ""
+        kwargs["crew_id"] = args[2] if len(args) > 2 else ""
+    elif action == "outpost_link":
+        kwargs["outpost_id"] = args[1] if len(args) > 1 else ""
+        kwargs["hub_id"] = args[2] if len(args) > 2 else ""
+    elif action == "megastructure_restore":
+        kwargs["body_id"] = args[1] if len(args) > 1 else ""
+    elif action == "diplomacy":
+        kwargs["diplomacy_action"] = args[1] if len(args) > 1 else ""
+        kwargs["faction_id"] = args[2] if len(args) > 2 else ""
+        kwargs["amount"] = args[3] if len(args) > 3 else 0
+    elif action == "war_support":
+        kwargs["war_id"] = args[1] if len(args) > 1 else ""
+        kwargs["faction_id"] = args[2] if len(args) > 2 else ""
+        kwargs["credits"] = args[3] if len(args) > 3 else 0
+    ok, msg = empire_action(engine, action, **kwargs)
     print((GREEN if ok else RED) + msg + RESET)
     if ok:
         storage.save(engine.state)
@@ -3682,6 +3790,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     progress_p.add_argument("arg1", nargs="?")
     progress_p.add_argument("arg2", nargs="?")
 
+    empire_p = subparsers.add_parser(
+        "empire",
+        help="One empire surface: research, outposts, megastructures and diplomacy",
+    )
+    empire_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    empire_p.add_argument("arg1", nargs="?")
+    empire_p.add_argument("arg2", nargs="?")
+    empire_p.add_argument("arg3", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help=argparse.SUPPRESS)
     codex_p = subparsers.add_parser("codex", help=argparse.SUPPRESS)
@@ -3701,6 +3818,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "mercs", "allies",
         "market", "autotrade", "quantum", "depot", "inventory",
         "character", "mastery", "relics", "codex", "log", "streak",
+        "research", "outpost", "megastructure", "diplomacy",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
@@ -3822,6 +3940,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "progress":
         return cmd_progress(engine, storage, [
             "progress", args.action, args.arg1, args.arg2,
+        ])
+    elif args.command == "empire":
+        return cmd_empire(engine, storage, [
+            "empire", args.action, args.arg1, args.arg2, args.arg3,
         ])
     elif args.command == "refit":
         parts = ["refit", args.action]

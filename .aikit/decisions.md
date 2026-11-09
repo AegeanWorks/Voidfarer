@@ -2410,3 +2410,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   1. Hide 21 legacy verbs from the subparser help list and the usage metavar: encounter (`anomaly`, `pirate`, `customs`, `decision`), fitting (`upgrades`, `refit`, `weapons`, `shipyard`), fleet (`mercs`, `allies`), logistics (`market`, `autotrade`, `quantum`, `depot`, `inventory`), and progression (`character`, `mastery`, `relics`, `codex`, `log`, `streak`).
   2. Keep every hidden verb in `subparsers.choices`, so existing scripts and the compatibility paths still parse; only the help listing and usage line shrink.
 - **Consequences**: `voidfarer --help` now lists the facade verbs (`encounter`, `fitting`, `fleet`, `logistics`, `progress`) without the 21 legacy aliases; `weapons list` and the other hidden verbs still execute. The full 1389-test suite stays green, so no invocation or API contract changed.
+
+### ADR-221: Research, outposts, megastructures and diplomacy become one empire surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The cockpit has one EMPIRE tab, but the CLI split it into `research`, `outpost`, `megastructure` and `diplomacy` with a dozen routes, each assembling its own leaders, outposts and research slice.
+- **Decision**:
+  1. Add `voidfarer/empire.py`: `empire_report()` returns research, outposts, the orbiting megastructure, faction leaders/wars and corporations in one payload; `empire_action()` routes to the existing research, outpost, megastructure, diplomacy and war-support methods.
+  2. Add `GET /api/empire`, `POST /api/empire/action` and a compact `empire` summary to `/api/state`.
+  3. Add the `empire` CLI with `status`, `research`, `outposts`, `megastructure`, `diplomacy`, `war` and the research/outpost/megastructure/diplomacy actions; hide the four legacy verbs from help while keeping them callable.
+- **Consequences**: An agent can read one empire report and issue any empire action through one route; the visible CLI is 51 commands with `empire` as the preferred surface. `tests/test_empire.py` adds 10 tests for the report, summary, research queue, outpost build/upgrade, megastructure restoration, diplomacy, invalid actions, REST and CLI. Full suite `Ran 1399 OK`; no save-schema change.

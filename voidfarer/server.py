@@ -17,6 +17,7 @@ from typing import Any
 
 from voidfarer.agent_api import build_action_catalog
 from voidfarer.economy import get_galactic_trade_routes
+from voidfarer.empire import empire_action, empire_report
 from voidfarer.encounters import encounter_report, resolve as resolve_encounter
 from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
 from voidfarer.fitting import (
@@ -402,6 +403,11 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
 
         if path == "/api/progress":
             report = progress_report(self.engine)
+            self._send_json({"ok": True, **report})
+            return
+
+        if path == "/api/empire":
+            report = empire_report(self.engine)
             self._send_json({"ok": True, **report})
             return
 
@@ -847,6 +853,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             payload = dict(body or {})
             action = str(payload.pop("action", ""))
             ok, msg = progress_action(self.engine, action, **payload)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/empire/action":
+            payload = dict(body or {})
+            action = str(payload.pop("action", ""))
+            ok, msg = empire_action(self.engine, action, **payload)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

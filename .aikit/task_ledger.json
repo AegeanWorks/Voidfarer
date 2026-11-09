@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-cli-help-consolidation",
+    "task_id": "voidfarer-empire-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794177618.2679036,
+    "updated_at": 1794203424.5776968,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794177646.236211
+    "completed_at": 1794203520.3553078
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-encounter-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: merge the four blocking encounters behind one normalized payload, resolver, REST pair and CLI command",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794165764.3797586,
-      "timestamp_str": "2026-11-08 22:22:44",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Decision, pirate, customs and anomaly each have their own model, resolver, route, command and cockpit card. They all mean 'the game is waiting for one choice', but the player/agent must learn four separate surfaces on top of 71 CLI commands and 148 routes.",
-        "benefits": "One encounter payload with costs and disabled reasons; one POST route and one `encounter` command; one cockpit card; effects, saves and legacy routes unchanged.",
-        "risks": "contract: REST/CLI/state snapshot; dependency: none; concurrency: resolve checks then delegates to the existing lock-protected resolvers; state: no save-schema change; regression: legacy routes and commands must keep working.",
-        "mitigation": "14 facade tests, blocked-allowlist tests, full suite, browser play and the 5/5 gate; legacy paths stay wired."
-      },
-      "plan_digest": "80afdb505251876b88188d4b5e695f78e42c3460b2e5fed754276d7eef6784da"
-    },
-    {
-      "task_id": "voidfarer-encounter-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Unified encounter backend verified: normalized payload/resolver, GET+POST routes, blocked allowlist, CLI, 14 tests, 1348 suite, gate 5/5; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794165980.5918682,
-      "timestamp_str": "2026-11-08 22:26:20",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-encounter-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-encounter-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794169160.865229,
-      "timestamp_str": "2026-11-08 23:19:20",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-fitting-merge",
       "phase": "phase 2",
@@ -266,6 +227,45 @@
       "status": "completed",
       "timestamp": 1794177646.2362123,
       "timestamp_str": "2026-11-09 01:40:46",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-empire-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge research, outposts, megastructures and diplomacy behind one empire report/action and CLI verb",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794203398.8998451,
+      "timestamp_str": "2026-11-09 08:49:58",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "One EMPIRE cockpit tab is backed by four CLI surfaces and a dozen routes, each assembling its own leaders, outposts and research slice.",
+        "benefits": "One report with research, outposts, megastructure, leaders/wars and corporations; one action route; one empire CLI with sections and research/outpost/megastructure/diplomacy actions; four legacy verbs hidden from help.",
+        "risks": "contract: REST/CLI/snapshot; dependency: factions/research/outposts/megastructures; concurrency: report reads under lock, actions delegate; state: no save change; regression: legacy commands/routes remain callable.",
+        "mitigation": "10 facade tests, full 1399 suite, gate."
+      },
+      "plan_digest": "9f80cfed1de994a46cef7fb986314f226d3625232e8fc8999234ce39028faee7"
+    },
+    {
+      "task_id": "voidfarer-empire-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Empire facade verified: report/summary, research queue, outpost build/upgrade, megastructure restore, diplomacy gift, REST+CLI, 10 tests, 1399 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794203424.5776968,
+      "timestamp_str": "2026-11-09 08:50:24",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-empire-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-empire-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794203520.35531,
+      "timestamp_str": "2026-11-09 08:52:00",
       "agent": "opencode:campaign"
     }
   ]
