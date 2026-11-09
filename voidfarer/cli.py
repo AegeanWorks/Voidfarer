@@ -59,6 +59,11 @@ from voidfarer.engineering import (
     engineering_action,
     engineering_report,
 )
+from voidfarer.narrative import (
+    NARRATIVE_ACTIONS,
+    narrative_action,
+    narrative_report,
+)
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -1079,6 +1084,113 @@ def cmd_intel(engine: SimulationEngine, storage: StorageManager, parts: list[str
             f"{corp['standing']:+4d} | {corp['specialty_commodity']} | {corp['perk']}"
         )
     return 0
+
+
+def cmd_narrative(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One narrative surface: story, tutorial, quests, contracts and events."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    sections = ("status", "story", "tutorial", "quests", "contracts", "events")
+
+    if action in sections:
+        report = narrative_report(engine)
+        if action == "status":
+            counts = report["counts"]
+            story = report["story"]
+            print(f"\n{BOLD}{CYAN}=== NARRATIVE ==={RESET}")
+            print(
+                f"  {story.get('campaign_title', 'Campaign')} | "
+                f"{counts['quests']} quests | {counts['contracts']} contracts "
+                f"({counts['contract_offers']} offers) | {counts['events']} events | "
+                f"tutorial {counts['tutorial_completed']}/{counts['tutorial_steps']}"
+            )
+            print(f"{DIM}Inspect: narrative story | tutorial | quests | contracts | events{RESET}")
+            return 0
+        if action == "story":
+            story = report["story"]
+            print(f"\n{BOLD}{MAGENTA}=== {story.get('campaign_title', 'CAMPAIGN')} ==={RESET}")
+            if story.get("completed"):
+                ending = story.get("ending", {})
+                print(f"  COMPLETE: {ending.get('title', 'Ending')}")
+            else:
+                print(
+                    f"  Act {story.get('active_act')}: {story.get('title')} | "
+                    f"target {story.get('target_system_id') or 'deep space'} | "
+                    f"{'READY' if story.get('ready') else 'BLOCKED'}"
+                )
+                print(f"  {story.get('objective')}")
+                for requirement in story.get("unmet_requirements", []):
+                    print(f"  {RED}x {requirement}{RESET}")
+                for choice in story.get("choices", []):
+                    lock = f" LOCKED ({choice['lock_reason']})" if choice["locked"] else ""
+                    print(f"  {choice['id']:<18} {choice['text']}{lock}")
+            return 0
+        if action == "tutorial":
+            tutorial = report["tutorial"]
+            print(f"\n{BOLD}{CYAN}=== TUTORIAL ==={RESET}")
+            if tutorial["completed"]:
+                print("  GRADUATED")
+            elif tutorial["skipped"]:
+                print("  SKIPPED")
+            else:
+                current = tutorial.get("current_step") or {}
+                print(
+                    f"  Step {tutorial['current_step_index'] + 1}/{len(tutorial['steps'])}: "
+                    f"{current.get('title', '')}"
+                )
+                print(f"  {current.get('description', '')}")
+                for step in tutorial["steps"]:
+                    mark = "x" if step["completed"] else (">" if step["current"] else " ")
+                    print(f"  [{mark}] {step['index'] + 1}. {step['title']} ({step['action_target']})")
+            print(f"{DIM}Skip: narrative tutorial_skip | Reset: narrative tutorial_reset{RESET}")
+            return 0
+        if action == "quests":
+            print(f"\n{BOLD}{CYAN}=== QUESTS ==={RESET}")
+            for quest in report["quests"]:
+                print(
+                    f"  {quest['title']} [{quest['kind'].upper()}] "
+                    f"{quest['progress']}/{quest['target_count']} — {quest['reward']}"
+                )
+            return 0
+        if action == "contracts":
+            print(f"\n{BOLD}{CYAN}=== CONTRACTS ==={RESET}")
+            for contract in report["contracts"]:
+                mark = "READY" if contract["completed"] else "IN PROGRESS"
+                print(
+                    f"  {contract['id']:<26} {contract['title']:<26} "
+                    f"{contract['current_count']}/{contract['target_count']} {mark}"
+                )
+            for offer in report["contract_offers"]:
+                print(f"  {DIM}offer {offer['id']:<24} {offer['title']}{RESET}")
+            print(f"{DIM}Claim: narrative contract_claim <id> | Swap: contract_swap <offer> <active>{RESET}")
+            return 0
+        print(f"\n{BOLD}{CYAN}=== EVENTS ==={RESET}")
+        for event in report["active_events"]:
+            print(
+                f"  [{event['id']}] ({event['kind'].upper()} @ {event['tick']}) "
+                f"{event['title']}: {event['message']}"
+            )
+        print(f"{DIM}Dismiss: narrative event_dismiss <event_id>{RESET}")
+        return 0
+
+    if action not in NARRATIVE_ACTIONS:
+        print(f"{RED}Unknown narrative action '{action}'.{RESET}")
+        return 1
+    kwargs: dict[str, object] = {}
+    if action == "story_choose":
+        kwargs["choice_id"] = args[1] if len(args) > 1 else ""
+    elif action == "contract_claim":
+        kwargs["contract_id"] = args[1] if len(args) > 1 else ""
+    elif action == "contract_swap":
+        kwargs["offer_id"] = args[1] if len(args) > 1 else ""
+        kwargs["drop_id"] = args[2] if len(args) > 2 else ""
+    elif action == "event_dismiss":
+        kwargs["event_id"] = args[1] if len(args) > 1 else ""
+    ok, msg = narrative_action(engine, action, **kwargs)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        storage.save(engine.state)
+    return 0 if ok else 1
 
 
 def cmd_engineering(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -4058,6 +4170,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     engineering_p.add_argument("arg3", nargs="?")
     engineering_p.add_argument("arg4", nargs="?")
 
+    narrative_p = subparsers.add_parser(
+        "narrative",
+        help="One narrative surface: story, tutorial, quests, contracts and events",
+    )
+    narrative_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    narrative_p.add_argument("arg1", nargs="?")
+    narrative_p.add_argument("arg2", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help=argparse.SUPPRESS)
     codex_p = subparsers.add_parser("codex", help=argparse.SUPPRESS)
@@ -4080,6 +4200,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "research", "outpost", "megastructure", "diplomacy", "away",
         "chart", "economy", "scan", "factions", "war", "corps", "corporations",
         "power", "reactor", "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop",
+        "story", "tutorial", "quests", "contracts", "events",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
@@ -4213,6 +4334,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "engineering":
         return cmd_engineering(engine, storage, [
             "engineering", args.action, args.arg1, args.arg2, args.arg3, args.arg4,
+        ])
+    elif args.command == "narrative":
+        return cmd_narrative(engine, storage, [
+            "narrative", args.action, args.arg1, args.arg2,
         ])
     elif args.command == "refit":
         parts = ["refit", args.action]

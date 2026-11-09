@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-engineering-merge",
+    "task_id": "voidfarer-narrative-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794240472.7976584,
+    "updated_at": 1794243924.8222542,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794240569.1022437
+    "completed_at": 1794244020.6876209
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-logistics-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-logistics-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794175871.9344616,
-      "timestamp_str": "2026-11-09 01:11:11",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-progress-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge commander, pilot, skills, abilities, relics, codex and streak behind one progress report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794176934.4237697,
-      "timestamp_str": "2026-11-09 01:28:54",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Six CLI surfaces and eight routes each assemble the same progression state for commander, pilot and collections.",
-        "benefits": "One report with commander, pilot, abilities, relics, codex and streak; one action route; one progress CLI with sections and train/use/unlock/claim/fuse.",
-        "risks": "contract: REST/CLI/snapshot; dependency: character/retention/codex; concurrency: report reads state, actions delegate; state: no save change; regression: legacy character/mastery/relics/codex/log/streak commands and routes.",
-        "mitigation": "9 facade tests, full 1389 suite, gate."
-      },
-      "plan_digest": "667e630e031b729a369d54a4f2849f3b58e1d419da691fc0754ce9c86a54fd45"
-    },
-    {
-      "task_id": "voidfarer-progress-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Progress facade verified: report/summary, train/use abilities, REST+CLI sections, 9 tests, 1389 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794176934.4238234,
-      "timestamp_str": "2026-11-09 01:28:54",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-progress-merge",
       "phase": "phase 4",
@@ -265,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794240569.1022463,
       "timestamp_str": "2026-11-09 19:09:29",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-narrative-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge story, tutorial, quests, contracts and events behind one narrative report/action and CLI verb",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794243920.5419023,
+      "timestamp_str": "2026-11-09 20:05:20",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The QUESTS panel is one surface, but the CLI splits campaign, academy, contracts and events across five verbs and five routes.",
+        "benefits": "One report with objective/choices, tutorial steps, quests, contracts/offers and events; one action route; five legacy verbs hidden but callable.",
+        "risks": "contract: REST/CLI/snapshot; dependency: story/tutorial/contract/event engine methods; concurrency: report reads state and story status; state: no save change; regression: legacy verbs and routes stay callable.",
+        "mitigation": "11 facade tests, full 1441 suite, gate."
+      },
+      "plan_digest": "51074fe3e63245e4b176b770e07a23e604e5603534d856e9b7047bf68c152c86"
+    },
+    {
+      "task_id": "voidfarer-narrative-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Narrative facade verified: report/summary, story choice, tutorial skip/reset, contract refresh, event dismissal, invalid action, REST+CLI, 11 tests, 1441 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794243924.8222542,
+      "timestamp_str": "2026-11-09 20:05:24",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-narrative-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-narrative-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794244020.6876225,
+      "timestamp_str": "2026-11-09 20:07:00",
       "agent": "opencode:campaign"
     }
   ]

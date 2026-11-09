@@ -335,6 +335,7 @@ from voidfarer.fitting import fitting_summary
 from voidfarer.fleet_command import fleet_summary
 from voidfarer.intel import intel_summary
 from voidfarer.logistics import logistics_summary
+from voidfarer.narrative import narrative_summary
 from voidfarer.progress import progress_summary
 from voidfarer.state_machines import situation as state_machine_situation
 from voidfarer.upgrades import (
@@ -7974,6 +7975,7 @@ class SimulationEngine:
                 "crew_overview": crew_summary(self.state),
                 "intel": intel_summary(self.state),
                 "engineering": engineering_summary(self.state),
+                "narrative": narrative_summary(self.state),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),

@@ -2450,3 +2450,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/engineering`, `POST /api/engineering/action` and a compact `engineering` summary to `/api/state`.
   3. Add `engineering status|reactor|power|hull|salvage|fabrication` plus the action names; hide the eight legacy verbs from help while keeping them callable.
 - **Consequences**: An agent reads the whole engineering state in one call and repairs, refuels, routes power, vents heat, fabricates or salvages through one route. The visible CLI is 37 commands. `tests/test_engineering.py` adds 11 tests for the report, counts, summary, power, reactor mode, repair/refuel, fabrication, invalid actions, REST and CLI. Full suite `Ran 1430 OK`; no save-schema change.
+
+### ADR-225: Story, tutorial, quests, contracts and events become one narrative surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The QUESTS panel already merges the campaign chapter, academy milestones and contracts, but the CLI exposed five verbs and five routes; an agent had to call several to see what was actionable.
+- **Decision**:
+  1. Add `voidfarer/narrative.py`: `narrative_report()` returns the story objective/choices, tutorial steps, quests, active contracts, pending offers and cockpit events in one payload; `narrative_action()` routes story choice, tutorial skip/reset, contract refresh/claim/swap and event dismissal to the existing engine methods.
+  2. Add `GET /api/narrative`, `POST /api/narrative/action` and a compact `narrative` summary to `/api/state`.
+  3. Add `narrative status|story|tutorial|quests|contracts|events` plus the action names; hide the five legacy verbs from help while keeping them callable.
+- **Consequences**: One read gives an agent the campaign objective, onboarding step, quests, contracts and unattended events; one action route resolves any of them. The visible CLI is 33 commands. `tests/test_narrative.py` adds 11 tests for the report, story/tutorial rows, summary, story choice, tutorial skip/reset, contract refresh, event dismissal, invalid actions, REST and CLI. Full suite `Ran 1441 OK`; no save-schema change.

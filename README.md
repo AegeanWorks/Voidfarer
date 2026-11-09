@@ -90,6 +90,7 @@ voidfarer/
 │   ├── crew_command.py   <- crew facade
 │   ├── intel.py          <- intel facade
 │   ├── engineering.py    <- engineering facade
+│   ├── narrative.py      <- narrative facade
 │   ├── state_machines.py <- implicit machine registry
 │   ├── reactor.py        <- reactor modes, heat, cooling & derating
 │   ├── mapmods.py        <- procedural sector map modifiers
@@ -142,7 +143,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (90 suites)
+└── tests/                <- unit & integration test suite (91 suites)
 ```
 
 ---
@@ -390,13 +391,13 @@ mechanic families, succeeds on 38 endpoints, attempts 51 and reports **zero cove
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
 
-Click-map controls; missing/dup fail (desktop:
-184 controls, 39 visible, 0 missing/dup). 5 systems; MORE SYSTEMS restores 16.
+Click-map: dup/missing fail (desktop:
+184 controls, 39 visible, 0 dup). 5 systems; MORE SYSTEMS restores 16.
 PLAYER in strip. SHIP/COMMERCE/FLEET;
-56px headers. Reactor presets; combat keeps four actions
-(MORE TACTICS); unlocked chips only (LOCKED n). Target/surface keep key stats
-upfront, details/map behind SHOW. EMPIRE/SKILLS/CREW/QUESTS/AI/MESSAGES keep
-headlines; catalogs/logs hidden.
+56px headers. Reactor presets; combat keeps four
+(MORE TACTICS); unlocked chips only (LOCKED n). Target/surface keep stats
+upfront, details behind SHOW. EMPIRE/SKILLS/CREW/QUESTS/AI/MESSAGES
+headlines; catalogs hidden.
 
 ### 14d. Implicit State-Machine Contract
 
@@ -587,7 +588,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,430-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,441-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 
