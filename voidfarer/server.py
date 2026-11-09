@@ -17,6 +17,7 @@ from typing import Any
 
 from voidfarer.agent_api import build_action_catalog
 from voidfarer.economy import get_galactic_trade_routes
+from voidfarer.comms import comms_action, comms_report
 from voidfarer.crew_command import crew_action, crew_report
 from voidfarer.empire import empire_action, empire_report
 from voidfarer.encounters import encounter_report, resolve as resolve_encounter
@@ -436,6 +437,11 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, **report})
             return
 
+        if path == "/api/comms":
+            report = comms_report(self.engine)
+            self._send_json({"ok": True, **report})
+            return
+
         if path == "/api/inventory":
             with self.engine.lock:
                 manifest = get_inventory_manifest(self.engine.state.ship.cargo)
@@ -735,6 +741,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             payload = dict(body or {})
             action = str(payload.pop("action", ""))
             ok, msg = narrative_action(self.engine, action, **payload)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/comms/action":
+            payload = dict(body or {})
+            action = str(payload.pop("action", ""))
+            ok, msg = comms_action(self.engine, action, **payload)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

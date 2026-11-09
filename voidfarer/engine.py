@@ -327,6 +327,7 @@ from voidfarer.story import (
     migrate_story_state,
     resolve_story_ending,
 )
+from voidfarer.comms import comms_summary
 from voidfarer.crew_command import crew_summary
 from voidfarer.empire import empire_summary
 from voidfarer.encounters import encounter_report
@@ -7976,6 +7977,7 @@ class SimulationEngine:
                 "intel": intel_summary(self.state),
                 "engineering": engineering_summary(self.state),
                 "narrative": narrative_summary(self.state),
+                "comms": comms_summary(self.state),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),

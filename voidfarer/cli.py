@@ -64,6 +64,7 @@ from voidfarer.narrative import (
     narrative_action,
     narrative_report,
 )
+from voidfarer.comms import COMMS_ACTIONS, comms_action, comms_report
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -1085,6 +1086,88 @@ def cmd_intel(engine: SimulationEngine, storage: StorageManager, parts: list[str
             f"{corp['standing']:+4d} | {corp['specialty_commodity']} | {corp['perk']}"
         )
     return 0
+
+
+def cmd_comms(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One comms surface: AI captains, quantum inbox and message trees."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    sections = ("status", "captains", "inbox", "trees")
+
+    if action in sections:
+        report = comms_report(engine)
+        if action == "status":
+            counts = report["counts"]
+            print(f"\n{BOLD}{CYAN}=== COMMS ==={RESET}")
+            print(
+                f"  {counts['captains']} captains ({counts['allies']} allied) | "
+                f"{counts['messages']} messages ({counts['unread']} unread, "
+                f"{counts['unresolved']} unresolved) | {counts['trees']} trees"
+            )
+            print(f"{DIM}Inspect: comms captains | inbox | trees{RESET}")
+            return 0
+        if action == "captains":
+            print(f"\n{BOLD}{CYAN}=== AI CAPTAINS ==={RESET}")
+            for captain in report["captains"]:
+                print(
+                    f"  {captain['id']:<18} {captain['name']:<20} "
+                    f"{captain.get('archetype', ''):<10} {captain.get('system_id', ''):<14} "
+                    f"trust={captain.get('trust', 0):<4} ally={captain.get('ally')}"
+                )
+            print(f"{DIM}Hail/trade: comms hail|buy|sell|hire|ally <captain_id>{RESET}")
+            return 0
+        if action == "inbox":
+            print(f"\n{BOLD}{CYAN}=== QUANTUM INBOX ==={RESET}")
+            for message in report["messages"]:
+                marker = " " if message.get("read") else "*"
+                tree = f" [TREE {message['tree_id']}]" if message.get("tree_id") else ""
+                resolved = f" (resolved: {message['resolved_choice']})" if message.get("resolved_choice") else ""
+                print(
+                    f"{marker} {message['id']:<24} {message['sender']:<18} "
+                    f"{message['subject']}{tree}{resolved}"
+                )
+            print(f"{DIM}Read: comms read <message_id> | Send: comms send <to> <subject> <body>{RESET}")
+            return 0
+        print(f"\n{BOLD}{CYAN}=== MESSAGE TREES ==={RESET}")
+        for tree in report["trees"]:
+            print(f"  {tree['name']} ({tree['id']})")
+            for node in tree["nodes"]:
+                choices = ", ".join(choice["id"] for choice in node["choices"])
+                print(f"    {node['id']}: {node['subject']} -> {choices}")
+        return 0
+
+    if action not in COMMS_ACTIONS:
+        print(f"{RED}Unknown comms action '{action}'.{RESET}")
+        return 1
+    kwargs: dict[str, object] = {}
+    if action in ("hail", "buy", "sell", "hire", "ally"):
+        kwargs["captain_id"] = args[1] if len(args) > 1 else ""
+        kwargs["commodity_id"] = args[2] if len(args) > 2 else ""
+        kwargs["quantity"] = args[3] if len(args) > 3 else 1
+    elif action == "send":
+        kwargs["recipient"] = args[1] if len(args) > 1 else ""
+        kwargs["subject"] = args[2] if len(args) > 2 else ""
+        kwargs["body"] = args[3] if len(args) > 3 else ""
+    elif action == "read":
+        kwargs["message_id"] = args[1] if len(args) > 1 else ""
+    elif action == "choose":
+        kwargs["message_id"] = args[1] if len(args) > 1 else ""
+        kwargs["choice_id"] = args[2] if len(args) > 2 else ""
+    ok, msg = comms_action(engine, action, **kwargs)
+    print((GREEN if ok else RED) + msg + RESET)
+    if ok:
+        if action == "read":
+            message = next(
+                (m for m in engine.state.messages if m.id == args[1]), None
+            ) if len(args) > 1 else None
+            if message:
+                print(f"\n{BOLD}{message.subject}{RESET}\n{message.body}")
+                for choice in message.choices:
+                    print(f"  [{choice.id}] {choice.label} - {DIM}{choice.description}{RESET}")
+                if message.choices:
+                    print(f"{DIM}Choose: comms choose {message.id} <choice_id>{RESET}")
+        storage.save(engine.state)
+    return 0 if ok else 1
 
 
 def cmd_narrative(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -4179,6 +4262,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     narrative_p.add_argument("arg1", nargs="?")
     narrative_p.add_argument("arg2", nargs="?")
 
+    comms_p = subparsers.add_parser(
+        "comms",
+        help="One comms surface: AI captains, quantum inbox and message trees",
+    )
+    comms_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    comms_p.add_argument("arg1", nargs="?")
+    comms_p.add_argument("arg2", nargs="?")
+    comms_p.add_argument("arg3", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help=argparse.SUPPRESS)
     codex_p = subparsers.add_parser("codex", help=argparse.SUPPRESS)
@@ -4202,7 +4294,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "chart", "economy", "scan", "factions", "war", "corps", "corporations",
         "power", "reactor", "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop",
         "story", "tutorial", "quests", "contracts", "events",
-        "buy", "sell",
+        "buy", "sell", "ai", "messages",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
@@ -4340,6 +4432,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "narrative":
         return cmd_narrative(engine, storage, [
             "narrative", args.action, args.arg1, args.arg2,
+        ])
+    elif args.command == "comms":
+        return cmd_comms(engine, storage, [
+            "comms", args.action, args.arg1, args.arg2, args.arg3,
         ])
     elif args.command == "refit":
         parts = ["refit", args.action]

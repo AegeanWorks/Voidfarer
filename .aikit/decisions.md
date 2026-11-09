@@ -2467,3 +2467,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: `logistics` already routed buy/sell through `logistics_action`, but `buy` and `sell` stayed visible as separate top-level verbs, so the market appeared twice in help.
 - **Decision**: Hide `buy` and `sell` from the visible help and usage line; keep both parsers and the existing dispatch unchanged; document `logistics buy|sell <commodity> <qty|max|all>` in the logistics status output and README.
 - **Consequences**: The visible CLI is 31 commands and the market has one discoverable surface. `tests/test_logistics.py` adds a test that the hidden verbs still trade. Full suite `Ran 1442 OK`; no server, save or UI change.
+
+### ADR-227: AI captains and quantum messages become one comms surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The cockpit has separate AI CAPTAINS and MESSAGES tabs, but the CLI split the same contacts and inbox across `ai` and `messages` with nine sub-actions.
+- **Decision**:
+  1. Add `voidfarer/comms.py`: `comms_report()` returns captains, messages and message trees in one payload; `comms_action()` routes hail/buy/sell/hire/ally, send, read and choose to the existing engine methods.
+  2. Add `GET /api/comms`, `POST /api/comms/action` and a compact `comms` summary to `/api/state`.
+  3. Add `comms status|captains|inbox|trees` plus the action names; hide `ai` and `messages` from help while keeping them callable.
+- **Consequences**: One read lists every captain and every message; one action route hails, trades, hires, allies, sends, reads or resolves a branch. The visible CLI is 30 commands. `tests/test_comms.py` adds 10 tests for the report, summary, hail, send/read, branch choice, invalid actions, REST and CLI. Full suite `Ran 1452 OK`; no save-schema change.

@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-trade-merge",
+    "task_id": "voidfarer-comms-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794248477.893259,
+    "updated_at": 1794248930.4901454,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794248599.6264427
+    "completed_at": 1794249028.1920104
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cli-help-consolidation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Help consolidation verified: 21 legacy verbs hidden from help/usage, hidden verbs still execute, 1389 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794177618.2679036,
-      "timestamp_str": "2026-11-09 01:40:18",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-cli-help-consolidation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cli-help-consolidation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794177646.2362123,
-      "timestamp_str": "2026-11-09 01:40:46",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-empire-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge research, outposts, megastructures and diplomacy behind one empire report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794203398.8998451,
-      "timestamp_str": "2026-11-09 08:49:58",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "One EMPIRE cockpit tab is backed by four CLI surfaces and a dozen routes, each assembling its own leaders, outposts and research slice.",
-        "benefits": "One report with research, outposts, megastructure, leaders/wars and corporations; one action route; one empire CLI with sections and research/outpost/megastructure/diplomacy actions; four legacy verbs hidden from help.",
-        "risks": "contract: REST/CLI/snapshot; dependency: factions/research/outposts/megastructures; concurrency: report reads under lock, actions delegate; state: no save change; regression: legacy commands/routes remain callable.",
-        "mitigation": "10 facade tests, full 1399 suite, gate."
-      },
-      "plan_digest": "9f80cfed1de994a46cef7fb986314f226d3625232e8fc8999234ce39028faee7"
-    },
     {
       "task_id": "voidfarer-empire-merge",
       "phase": "phase 4",
@@ -265,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794248599.6264462,
       "timestamp_str": "2026-11-09 21:23:19",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-comms-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge AI captains, quantum messages and message trees behind one comms report/action and CLI verb",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794248926.2258716,
+      "timestamp_str": "2026-11-09 21:28:46",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "The cockpit has separate AI CAPTAINS and MESSAGES tabs, but the CLI splits the same contacts and inbox across ai and messages.",
+        "benefits": "One report with captains, messages and trees; one action route for hail/trade/hire/ally/send/read/choose; two legacy verbs hidden but callable.",
+        "risks": "contract: REST/CLI/snapshot; dependency: interact_ai/message engine methods; concurrency: report reads state and tree catalog; state: no save change; regression: legacy ai/messages commands and routes stay callable.",
+        "mitigation": "10 facade tests, full 1452 suite, gate."
+      },
+      "plan_digest": "d439f1d6e09b15d77edf4cbce59f1d22a9582ff30a8a70fcf3fa9bcbdf343327"
+    },
+    {
+      "task_id": "voidfarer-comms-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Comms facade verified: report/summary, hail, send/read, branch choice, invalid action, REST+CLI, 10 tests, 1452 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794248930.4901454,
+      "timestamp_str": "2026-11-09 21:28:50",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-comms-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-comms-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794249028.1920137,
+      "timestamp_str": "2026-11-09 21:30:28",
       "agent": "opencode:campaign"
     }
   ]

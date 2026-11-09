@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `149`
-- **Total Classes**: `409`
-- **Total Top-Level Functions**: `477`
-- **Total Class Methods**: `2241`
-- **Total Source Lines**: `57492`
+- **Total Python Modules**: `151`
+- **Total Classes**: `412`
+- **Total Top-Level Functions**: `484`
+- **Total Class Methods**: `2256`
+- **Total Source Lines**: `57865`
 
 ---
 
@@ -867,6 +867,36 @@
   - Method `.test_arrival_pays_resonance_credits_and_xp()`
   - Method `.test_emergency_emerge_pays_only_prorated_resonance()`
   - Method `.test_cli_and_cockpit_expose_resonance()`
+
+---
+
+### [`tests/test_comms.py`](tests/test_comms.py)
+> *Unified comms report/action, REST and CLI tests.*
+
+**Size**: `168` lines (`6166` bytes)
+
+**Classes:**
+- `class TestCommsReport`
+  - Method `.test_report_has_every_section()`
+  - Method `.test_captains_and_inbox_are_populated()`
+  - Method `.test_summary_and_snapshot()`
+- `class TestCommsActions`
+  - Method `.test_hail_captain()`
+  - Method `.test_send_and_read_message()`
+  - Method `.test_choose_message_branch()`
+  - Method `.test_invalid_action_is_rejected()`
+- `class TestCommsSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_report()`
+  - Method `.test_action_endpoint_hails()`
+  - Method `.test_cli_sections()`
+
+**Functions:**
+- `def _base()`
 
 ---
 
@@ -3124,7 +3154,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `800` lines (`35852` bytes)
+**Size**: `801` lines (`35951` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -3241,7 +3271,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4603` lines (`227588` bytes)
+**Size**: `4699` lines (`232276` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3259,6 +3289,7 @@
 - `def cmd_progress(engine, storage, parts)` - *One progression surface: commander, pilot, skills, abilities, relics, codex, streak.*
 - `def cmd_empire(engine, storage, parts)` - *One empire surface: research, outposts, megastructures and diplomacy.*
 - `def cmd_intel(engine, storage, parts)` - *One intel surface: chart, economy, factions, wars and corporations.*
+- `def cmd_comms(engine, storage, parts)` - *One comms surface: AI captains, quantum inbox and message trees.*
 - `def cmd_narrative(engine, storage, parts)` - *One narrative surface: story, tutorial, quests, contracts and events.*
 - `def cmd_engineering(engine, storage, parts)` - *One engineering surface: power, reactor, repair, refuel, fabrication, salvage.*
 - `def cmd_shipyard(engine, storage, parts)` - *Orbital shipyard: inspect ship chassis upgrades, purchase vessels, and sell modules.*
@@ -3334,6 +3365,20 @@
 - `def metric_value(state, metric)` - *Compute one codex metric from the saved game state.*
 - `def evaluate_codex(state)` - *Return every milestone with current progress, completion, and claim state.*
 - `def build_codex_report(state)` - *Build the JSON-safe captain's log and discovery codex report.*
+
+---
+
+### [`voidfarer/comms.py`](voidfarer/comms.py)
+> *One report and action surface for AI captains, quantum messages and trees.*
+
+**Size**: `92` lines (`3158` bytes)
+
+**Functions:**
+- `def comms_summary(state)` - *Compact payload for /api/state.*
+- `def comms_report(engine)` - *Return captains, inbox, trees and unresolved choices in one payload.*
+- `def _text(value)`
+- `def _int(value, default)`
+- `def comms_action(engine, action, **kwargs)` - *Route one comms command to its existing engine method.*
 
 ---
 
@@ -3485,7 +3530,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10441` lines (`515501` bytes)
+**Size**: `10443` lines (`515595` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4374,7 +4419,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1731` lines (`74188` bytes)
+**Size**: `1745` lines (`74762` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
