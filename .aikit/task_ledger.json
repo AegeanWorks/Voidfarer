@@ -1,56 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-narrative-merge",
+    "task_id": "voidfarer-trade-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794243924.8222542,
+    "updated_at": 1794248477.893259,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794244020.6876209
+    "completed_at": 1794248599.6264427
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-progress-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Progress facade verified: report/summary, train/use abilities, REST+CLI sections, 9 tests, 1389 suite, gate 5/5; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794176958.4973865,
-      "timestamp_str": "2026-11-09 01:29:18",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-progress-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-progress-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794176984.297987,
-      "timestamp_str": "2026-11-09 01:29:44",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-cli-help-consolidation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: hide 21 legacy merged verbs from CLI help and usage while keeping them callable",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794177596.010606,
-      "timestamp_str": "2026-11-09 01:39:56",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Five facade merges added preferred verbs, but the legacy aliases remained visible, so the CLI help grew to 75 entries.",
-        "benefits": "The visible help lists the five facades; legacy invocations still parse; no API change.",
-        "risks": "contract: CLI help only; dependency: none; concurrency: none; state: none; regression: hidden verbs must still execute and tests must stay green.",
-        "mitigation": "Full 1389 suite, targeted hidden-verb invocation, gate."
-      },
-      "plan_digest": "c950778a2af023659ab1edfc7c9264c7691dc344c0824af317fd0f99163319f5"
-    },
     {
       "task_id": "voidfarer-cli-help-consolidation",
       "phase": "phase 4",
@@ -265,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794244020.6876225,
       "timestamp_str": "2026-11-09 20:07:00",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-trade-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: hide standalone buy/sell and document logistics buy|sell as the market action",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794248416.1055434,
+      "timestamp_str": "2026-11-09 21:20:16",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "logistics already routes buy/sell through logistics_action, but the two top-level verbs duplicate the market surface in help.",
+        "benefits": "One discoverable market surface; two fewer visible commands; legacy parsers still work.",
+        "risks": "contract: CLI help only; dependency: existing buy/sell parsers and logistics_action; concurrency: none; state: no save change; regression: hidden verbs remain callable and tests cover them.",
+        "mitigation": "logistics alias test, full suite, gate."
+      },
+      "plan_digest": "abe4fd1fc148c8b9a16245861ff51f48bb90076abd9461b2a43717ece7424392"
+    },
+    {
+      "task_id": "voidfarer-trade-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Trade merge verified: logistics buy/sell documented, hidden buy/sell aliases still trade, 1442 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794248477.893259,
+      "timestamp_str": "2026-11-09 21:21:17",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-trade-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-trade-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794248599.6264462,
+      "timestamp_str": "2026-11-09 21:23:19",
       "agent": "opencode:campaign"
     }
   ]

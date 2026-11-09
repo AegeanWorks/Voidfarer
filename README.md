@@ -276,11 +276,11 @@ python -m voidfarer.cli streak
 # Inspect local exchange prices
 python -m voidfarer.cli market
 
-# Buy and sell (max: largest affordable buy; all: whole hold); sales show P/L
-python -m voidfarer.cli buy fuel_cells max
-python -m voidfarer.cli sell titanium all
+# Buy/sell (max: affordable buy; all: whole hold); sales show P/L
+python -m voidfarer.cli logistics buy fuel_cells max
+python -m voidfarer.cli logistics sell titanium all
 
-# Repair hull damage and refuel, scrub hyperlane wear, field-fabricate repairs
+# Repair/refuel, scrub hyperlane wear, field-fabricate
 python -m voidfarer.cli repair --amount 25
 python -m voidfarer.cli refuel --amount 20
 python -m voidfarer.cli overhaul
@@ -588,7 +588,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,441-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: Comprehensive 1,442-test suite runs in about 40 seconds (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

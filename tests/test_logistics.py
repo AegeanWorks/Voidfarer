@@ -195,6 +195,16 @@ class TestLogisticsSurfaces(unittest.TestCase):
             self.assertIsNotNone(loaded)
             self.assertGreaterEqual(loaded.ship.cargo.get("titanium", 0), 1)
 
+    def test_hidden_trade_verbs_still_trade(self):
+        with tempfile.TemporaryDirectory() as temp:
+            StorageManager(temp).save(self.engine.state)
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = cli.main(["--save-path", temp, "buy", "titanium", "1"])
+            self.assertEqual(code, 0)
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = cli.main(["--save-path", temp, "sell", "titanium", "1"])
+            self.assertEqual(code, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

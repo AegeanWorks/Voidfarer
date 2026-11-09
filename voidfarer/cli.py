@@ -716,6 +716,7 @@ def cmd_logistics(engine: SimulationEngine, storage: StorageManager, parts: list
             )
             print(f"  Market {counts['market_lines']} lines | {counts['freight_orders']} freight orders")
             print(f"{DIM}Inspect: logistics market | cargo | depot | freight | automation{RESET}")
+            print(f"{DIM}Trade: logistics buy|sell <commodity> <qty|max|all>{RESET}")
             return 0
         if action == "market":
             print(f"\n{BOLD}{CYAN}=== LOCAL EXCHANGE ==={RESET}")
@@ -4201,6 +4202,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "chart", "economy", "scan", "factions", "war", "corps", "corporations",
         "power", "reactor", "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop",
         "story", "tutorial", "quests", "contracts", "events",
+        "buy", "sell",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())

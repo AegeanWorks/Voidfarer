@@ -9,8 +9,8 @@
 - **Total Python Modules**: `149`
 - **Total Classes**: `409`
 - **Total Top-Level Functions**: `477`
-- **Total Class Methods**: `2240`
-- **Total Source Lines**: `57480`
+- **Total Class Methods**: `2241`
+- **Total Source Lines**: `57492`
 
 ---
 
@@ -1848,7 +1848,7 @@
 ### [`tests/test_logistics.py`](tests/test_logistics.py)
 > *Unified logistics report/action, REST and CLI tests.*
 
-**Size**: `200` lines (`7865` bytes)
+**Size**: `210` lines (`8381` bytes)
 
 **Classes:**
 - `class TestLogisticsReport`
@@ -1869,6 +1869,7 @@
   - Method `.test_get_endpoint_returns_the_report()`
   - Method `.test_action_endpoint_buys_cargo()`
   - Method `.test_cli_status_and_buy()`
+  - Method `.test_hidden_trade_verbs_still_trade()`
 
 **Functions:**
 - `def _engine()`
@@ -3240,7 +3241,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4601` lines (`227479` bytes)
+**Size**: `4603` lines (`227588` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*

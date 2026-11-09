@@ -2460,3 +2460,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/narrative`, `POST /api/narrative/action` and a compact `narrative` summary to `/api/state`.
   3. Add `narrative status|story|tutorial|quests|contracts|events` plus the action names; hide the five legacy verbs from help while keeping them callable.
 - **Consequences**: One read gives an agent the campaign objective, onboarding step, quests, contracts and unattended events; one action route resolves any of them. The visible CLI is 33 commands. `tests/test_narrative.py` adds 11 tests for the report, story/tutorial rows, summary, story choice, tutorial skip/reset, contract refresh, event dismissal, invalid actions, REST and CLI. Full suite `Ran 1441 OK`; no save-schema change.
+
+### ADR-226: Standalone buy and sell join the logistics surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: `logistics` already routed buy/sell through `logistics_action`, but `buy` and `sell` stayed visible as separate top-level verbs, so the market appeared twice in help.
+- **Decision**: Hide `buy` and `sell` from the visible help and usage line; keep both parsers and the existing dispatch unchanged; document `logistics buy|sell <commodity> <qty|max|all>` in the logistics status output and README.
+- **Consequences**: The visible CLI is 31 commands and the market has one discoverable surface. `tests/test_logistics.py` adds a test that the hidden verbs still trade. Full suite `Ran 1442 OK`; no server, save or UI change.
