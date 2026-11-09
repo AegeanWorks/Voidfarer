@@ -17,6 +17,7 @@ from typing import Any
 
 from voidfarer.agent_api import build_action_catalog
 from voidfarer.economy import get_galactic_trade_routes
+from voidfarer.crew_command import crew_action, crew_report
 from voidfarer.empire import empire_action, empire_report
 from voidfarer.encounters import encounter_report, resolve as resolve_encounter
 from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
@@ -294,7 +295,13 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/crew":
-            self._send_json({"ok": True, "crew": self.engine.get_crew_report(), "state": self.engine.get_status_snapshot()})
+            report = crew_report(self.engine)
+            self._send_json({
+                "ok": True,
+                "crew": report["roster"],
+                "report": report,
+                "state": self.engine.get_status_snapshot(),
+            })
             return
 
         if path == "/api/away":
@@ -678,6 +685,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             crew_id = str(body.get("crew_id", ""))
             station = str(body.get("station", ""))
             ok, msg = self.engine.assign_crew_station(crew_id, station)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/crew/action":
+            payload = dict(body or {})
+            action = str(payload.pop("action", ""))
+            ok, msg = crew_action(self.engine, action, **payload)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

@@ -6,11 +6,11 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `141`
-- **Total Classes**: `397`
-- **Total Top-Level Functions**: `446`
-- **Total Class Methods**: `2178`
-- **Total Source Lines**: `55811`
+- **Total Python Modules**: `143`
+- **Total Classes**: `400`
+- **Total Top-Level Functions**: `451`
+- **Total Class Methods**: `2193`
+- **Total Source Lines**: `56148`
 
 ---
 
@@ -867,6 +867,36 @@
   - Method `.test_arrival_pays_resonance_credits_and_xp()`
   - Method `.test_emergency_emerge_pays_only_prorated_resonance()`
   - Method `.test_cli_and_cockpit_expose_resonance()`
+
+---
+
+### [`tests/test_crew_command.py`](tests/test_crew_command.py)
+> *Unified crew/away report and action tests.*
+
+**Size**: `176` lines (`6616` bytes)
+
+**Classes:**
+- `class TestCrewReport`
+  - Method `.test_report_has_roster_and_away()`
+  - Method `.test_summary_and_snapshot()`
+- `class TestCrewActions`
+  - Method `.test_recruit_train_and_dismiss()`
+  - Method `.test_station_assign_and_clear()`
+  - Method `.test_shore_leave_reports_something()`
+  - Method `.test_away_launch_and_recall()`
+  - Method `.test_invalid_action_is_rejected()`
+- `class TestCrewSurfaces`
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.setUp()`
+  - Method `._get(path)`
+  - Method `._post(path, payload)`
+  - Method `.test_get_endpoint_returns_report()`
+  - Method `.test_action_endpoint_assigns_station()`
+  - Method `.test_cli_overview_and_away_sections()`
+
+**Functions:**
+- `def _base()`
 
 ---
 
@@ -3000,7 +3030,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `796` lines (`35466` bytes)
+**Size**: `797` lines (`35564` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -3117,7 +3147,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4207` lines (`209289` bytes)
+**Size**: `4263` lines (`211792` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3236,6 +3266,19 @@
 
 ---
 
+### [`voidfarer/crew_command.py`](voidfarer/crew_command.py)
+> *One report and action surface for crew, stations, shore leave and away teams.*
+
+**Size**: `87` lines (`3140` bytes)
+
+**Functions:**
+- `def crew_summary(state)` - *Compact payload for /api/state.*
+- `def crew_report(engine)` - *Return the roster, roles, bonuses and expedition state in one payload.*
+- `def _text(value)`
+- `def crew_action(engine, action, **kwargs)` - *Route one crew command to its existing engine method.*
+
+---
+
 ### [`voidfarer/decisions.py`](voidfarer/decisions.py)
 > *Conditional real-time decision events that pause the simulation until resolved.*
 
@@ -3345,7 +3388,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10433` lines (`515072` bytes)
+**Size**: `10435` lines (`515179` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4188,7 +4231,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1674` lines (`71841` bytes)
+**Size**: `1689` lines (`72396` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

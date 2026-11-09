@@ -2420,3 +2420,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/empire`, `POST /api/empire/action` and a compact `empire` summary to `/api/state`.
   3. Add the `empire` CLI with `status`, `research`, `outposts`, `megastructure`, `diplomacy`, `war` and the research/outpost/megastructure/diplomacy actions; hide the four legacy verbs from help while keeping them callable.
 - **Consequences**: An agent can read one empire report and issue any empire action through one route; the visible CLI is 51 commands with `empire` as the preferred surface. `tests/test_empire.py` adds 10 tests for the report, summary, research queue, outpost build/upgrade, megastructure restoration, diplomacy, invalid actions, REST and CLI. Full suite `Ran 1399 OK`; no save-schema change.
+
+### ADR-222: Crew, stations, shore leave and away teams become one crew surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: The CREW tab already shows the roster, roles, morale and away teams, but the CLI split the same data across `crew` and `away`, with nine routes and two reports that each recomputed assignments.
+- **Decision**:
+  1. Add `voidfarer/crew_command.py`: `crew_report()` returns the roster (roles, bonuses, upkeep, injuries) and the away report (active teams, available missions, risk) in one payload; `crew_action()` routes recruit/train/dismiss/shore/station and away launch/recall to the existing engine methods.
+  2. Extend `GET /api/crew` with the unified report, add `POST /api/crew/action`, and add a compact `crew_overview` summary to `/api/state`.
+  3. Add `crew overview` and `crew away` sections plus `crew away_launch` / `crew away_recall`; hide the legacy `away` verb from help while keeping it callable.
+- **Consequences**: An agent inspects the roster and expeditions in one call and launches or recalls a team from the same action route. The visible CLI is 50 commands. `tests/test_crew_command.py` adds 10 tests for the report, summary, recruit/train/dismiss, station assignment, shore leave, away launch/recall, invalid actions, REST and CLI. Full suite `Ran 1409 OK`; no save-schema change.

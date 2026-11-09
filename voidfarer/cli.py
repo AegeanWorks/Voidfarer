@@ -52,6 +52,7 @@ from voidfarer.empire import (
     empire_action,
     empire_report,
 )
+from voidfarer.crew_command import crew_action, crew_report
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -2685,6 +2686,58 @@ def cmd_route(engine: SimulationEngine, target: str) -> int:
 
 def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
     sub = parts[1].lower() if len(parts) > 1 else "list"
+    if sub in ("overview", "report"):
+        overview = crew_report(engine)
+        counts = overview["counts"]
+        print(f"\n{BOLD}{CYAN}=== CREW ==={RESET}")
+        print(
+            f"  {counts['active']}/{counts['capacity']} active | "
+            f"{counts['away_missions']} expeditions | "
+            f"{counts['available_missions']} available | {counts['injured']} injured"
+        )
+        print(f"{DIM}Inspect: crew list | crew away | Recruit: crew recruit <role>{RESET}")
+        return 0
+    if sub in ("away", "expeditions"):
+        away = engine.get_away_report()
+        print(f"\n{BOLD}{CYAN}=== AWAY TEAMS ==={RESET}")
+        body = away.get("body")
+        print(f"  Body: {body['name'] if body else 'none (orbit a world)'} | "
+              f"slots {len(away['active'])}/{away['max_active']}")
+        for mission in away["active"]:
+            print(
+                f"  {mission['id']:<22} {mission['name']:<20} "
+                f"{mission['progress']:.0f}% ({mission['remaining_ticks']}t left)"
+            )
+        for mission in away["available"]:
+            mark = "READY" if mission["available"] else "LOCKED"
+            print(
+                f"  {mission['id']:<22} {mission['name']:<20} {mark}"
+                + (f" — {mission['reason']}" if mission["reason"] else "")
+            )
+        print(f"{DIM}Launch: crew away_launch <mission_type> [crew_ids] | Recall: crew away_recall <mission_id>{RESET}")
+        return 0
+    if sub == "away_launch":
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} crew away_launch <mission_type> [crew_id,crew_id]")
+            return 1
+        crew_ids = [
+            cid for cid in (parts[3] if len(parts) > 3 else "").split(",") if cid
+        ]
+        ok, msg = crew_action(engine, "away_launch", mission_type=parts[2], crew_ids=crew_ids)
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub == "away_recall":
+        if len(parts) < 3:
+            print(f"{RED}Usage:{RESET} crew away_recall <mission_id>")
+            return 1
+        ok, msg = crew_action(engine, "away_recall", mission_id=parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+
     report = engine.get_crew_report()
     if sub in ("list", "status", "roster"):
         print(f"\n{BOLD}{CYAN}=== CREW ROSTER ==={RESET}")
@@ -2706,7 +2759,7 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
             )
         print(f"\n{DIM}Recruit: crew recruit <{'|'.join(r.id for r in CREW_ROLES)}> | Drill: crew train <id> | Dismiss: crew dismiss <id> | Shore leave: crew shore{RESET}")
         print(f"{DIM}Assign a bridge station: crew station <id> <helm|engineering|science|medical|tactical|unassigned>{RESET}")
-        print(f"{DIM}Away teams: away | away launch <mission_type> [crew_ids...] | away recall <mission_id>{RESET}")
+        print(f"{DIM}Away teams: crew away | crew away_launch <mission_type> [crew_ids] | crew away_recall <mission_id>{RESET}")
         return 0
     if sub in ("recruit", "hire"):
         if len(parts) < 3:
@@ -3666,7 +3719,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     crew_p = subparsers.add_parser("crew", help="Crew roster, recruiting, drills, shore leave, and portraits")
     crew_p.add_argument(
         "action", nargs="?", default="list",
-        choices=["list", "recruit", "train", "shore", "dismiss", "station"],
+        choices=[
+            "list", "overview", "away", "recruit", "train", "shore",
+            "dismiss", "station", "away_launch", "away_recall",
+        ],
     )
     crew_p.add_argument("value", nargs="?", help="Role, crew id, or crew id for station assignment")
     crew_p.add_argument("value2", nargs="?", help="Station for 'crew station'")
@@ -3818,7 +3874,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "mercs", "allies",
         "market", "autotrade", "quantum", "depot", "inventory",
         "character", "mastery", "relics", "codex", "log", "streak",
-        "research", "outpost", "megastructure", "diplomacy",
+        "research", "outpost", "megastructure", "diplomacy", "away",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
