@@ -1,57 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-crew-merge",
+    "task_id": "voidfarer-intel-merge",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794239544.6807349,
+    "updated_at": 1794240019.154606,
     "owner": "opencode:campaign",
     "started_by": "opencode:campaign",
     "continuations": [],
-    "completed_at": 1794239647.7792294
+    "completed_at": 1794240109.0988946
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-fleet-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge drones, escorts, mercenaries and alliances behind one fleet report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794174351.255309,
-      "timestamp_str": "2026-11-09 00:45:51",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "One FLEET cockpit tab is backed by three CLI commands and fifteen routes; the roster, upkeep and alliance state are assembled separately.",
-        "benefits": "One report with drones, mercenary units, escorts, offers, alliances, catalogs and counts; one action route; one fleet CLI verb with overview/mercs/allies/hire/dismiss/refit/ally.",
-        "risks": "contract: REST/CLI/snapshot; dependency: fleet/frontier catalogs; concurrency: report reads under lock, actions delegate; state: no save change; regression: legacy fleet/mercs/allies commands and routes.",
-        "mitigation": "11 facade tests, full 1370 suite, gate, and the existing FLEET tab left intact."
-      },
-      "plan_digest": "69d0d9a9b73cb64f0c5c37a9694b3a47f12c11f7e0d0d312d36a02ea370159ab"
-    },
-    {
-      "task_id": "voidfarer-fleet-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Fleet facade verified: report/summary, drone/escort/mercenary/alliance actions, REST+CLI, 11 tests, 1370 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794174351.2647717,
-      "timestamp_str": "2026-11-09 00:45:51",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-fleet-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Fleet facade verified: report/summary, drone/escort/mercenary/alliance actions, REST+CLI, 11 tests, 1370 suite, gate 5/5; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794174389.0579202,
-      "timestamp_str": "2026-11-09 00:46:29",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-fleet-merge",
       "phase": "completed",
@@ -266,6 +226,45 @@
       "status": "completed",
       "timestamp": 1794239647.779231,
       "timestamp_str": "2026-11-09 18:54:07",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-intel-merge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: merge chart, economy, factions, wars and corporations behind one intel report/action and CLI verb",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794240014.1592193,
+      "timestamp_str": "2026-11-09 19:00:14",
+      "agent": "opencode:campaign",
+      "impact_assessment": {
+        "why": "Seven read-only verbs each assemble a slice of the same strategic picture; agents must call several to learn one system's state.",
+        "benefits": "One report with chart, economy shocks/routes, rated factions, wars and corporations; one action route for scan and war support; seven legacy verbs hidden but callable.",
+        "risks": "contract: REST/CLI/snapshot; dependency: economy/factions/politics/scan; concurrency: report reads under engine lock where required; state: no save change; regression: legacy intel commands and routes stay callable.",
+        "mitigation": "10 facade tests, full 1419 suite, gate."
+      },
+      "plan_digest": "5c2d8fd33fdaf85daa19db734c95c920dc2bb186b5a93aeb0e5419c7a1321b97"
+    },
+    {
+      "task_id": "voidfarer-intel-merge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Intel facade verified: report/summary, chart, economy, factions, wars, corporations, scan, war support, REST+CLI, 10 tests, 1419 suite; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794240019.154606,
+      "timestamp_str": "2026-11-09 19:00:19",
+      "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-intel-merge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-intel-merge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794240109.098897,
+      "timestamp_str": "2026-11-09 19:01:49",
       "agent": "opencode:campaign"
     }
   ]

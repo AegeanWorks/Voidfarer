@@ -40,6 +40,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/progress/action": "alias: routes to the existing skill/talent/ability/relic/codex actions",
     "/api/empire/action": "alias: routes to the existing research/outpost/megastructure/diplomacy actions",
     "/api/crew/action": "alias: routes to the existing recruit/train/shore/station/away actions",
+    "/api/intel/action": "alias: routes the existing scan and war-support actions",
     "/api/reconstruct": "needs a devastated inhabited world in orbit",
     "/api/void/dive": "needs a black-hole horizon",
     "/api/void/emerge": "needs an active void traversal",

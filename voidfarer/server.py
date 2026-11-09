@@ -20,6 +20,7 @@ from voidfarer.economy import get_galactic_trade_routes
 from voidfarer.crew_command import crew_action, crew_report
 from voidfarer.empire import empire_action, empire_report
 from voidfarer.encounters import encounter_report, resolve as resolve_encounter
+from voidfarer.intel import intel_action, intel_report
 from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
 from voidfarer.fitting import (
     fitting_report,
@@ -418,6 +419,11 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": True, **report})
             return
 
+        if path == "/api/intel":
+            report = intel_report(self.engine)
+            self._send_json({"ok": True, **report})
+            return
+
         if path == "/api/inventory":
             with self.engine.lock:
                 manifest = get_inventory_manifest(self.engine.state.ship.cargo)
@@ -693,6 +699,14 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             payload = dict(body or {})
             action = str(payload.pop("action", ""))
             ok, msg = crew_action(self.engine, action, **payload)
+            self.storage.save(self.engine.state)
+            self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
+            return
+
+        if path == "/api/intel/action":
+            payload = dict(body or {})
+            action = str(payload.pop("action", ""))
+            ok, msg = intel_action(self.engine, action, **payload)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "state": self.engine.get_status_snapshot()})
             return

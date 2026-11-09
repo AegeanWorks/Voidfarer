@@ -2430,3 +2430,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Extend `GET /api/crew` with the unified report, add `POST /api/crew/action`, and add a compact `crew_overview` summary to `/api/state`.
   3. Add `crew overview` and `crew away` sections plus `crew away_launch` / `crew away_recall`; hide the legacy `away` verb from help while keeping it callable.
 - **Consequences**: An agent inspects the roster and expeditions in one call and launches or recalls a team from the same action route. The visible CLI is 50 commands. `tests/test_crew_command.py` adds 10 tests for the report, summary, recruit/train/dismiss, station assignment, shore leave, away launch/recall, invalid actions, REST and CLI. Full suite `Ran 1409 OK`; no save-schema change.
+
+### ADR-223: Chart, economy, factions, wars and corporations become one intel surface
+- **Date**: 2026-11-08
+- **Status**: Accepted
+- **Context**: Seven read-only CLI verbs (`chart`, `economy`, `scan`, `factions`, `war`, `corps`, `corporations`) each assembled a slice of the same strategic picture; an agent had to call several to learn one system's state.
+- **Decision**:
+  1. Add `voidfarer/intel.py`: `intel_report()` returns chart (systems, bodies, visited/current/scanned), economy (shocks, top routes), rated factions, wars and corporations in one payload; `intel_action()` routes `scan` and war support to the existing engine methods.
+  2. Add `GET /api/intel`, `POST /api/intel/action` and a compact `intel` summary to `/api/state`.
+  3. Add `intel status|chart|economy|factions|war|corps|scan`; hide the seven legacy verbs from help while keeping them callable.
+- **Consequences**: One read gives an agent the map, prices, standings and wars; one action route scans or pledges war support. The visible CLI is 43 commands. `tests/test_intel.py` adds 10 tests for the report, chart, standings, summary, scan, war support, invalid actions, REST and CLI. Full suite `Ran 1419 OK`; no save-schema change.

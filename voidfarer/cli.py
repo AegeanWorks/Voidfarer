@@ -53,6 +53,7 @@ from voidfarer.empire import (
     empire_report,
 )
 from voidfarer.crew_command import crew_action, crew_report
+from voidfarer.intel import INTEL_ACTIONS, intel_action, intel_report
 from voidfarer.engine import SimulationEngine
 from voidfarer.factions import (
     CANONICAL_CORPORATIONS,
@@ -981,6 +982,98 @@ def cmd_empire(engine: SimulationEngine, storage: StorageManager, parts: list[st
     if ok:
         storage.save(engine.state)
     return 0 if ok else 1
+
+
+def cmd_intel(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
+    """One intel surface: chart, economy, factions, wars and corporations."""
+    args = [part for part in parts[1:] if part]
+    action = args[0].lower() if args else "status"
+    if action in ("scan", "war_support"):
+        if action == "scan":
+            ok, message = intel_action(engine, "scan")
+        else:
+            ok, message = intel_action(
+                engine, "war_support",
+                war_id=args[1] if len(args) > 1 else "",
+                faction_id=args[2] if len(args) > 2 else "",
+                credits=args[3] if len(args) > 3 else 0,
+            )
+        print((GREEN if ok else RED) + message + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+
+    sections = ("status", "chart", "economy", "factions", "war", "corps", "corporations")
+    if action not in sections:
+        print(f"{RED}Unknown intel action '{action}'. Use {', '.join(sections)} or scan.{RESET}")
+        return 1
+    report = intel_report(engine)
+    if action == "status":
+        counts = report["counts"]
+        print(f"\n{BOLD}{CYAN}=== INTEL ==={RESET}")
+        print(
+            f"  {report['chart']['current_system']} | {counts['systems']} systems "
+            f"({counts['visited']} visited) | {counts['factions']} factions | "
+            f"{counts['active_wars']} wars | {counts['corporations']} corps | "
+            f"{counts['trade_routes']} routes"
+        )
+        print(f"{DIM}Inspect: intel chart | economy | factions | war | corps | scan{RESET}")
+        return 0
+    if action == "chart":
+        print(f"\n{BOLD}{CYAN}=== CHART ==={RESET}")
+        for system in report["chart"]["systems"]:
+            mark = "*" if system["current"] else ("+" if system["visited"] else "?")
+            print(
+                f"  {mark} {system['name']:<18} ({system['id']}) "
+                f"SEC {system['security']:.1f} | links {', '.join(system['connections'])}"
+            )
+        print(f"{DIM}Bodies in {report['chart']['current_system']}:{RESET}")
+        for body in report["chart"]["bodies"]:
+            print(
+                f"  {body['name']:<24} {body['body_type']:<16} "
+                f"{body['orbit_radius']:.2f} AU | "
+                f"{'DOCK' if body['dockable'] else 'NO DOCK'} | "
+                f"{'SCANNED' if body['scanned'] else 'UNSCANNED'}"
+            )
+        return 0
+    if action == "economy":
+        economy = report["economy"]
+        print(f"\n{BOLD}{CYAN}=== ECONOMY ==={RESET}")
+        print(f"  Tick #{economy['tick']} | {len(economy['events'])} shocks")
+        for event in economy["events"]:
+            print(
+                f"  {event['title']:<28} {event['commodity_id'].upper():<14} "
+                f"x{event['price_multiplier']:.2f} ({event['duration_ticks']}t)"
+            )
+        for route in economy["trade_routes"]:
+            print(
+                f"  {route['commodity_name']:<20} {route['buy_system_name']} -> "
+                f"{route['sell_system_name']}  +{route['profit_per_unit']} cr/unit"
+            )
+        return 0
+    if action == "factions":
+        print(f"\n{BOLD}{CYAN}=== FACTIONS ==={RESET}")
+        for faction in report["factions"]:
+            print(
+                f"  {faction['id']:<18} {faction['name']:<24} "
+                f"{faction['standing']:+4d} {faction['tier']:<11} {faction['perk']}"
+            )
+        return 0
+    if action == "war":
+        print(f"\n{BOLD}{CYAN}=== WARS ==={RESET}")
+        for war in report["wars"]:
+            print(
+                f"  {war['id']}: {war['attacker']} vs {war['defender']} "
+                f"score {war['war_score']:+.1f} | {len(war['fronts'])} fronts"
+            )
+        return 0
+    print(f"\n{BOLD}{CYAN}=== CORPORATIONS ==={RESET}")
+    for corp in report["corporations"]:
+        print(
+            f"  {corp['id']:<20} {corp['name']:<26} "
+            f"{corp['standing']:+4d} | {corp['specialty_commodity']} | {corp['perk']}"
+        )
+    return 0
 
 
 def cmd_shipyard(engine: SimulationEngine, storage: StorageManager, parts: list[str]) -> int:
@@ -3855,6 +3948,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     empire_p.add_argument("arg2", nargs="?")
     empire_p.add_argument("arg3", nargs="?")
 
+    intel_p = subparsers.add_parser(
+        "intel",
+        help="One intel surface: chart, economy, factions, wars and corporations",
+    )
+    intel_p.add_argument("action", nargs="?", default="status", help="status, a section, or an action")
+    intel_p.add_argument("arg1", nargs="?")
+    intel_p.add_argument("arg2", nargs="?")
+    intel_p.add_argument("arg3", nargs="?")
+
     subparsers.add_parser("simulation", help="Print unified simulation telemetry report")
     subparsers.add_parser("log", help=argparse.SUPPRESS)
     codex_p = subparsers.add_parser("codex", help=argparse.SUPPRESS)
@@ -3875,6 +3977,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "market", "autotrade", "quantum", "depot", "inventory",
         "character", "mastery", "relics", "codex", "log", "streak",
         "research", "outpost", "megastructure", "diplomacy", "away",
+        "chart", "economy", "scan", "factions", "war", "corps", "corporations",
     })
     subparsers._choices_actions[:] = [
         action for action in getattr(subparsers, "_choices_actions", ())
@@ -4000,6 +4103,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "empire":
         return cmd_empire(engine, storage, [
             "empire", args.action, args.arg1, args.arg2, args.arg3,
+        ])
+    elif args.command == "intel":
+        return cmd_intel(engine, storage, [
+            "intel", args.action, args.arg1, args.arg2, args.arg3,
         ])
     elif args.command == "refit":
         parts = ["refit", args.action]
