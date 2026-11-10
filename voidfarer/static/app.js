@@ -4425,7 +4425,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.crewAwayCount.classList.toggle("is-live", active.length > 0);
         }
         const bodyLabel = body
-            ? `${this.escapeHtml(body.name)} // ${this.escapeHtml(body.body_type || "body")}`
+            ? `${this.escapeHtml(body.name)} // ${this.escapeHtml(String(body.body_type || "body").replace(/_/g, " ").toUpperCase())}`
             : "NO ORBIT";
 
         const activeRows = active.length ? active.map(mission => {
@@ -5412,9 +5412,26 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             });
             const json = await res.json();
             if (json.ok) {
-                this.sound.playChime();
+                if (action === "point_defense") {
+                    this.sound?.playFlak ? this.sound.playFlak() : this.sound.playLaser();
+                } else if (action === "fire_lasers" || action === "target_bridge" || action === "target_engines" || action === "target_shields" || action === "target_weapons") {
+                    this.sound?.playLaser ? this.sound.playLaser() : this.sound.playChime();
+                } else if (action === "evasive_burn" || action === "flee") {
+                    this.sound?.playWarp ? this.sound.playWarp() : this.sound.playBeep(220);
+                } else if (action === "shield_absorb") {
+                    this.sound?.playShieldDeflect ? this.sound.playShieldDeflect() : this.sound.playChime();
+                } else {
+                    this.sound.playChime();
+                }
                 const at = this.lastShipPosition || this.mapCenter();
-                const color = action === "target_bridge" ? "#c96b5a" : (action === "target_engines" ? "#e2c078" : (action === "fire_lasers" ? "#ffd166" : "#7fb7c9"));
+                const primaryW = (json.state && json.state.ship && json.state.ship.primary_weapon) || "pulse_laser";
+                let wepCol = "#ffd166";
+                if (primaryW === "railgun") wepCol = "#ffffff";
+                else if (primaryW === "plasma_lance") wepCol = "#48cae4";
+                else if (primaryW === "ion_disruptor") wepCol = "#70c1b3";
+                else if (primaryW === "quantum_lance") wepCol = "#c77dff";
+                else if (primaryW === "entangled_torpedo" || primaryW === "missile_pod") wepCol = "#ff7b2e";
+                const color = action === "target_bridge" ? "#c96b5a" : (action === "target_engines" ? "#e2c078" : (action === "fire_lasers" ? wepCol : "#7fb7c9"));
                 const count = action === "target_bridge" ? 28 : (action === "fire_lasers" ? 20 : 12);
                 if (action === "point_defense") {
                     this.particles?.flakBurst?.(at.x, at.y, 28, "#e2c078");
@@ -6902,12 +6919,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         // Target acquisition crosshair pip & telemetry readouts
         ctx.fillStyle = "rgba(255, 120, 100, 0.9)";
         ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 2, 0, Math.PI * 2); ctx.fill();
-        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
+        ctx.font = "11px 'Cascadia Mono', Consolas, monospace";
         ctx.textAlign = "center";
         ctx.fillStyle = "rgba(201, 107, 90, 0.85)";
-        ctx.fillText("LOCK: TGT-01", enemy.x, enemy.y - boxS - 6);
-        ctx.fillStyle = "rgba(127, 183, 201, 0.75)";
-        ctx.fillText("DIST: 1.4M KM", enemy.x, enemy.y + boxS + 14);
+        ctx.fillText("LOCK: TGT-01 // 1.4M KM", enemy.x, enemy.y - boxS - 6);
         ctx.restore();
         ctx.restore();
         this.combatFx?.trail(player.x - 12, player.y, 0, "#8fd8ff", 0.8);
@@ -6920,40 +6935,94 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (performance.now() < this.combatBeamUntil) {
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            const primaryWeapon = (this.state && this.state.ship && this.state.ship.primary_weapon) || "pulse_laser";
+            let beamCore = "#ffd166";
+            let beamBloom = "rgba(255, 209, 102, 0.28)";
+            let beamWidth = 3;
+            let muzzleColor = "#ffd166";
+            let isKinetic = false;
+            let isIon = false;
+
+            if (primaryWeapon === "railgun") {
+                beamCore = "#ffffff";
+                beamBloom = "rgba(180, 220, 255, 0.45)";
+                beamWidth = 2.2;
+                muzzleColor = "#a8dadc";
+                isKinetic = true;
+            } else if (primaryWeapon === "plasma_lance") {
+                beamCore = "#48cae4";
+                beamBloom = "rgba(0, 240, 255, 0.45)";
+                beamWidth = 4.5;
+                muzzleColor = "#00f0ff";
+            } else if (primaryWeapon === "ion_disruptor") {
+                beamCore = "#70c1b3";
+                beamBloom = "rgba(112, 193, 179, 0.5)";
+                beamWidth = 2.8;
+                muzzleColor = "#70c1b3";
+                isIon = true;
+            } else if (primaryWeapon === "quantum_lance") {
+                beamCore = "#c77dff";
+                beamBloom = "rgba(199, 125, 255, 0.5)";
+                beamWidth = 3.6;
+                muzzleColor = "#c77dff";
+            } else if (primaryWeapon === "entangled_torpedo" || primaryWeapon === "missile_pod") {
+                beamCore = "#ff7b2e";
+                beamBloom = "rgba(255, 123, 46, 0.45)";
+                beamWidth = 2.6;
+                muzzleColor = "#ff7b2e";
+            }
+
             // Volumetric ambient bloom sheath
-            ctx.strokeStyle = "rgba(255, 209, 102, 0.25)";
-            ctx.shadowColor = "#ffd166";
+            ctx.strokeStyle = beamBloom;
+            ctx.shadowColor = beamCore;
             ctx.shadowBlur = 14;
-            ctx.lineWidth = 6;
+            ctx.lineWidth = beamWidth + 3.5;
             ctx.beginPath();
             ctx.moveTo(player.x + 13, player.y);
             ctx.lineTo(enemy.x - 13, enemy.y);
             ctx.stroke();
 
-            // High-energy radiant plasma beam
-            ctx.strokeStyle = "#ffd166";
+            // High-energy radiant beam or kinetic tracer
+            ctx.strokeStyle = beamCore;
             ctx.shadowBlur = 8;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = beamWidth;
             ctx.beginPath();
             ctx.moveTo(player.x + 13, player.y);
             ctx.lineTo(enemy.x - 13, enemy.y);
             ctx.stroke();
 
-            // Intense ionizing core with micro-jitter
-            const jY = (Math.random() - 0.5) * 1.2;
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 1.2;
-            ctx.shadowBlur = 2;
-            ctx.beginPath();
-            ctx.moveTo(player.x + 13, player.y);
-            ctx.lineTo((player.x + enemy.x) * 0.5, (player.y + enemy.y) * 0.5 + jY);
-            ctx.lineTo(enemy.x - 13, enemy.y);
-            ctx.stroke();
+            if (isKinetic) {
+                // Mach shockwave rings along the railgun hypervelocity vector
+                for (let si = 1; si <= 3; si++) {
+                    const st = si / 4;
+                    const sx = player.x + 13 + (enemy.x - player.x - 26) * st;
+                    const sy = player.y + (enemy.y - player.y) * st;
+                    ctx.strokeStyle = "rgba(200, 230, 255, 0.75)";
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.ellipse(sx, sy, 3, 7, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            } else if (isIon) {
+                // Ion crackle branching
+                this.combatFx?.ionArc?.(player.x + 13, player.y, enemy.x - 13, enemy.y, "#70c1b3");
+            } else {
+                // Intense ionizing core with micro-jitter
+                const jY = (Math.random() - 0.5) * 1.2;
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 1.2;
+                ctx.shadowBlur = 2;
+                ctx.beginPath();
+                ctx.moveTo(player.x + 13, player.y);
+                ctx.lineTo((player.x + enemy.x) * 0.5, (player.y + enemy.y) * 0.5 + jY);
+                ctx.lineTo(enemy.x - 13, enemy.y);
+                ctx.stroke();
+            }
 
             // Firing muzzle flash at player prow
             const muzzle = ctx.createRadialGradient(player.x + 13, player.y, 1, player.x + 13, player.y, 11);
             muzzle.addColorStop(0, "#ffffff");
-            muzzle.addColorStop(0.45, "#ffd166");
+            muzzle.addColorStop(0.45, muzzleColor);
             muzzle.addColorStop(1, "rgba(255, 209, 102, 0)");
             ctx.fillStyle = muzzle;
             ctx.beginPath();
@@ -9443,8 +9512,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.fill();
         }
         this.lastShipPosition = { x, y };
-        this.particles?.warp(x, y, heading, "#7fb7c9");
-        this.particles?.warp(x, y, heading, "#b7e4ff");
+        if (anim.mode === "sublight") {
+            this.particles?.thrustPlume?.(x, y, heading, 1.25);
+        } else {
+            this.particles?.warp?.(x, y, heading, "#7fb7c9");
+            this.particles?.warp?.(x, y, heading, "#b7e4ff");
+        }
         ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.fillStyle = "#7fb7c9";
         if (activeTravel) {

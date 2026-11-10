@@ -54,7 +54,7 @@ TAB_IDS = {
 }
 
 
-def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
+def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int, weapon: str = "") -> None:
     """Wait for the cockpit and move it into the requested review state."""
     page.wait_for_function("() => Boolean(window.cockpit)", timeout=timeout)
     page.wait_for_function("() => document.readyState === 'complete'", timeout=timeout)
@@ -190,10 +190,13 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
         page.wait_for_timeout(500)
     elif scenario == "combat":
         page.evaluate(
-            """() => {
+            """(wep) => {
                 // The tactical canvas reads state.active_combat, so seed the real state
                 // instead of only faking the card DOM.
                 if (window.cockpit && window.cockpit.state) {
+                    if (wep && window.cockpit.state.ship) {
+                        window.cockpit.state.ship.primary_weapon = wep;
+                    }
                     window.cockpit.state.active_combat = {
                         enemy_name: "Corsair Marauder",
                         enemy_class: "Marauder",
@@ -226,7 +229,8 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int) -> None:
                 if (shieldBar) shieldBar.style.width = "60%";
                 // Hold the review state without stopping the RAF or opening the menu.
                 if (window.cockpit) window.cockpit.refreshInFlight = true;
-            }"""
+            }""",
+            weapon,
         )
         page.wait_for_timeout(500)
     elif scenario == "customs":
@@ -314,7 +318,7 @@ def _click_probe(page: Any) -> Dict[str, Any]:
 
 def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
                   scenario: str, tab: str, out: Path, timeout: int,
-                  scroll: str = "top", click_map: bool = False) -> Dict[str, Any]:
+                  scroll: str = "top", click_map: bool = False, weapon: str = "") -> Dict[str, Any]:
     """Open one real browser viewport, drive it and capture a true screenshot."""
     context = browser.new_context(
         viewport={"width": viewport[0], "height": viewport[1]},
@@ -335,6 +339,8 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
     page.on("requestfailed", lambda request: errors.append(
         f"requestfailed: {request.url} // {request.failure}"))
     label = name if scenario == "cockpit" else f"{name}-{scenario}"
+    if weapon and scenario == "combat":
+        label += f"-{weapon}"
     if tab and scenario == "cockpit":
         label += f"-{tab}"
     if scroll == "bottom":
@@ -342,7 +348,7 @@ def _run_viewport(browser: Any, url: str, name: str, viewport: tuple[int, int],
     target = out / f"{label}.png"
     try:
         page.goto(url, wait_until="domcontentloaded", timeout=timeout)
-        _open_cockpit(page, scenario, tab, timeout)
+        _open_cockpit(page, scenario, tab, timeout, weapon)
         if scroll == "bottom":
             page.evaluate("() => { const el = document.querySelector('.terminal-content-stack'); if (el) el.scrollTop = el.scrollHeight; }")
             page.wait_for_timeout(300)
@@ -481,6 +487,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                         help="scroll the terminal content to the top or bottom")
     parser.add_argument("--headed", action="store_true", help="show the browser window")
     parser.add_argument("--channel", default="msedge", help="Playwright browser channel")
+    parser.add_argument("--weapon", default="", help="fitted primary weapon override for combat review")
     parser.add_argument("--click-map", action="store_true",
                         help="enumerate every cockpit control via window.voidfarerClickMap()")
     args = parser.parse_args(argv)
@@ -545,7 +552,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             try:
                 for name in names:
                     report = _run_viewport(browser, url, name, VIEWPORTS[name], args.scenario,
-                                           args.tab, out, args.timeout, args.scroll, args.click_map)
+                                           args.tab, out, args.timeout, args.scroll, args.click_map, args.weapon)
                     reports.append(report)
                     clicks = report.get("clicks")
                     click_note = ""

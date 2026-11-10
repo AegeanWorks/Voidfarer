@@ -1237,5 +1237,19 @@
     "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
     "final_snapshot_entries": 1257,
     "surface_digest": "ec16bd70ef4835a514b969ce7485975e60933d5612e32bf68f26f22b0c75a2e9"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "baseline_commit": "8bca46ac6aeea5b411aeee97fe4dd4abb866f654",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794356000.0,
+    "finished_at": 1794356400.0,
+    "strikes": 0,
+    "reviewer": "gemini-3.8-flash (multimodal G-015 vision review via ui-review screenshots)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
+    "final_snapshot_entries": 1257,
+    "surface_digest": "13d88bdd146c4b1221518888d61ac235953481d121deb7ccdd8c9fdd4c698849"
   }
 ]

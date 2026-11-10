@@ -1,67 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-flight-merge",
-    "last_phase": "phase 4",
+    "task_id": "voidfarer-visual-polish",
+    "last_phase": "phase 5",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794251362.620502,
-    "owner": "opencode:campaign",
-    "started_by": "opencode:campaign",
+    "updated_at": 1794349763.7414377,
+    "owner": "gemini",
+    "started_by": "gemini",
     "continuations": [],
-    "completed_at": 1794251456.5307384
+    "completed_at": 1794349794.5586655
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-intel-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Intel facade verified: report/summary, chart, economy, factions, wars, corporations, scan, war support, REST+CLI, 10 tests, 1419 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794240019.154606,
-      "timestamp_str": "2026-11-09 19:00:19",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-intel-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-intel-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794240109.098897,
-      "timestamp_str": "2026-11-09 19:01:49",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-engineering-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge power, reactor, repair, refuel, overhaul, fabrication, salvage and scoop behind one engineering report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794240468.8527548,
-      "timestamp_str": "2026-11-09 19:07:48",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The SHIP tab shows engineering telemetry together, but the CLI spreads it across eight verbs and nine routes.",
-        "benefits": "One report with reactor/power/hull/fuel/salvage/scoop/fabrication; one action route for ten actions; engineering sections; eight legacy verbs hidden but callable.",
-        "risks": "contract: REST/CLI/snapshot; dependency: reactor/snapshot/salvage/fabrication methods; concurrency: report reads through the engine snapshot and reactor report; state: no save change; regression: legacy verbs and routes stay callable.",
-        "mitigation": "11 facade tests, full 1430 suite, gate."
-      },
-      "plan_digest": "e88935b6991396f811340503587b618ede66f4ee6ae130ab406b1d2bfe9d7be6"
-    },
-    {
-      "task_id": "voidfarer-engineering-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Engineering facade verified: report/summary, power, reactor mode, repair/refuel, fabrication, invalid action, REST+CLI, 11 tests, 1430 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794240472.7976584,
-      "timestamp_str": "2026-11-09 19:07:52",
-      "agent": "opencode:campaign"
-    },
     {
       "task_id": "voidfarer-engineering-merge",
       "phase": "completed",
@@ -266,6 +216,57 @@
       "timestamp": 1794251456.5307412,
       "timestamp_str": "2026-11-09 22:10:56",
       "agent": "opencode:campaign"
+    },
+    {
+      "task_id": "voidfarer-visual-polish",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Plan: visual polish for celestial naming, combat hud typography, solar corona prominence and radar thruster trails",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794348425.524211,
+      "timestamp_str": "2026-11-11 01:07:05",
+      "agent": "gemini",
+      "impact_assessment": {
+        "why": "Raw snake_case underscores in planet names, combat distance text colliding with enemy ship name, and flat star/ship motion reduce immersion and visual appeal in the cockpit.",
+        "benefits": "Clean typography in HUD and radar, zero text collisions in combat modal, dynamic solar corona flare visuals, and responsive thruster plume particles during ship travel.",
+        "risks": "contract: no REST API or save format change; dependency: static JS and galaxy generator; concurrency: none; state: backward-compatible body names; regression: test suite must maintain 100% pass.",
+        "mitigation": "Automated test suite (94 test suites) + tools/ui_audit.py + tools/ui_browser.py headless Edge screenshot review."
+      },
+      "plan_digest": "54124a615c63c97a81adada5a3998c0b73ea56937d98c844ebeef12d268d6bbf"
+    },
+    {
+      "task_id": "voidfarer-visual-polish",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Milestone 1 verified: celestial body names cleaned of underscores, combat telemetry collision fixed, 1472 tests pass, UI inventory stable, audit clean; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794348685.516305,
+      "timestamp_str": "2026-11-11 01:11:25",
+      "agent": "gemini",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-visual-polish",
+      "phase": "phase 5",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-visual-polish' completed successfully.",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794349763.7414377,
+      "timestamp_str": "2026-11-11 01:29:23",
+      "agent": "gemini"
+    },
+    {
+      "task_id": "voidfarer-visual-polish",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-visual-polish' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794349794.5586665,
+      "timestamp_str": "2026-11-11 01:29:54",
+      "agent": "gemini"
     }
   ]
 }

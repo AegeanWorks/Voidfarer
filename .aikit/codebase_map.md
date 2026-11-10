@@ -1,7 +1,7 @@
 # Codebase Map & Symbol Catalog 🗺️
 
 > **AUTO-GENERATED & VERIFIED BY `scripts/update_knowledge_base.py`**
-> This document provides an automated, up-to-date registry of all modules, classes, and exported functions across this repository.
+> This document catalogues Python modules, classes, and exported functions. See Map Coverage for any stack it does not index.
 
 ---
 
@@ -10,7 +10,13 @@
 - **Total Classes**: `418`
 - **Total Top-Level Functions**: `496`
 - **Total Class Methods**: `2286`
-- **Total Source Lines**: `58599`
+- **Total Source Lines**: `58606`
+
+## 🧭 Map Coverage
+- **Indexed**: python (`155` module(s))
+- **Not indexed by this map**: javascript (`4` file(s))
+
+> Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
 
 ---
 
@@ -3151,13 +3157,13 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `590` lines (`26336` bytes)
+**Size**: `597` lines (`26746` bytes)
 
 **Functions:**
-- `def _open_cockpit(page, scenario, tab, timeout)` - *Wait for the cockpit and move it into the requested review state.*
+- `def _open_cockpit(page, scenario, tab, timeout, weapon)` - *Wait for the cockpit and move it into the requested review state.*
 - `def _metrics(page)` - *Return viewport, scroll, element and tiny-text counts from the live page.*
 - `def _click_probe(page)` - *Enumerate every cockpit control through the shipped click map and prove handles are unique.*
-- `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll, click_map)` - *Open one real browser viewport, drive it and capture a true screenshot.*
+- `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll, click_map, weapon)` - *Open one real browser viewport, drive it and capture a true screenshot.*
 - `def _prepare_boarding(engine)` - *Put a marine aboard and a crippled hostile in front of the flagship.*
 - `def _prepare_relief(engine)` - *Devastate an inhabited Sol world and put the flagship in orbit for the target card.*
 - `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
@@ -4033,7 +4039,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1389` lines (`62597` bytes)
+**Size**: `1389` lines (`62615` bytes)
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*

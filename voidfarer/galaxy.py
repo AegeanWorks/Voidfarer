@@ -991,7 +991,7 @@ class GalaxyGenerator:
             orbit_speed = 0.08 / (i + 1)
             is_station = body_type in ("orbital_station", "research_outpost")
             body_id = f"{sys_id}_body_{i+1}"
-            body_name = f"{sys_name} {chr(65+i)} ({designation.title()})"
+            body_name = f"{sys_name} {chr(65+i)} ({designation.replace('_', ' ').title()})"
 
             moon_count = 0
             if body_type in ("gas_giant", "ringed_giant", "ice_giant", "super_earth"):

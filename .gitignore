@@ -3,6 +3,8 @@
 .aikit/*.bak
 .aikit/*.tmp_*
 .aikit/*.corrupt_*
+.aikit/*.log
+.aikit/task_ledger_archive.jsonl
 .aikit/reforge.reviews/
 
 # Python caches
