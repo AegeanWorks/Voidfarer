@@ -10882,3 +10882,9 @@ body.cockpit-theme .nav-panel > .panel-header {
 /* REFIT slot filters wrap onto as many rows as the drawer needs instead of clipping the last slots. */
 .arsenal-filters { flex-wrap: wrap; row-gap: 4px; margin: 6px 0; }
 .arsenal-filters .market-cat-pill { flex: 0 0 auto; white-space: nowrap; }
+
+/* Payroll runway: green when comfortable, amber under three months, red under one. */
+.cashflow-runway.is-ok strong { color: var(--console-green); }
+.cashflow-runway.is-warn strong { color: var(--neon-amber); }
+.cashflow-runway.is-danger strong { color: #d9705f; }
+.cashflow-runway.is-danger { padding: 0 6px; border: 1px solid rgba(217, 112, 95, 0.55); border-radius: 2px; }

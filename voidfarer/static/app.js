@@ -3843,6 +3843,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         return match ? match[0] : null;
     }
 
+    // How long the treasury carries the monthly bills before wages go unpaid and morale starts to fall.
+    payrollRunway(credits, netPerMonth) {
+        if (netPerMonth >= 0) {
+            return { label: "SELF-FUNDING", level: "ok", title: "Passive income covers payroll and fleet upkeep." };
+        }
+        const months = Math.max(0, credits) / -netPerMonth;
+        const label = months >= 12 ? "12+ MO" : months < 0.1 ? "< 3 DAYS" : `${months.toFixed(1)} MO`;
+        const level = months < 1 ? "danger" : months < 3 ? "warn" : "ok";
+        return {
+            label,
+            level,
+            title: `${Math.max(0, credits)} cr covers ${label} of bills at ${netPerMonth} cr/month; unpaid wages drain crew morale and cause desertion.`,
+        };
+    }
+
     toggleShipDisclosure(button, target, section = null) {
         this.applyDisclosure(button, target, section);
     }
@@ -4117,12 +4132,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.crewCashFlow && cashFlow) {
             const net = cashFlow.net_per_month;
             const netColor = net >= 0 ? "var(--neon-green, #00f088)" : "var(--neon-red, #c96b5a)";
+            const runway = this.payrollRunway(Number((this.state.ship || {}).credits || 0), Number(net) || 0);
             this.crewCashFlow.innerHTML = `
                 <span class="cashflow-label">CASH FLOW / MONTH</span>
                 <span class="cashflow-value">PAYROLL <strong>-${cashFlow.crew_upkeep_per_month ?? cashFlow.upkeep_per_month}</strong> CR</span>
                 <span class="cashflow-value">FLEET <strong>-${cashFlow.fleet_upkeep_per_month || 0}</strong> CR</span>
                 <span class="cashflow-value">PASSIVE <strong>+${cashFlow.passive_per_month}</strong> CR</span>
                 <span class="cashflow-value">NET <strong style="color:${netColor}">${net >= 0 ? "+" : ""}${net}</strong> CR</span>
+                <span class="cashflow-value cashflow-runway is-${runway.level}" title="${runway.title}">RUNWAY <strong>${runway.label}</strong></span>
             `;
         }
 

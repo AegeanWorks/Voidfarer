@@ -2528,3 +2528,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The expanded REFIT tab scrolled to ~6,800px; its 23 upgrades were a single unbroken list.
 - **Decision**: A chip bar inside the upgrade disclosure: ALL, AFFORDABLE and one chip per hardware slot with counts. Chips wrap to rows; filtering is client-side and leaves the equipped state and purchase flow unchanged. `tests/test_refit_filters.py` (new, failing first) pins the bar placement, the chips and the wrapping. It was added after `ui finish` because the UI guard protects `tests/` during a task; it runs in the Phase 4 gate.
 - **Consequences**: Markup, CSS and render code only; no save, API or CLI change.
+
+### ADR-234: The CREW cash-flow strip shows a payroll runway
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: Unpaid wages already drain morale and cause desertion (`crew.tick_crew`), and fleet shortfalls stand escorts down, but the cockpit only showed the monthly net. A captain learned about a pay crisis after the morale warning, not before.
+- **Decision**: Add `RUNWAY` to the strip: months the treasury covers at the current net burn, `SELF-FUNDING` when net is non-negative, amber under three months and a boxed red under one, with a tooltip naming the consequence. Display only, derived from existing state; no engine, save, API or CLI change. `tests/test_payroll_runway.py` (new, failing first) was added after `ui finish` because the UI guard protects `tests/` during a task; it runs in the Phase 4 gate.
+- **Consequences**: Markup, CSS and render code only. Verified in real Edge at 40, 200 and 5000 cr under a -95 cr/month net.

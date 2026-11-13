@@ -1041,3 +1041,7 @@ Resolved the open dead-space item without touching the pinned test (ADR-232): tr
 ### Twenty-sixth pass — REFIT slot filters
 
 ADR-233: ALL, AFFORDABLE and per-slot chips; clicking ENGINES in real Edge left exactly 4 of 23 cards. Proof: `ui-review/goal-after8` (overflow found), `goal-after9` (wrapped, SHIELDS filtered).
+
+### Twenty-seventh pass — payroll runway
+
+Mechanics probe found the pay-shortfall rules complete (morale drain, then desertion) but invisible until too late. ADR-234 adds a RUNWAY readout to the CREW strip. Proof: `ui-review/goal-runway-sheet.png` (0.4 MO danger, 2.1 MO warn, 12+ MO ok).

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `156`
-- **Total Classes**: `419`
+- **Total Python Modules**: `157`
+- **Total Classes**: `420`
 - **Total Top-Level Functions**: `496`
-- **Total Class Methods**: `2291`
-- **Total Source Lines**: `58648`
+- **Total Class Methods**: `2295`
+- **Total Source Lines**: `58682`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`156` module(s))
+- **Indexed**: python (`157` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2208,6 +2208,20 @@
 
 **Functions:**
 - `def _outpost(outpost_id, system_id, **kwargs)`
+
+---
+
+### [`tests/test_payroll_runway.py`](tests/test_payroll_runway.py)
+> *CREW cash-flow strip: a payroll runway warns before wages go unpaid.*
+
+**Size**: `34` lines (`1297` bytes)
+
+**Classes:**
+- `class TestPayrollRunway`
+  - Method `.setUpClass()`
+  - Method `.test_strip_renders_the_runway_after_net()`
+  - Method `.test_runway_levels_are_defined_for_danger_warn_and_ok()`
+  - Method `.test_tooltip_states_the_consequence()`
 
 ---
 

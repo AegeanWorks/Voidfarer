@@ -1,55 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-refit-filters",
+    "task_id": "voidfarer-payroll-runway",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794546346.499499,
+    "updated_at": 1794547043.6866517,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-surface-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Surface facade verified: report/summary, landing, operation, reconstruction, invalid action, REST+CLI, 9 tests, 1461 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794249938.3872519,
-      "timestamp_str": "2026-11-09 21:45:38",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-surface-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-surface-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794250041.0072799,
-      "timestamp_str": "2026-11-09 21:47:21",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-flight-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge route, navigate, jump, orbit and travel behind one flight report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794251357.9827316,
-      "timestamp_str": "2026-11-09 22:09:17",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "Flight is one cockpit workflow, but the CLI exposes five movement verbs and six routes with no shared current-system report.",
-        "benefits": "One report with system bodies, lane options, fuel and travel state; one action route for plot/navigate/jump/orbit/travel; five legacy verbs hidden but callable.",
-        "risks": "contract: REST/CLI/snapshot; dependency: plan/navigate/jump/orbit/travel engine methods; concurrency: report plans routes read-only; state: no save change; regression: legacy verbs and routes stay callable.",
-        "mitigation": "11 facade tests, full 1472 suite, gate."
-      },
-      "plan_digest": "6d23f71421057a2103c8904fed7f602ac95fb30e94e3cb97c9d34edb28f54731"
-    },
     {
       "task_id": "voidfarer-flight-merge",
       "phase": "phase 4",
@@ -269,6 +230,46 @@
       "status": "in_progress",
       "timestamp": 1794546346.499499,
       "timestamp_str": "2026-11-13 08:05:46",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-refit-filters",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-refit-filters' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794546558.3876069,
+      "timestamp_str": "2026-11-13 08:09:18",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-payroll-runway",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: CREW cash-flow runway readout with failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794547043.164058,
+      "timestamp_str": "2026-11-13 08:17:23",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Pay crisis visible only after morale warnings",
+        "benefits": "Captain sees the runway before wages fail",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "New test, three-state Edge proof, ADR-234"
+      },
+      "plan_digest": "be69d8759eed468dbbfb058a334cc48232aeec19fd429fd6a7bf71b1529f3ae3"
+    },
+    {
+      "task_id": "voidfarer-payroll-runway",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794547043.6866517,
+      "timestamp_str": "2026-11-13 08:17:23",
       "agent": "claude:1",
       "checklists": "passed"
     }
