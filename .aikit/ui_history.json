@@ -1398,5 +1398,25 @@
     "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
     "final_snapshot_entries": 1264,
     "surface_digest": "b41725556900b30e473ed14f6ab66a624280b6fd8c66bd2c6cc166d583898103"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "81e4f75bf6128252ea1ba7fbfe1f1348203e8b2b",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794548750.875852,
+    "finished_at": 1794548862.486264,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted SETTINGS, Radar grid and Orbit labels gold checkmarks, gold slider thumbs on Starfield density, HUD scale, Master volume 80%)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
+    "final_snapshot_entries": 1264,
+    "surface_digest": "e2470cd28973c91a76a6c3b39500fe8d78838afca63d21dba5ecb7182452969e"
   }
 ]

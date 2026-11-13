@@ -1055,3 +1055,7 @@ ADR-235: orbital rings and an orbiting planet fill the empty right of the menu o
 An invariant fuzz (credits, hull, shield, fuel, cargo, morale and standings checked every 40 steps over seeds 3, 11 and 29) found no violations, but showed captains stranded at 0 to 4 fuel holding 12 to 14 fuel cells. ADR-236 adds `burn_cells` (1 cell = 4 fuel) through engine, CLI and REST. Proof: 10 new tests, failing first (4 failures, 6 errors) and passing.
 
 Cockpit follow-up: the SHIP tab gains a BURN FUEL CELL button beside FABRICATE FUEL PACK (posts `burn_cells` to `/api/engineering/action`). A first draft used a color emoji, which the cockpit's no-emoji test rejected; it now uses a monochrome glyph. Proof in real Edge: fuel 35 to 39 and cells 4 to 3 after the click (`ui-review/goal-burn`, `goal-burn2`).
+
+### Thirtieth pass — settings controls
+
+Review of the secondary scenes (death, settings, and others) found the SETTINGS toggles and sliders off-theme (ADR-237): crossed-diagonal checked state and default-blue slider thumbs. Proof: `ui-review/goal-scenes/desktop-settings.png` (before), `ui-review/goal-settings2/desktop-settings.png` (after).

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `160`
-- **Total Classes**: `425`
-- **Total Top-Level Functions**: `497`
-- **Total Class Methods**: `2309`
-- **Total Source Lines**: `58912`
+- **Total Python Modules**: `161`
+- **Total Classes**: `426`
+- **Total Top-Level Functions**: `498`
+- **Total Class Methods**: `2312`
+- **Total Source Lines**: `58948`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`160` module(s))
+- **Indexed**: python (`161` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2597,6 +2597,22 @@
   - Method `.test_customs_resolve_endpoint()`
   - Method `.test_overhaul_endpoint()`
   - Method `.test_relic_fuse_endpoint()`
+
+---
+
+### [`tests/test_settings_controls.py`](tests/test_settings_controls.py)
+> *Settings overlay controls: real checkmarks and themed sliders instead of browser defaults.*
+
+**Size**: `36` lines (`1454` bytes)
+
+**Classes:**
+- `class TestSettingsControls`
+  - Method `.test_range_inputs_drop_native_appearance_so_the_theme_applies()`
+  - Method `.test_checked_box_draws_a_checkmark_not_crossed_diagonals()`
+  - Method `.test_keyboard_focus_is_visible_on_both_controls()`
+
+**Functions:**
+- `def _last_rule(selector)`
 
 ---
 

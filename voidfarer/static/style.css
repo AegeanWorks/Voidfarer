@@ -10920,3 +10920,31 @@ body.cockpit-theme .nav-panel > .panel-header {
 @media (prefers-reduced-motion: reduce) {
     .main-menu-overlay::after { animation: none; }
 }
+
+/* Settings controls: the native range appearance made the gold thumb and track rules inert, and the checked
+   box drew crossed diagonals; use real appearance resets, a drawn checkmark and visible keyboard focus. */
+#settingsOverlay input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+#settingsOverlay input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    box-shadow: 0 0 8px rgba(201, 163, 90, 0.35);
+}
+#settingsOverlay input[type="range"]::-moz-range-thumb {
+    background: linear-gradient(180deg, var(--console-gold-bright), #a77f3e);
+}
+#settingsOverlay input[type="checkbox"]:checked {
+    border-color: var(--console-gold-bright);
+    background:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5.5 12.5l4.3 4.3L18.5 7.8' fill='none' stroke='%230a0e16' stroke-width='3.2' stroke-linecap='square'/></svg>") center / 100% 100% no-repeat,
+        var(--console-gold);
+    box-shadow: 0 0 8px rgba(201, 163, 90, 0.25);
+}
+#settingsOverlay input[type="checkbox"]:focus-visible,
+#settingsOverlay input[type="range"]:focus-visible {
+    outline: 2px solid var(--console-gold-bright);
+    outline-offset: 2px;
+}
