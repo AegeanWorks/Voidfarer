@@ -6607,11 +6607,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     const depleted = scoop.tapped >= scoop.reserve;
                     this.btnScoopFuel.style.display = "inline-block";
                     this.btnScoopFuel.disabled = !scoop.available;
+                    const tapsLeft = Math.max(0, scoop.reserve - scoop.tapped);
+                    const plan = `Scoops about ${scoop.base} fuel at +${scoop.heat} reactor heat; ${tapsLeft} of ${scoop.reserve} taps left.`;
                     this.btnScoopFuel.title = scoop.tapped > 0
-                        ? `Next volatile tap in ${scoop.next_tap_in} ticks`
-                        : "";
+                        ? `${plan} Next volatile tap in ${scoop.next_tap_in} ticks`
+                        : plan;
                     this.btnScoopFuel.textContent = scoop.available
-                        ? "SCOOP FUEL"
+                        ? `SCOOP FUEL (${tapsLeft}/${scoop.reserve} TAPS)`
                         : depleted ? "RESERVOIR DEPLETED" : "TANKS FULL";
                 }
             }

@@ -1785,5 +1785,25 @@
     "final_snapshot_digest": "2e8e2e6271111477022e27c7051d34f96efa324b1d7c49349aa4168d20c517de",
     "final_snapshot_entries": 1280,
     "surface_digest": "2621ce7dd0e9aecec728081f71b4a15869b354585a77736f93b07510fc366c07"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "5c2b1a0753a6972f0630dc110f95b8f178aea8cd",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794568877.0394602,
+    "finished_at": 1794568973.8173835,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; label-only change; quoted SCOOP FUEL (6/6 TAPS) then (5/6 TAPS) after a real scoop that took server fuel 10 to 32, tooltip: Scoops about 22 fuel at +12 reactor heat)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "2e8e2e6271111477022e27c7051d34f96efa324b1d7c49349aa4168d20c517de",
+    "final_snapshot_entries": 1280,
+    "surface_digest": "32df20d760b3882a4ed4a2e3e9f70a512771930ac2d2e1f14d07a71c9866d8f4"
   }
 ]

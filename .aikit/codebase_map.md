@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `181`
-- **Total Classes**: `448`
+- **Total Python Modules**: `182`
+- **Total Classes**: `449`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2380`
-- **Total Source Lines**: `59772`
+- **Total Class Methods**: `2383`
+- **Total Source Lines**: `59799`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`181` module(s))
+- **Indexed**: python (`182` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2757,6 +2757,19 @@
   - Method `.test_malformed_json_is_a_protocol_error()`
   - Method `.test_blocked_actions_are_not_counted_as_attempted()`
   - Method `.test_missing_catalog_is_an_error_not_silent_coverage()`
+
+---
+
+### [`tests/test_scoop_button.py`](tests/test_scoop_button.py)
+> *The scoop button states its remaining taps, expected yield and reactor heat.*
+
+**Size**: `27` lines (`1039` bytes)
+
+**Classes:**
+- `class TestScoopButton`
+  - Method `.test_label_shows_taps_left_out_of_the_reservoir()`
+  - Method `.test_tooltip_states_yield_and_heat_and_the_recharge_wait()`
+  - Method `.test_unavailable_states_keep_their_original_labels()`
 
 ---
 
