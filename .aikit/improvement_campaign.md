@@ -1105,3 +1105,7 @@ Layout holds at 85% and 120% (0 off-viewport, no scroll; all 16 tabs clean excep
 ### Forty-first pass — REFIT replacement clarity
 
 Took the REFIT redesign judgement call: cards now say what a purchase replaces (ADR-248). Proof: `ui-review/goal-replaces/arsenal.png`.
+
+### Forty-second pass — jump fuel cost
+
+The jump button now shows its lane fuel cost and blocks an unaffordable jump with a clear reason (ADR-249). Proof: `ui-review/goal-jumpfuel2/card.png`; Edge states 8 FUEL / NEED 8 FUEL (HAVE 2) / OUT OF HYPERLANE RANGE.

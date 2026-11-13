@@ -3875,6 +3875,31 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         return match ? match[0] : null;
     }
 
+    // Exact lane fuel from the engine's route plan (GET /api/flight), cached for two seconds per system.
+    // Returns null until the first answer arrives, so the card keeps its plain label meanwhile.
+    laneFuelFor(systemId) {
+        const cache = this._laneFuel;
+        if (!cache || cache.system !== this.state.current_system.id || Date.now() - cache.at > 2000) {
+            if (!this._laneFuelPending) {
+                this._laneFuelPending = true;
+                const origin = this.state.current_system.id;
+                apiFetch("/api/flight").then(res => res.json()).then(report => {
+                    const lanes = {};
+                    (report.connections || []).forEach(connection => { lanes[connection.id] = connection.fuel_estimate; });
+                    this._laneFuel = { system: origin, at: Date.now(), lanes };
+                }).catch(() => {
+                    this._laneFuel = { system: origin, at: Date.now(), lanes: {} };
+                }).finally(() => {
+                    this._laneFuelPending = false;
+                    if (this.selectedType === "system") this.updateTargetCard();
+                });
+            }
+        }
+        const fresh = this._laneFuel && this._laneFuel.system === this.state.current_system.id ? this._laneFuel : null;
+        const value = fresh ? fresh.lanes[systemId] : undefined;
+        return Number.isFinite(Number(value)) && value !== undefined ? Number(value) : null;
+    }
+
     // A vital card becomes a real keyboard control (focusable button, Enter or Space) only while it
     // offers an action; the handler is bound once and always reads the current state.
     setVitalAction(card, actionable, handler) {
@@ -6694,6 +6719,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.btnJumpTarget.style.display = "inline-block";
             this.btnJumpTarget.disabled = (!isConn || s.id === curSys.id);
             this.btnJumpTarget.textContent = (s.id === curSys.id) ? "CURRENT LOCATION" : (isConn ? "EXECUTE HYPERSPACE JUMP" : "OUT OF HYPERLANE RANGE");
+            this.btnJumpTarget.title = "";
+            const lane = isConn && s.id !== curSys.id ? this.laneFuelFor(s.id) : null;
+            if (lane != null) {
+                const fuel = Number(this.state.ship.fuel || 0);
+                const short = fuel < lane;
+                this.btnJumpTarget.disabled = short;
+                this.btnJumpTarget.textContent = short
+                    ? `NEED ${lane} FUEL (HAVE ${fuel})`
+                    : `EXECUTE HYPERSPACE JUMP (${lane} FUEL)`;
+                this.btnJumpTarget.title = short
+                    ? "Not enough quantum fuel for this lane: refuel, scoop, burn a fuel cell or fabricate a fuel pack."
+                    : `This lane costs ${lane} quantum fuel at your current power routing.`;
+            }
             if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
             if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";
         }

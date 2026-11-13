@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `173`
-- **Total Classes**: `438`
+- **Total Python Modules**: `174`
+- **Total Classes**: `439`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2348`
-- **Total Source Lines**: `59335`
+- **Total Class Methods**: `2352`
+- **Total Source Lines**: `59367`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`173` module(s))
+- **Indexed**: python (`174` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1951,6 +1951,20 @@
   - Method `.test_use_missing_item_fails()`
   - Method `.test_commodity_cannot_be_consumed()`
   - Method `.test_decoy_requires_active_combat()`
+
+---
+
+### [`tests/test_jump_fuel_cost.py`](tests/test_jump_fuel_cost.py)
+> *System target card: the jump button states its fuel cost and refuses a jump the tank cannot cover.*
+
+**Size**: `32` lines (`1275` bytes)
+
+**Classes:**
+- `class TestJumpFuelCost`
+  - Method `.test_lane_fuel_comes_from_the_flight_report_and_is_cached()`
+  - Method `.test_button_shows_the_cost_and_blocks_an_unaffordable_jump()`
+  - Method `.test_an_unknown_cost_keeps_the_original_label()`
+  - Method `.test_out_of_range_and_current_location_labels_are_unchanged()`
 
 ---
 

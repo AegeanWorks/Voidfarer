@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-refit-replaces",
+    "task_id": "voidfarer-jump-fuel",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794565505.098208,
+    "updated_at": 1794565882.23756,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-low-fuel-gauge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794551556.0633419,
-      "timestamp_str": "2026-11-13 09:32:36",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-low-fuel-gauge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-low-fuel-gauge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794551619.7422814,
-      "timestamp_str": "2026-11-13 09:33:39",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-low-hull-gauge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: critical-hull gauge with one-click patch kit, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794551854.8353782,
-      "timestamp_str": "2026-11-13 09:37:34",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Patch kit is hidden on the SHIP tab",
-        "benefits": "Captains find the hull remedy at the gauge",
-        "risks": "contract: none pinned; dependency: reuses /api/fabricate; concurrency: none; state: none",
-        "mitigation": "Failing-first test, real click proof on server, ADR-243"
-      },
-      "plan_digest": "7ff88246387090182672299113c02965a2bfa0533eb0f58a6245f191468a0749"
-    },
     {
       "task_id": "voidfarer-low-hull-gauge",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794565505.098208,
       "timestamp_str": "2026-11-13 13:25:05",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-refit-replaces",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-refit-replaces' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794565600.3918965,
+      "timestamp_str": "2026-11-13 13:26:40",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-jump-fuel",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: jump button shows lane fuel cost and blocks unaffordable jumps, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794565881.7340019,
+      "timestamp_str": "2026-11-13 13:31:21",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Captains learn a jump is unaffordable only from a refusal",
+        "benefits": "Fuel planning at the point of decision",
+        "risks": "contract: reads /api/flight; dependency: none; concurrency: cached and non-blocking; state: none",
+        "mitigation": "Original label kept until data arrives, engine still enforces, failing-first test, ADR-249"
+      },
+      "plan_digest": "873af3051031956ebacb51bec1f0c113561896c568d79bbfe9ad7041ed33497d"
+    },
+    {
+      "task_id": "voidfarer-jump-fuel",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794565882.23756,
+      "timestamp_str": "2026-11-13 13:31:22",
       "agent": "claude:1",
       "checklists": "passed"
     }

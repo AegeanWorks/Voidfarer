@@ -1643,5 +1643,25 @@
     "final_snapshot_digest": "661da18f32742c886bdb5a11caf219e02452dc8956f57e1e6df0bf1366caa4c3",
     "final_snapshot_entries": 1268,
     "surface_digest": "624253374044d02a7ac279366b131fc707e7ca835810f1aa0f0dc04d5a16c8c4"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "0be5e308671b638caca9e72aea880b630db2cc6a",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794565769.2203362,
+    "finished_at": 1794565876.290535,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted Alpha Centauri card with NEED 8 FUEL (HAVE 2) disabled beside CLEAR; affordable state read EXECUTE HYPERSPACE JUMP (8 FUEL))",
+    "allowed_removals": [],
+    "final_snapshot_digest": "03a1c8ec74bb82f11bb24cc9df118f065ce7fb16c041a30b39ca3ac881c2ccb2",
+    "final_snapshot_entries": 1270,
+    "surface_digest": "a81d7943b16d1766c615919ad39ef195d0a5c4e7ee87a7197b7b44632940c085"
   }
 ]
