@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `167`
-- **Total Classes**: `432`
+- **Total Python Modules**: `168`
+- **Total Classes**: `433`
 - **Total Top-Level Functions**: `500`
-- **Total Class Methods**: `2329`
-- **Total Source Lines**: `59136`
+- **Total Class Methods**: `2333`
+- **Total Source Lines**: `59172`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`167` module(s))
+- **Indexed**: python (`168` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1999,6 +1999,20 @@
   - Method `.test_card_carries_a_hidden_burn_chip()`
   - Method `.test_low_threshold_and_burnable_state_are_computed()`
   - Method `.test_only_a_burnable_card_triggers_the_burn()`
+  - Method `.test_styles_exist_for_both_states()`
+
+---
+
+### [`tests/test_low_hull_gauge.py`](tests/test_low_hull_gauge.py)
+> *Top-bar hull gauge: a critical-hull state that offers the titanium patch kit where the problem shows.*
+
+**Size**: `36` lines (`1537` bytes)
+
+**Classes:**
+- `class TestLowHullGauge`
+  - Method `.test_card_carries_a_hidden_patch_chip()`
+  - Method `.test_critical_threshold_and_patchable_state_are_computed()`
+  - Method `.test_only_a_patchable_card_fabricates()`
   - Method `.test_styles_exist_for_both_states()`
 
 ---

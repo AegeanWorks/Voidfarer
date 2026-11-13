@@ -1081,3 +1081,7 @@ Repeating the expanded all-tabs sweep at 1280px found clipping the 1920px runs h
 ### Thirty-fifth pass — low-fuel gauge
 
 Expanded sweeps at 1366 and 3840 were clean, so this pass made ADR-236's burn discoverable: a red low-fuel gauge with a one-click BURN CELL (ADR-242). Proof: `ui-review/goal-lowfuel3/top.png`; click moved server fuel 30 to 34.
+
+### Thirty-sixth pass — critical-hull gauge
+
+Mirror of the low-fuel gauge for hull: red state plus one-click PATCH HULL when titanium is held (ADR-243). Proof: `ui-review/goal-lowhull2/top.png`; click moved server hull 96 to 121.

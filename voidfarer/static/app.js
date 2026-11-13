@@ -2032,6 +2032,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const hullPct = Math.round((ship.hull / ship.max_hull) * 100);
         this.hullBar.style.width = `${hullPct}%`;
         this.hullVal.textContent = `${ship.hull}/${ship.max_hull}`;
+        const lowHull = hullPct <= 30;
+        const titanium = Number((ship.cargo || {}).titanium || 0);
+        const hullCard = document.getElementById("vitalHullCard");
+        if (hullCard) {
+            hullCard.classList.toggle("is-low", lowHull);
+            hullCard.classList.toggle("is-patchable", lowHull && titanium > 0);
+            hullCard.dataset.tooltip = lowHull
+                ? (titanium > 0
+                    ? `HULL CRITICAL // ${titanium} titanium in the hold: click to fabricate a patch kit (+25 hull).`
+                    : "HULL CRITICAL // Dock for repairs, or carry titanium to fabricate patch kits.")
+                : "Hull integrity // Hits below zero destroy the command ship.";
+            if (!hullCard.dataset.patchBound) {
+                hullCard.dataset.patchBound = "true";
+                hullCard.addEventListener("click", () => {
+                    if (hullCard.classList.contains("is-patchable")) this.handleFabricate("patch_kit");
+                });
+            }
+        }
 
         const shieldPct = Math.round((ship.shield / ship.max_shield) * 100);
         this.shieldBar.style.width = `${shieldPct}%`;

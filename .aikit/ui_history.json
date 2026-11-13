@@ -1520,5 +1520,27 @@
     "final_snapshot_digest": "5c05ae690c5501f77c2f6a1283bd9001fcdf5791abc64e38a6ad75c26e754051",
     "final_snapshot_entries": 1266,
     "surface_digest": "bbbba7b75358481c403ea3a1c63b3ae581feaf5442c885c147f8e2ab54e1e400"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "1c78f52592b1d8124de1543ff77e514d8b18f47d",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794551736.528956,
+    "finished_at": 1794551849.4047134,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted HULL 20/160 PATCH HULL and FUEL 8/60 BURN CELL chips; click took server hull 96 to 121, titanium 3 to 2)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "cbb716e9bb37e5a38270d747c5cb89e7562640da73a92a08906e6c5b18b539f8",
+    "final_snapshot_entries": 1267,
+    "surface_digest": "b4d9c9e13a3e6fc13f863f06b96a334bb6321cde9cb7fa3d7d666accf0f01b94"
   }
 ]

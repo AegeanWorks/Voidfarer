@@ -2591,3 +2591,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-236's fuel-cell burn lives on the SHIP tab, so a captain running dry in the top bar would not find it.
 - **Decision**: At 25% fuel or less the top-bar fuel card turns red and its tooltip says what to do. With fuel cells in the hold it also shows a boxed BURN CELL chip and the whole card becomes a one-click burn (`handleBurnCells`, the same `burn_cells` engineering action); without cells the tooltip points to refuel, scooping or fabrication. Display and a click on existing state only: no engine, save, API or CLI change. `tests/test_low_fuel_gauge.py` (new, failing first: 4 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
 - **Consequences**: Verified in real Edge on a played save: forced 8/60 shows the red state and chip; a real click moved server fuel 30 to 34 and cells 4 to 3.
+
+### ADR-243: A critical-hull gauge offers the titanium patch kit
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: Field fabrication of a patch kit (+25 hull from 1 titanium) lives only on the SHIP tab, so a captain watching the hull bar fall would not find it. ADR-242 solved the same problem for fuel.
+- **Decision**: At 30% hull or less the top-bar hull card turns red with a tooltip naming the remedy. With titanium in the hold it shows a boxed PATCH HULL chip and the card fabricates one patch kit on click (`handleFabricate("patch_kit")`, the existing `/api/fabricate`); without titanium the tooltip says to dock or carry titanium. Display and a click on existing state only. `tests/test_low_hull_gauge.py` (new, failing first: 4 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+- **Consequences**: Verified in real Edge: a forced critical hull shows the chip, and a real click moved server hull 96 to 121 and titanium 3 to 2. No engine, save, API or CLI change.

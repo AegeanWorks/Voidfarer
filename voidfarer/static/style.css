@@ -10973,3 +10973,10 @@ body.cockpit-theme .nav-panel > .panel-header {
 #vitalFuelCard.is-burnable { cursor: pointer; }
 #vitalFuelCard.is-burnable #fuelBurnChip { display: inline-block; }
 #vitalFuelCard.is-burnable:hover #fuelBurnChip { background: rgba(217, 112, 95, 0.2); }
+
+/* Critical hull: the gauge turns red, and with titanium in the hold it offers a one-click patch kit. */
+#hullPatchChip { display: none; margin-left: 6px; padding: 0 5px; border: 1px solid rgba(217, 112, 95, 0.7); border-radius: 2px; color: #f0b3a6; font-size: 12px; letter-spacing: 0.06em; white-space: nowrap; }
+#vitalHullCard.is-low #hullVal { color: #f0b3a6; }
+#vitalHullCard.is-patchable { cursor: pointer; }
+#vitalHullCard.is-patchable #hullPatchChip { display: inline-block; }
+#vitalHullCard.is-patchable:hover #hullPatchChip { background: rgba(217, 112, 95, 0.2); }

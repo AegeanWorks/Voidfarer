@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-low-fuel-gauge",
+    "task_id": "voidfarer-low-hull-gauge",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794551556.0633419,
+    "updated_at": 1794551855.3287952,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-fuel-cell-burn",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] cockpit button Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794548492.6110342,
-      "timestamp_str": "2026-11-13 08:41:32",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-fuel-cell-burn",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-fuel-cell-burn' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794548583.3269637,
-      "timestamp_str": "2026-11-13 08:43:03",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-settings-controls",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: themed settings checkmarks and sliders with failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794548876.4123611,
-      "timestamp_str": "2026-11-13 08:47:56",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Settings toggles read as bowties and sliders use default blue",
-        "benefits": "Settings overlay matches the cockpit theme and is keyboard-visible",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "New test, real-Edge capture, ADR-237"
-      },
-      "plan_digest": "988f05f3e04d0b23276a68cea6537811bc29cfa6ca924720a77b27ddc5ac410b"
-    },
     {
       "task_id": "voidfarer-settings-controls",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794551556.0633419,
       "timestamp_str": "2026-11-13 09:32:36",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-low-fuel-gauge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-low-fuel-gauge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794551619.7422814,
+      "timestamp_str": "2026-11-13 09:33:39",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-low-hull-gauge",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: critical-hull gauge with one-click patch kit, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794551854.8353782,
+      "timestamp_str": "2026-11-13 09:37:34",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Patch kit is hidden on the SHIP tab",
+        "benefits": "Captains find the hull remedy at the gauge",
+        "risks": "contract: none pinned; dependency: reuses /api/fabricate; concurrency: none; state: none",
+        "mitigation": "Failing-first test, real click proof on server, ADR-243"
+      },
+      "plan_digest": "7ff88246387090182672299113c02965a2bfa0533eb0f58a6245f191468a0749"
+    },
+    {
+      "task_id": "voidfarer-low-hull-gauge",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794551855.3287952,
+      "timestamp_str": "2026-11-13 09:37:35",
       "agent": "claude:1",
       "checklists": "passed"
     }
