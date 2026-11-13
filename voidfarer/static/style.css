@@ -10888,3 +10888,35 @@ body.cockpit-theme .nav-panel > .panel-header {
 .cashflow-runway.is-warn strong { color: var(--neon-amber); }
 .cashflow-runway.is-danger strong { color: #d9705f; }
 .cashflow-runway.is-danger { padding: 0 6px; border: 1px solid rgba(217, 112, 95, 0.55); border-radius: 2px; }
+
+/* Main menu backdrop: static orbital rings fill the right of the screen that the left-aligned card leaves empty,
+   and one small planet circles the outer ring. */
+@media (min-width: 1600px) and (min-height: 800px) {
+    .main-menu-overlay::before,
+    .main-menu-overlay::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 7vw;
+        z-index: -1;
+        width: min(62vh, 38vw);
+        aspect-ratio: 1;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .main-menu-overlay::before {
+        background:
+            radial-gradient(circle, rgba(201, 163, 90, 0.9) 0 3px, transparent 4px),
+            radial-gradient(circle at 50% 50%, transparent 0 24%, rgba(201, 163, 90, 0.22) 24.3% 24.6%, transparent 25% 42%, rgba(111, 195, 215, 0.2) 42.3% 42.6%, transparent 43% 60%, rgba(201, 163, 90, 0.16) 60.3% 60.6%, transparent 61% 78%, rgba(111, 195, 215, 0.12) 78.3% 78.6%, transparent 79%);
+        box-shadow: 0 0 120px rgba(111, 195, 215, 0.05);
+    }
+    .main-menu-overlay::after {
+        background: radial-gradient(circle at 50% 11%, #f4ead6 0 3px, var(--console-gold) 4px, rgba(201, 163, 90, 0.25) 8px, transparent 11px);
+        animation: menu-orbit-drift 90s linear infinite;
+    }
+}
+@keyframes menu-orbit-drift { to { transform: translateY(-50%) rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .main-menu-overlay::after { animation: none; }
+}

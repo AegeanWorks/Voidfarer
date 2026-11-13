@@ -1045,3 +1045,7 @@ ADR-233: ALL, AFFORDABLE and per-slot chips; clicking ENGINES in real Edge left 
 ### Twenty-seventh pass — payroll runway
 
 Mechanics probe found the pay-shortfall rules complete (morale drain, then desertion) but invisible until too late. ADR-234 adds a RUNWAY readout to the CREW strip. Proof: `ui-review/goal-runway-sheet.png` (0.4 MO danger, 2.1 MO warn, 12+ MO ok).
+
+### Twenty-eighth pass — main menu backdrop
+
+ADR-235: orbital rings and an orbiting planet fill the empty right of the menu on roomy windows. Proof: `ui-review/goal-menu2` (1080p), `goal-menu3` (720p overlap found), `goal-menu4` (720p clean, 4K).

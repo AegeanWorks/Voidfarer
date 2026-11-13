@@ -2535,3 +2535,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Unpaid wages already drain morale and cause desertion (`crew.tick_crew`), and fleet shortfalls stand escorts down, but the cockpit only showed the monthly net. A captain learned about a pay crisis after the morale warning, not before.
 - **Decision**: Add `RUNWAY` to the strip: months the treasury covers at the current net burn, `SELF-FUNDING` when net is non-negative, amber under three months and a boxed red under one, with a tooltip naming the consequence. Display only, derived from existing state; no engine, save, API or CLI change. `tests/test_payroll_runway.py` (new, failing first) was added after `ui finish` because the UI guard protects `tests/` during a task; it runs in the Phase 4 gate.
 - **Consequences**: Markup, CSS and render code only. Verified in real Edge at 40, 200 and 5000 cr under a -95 cr/month net.
+
+### ADR-235: The main menu gets an orbital-ring backdrop
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: The menu card and brand vista are deliberately left-aligned, which left the right half of a 1080p or 4K screen empty over the dimmed cockpit.
+- **Decision**: Pure-CSS pseudo-elements on `.main-menu-overlay`: four static concentric rings and a centre star (`::before`), and one planet orbiting the outer ring (`::after`, 90s, stopped under `prefers-reduced-motion`). Shown only at 1600px wide and 800px tall or more, because at 1280x720 the rings sat behind the vista and the planet covered its text. `pointer-events: none`, `z-index: -1`. Rotating the concentric rings themselves was dropped as invisible. `tests/test_menu_backdrop.py` (new, failing first) pins the gate, the inertness and the animation scope; it was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+- **Consequences**: CSS only; no markup, save, API or CLI change.

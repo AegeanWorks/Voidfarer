@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `157`
-- **Total Classes**: `420`
+- **Total Python Modules**: `158`
+- **Total Classes**: `421`
 - **Total Top-Level Functions**: `496`
-- **Total Class Methods**: `2295`
-- **Total Source Lines**: `58682`
+- **Total Class Methods**: `2298`
+- **Total Source Lines**: `58711`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`157` module(s))
+- **Indexed**: python (`158` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1957,6 +1957,19 @@
   - Method `.test_bonus_math_and_outpost_application()`
   - Method `.test_restoration_round_trips_and_legacy_defaults()`
   - Method `.test_codex_metric_counts_restored_structures()`
+
+---
+
+### [`tests/test_menu_backdrop.py`](tests/test_menu_backdrop.py)
+> *Main menu backdrop: orbital rings fill the empty side only where there is room.*
+
+**Size**: `29` lines (`1245` bytes)
+
+**Classes:**
+- `class TestMenuBackdrop`
+  - Method `.test_motif_is_gated_to_roomy_windows()`
+  - Method `.test_motif_never_blocks_the_menu()`
+  - Method `.test_only_the_planet_animates_and_reduced_motion_stops_it()`
 
 ---
 
