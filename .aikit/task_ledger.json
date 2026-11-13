@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-escape-creation",
+    "task_id": "voidfarer-tab-current",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794567317.6631541,
+    "updated_at": 1794567565.9593523,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-scale-titles",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: titles for clamped text found at HUD scale 120%, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794553378.9836774,
-      "timestamp_str": "2026-11-13 10:02:58",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "At 120% scale message consequences and a faction name were clipped",
-        "benefits": "Full text always reachable without touching pinned layout",
-        "risks": "contract: pinned clamp untouched; dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test, live title count, ADR-247"
-      },
-      "plan_digest": "691a68d59eb63b33f6398f6e922f18f375af5cafe1326d8ba23c4eb072cd6f6d"
-    },
-    {
-      "task_id": "voidfarer-scale-titles",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794553379.3007305,
-      "timestamp_str": "2026-11-13 10:02:59",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-scale-titles",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-scale-titles' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794553457.9733224,
-      "timestamp_str": "2026-11-13 10:04:17",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-refit-replaces",
       "phase": "phase 2",
@@ -278,6 +238,46 @@
       "status": "in_progress",
       "timestamp": 1794567317.6631541,
       "timestamp_str": "2026-11-13 13:55:17",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-escape-creation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-escape-creation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794567385.0678394,
+      "timestamp_str": "2026-11-13 13:56:25",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-tab-current",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: aria-current on the tab rail, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794567565.6502535,
+      "timestamp_str": "2026-11-13 13:59:25",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Active tab was only a CSS class",
+        "benefits": "Screen readers announce the current tab",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first test, real Edge proof, ADR-254"
+      },
+      "plan_digest": "bc6bf248cf0a96559c06ca9d9b3cc5bde3a248034600c90808044ee09638c93f"
+    },
+    {
+      "task_id": "voidfarer-tab-current",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794567565.9593523,
+      "timestamp_str": "2026-11-13 13:59:25",
       "agent": "claude:1",
       "checklists": "passed"
     }

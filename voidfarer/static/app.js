@@ -1810,7 +1810,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.activeRightTab = null;
             this.panelLeft.classList.add("drawer-collapsed");
             Object.values(tabButtons).forEach(button => {
-                if (button) button.classList.remove("active");
+                if (button) {
+                    button.classList.remove("active");
+                    button.removeAttribute("aria-current");
+                }
             });
             Object.values(tabContents).forEach(content => {
                 if (content) content.style.display = "none";
@@ -1828,7 +1831,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         Object.entries(tabButtons).forEach(([name, button]) => {
-            if (button) button.classList.toggle("active", tabName === name);
+            if (!button) return;
+            button.classList.toggle("active", tabName === name);
+            if (tabName === name) button.setAttribute("aria-current", "true");
+            else button.removeAttribute("aria-current");
         });
 
         Object.entries(tabContents).forEach(([name, content]) => {

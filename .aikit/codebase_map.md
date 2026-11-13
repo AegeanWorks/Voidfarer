@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `178`
-- **Total Classes**: `443`
+- **Total Python Modules**: `179`
+- **Total Classes**: `444`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2363`
-- **Total Source Lines**: `59512`
+- **Total Class Methods**: `2365`
+- **Total Source Lines**: `59536`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`178` module(s))
+- **Indexed**: python (`179` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3094,6 +3094,18 @@
 
 **Functions:**
 - `def _base(orbiting)`
+
+---
+
+### [`tests/test_tab_rail_state.py`](tests/test_tab_rail_state.py)
+> *The terminal tab rail exposes its active tab to assistive technology, not only through a CSS class.*
+
+**Size**: `24` lines (`1001` bytes)
+
+**Classes:**
+- `class TestTabRailState`
+  - Method `.test_switching_tabs_sets_aria_current_on_the_active_button()`
+  - Method `.test_collapsing_the_drawer_clears_the_current_marker()`
 
 ---
 

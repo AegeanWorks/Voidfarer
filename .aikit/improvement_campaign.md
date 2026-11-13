@@ -1125,3 +1125,7 @@ Overlays were unlabelled divs that left focus behind (ADR-252). Now labelled mod
 ### Forty-sixth pass — Escape and Character Creation
 
 Keyboard probe after the dialog work: Escape stacked the main menu over Character Creation (ADR-253). Fixed; proof in real Edge (`ui-review/goal-esc`, `goal-esc2`).
+
+### Forty-seventh pass — current tab for assistive technology
+
+Page basics scanned clean (lang, title, landmarks, live log); the tab rail now exposes its current tab (ADR-254). Proof: aria-current followed the active tab in real Edge (`ui-review/goal-ariacur`).

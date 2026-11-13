@@ -1744,5 +1744,25 @@
     "final_snapshot_digest": "04bdf2cb78fb6aed25abfa4ba10e6b0df44ead7949dec3644441bb3d465cad27",
     "final_snapshot_entries": 1279,
     "surface_digest": "bdd5b7e11b8ad7918c5bdf819c56a2c3671df893829d907d6f2dde34b5a75fb5"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "0e709ee4723cf6bcc3e44029635a8751a72f800a",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794567470.124515,
+    "finished_at": 1794567562.5415988,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; attribute-only change, no visual difference; real Edge: aria-current followed tabBtnPlayer, tabBtnMarket, tabBtnShip and cleared on collapse)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "04bdf2cb78fb6aed25abfa4ba10e6b0df44ead7949dec3644441bb3d465cad27",
+    "final_snapshot_entries": 1279,
+    "surface_digest": "409430875de1ad5449a52385374e2c4be92ff89568450bf612933b57fadeae3a"
   }
 ]

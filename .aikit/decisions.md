@@ -2668,3 +2668,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A keyboard probe of the new dialogs (ADR-252) found Escape closed Settings but not Character Creation: with it open, Escape fell through to `toggleMainMenu()` and stacked the main menu on top of it.
 - **Decision**: The Escape handler closes an open Character Creation overlay (`closeCharacterCreation`, which already returns to the menu when no game has started) before falling back to the menu toggle.
 - **Consequences**: Input handling only. `tests/test_escape_character_creation.py` (new, failing first) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified in real Edge: Escape took the overlay from open to closed with the menu staying closed.
+
+### ADR-254: The terminal tab rail exposes its current tab
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: The page-level scan (language, title, landmarks, live regions) was sound, but the 16-tab terminal rail marked the open tab only with the `active` CSS class, so assistive technology could not tell which tab was current.
+- **Decision**: `switchRightTab` sets `aria-current="true"` on the active tab button and removes it from the others, and clears it when the drawer collapses. Attribute-only.
+- **Consequences**: No visual, engine, save, API or CLI change. `tests/test_tab_rail_state.py` (new, failing first: 2 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified in real Edge across player, market, ship and a collapse.
