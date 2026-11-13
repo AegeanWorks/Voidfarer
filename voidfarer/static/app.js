@@ -1674,6 +1674,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.handleSetTimeSpeed(5.0);
             } else if (e.key === "4") {
                 this.handleSetTimeSpeed(10.0);
+            } else if (e.code === "Comma" || e.code === "Period") {
+                e.preventDefault();
+                this.cycleBodyTarget(e.code === "Period" ? 1 : -1);
             } else if (hotkey === "t") {
                 this.handleTimeStep(1);
             } else if (e.code === "BracketLeft" || e.code === "BracketRight") {
@@ -1689,6 +1692,23 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     openInitialTerminalTab() {
         const remembered = this.rememberTerminalTab && TERMINAL_TABS.includes(this.lastTerminalTab);
         this.switchRightTab(remembered ? this.lastTerminalTab : "player", { quiet: true });
+    }
+
+    // Keyboard targeting for the system radar: step through the bodies from the star outward, wrapping.
+    cycleBodyTarget(step) {
+        if (this.viewMode !== "ORBITS" || !this.state) return;
+        const bodies = [...((this.state.current_system || {}).bodies || [])]
+            .sort((a, b) => (a.orbit_radius || 0) - (b.orbit_radius || 0));
+        if (!bodies.length) return;
+        const current = this.selectedType === "body" && this.selectedTarget
+            ? bodies.findIndex(b => b.id === this.selectedTarget.id) : -1;
+        const index = current < 0
+            ? (step > 0 ? 0 : bodies.length - 1)
+            : (current + step + bodies.length) % bodies.length;
+        this.selectedTarget = bodies[index];
+        this.selectedType = "body";
+        this.sound.playBeep(1000);
+        this.updateTargetCard();
     }
 
     cycleTerminalTab(step) {

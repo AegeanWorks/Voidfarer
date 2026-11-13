@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-radar-hover",
+    "task_id": "voidfarer-body-hotkeys",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794583544.584358,
+    "updated_at": 1794584044.689985,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-escape-creation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794567317.6631541,
-      "timestamp_str": "2026-11-13 13:55:17",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-escape-creation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-escape-creation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794567385.0678394,
-      "timestamp_str": "2026-11-13 13:56:25",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-tab-current",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: aria-current on the tab rail, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794567565.6502535,
-      "timestamp_str": "2026-11-13 13:59:25",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Active tab was only a CSS class",
-        "benefits": "Screen readers announce the current tab",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test, real Edge proof, ADR-254"
-      },
-      "plan_digest": "bc6bf248cf0a96559c06ca9d9b3cc5bde3a248034600c90808044ee09638c93f"
-    },
     {
       "task_id": "voidfarer-tab-current",
       "phase": "phase 4",
@@ -266,6 +226,46 @@
       "status": "in_progress",
       "timestamp": 1794583544.584358,
       "timestamp_str": "2026-11-13 18:25:44",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-radar-hover",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-radar-hover' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794583631.3694441,
+      "timestamp_str": "2026-11-13 18:27:11",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-body-hotkeys",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: comma and period cycle the radar body target, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794584043.6294227,
+      "timestamp_str": "2026-11-13 18:34:03",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Targeting was mouse-only",
+        "benefits": "Keyboard-only players can target bodies",
+        "risks": "contract: new hotkeys; dependency: none; concurrency: none; state: none",
+        "mitigation": "Ignored while dialogs or typing, real key probe, ADR-259"
+      },
+      "plan_digest": "32c3e2607b6a8c046f1a7f150fbdeef8bcac8bc04d3fef4f3e551a59f6091842"
+    },
+    {
+      "task_id": "voidfarer-body-hotkeys",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794584044.689985,
+      "timestamp_str": "2026-11-13 18:34:04",
       "agent": "claude:1",
       "checklists": "passed"
     }

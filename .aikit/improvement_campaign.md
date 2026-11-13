@@ -1147,3 +1147,7 @@ Fifty-first pass — the AI captain now burns fuel cells in its tour, so the mec
 ### Fifty-second pass — radar hover
 
 Took the radar interaction call: the body under the pointer is ringed and named (ADR-258). Proof: `ui-review/goal-hover/hover.png`, real-mouse probe with labels off.
+
+### Fifty-third pass — keyboard targeting
+
+Targeting a body was mouse-only; `,` and `.` now cycle bodies in orbit order (ADR-259). Proof: real key presses in Edge (`ui-review/goal-keys`).

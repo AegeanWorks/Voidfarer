@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `184`
-- **Total Classes**: `452`
+- **Total Python Modules**: `185`
+- **Total Classes**: `453`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2391`
-- **Total Source Lines**: `59902`
+- **Total Class Methods**: `2395`
+- **Total Source Lines**: `59936`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`184` module(s))
+- **Indexed**: python (`185` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -214,6 +214,20 @@
   - Method `.test_voidfarer_bat_uses_crlf_line_endings()`
 - `class TestLauncherMenu` - *The interactive mission menu must survive its ASCII banner and exit cleanly.*
   - Method `.test_menu_choice_zero_renders_and_exits_cleanly()`
+
+---
+
+### [`tests/test_body_target_hotkeys.py`](tests/test_body_target_hotkeys.py)
+> *Keyboard targeting: comma and period cycle the selected radar body, and the reference lists them.*
+
+**Size**: `34` lines (`1414` bytes)
+
+**Classes:**
+- `class TestBodyTargetHotkeys`
+  - Method `.test_hotkeys_call_the_cycler_with_a_direction()`
+  - Method `.test_cycler_orders_bodies_by_orbit_and_wraps()`
+  - Method `.test_only_the_orbit_view_is_affected()`
+  - Method `.test_the_controls_reference_documents_the_keys()`
 
 ---
 

@@ -1805,5 +1805,26 @@
     "final_snapshot_digest": "2e8e2e6271111477022e27c7051d34f96efa324b1d7c49349aa4168d20c517de",
     "final_snapshot_entries": 1280,
     "surface_digest": "32df20d760b3882a4ed4a2e3e9f70a512771930ac2d2e1f14d07a71c9866d8f4"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "ffe3101c719cb9fe6b628305df7b120cd4230e42",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794583813.9366472,
+    "finished_at": 1794584235.5532055,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; keyboard behaviour, no visual change beyond the existing target card; real Edge key presses stepped Sol System Primary, Helios Dyson Swarm, Sol System A (Citadel) and back; a dialog open ignores the keys)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "40938870f691b1538f5bee650e12f14749e452d17b8d06863f1ae6d1c8dd68d0",
+    "final_snapshot_entries": 1283,
+    "surface_digest": "4b7c44564e56fcc7c942c8594dfe1611ab931c685821e9d7ebd0abe784171d2d"
   }
 ]
