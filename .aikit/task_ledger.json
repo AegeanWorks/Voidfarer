@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-tab-current",
+    "task_id": "voidfarer-distress-call",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794567565.9593523,
+    "updated_at": 1794567943.1967673,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-refit-replaces",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: REFIT cards show what a purchase replaces, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794565504.6002092,
-      "timestamp_str": "2026-11-13 13:25:04",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Buying into an occupied slot silently replaces the installed upgrade",
-        "benefits": "Informed refit decisions",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test, live ENGINES check, ADR-248"
-      },
-      "plan_digest": "6c368355062ad1a851aae4846a4e4aac81849039fb50b415c0d6156f3caedffd"
-    },
-    {
-      "task_id": "voidfarer-refit-replaces",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794565505.098208,
-      "timestamp_str": "2026-11-13 13:25:05",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-refit-replaces",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-refit-replaces' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794565600.3918965,
-      "timestamp_str": "2026-11-13 13:26:40",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-jump-fuel",
       "phase": "phase 2",
@@ -278,6 +238,46 @@
       "status": "in_progress",
       "timestamp": 1794567565.9593523,
       "timestamp_str": "2026-11-13 13:59:25",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-tab-current",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-tab-current' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794567637.948011,
+      "timestamp_str": "2026-11-13 14:00:37",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-distress-call",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 distress_call engine, engineering, CLI, REST with tests; M2 cockpit chip as a UI task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794567942.6629229,
+      "timestamp_str": "2026-11-13 14:05:42",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "A stranded ship with no fuel, credits or convertible cargo has no move",
+        "benefits": "No soft lock; a priced last resort",
+        "risks": "contract: new engineering action; dependency: none; concurrency: engine RLock reused; state: no schema change",
+        "mitigation": "Fee and time cost, narrow eligibility, failing-first tests, ADR-255"
+      },
+      "plan_digest": "2e83098f770576e8cc834ec43571b40d754931cf95f68abff1f3944d74ec88f3"
+    },
+    {
+      "task_id": "voidfarer-distress-call",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] backend Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794567943.1967673,
+      "timestamp_str": "2026-11-13 14:05:43",
       "agent": "claude:1",
       "checklists": "passed"
     }

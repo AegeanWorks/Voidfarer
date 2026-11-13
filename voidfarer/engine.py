@@ -442,6 +442,13 @@ class SimulationEngine:
     # Emergency drive burn: one hold Quantum Fuel Cell injects this many fuel units. A cell trades for
     # ~75-90 cr, so this is dearer than the 6 cr/unit refinery and only worth it away from a station.
     FUEL_CELL_BURN_YIELD = 4
+    # Distress call: the last resort for a ship that cannot jump, has no fuel cells or titanium to
+    # convert, and so cannot help itself. A tender brings RESCUE_FUEL units for up to RESCUE_FEE credits
+    # (never more than the captain holds, so a broke captain is still rescued) and the wait costs
+    # RESCUE_WAIT_TICKS of game time, which keeps wages and upkeep running: it is a rescue, not free fuel.
+    RESCUE_FUEL = 15
+    RESCUE_FEE = 200
+    RESCUE_WAIT_TICKS = 6
     RELIEF_CARGO = (("medicines", 2), ("hydroponics", 2), ("fuel_cells", 1))
     WAR_NEWS_TITLES = (
         ("WAR: ", "System Captured"),
@@ -7195,6 +7202,58 @@ class SimulationEngine:
 
             else:
                 return False, f"Unknown fabrication blueprint '{munitions_type}'. Valid blueprints: 'patch_kit', 'fuel_cell'."
+
+    def rescue_status(self) -> dict[str, Any]:
+        """Whether a distress call would be accepted now, and why not."""
+        with self.lock:
+            ship = self.state.ship
+            lanes = [
+                int(self.plan_route(target).get("fuel_estimate", 0) or 0)
+                for target in self.current_system.connections
+            ]
+            cheapest = min((cost for cost in lanes if cost > 0), default=0)
+            if ship.fuel >= ship.max_fuel:
+                reason = "not stranded: the tanks are full."
+            elif cheapest and ship.fuel >= cheapest:
+                reason = f"not stranded: a jump needs {cheapest} fuel and you have {ship.fuel}."
+            elif int(ship.cargo.get("fuel_cells", 0)) > 0:
+                reason = "you still have a Quantum Fuel Cell to burn."
+            elif int(ship.cargo.get("titanium", 0)) > 0:
+                reason = "you can still fabricate a fuel pack from titanium."
+            else:
+                reason = ""
+            return {
+                "available": not reason,
+                "reason": reason,
+                "fuel": self.RESCUE_FUEL,
+                "fee": min(self.RESCUE_FEE, max(0, int(ship.credits))),
+                "wait_ticks": self.RESCUE_WAIT_TICKS,
+            }
+
+    def distress_call(self) -> tuple[bool, str]:
+        """Summon a rescue tender: fuel for a fee and some lost time, only when truly stranded."""
+        with self.lock:
+            lock = self._action_lock_reason()
+            if lock:
+                return False, lock
+            status = self.rescue_status()
+            if not status["available"]:
+                return False, f"Distress call refused: {status['reason']}"
+            ship = self.state.ship
+            gained = min(self.RESCUE_FUEL, ship.max_fuel - ship.fuel)
+            fee = status["fee"]
+            msg = (
+                f"A rescue tender answers your distress call: +{gained} fuel for {fee} cr "
+                f"after a {self.RESCUE_WAIT_TICKS}-tick wait."
+            )
+            new_ship = self._clone_ship(
+                fuel=ship.fuel + gained,
+                credits=ship.credits - fee,
+                flight_log=tuple(list(ship.flight_log[-19:]) + [msg]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            self.tick(self.RESCUE_WAIT_TICKS)
+            return True, msg
 
     def burn_fuel_cells(self, quantity: int = 1) -> tuple[bool, str]:
         """Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.

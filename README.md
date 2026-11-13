@@ -146,7 +146,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (118 suites)
+└── tests/                <- unit & integration test suite (119 suites)
 ```
 
 ---
@@ -241,7 +241,7 @@ Hostile strength scales +5% hull, shields, damage and bounty per Pilot Mastery l
 # View active contracts, progress bars, and rewards
 python -m voidfarer.cli contracts
 
-# Claim completed contract reward and draw replacement assignment (plus 2 free-swap offers)
+# Claim a completed contract reward and draw a replacement (2 free swaps)
 python -m voidfarer.cli contracts claim contract_explore_alpha_centauri
 
 # Swap any active contract for a pending offer: free, no standing loss
@@ -289,8 +289,9 @@ python -m voidfarer.cli refuel --amount 20
 python -m voidfarer.cli overhaul
 python -m voidfarer.cli fabricate patch_kit
 python -m voidfarer.cli engineering burn_cells 2
+python -m voidfarer.cli engineering distress  # stranded only: tender, 15 fuel
 
-# Inspect the living galactic economy: stockpiles, market shocks, and best trade routes
+# Galactic economy: stockpiles, market shocks, best trade routes
 python -m voidfarer.cli economy
 
 # Inspect the cargo manifest, buy station consumables, and use them in space
@@ -317,7 +318,7 @@ python -m voidfarer.cli tutorial reset
 
 ### 13. The Precursor Cipher Narrative Campaign (Space Opera)
 ```bash
-# Display active chapter synopsis, objectives, transmissions log, and moral choices
+# Chapter synopsis, objectives, transmissions and moral choices
 python -m voidfarer.cli story
 
 # Resolve an episodic narrative dilemma
@@ -418,7 +419,7 @@ python -m voidfarer.cli time status
 python -m voidfarer.cli time pause
 python -m voidfarer.cli time resume
 
-# Adjust simulation speed multiplier (1x normal, 2x fast, 5x sub-warp, 10x hyper-warp)
+# Simulation speed (1x normal, 2x fast, 5x sub-warp, 10x hyper-warp)
 python -m voidfarer.cli time speed 5
 
 # Advance cosmic simulation by a discrete number of ticks (+1, +4, +10)

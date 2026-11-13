@@ -1129,3 +1129,7 @@ Keyboard probe after the dialog work: Escape stacked the main menu over Characte
 ### Forty-seventh pass — current tab for assistive technology
 
 Page basics scanned clean (lang, title, landmarks, live log); the tab rail now exposes its current tab (ADR-254). Proof: aria-current followed the active tab in real Edge (`ui-review/goal-ariacur`).
+
+### Forty-eighth pass — distress call (mechanic)
+
+Chose the stranded-ship dead end myself (ADR-255): a rescue tender for 15 fuel, up to 200 cr and 6 ticks, only when nothing else can help. Engine, CLI and REST in this commit; cockpit chip next.

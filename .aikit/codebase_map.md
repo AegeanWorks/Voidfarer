@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `179`
-- **Total Classes**: `444`
-- **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2365`
-- **Total Source Lines**: `59536`
+- **Total Python Modules**: `180`
+- **Total Classes**: `446`
+- **Total Top-Level Functions**: `503`
+- **Total Class Methods**: `2375`
+- **Total Source Lines**: `59725`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`179` module(s))
+- **Indexed**: python (`180` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -991,6 +991,28 @@
   - Method `.test_upgrade_button_states_the_credit_shortfall_or_installed_state()`
   - Method `.test_a_reason_is_only_set_when_the_button_is_disabled()`
   - Method `.test_training_weapons_modules_and_chassis_explain_a_disabled_state()`
+
+---
+
+### [`tests/test_distress_call.py`](tests/test_distress_call.py)
+> *Distress call: a truly stranded ship can summon a rescue tender, at a price, through every surface.*
+
+**Size**: `127` lines (`5459` bytes)
+
+**Classes:**
+- `class TestDistressCall`
+  - Method `.test_rescue_delivers_fuel_charges_the_fee_and_costs_time()`
+  - Method `.test_fee_never_exceeds_what_the_captain_holds()`
+  - Method `.test_a_broke_captain_is_still_rescued()`
+  - Method `.test_guards_refuse_without_changing_state()`
+  - Method `.test_it_is_refused_while_an_encounter_freezes_flight()`
+- `class TestSurfaces`
+  - Method `.test_engineering_action_and_report()`
+  - Method `.test_cli_engineering_distress_saves()`
+  - Method `.test_rest_engineering_action()`
+
+**Functions:**
+- `def _stranded(credits, fuel, cargo)`
 
 ---
 
@@ -3933,7 +3955,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10486` lines (`517809` bytes)
+**Size**: `10545` lines (`520660` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4101,6 +4123,8 @@
   - Method `.repair_hull(amount)` - *Repair ship hull integrity at orbital station.*
   - Method `.refuel(amount)` - *Refuel quantum drive at orbital station.*
   - Method `.fabricate_munitions(munitions_type)` - *Field-fabricate emergency hull patch kits or fuel packs from raw titanium alloy.*
+  - Method `.rescue_status()` - *Whether a distress call would be accepted now, and why not.*
+  - Method `.distress_call()` - *Summon a rescue tender: fuel for a fee and some lost time, only when truly stranded.*
   - Method `.burn_fuel_cells(quantity)` - *Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.*
   - Method `.check_solar_weather(system)` - *Telemetry check for space weather and coronal radiation risk in the specified or current system.*
   - Method `.step_orbits(delta_time)` - *Advance celestial bodies along orbital mechanics paths and cycle fleet drones.*
@@ -4172,7 +4196,7 @@
 ### [`voidfarer/engineering.py`](voidfarer/engineering.py)
 > *One report and action surface for power, reactor, repair, salvage and fabrication.*
 
-**Size**: `129` lines (`4642` bytes)
+**Size**: `132` lines (`4763` bytes)
 
 **Functions:**
 - `def engineering_summary(state)` - *Compact payload for /api/state.*
