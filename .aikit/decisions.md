@@ -2661,3 +2661,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Only the decision popup declared `role="dialog"`. The main menu, Settings, Character Creation and the death screen were plain divs: a screen reader did not announce them, and opening one left keyboard focus on the control underneath it.
 - **Decision**: The four overlays get `role="dialog"` (`alertdialog` for the death screen, which interrupts), `aria-modal="true"` and an `aria-labelledby` pointing at their new title ids. One `MutationObserver` per overlay (`initDialogFocus`) watches visibility, so every existing open and close path is covered without editing eight call sites: on open it remembers the focused element and focuses the overlay's first control; on close it restores the previous focus.
 - **Consequences**: Markup and one small helper; no visual, engine, save, API or CLI change. `tests/test_dialog_semantics.py` (new, failing first: 2 failures and 1 error) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified in real Edge: Settings open focused the close button and close returned focus to the SHIP tab button; the main menu did the same.
+
+### ADR-253: Escape closes Character Creation
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: A keyboard probe of the new dialogs (ADR-252) found Escape closed Settings but not Character Creation: with it open, Escape fell through to `toggleMainMenu()` and stacked the main menu on top of it.
+- **Decision**: The Escape handler closes an open Character Creation overlay (`closeCharacterCreation`, which already returns to the menu when no game has started) before falling back to the menu toggle.
+- **Consequences**: Input handling only. `tests/test_escape_character_creation.py` (new, failing first) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified in real Edge: Escape took the overlay from open to closed with the menu staying closed.

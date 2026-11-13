@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `177`
-- **Total Classes**: `442`
+- **Total Python Modules**: `178`
+- **Total Classes**: `443`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2361`
-- **Total Source Lines**: `59488`
+- **Total Class Methods**: `2363`
+- **Total Source Lines**: `59512`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`177` module(s))
+- **Indexed**: python (`178` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1336,6 +1336,18 @@
   - Method `.test_reactive_shield_regenerator_adds_tick_recharge()`
   - Method `._combat_after_jump(equipped)`
   - Method `.test_ecm_scrambler_reduces_pirate_encounter_chance()`
+
+---
+
+### [`tests/test_escape_character_creation.py`](tests/test_escape_character_creation.py)
+> *Escape closes Character Creation instead of stacking the main menu on top of it.*
+
+**Size**: `24` lines (`920` bytes)
+
+**Classes:**
+- `class TestEscapeCharacterCreation`
+  - Method `.test_escape_handler_closes_character_creation_before_toggling_the_menu()`
+  - Method `.test_the_check_reads_the_overlay_visibility()`
 
 ---
 

@@ -1121,3 +1121,7 @@ Scan for controls without an accessible name found seven inputs (ADR-251); all n
 ### Forty-fifth pass — dialog semantics and focus
 
 Overlays were unlabelled divs that left focus behind (ADR-252). Now labelled modal dialogs with focus in and focus restored. Proof: `ui-review/goal-dialog` eval output (focus path btnCloseSettings then tabBtnShip).
+
+### Forty-sixth pass — Escape and Character Creation
+
+Keyboard probe after the dialog work: Escape stacked the main menu over Character Creation (ADR-253). Fixed; proof in real Edge (`ui-review/goal-esc`, `goal-esc2`).

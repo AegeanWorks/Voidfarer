@@ -1620,6 +1620,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     this.closeSettings();
                     return;
                 }
+                const creationOverlay = document.getElementById("characterCreationOverlay");
+                if (creationOverlay && creationOverlay.style.display !== "none") {
+                    this.closeCharacterCreation();
+                    return;
+                }
                 this.toggleMainMenu();
                 return;
             }

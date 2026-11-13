@@ -1724,5 +1724,25 @@
     "final_snapshot_digest": "04bdf2cb78fb6aed25abfa4ba10e6b0df44ead7949dec3644441bb3d465cad27",
     "final_snapshot_entries": 1279,
     "surface_digest": "68feaab3d5b952af76f09c417a0f2fd33b7611bab4e5ba58139ee15053c3c02d"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "be380fd3c3003cf9a4c0f44a5d19fbde37860067",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794567210.4530008,
+    "finished_at": 1794567314.1957204,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; no visual change; real Edge: Escape with Character Creation open closed it and left the main menu closed)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "04bdf2cb78fb6aed25abfa4ba10e6b0df44ead7949dec3644441bb3d465cad27",
+    "final_snapshot_entries": 1279,
+    "surface_digest": "bdd5b7e11b8ad7918c5bdf819c56a2c3671df893829d907d6f2dde34b5a75fb5"
   }
 ]
