@@ -1674,6 +1674,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.handleSetTimeSpeed(5.0);
             } else if (e.key === "4") {
                 this.handleSetTimeSpeed(10.0);
+            } else if (hotkey === "x") {
+                e.preventDefault();
+                this.dismissEventPopups();
             } else if (hotkey === "j") {
                 e.preventDefault();
                 this.pressTargetAction("btnJumpTarget");
@@ -9623,6 +9626,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const activeTravel = this.state?.ship?.travel || this.state?.travel || null;
             this.startTravelAnimation(fromId, targetId, activeTravel);
         }
+    }
+
+    // Keyboard dismissal: press every visible notification's own DISMISS button, so the server records
+    // the dismissal exactly as a click would.
+    dismissEventPopups() {
+        if (!this.eventPopupContainer) return;
+        const buttons = [...this.eventPopupContainer.querySelectorAll("[data-dismiss-event]")];
+        if (!buttons.length) return;
+        buttons.forEach(button => button.click());
     }
 
     renderEventPopups() {

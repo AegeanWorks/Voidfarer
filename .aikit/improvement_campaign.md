@@ -1159,3 +1159,7 @@ The same keys step through linked star systems on the galaxy map (ADR-260). Proo
 ### Fifty-fifth pass — keyboard actions on the target
 
 J and O press the target card's own jump and transit buttons, completing a keyboard-only target and act loop (ADR-261). Proof: real key presses in Edge (jump, explained refusal, transit).
+
+### Fifty-sixth pass — keyboard notification dismissal
+
+`X` dismisses visible notifications (ADR-262). Proof: real engine events dismissed from the keyboard, server count 2 to 0.

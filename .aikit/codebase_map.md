@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `187`
-- **Total Classes**: `455`
+- **Total Python Modules**: `188`
+- **Total Classes**: `456`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2402`
-- **Total Source Lines**: `60004`
+- **Total Class Methods**: `2406`
+- **Total Source Lines**: `60036`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`187` module(s))
+- **Indexed**: python (`188` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1016,6 +1016,20 @@
   - Method `.test_upgrade_button_states_the_credit_shortfall_or_installed_state()`
   - Method `.test_a_reason_is_only_set_when_the_button_is_disabled()`
   - Method `.test_training_weapons_modules_and_chassis_explain_a_disabled_state()`
+
+---
+
+### [`tests/test_dismiss_hotkey.py`](tests/test_dismiss_hotkey.py)
+> *X dismisses the visible event notifications through their own DISMISS buttons.*
+
+**Size**: `32` lines (`1192` bytes)
+
+**Classes:**
+- `class TestDismissHotkey`
+  - Method `.test_x_calls_the_dismisser()`
+  - Method `.test_the_dismisser_clicks_each_real_button_so_server_state_updates()`
+  - Method `.test_it_does_nothing_without_notifications()`
+  - Method `.test_the_controls_reference_lists_the_key()`
 
 ---
 

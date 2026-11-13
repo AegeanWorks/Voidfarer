@@ -1868,5 +1868,26 @@
     "final_snapshot_digest": "3213354b33cd85319c23a8115ce2ecf37179c4953b565867974b00fc529f47fc",
     "final_snapshot_entries": 1287,
     "surface_digest": "8891dce4644d4c2efd2eeed4b142fb64fdae55aeb12b8b33f85bc9d5e1f59dd4"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "116604fdad96f315e86b437701dc605b8e660e29",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794585496.6195385,
+    "finished_at": 1794585701.4369888,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; keyboard behaviour, no visual change; real Edge with two engine events: popups 2 and server undismissed 2, after X popups 0 and server undismissed 0, second X harmless)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "18a3bcccb14fc4991db9a581fe7b3bb3dda0f6b23324525ec6ebb68129cba428",
+    "final_snapshot_entries": 1289,
+    "surface_digest": "117cfdee499de6b8e8240a1d71380c87db322e4a378db0b112e1b9f13990d4ff"
   }
 ]

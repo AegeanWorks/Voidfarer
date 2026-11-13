@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-target-actions",
+    "task_id": "voidfarer-dismiss-hotkey",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794585192.1249619,
+    "updated_at": 1794585718.1602643,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-distress-call",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-distress-call' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794568631.0532815,
-      "timestamp_str": "2026-11-13 14:17:11",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-scoop-button",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: scoop button shows taps, yield and heat, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794568977.1680436,
-      "timestamp_str": "2026-11-13 14:22:57",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Scoop label hid the data a stranded captain needs",
-        "benefits": "Informed scooping decisions",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test, real scoop proof in Edge, ADR-256"
-      },
-      "plan_digest": "56ef08c017b8978d687840c27c93c4a2cde593d0072547cb027de6059b3b8463"
-    },
-    {
-      "task_id": "voidfarer-scoop-button",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794568977.4844499,
-      "timestamp_str": "2026-11-13 14:22:57",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-scoop-button",
       "phase": "completed",
@@ -270,6 +230,46 @@
       "status": "in_progress",
       "timestamp": 1794585192.1249619,
       "timestamp_str": "2026-11-13 18:53:12",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-target-actions",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-target-actions' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794585292.7349608,
+      "timestamp_str": "2026-11-13 18:54:52",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-dismiss-hotkey",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: X dismisses visible notifications, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794585717.784779,
+      "timestamp_str": "2026-11-13 19:01:57",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Notifications needed Tab navigation to clear",
+        "benefits": "Keyboard loop is complete",
+        "risks": "contract: new hotkey; dependency: reuses DISMISS buttons; concurrency: none; state: none",
+        "mitigation": "Clicks the real buttons, real-event probe, ADR-262"
+      },
+      "plan_digest": "8cce05de432159f5cef8f0371a1d0c74e4fc6a31731eac3fc4105dbb2fa3dffb"
+    },
+    {
+      "task_id": "voidfarer-dismiss-hotkey",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794585718.1602643,
+      "timestamp_str": "2026-11-13 19:01:58",
       "agent": "claude:1",
       "checklists": "passed"
     }
