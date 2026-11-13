@@ -92,7 +92,7 @@
                     <section class="settings-group" id="settingsAudio">
                         <h3 class="settings-group-title">AUDIO <span>// bridge signals</span></h3>
                         <label class="setting-row"><span>Sound effects</span><input type="checkbox" id="settingSound" checked></label>
-                        <label class="setting-row"><span>Master volume <output id="settingVolumeValue">80%</output></span><input type="range" id="settingVolume" min="0" max="100" step="5" value="80"></label>
+                        <label class="setting-row"><span>Master volume <output id="settingVolumeValue">80%</output></span><input type="range" id="settingVolume" aria-label="Master volume" min="0" max="100" step="5" value="80"></label>
                     </section>
                     <section class="settings-group" id="settingsGameplay">
                         <h3 class="settings-group-title">GAMEPLAY <span>// simulation</span></h3>
@@ -159,11 +159,11 @@
                     <h3>BASIC INFO</h3>
                     <div class="creation-field">
                         <label>NAME</label>
-                        <input type="text" id="charName" maxlength="24" placeholder="Enter name...">
+                        <input type="text" id="charName" aria-label="Commander name" maxlength="24" placeholder="Enter name...">
                     </div>
                     <div class="creation-field">
                         <label>AGE</label>
-                        <input type="number" id="charAge" min="18" max="65" value="30">
+                        <input type="number" id="charAge" aria-label="Commander age" min="18" max="65" value="30">
                     </div>
                     <div class="creation-field">
                         <label>BACKGROUND</label>
@@ -1234,7 +1234,7 @@
                                     <span class="pwr-label cyan-glow"><span class="pwr-icon">➤</span> ENGINES <kbd class="hotkey-chip">Q</kbd></span>
                                     <span class="pwr-val" id="pwrEngVal">25%</span>
                                 </div>
-                                <input type="range" min="0" max="100" value="25" class="pwr-slider cyan-range" id="sliderEng">
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider cyan-range" id="sliderEng" aria-label="Engines power">
                                 <span class="pwr-hint">Increases warp jump fuel efficiency</span>
                             </div>
 
@@ -1243,7 +1243,7 @@
                                     <span class="pwr-label blue-glow"><span class="pwr-icon">⬡</span> SHIELDS <kbd class="hotkey-chip">W</kbd></span>
                                     <span class="pwr-val" id="pwrShdVal">25%</span>
                                 </div>
-                                <input type="range" min="0" max="100" value="25" class="pwr-slider blue-range" id="sliderShd">
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider blue-range" id="sliderShd" aria-label="Shields power">
                                 <span class="pwr-hint">Protects against solar flares & combat damage</span>
                             </div>
 
@@ -1252,7 +1252,7 @@
                                     <span class="pwr-label magenta-glow"><span class="pwr-icon">◈</span> SENSORS <kbd class="hotkey-chip">E</kbd></span>
                                     <span class="pwr-val" id="pwrSenVal">25%</span>
                                 </div>
-                                <input type="range" min="0" max="100" value="25" class="pwr-slider magenta-range" id="sliderSen">
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider magenta-range" id="sliderSen" aria-label="Sensors power">
                                 <span class="pwr-hint">Multiplies research credits earned from scans</span>
                             </div>
 
@@ -1261,7 +1261,7 @@
                                     <span class="pwr-label red-glow"><span class="pwr-icon">◎</span> WEAPONS <kbd class="hotkey-chip">R</kbd></span>
                                     <span class="pwr-val" id="pwrWepVal">25%</span>
                                 </div>
-                                <input type="range" min="0" max="100" value="25" class="pwr-slider red-range" id="sliderWep">
+                                <input type="range" min="0" max="100" value="25" class="pwr-slider red-range" id="sliderWep" aria-label="Weapons power">
                                 <span class="pwr-hint">Amplifies strike damage against hostile corsairs</span>
                             </div>
                         </div>

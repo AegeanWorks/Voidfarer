@@ -1,50 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-disabled-reasons",
+    "task_id": "voidfarer-input-names",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794566381.2062068,
+    "updated_at": 1794566728.7452297,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-vital-keyboard",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/2] test re-expression Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794552193.4153483,
-      "timestamp_str": "2026-11-13 09:43:13",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-vital-keyboard",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] keyboard helper Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794552423.3319626,
-      "timestamp_str": "2026-11-13 09:47:03",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-vital-keyboard",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-vital-keyboard' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794552487.7366862,
-      "timestamp_str": "2026-11-13 09:48:07",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-reduced-motion",
       "phase": "phase 2",
@@ -272,6 +238,46 @@
       "status": "in_progress",
       "timestamp": 1794566381.2062068,
       "timestamp_str": "2026-11-13 13:39:41",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-disabled-reasons",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-disabled-reasons' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794566466.1917944,
+      "timestamp_str": "2026-11-13 13:41:06",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-input-names",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: aria-labels for seven unnamed inputs, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794566728.4130101,
+      "timestamp_str": "2026-11-13 13:45:28",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Screen readers announced unnamed sliders and fields",
+        "benefits": "Accessible names on every input",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first test, live scan 7 to 0, ADR-251"
+      },
+      "plan_digest": "f04e0aff542ff35c56c4d150c2cb93c5ab6d243cee9f3959e77bf17c3bc345c8"
+    },
+    {
+      "task_id": "voidfarer-input-names",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794566728.7452297,
+      "timestamp_str": "2026-11-13 13:45:28",
       "agent": "claude:1",
       "checklists": "passed"
     }

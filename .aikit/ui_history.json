@@ -1683,5 +1683,25 @@
     "final_snapshot_digest": "03a1c8ec74bb82f11bb24cc9df118f065ce7fb16c041a30b39ca3ac881c2ccb2",
     "final_snapshot_entries": 1270,
     "surface_digest": "bcf62831ce2e9d49cd0d4f68820cbefba57afe0b3fef2f949837d48f034e6d07"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "5d66e4e05b6092816c7fd90e691f686476b3f60a",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794566629.7336085,
+    "finished_at": 1794566725.1929715,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; attribute-only change, no visual difference; live Edge scan of unnamed controls went from 7 to 0)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "03a1c8ec74bb82f11bb24cc9df118f065ce7fb16c041a30b39ca3ac881c2ccb2",
+    "final_snapshot_entries": 1270,
+    "surface_digest": "65993d2321f9399703e370db989f17d3b759e1ebe60d8efb4b46bd9dfc5ab0b2"
   }
 ]

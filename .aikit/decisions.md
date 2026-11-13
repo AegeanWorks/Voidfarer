@@ -2647,3 +2647,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A live scan of every expanded tab found disabled buttons with no `title`: perk UNLOCK and REQUIRES (no talent point or unmet prerequisite), TRAIN 1 SP, REFIT upgrade and chassis prices, weapon purchases, PRIMARY, and structural-module INSTALL. A greyed button with a price gave no hint whether the cause was credits, docking or an occupied slot.
 - **Decision**: Each gets a reason title: the credit shortfall ("Need 490 more credits."), "Already installed in the engines slot.", "Dock at a station ...", "That slot is occupied: remove the installed module first.", "Needs a talent point to unlock.", "Unlock dreadnought tactics first.", "Needs a skill point: level up to earn one." and so on. Titles are set only while the button is disabled. Display attributes only.
 - **Consequences**: No engine, save, API or CLI change. `tests/test_disabled_reasons.py` (new, failing first: 4 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Untitled disabled buttons on SKILLS, REFIT and SHIP went from 6, 18 and 0 (after the first two groups) to 0.
+
+### ADR-251: Every form input has an accessible name
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: A live scan of buttons, inputs, selects and links across all tabs found seven inputs with no accessible name: the master-volume slider, the commander name and age fields, and the four reactor power sliders. Their visible labels sat beside them without being associated, so a screen reader announced only "slider" or "edit text".
+- **Decision**: Add explicit `aria-label`s: Master volume, Commander name, Commander age, and Engines, Shields, Sensors and Weapons power. Attribute-only; `tests/test_input_names.py` (new, failing first: 2 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+- **Consequences**: No visual, engine, save, API or CLI change. Unnamed controls in the live page: 7 to 0.

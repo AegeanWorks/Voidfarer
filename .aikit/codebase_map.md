@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `175`
-- **Total Classes**: `440`
+- **Total Python Modules**: `176`
+- **Total Classes**: `441`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2356`
-- **Total Source Lines**: `59404`
+- **Total Class Methods**: `2358`
+- **Total Source Lines**: `59444`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`175` module(s))
+- **Indexed**: python (`176` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1910,6 +1910,18 @@
 **Functions:**
 - `def _member(member_id, morale, wage)`
 - `def _world_snapshot(engine)` - *Comparable snapshot of the ticking world state.*
+
+---
+
+### [`tests/test_input_names.py`](tests/test_input_names.py)
+> *Every form input has an accessible name, not just a nearby visual label.*
+
+**Size**: `40` lines (`1503` bytes)
+
+**Classes:**
+- `class TestInputNames`
+  - Method `.test_each_listed_input_carries_its_aria_label()`
+  - Method `.test_no_text_range_or_number_input_is_left_unnamed()`
 
 ---
 

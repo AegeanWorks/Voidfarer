@@ -1113,3 +1113,7 @@ The jump button now shows its lane fuel cost and blocks an unaffordable jump wit
 ### Forty-third pass — disabled buttons explain themselves
 
 A scan for disabled buttons without a title found silent perks, upgrades, chassis, weapons, skills and modules (ADR-250). Proof: before/after counts in the live page (`ui-review/goal-disabled`, `goal-disabled4`).
+
+### Forty-fourth pass — accessible names
+
+Scan for controls without an accessible name found seven inputs (ADR-251); all now carry aria-labels. Proof: live counts 7 then 0 (`ui-review/goal-names`, `goal-names2`).
