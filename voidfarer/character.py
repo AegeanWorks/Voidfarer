@@ -56,9 +56,15 @@ COMMANDER_BACKGROUNDS: dict[str, dict[str, Any]] = {
 }
 
 
+# Names the creation screen once offered that are not catalog origins: they map to the nearest one so a
+# commander created with them (API, CLI or an old client) still gets origin training and lore.
+BACKGROUND_ALIASES: dict[str, str] = {"scientist": "prospector", "trader": "merchant"}
+
+
 def match_background(background: str) -> str | None:
-    """Canonical background id for an id or display name (case-insensitive); None for custom strings."""
+    """Canonical background id for an id, display name or legacy alias (case-insensitive); None for custom strings."""
     want = str(background or "").strip().lower()
+    want = BACKGROUND_ALIASES.get(want, want)
     for background_id, info in COMMANDER_BACKGROUNDS.items():
         if want == background_id or want == str(info.get("name", "")).lower():
             return background_id

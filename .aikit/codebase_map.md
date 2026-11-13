@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `197`
-- **Total Classes**: `468`
+- **Total Python Modules**: `198`
+- **Total Classes**: `469`
 - **Total Top-Level Functions**: `511`
-- **Total Class Methods**: `2445`
-- **Total Source Lines**: `60519`
+- **Total Class Methods**: `2449`
+- **Total Source Lines**: `60564`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`197` module(s))
+- **Indexed**: python (`198` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -181,6 +181,20 @@
 
 **Functions:**
 - `def _crew(member_id, role, skill, specialty, injury)`
+
+---
+
+### [`tests/test_background_aliases.py`](tests/test_background_aliases.py)
+> *Every origin name the creation screen has ever offered grants its origin training.*
+
+**Size**: `39` lines (`1642` bytes)
+
+**Classes:**
+- `class TestBackgroundAliases`
+  - Method `.test_legacy_dropdown_names_resolve_to_their_catalog_origins()`
+  - Method `.test_aliases_grant_the_same_training_as_the_catalog_name()`
+  - Method `.test_every_catalog_origin_still_resolves_by_id_and_by_display_name()`
+  - Method `.test_a_genuinely_custom_origin_still_grants_nothing()`
 
 ---
 
@@ -3939,10 +3953,10 @@
 ### [`voidfarer/character.py`](voidfarer/character.py)
 > *Commander character progression, skills, and activatable abilities.*
 
-**Size**: `210` lines (`8480` bytes)
+**Size**: `216` lines (`8828` bytes)
 
 **Functions:**
-- `def match_background(background)` - *Canonical background id for an id or display name (case-insensitive); None for custom strings.*
+- `def match_background(background)` - *Canonical background id for an id, display name or legacy alias (case-insensitive); None for custom strings.*
 - `def apply_background_bonus(skills, background_id)` - *Layer origin training onto creation skills, capped at rank 10.*
 - `def skill_level(character, skill)`
 - `def skill_bonus(character, skill)` - *Percent bonus per skill level above baseline.*

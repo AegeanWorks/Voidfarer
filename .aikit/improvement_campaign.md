@@ -1199,3 +1199,7 @@ Audited diplomacy thresholds (8 of 8), NAP length and gift cost, outpost prices 
 ### Sixty-fifth pass — promises become tests
 
 The audit scripts are now a permanent suite (ADR-272), checked by mutation: four deliberately broken promises were each caught.
+
+### Sixty-sixth pass — first-run walkthrough: origins that did nothing
+
+Walking character creation found 2 of 6 dropdown origins granting nothing and 2 real origins unreachable (ADR-273). Engine aliases first; the dropdown follows in the next commit.

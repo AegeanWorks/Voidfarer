@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-promise-tests",
+    "task_id": "voidfarer-origins",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794604812.1618066,
+    "updated_at": 1794605328.4505963,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-decision-focus",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794586896.1979759,
-      "timestamp_str": "2026-11-13 19:21:36",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-decision-focus",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-decision-focus' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794586987.407061,
-      "timestamp_str": "2026-11-13 19:23:07",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-canvas-font",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: M1 declare the surface map renderer a theme path (ADR-266); M2 raise canvas fonts to 12px as a UI task",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794587419.6737127,
-      "timestamp_str": "2026-11-13 19:30:19",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Canvas text below the 12px floor, and the lint treats two canvas renderers differently",
-        "benefits": "Readable canvas labels; consistent contract",
-        "risks": "contract: ui.json theme_paths widened by one canvas renderer; dependency: none; concurrency: none; state: none",
-        "mitigation": "Own commit with ADR, other canvas files stay linted, ADR-266"
-      },
-      "plan_digest": "7fd526b8839f199c6ef7ec4d889e92ab9ed17f8474d9509aa8a02461997610b1"
-    },
     {
       "task_id": "voidfarer-canvas-font",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794604812.1618066,
       "timestamp_str": "2026-11-14 00:20:12",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-promise-tests",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-promise-tests' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794604929.7874904,
+      "timestamp_str": "2026-11-14 00:22:09",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-origins",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 engine aliases for legacy origin names with tests; M2 dropdown follows the catalog as a UI task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794605328.0514,
+      "timestamp_str": "2026-11-14 00:28:48",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "2 of 6 creation origins granted nothing and 2 real origins were unreachable",
+        "benefits": "Every origin choice has its promised training",
+        "risks": "contract: match_background accepts two more names; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first tests, custom origins still grant nothing, ADR-273"
+      },
+      "plan_digest": "a76e8c4514bc9a9138b60de63f0295ab790362af6f3f4df6a5932b9e56a11d9b"
+    },
+    {
+      "task_id": "voidfarer-origins",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] aliases Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794605328.4505963,
+      "timestamp_str": "2026-11-14 00:28:48",
       "agent": "claude:1",
       "checklists": "passed"
     }
