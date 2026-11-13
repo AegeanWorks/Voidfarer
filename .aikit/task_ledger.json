@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-rescue-scoop",
+    "task_id": "voidfarer-ai-burn",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794569090.6875014,
+    "updated_at": 1794570414.7613816,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-input-names",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-input-names' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794566795.651307,
-      "timestamp_str": "2026-11-13 13:46:35",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-dialog-semantics",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: dialog roles, labels and focus management for four overlays, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794567026.1894143,
-      "timestamp_str": "2026-11-13 13:50:26",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Overlays were not announced and left focus underneath",
-        "benefits": "Screen reader and keyboard users get real dialogs",
-        "risks": "contract: none pinned; dependency: MutationObserver; concurrency: none; state: none",
-        "mitigation": "Observer covers all open paths, real Edge focus proof, ADR-252"
-      },
-      "plan_digest": "7524f658081b94463e3c480f744dc8500657041622dc6038795ab8235cfced07"
-    },
-    {
-      "task_id": "voidfarer-dialog-semantics",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794567026.5337892,
-      "timestamp_str": "2026-11-13 13:50:26",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-dialog-semantics",
       "phase": "completed",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794569090.6875014,
       "timestamp_str": "2026-11-13 14:24:50",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-rescue-scoop",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-rescue-scoop' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794569604.045134,
+      "timestamp_str": "2026-11-13 14:33:24",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-ai-burn",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: AI captain tour burns fuel cells, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794570414.3863013,
+      "timestamp_str": "2026-11-13 14:46:54",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Mechanics gate did not cover the fuel-cell burn",
+        "benefits": "Regressions in ADR-236 are caught by ai_play",
+        "risks": "contract: tour order; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first test, ai_play still 0 gaps, ADR-257"
+      },
+      "plan_digest": "c9265a0a46bba23be68a77e5b7f692556fd9b1e3ac8753448628d3feac18a729"
+    },
+    {
+      "task_id": "voidfarer-ai-burn",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794570414.7613816,
+      "timestamp_str": "2026-11-13 14:46:54",
       "agent": "claude:1",
       "checklists": "passed"
     }

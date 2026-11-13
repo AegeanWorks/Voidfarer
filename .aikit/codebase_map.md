@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `182`
-- **Total Classes**: `450`
+- **Total Python Modules**: `183`
+- **Total Classes**: `451`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2386`
-- **Total Source Lines**: `59826`
+- **Total Class Methods**: `2388`
+- **Total Source Lines**: `59876`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`182` module(s))
+- **Indexed**: python (`183` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -118,6 +118,17 @@
   - Method `.test_calendar_date_advances_and_rolls_over_months()`
   - Method `.test_time_payload_exposes_date()`
   - Method `.test_engine_tick_updates_calendar_date()`
+
+---
+
+### [`tests/test_ai_burn_cells.py`](tests/test_ai_burn_cells.py)
+> *The headless AI captain exercises the fuel-cell burn, so the mechanics gate covers it.*
+
+**Size**: `41` lines (`1585` bytes)
+
+**Classes:**
+- `class TestAiBurnCells`
+  - Method `.test_a_played_game_burns_a_cell_through_the_engineering_action()`
 
 ---
 
@@ -3610,7 +3621,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `803` lines (`36147` bytes)
+**Size**: `812` lines (`36638` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -3630,6 +3641,7 @@
   - Method `._tour_messages()`
   - Method `._tour_contracts()`
   - Method `._tour_refuel()`
+  - Method `._tour_burn_cells()` - *Burn one hold Quantum Fuel Cell when the tank has room (the fuel-cell emergency refuel).*
   - Method `._tour_repair()`
   - Method `._tour_crew()`
   - Method `._tour_upgrade()`

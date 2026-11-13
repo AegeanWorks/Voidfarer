@@ -2695,3 +2695,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Consequences**: No engine, save, API or CLI change. `tests/test_scoop_button.py` (new, failing first: 2 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified in real Edge on the Sol star: 6/6 TAPS, then 5/6 after a real scoop that took server fuel 10 to 32, matching the advertised yield of about 22.
 
 - **Addendum 2 (same day)**: the verdict ignored scooping, so a stranded captain orbiting a star with taps left was offered a 200 cr rescue while free fuel was available. `rescue_status()` now refuses with "you can scoop fuel from the body you are orbiting." when the orbited body is scoopable and its volatile reservoir still has a tap (`_scoop_available_here`, using the same profile and recharge helpers as the scoop action). Two tests added to `tests/test_distress_call.py`, failing first.
+
+### ADR-257: The headless AI captain exercises the fuel-cell burn
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: The `/api/engineering/action` alias is documented in the agent catalog but never attempted, so the mechanics gate (`ai_play`) would not notice a regression in the fuel-cell burn (ADR-236) that the cockpit, CLI and REST all depend on.
+- **Decision**: A tour step `_tour_burn_cells` burns one hold fuel cell whenever the captain holds one and the tank has room, through the engineering alias. The tour is keyed by path, so one engineering step runs per game; the distress call (ADR-255) is deliberately not added because it is eligible only in a stranded state a normal tour does not reach.
+- **Consequences**: Mechanics gate coverage only; no game rule change. `tests/test_ai_burn_cells.py` (new, failing first) plays 200 steps and requires `burn_cells` among the families with zero errors and zero coverage gaps. `ai_play --steps 180` still reports 0 gaps.

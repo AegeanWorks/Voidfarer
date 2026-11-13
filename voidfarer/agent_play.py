@@ -351,6 +351,7 @@ class AiCaptain:
             self._tour_orbit,
             self._tour_salvage,
             self._tour_scoop,
+            self._tour_burn_cells,
         )
         attempts = 0
         while attempts < len(builders):
@@ -413,6 +414,14 @@ class AiCaptain:
         if int(ship.get("credits") or 0) < 100 or int(ship.get("fuel") or 0) >= int(ship.get("max_fuel") or 0):
             return None
         return "/api/refuel", {"amount": 10}, "refuel"
+
+    def _tour_burn_cells(self):
+        """Burn one hold Quantum Fuel Cell when the tank has room (the fuel-cell emergency refuel)."""
+        ship = self.state.get("ship") or {}
+        cells = int((ship.get("cargo") or {}).get("fuel_cells") or 0)
+        if cells < 1 or int(ship.get("fuel") or 0) >= int(ship.get("max_fuel") or 0):
+            return None
+        return "/api/engineering/action", {"action": "burn_cells", "quantity": 1}, "burn_cells"
 
     def _tour_repair(self):
         ship = self.state.get("ship") or {}
