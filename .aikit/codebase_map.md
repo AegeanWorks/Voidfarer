@@ -10,7 +10,7 @@
 - **Total Classes**: `433`
 - **Total Top-Level Functions**: `500`
 - **Total Class Methods**: `2333`
-- **Total Source Lines**: `59172`
+- **Total Source Lines**: `59180`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`168` module(s))
@@ -1992,7 +1992,7 @@
 ### [`tests/test_low_fuel_gauge.py`](tests/test_low_fuel_gauge.py)
 > *Top-bar fuel gauge: a low-fuel state that offers the hold fuel-cell burn where the problem shows.*
 
-**Size**: `36` lines (`1511` bytes)
+**Size**: `40` lines (`1824` bytes)
 
 **Classes:**
 - `class TestLowFuelGauge`
@@ -2006,7 +2006,7 @@
 ### [`tests/test_low_hull_gauge.py`](tests/test_low_hull_gauge.py)
 > *Top-bar hull gauge: a critical-hull state that offers the titanium patch kit where the problem shows.*
 
-**Size**: `36` lines (`1537` bytes)
+**Size**: `40` lines (`1855` bytes)
 
 **Classes:**
 - `class TestLowHullGauge`

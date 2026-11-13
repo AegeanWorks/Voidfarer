@@ -2598,3 +2598,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Field fabrication of a patch kit (+25 hull from 1 titanium) lives only on the SHIP tab, so a captain watching the hull bar fall would not find it. ADR-242 solved the same problem for fuel.
 - **Decision**: At 30% hull or less the top-bar hull card turns red with a tooltip naming the remedy. With titanium in the hold it shows a boxed PATCH HULL chip and the card fabricates one patch kit on click (`handleFabricate("patch_kit")`, the existing `/api/fabricate`); without titanium the tooltip says to dock or carry titanium. Display and a click on existing state only. `tests/test_low_hull_gauge.py` (new, failing first: 4 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
 - **Consequences**: Verified in real Edge: a forced critical hull shows the chip, and a real click moved server hull 96 to 121 and titanium 3 to 2. No engine, save, API or CLI change.
+
+### ADR-244: Actionable vital cards are keyboard controls
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: The BURN CELL (ADR-242) and PATCH HULL (ADR-243) vital cards were clickable `div`s, unreachable by keyboard.
+- **Decision**: A shared `setVitalAction(card, actionable, handler)` makes a card `role="button"` and focusable (Enter or Space activates it) only while it offers an action, and removes both when it does not. Delivered in two commits because the UI task guard protects `tests/`. **Test change, named per PRINCIPLE-014:** `test_only_a_burnable_card_triggers_the_burn` and `test_only_a_patchable_card_fabricates` pinned the old inline click-binding wording; they are re-expressed to accept the same contract (the action fires only from the actionable state, via the same handler) through either the old class check or the new helper. This is not a loosening of behaviour: the new keyboard test adds a stricter role check on top.
+- **Consequences**: Display and input handling only; no engine, save, API or CLI change.

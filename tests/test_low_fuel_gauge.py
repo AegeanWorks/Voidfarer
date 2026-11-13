@@ -23,7 +23,11 @@ class TestLowFuelGauge(unittest.TestCase):
         self.assertIn('classList.toggle("is-burnable", lowFuel && cells > 0)', JS)
 
     def test_only_a_burnable_card_triggers_the_burn(self) -> None:
-        self.assertIn('fuelCard.classList.contains("is-burnable")', JS)
+        # Contract: the burn fires only from a card in the burnable state, via handleBurnCells. It is
+        # either gated by the class directly or by the keyboard-aware setVitalAction helper (ADR-244).
+        gated = ('fuelCard.classList.contains("is-burnable")' in JS
+                 or "this.setVitalAction(fuelCard, lowFuel && cells > 0," in JS)
+        self.assertTrue(gated)
         self.assertIn("this.handleBurnCells()", JS)
 
     def test_styles_exist_for_both_states(self) -> None:

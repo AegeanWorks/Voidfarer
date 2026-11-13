@@ -23,7 +23,11 @@ class TestLowHullGauge(unittest.TestCase):
         self.assertIn('classList.toggle("is-patchable", lowHull && titanium > 0)', JS)
 
     def test_only_a_patchable_card_fabricates(self) -> None:
-        self.assertIn('hullCard.classList.contains("is-patchable")', JS)
+        # Contract: the patch fires only from a card in the patchable state, via handleFabricate. It is
+        # either gated by the class directly or by the keyboard-aware setVitalAction helper (ADR-244).
+        gated = ('hullCard.classList.contains("is-patchable")' in JS
+                 or "this.setVitalAction(hullCard, lowHull && titanium > 0," in JS)
+        self.assertTrue(gated)
         self.assertIn('this.handleFabricate("patch_kit")', JS)
 
     def test_styles_exist_for_both_states(self) -> None:

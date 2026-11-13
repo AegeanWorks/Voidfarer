@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-low-hull-gauge",
+    "task_id": "voidfarer-vital-keyboard",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794551855.3287952,
+    "updated_at": 1794552193.4153483,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-settings-controls",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794548876.8918083,
-      "timestamp_str": "2026-11-13 08:47:56",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-settings-controls",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-settings-controls' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794548942.1945076,
-      "timestamp_str": "2026-11-13 08:49:02",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-customs-review",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: M1 tool drives a real customs encounter; M2 encounter action text to 12px as a UI task",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794549051.9647524,
-      "timestamp_str": "2026-11-13 08:50:51",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Customs scenario rendered nothing and the card was never audited",
-        "benefits": "Customs card reviewable; readability floor enforced on all encounter cards",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "New failing-first tests, real-Edge audit, ADR-238"
-      },
-      "plan_digest": "670731cfd8b2da376547f493ba956d7959309c10b7a271e93258c2d335338bd9"
-    },
     {
       "task_id": "voidfarer-customs-review",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794551855.3287952,
       "timestamp_str": "2026-11-13 09:37:35",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-low-hull-gauge",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-low-hull-gauge' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794551938.0809245,
+      "timestamp_str": "2026-11-13 09:38:58",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-vital-keyboard",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 re-express two gauge tests to accept the helper (no UI task); M2 setVitalAction helper as a UI task plus keyboard test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794552193.1124363,
+      "timestamp_str": "2026-11-13 09:43:13",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "BURN CELL and PATCH HULL cards are mouse-only",
+        "benefits": "Keyboard players can use both remedies",
+        "risks": "contract: two test assertions re-expressed, named in ADR-244; dependency: none; concurrency: none; state: none",
+        "mitigation": "Same contract kept, stricter new test, real Enter-key proof, ADR-244"
+      },
+      "plan_digest": "e85e5c25ca00ac90bccc6dde80315539276126a7f60b14fa898f0b42141927c6"
+    },
+    {
+      "task_id": "voidfarer-vital-keyboard",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] test re-expression Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794552193.4153483,
+      "timestamp_str": "2026-11-13 09:43:13",
       "agent": "claude:1",
       "checklists": "passed"
     }
