@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `193`
-- **Total Classes**: `461`
-- **Total Top-Level Functions**: `507`
-- **Total Class Methods**: `2424`
-- **Total Source Lines**: `60234`
+- **Total Python Modules**: `194`
+- **Total Classes**: `462`
+- **Total Top-Level Functions**: `508`
+- **Total Class Methods**: `2430`
+- **Total Source Lines**: `60322`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`193` module(s))
+- **Indexed**: python (`194` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2145,6 +2145,23 @@
 
 ---
 
+### [`tests/test_jump_cost_estimate.py`](tests/test_jump_cost_estimate.py)
+> *The route planner's fuel estimate equals what a jump really spends, so cockpit, CLI and rescue logic can trust it.*
+
+**Size**: `64` lines (`2880` bytes)
+
+**Classes:**
+- `class TestJumpCostEstimate`
+  - Method `.test_single_hop_estimate_equals_the_fuel_a_jump_spends()`
+  - Method `.test_public_cost_helper_matches_the_estimate_for_a_direct_lane()`
+  - Method `.test_multi_hop_estimate_is_the_sum_of_its_hops()`
+  - Method `.test_rescue_verdict_uses_the_true_cost()`
+
+**Functions:**
+- `def _engine(seed, power, fuel)`
+
+---
+
 ### [`tests/test_jump_fuel_cost.py`](tests/test_jump_fuel_cost.py)
 > *System target card: the jump button states its fuel cost and refuses a jump the tank cannot cover.*
 
@@ -4145,7 +4162,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10563` lines (`521598` bytes)
+**Size**: `10587` lines (`522910` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4259,6 +4276,8 @@
   - Method `.dismiss_escort(ship_id)`
   - Method `.sell_escort(ship_id)` - *Sell an escort or captured prize at a docked station.*
   - Method `.get_fleet_manager_report()`
+  - Method `._hop_fuel_cost(cur_sys, target_sys)` - *Quantum fuel one hyperspace hop spends right now: power routing, upgrades, relics, talents,*
+  - Method `.jump_fuel_cost(target_system_id)` - *Fuel a direct jump from the current system to a linked system would spend now.*
   - Method `.plan_route(target_system_id)`
   - Method `.navigate_to(target_system_id)`
   - Method `.recruit_crew(role_id)`

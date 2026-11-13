@@ -1666,27 +1666,11 @@ class SimulationEngine:
             if not target_sys:
                 return False, f"Unknown system target '{target_system_id}'."
 
-            # Calculate fuel cost (with warp booster upgrade bonus, relics, and talents)
-            passives = calculate_passive_multipliers(self.state.ship)
+            fuel_cost = self._hop_fuel_cost(cur_sys, target_sys)
+            # The rest of the jump (encounter risk, events) reads these same inputs.
             equipment = self._combined_equipment()
-            eng_pwr = self._effective_power("engines")
-            base_fuel = 8
-            if eng_pwr >= 40:
-                fuel_cost = max(3, base_fuel - 3)
-            elif eng_pwr < 20:
-                fuel_cost = base_fuel + 4
-            else:
-                fuel_cost = base_fuel
-
             origin_map = self._map_effects(cur_sys)
             target_map = self._map_effects(target_sys)
-            route_fuel_mult = (float(origin_map["fuel_mult"]) + float(target_map["fuel_mult"])) / 2.0
-            research = self._research_bonuses()
-            fuel_cost = max(1, int(fuel_cost * equipment["fuel_efficiency"] * passives["fuel_efficiency"] * research["fuel_efficiency"] * (1.0 - min(0.25, self._skill("piloting"))) * route_fuel_mult))
-            fuel_cost = max(
-                1,
-                fuel_cost - int(self._megastructure_bonuses()["jump_fuel"]),
-            )
 
             if self.state.ship.fuel < fuel_cost:
                 return False, f"Insufficient Quantum Fuel: {fuel_cost} units required, {self.state.ship.fuel} available."
@@ -4106,9 +4090,49 @@ class SimulationEngine:
                 "formations": ["balanced", "aggressive", "defensive"],
             }
 
+    def _hop_fuel_cost(self, cur_sys: StarSystem, target_sys: StarSystem) -> int:
+        """Quantum fuel one hyperspace hop spends right now: power routing, upgrades, relics, talents,
+        research, piloting, the map effects at both ends and megastructures. The single formula behind
+        the jump itself and every fuel estimate, so a plan can never disagree with the real cost."""
+        passives = calculate_passive_multipliers(self.state.ship)
+        equipment = self._combined_equipment()
+        eng_pwr = self._effective_power("engines")
+        base_fuel = 8
+        if eng_pwr >= 40:
+            fuel_cost = max(3, base_fuel - 3)
+        elif eng_pwr < 20:
+            fuel_cost = base_fuel + 4
+        else:
+            fuel_cost = base_fuel
+
+        origin_map = self._map_effects(cur_sys)
+        target_map = self._map_effects(target_sys)
+        route_fuel_mult = (float(origin_map["fuel_mult"]) + float(target_map["fuel_mult"])) / 2.0
+        research = self._research_bonuses()
+        fuel_cost = max(1, int(fuel_cost * equipment["fuel_efficiency"] * passives["fuel_efficiency"] * research["fuel_efficiency"] * (1.0 - min(0.25, self._skill("piloting"))) * route_fuel_mult))
+        fuel_cost = max(
+            1,
+            fuel_cost - int(self._megastructure_bonuses()["jump_fuel"]),
+        )
+        return fuel_cost
+
+    def jump_fuel_cost(self, target_system_id: str) -> int:
+        """Fuel a direct jump from the current system to a linked system would spend now."""
+        with self.lock:
+            target = self.state.systems.get(target_system_id)
+            return self._hop_fuel_cost(self.current_system, target) if target else 0
+
     def plan_route(self, target_system_id: str) -> dict[str, Any]:
         with self.lock:
-            return route_plan(self.state.systems, self.state.ship.current_system_id, target_system_id)
+            plan = route_plan(self.state.systems, self.state.ship.current_system_id, target_system_id)
+            if plan.get("reachable") and len(plan["path"]) > 1:
+                # The planner's flat per-hop guess is replaced by the real cost of each hop.
+                systems = self.state.systems
+                plan["fuel_estimate"] = max(1, sum(
+                    self._hop_fuel_cost(systems[a], systems[b])
+                    for a, b in zip(plan["path"], plan["path"][1:])
+                ))
+            return plan
 
     def navigate_to(self, target_system_id: str) -> tuple[bool, str]:
         plan = self.plan_route(target_system_id)

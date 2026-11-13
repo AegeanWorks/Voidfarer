@@ -1183,3 +1183,7 @@ The 12px floor now covers canvas text too (ADR-267): ten literals raised, surfac
 ### Sixty-first pass — radar label contrast
 
 Measured canvas label contrast against the sampled nebula (1.6 to 2.6:1), retinted to ivory and removed a tick/compass overlap the brighter text revealed (ADR-268). Proof: `ui-review/goal-radarcontrast/`.
+
+### Sixty-second pass — true jump costs
+
+Audit of my own earlier display change found the planner's estimate disagreed with real jumps in 47 of 48 lanes; the engine now has one cost formula shared by the jump and every estimate (ADR-269). Proof: estimates equal spends in tests, and the button matched real jumps at three power settings in Edge.
