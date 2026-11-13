@@ -123,5 +123,20 @@ class TestSurfaces(unittest.TestCase):
         self.assertEqual(engine.state.ship.fuel, engine.RESCUE_FUEL)
 
 
+class TestSnapshotVerdict(unittest.TestCase):
+    def test_snapshot_carries_the_engines_verdict_only_when_fuel_is_low(self) -> None:
+        stranded = _stranded()
+        verdict = stranded.get_status_snapshot()["rescue"]
+        self.assertTrue(verdict["available"])
+        healthy = SimulationEngine(seed=42)
+        self.assertIsNone(healthy.get_status_snapshot()["rescue"])
+
+    def test_a_low_tank_that_can_still_jump_is_not_offered_a_rescue(self) -> None:
+        engine = _stranded(fuel=15)  # 25% of 60: gauge is low, but a jump (about 8) is affordable
+        verdict = engine.get_status_snapshot()["rescue"]
+        self.assertFalse(verdict["available"])
+        self.assertIn("not stranded", verdict["reason"])
+
+
 if __name__ == "__main__":
     unittest.main()

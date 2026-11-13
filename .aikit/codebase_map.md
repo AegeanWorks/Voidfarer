@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `180`
-- **Total Classes**: `446`
+- **Total Python Modules**: `181`
+- **Total Classes**: `448`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2375`
-- **Total Source Lines**: `59725`
+- **Total Class Methods**: `2379`
+- **Total Source Lines**: `59769`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`180` module(s))
+- **Indexed**: python (`181` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -997,7 +997,7 @@
 ### [`tests/test_distress_call.py`](tests/test_distress_call.py)
 > *Distress call: a truly stranded ship can summon a rescue tender, at a price, through every surface.*
 
-**Size**: `127` lines (`5459` bytes)
+**Size**: `142` lines (`6185` bytes)
 
 **Classes:**
 - `class TestDistressCall`
@@ -1010,9 +1010,24 @@
   - Method `.test_engineering_action_and_report()`
   - Method `.test_cli_engineering_distress_saves()`
   - Method `.test_rest_engineering_action()`
+- `class TestSnapshotVerdict`
+  - Method `.test_snapshot_carries_the_engines_verdict_only_when_fuel_is_low()`
+  - Method `.test_a_low_tank_that_can_still_jump_is_not_offered_a_rescue()`
 
 **Functions:**
 - `def _stranded(credits, fuel, cargo)`
+
+---
+
+### [`tests/test_distress_cockpit.py`](tests/test_distress_cockpit.py)
+> *Cockpit: the low-fuel gauge offers the rescue when no cell or titanium remains.*
+
+**Size**: `23` lines (`851` bytes)
+
+**Classes:**
+- `class TestCockpit`
+  - Method `.test_low_fuel_gauge_offers_the_rescue_when_nothing_else_remains()`
+  - Method `.test_the_chip_text_returns_to_burn_cell_when_cells_exist()`
 
 ---
 
@@ -3955,7 +3970,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10545` lines (`520660` bytes)
+**Size**: `10551` lines (`521032` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

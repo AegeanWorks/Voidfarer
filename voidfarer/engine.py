@@ -8080,6 +8080,12 @@ class SimulationEngine:
                 "comms": comms_summary(self.state),
                 "surface": surface_summary(self.state),
                 "flight": flight_summary(self.state),
+                # The engine's own distress-call verdict, only worked out while the tank is at or below a
+                # quarter (the gauge's low state), so healthy snapshots pay nothing for it.
+                "rescue": (
+                    self.rescue_status()
+                    if self.state.ship.fuel * 4 <= self.state.ship.max_fuel else None
+                ),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),
