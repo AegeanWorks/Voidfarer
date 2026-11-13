@@ -1117,3 +1117,7 @@ A scan for disabled buttons without a title found silent perks, upgrades, chassi
 ### Forty-fourth pass — accessible names
 
 Scan for controls without an accessible name found seven inputs (ADR-251); all now carry aria-labels. Proof: live counts 7 then 0 (`ui-review/goal-names`, `goal-names2`).
+
+### Forty-fifth pass — dialog semantics and focus
+
+Overlays were unlabelled divs that left focus behind (ADR-252). Now labelled modal dialogs with focus in and focus restored. Proof: `ui-review/goal-dialog` eval output (focus path btnCloseSettings then tabBtnShip).

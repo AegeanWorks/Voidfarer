@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `176`
-- **Total Classes**: `441`
+- **Total Python Modules**: `177`
+- **Total Classes**: `442`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2358`
-- **Total Source Lines**: `59444`
+- **Total Class Methods**: `2361`
+- **Total Source Lines**: `59488`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`176` module(s))
+- **Indexed**: python (`177` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -964,6 +964,19 @@
   - Method `.test_three_victories_award_the_combat_medal()`
   - Method `.test_away_mission_awards_the_explorer_medal()`
   - Method `.test_codex_counts_all_crew_medals()`
+
+---
+
+### [`tests/test_dialog_semantics.py`](tests/test_dialog_semantics.py)
+> *Overlays are real dialogs: labelled, modal, and they take and return keyboard focus.*
+
+**Size**: `44` lines (`1781` bytes)
+
+**Classes:**
+- `class TestDialogSemantics`
+  - Method `.test_each_overlay_is_a_labelled_modal_dialog()`
+  - Method `.test_one_observer_manages_focus_for_every_open_and_close_path()`
+  - Method `.test_focus_moves_in_on_open_and_is_restored_on_close()`
 
 ---
 

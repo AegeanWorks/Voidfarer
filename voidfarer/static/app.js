@@ -587,6 +587,7 @@ class CockpitApp {
         this.bindEvents();
         this.initTooltips();
         this.initDeckScrollHint();
+        this.initDialogFocus();
         this.openInitialTerminalTab();
         this.applyViewportProfile();
         this.syncRadarControlState();
@@ -8894,6 +8895,34 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const overlay = document.getElementById("mainMenuOverlay");
         if (overlay) overlay.classList.add("hidden");
         this.sound.playBeep(640, 0.04);
+    }
+
+    // Overlays are modal dialogs: when one becomes visible, keyboard focus moves to its first control and
+    // the previous focus is remembered; when it hides, focus returns. One observer covers every open and
+    // close path (menu, settings, character creation, death).
+    initDialogFocus() {
+        const isOpen = el => (el.id === "mainMenuOverlay"
+            ? !el.classList.contains("hidden")
+            : getComputedStyle(el).display !== "none");
+        ["mainMenuOverlay", "settingsOverlay", "characterCreationOverlay", "deathOverlay"].forEach(id => {
+            const overlay = document.getElementById(id);
+            if (!overlay || typeof MutationObserver === "undefined") return;
+            let opener = null;
+            let wasOpen = isOpen(overlay);
+            new MutationObserver(() => {
+                const open = isOpen(overlay);
+                if (open === wasOpen) return;
+                wasOpen = open;
+                if (open) {
+                    opener = document.activeElement;
+                    const first = overlay.querySelector("button, input, select, [tabindex]:not([tabindex='-1'])");
+                    if (first) first.focus();
+                } else if (opener && typeof opener.focus === "function" && document.contains(opener)) {
+                    opener.focus();
+                    opener = null;
+                }
+            }).observe(overlay, { attributes: true, attributeFilter: ["style", "class"] });
+        });
     }
 
     initDeckScrollHint() {

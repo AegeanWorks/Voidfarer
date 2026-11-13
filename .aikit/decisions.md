@@ -2654,3 +2654,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A live scan of buttons, inputs, selects and links across all tabs found seven inputs with no accessible name: the master-volume slider, the commander name and age fields, and the four reactor power sliders. Their visible labels sat beside them without being associated, so a screen reader announced only "slider" or "edit text".
 - **Decision**: Add explicit `aria-label`s: Master volume, Commander name, Commander age, and Engines, Shields, Sensors and Weapons power. Attribute-only; `tests/test_input_names.py` (new, failing first: 2 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
 - **Consequences**: No visual, engine, save, API or CLI change. Unnamed controls in the live page: 7 to 0.
+
+### ADR-252: Overlays are labelled modal dialogs that take and return keyboard focus
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: Only the decision popup declared `role="dialog"`. The main menu, Settings, Character Creation and the death screen were plain divs: a screen reader did not announce them, and opening one left keyboard focus on the control underneath it.
+- **Decision**: The four overlays get `role="dialog"` (`alertdialog` for the death screen, which interrupts), `aria-modal="true"` and an `aria-labelledby` pointing at their new title ids. One `MutationObserver` per overlay (`initDialogFocus`) watches visibility, so every existing open and close path is covered without editing eight call sites: on open it remembers the focused element and focuses the overlay's first control; on close it restores the previous focus.
+- **Consequences**: Markup and one small helper; no visual, engine, save, API or CLI change. `tests/test_dialog_semantics.py` (new, failing first: 2 failures and 1 error) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified in real Edge: Settings open focused the close button and close returned focus to the SHIP tab button; the main menu did the same.

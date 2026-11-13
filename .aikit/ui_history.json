@@ -1703,5 +1703,26 @@
     "final_snapshot_digest": "03a1c8ec74bb82f11bb24cc9df118f065ce7fb16c041a30b39ca3ac881c2ccb2",
     "final_snapshot_entries": 1270,
     "surface_digest": "65993d2321f9399703e370db989f17d3b759e1ebe60d8efb4b46bd9dfc5ab0b2"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "5c611238063b9a4e1c9f632cd5312f042bbb3a91",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794566922.772842,
+    "finished_at": 1794567022.543065,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; no visual change; real Edge: Settings open moved focus to btnCloseSettings and close restored tabBtnShip; menu likewise; role=dialog on four overlays)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "04bdf2cb78fb6aed25abfa4ba10e6b0df44ead7949dec3644441bb3d465cad27",
+    "final_snapshot_entries": 1279,
+    "surface_digest": "68feaab3d5b952af76f09c417a0f2fd33b7611bab4e5ba58139ee15053c3c02d"
   }
 ]

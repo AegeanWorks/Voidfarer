@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-input-names",
+    "task_id": "voidfarer-dialog-semantics",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794566728.7452297,
+    "updated_at": 1794567026.5337892,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-reduced-motion",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: particle FX honor reduce-motion with failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794552739.7908072,
-      "timestamp_str": "2026-11-13 09:52:19",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Canvas particles ignored the OS reduce-motion preference",
-        "benefits": "Motion-sensitive players get a calm cockpit",
-        "risks": "contract: none pinned; dependency: matchMedia; concurrency: none; state: none",
-        "mitigation": "Event feedback kept, failing-first test, two-mode Edge proof, ADR-245"
-      },
-      "plan_digest": "71a35c62f4ce7de77e0541abf1fdfbceb88e40574c5bacb2efc5eaca573aa323"
-    },
-    {
-      "task_id": "voidfarer-reduced-motion",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794552740.0830917,
-      "timestamp_str": "2026-11-13 09:52:20",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-reduced-motion",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-reduced-motion' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794552802.6083205,
-      "timestamp_str": "2026-11-13 09:53:22",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-forced-colors",
       "phase": "phase 2",
@@ -278,6 +238,46 @@
       "status": "in_progress",
       "timestamp": 1794566728.7452297,
       "timestamp_str": "2026-11-13 13:45:28",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-input-names",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-input-names' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794566795.651307,
+      "timestamp_str": "2026-11-13 13:46:35",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-dialog-semantics",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: dialog roles, labels and focus management for four overlays, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794567026.1894143,
+      "timestamp_str": "2026-11-13 13:50:26",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Overlays were not announced and left focus underneath",
+        "benefits": "Screen reader and keyboard users get real dialogs",
+        "risks": "contract: none pinned; dependency: MutationObserver; concurrency: none; state: none",
+        "mitigation": "Observer covers all open paths, real Edge focus proof, ADR-252"
+      },
+      "plan_digest": "7524f658081b94463e3c480f744dc8500657041622dc6038795ab8235cfced07"
+    },
+    {
+      "task_id": "voidfarer-dialog-semantics",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794567026.5337892,
+      "timestamp_str": "2026-11-13 13:50:26",
       "agent": "claude:1",
       "checklists": "passed"
     }

@@ -15,11 +15,11 @@
     <div class="scanline-overlay"></div>
 
     <!-- Main Menu Overlay -->
-    <div class="main-menu-overlay hidden" id="mainMenuOverlay">
+    <div class="main-menu-overlay hidden" id="mainMenuOverlay" role="dialog" aria-modal="true" aria-labelledby="mainMenuTitle">
         <div class="main-menu-card">
             <div class="main-menu-brand">
                 <span class="main-menu-kicker">WINDOWS COMMAND AUTHORITY // PRESS ESC TO TOGGLE</span>
-                <h1>VOIDFARER</h1>
+                <h1 id="mainMenuTitle">VOIDFARER</h1>
                 <p>Autonomous galaxy simulation // tactical cockpit</p>
             </div>
             <div class="main-menu-saves-panel">
@@ -58,10 +58,10 @@
     </div>
 
     <!-- Settings Window -->
-    <div class="game-window-overlay" id="settingsOverlay" style="display: none;">
+    <div class="game-window-overlay" id="settingsOverlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
         <div class="game-window">
             <div class="game-window-header">
-                <h2>SETTINGS</h2>
+                <h2 id="settingsTitle">SETTINGS</h2>
                 <button class="window-close" id="btnCloseSettings" aria-label="Close settings" data-tooltip="Close settings">×</button>
             </div>
             <div class="game-window-body settings-body">
@@ -148,10 +148,10 @@
     </div>
 
     <!-- Character Creation Window -->
-    <div class="game-window-overlay" id="characterCreationOverlay" style="display: none;">
+    <div class="game-window-overlay" id="characterCreationOverlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="charCreationTitle">
         <div class="game-window">
             <div class="game-window-header">
-                <h2>CHARACTER CREATION</h2>
+                <h2 id="charCreationTitle">CHARACTER CREATION</h2>
                 <button class="window-close" id="btnCloseCharCreation" aria-label="Close character creation" data-tooltip="Close character creation">×</button>
             </div>
             <div class="game-window-body">
@@ -195,10 +195,10 @@
     </div>
 
     <!-- Death Overlay -->
-    <div class="game-window-overlay" id="deathOverlay" style="display: none;">
+    <div class="game-window-overlay" id="deathOverlay" style="display: none;" role="alertdialog" aria-modal="true" aria-labelledby="deathTitle">
         <div class="game-window death-window">
             <div class="game-window-header">
-                <h2>COMMANDER LOST</h2>
+                <h2 id="deathTitle">COMMANDER LOST</h2>
             </div>
             <div class="game-window-body">
                 <div class="death-content">
