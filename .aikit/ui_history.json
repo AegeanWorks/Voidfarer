@@ -1764,5 +1764,26 @@
     "final_snapshot_digest": "04bdf2cb78fb6aed25abfa4ba10e6b0df44ead7949dec3644441bb3d465cad27",
     "final_snapshot_entries": 1279,
     "surface_digest": "409430875de1ad5449a52385374e2c4be92ff89568450bf612933b57fadeae3a"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "589230d33f567da60c3d0918d42224bab44a7e5b",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794568301.5463512,
+    "finished_at": 1794568475.1226282,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted FUEL 0/60 in red with a boxed CALL RESCUE chip; click took server fuel 0 to 15 and credits 500 to 297; after the rescue the card stops offering it)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "2e8e2e6271111477022e27c7051d34f96efa324b1d7c49349aa4168d20c517de",
+    "final_snapshot_entries": 1280,
+    "surface_digest": "2621ce7dd0e9aecec728081f71b4a15869b354585a77736f93b07510fc366c07"
   }
 ]

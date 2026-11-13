@@ -10998,3 +10998,8 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* REFIT: a purchase into an occupied slot says what it replaces. */
 .arsenal-replaces { margin: 3px 0 0; color: var(--console-gold); font-size: 12px; letter-spacing: 0.05em; }
+
+/* Stranded (no cells, no titanium): the same chip offers a rescue tender. */
+#vitalFuelCard.is-rescuable { cursor: pointer; }
+#vitalFuelCard.is-rescuable #fuelBurnChip { display: inline-block; }
+#vitalFuelCard.is-rescuable:hover #fuelBurnChip { background: rgba(217, 112, 95, 0.2); }

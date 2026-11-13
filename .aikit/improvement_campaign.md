@@ -1133,3 +1133,5 @@ Page basics scanned clean (lang, title, landmarks, live log); the tab rail now e
 ### Forty-eighth pass — distress call (mechanic)
 
 Chose the stranded-ship dead end myself (ADR-255): a rescue tender for 15 fuel, up to 200 cr and 6 ticks, only when nothing else can help. Engine, CLI and REST in this commit; cockpit chip next.
+
+Cockpit follow-up (ADR-255): CALL RESCUE chip on the fuel gauge, following the engine's verdict. A real-browser probe caught the gauge offering a rescue at exactly 15/60 that the engine would refuse; fixed by exposing the verdict in the snapshot. Proof: `ui-review/goal-rescue/top.png`.

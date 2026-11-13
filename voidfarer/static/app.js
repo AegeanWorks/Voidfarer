@@ -2077,6 +2077,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     : "LOW FUEL // Refuel at a station, scoop a gas giant or fabricate a fuel pack.")
                 : "Quantum fuel // Spent by jumps, sublight transit and evasive burns.";
             this.setVitalAction(fuelCard, lowFuel && cells > 0, () => this.handleBurnCells());
+            // Nothing left to burn or fabricate: the last resort is a rescue tender (ADR-255).
+            const fuelTitanium = Number((ship.cargo || {}).titanium || 0);
+            const rescuable = lowFuel && cells === 0 && fuelTitanium === 0
+                && Boolean(this.state.rescue && this.state.rescue.available);
+            fuelCard.classList.toggle("is-rescuable", rescuable);
+            const chip = document.getElementById("fuelBurnChip");
+            if (chip) chip.textContent = rescuable ? "CALL RESCUE" : "BURN CELL";
+            if (rescuable) {
+                this.setVitalAction(fuelCard, true, () => this.handleDistress());
+                fuelCard.dataset.tooltip = "STRANDED // No fuel cells or titanium left: click to call a rescue tender (+15 fuel for up to 200 cr and a 6-tick wait).";
+            }
         }
 
         this.creditsVal.textContent = `${ship.credits.toLocaleString()} CR`;
@@ -5627,6 +5638,30 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.renderHUD();
         } catch (e) {
             this.appendLog(`[ERROR] Field fabrication failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleDistress() {
+        this.sound?.init();
+        this.sound?.playBeep(440);
+        try {
+            const res = await apiFetch("/api/engineering/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "distress" })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound?.playChime();
+                this.appendLog(json.message, "reward");
+            } else {
+                this.sound?.playAlarm?.();
+                this.appendLog(`[DISTRESS] ${json.message}`, "hazard");
+            }
+            if (json.state) this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Distress call failed: ${e.message}`, "hazard");
         }
     }
 

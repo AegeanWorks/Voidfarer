@@ -5,24 +5,12 @@
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794568138.7964444,
+    "updated_at": 1794568485.3684304,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-jump-fuel",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794565882.23756,
-      "timestamp_str": "2026-11-13 13:31:22",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-jump-fuel",
       "phase": "completed",
@@ -272,6 +260,18 @@
       "status": "in_progress",
       "timestamp": 1794568138.7964444,
       "timestamp_str": "2026-11-13 14:08:58",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-distress-call",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] cockpit chip Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794568485.3684304,
+      "timestamp_str": "2026-11-13 14:14:45",
       "agent": "claude:1",
       "checklists": "passed"
     }

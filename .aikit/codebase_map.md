@@ -9,8 +9,8 @@
 - **Total Python Modules**: `181`
 - **Total Classes**: `448`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2379`
-- **Total Source Lines**: `59769`
+- **Total Class Methods**: `2380`
+- **Total Source Lines**: `59772`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`181` module(s))
@@ -1022,11 +1022,12 @@
 ### [`tests/test_distress_cockpit.py`](tests/test_distress_cockpit.py)
 > *Cockpit: the low-fuel gauge offers the rescue when no cell or titanium remains.*
 
-**Size**: `23` lines (`851` bytes)
+**Size**: `26` lines (`1015` bytes)
 
 **Classes:**
 - `class TestCockpit`
   - Method `.test_low_fuel_gauge_offers_the_rescue_when_nothing_else_remains()`
+  - Method `.test_the_offer_follows_the_engines_verdict_not_a_client_guess()`
   - Method `.test_the_chip_text_returns_to_burn_cell_when_cells_exist()`
 
 ---
