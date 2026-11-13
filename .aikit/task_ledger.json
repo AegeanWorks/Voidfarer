@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-forced-colors",
+    "task_id": "voidfarer-scale-titles",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794552994.2891822,
+    "updated_at": 1794553379.3007305,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-radar-labels",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794550549.4000797,
-      "timestamp_str": "2026-11-13 09:15:49",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-radar-labels",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-radar-labels' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794550636.4038153,
-      "timestamp_str": "2026-11-13 09:17:16",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-narrow-clipping",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: wrap clipped text in REFIT, FACTIONS, COMMERCE at 1280px with failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794551024.9140995,
-      "timestamp_str": "2026-11-13 09:23:44",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "1280px sweep found cut-off trade-off text and overflowing service card",
-        "benefits": "No information hidden at minimum width",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test, re-sweep to 0 clipped, ADR-241"
-      },
-      "plan_digest": "26e988dcbbb0c9100977fd26c4f1f3756bf6b13c6a8464af158fa869e9771c26"
-    },
     {
       "task_id": "voidfarer-narrow-clipping",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794552994.2891822,
       "timestamp_str": "2026-11-13 09:56:34",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-forced-colors",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-forced-colors' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794553056.3780506,
+      "timestamp_str": "2026-11-13 09:57:36",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-scale-titles",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: titles for clamped text found at HUD scale 120%, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794553378.9836774,
+      "timestamp_str": "2026-11-13 10:02:58",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "At 120% scale message consequences and a faction name were clipped",
+        "benefits": "Full text always reachable without touching pinned layout",
+        "risks": "contract: pinned clamp untouched; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first test, live title count, ADR-247"
+      },
+      "plan_digest": "691a68d59eb63b33f6398f6e922f18f375af5cafe1326d8ba23c4eb072cd6f6d"
+    },
+    {
+      "task_id": "voidfarer-scale-titles",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794553379.3007305,
+      "timestamp_str": "2026-11-13 10:02:59",
       "agent": "claude:1",
       "checklists": "passed"
     }

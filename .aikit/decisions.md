@@ -2619,3 +2619,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: G-014 makes Voidfarer a Windows-only game, and Windows High Contrast turns on `forced-colors`. The CSS had no forced-colors handling, and a capture with it active showed the hull, shield and fuel bars (and every other fill-style meter) gone, because forced colors strips background fills. Text and borders were already readable through the browser's defaults.
 - **Decision**: A `@media (forced-colors: active)` block opts every meter-fill class out of color adjustment (`forced-color-adjust: none`) and paints it with the system `Highlight` color, and gives critical (`is-low`) hull and fuel cards a `Mark` outline. Nothing else is overridden. `tests/test_forced_colors.py` (new, failing first: 3 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
 - **Consequences**: CSS only, applies only under forced colors; the default theme is unchanged and the layout, inventory and audit suites pass.
+
+### ADR-247: Clamped text stays reachable at the 120% HUD scale
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: G-011 keeps the HUD scale user-selectable (85 to 120%). The expanded all-tabs sweep at 1280px with the scale forced to 120% was clean except two MESSAGES choice buttons, whose two-line clamp (pinned by `test_small_card_lists_share_a_rhythm`) hid the consequence clause ("...but Watch standing suffers"), and one ellipsized faction name. A probe that set `uiScale` without `applyViewportProfile()` had silently reported "0 issues"; the corrected probe confirmed `--ui-scale` actually changed.
+- **Decision**: Leave the pinned clamp untouched and give each message choice button a `title` with its label and full description, and each faction card name a `title`. No layout change.
+- **Consequences**: Markup attributes only; hover or screen-reader name exposes the full text. `tests/test_clipped_text_titles.py` (new, failing first: 2 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.

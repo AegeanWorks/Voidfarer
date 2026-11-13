@@ -1097,3 +1097,7 @@ The canvas particles ignored the OS reduce-motion setting (ADR-245). Proof: `red
 ### Thirty-ninth pass — Windows High Contrast
 
 Forced-colors emulation showed every gauge bar vanishing (ADR-246). Fixed with a scoped forced-colors block. Proof: `ui-review/goal-forced/forced.png` (no bars) vs `ui-review/goal-forced2/top.png` (bars visible).
+
+### Fortieth pass — HUD scale extremes
+
+Layout holds at 85% and 120% (0 off-viewport, no scroll; all 16 tabs clean except two clamped choice buttons and one faction name). Both now expose full text through titles (ADR-247). Proof: `ui-review/goal-scale-120/player.png`, `goal-scale-sweep/`, `goal-titles/`.

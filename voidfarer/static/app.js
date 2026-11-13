@@ -8644,7 +8644,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
             card.innerHTML = `
                 <div class="faction-top-row">
-                    <span class="faction-name" style="color: ${factionColor};">${this.escapeHtml(f.name)}</span>
+                    <span class="faction-name" title="${this.escapeHtml(f.name)}" style="color: ${factionColor};">${this.escapeHtml(f.name)}</span>
                     <span class="standing-badge ${tierClass}">${this.escapeHtml(f.standing_tier.toUpperCase())} (${f.standing > 0 ? "+" : ""}${f.standing})</span>
                 </div>
                 <div class="faction-ideology">Ideology: ${this.escapeHtml(f.ideology)} // HQ: ${this.escapeHtml(f.headquarters_system.toUpperCase())}</div>
@@ -9319,6 +9319,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.messageList.innerHTML = messages.slice().reverse().map(m => {
             const choices = (m.choices || []).map(choice => `
                 <button class="message-choice-btn" data-msg-choice="${this.escapeHtml(choice.id)}" data-msg-id="${this.escapeHtml(m.id)}"
+                    title="${this.escapeHtml(choice.label)}${choice.description ? " // " + this.escapeHtml(choice.description) : ""}"
                     ${m.resolved_choice ? "disabled" : ""}>
                     <strong>${this.escapeHtml(choice.label)}</strong>
                     <span>${this.escapeHtml(choice.description || "")}</span>

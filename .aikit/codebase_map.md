@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `171`
-- **Total Classes**: `436`
+- **Total Python Modules**: `172`
+- **Total Classes**: `437`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2343`
-- **Total Source Lines**: `59286`
+- **Total Class Methods**: `2345`
+- **Total Source Lines**: `59308`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`171` module(s))
+- **Indexed**: python (`172` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -382,6 +382,18 @@
 - `class TestCLIReplRelicsFuse`
   - Method `.test_repl_relics_fuse()`
   - Method `.test_repl_relics_fuse_does_not_exit()`
+
+---
+
+### [`tests/test_clipped_text_titles.py`](tests/test_clipped_text_titles.py)
+> *Text that a clamp or ellipsis can shorten (at 120% HUD scale) is always reachable through a title.*
+
+**Size**: `22` lines (`851` bytes)
+
+**Classes:**
+- `class TestClippedTextTitles`
+  - Method `.test_message_choice_buttons_carry_their_full_text()`
+  - Method `.test_faction_names_carry_a_title()`
 
 ---
 
