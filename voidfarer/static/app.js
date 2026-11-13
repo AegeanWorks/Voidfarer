@@ -2612,6 +2612,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         const pendingDecision = this.state.pending_decision;
         if (pendingDecision && this.decisionOverlay) {
+            const newDecision = this._lastDecisionId !== pendingDecision.id;
+            if (newDecision) {
+                this._lastDecisionId = pendingDecision.id;
+                this._decisionOpener = document.activeElement;
+            }
+            // The choices are rebuilt on every refresh, so remember which one holds keyboard focus.
+            const focusedChoice = this.decisionOverlay.contains(document.activeElement)
+                ? (document.activeElement.dataset || {}).decisionChoice : null;
             this.decisionOverlay.style.display = "flex";
             this.decisionSeverity.textContent = `DECISION REQUIRED // ${String(pendingDecision.severity || "major").toUpperCase()}`;
             this.decisionTitle.textContent = pendingDecision.title;
@@ -2623,11 +2631,28 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 button.className = "decision-choice-btn";
                 const desc = choice.description ? `<small>${this.escapeHtml(choice.description)}</small>` : "";
                 button.innerHTML = `<strong>${this.escapeHtml(choice.label)}</strong>${desc}`;
+                button.dataset.decisionChoice = choice.id;
                 button.addEventListener("click", () => this.handleDecisionChoice(choice.id));
                 this.decisionChoices.appendChild(button);
             });
+            // A decision freezes time and flight: take keyboard focus once, and keep it through rebuilds.
+            const choices = [...this.decisionChoices.querySelectorAll(".decision-choice-btn")];
+            const kept = focusedChoice ? choices.find(btn => btn.dataset.decisionChoice === focusedChoice) : null;
+            if (kept) {
+                kept.focus();
+            } else if (newDecision) {
+                const first = choices[0];
+                if (first) first.focus();
+            }
         } else if (this.decisionOverlay) {
             this.decisionOverlay.style.display = "none";
+            this._lastDecisionId = null;
+            // Resolved: hand keyboard focus back to where the player was.
+            if (this._decisionOpener && document.contains(this._decisionOpener)
+                && this.decisionOverlay.contains(document.activeElement)) {
+                this._decisionOpener.focus();
+            }
+            this._decisionOpener = null;
         }
 
         // Cadet Academy Ribbon render

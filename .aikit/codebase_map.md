@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `190`
-- **Total Classes**: `458`
-- **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2414`
-- **Total Source Lines**: `60116`
+- **Total Python Modules**: `191`
+- **Total Classes**: `459`
+- **Total Top-Level Functions**: `504`
+- **Total Class Methods**: `2417`
+- **Total Source Lines**: `60152`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`190` module(s))
+- **Indexed**: python (`191` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1002,6 +1002,22 @@
   - Method `.test_three_victories_award_the_combat_medal()`
   - Method `.test_away_mission_awards_the_explorer_medal()`
   - Method `.test_codex_counts_all_crew_medals()`
+
+---
+
+### [`tests/test_decision_focus.py`](tests/test_decision_focus.py)
+> *The decision popup takes keyboard focus on a new decision, keeps it across rebuilds and returns it.*
+
+**Size**: `36` lines (`1446` bytes)
+
+**Classes:**
+- `class TestDecisionFocus`
+  - Method `.test_a_new_decision_remembers_the_opener_and_focuses_a_choice_once()`
+  - Method `.test_a_rebuild_keeps_focus_on_the_same_choice()`
+  - Method `.test_resolving_returns_focus_to_the_opener()`
+
+**Functions:**
+- `def _block()`
 
 ---
 

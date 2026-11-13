@@ -1,48 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-combat-focus",
+    "task_id": "voidfarer-decision-focus",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794586532.3360379,
+    "updated_at": 1794586896.1979759,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-ai-burn",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-ai-burn' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794570508.7579832,
-      "timestamp_str": "2026-11-13 14:48:28",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-radar-hover",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794583544.584358,
-      "timestamp_str": "2026-11-13 18:25:44",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-radar-hover",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-radar-hover' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794583631.3694441,
-      "timestamp_str": "2026-11-13 18:27:11",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-body-hotkeys",
       "phase": "phase 2",
@@ -270,6 +238,46 @@
       "status": "in_progress",
       "timestamp": 1794586532.3360379,
       "timestamp_str": "2026-11-13 19:15:32",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-combat-focus",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-combat-focus' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794586623.3068185,
+      "timestamp_str": "2026-11-13 19:17:03",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-decision-focus",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: decision popup takes, keeps and returns keyboard focus, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794586895.8749292,
+      "timestamp_str": "2026-11-13 19:21:35",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Decision popup left focus behind despite its dialog role",
+        "benefits": "Keyboard players resolve decisions immediately",
+        "risks": "contract: focus handling in the HUD render; dependency: none; concurrency: none; state: none",
+        "mitigation": "Once per decision id, preserved across rebuilds, real decision probe, ADR-265"
+      },
+      "plan_digest": "59fead7e1b55328528159991c507d4f463c7355d10f00bb94f20a7fc9ef84f5c"
+    },
+    {
+      "task_id": "voidfarer-decision-focus",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794586896.1979759,
+      "timestamp_str": "2026-11-13 19:21:36",
       "agent": "claude:1",
       "checklists": "passed"
     }

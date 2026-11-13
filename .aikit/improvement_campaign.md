@@ -1171,3 +1171,7 @@ Blocking encounters now take keyboard focus and return it (ADR-263). Proof: real
 ### Fifty-eighth pass — combat keyboard focus
 
 The combat card now takes and returns keyboard focus like the encounter card (ADR-264). Proof: real combat in Edge, Enter fired the laser (hull 60 to 25), focus restored.
+
+### Fifty-ninth pass — decision popup focus
+
+Verified a claim I had made without testing, found it false, and fixed it: the decision popup now takes, keeps and returns keyboard focus (ADR-265). Proof: real decision resolved with Enter in Edge.

@@ -1931,5 +1931,25 @@
     "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
     "final_snapshot_entries": 1291,
     "surface_digest": "ba1f705f5b99a7df2b21bdb9968b3d1287dab2c77fefcdef5aa8ea52e561557f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "771372cf8c305044540a836b62153db80dba68a1",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794586753.8340545,
+    "finished_at": 1794586883.9326336,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; no visual change; real Edge with a real DecisionEvent: focus on Option A, Tab to Option B kept across a refresh, Enter resolved it on the server, focus returned to tabBtnShip)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
+    "final_snapshot_entries": 1291,
+    "surface_digest": "4daf9a72db6699f7edfc0387c960656c0cef141a57258124103ad6159d7a6d4a"
   }
 ]
