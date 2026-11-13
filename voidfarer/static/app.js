@@ -2441,7 +2441,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.state.active_combat) {
             const c = this.state.active_combat;
             this.sound.playAlarm();
+            const newCombat = this._lastCombatId !== c.id;
+            if (newCombat) {
+                this._lastCombatId = c.id;
+                this._combatOpener = document.activeElement;
+            }
             this.combatCard.style.display = "flex";
+            if (newCombat) {
+                // A hostile intercept freezes flight until resolved: take keyboard focus once, on FIRE.
+                const fire = document.getElementById("btnCombatFire");
+                if (fire && !fire.disabled) fire.focus();
+            }
             this.combatEnemyTitle.textContent = `${c.enemy_name} [${c.enemy_class}]`;
             if (this.combatEnemyFaction) {
                 this.combatEnemyFaction.textContent = c.faction_id ? `FACTION: ${c.faction_id.replace('_', ' ').toUpperCase()}` : "";
@@ -2553,6 +2563,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         } else {
             this.combatCard.style.display = "none";
+            this._lastCombatId = null;
+            // The fight ended: hand keyboard focus back to where the player was.
+            if (this._combatOpener && document.contains(this._combatOpener)
+                && this.combatCard.contains(document.activeElement)) {
+                this._combatOpener.focus();
+            }
+            this._combatOpener = null;
         }
 
         // One card for every blocking encounter: decision/pirate/customs/anomaly.

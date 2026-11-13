@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `189`
-- **Total Classes**: `457`
+- **Total Python Modules**: `190`
+- **Total Classes**: `458`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2411`
-- **Total Source Lines**: `60080`
+- **Total Class Methods**: `2414`
+- **Total Source Lines**: `60116`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`189` module(s))
+- **Indexed**: python (`190` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -844,6 +844,19 @@
   - Method `.test_new_milestones_complete_and_are_listed()`
   - Method `.test_repair_outpost_increments_the_codex_stat()`
   - Method `.test_codex_stats_cover_all_labeled_metrics()`
+
+---
+
+### [`tests/test_combat_focus.py`](tests/test_combat_focus.py)
+> *The combat card is an alert dialog that takes keyboard focus on a new fight and returns it afterwards.*
+
+**Size**: `36` lines (`1532` bytes)
+
+**Classes:**
+- `class TestCombatFocus`
+  - Method `.test_the_card_is_declared_an_alert_dialog()`
+  - Method `.test_a_new_fight_focuses_the_first_enabled_action_once()`
+  - Method `.test_the_end_of_combat_restores_the_previous_focus()`
 
 ---
 

@@ -1167,3 +1167,7 @@ J and O press the target card's own jump and transit buttons, completing a keybo
 ### Fifty-seventh pass — encounter keyboard focus
 
 Blocking encounters now take keyboard focus and return it (ADR-263). Proof: real customs stop resolved with Enter in Edge, server state changed, focus restored.
+
+### Fifty-eighth pass — combat keyboard focus
+
+The combat card now takes and returns keyboard focus like the encounter card (ADR-264). Proof: real combat in Edge, Enter fired the laser (hull 60 to 25), focus restored.

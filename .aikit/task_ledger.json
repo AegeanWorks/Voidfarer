@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-encounter-focus",
+    "task_id": "voidfarer-combat-focus",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794586131.2293994,
+    "updated_at": 1794586532.3360379,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-rescue-scoop",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-rescue-scoop' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794569604.045134,
-      "timestamp_str": "2026-11-13 14:33:24",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-ai-burn",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: AI captain tour burns fuel cells, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794570414.3863013,
-      "timestamp_str": "2026-11-13 14:46:54",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Mechanics gate did not cover the fuel-cell burn",
-        "benefits": "Regressions in ADR-236 are caught by ai_play",
-        "risks": "contract: tour order; dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test, ai_play still 0 gaps, ADR-257"
-      },
-      "plan_digest": "c9265a0a46bba23be68a77e5b7f692556fd9b1e3ac8753448628d3feac18a729"
-    },
-    {
-      "task_id": "voidfarer-ai-burn",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794570414.7613816,
-      "timestamp_str": "2026-11-13 14:46:54",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-ai-burn",
       "phase": "completed",
@@ -270,6 +230,46 @@
       "status": "in_progress",
       "timestamp": 1794586131.2293994,
       "timestamp_str": "2026-11-13 19:08:51",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-encounter-focus",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-encounter-focus' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794586220.3937242,
+      "timestamp_str": "2026-11-13 19:10:20",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-combat-focus",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: combat card alertdialog with focus in and restored, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794586532.0336196,
+      "timestamp_str": "2026-11-13 19:15:32",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Combat card left keyboard focus behind",
+        "benefits": "Keyboard players can fight immediately",
+        "risks": "contract: focus handling in the HUD render; dependency: none; concurrency: none; state: none",
+        "mitigation": "Once per encounter id, real combat probe, ADR-264"
+      },
+      "plan_digest": "dec1e2936e19fd212093bea6ce7488ee7d104e1dec278a04a327c628f89309ff"
+    },
+    {
+      "task_id": "voidfarer-combat-focus",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794586532.3360379,
+      "timestamp_str": "2026-11-13 19:15:32",
       "agent": "claude:1",
       "checklists": "passed"
     }

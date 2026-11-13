@@ -1910,5 +1910,26 @@
     "final_snapshot_digest": "3800b151586fbb87560eaf7bb7f0901bb69c09f188dc5ad62f7fe542c5de188e",
     "final_snapshot_entries": 1290,
     "surface_digest": "cde346ef14ed7463036db59a9130395b3eb9329e0b4d40a2da46124d49c53e32"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "5335116e957fdc157e0f84fa2d73806fbf1b8b0f",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794586385.34675,
+    "finished_at": 1794586518.0758893,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; no visual change; real Edge with a real combat encounter: role alertdialog, focus on FIRE LASER ARRAY, Enter took enemy hull 60 to 25 on the server, focus returned to tabBtnShip when the fight ended)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
+    "final_snapshot_entries": 1291,
+    "surface_digest": "ba1f705f5b99a7df2b21bdb9968b3d1287dab2c77fefcdef5aa8ea52e561557f"
   }
 ]
