@@ -2040,6 +2040,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const fuelPct = Math.round((ship.fuel / ship.max_fuel) * 100);
         this.fuelBar.style.width = `${fuelPct}%`;
         this.fuelVal.textContent = `${ship.fuel}/${ship.max_fuel}`;
+        const lowFuel = fuelPct <= 25;
+        const cells = Number((ship.cargo || {}).fuel_cells || 0);
+        const fuelCard = document.getElementById("vitalFuelCard");
+        if (fuelCard) {
+            fuelCard.classList.toggle("is-low", lowFuel);
+            fuelCard.classList.toggle("is-burnable", lowFuel && cells > 0);
+            fuelCard.dataset.tooltip = lowFuel
+                ? (cells > 0
+                    ? `LOW FUEL // ${cells} fuel cell${cells === 1 ? "" : "s"} in the hold: click to burn one (+4 fuel).`
+                    : "LOW FUEL // Refuel at a station, scoop a gas giant or fabricate a fuel pack.")
+                : "Quantum fuel // Spent by jumps, sublight transit and evasive burns.";
+            if (!fuelCard.dataset.burnBound) {
+                fuelCard.dataset.burnBound = "true";
+                fuelCard.addEventListener("click", () => {
+                    if (fuelCard.classList.contains("is-burnable")) this.handleBurnCells();
+                });
+            }
+        }
 
         this.creditsVal.textContent = `${ship.credits.toLocaleString()} CR`;
 

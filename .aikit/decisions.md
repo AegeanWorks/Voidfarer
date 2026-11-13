@@ -2584,3 +2584,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: An expanded all-tabs sweep of a lived-in save at 1280px reported clipped text the 1920px sweep did not: 12 structural-refit descriptions in REFIT cut off mid-trade-off ("+60 max hull, but ..." in a 151px column), the FACTIONS "BACK NEBULA / 500" pledge buttons ellipsized, a long station name in the COMMERCE title, and the OVERHAUL service card running past its own border.
 - **Decision**: Refit descriptions wrap in full (they state the downside, so a line clamp would still hide it); war pledge buttons and the exchange title wrap; in the three-card narrow layout the service icon stacks above its text. `tests/test_narrow_clipping.py` (new, failing first) pins all four; it was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
 - **Consequences**: CSS only. Sweep clipped counts at 1280px: REFIT 12 to 0, FACTIONS 2 to 0, COMMERCE 1 to 0.
+
+### ADR-242: A low-fuel gauge offers the fuel-cell burn where the problem shows
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: ADR-236's fuel-cell burn lives on the SHIP tab, so a captain running dry in the top bar would not find it.
+- **Decision**: At 25% fuel or less the top-bar fuel card turns red and its tooltip says what to do. With fuel cells in the hold it also shows a boxed BURN CELL chip and the whole card becomes a one-click burn (`handleBurnCells`, the same `burn_cells` engineering action); without cells the tooltip points to refuel, scooping or fabrication. Display and a click on existing state only: no engine, save, API or CLI change. `tests/test_low_fuel_gauge.py` (new, failing first: 4 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+- **Consequences**: Verified in real Edge on a played save: forced 8/60 shows the red state and chip; a real click moved server fuel 30 to 34 and cells 4 to 3.

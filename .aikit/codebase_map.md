@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `166`
-- **Total Classes**: `431`
+- **Total Python Modules**: `167`
+- **Total Classes**: `432`
 - **Total Top-Level Functions**: `500`
-- **Total Class Methods**: `2325`
-- **Total Source Lines**: `59100`
+- **Total Class Methods**: `2329`
+- **Total Source Lines**: `59136`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`166` module(s))
+- **Indexed**: python (`167` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1986,6 +1986,20 @@
 
 **Functions:**
 - `def _engine()`
+
+---
+
+### [`tests/test_low_fuel_gauge.py`](tests/test_low_fuel_gauge.py)
+> *Top-bar fuel gauge: a low-fuel state that offers the hold fuel-cell burn where the problem shows.*
+
+**Size**: `36` lines (`1511` bytes)
+
+**Classes:**
+- `class TestLowFuelGauge`
+  - Method `.test_card_carries_a_hidden_burn_chip()`
+  - Method `.test_low_threshold_and_burnable_state_are_computed()`
+  - Method `.test_only_a_burnable_card_triggers_the_burn()`
+  - Method `.test_styles_exist_for_both_states()`
 
 ---
 

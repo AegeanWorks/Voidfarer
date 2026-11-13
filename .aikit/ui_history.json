@@ -1498,5 +1498,27 @@
     "final_snapshot_digest": "697c9f6b06ed712fb36ba572831c1d7cd3d2e413f960a5825cd3acaee095a3e2",
     "final_snapshot_entries": 1265,
     "surface_digest": "40c6b6abaeb78e8fbe9766fbf28ea4e66f701425b8e25f56036f6c73c66e8327"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "9be89b8363345ac269f7bf9e315b885de74ad0ce",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794551458.2997503,
+    "finished_at": 1794551552.4385507,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted FUEL 8/60 in red with boxed BURN CELL chip; click took server fuel 30 to 34, cells 4 to 3)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "5c05ae690c5501f77c2f6a1283bd9001fcdf5791abc64e38a6ad75c26e754051",
+    "final_snapshot_entries": 1266,
+    "surface_digest": "bbbba7b75358481c403ea3a1c63b3ae581feaf5442c885c147f8e2ab54e1e400"
   }
 ]

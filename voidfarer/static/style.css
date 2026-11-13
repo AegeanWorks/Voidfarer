@@ -10965,3 +10965,11 @@ body.cockpit-theme .nav-panel > .panel-header {
     .station-services-bar .btn-service { flex-direction: column; align-items: flex-start; gap: 2px; }
     .station-services-bar .service-meta { min-width: 0; overflow-wrap: anywhere; }
 }
+
+/* Low fuel: the gauge turns amber-red, and with fuel cells in the hold it offers a one-click burn. */
+#fuelBurnChip { display: none; margin-left: 6px; padding: 0 5px; border: 1px solid rgba(217, 112, 95, 0.7); border-radius: 2px; color: #f0b3a6; font-size: 12px; letter-spacing: 0.06em; white-space: nowrap; }
+#vitalFuelCard.is-low #fuelVal { color: #f0b3a6; }
+#vitalFuelCard.is-low .fuel-fill { background: linear-gradient(90deg, #a8453a, #d9705f); }
+#vitalFuelCard.is-burnable { cursor: pointer; }
+#vitalFuelCard.is-burnable #fuelBurnChip { display: inline-block; }
+#vitalFuelCard.is-burnable:hover #fuelBurnChip { background: rgba(217, 112, 95, 0.2); }
