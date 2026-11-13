@@ -1155,3 +1155,7 @@ Targeting a body was mouse-only; `,` and `.` now cycle bodies in orbit order (AD
 ### Fifty-fourth pass — galaxy keyboard targeting
 
 The same keys step through linked star systems on the galaxy map (ADR-260). Proof: real key presses in Edge (`ui-review/goal-keys2`).
+
+### Fifty-fifth pass — keyboard actions on the target
+
+J and O press the target card's own jump and transit buttons, completing a keyboard-only target and act loop (ADR-261). Proof: real key presses in Edge (jump, explained refusal, transit).

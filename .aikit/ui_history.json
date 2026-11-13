@@ -1847,5 +1847,26 @@
     "final_snapshot_digest": "9e4bd779d7abb7912b84b17c5364712534dc03a342bcd320fb04fb9368899560",
     "final_snapshot_entries": 1284,
     "surface_digest": "0f4423e2033a224cc66ddfddcbc015f4351d17d17ecd7c8c7814cb2c199690ee"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "7b96c455a4c353e8b1aeeea1e72227b306fcbf78",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794585046.4789436,
+    "finished_at": 1794585174.1080132,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; keyboard behaviour; real Edge: . then J jumped sol to alpha_centauri (8 fuel); J with 1 fuel logged NEED 8 FUEL (HAVE 1) and stayed in sol; O started a 3-tick transit to the Ring World)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "3213354b33cd85319c23a8115ce2ecf37179c4953b565867974b00fc529f47fc",
+    "final_snapshot_entries": 1287,
+    "surface_digest": "8891dce4644d4c2efd2eeed4b142fb64fdae55aeb12b8b33f85bc9d5e1f59dd4"
   }
 ]

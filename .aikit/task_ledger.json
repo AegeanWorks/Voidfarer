@@ -1,52 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-system-hotkeys",
+    "task_id": "voidfarer-target-actions",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794584740.658049,
+    "updated_at": 1794585192.1249619,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-distress-call",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/2] backend Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794567943.1967673,
-      "timestamp_str": "2026-11-13 14:05:43",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-distress-call",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1b/2] snapshot verdict Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794568138.7964444,
-      "timestamp_str": "2026-11-13 14:08:58",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-distress-call",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] cockpit chip Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794568485.3684304,
-      "timestamp_str": "2026-11-13 14:14:45",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-distress-call",
       "phase": "completed",
@@ -266,6 +230,46 @@
       "status": "in_progress",
       "timestamp": 1794584740.658049,
       "timestamp_str": "2026-11-13 18:45:40",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-system-hotkeys",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-system-hotkeys' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794584816.413486,
+      "timestamp_str": "2026-11-13 18:46:56",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-target-actions",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: J and O press the target card's jump and transit buttons, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794585191.6016822,
+      "timestamp_str": "2026-11-13 18:53:11",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Keyboard targeting stopped before acting",
+        "benefits": "Complete keyboard-only target and act loop",
+        "risks": "contract: new hotkeys; dependency: reuses the buttons so all guards apply; concurrency: none; state: none",
+        "mitigation": "Never bypasses a disabled button, explains refusals, real key probe, ADR-261"
+      },
+      "plan_digest": "61a1be515cb2cb08d53fe7a8b58039104ba4cdf25088a7c14889465e4a7aaeb1"
+    },
+    {
+      "task_id": "voidfarer-target-actions",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794585192.1249619,
+      "timestamp_str": "2026-11-13 18:53:12",
       "agent": "claude:1",
       "checklists": "passed"
     }

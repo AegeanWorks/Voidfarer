@@ -1674,6 +1674,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.handleSetTimeSpeed(5.0);
             } else if (e.key === "4") {
                 this.handleSetTimeSpeed(10.0);
+            } else if (hotkey === "j") {
+                e.preventDefault();
+                this.pressTargetAction("btnJumpTarget");
+            } else if (hotkey === "o") {
+                e.preventDefault();
+                this.pressTargetAction("btnOrbitTarget");
             } else if (e.code === "Comma" || e.code === "Period") {
                 e.preventDefault();
                 this.cycleBodyTarget(e.code === "Period" ? 1 : -1);
@@ -1692,6 +1698,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     openInitialTerminalTab() {
         const remembered = this.rememberTerminalTab && TERMINAL_TABS.includes(this.lastTerminalTab);
         this.switchRightTab(remembered ? this.lastTerminalTab : "player", { quiet: true });
+    }
+
+    // J and O press the target card's own jump and transit buttons, so every guard on them still
+    // applies; a refusal is explained in the flight log instead of failing silently.
+    pressTargetAction(id) {
+        const button = document.getElementById(id);
+        if (!button || button.style.display === "none") {
+            this.appendLog("[TARGET] Select a target that offers this action first (, . cycle targets).", "hazard");
+            return;
+        }
+        if (button.disabled) {
+            this.appendLog(`[TARGET] ${button.textContent.trim()}: ${button.title || "this action is unavailable right now."}`, "hazard");
+            return;
+        }
+        button.click();
     }
 
     // Keyboard targeting for the system radar: step through the bodies from the star outward, wrapping.

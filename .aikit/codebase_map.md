@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `186`
-- **Total Classes**: `454`
+- **Total Python Modules**: `187`
+- **Total Classes**: `455`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2398`
-- **Total Source Lines**: `59968`
+- **Total Class Methods**: `2402`
+- **Total Source Lines**: `60004`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`186` module(s))
+- **Indexed**: python (`187` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3211,6 +3211,20 @@
 - `class TestTabRailState`
   - Method `.test_switching_tabs_sets_aria_current_on_the_active_button()`
   - Method `.test_collapsing_the_drawer_clears_the_current_marker()`
+
+---
+
+### [`tests/test_target_action_hotkeys.py`](tests/test_target_action_hotkeys.py)
+> *J and O press the target card's own jump and transit buttons, so every guard still applies.*
+
+**Size**: `36` lines (`1439` bytes)
+
+**Classes:**
+- `class TestTargetActionHotkeys`
+  - Method `.test_hotkeys_route_through_one_helper()`
+  - Method `.test_the_helper_never_bypasses_a_disabled_or_hidden_button()`
+  - Method `.test_refusals_are_explained_not_silent()`
+  - Method `.test_the_controls_reference_lists_both_keys()`
 
 ---
 
