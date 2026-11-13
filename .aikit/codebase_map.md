@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `196`
-- **Total Classes**: `464`
-- **Total Top-Level Functions**: `510`
-- **Total Class Methods**: `2437`
-- **Total Source Lines**: `60388`
+- **Total Python Modules**: `197`
+- **Total Classes**: `468`
+- **Total Top-Level Functions**: `511`
+- **Total Class Methods**: `2445`
+- **Total Source Lines**: `60519`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`196` module(s))
+- **Indexed**: python (`197` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3559,6 +3559,30 @@
   - Method `.test_the_inventory_names_the_core_controls_and_handlers()`
   - Method `.test_the_inventory_names_the_ui_routes_and_theme_surface()`
   - Method `.test_the_inventory_is_sorted_and_deduplicated()`
+
+---
+
+### [`tests/test_ui_promises_match_engine.py`](tests/test_ui_promises_match_engine.py)
+> *The numbers the cockpit advertises equal what the engine does: preview, quote, threshold, price and yield.*
+
+**Size**: `131` lines (`6546` bytes)
+
+**Classes:**
+- `class TestTransitPreviewIsExact`
+  - Method `.test_preview_duration_and_fuel_equal_a_real_transit()`
+- `class TestDrydockQuotesAreExact`
+  - Method `.test_repair_refuel_and_overhaul_charge_exactly_the_quote()`
+- `class TestDiplomacyThresholdsMatchTheTooltips`
+  - Method `._accepts(action, standing)`
+  - Method `.test_each_action_is_refused_one_point_below_and_accepted_at_the_stated_standing()`
+  - Method `.test_non_aggression_lasts_the_advertised_90_ticks_and_a_gift_costs_300()`
+- `class TestOutpostPromises`
+  - Method `._chartered()`
+  - Method `.test_price_is_charged_and_credit_yield_matches_the_card()`
+  - Method `.test_goods_are_delivered_to_the_local_depot_at_the_card_rate()`
+
+**Functions:**
+- `def _engine(seed, **ship)`
 
 ---
 

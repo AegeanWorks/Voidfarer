@@ -1195,3 +1195,7 @@ Chose the stranded-ship thread again: the scoop is auto-revealed at a low tank (
 ### Sixty-fourth pass — outpost promises
 
 Audited diplomacy thresholds (8 of 8), NAP length and gift cost, outpost prices (5 of 5) and outpost yields (credits exact, goods exact in the depot): all true. Fixed the three presentation gaps they exposed (ADR-271). Proof: `ui-review/goal-outpostcard/outposts.png`.
+
+### Sixty-fifth pass — promises become tests
+
+The audit scripts are now a permanent suite (ADR-272), checked by mutation: four deliberately broken promises were each caught.
