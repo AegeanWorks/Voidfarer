@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `192`
-- **Total Classes**: `460`
-- **Total Top-Level Functions**: `505`
-- **Total Class Methods**: `2420`
-- **Total Source Lines**: `60186`
+- **Total Python Modules**: `193`
+- **Total Classes**: `461`
+- **Total Top-Level Functions**: `507`
+- **Total Class Methods**: `2424`
+- **Total Source Lines**: `60234`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`192` module(s))
+- **Indexed**: python (`193` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2700,6 +2700,24 @@
   - Method `.test_hovered_body_is_detected_by_id()`
   - Method `.test_a_ring_is_drawn_around_the_hovered_body()`
   - Method `.test_the_label_is_forced_on_and_prioritised_while_hovered()`
+
+---
+
+### [`tests/test_radar_label_contrast.py`](tests/test_radar_label_contrast.py)
+> *Radar reference labels (AU ticks, compass, range scale) use a tint that clears 3:1 on the nebula backdrop.*
+
+**Size**: `48` lines (`1849` bytes)
+
+**Classes:**
+- `class TestRadarLabelContrast`
+  - Method `.test_au_ticks_use_a_light_tint_at_0_6_or_more()`
+  - Method `.test_compass_labels_use_a_light_tint_at_0_6_or_more()`
+  - Method `.test_the_range_scale_label_is_the_brightest_of_the_three()`
+  - Method `.test_tick_labels_step_around_the_east_compass_label()`
+
+**Functions:**
+- `def _fill_before(anchor)` - *The fillStyle assigned immediately before the line containing `anchor`.*
+- `def _alpha(rgba)`
 
 ---
 

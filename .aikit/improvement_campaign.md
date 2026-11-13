@@ -1179,3 +1179,7 @@ Verified a claim I had made without testing, found it false, and fixed it: the d
 ### Sixtieth pass — canvas text size
 
 The 12px floor now covers canvas text too (ADR-267): ten literals raised, surface callout re-laid out. Along the way the UI contract's inconsistent theme paths were corrected openly (ADR-266). Proof: `ui-review/goal-canvasfont/surface.png`.
+
+### Sixty-first pass — radar label contrast
+
+Measured canvas label contrast against the sampled nebula (1.6 to 2.6:1), retinted to ivory and removed a tick/compass overlap the brighter text revealed (ADR-268). Proof: `ui-review/goal-radarcontrast/`.

@@ -7447,10 +7447,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.arc(cx, cy, radius, 0, Math.PI * 2);
                 ctx.stroke();
                 const auDist = radius / Math.max(1, auScale);
-                if (auDist >= 0.25) {
+                // Keep a tick label off the east compass label, which sits on the same row.
+                const compassGuard = Math.min(this.viewW, this.viewH) * 0.46;
+                const hitsCompassLabel = compassGuard > 120
+                    && radius + 62 > compassGuard - 12 && radius + 4 < compassGuard + 40;
+                if (auDist >= 0.25 && !hitsCompassLabel) {
                     ctx.save();
                     ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
-                    ctx.fillStyle = "rgba(127, 183, 201, 0.5)";
+                    ctx.fillStyle = "rgba(236, 228, 212, 0.6)";
                     ctx.fillText(`${auDist.toFixed(1)} AU`, cx + radius + 4, cy - 3);
                     ctx.restore();
                 }
@@ -7473,7 +7477,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.stroke();
 
                 ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
-                ctx.fillStyle = "rgba(127, 183, 201, 0.38)";
+                ctx.fillStyle = "rgba(236, 228, 212, 0.62)";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 const cardinals = [
@@ -7863,7 +7867,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ctx.lineTo(padX + scalePx, padY - 4);
                 ctx.stroke();
                 ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
-                ctx.fillStyle = "rgba(127, 183, 201, 0.65)";
+                ctx.fillStyle = "rgba(236, 228, 212, 0.78)";
                 ctx.textAlign = "center";
                 const scaleLabel = `RANGE SCALE [ ${scaleAu < 1 ? scaleAu.toFixed(1) : scaleAu.toFixed(0)} AU ]`;
                 // Center over the bar, but never let the text start under the

@@ -1972,5 +1972,25 @@
     "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
     "final_snapshot_entries": 1291,
     "surface_digest": "522cb9120ececa191d1b640126461458da91835af58a775824a47cd6c8f6a517"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "9464e058e2a6f7db617f695c411e625cfaa27a2f",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794587975.3039439,
+    "finished_at": 1794588096.6954057,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted radar ticks 13.0 AU, 19.5 AU, 26.0 AU legible in ivory, W 270 compass label, RANGE SCALE [ 10 AU ]; the 32.5 AU tick no longer overlaps E 090)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
+    "final_snapshot_entries": 1291,
+    "surface_digest": "9357666cf1f7ad1fc9320ce584fecd66152cd249c68ddd231fe2ca0f5e62882f"
   }
 ]
