@@ -138,5 +138,20 @@ class TestSnapshotVerdict(unittest.TestCase):
         self.assertIn("not stranded", verdict["reason"])
 
 
+class TestScoopFirst(unittest.TestCase):
+    def test_a_stranded_ship_orbiting_a_scoopable_body_is_told_to_scoop(self) -> None:
+        engine = _stranded()
+        star = next(b for b in engine.current_system.bodies if b.body_type == "star")
+        engine.orbit(star.id)
+        engine.state = engine._clone_state(ship=engine._clone_ship(fuel=0, credits=500, cargo={}))
+        ok, message = engine.distress_call()
+        self.assertFalse(ok)
+        self.assertIn("scoop", message.lower())
+        self.assertFalse(engine.rescue_status()["available"])
+
+    def test_scooping_is_not_assumed_when_nothing_scoopable_is_in_orbit(self) -> None:
+        self.assertTrue(_stranded().rescue_status()["available"])
+
+
 if __name__ == "__main__":
     unittest.main()

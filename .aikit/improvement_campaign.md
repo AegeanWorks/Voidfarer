@@ -1139,3 +1139,5 @@ Cockpit follow-up (ADR-255): CALL RESCUE chip on the fuel gauge, following the e
 ### Forty-ninth pass — scoop clarity
 
 Frame times were already at the 60Hz floor at 1080p and 4K, so this pass stayed in the fuel thread: the scoop button now shows taps, yield and heat (ADR-256). Proof: real scoop 6/6 to 5/6 taps and fuel 10 to 32 in Edge (`ui-review/goal-scoop`).
+
+Fiftieth pass — the distress verdict now defers to scooping when a scoopable body with taps left is in orbit (ADR-255 addendum 2).

@@ -7203,6 +7203,16 @@ class SimulationEngine:
             else:
                 return False, f"Unknown fabrication blueprint '{munitions_type}'. Valid blueprints: 'patch_kit', 'fuel_cell'."
 
+    def _scoop_available_here(self) -> bool:
+        """True when the orbited body can be scooped and its volatile reservoir still has a tap."""
+        body = self.docked_body
+        if not body or scoop_profile(body) is None:
+            return False
+        tapped, _ = recharge_volatile_reserve(
+            body.volatile_tapped, body.volatile_recharge_tick, self.state.time.tick,
+        )
+        return tapped < scoop_reserve(body)
+
     def rescue_status(self) -> dict[str, Any]:
         """Whether a distress call would be accepted now, and why not."""
         with self.lock:
@@ -7216,6 +7226,8 @@ class SimulationEngine:
                 reason = "not stranded: the tanks are full."
             elif cheapest and ship.fuel >= cheapest:
                 reason = f"not stranded: a jump needs {cheapest} fuel and you have {ship.fuel}."
+            elif self._scoop_available_here():
+                reason = "you can scoop fuel from the body you are orbiting."
             elif int(ship.cargo.get("fuel_cells", 0)) > 0:
                 reason = "you still have a Quantum Fuel Cell to burn."
             elif int(ship.cargo.get("titanium", 0)) > 0:

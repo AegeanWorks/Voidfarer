@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `182`
-- **Total Classes**: `449`
+- **Total Classes**: `450`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2383`
-- **Total Source Lines**: `59799`
+- **Total Class Methods**: `2386`
+- **Total Source Lines**: `59826`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`182` module(s))
@@ -997,7 +997,7 @@
 ### [`tests/test_distress_call.py`](tests/test_distress_call.py)
 > *Distress call: a truly stranded ship can summon a rescue tender, at a price, through every surface.*
 
-**Size**: `142` lines (`6185` bytes)
+**Size**: `157` lines (`6897` bytes)
 
 **Classes:**
 - `class TestDistressCall`
@@ -1013,6 +1013,9 @@
 - `class TestSnapshotVerdict`
   - Method `.test_snapshot_carries_the_engines_verdict_only_when_fuel_is_low()`
   - Method `.test_a_low_tank_that_can_still_jump_is_not_offered_a_rescue()`
+- `class TestScoopFirst`
+  - Method `.test_a_stranded_ship_orbiting_a_scoopable_body_is_told_to_scoop()`
+  - Method `.test_scooping_is_not_assumed_when_nothing_scoopable_is_in_orbit()`
 
 **Functions:**
 - `def _stranded(credits, fuel, cargo)`
@@ -3984,7 +3987,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10551` lines (`521032` bytes)
+**Size**: `10563` lines (`521598` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4152,6 +4155,7 @@
   - Method `.repair_hull(amount)` - *Repair ship hull integrity at orbital station.*
   - Method `.refuel(amount)` - *Refuel quantum drive at orbital station.*
   - Method `.fabricate_munitions(munitions_type)` - *Field-fabricate emergency hull patch kits or fuel packs from raw titanium alloy.*
+  - Method `._scoop_available_here()` - *True when the orbited body can be scooped and its volatile reservoir still has a tap.*
   - Method `.rescue_status()` - *Whether a distress call would be accepted now, and why not.*
   - Method `.distress_call()` - *Summon a rescue tender: fuel for a fee and some lost time, only when truly stranded.*
   - Method `.burn_fuel_cells(quantity)` - *Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.*
