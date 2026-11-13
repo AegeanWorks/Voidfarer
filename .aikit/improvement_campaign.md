@@ -1093,3 +1093,7 @@ BURN CELL and PATCH HULL cards are focusable buttons only while actionable (ADR-
 ### Thirty-eighth pass — reduced motion for canvas FX
 
 The canvas particles ignored the OS reduce-motion setting (ADR-245). Proof: `reduced_motion=reduce` emitted 0 continuous particles against 5 by default; bursts stayed at 10.
+
+### Thirty-ninth pass — Windows High Contrast
+
+Forced-colors emulation showed every gauge bar vanishing (ADR-246). Fixed with a scoped forced-colors block. Proof: `ui-review/goal-forced/forced.png` (no bars) vs `ui-review/goal-forced2/top.png` (bars visible).

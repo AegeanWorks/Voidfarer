@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-reduced-motion",
+    "task_id": "voidfarer-forced-colors",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794552740.0830917,
+    "updated_at": 1794552994.2891822,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-vector-header",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794549999.2342906,
-      "timestamp_str": "2026-11-13 09:06:39",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-vector-header",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-vector-header' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794550065.7010999,
-      "timestamp_str": "2026-11-13 09:07:45",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-radar-labels",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: radar label wording fallback and extra positions with failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794550548.899181,
-      "timestamp_str": "2026-11-13 09:15:48",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "3 of 11 bodies unnamed at 1280x720",
-        "benefits": "Every body named on crowded maps",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Label-only change, G-007 untouched, measured in Edge, ADR-240"
-      },
-      "plan_digest": "2dc53582299483b8c73cefca96560e10ddcd820a7a23ab1ece0a3c450d8aa974"
-    },
     {
       "task_id": "voidfarer-radar-labels",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794552740.0830917,
       "timestamp_str": "2026-11-13 09:52:20",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-reduced-motion",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-reduced-motion' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794552802.6083205,
+      "timestamp_str": "2026-11-13 09:53:22",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-forced-colors",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: forced-colors block keeps meter fills visible, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794552993.9957654,
+      "timestamp_str": "2026-11-13 09:56:33",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Gauge bars vanish in Windows High Contrast",
+        "benefits": "High Contrast users can read hull, shield, fuel and every progress bar",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "Scoped to forced-colors only, failing-first test, emulated capture, ADR-246"
+      },
+      "plan_digest": "49e9a5222755827d82149a2e5bc1a35605b856d5b3ee58690a9ea798d801693a"
+    },
+    {
+      "task_id": "voidfarer-forced-colors",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794552994.2891822,
+      "timestamp_str": "2026-11-13 09:56:34",
       "agent": "claude:1",
       "checklists": "passed"
     }

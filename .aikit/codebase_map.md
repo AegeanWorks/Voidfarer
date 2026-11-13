@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `170`
-- **Total Classes**: `435`
-- **Total Top-Level Functions**: `501`
-- **Total Class Methods**: `2340`
-- **Total Source Lines**: `59246`
+- **Total Python Modules**: `171`
+- **Total Classes**: `436`
+- **Total Top-Level Functions**: `502`
+- **Total Class Methods**: `2343`
+- **Total Source Lines**: `59286`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`170` module(s))
+- **Indexed**: python (`171` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1596,6 +1596,22 @@
 
 **Functions:**
 - `def _base()`
+
+---
+
+### [`tests/test_forced_colors.py`](tests/test_forced_colors.py)
+> *Windows High Contrast (forced colors): meter fills must stay visible, not vanish with their backgrounds.*
+
+**Size**: `40` lines (`1595` bytes)
+
+**Classes:**
+- `class TestForcedColors`
+  - Method `.test_a_forced_colors_block_exists()`
+  - Method `.test_every_meter_fill_class_is_opted_out_and_painted_with_a_system_color()`
+  - Method `.test_actionable_vital_cards_keep_a_visible_boundary()`
+
+**Functions:**
+- `def _block()`
 
 ---
 

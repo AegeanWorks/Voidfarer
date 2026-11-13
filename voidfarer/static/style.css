@@ -10980,3 +10980,18 @@ body.cockpit-theme .nav-panel > .panel-header {
 #vitalHullCard.is-patchable { cursor: pointer; }
 #vitalHullCard.is-patchable #hullPatchChip { display: inline-block; }
 #vitalHullCard.is-patchable:hover #hullPatchChip { background: rgba(217, 112, 95, 0.2); }
+
+/* Windows High Contrast (forced colors): the browser strips background fills, which made every
+   gauge and progress bar disappear. Meter fills opt out and paint with the system Highlight color;
+   critical vital cards keep a visible outline. */
+@media (forced-colors: active) {
+    .meter-fill, .hull-fill, .shield-fill, .fuel-fill, .reactor-heat-fill, .crew-morale-fill,
+    .cargo-meter-fill, .contract-progress-fill, .skill-bar-fill, .skill-quick-fill, .codex-progress-fill,
+    .mastery-fill, .combat-meter-fill, .standing-bar-fill, .character-xp-fill, .fleet-xp-fill,
+    .gauge-fill, .void-meter-fill {
+        forced-color-adjust: none;
+        background: Highlight;
+        box-shadow: none;
+    }
+    #vitalHullCard.is-low, #vitalFuelCard.is-low { border: 2px solid; border-color: Mark; }
+}
