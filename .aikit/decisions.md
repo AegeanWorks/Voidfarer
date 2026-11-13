@@ -2577,3 +2577,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: At 1280x720 the Sol system radar placed only 8 of 11 body labels, so three bodies were unnamed and indistinguishable. An earlier attempt to steer labels away from neighbouring discs made no measurable difference and was reverted.
 - **Decision**: `placeRadarLabel` tries each wording in `radarLabelVariants` (the full name, then the name without its trailing parenthetical, e.g. "Sol System E" for "Sol System E (Magma Forge)") across the four original positions plus six nudged or second-row positions. The full name is always tried first; selected bodies and the flagship still force the full text. This stays within G-007: it moves labels only, never bodies, rings or the AU scale.
 - **Consequences**: Render code only. Measured in real Edge: labels placed 8 to 11 of 11 bodies at 1280x720 and 10 to 11 at 1366x768; 1920x1080 unchanged. `tests/test_radar_label_fallback.py` (new, failing first) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+
+### ADR-241: Narrow-terminal text wraps instead of clipping (REFIT, FACTIONS, COMMERCE)
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: An expanded all-tabs sweep of a lived-in save at 1280px reported clipped text the 1920px sweep did not: 12 structural-refit descriptions in REFIT cut off mid-trade-off ("+60 max hull, but ..." in a 151px column), the FACTIONS "BACK NEBULA / 500" pledge buttons ellipsized, a long station name in the COMMERCE title, and the OVERHAUL service card running past its own border.
+- **Decision**: Refit descriptions wrap in full (they state the downside, so a line clamp would still hide it); war pledge buttons and the exchange title wrap; in the three-card narrow layout the service icon stacks above its text. `tests/test_narrow_clipping.py` (new, failing first) pins all four; it was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+- **Consequences**: CSS only. Sweep clipped counts at 1280px: REFIT 12 to 0, FACTIONS 2 to 0, COMMERCE 1 to 0.

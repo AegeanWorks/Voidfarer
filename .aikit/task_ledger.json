@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-radar-labels",
+    "task_id": "voidfarer-narrow-clipping",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794550549.4000797,
+    "updated_at": 1794551025.2028515,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-payroll-runway",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-payroll-runway' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794547135.3643925,
-      "timestamp_str": "2026-11-13 08:18:55",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-menu-backdrop",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: gated CSS orbital backdrop for the main menu with failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794547411.094338,
-      "timestamp_str": "2026-11-13 08:23:31",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Right half of the menu screen is empty",
-        "benefits": "A composed first screen",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "New test, 720p overlap check, reduced-motion stop, ADR-235"
-      },
-      "plan_digest": "1acea7a46b39b6b8600d6b633b75d7dc8938d8479d63f9524f5b4dc32b6eddd5"
-    },
-    {
-      "task_id": "voidfarer-menu-backdrop",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794547411.6407385,
-      "timestamp_str": "2026-11-13 08:23:31",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-menu-backdrop",
       "phase": "completed",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794550549.4000797,
       "timestamp_str": "2026-11-13 09:15:49",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-radar-labels",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-radar-labels' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794550636.4038153,
+      "timestamp_str": "2026-11-13 09:17:16",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-narrow-clipping",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: wrap clipped text in REFIT, FACTIONS, COMMERCE at 1280px with failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794551024.9140995,
+      "timestamp_str": "2026-11-13 09:23:44",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "1280px sweep found cut-off trade-off text and overflowing service card",
+        "benefits": "No information hidden at minimum width",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first test, re-sweep to 0 clipped, ADR-241"
+      },
+      "plan_digest": "26e988dcbbb0c9100977fd26c4f1f3756bf6b13c6a8464af158fa869e9771c26"
+    },
+    {
+      "task_id": "voidfarer-narrow-clipping",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794551025.2028515,
+      "timestamp_str": "2026-11-13 09:23:45",
       "agent": "claude:1",
       "checklists": "passed"
     }

@@ -1073,3 +1073,7 @@ All 16 scenarios across all five viewports audited clean (errors 0, hscroll 0, t
 ### Thirty-third pass — radar labels on crowded maps
 
 First radar graphics change: labels try a shorter wording and extra positions so every body is named at 1280x720 (ADR-240). Proof: `ui-review/goal-labels3/short-crop.png`; counts 8 to 11 of 11 labels.
+
+### Thirty-fourth pass — 1280px expanded sweep
+
+Repeating the expanded all-tabs sweep at 1280px found clipping the 1920px runs hid (ADR-241). Proof: `ui-review/goal-sweep720/` (before), `goal-sweep720c`, `goal-sweep720e` (after).

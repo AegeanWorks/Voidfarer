@@ -10948,3 +10948,20 @@ body.cockpit-theme .nav-panel > .panel-header {
     outline: 2px solid var(--console-gold-bright);
     outline-offset: 2px;
 }
+
+/* Narrow terminals: structural-refit descriptions wrap in full (they state the trade-off), and war pledge buttons wrap instead of ellipsizing. */
+.ship-module-info small {
+    display: block;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.3;
+}
+.war-actions .btn-hud { white-space: normal; text-overflow: clip; line-height: 1.2; }
+#tabContentMarket > .panel-header .panel-title { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; }
+
+/* Three service cards in a narrow terminal: icon above text so words like OVERHAUL fit their card. */
+@media (max-width: 1599px) {
+    .station-services-bar .btn-service { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .station-services-bar .service-meta { min-width: 0; overflow-wrap: anywhere; }
+}

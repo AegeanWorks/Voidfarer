@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `165`
-- **Total Classes**: `430`
-- **Total Top-Level Functions**: `499`
-- **Total Class Methods**: `2321`
-- **Total Source Lines**: `59062`
+- **Total Python Modules**: `166`
+- **Total Classes**: `431`
+- **Total Top-Level Functions**: `500`
+- **Total Class Methods**: `2325`
+- **Total Source Lines**: `59100`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`165` module(s))
+- **Indexed**: python (`166` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2127,6 +2127,23 @@
 
 **Functions:**
 - `def _base()`
+
+---
+
+### [`tests/test_narrow_clipping.py`](tests/test_narrow_clipping.py)
+> *At 1280px the REFIT module descriptions and war pledge buttons wrap instead of being cut off.*
+
+**Size**: `38` lines (`1430` bytes)
+
+**Classes:**
+- `class TestNarrowClipping`
+  - Method `.test_module_descriptions_wrap_in_full_because_they_state_the_trade_off()`
+  - Method `.test_war_pledge_buttons_wrap_instead_of_ellipsizing()`
+  - Method `.test_exchange_title_wraps_for_long_station_names()`
+  - Method `.test_narrow_service_cards_stack_icon_over_text()`
+
+**Functions:**
+- `def _last(selector)`
 
 ---
 

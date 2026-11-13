@@ -1478,5 +1478,25 @@
     "final_snapshot_digest": "697c9f6b06ed712fb36ba572831c1d7cd3d2e413f960a5825cd3acaee095a3e2",
     "final_snapshot_entries": 1265,
     "surface_digest": "b758a28afaa86a14dbda6777c43cb607217db1495acf1f11c365889c99babe06"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "a972fd3ba9fed489d229b488b364740bb251938d",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794550935.5229084,
+    "finished_at": 1794551021.7595026,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted ALTAIR REACH D (SCIENCE) EXCHANGE on two lines, REPAIR/REFUEL/OVERHAUL cards with 7.0% WEAR (31 CR))",
+    "allowed_removals": [],
+    "final_snapshot_digest": "697c9f6b06ed712fb36ba572831c1d7cd3d2e413f960a5825cd3acaee095a3e2",
+    "final_snapshot_entries": 1265,
+    "surface_digest": "40c6b6abaeb78e8fbe9766fbf28ea4e66f701425b8e25f56036f6c73c66e8327"
   }
 ]
