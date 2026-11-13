@@ -5276,7 +5276,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     return `<div class="perk-node ${unlocked ? "unlocked" : "locked"}">
                         <strong>${this.escapeHtml(t.name)}</strong>
                         <div>${this.escapeHtml(t.description)}</div>
-                        ${unlocked ? "<div>UNLOCKED</div>" : `<button class="btn-hud" data-talent="${this.escapeHtml(t.id)}" ${canUnlock ? "" : "disabled"}>${requiresMet ? "UNLOCK" : "REQUIRES " + requires.join(", ").toUpperCase()}</button>`}
+                        ${unlocked ? `<span class="perk-state">UNLOCKED</span>` : `<button class="btn-hud" data-talent="${this.escapeHtml(t.id)}" ${canUnlock ? "" : "disabled"}>${requiresMet ? "UNLOCK" : "REQUIRES " + requires.map(r => String(r).replace(/_/g, " ")).join(", ").toUpperCase()}</button>`}
                     </div>`;
                 }).join("")}
             </div>

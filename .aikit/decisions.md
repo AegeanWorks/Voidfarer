@@ -2507,3 +2507,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Rail badges become compact 18px pills; role, escort, mercenary and drone descriptions wrap to two lines; the career statistics grid is no longer height-capped.
   3. Open: AI COMMAND and MESSAGES cards still pad 60-100px of dead space because `test_small_card_lists_share_a_rhythm` pins min-height 200px and 168px. Changing that pinned contract needs the user's approval and is not done here.
 - **Consequences**: CSS and render-markup only; no save, API, CLI or test change. Verified with real-Edge captures at 1920x1080, 1280x720 and 3840x2160 (errors 0, hscroll 0, tiny 0); full suite `Ran 1472 OK`.
+
+### ADR-231: EMPIRE diplomacy rows and SKILLS perks keep their layout at every width
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: The 16-tab sweep found three more layouts that only worked below 1600px or never worked: EMPIRE faction-leader rows (identity and standing on one line, actions below) were defined only inside a max-width media query, so wider windows showed ragged button clusters beside the standing text; an unlocked perk's UNLOCKED label overlapped its description; and the three Resonance Forge buttons overflowed their row and collided ("RAREFUSE").
+- **Decision**: Lift the diplomacy-row stacking rules out of the media query; render UNLOCKED as a header badge (`.perk-state`); show perk requirements as words instead of raw ids; stack the forge fusions as full-width rows.
+- **Consequences**: CSS and render-markup only; no save, API, CLI or test change. Layout, inventory and audit suites pass.

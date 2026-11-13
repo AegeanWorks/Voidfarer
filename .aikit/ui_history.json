@@ -1272,5 +1272,26 @@
     "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
     "final_snapshot_entries": 1257,
     "surface_digest": "763f81bbd22fe842a16a324f2b0d374c3bc065b71b19e7dd3b2ad01bb3c92b1d"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "410c5d7b0c43e60bc6ff2e649bc4b08f9a4e4ec6",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794544934.7348342,
+    "finished_at": 1794545133.4354553,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted UNLOCKED badge beside Void Cartographer, FUSE 3xCOMMON -> RARE, REQUIRES SWARM COMMANDER, IMPROVE GIFT 300 NAP PACT R&D ALLY row)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
+    "final_snapshot_entries": 1257,
+    "surface_digest": "3392a5fb548f744ce0c9578947d4dcda2eddbcd804689ab9586a27e6f6bae3f8"
   }
 ]

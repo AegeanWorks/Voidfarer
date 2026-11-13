@@ -1,55 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-tab-polish",
+    "task_id": "voidfarer-tab-polish-2",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794544593.2133682,
+    "updated_at": 1794545134.2833867,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-narrative-merge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Narrative facade verified: report/summary, story choice, tutorial skip/reset, contract refresh, event dismissal, invalid action, REST+CLI, 11 tests, 1441 suite; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794243924.8222542,
-      "timestamp_str": "2026-11-09 20:05:24",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-narrative-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-narrative-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794244020.6876225,
-      "timestamp_str": "2026-11-09 20:07:00",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-trade-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: hide standalone buy/sell and document logistics buy|sell as the market action",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794248416.1055434,
-      "timestamp_str": "2026-11-09 21:20:16",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "logistics already routes buy/sell through logistics_action, but the two top-level verbs duplicate the market surface in help.",
-        "benefits": "One discoverable market surface; two fewer visible commands; legacy parsers still work.",
-        "risks": "contract: CLI help only; dependency: existing buy/sell parsers and logistics_action; concurrency: none; state: no save change; regression: hidden verbs remain callable and tests cover them.",
-        "mitigation": "logistics alias test, full suite, gate."
-      },
-      "plan_digest": "abe4fd1fc148c8b9a16245861ff51f48bb90076abd9461b2a43717ece7424392"
-    },
     {
       "task_id": "voidfarer-trade-merge",
       "phase": "phase 4",
@@ -266,6 +227,46 @@
       "status": "in_progress",
       "timestamp": 1794544593.2133682,
       "timestamp_str": "2026-11-13 07:36:33",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-tab-polish",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-tab-polish' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794544695.5497565,
+      "timestamp_str": "2026-11-13 07:38:15",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-tab-polish-2",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: EMPIRE faction-leader rows get a header line plus an aligned action row; then radar label and mechanics review",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794544717.8866057,
+      "timestamp_str": "2026-11-13 07:38:37",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Sweep showed EMPIRE leader rows with ragged button clusters beside standing text",
+        "benefits": "Consistent, scannable diplomacy rows",
+        "risks": "contract: pinned layout tests; dependency: none; concurrency: none; state: none",
+        "mitigation": "Run layout suites, real-Edge captures, ADR"
+      },
+      "plan_digest": "cece4e7fa69647a2919a2b52f418f744a24c82c63c6d5788f776e1192530ee4b"
+    },
+    {
+      "task_id": "voidfarer-tab-polish-2",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 run after EMPIRE and SKILLS fixes. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794545134.2833867,
+      "timestamp_str": "2026-11-13 07:45:34",
       "agent": "claude:1",
       "checklists": "passed"
     }

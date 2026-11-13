@@ -1029,3 +1029,7 @@ review quoted `CORVETTE SCOUT // 3/6 STAFFED` on its own line with no header col
 ### Twenty-third pass — every tab, expanded, on a lived-in save
 
 All 16 tabs were opened with every disclosure expanded after 180 AI-captain steps. Fixed (ADR-230): DEPOT names crushed under buttons, rail badge overflow, ellipsized role/escort/drone descriptions, clipped career statistics. Proof: before `ui-review/goal-sweep-expanded/`, after `ui-review/goal-after1`, `goal-after3`, `goal-after-matrix` (720p and 4K). Suite `Ran 1472 OK`. Open: AI COMMAND and MESSAGES card dead space (pinned min-height test).
+
+### Twenty-fourth pass — EMPIRE diplomacy and SKILLS perks
+
+Fixed (ADR-231): ragged diplomacy button clusters at wide widths, the UNLOCKED label overlapping a perk description, clipped Resonance Forge buttons and raw `SWARM_COMMANDER` ids. Proof: `ui-review/goal-after4` (EMPIRE before), `goal-after5` (SKILLS after).
