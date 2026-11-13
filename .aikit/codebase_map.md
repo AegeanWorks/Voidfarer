@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `168`
-- **Total Classes**: `433`
+- **Total Python Modules**: `169`
+- **Total Classes**: `434`
 - **Total Top-Level Functions**: `500`
-- **Total Class Methods**: `2333`
-- **Total Source Lines**: `59180`
+- **Total Class Methods**: `2337`
+- **Total Source Lines**: `59213`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`168` module(s))
+- **Indexed**: python (`169` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3176,6 +3176,20 @@
 - `class TestVectorTargetHeader`
   - Method `.test_header_distance_does_not_repeat_the_bearing()`
   - Method `.test_bearing_is_still_shown_as_a_stat_chip()`
+
+---
+
+### [`tests/test_vital_card_keyboard.py`](tests/test_vital_card_keyboard.py)
+> *Actionable vital cards (burn cell, patch hull) are real keyboard controls, not mouse-only divs.*
+
+**Size**: `33` lines (`1425` bytes)
+
+**Classes:**
+- `class TestVitalCardKeyboard`
+  - Method `.test_a_shared_helper_makes_a_card_a_button_only_when_actionable()`
+  - Method `.test_enter_and_space_activate_the_card()`
+  - Method `.test_both_gauges_use_the_helper()`
+  - Method `.test_old_click_only_bindings_are_gone()`
 
 ---
 

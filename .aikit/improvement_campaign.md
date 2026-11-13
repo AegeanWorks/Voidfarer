@@ -1085,3 +1085,7 @@ Expanded sweeps at 1366 and 3840 were clean, so this pass made ADR-236's burn di
 ### Thirty-sixth pass — critical-hull gauge
 
 Mirror of the low-fuel gauge for hull: red state plus one-click PATCH HULL when titanium is held (ADR-243). Proof: `ui-review/goal-lowhull2/top.png`; click moved server hull 96 to 121.
+
+### Thirty-seventh pass — keyboard access to the vital remedies
+
+BURN CELL and PATCH HULL cards are focusable buttons only while actionable (ADR-244). Proof: Enter moved server fuel 25 to 29 and cells 4 to 3; the role and tabindex are absent when idle.

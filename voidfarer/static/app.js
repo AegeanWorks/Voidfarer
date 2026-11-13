@@ -2043,12 +2043,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     ? `HULL CRITICAL // ${titanium} titanium in the hold: click to fabricate a patch kit (+25 hull).`
                     : "HULL CRITICAL // Dock for repairs, or carry titanium to fabricate patch kits.")
                 : "Hull integrity // Hits below zero destroy the command ship.";
-            if (!hullCard.dataset.patchBound) {
-                hullCard.dataset.patchBound = "true";
-                hullCard.addEventListener("click", () => {
-                    if (hullCard.classList.contains("is-patchable")) this.handleFabricate("patch_kit");
-                });
-            }
+            this.setVitalAction(hullCard, lowHull && titanium > 0, () => this.handleFabricate("patch_kit"));
         }
 
         const shieldPct = Math.round((ship.shield / ship.max_shield) * 100);
@@ -2069,12 +2064,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     ? `LOW FUEL // ${cells} fuel cell${cells === 1 ? "" : "s"} in the hold: click to burn one (+4 fuel).`
                     : "LOW FUEL // Refuel at a station, scoop a gas giant or fabricate a fuel pack.")
                 : "Quantum fuel // Spent by jumps, sublight transit and evasive burns.";
-            if (!fuelCard.dataset.burnBound) {
-                fuelCard.dataset.burnBound = "true";
-                fuelCard.addEventListener("click", () => {
-                    if (fuelCard.classList.contains("is-burnable")) this.handleBurnCells();
-                });
-            }
+            this.setVitalAction(fuelCard, lowFuel && cells > 0, () => this.handleBurnCells());
         }
 
         this.creditsVal.textContent = `${ship.credits.toLocaleString()} CR`;
@@ -3881,6 +3871,32 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const factions = this.state.factions || {};
         const match = Object.entries(factions).find(([, f]) => f.name === name);
         return match ? match[0] : null;
+    }
+
+    // A vital card becomes a real keyboard control (focusable button, Enter or Space) only while it
+    // offers an action; the handler is bound once and always reads the current state.
+    setVitalAction(card, actionable, handler) {
+        card._vitalHandler = handler;
+        if (!card.dataset.vitalBound) {
+            card.dataset.vitalBound = "true";
+            card.addEventListener("click", () => {
+                if (card.getAttribute("role") === "button") card._vitalHandler();
+            });
+            card.addEventListener("keydown", event => {
+                if (card.getAttribute("role") !== "button") return;
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    card._vitalHandler();
+                }
+            });
+        }
+        if (actionable) {
+            card.setAttribute("role", "button");
+            card.tabIndex = 0;
+        } else {
+            card.removeAttribute("role");
+            card.removeAttribute("tabindex");
+        }
     }
 
     // How long the treasury carries the monthly bills before wages go unpaid and morale starts to fall.
