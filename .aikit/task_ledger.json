@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-decision-focus",
+    "task_id": "voidfarer-canvas-font",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794586896.1979759,
+    "updated_at": 1794587420.2047849,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-body-hotkeys",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: comma and period cycle the radar body target, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794584043.6294227,
-      "timestamp_str": "2026-11-13 18:34:03",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Targeting was mouse-only",
-        "benefits": "Keyboard-only players can target bodies",
-        "risks": "contract: new hotkeys; dependency: none; concurrency: none; state: none",
-        "mitigation": "Ignored while dialogs or typing, real key probe, ADR-259"
-      },
-      "plan_digest": "32c3e2607b6a8c046f1a7f150fbdeef8bcac8bc04d3fef4f3e551a59f6091842"
-    },
-    {
-      "task_id": "voidfarer-body-hotkeys",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794584044.689985,
-      "timestamp_str": "2026-11-13 18:34:04",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-body-hotkeys",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-body-hotkeys' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794584390.4487238,
-      "timestamp_str": "2026-11-13 18:39:50",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-system-hotkeys",
       "phase": "phase 2",
@@ -278,6 +238,46 @@
       "status": "in_progress",
       "timestamp": 1794586896.1979759,
       "timestamp_str": "2026-11-13 19:21:36",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-decision-focus",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-decision-focus' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794586987.407061,
+      "timestamp_str": "2026-11-13 19:23:07",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-canvas-font",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 declare the surface map renderer a theme path (ADR-266); M2 raise canvas fonts to 12px as a UI task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794587419.6737127,
+      "timestamp_str": "2026-11-13 19:30:19",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Canvas text below the 12px floor, and the lint treats two canvas renderers differently",
+        "benefits": "Readable canvas labels; consistent contract",
+        "risks": "contract: ui.json theme_paths widened by one canvas renderer; dependency: none; concurrency: none; state: none",
+        "mitigation": "Own commit with ADR, other canvas files stay linted, ADR-266"
+      },
+      "plan_digest": "7fd526b8839f199c6ef7ec4d889e92ab9ed17f8474d9509aa8a02461997610b1"
+    },
+    {
+      "task_id": "voidfarer-canvas-font",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] contract fix Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794587420.2047849,
+      "timestamp_str": "2026-11-13 19:30:20",
       "agent": "claude:1",
       "checklists": "passed"
     }
