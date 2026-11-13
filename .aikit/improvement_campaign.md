@@ -1143,3 +1143,7 @@ Frame times were already at the 60Hz floor at 1080p and 4K, so this pass stayed 
 Fiftieth pass — the distress verdict now defers to scooping when a scoopable body with taps left is in orbit (ADR-255 addendum 2).
 
 Fifty-first pass — the AI captain now burns fuel cells in its tour, so the mechanics gate covers ADR-236 (ADR-257).
+
+### Fifty-second pass — radar hover
+
+Took the radar interaction call: the body under the pointer is ringed and named (ADR-258). Proof: `ui-review/goal-hover/hover.png`, real-mouse probe with labels off.

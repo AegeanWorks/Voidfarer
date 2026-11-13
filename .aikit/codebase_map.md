@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `183`
-- **Total Classes**: `451`
+- **Total Python Modules**: `184`
+- **Total Classes**: `452`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2388`
-- **Total Source Lines**: `59876`
+- **Total Class Methods**: `2391`
+- **Total Source Lines**: `59902`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`183` module(s))
+- **Indexed**: python (`184` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2599,6 +2599,19 @@
   - Method `.test_cooldown_and_minimum_block_orders()`
   - Method `.test_policy_round_trips()`
   - Method `.test_legacy_payload_defaults_to_off()`
+
+---
+
+### [`tests/test_radar_hover.py`](tests/test_radar_hover.py)
+> *System radar: the hovered body gets a ring and a forced name, even with labels switched off.*
+
+**Size**: `26` lines (`1075` bytes)
+
+**Classes:**
+- `class TestRadarHover`
+  - Method `.test_hovered_body_is_detected_by_id()`
+  - Method `.test_a_ring_is_drawn_around_the_hovered_body()`
+  - Method `.test_the_label_is_forced_on_and_prioritised_while_hovered()`
 
 ---
 

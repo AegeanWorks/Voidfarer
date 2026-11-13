@@ -7585,14 +7585,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 });
             }
 
-            if (this.radarLabels) {
+            // Hover feedback: on a crowded map the body under the pointer gets a ring and its name.
+            const hoveredBody = Boolean(this.hoveredItem && this.hoveredItem.id === b.id);
+            if (hoveredBody) {
+                ctx.save();
+                ctx.strokeStyle = "rgba(240, 217, 160, 0.9)";
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(bx, by, bodyRadius + 5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+            if (this.radarLabels || hoveredBody) {
                 labels.push({
                     text: b.name,
                     x: bx,
                     y: by,
                     radius: bodyRadius,
                     color: "#ece4d4",
-                    priority: this.selectedTarget && this.selectedTarget.id === b.id ? 4 : 1,
+                    priority: (this.selectedTarget && this.selectedTarget.id === b.id) || hoveredBody ? 4 : 1,
                 });
             }
         });

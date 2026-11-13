@@ -2702,3 +2702,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The `/api/engineering/action` alias is documented in the agent catalog but never attempted, so the mechanics gate (`ai_play`) would not notice a regression in the fuel-cell burn (ADR-236) that the cockpit, CLI and REST all depend on.
 - **Decision**: A tour step `_tour_burn_cells` burns one hold fuel cell whenever the captain holds one and the tank has room, through the engineering alias. The tour is keyed by path, so one engineering step runs per game; the distress call (ADR-255) is deliberately not added because it is eligible only in a stranded state a normal tour does not reach.
 - **Consequences**: Mechanics gate coverage only; no game rule change. `tests/test_ai_burn_cells.py` (new, failing first) plays 200 steps and requires `burn_cells` among the families with zero errors and zero coverage gaps. `ai_play --steps 180` still reports 0 gaps.
+
+### ADR-258: The hovered radar body gets a ring and its name
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: In the system view, hover only changed the cursor. On a crowded map (several bodies within a few pixels of each other at 1280x720) the player could not tell which body a click would select, and with radar labels switched off nothing named it.
+- **Decision**: The body under the pointer gets a thin gold ring (radius plus 5px) and its label, prioritised so it always names itself, even with the labels setting off. This changes no placement or scale (G-007): the ring and label are drawn at the body's existing position.
+- **Consequences**: Render code only. `tests/test_radar_hover.py` (new, failing first: 2 failures and 1 error) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified with a real mouse in Edge at 1280x720: hovering Sol System D with labels off drew the ring and one label (labels placed 1 to 2).
