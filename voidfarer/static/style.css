@@ -10878,3 +10878,7 @@ body.cockpit-theme .nav-panel > .panel-header {
 .message-card h4 { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .message-state { padding: 1px 6px; border: 1px solid var(--border-subtle); border-radius: 2px; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; }
 .message-card.unread .message-state { border-color: var(--neon-amber); color: var(--neon-amber); }
+
+/* REFIT slot filters wrap onto as many rows as the drawer needs instead of clipping the last slots. */
+.arsenal-filters { flex-wrap: wrap; row-gap: 4px; margin: 6px 0; }
+.arsenal-filters .market-cat-pill { flex: 0 0 auto; white-space: nowrap; }

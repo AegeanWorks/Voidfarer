@@ -1037,3 +1037,7 @@ Fixed (ADR-231): ragged diplomacy button clusters at wide widths, the UNLOCKED l
 ### Twenty-fifth pass — AI captain meters and message state
 
 Resolved the open dead-space item without touching the pinned test (ADR-232): trust/standing meters on captain dossiers, bottom-anchored actions, UNREAD/READ chips. Proof: `ui-review/goal-after6`, `goal-after7`.
+
+### Twenty-sixth pass — REFIT slot filters
+
+ADR-233: ALL, AFFORDABLE and per-slot chips; clicking ENGINES in real Edge left exactly 4 of 23 cards. Proof: `ui-review/goal-after8` (overflow found), `goal-after9` (wrapped, SHIELDS filtered).

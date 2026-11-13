@@ -927,6 +927,7 @@ class CockpitApp {
 
         // Arsenal & Fleet containers
         this.arsenalList = document.getElementById("arsenalList");
+        this.arsenalFilters = document.getElementById("arsenalFilters");
         this.shipyardChassisList = document.getElementById("shipyardChassisList");
         this.weaponsBayList = document.getElementById("weaponsBayList");
         this.btnToggleArsenalUpgrades = document.getElementById("btnToggleArsenalUpgrades");
@@ -3420,8 +3421,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const upgrades = this.state.catalog_upgrades || [];
             const equipped = this.state.ship.equipped_upgrades || {};
             const credits = this.state.ship.credits;
+            const filter = this.arsenalFilter || "all";
+            const slots = [...new Set(upgrades.map(u => u.slot))];
+            const affordable = upgrades.filter(u => equipped[u.slot] !== u.id && credits >= u.cost).length;
+            if (this.arsenalFilters) {
+                const chips = [["all", `ALL (${upgrades.length})`], ["affordable", `AFFORDABLE (${affordable})`]]
+                    .concat(slots.map(slot => [slot, `${slot.toUpperCase()} (${upgrades.filter(u => u.slot === slot).length})`]));
+                this.arsenalFilters.innerHTML = chips.map(([key, label]) =>
+                    `<button type="button" class="market-cat-pill ${key === filter ? "active" : ""}" data-arsenal-filter="${this.escapeHtml(key)}" aria-pressed="${key === filter}">${this.escapeHtml(label)}</button>`
+                ).join("");
+                this.arsenalFilters.querySelectorAll("[data-arsenal-filter]").forEach(btn =>
+                    btn.addEventListener("click", () => {
+                        this.arsenalFilter = btn.getAttribute("data-arsenal-filter");
+                        this.renderArsenal();
+                    }));
+            }
 
-            upgrades.forEach(u => {
+            upgrades.filter(u => filter === "all"
+                || (filter === "affordable" ? (equipped[u.slot] !== u.id && credits >= u.cost) : u.slot === filter)
+            ).forEach(u => {
                 const isEquipped = equipped[u.slot] === u.id;
                 const card = document.createElement("div");
                 card.className = `arsenal-card ${isEquipped ? 'installed' : ''}`;

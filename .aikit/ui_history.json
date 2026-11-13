@@ -1314,5 +1314,27 @@
     "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
     "final_snapshot_entries": 1257,
     "surface_digest": "8151a19b578a39dc56d54c586152478aad01b0c1e16fc168a60f7708766c5f32"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "221b2fac27380964e7d4ba486e2bb30d94e3f044",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794546230.2494433,
+    "finished_at": 1794546337.152545,
+    "strikes": 1,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted ALL (23) AFFORDABLE (22) ENGINES (4) SHIELDS (4) chips and Deflector Array MK-I 500 CR)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "d5b8baec5639575f7d777742251559a00eb81dfda3db05456acf9cae43c65b55",
+    "final_snapshot_entries": 1259,
+    "surface_digest": "7c0b8671cbbca9fda4ed40ede7fdb9b4dbb460e6a428eea9073c8e5b22e79d27"
   }
 ]

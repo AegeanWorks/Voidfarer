@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `155`
-- **Total Classes**: `418`
+- **Total Python Modules**: `156`
+- **Total Classes**: `419`
 - **Total Top-Level Functions**: `496`
-- **Total Class Methods**: `2286`
-- **Total Source Lines**: `58606`
+- **Total Class Methods**: `2291`
+- **Total Source Lines**: `58648`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`155` module(s))
+- **Indexed**: python (`156` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2383,6 +2383,21 @@
   - Method `.test_silhouette_cases_show_the_code_and_a_real_wrench_glyph()`
   - Method `.test_catalog_names_wrap_instead_of_losing_words()`
   - Method `.test_research_rows_align_their_cost_and_start_button()`
+
+---
+
+### [`tests/test_refit_filters.py`](tests/test_refit_filters.py)
+> *REFIT upgrade list: slot filter chips keep the long catalogue navigable.*
+
+**Size**: `42` lines (`1669` bytes)
+
+**Classes:**
+- `class TestRefitSlotFilters`
+  - Method `.setUpClass()`
+  - Method `.test_filter_bar_lives_inside_the_upgrade_disclosure()`
+  - Method `.test_chips_cover_all_affordable_and_every_slot()`
+  - Method `.test_filtering_never_drops_the_equipped_state()`
+  - Method `.test_chips_wrap_instead_of_clipping()`
 
 ---
 

@@ -2521,3 +2521,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: AI COMMAND and MESSAGES cards reserve 200px and 168px (pinned by `test_small_card_lists_share_a_rhythm`) but their content often filled half of it, leaving dead space, and a message's read state was only a border colour.
 - **Decision**: Keep the pinned heights and make them useful: each captain card gains a trust meter (tick at the 50-trust alliance threshold) and a centre-anchored standing meter; actions anchor to the card bottom; each message header carries an UNREAD or READ chip.
 - **Consequences**: CSS and render-markup only; no save, API, CLI or test change. Supersedes the open item in ADR-230.
+
+### ADR-233: REFIT upgrades get slot filter chips
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: The expanded REFIT tab scrolled to ~6,800px; its 23 upgrades were a single unbroken list.
+- **Decision**: A chip bar inside the upgrade disclosure: ALL, AFFORDABLE and one chip per hardware slot with counts. Chips wrap to rows; filtering is client-side and leaves the equipped state and purchase flow unchanged. `tests/test_refit_filters.py` (new, failing first) pins the bar placement, the chips and the wrapping. It was added after `ui finish` because the UI guard protects `tests/` during a task; it runs in the Phase 4 gate.
+- **Consequences**: Markup, CSS and render code only; no save, API or CLI change.
