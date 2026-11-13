@@ -1089,3 +1089,7 @@ Mirror of the low-fuel gauge for hull: red state plus one-click PATCH HULL when 
 ### Thirty-seventh pass — keyboard access to the vital remedies
 
 BURN CELL and PATCH HULL cards are focusable buttons only while actionable (ADR-244). Proof: Enter moved server fuel 25 to 29 and cells 4 to 3; the role and tabindex are absent when idle.
+
+### Thirty-eighth pass — reduced motion for canvas FX
+
+The canvas particles ignored the OS reduce-motion setting (ADR-245). Proof: `reduced_motion=reduce` emitted 0 continuous particles against 5 by default; bursts stayed at 10.

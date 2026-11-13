@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `169`
-- **Total Classes**: `434`
-- **Total Top-Level Functions**: `500`
-- **Total Class Methods**: `2337`
-- **Total Source Lines**: `59213`
+- **Total Python Modules**: `170`
+- **Total Classes**: `435`
+- **Total Top-Level Functions**: `501`
+- **Total Class Methods**: `2340`
+- **Total Source Lines**: `59246`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`169` module(s))
+- **Indexed**: python (`170` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2515,6 +2515,22 @@
   - Method `.test_silhouette_cases_show_the_code_and_a_real_wrench_glyph()`
   - Method `.test_catalog_names_wrap_instead_of_losing_words()`
   - Method `.test_research_rows_align_their_cost_and_start_button()`
+
+---
+
+### [`tests/test_reduced_motion.py`](tests/test_reduced_motion.py)
+> *Particle FX honor the OS reduce-motion preference: continuous decoration stops, event feedback stays.*
+
+**Size**: `33` lines (`1254` bytes)
+
+**Classes:**
+- `class TestReducedMotion`
+  - Method `.test_preference_is_read_and_tracked_live()`
+  - Method `.test_continuous_emitters_return_early_when_reduced()`
+  - Method `.test_event_feedback_is_not_suppressed()`
+
+**Functions:**
+- `def _method(name)`
 
 ---
 

@@ -9,6 +9,15 @@ class ParticleSystem {
         this.max = max;
         this.items = [];
         this.last = performance.now();
+        // Honor the OS "reduce motion" setting live: continuous decoration (exhaust, plumes, warp
+        // streaks, RCS puffs, ion drift) stops, while one-shot event feedback (impacts, ripples,
+        // bursts) stays because it tells the player what just happened.
+        const query = typeof window !== "undefined" && window.matchMedia
+            ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+        this.reduced = Boolean(query && query.matches);
+        if (query && query.addEventListener) {
+            query.addEventListener("change", event => { this.reduced = event.matches; });
+        }
         // A tiny xorshift keeps repeated captures close without seeding gameplay.
         let seed = 0x9e3779b9;
         this.rng = () => {
@@ -128,6 +137,7 @@ class ParticleSystem {
     }
 
     trail(x, y, heading, color = "#8fd8ff", power = 1) {
+        if (this.reduced) return;
         const angle = heading + Math.PI + this.random(-0.34, 0.34);
         const speed = this.random(24, 68) * power;
         const vx = Math.cos(angle) * speed;
@@ -155,6 +165,7 @@ class ParticleSystem {
     }
 
     thrustPlume(x, y, heading, power = 1) {
+        if (this.reduced) return;
         const angle = heading + Math.PI + this.random(-0.16, 0.16);
         const speed = this.random(75, 180) * Math.max(0.4, power);
         const vx = Math.cos(angle) * speed;
@@ -187,6 +198,7 @@ class ParticleSystem {
     }
 
     warp(x, y, heading, color = "#7fb7c9") {
+        if (this.reduced) return;
         const angle = heading + this.random(-0.10, 0.10);
         const speed = this.random(110, 250);
         this.spawn({
@@ -222,6 +234,7 @@ class ParticleSystem {
     }
 
     ion(x, y, vx, vy, color = "#8fd8ff", life = 0.5, size = 1.2) {
+        if (this.reduced) return;
         this.spawn({
             x, y, vx, vy,
             life,
@@ -303,6 +316,7 @@ class ParticleSystem {
     }
 
     rcsPuff(x, y, angle, color = "rgba(236, 228, 212, 0.85)", speed = 35) {
+        if (this.reduced) return;
         for (let i = 0; i < 4; i++) {
             const spread = (this.rng() - 0.5) * 0.45;
             const spd = speed * (0.7 + this.rng() * 0.6);

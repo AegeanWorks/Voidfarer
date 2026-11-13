@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-vital-keyboard",
+    "task_id": "voidfarer-reduced-motion",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794552423.3319626,
+    "updated_at": 1794552740.0830917,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-customs-review",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] 12px fix Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794549365.3610895,
-      "timestamp_str": "2026-11-13 08:56:05",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-customs-review",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-customs-review' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794549470.043425,
-      "timestamp_str": "2026-11-13 08:57:50",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-vector-header",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: vector target header drops the duplicate bearing, with failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794549998.9448812,
-      "timestamp_str": "2026-11-13 09:06:38",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Open-space target title wrapped and orphaned AU",
-        "benefits": "One-line readable title",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Failing-first test, real-Edge capture, ADR-239"
-      },
-      "plan_digest": "a5f6e86734b0608d660a8832f52d6dd5216b04c36eff9bf186e5377ceb93d48b"
-    },
     {
       "task_id": "voidfarer-vector-header",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794552423.3319626,
       "timestamp_str": "2026-11-13 09:47:03",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-vital-keyboard",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-vital-keyboard' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794552487.7366862,
+      "timestamp_str": "2026-11-13 09:48:07",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-reduced-motion",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: particle FX honor reduce-motion with failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794552739.7908072,
+      "timestamp_str": "2026-11-13 09:52:19",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Canvas particles ignored the OS reduce-motion preference",
+        "benefits": "Motion-sensitive players get a calm cockpit",
+        "risks": "contract: none pinned; dependency: matchMedia; concurrency: none; state: none",
+        "mitigation": "Event feedback kept, failing-first test, two-mode Edge proof, ADR-245"
+      },
+      "plan_digest": "71a35c62f4ce7de77e0541abf1fdfbceb88e40574c5bacb2efc5eaca573aa323"
+    },
+    {
+      "task_id": "voidfarer-reduced-motion",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794552740.0830917,
+      "timestamp_str": "2026-11-13 09:52:20",
       "agent": "claude:1",
       "checklists": "passed"
     }

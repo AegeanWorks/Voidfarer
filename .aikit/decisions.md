@@ -2605,3 +2605,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The BURN CELL (ADR-242) and PATCH HULL (ADR-243) vital cards were clickable `div`s, unreachable by keyboard.
 - **Decision**: A shared `setVitalAction(card, actionable, handler)` makes a card `role="button"` and focusable (Enter or Space activates it) only while it offers an action, and removes both when it does not. Delivered in two commits because the UI task guard protects `tests/`. **Test change, named per PRINCIPLE-014:** `test_only_a_burnable_card_triggers_the_burn` and `test_only_a_patchable_card_fabricates` pinned the old inline click-binding wording; they are re-expressed to accept the same contract (the action fires only from the actionable state, via the same handler) through either the old class check or the new helper. This is not a loosening of behaviour: the new keyboard test adds a stricter role check on top.
 - **Consequences**: Display and input handling only; no engine, save, API or CLI change.
+
+### ADR-245: Particle FX honor the OS reduce-motion preference
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: Only four CSS blocks respected `prefers-reduced-motion`; the canvas particle system (exhaust trails, thrust plumes, warp streaks, RCS puffs, ion drift) ignored it, so a player who asked their OS for less motion still got constant moving decoration.
+- **Decision**: `ParticleSystem` reads `(prefers-reduced-motion: reduce)` at construction and tracks changes live (`this.reduced`). The five continuous decorative emitters (`trail`, `thrustPlume`, `warp`, `rcsPuff`, `ion`) return early when reduced; one-shot event feedback (bursts, shield ripples, impacts, flak, rings) is unchanged because it tells the player what just happened. `tests/test_reduced_motion.py` (new, failing first: 2 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+- **Consequences**: Visual-only; no engine, save, API or CLI change. Verified in real Edge with Playwright `reduced_motion` set to `no-preference` and `reduce`: 5 versus 0 continuous particles, 10 burst particles in both.
