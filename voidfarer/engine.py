@@ -439,6 +439,9 @@ class SimulationEngine:
     RECONSTRUCTION_CREDIT_COST = 600
     RECONSTRUCTION_CREDIT_DEVASTATION = 20.0
     RELIEF_DEVASTATION = 40.0
+    # Emergency drive burn: one hold Quantum Fuel Cell injects this many fuel units. A cell trades for
+    # ~75-90 cr, so this is dearer than the 6 cr/unit refinery and only worth it away from a station.
+    FUEL_CELL_BURN_YIELD = 4
     RELIEF_CARGO = (("medicines", 2), ("hydroponics", 2), ("fuel_cells", 1))
     WAR_NEWS_TITLES = (
         ("WAR: ", "System Captured"),
@@ -7192,6 +7195,42 @@ class SimulationEngine:
 
             else:
                 return False, f"Unknown fabrication blueprint '{munitions_type}'. Valid blueprints: 'patch_kit', 'fuel_cell'."
+
+    def burn_fuel_cells(self, quantity: int = 1) -> tuple[bool, str]:
+        """Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.
+
+        Like field fabrication this is allowed mid-encounter (fuel is what a fleeing ship needs).
+        Never burns more cells than the free tank space can use.
+        """
+        with self.lock:
+            if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity <= 0:
+                return False, "Burn quantity must be a positive integer."
+            ship = self.state.ship
+            held = int(ship.cargo.get("fuel_cells", 0))
+            if held < 1:
+                return False, "No Quantum Fuel Cells in the hold to burn."
+            needed = ship.max_fuel - ship.fuel
+            if needed <= 0:
+                return False, f"Quantum fuel tanks are already at maximum capacity ({ship.fuel}/{ship.max_fuel} Fuel)."
+            per_cell = self.FUEL_CELL_BURN_YIELD
+            cells = min(quantity, held, -(-needed // per_cell))
+            gained = min(needed, cells * per_cell)
+            new_cargo = dict(ship.cargo)
+            new_cargo["fuel_cells"] = held - cells
+            if new_cargo["fuel_cells"] <= 0:
+                del new_cargo["fuel_cells"]
+            new_fuel = ship.fuel + gained
+            msg = (
+                f"Burned {cells}x Quantum Fuel Cells in the drive injectors "
+                f"(+{gained} Fuel; {new_fuel}/{ship.max_fuel} Fuel)."
+            )
+            new_ship = self._clone_ship(
+                fuel=new_fuel,
+                cargo=new_cargo,
+                flight_log=tuple(list(ship.flight_log[-19:]) + [msg]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, msg
 
     def check_solar_weather(self, system: StarSystem | None = None) -> dict[str, Any]:
         """Telemetry check for space weather and coronal radiation risk in the specified or current system."""

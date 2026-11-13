@@ -146,7 +146,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (97 suites)
+└── tests/                <- unit & integration test suite (98 suites)
 ```
 
 ---
@@ -223,10 +223,10 @@ python -m voidfarer.cli fleet harvest
 When intercepted by hostile corsairs, syndicate marauders, or faction enforcers in low-security space:
 ```bash
 # Tactical maneuvers
-python -m voidfarer.cli combat fire             # Laser battery barrage (depletes deflector shields, overflows to hull)
-python -m voidfarer.cli combat drone            # Kinetic drone torpedo strike (armor-piercing; bypasses deflector shields)
-python -m voidfarer.cli combat target weapons   # Precision strike to disable enemy offensive arrays
-python -m voidfarer.cli combat target shields   # Precision strike to destabilize shield harmonic generators
+python -m voidfarer.cli combat fire             # Laser barrage (hits shields first, overflow to hull)
+python -m voidfarer.cli combat drone            # Drone torpedo strike (armor-piercing; bypasses shields)
+python -m voidfarer.cli combat target weapons   # Precision strike: disable enemy weapons
+python -m voidfarer.cli combat target shields   # Precision strike: destabilize enemy shields
 python -m voidfarer.cli combat absorb           # Overcharge deflector shield capacitors
 python -m voidfarer.cli combat evade            # High-G thruster burn to dodge telegraphed attacks
 python -m voidfarer.cli combat flee             # Emergency hyperspace micro-jump
@@ -283,11 +283,12 @@ python -m voidfarer.cli market
 python -m voidfarer.cli logistics buy fuel_cells max
 python -m voidfarer.cli logistics sell titanium all
 
-# Repair/refuel, scrub hyperlane wear, field-fabricate
+# Repair/refuel, scrub hyperlane wear, fabricate, burn hold fuel cells
 python -m voidfarer.cli repair --amount 25
 python -m voidfarer.cli refuel --amount 20
 python -m voidfarer.cli overhaul
 python -m voidfarer.cli fabricate patch_kit
+python -m voidfarer.cli engineering burn_cells 2
 
 # Inspect the living galactic economy: stockpiles, market shocks, and best trade routes
 python -m voidfarer.cli economy
@@ -591,7 +592,7 @@ Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tool
 
 1. **Zero External Dependencies**: Built entirely on standard Python modules.
 2. **Power-Loss Recovery (PRINCIPLE-013)**: State saves use atomic replacement with file descriptor `fsync`, shadow `.bak` backups, and automatic quarantine of corrupt payloads.
-3. **Fast Test Verification**: Comprehensive 1,472-test suite runs in about 40 seconds (`python -m unittest discover`).
+3. **Fast Test Verification**: The full suite runs in about a minute (`python -m unittest discover`).
 4. **Windows Only**: Windows 10/11, batch launchers, PowerShell-aware console UTF-8, and Windows paths; no Linux/macOS branches or OS-independent claims.
 5. **Realistic Mechanics & Economic Integrity**: anti-arbitrage guards, faction tariffs, cargo-volume refit gates, fuel efficiency and cockpit parity.
 

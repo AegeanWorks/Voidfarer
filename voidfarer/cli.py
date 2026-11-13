@@ -1408,7 +1408,11 @@ def cmd_engineering(engine: SimulationEngine, storage: StorageManager, parts: li
             f"  Titanium {fabrication['titanium']} | Blueprints "
             f"{', '.join(fabrication['blueprints'])}"
         )
-        print(f"{DIM}Fabricate: engineering fabricate <patch_kit|fuel_cell>{RESET}")
+        print(
+            f"  Fuel cells {fabrication['fuel_cells']} "
+            f"(burnable: {'yes' if fabrication['can_burn_cells'] else 'no'})"
+        )
+        print(f"{DIM}Fabricate: engineering fabricate <patch_kit|fuel_cell> | engineering burn_cells [n]{RESET}")
         return 0
 
     if action not in ENGINEERING_ACTIONS:
@@ -1426,6 +1430,9 @@ def cmd_engineering(engine: SimulationEngine, storage: StorageManager, parts: li
             kwargs["amount"] = args[1]
     elif action == "fabricate":
         kwargs["blueprint"] = args[1] if len(args) > 1 else "patch_kit"
+    elif action == "burn_cells":
+        if len(args) > 1:
+            kwargs["quantity"] = args[1]
     elif action == "salvage":
         kwargs["strategy"] = args[1] if len(args) > 1 else "balanced"
     ok, msg = engineering_action(engine, action, **kwargs)

@@ -1049,3 +1049,7 @@ Mechanics probe found the pay-shortfall rules complete (morale drain, then deser
 ### Twenty-eighth pass — main menu backdrop
 
 ADR-235: orbital rings and an orbiting planet fill the empty right of the menu on roomy windows. Proof: `ui-review/goal-menu2` (1080p), `goal-menu3` (720p overlap found), `goal-menu4` (720p clean, 4K).
+
+### Twenty-ninth pass — fuel cells as emergency fuel (mechanics)
+
+An invariant fuzz (credits, hull, shield, fuel, cargo, morale and standings checked every 40 steps over seeds 3, 11 and 29) found no violations, but showed captains stranded at 0 to 4 fuel holding 12 to 14 fuel cells. ADR-236 adds `burn_cells` (1 cell = 4 fuel) through engine, CLI and REST. Proof: 10 new tests, failing first (4 failures, 6 errors) and passing.

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `158`
-- **Total Classes**: `421`
-- **Total Top-Level Functions**: `496`
-- **Total Class Methods**: `2298`
-- **Total Source Lines**: `58711`
+- **Total Python Modules**: `159`
+- **Total Classes**: `424`
+- **Total Top-Level Functions**: `497`
+- **Total Class Methods**: `2308`
+- **Total Source Lines**: `58891`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`158` module(s))
+- **Indexed**: python (`159` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1717,6 +1717,30 @@
 
 ---
 
+### [`tests/test_fuel_cell_burn.py`](tests/test_fuel_cell_burn.py)
+> *Emergency fuel-cell burn: hold fuel cells refill the tank through every surface.*
+
+**Size**: `130` lines (`5582` bytes)
+
+**Classes:**
+- `class TestBurnFuelCells`
+  - Method `.test_one_cell_yields_four_fuel_and_leaves_the_rest()`
+  - Method `.test_burn_is_capped_by_free_tank_space_and_never_wastes_cells()`
+  - Method `.test_last_cell_removes_the_cargo_entry()`
+  - Method `.test_guards_refuse_without_changing_state()`
+  - Method `.test_burn_works_mid_encounter_like_field_fabrication()`
+- `class TestEngineeringSurface`
+  - Method `.test_action_is_listed_and_routes_quantity()`
+  - Method `.test_report_exposes_cells_and_burnability()`
+- `class TestCliAndRest`
+  - Method `.test_cli_engineering_burn_cells_saves()`
+  - Method `.test_rest_engineering_action_burns_cells()`
+
+**Functions:**
+- `def _engine(fuel, cells)`
+
+---
+
 ### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
 > *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
 
@@ -3379,7 +3403,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4834` lines (`238243` bytes)
+**Size**: `4841` lines (`238532` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -3639,7 +3663,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10447` lines (`515799` bytes)
+**Size**: `10486` lines (`517809` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -3807,6 +3831,7 @@
   - Method `.repair_hull(amount)` - *Repair ship hull integrity at orbital station.*
   - Method `.refuel(amount)` - *Refuel quantum drive at orbital station.*
   - Method `.fabricate_munitions(munitions_type)` - *Field-fabricate emergency hull patch kits or fuel packs from raw titanium alloy.*
+  - Method `.burn_fuel_cells(quantity)` - *Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.*
   - Method `.check_solar_weather(system)` - *Telemetry check for space weather and coronal radiation risk in the specified or current system.*
   - Method `.step_orbits(delta_time)` - *Advance celestial bodies along orbital mechanics paths and cycle fleet drones.*
   - Method `.refresh_contracts()` - *Reroll the mission board across every category for a broker fee.*
@@ -3877,7 +3902,7 @@
 ### [`voidfarer/engineering.py`](voidfarer/engineering.py)
 > *One report and action surface for power, reactor, repair, salvage and fabrication.*
 
-**Size**: `125` lines (`4380` bytes)
+**Size**: `129` lines (`4642` bytes)
 
 **Functions:**
 - `def engineering_summary(state)` - *Compact payload for /api/state.*

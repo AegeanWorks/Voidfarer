@@ -13,7 +13,7 @@ from voidfarer.models import GameState
 
 ENGINEERING_ACTIONS = (
     "power", "reactor_mode", "reactor_vent", "reactor_repair",
-    "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop",
+    "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop", "burn_cells",
 )
 
 FABRICATION_BLUEPRINTS = ("patch_kit", "fuel_cell")
@@ -65,6 +65,8 @@ def engineering_report(engine: Any) -> dict[str, Any]:
             "blueprints": list(FABRICATION_BLUEPRINTS),
             "titanium": int(cargo.get("titanium", 0)),
             "can_fabricate": int(cargo.get("titanium", 0)) > 0,
+            "fuel_cells": int(cargo.get("fuel_cells", 0)),
+            "can_burn_cells": int(cargo.get("fuel_cells", 0)) > 0 and fuel < max_fuel,
         },
         "counts": {
             "hull_percent": round(100.0 * hull / max(1, max_hull), 1),
@@ -119,6 +121,8 @@ def engineering_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, s
         return ok, message
     if action == "scoop":
         return engine.scoop_fuel()
+    if action == "burn_cells":
+        return engine.burn_fuel_cells(_int(kwargs.get("quantity"), 1))
     return False, (
         f"Unknown engineering action '{action}'. "
         f"Use one of: {', '.join(ENGINEERING_ACTIONS)}."

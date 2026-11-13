@@ -1,49 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-menu-backdrop",
+    "task_id": "voidfarer-fuel-cell-burn",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794547411.6407385,
+    "updated_at": 1794547914.3522327,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-visual-polish",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Milestone 1 verified: celestial body names cleaned of underscores, combat telemetry collision fixed, 1472 tests pass, UI inventory stable, audit clean; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794348685.516305,
-      "timestamp_str": "2026-11-11 01:11:25",
-      "agent": "gemini",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-visual-polish",
-      "phase": "phase 5",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-visual-polish' completed successfully.",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794349763.7414377,
-      "timestamp_str": "2026-11-11 01:29:23",
-      "agent": "gemini"
-    },
-    {
-      "task_id": "voidfarer-visual-polish",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-visual-polish' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794349794.5586665,
-      "timestamp_str": "2026-11-11 01:29:54",
-      "agent": "gemini"
-    },
     {
       "task_id": "voidfarer-tab-polish",
       "phase": "phase 2",
@@ -271,6 +238,46 @@
       "status": "in_progress",
       "timestamp": 1794547411.6407385,
       "timestamp_str": "2026-11-13 08:23:31",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-menu-backdrop",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-menu-backdrop' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794547497.8968973,
+      "timestamp_str": "2026-11-13 08:24:57",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-fuel-cell-burn",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 backend burn_fuel_cells via engine, engineering, CLI, REST with tests; M2 cockpit button as a UI task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794547913.560288,
+      "timestamp_str": "2026-11-13 08:31:53",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Captains strand at 0 fuel carrying unusable fuel cells",
+        "benefits": "A hold-to-tank emergency option; one fewer dead commodity use",
+        "risks": "contract: new engineering action; dependency: none; concurrency: engine lock reused; state: consumes cargo only, no schema change",
+        "mitigation": "Failing-first tests across engine, CLI and REST; dearer than the refinery so it is no arbitrage; ADR-236"
+      },
+      "plan_digest": "3c40abbadc7eb1ac07e41a9eab30c64c77757af93ea0f1027f551e9cd722bcda"
+    },
+    {
+      "task_id": "voidfarer-fuel-cell-burn",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] backend Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794547914.3522327,
+      "timestamp_str": "2026-11-13 08:31:54",
       "agent": "claude:1",
       "checklists": "passed"
     }
