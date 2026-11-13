@@ -10864,3 +10864,17 @@ body.cockpit-theme .nav-panel > .panel-header {
 }
 .skills-panel .perk-node > button { white-space: normal; text-align: right; }
 .relic-fuse-row .btn-relic-fuse { flex: 1 1 100%; text-align: left; padding: 4px 8px; }
+
+/* AI captains: trust and standing meters give the dossier card its height a purpose. */
+.ai-list .ai-card, .message-list .message-card { display: flex; flex-direction: column; }
+.ai-list .ai-card .ai-actions, .message-list .message-card > button, .message-list .message-card .message-choices { margin-top: auto; }
+.ai-meters { display: grid; gap: 4px; margin-top: 8px; }
+.ai-meter { position: relative; display: block; height: 6px; background: rgba(127, 183, 201, 0.12); border-radius: 1px; overflow: hidden; }
+.ai-meter i { position: absolute; top: 0; bottom: 0; left: 0; background: linear-gradient(90deg, rgba(111, 195, 215, 0.55), var(--neon-cyan)); }
+.ai-meter-trust::after { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: rgba(201, 163, 90, 0.8); }
+.ai-meter-standing::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: rgba(201, 163, 90, 0.5); z-index: 1; }
+.ai-meter-standing i { left: 50%; background: linear-gradient(90deg, rgba(143, 191, 159, 0.55), var(--console-green)); }
+.ai-meter-standing.is-negative i { left: auto; right: 50%; background: linear-gradient(270deg, rgba(180, 80, 70, 0.55), #c0564a); }
+.message-card h4 { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.message-state { padding: 1px 6px; border: 1px solid var(--border-subtle); border-radius: 2px; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; }
+.message-card.unread .message-state { border-color: var(--neon-amber); color: var(--neon-amber); }

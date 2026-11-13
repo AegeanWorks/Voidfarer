@@ -1033,3 +1033,7 @@ All 16 tabs were opened with every disclosure expanded after 180 AI-captain step
 ### Twenty-fourth pass — EMPIRE diplomacy and SKILLS perks
 
 Fixed (ADR-231): ragged diplomacy button clusters at wide widths, the UNLOCKED label overlapping a perk description, clipped Resonance Forge buttons and raw `SWARM_COMMANDER` ids. Proof: `ui-review/goal-after4` (EMPIRE before), `goal-after5` (SKILLS after).
+
+### Twenty-fifth pass — AI captain meters and message state
+
+Resolved the open dead-space item without touching the pinned test (ADR-232): trust/standing meters on captain dossiers, bottom-anchored actions, UNREAD/READ chips. Proof: `ui-review/goal-after6`, `goal-after7`.

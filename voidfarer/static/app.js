@@ -9084,6 +9084,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 <div>${this.escapeHtml(c.description)}</div>
                 <div>SYSTEM: ${this.escapeHtml(c.system_id)} // TRUST: ${trust} // STANDING: ${c.standing}</div>
                 <div>CARGO: ${Object.entries(c.cargo || {}).map(([k, v]) => `${this.escapeHtml(k)} x${v}`).join(", ") || "empty"}</div>
+                <div class="ai-meters" aria-hidden="true">
+                    <span class="ai-meter ai-meter-trust" title="Trust ${trust}/100 (alliance at 50)"><i style="width:${Math.max(0, Math.min(100, trust))}%"></i></span>
+                    <span class="ai-meter ai-meter-standing ${Number(c.standing) < 0 ? "is-negative" : ""}" title="Standing ${c.standing}"><i style="width:${Math.min(50, Math.abs(Number(c.standing) || 0) / 2)}%"></i></span>
+                </div>
                 <div class="ai-actions">
                     <button class="btn-hud" data-captain="${this.escapeHtml(c.id)}" data-action="hail">HAIL</button>
                     <button class="btn-hud" data-captain="${this.escapeHtml(c.id)}" data-action="buy" ${captainFuel > 0 ? "" : "disabled"} title="${this.escapeHtml(buyTitle)}">BUY FUEL</button>
@@ -9189,7 +9193,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             `).join("");
             return `
                 <div class="message-card ${m.read ? "" : "unread"}">
-                    <h4>${this.escapeHtml(m.subject)}</h4>
+                    <h4>${this.escapeHtml(m.subject)}<span class="message-state">${m.read ? "READ" : "UNREAD"}</span></h4>
                     <div>FROM: ${this.escapeHtml(m.sender)} // TO: ${this.escapeHtml(m.recipient)} // TICK ${m.tick}
                         ${m.tree_id ? ` // TREE ${this.escapeHtml(m.tree_id)}` : ""}${m.resolved_choice ? ` // RESOLVED: ${this.escapeHtml(m.resolved_choice)}` : ""}</div>
                     <div>${this.escapeHtml(m.body)}</div>

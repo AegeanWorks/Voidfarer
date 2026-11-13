@@ -2514,3 +2514,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The 16-tab sweep found three more layouts that only worked below 1600px or never worked: EMPIRE faction-leader rows (identity and standing on one line, actions below) were defined only inside a max-width media query, so wider windows showed ragged button clusters beside the standing text; an unlocked perk's UNLOCKED label overlapped its description; and the three Resonance Forge buttons overflowed their row and collided ("RAREFUSE").
 - **Decision**: Lift the diplomacy-row stacking rules out of the media query; render UNLOCKED as a header badge (`.perk-state`); show perk requirements as words instead of raw ids; stack the forge fusions as full-width rows.
 - **Consequences**: CSS and render-markup only; no save, API, CLI or test change. Layout, inventory and audit suites pass.
+
+### ADR-232: AI captain dossiers show trust and standing as meters; messages show their read state
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: AI COMMAND and MESSAGES cards reserve 200px and 168px (pinned by `test_small_card_lists_share_a_rhythm`) but their content often filled half of it, leaving dead space, and a message's read state was only a border colour.
+- **Decision**: Keep the pinned heights and make them useful: each captain card gains a trust meter (tick at the 50-trust alliance threshold) and a centre-anchored standing meter; actions anchor to the card bottom; each message header carries an UNREAD or READ chip.
+- **Consequences**: CSS and render-markup only; no save, API, CLI or test change. Supersedes the open item in ADR-230.
