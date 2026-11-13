@@ -1251,5 +1251,26 @@
     "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
     "final_snapshot_entries": 1257,
     "surface_digest": "13d88bdd146c4b1221518888d61ac235953481d121deb7ccdd8c9fdd4c698849"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "bc7c79ea9114577e19900ebf59b680d5963fd628",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794544425.0672953,
+    "finished_at": 1794544583.9071944,
+    "strikes": 1,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted HOLD Quantum Fuel Cells x5, Improves evasion and fuel discipline.)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "6b7689cf78c49e704ab8b83bc656a204a08f21372f2e170647f0f77579c0090c",
+    "final_snapshot_entries": 1257,
+    "surface_digest": "763f81bbd22fe842a16a324f2b0d374c3bc065b71b19e7dd3b2ad01bb3c92b1d"
   }
 ]

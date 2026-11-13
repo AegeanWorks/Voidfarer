@@ -1025,3 +1025,7 @@ descriptions). `tiny 0`, `hscroll 0` and zero page/console errors at every size.
 `Ran 1312 OK`; `ui_inventory.py` 1255 lines; gate 5/5. Screenshots:
 `ship-desktop-check/desktop-ship.png` vs `ship-status-after/desktop-ship.png`; vision
 review quoted `CORVETTE SCOUT // 3/6 STAFFED` on its own line with no header collision.
+
+### Twenty-third pass — every tab, expanded, on a lived-in save
+
+All 16 tabs were opened with every disclosure expanded after 180 AI-captain steps. Fixed (ADR-230): DEPOT names crushed under buttons, rail badge overflow, ellipsized role/escort/drone descriptions, clipped career statistics. Proof: before `ui-review/goal-sweep-expanded/`, after `ui-review/goal-after1`, `goal-after3`, `goal-after-matrix` (720p and 4K). Suite `Ran 1472 OK`. Open: AI COMMAND and MESSAGES card dead space (pinned min-height test).

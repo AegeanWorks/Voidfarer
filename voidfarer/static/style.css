@@ -9883,7 +9883,7 @@ body.cockpit-theme .nav-panel > .panel-header {
     justify-content: space-between;
     gap: 8px;
 }
-.codex-stats-grid { max-height: 144px; }
+.codex-stats-grid { max-height: none; overflow-y: visible; }
 #arsenalUpgradeDetails[hidden], #chassisDetails[hidden], #ordnanceDetails[hidden],
 #factionDetails[hidden], #corpDetails[hidden], #codexMilestoneDetails[hidden],
 #powerDetails[hidden], #combatTacticsDetails[hidden],
@@ -9951,23 +9951,6 @@ body.cockpit-theme .nav-panel > .panel-header {
     .skills-points { min-width: 76px; padding: 4px 8px; }
     .skills-points strong { font-size: 20px; }
     .skills-desc { font-size: 12px; line-height: 1.35; }
-
-    /* Depot rows: name on its own line, actions below instead of a squeezed column. */
-    #depotList .depot-card {
-        grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: auto auto auto;
-        gap: 3px;
-        padding: 9px 10px;
-    }
-    #depotList .depot-card h4 { grid-column: 1; grid-row: 1; }
-    #depotList .depot-card > div:not(.depot-actions) { grid-column: 1; grid-row: 2; }
-    #depotList .depot-actions {
-        grid-column: 1;
-        grid-row: 3;
-        justify-self: start;
-        margin-top: 4px;
-    }
-    #depotList .depot-actions .btn-hud { width: auto; }
 
     /* Research rows: name/description full width, cost and actions beneath. */
     .research-projects .research-row {
@@ -10805,4 +10788,66 @@ body.cockpit-theme .nav-panel > .panel-header {
         flex: 1 1 0;
         min-width: 0;
     }
+}
+
+/* Depot rows at every width: name and quantity on one line, actions beneath as a compact button row. */
+#depotList .depot-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-items: start;
+    gap: 4px;
+    min-height: 0;
+    padding: 9px 10px;
+}
+#depotList .depot-card h4 {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    grid-column: 1;
+    grid-row: 1;
+}
+#depotList .depot-card > div:not(.depot-actions) { grid-column: 1; grid-row: 2; }
+#depotList .depot-actions {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    width: auto;
+    margin-top: 2px;
+}
+#depotList .depot-actions .btn-hud { width: auto; min-width: 96px; }
+.depot-tag {
+    padding: 1px 6px;
+    border: 1px solid rgba(111, 195, 215, 0.45);
+    border-radius: 2px;
+    color: var(--neon-cyan);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+}
+.depot-tag.is-stored { border-color: rgba(201, 163, 90, 0.5); color: var(--console-gold-bright); }
+.depot-qty { margin-left: auto; color: var(--console-gold-bright); font-family: var(--font-mono); font-size: 13px; }
+
+/* Rail badges: compact pills that never push a long label (AI COMMAND, CAPTAIN'S LOG) past the rail edge. */
+.panel-left .deck-tab-btn { gap: 4px; padding-right: 6px; }
+.panel-left .deck-tab-btn .tab-badge {
+    min-width: 18px;
+    padding: 0 4px;
+    border-radius: 2px;
+    box-shadow: none;
+    line-height: 16px;
+    text-align: center;
+}
+
+/* Descriptions wrap to two lines at every window size instead of ending in an ellipsis that hides the benefit. */
+.procurement-info small,
+.crew-role-info small,
+.drone-card .drone-stats {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: clip;
+    line-height: 1.3;
 }

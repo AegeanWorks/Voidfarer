@@ -9118,7 +9118,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.depotSummary.textContent = `${depot.name} // STORED VOLUME: ${used}/${depot.capacity}`;
         const depotRows = Object.entries(depot.cargo || {}).map(([item, qty]) => `
             <div class="depot-card">
-                <h4>${this.escapeHtml(item)} x${qty}</h4>
+                <h4><span class="depot-tag is-stored">STORED</span>${this.escapeHtml(item)}<span class="depot-qty">x${qty}</span></h4>
                 <div class="depot-actions">
                     <button class="btn-hud" data-action="withdraw" data-qty="1" data-item="${this.escapeHtml(item)}">WITHDRAW 1</button>
                     ${qty > 1 ? `<button class="btn-hud" data-action="withdraw" data-qty="${qty}" data-item="${this.escapeHtml(item)}">WITHDRAW ALL</button>` : ""}
@@ -9131,7 +9131,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const itemQty = item.total_quantity || item.quantity || 0;
             return `
             <div class="depot-card">
-                <h4>HOLD: ${this.escapeHtml(item.name || item.id)} x${itemQty}</h4>
+                <h4><span class="depot-tag">HOLD</span>${this.escapeHtml(item.name || item.id)}<span class="depot-qty">x${itemQty}</span></h4>
                 <div class="depot-actions">
                     <button class="btn-hud" data-action="deposit" data-qty="1" data-item="${this.escapeHtml(item.id)}">DEPOSIT 1</button>
                     ${itemQty > 1 ? `<button class="btn-hud" data-action="deposit" data-qty="${itemQty}" data-item="${this.escapeHtml(item.id)}">DEPOSIT ALL</button>` : ""}

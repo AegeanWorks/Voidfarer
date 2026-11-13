@@ -2497,3 +2497,13 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
   2. Add `GET /api/flight`, `POST /api/flight/action` and a compact `flight` summary to `/api/state`.
   3. Add `flight status|system|routes` plus `plot|navigate|jump|orbit|travel`; hide the five legacy verbs from help while keeping them callable.
 - **Consequences**: One read shows where the ship is, what is in system and which lanes are affordable; one action route plots, auto-routes, jumps, orbits or travels. The visible CLI is 24 commands. `tests/test_flight.py` adds 11 tests for the report, system/bodies, summary, plot, unknown target, orbit/travel, jump, invalid actions, REST and CLI. Full suite `Ran 1472 OK`; no save-schema change.
+
+### ADR-230: Terminal tabs read cleanly at every window size
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: A full 16-tab sweep on a lived-in save (180 AI-captain steps, every disclosure open) found: DEPOT item names crushed to a few characters under their buttons at widths of 1600px and up (the stacked layout lived only in a max-width media query); rail badges pushing CAPTAIN'S LOG past the rail edge; crew-role, mercenary, escort and drone lines ending in ellipses that hid the benefit; and a nested scroller cutting the CAREER STATISTICS list.
+- **Decision**:
+  1. DEPOT rows stack at every width: a HOLD or STORED chip, the item name and a right-aligned quantity on one line, actions beneath.
+  2. Rail badges become compact 18px pills; role, escort, mercenary and drone descriptions wrap to two lines; the career statistics grid is no longer height-capped.
+  3. Open: AI COMMAND and MESSAGES cards still pad 60-100px of dead space because `test_small_card_lists_share_a_rhythm` pins min-height 200px and 168px. Changing that pinned contract needs the user's approval and is not done here.
+- **Consequences**: CSS and render-markup only; no save, API, CLI or test change. Verified with real-Edge captures at 1920x1080, 1280x720 and 3840x2160 (errors 0, hscroll 0, tiny 0); full suite `Ran 1472 OK`.

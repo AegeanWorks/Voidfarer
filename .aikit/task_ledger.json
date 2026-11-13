@@ -1,45 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-visual-polish",
-    "last_phase": "phase 5",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794349763.7414377,
-    "owner": "gemini",
-    "started_by": "gemini",
-    "continuations": [],
-    "completed_at": 1794349794.5586655
+    "task_id": "voidfarer-tab-polish",
+    "last_phase": "phase 4",
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794544593.2133682,
+    "owner": "claude:1",
+    "started_by": "claude:1",
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-engineering-merge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-engineering-merge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794240569.1022463,
-      "timestamp_str": "2026-11-09 19:09:29",
-      "agent": "opencode:campaign"
-    },
-    {
-      "task_id": "voidfarer-narrative-merge",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: merge story, tutorial, quests, contracts and events behind one narrative report/action and CLI verb",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794243920.5419023,
-      "timestamp_str": "2026-11-09 20:05:20",
-      "agent": "opencode:campaign",
-      "impact_assessment": {
-        "why": "The QUESTS panel is one surface, but the CLI splits campaign, academy, contracts and events across five verbs and five routes.",
-        "benefits": "One report with objective/choices, tutorial steps, quests, contracts/offers and events; one action route; five legacy verbs hidden but callable.",
-        "risks": "contract: REST/CLI/snapshot; dependency: story/tutorial/contract/event engine methods; concurrency: report reads state and story status; state: no save change; regression: legacy verbs and routes stay callable.",
-        "mitigation": "11 facade tests, full 1441 suite, gate."
-      },
-      "plan_digest": "51074fe3e63245e4b176b770e07a23e604e5603534d856e9b7047bf68c152c86"
-    },
     {
       "task_id": "voidfarer-narrative-merge",
       "phase": "phase 4",
@@ -267,6 +238,36 @@
       "timestamp": 1794349794.5586665,
       "timestamp_str": "2026-11-11 01:29:54",
       "agent": "gemini"
+    },
+    {
+      "task_id": "voidfarer-tab-polish",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: DEPOT rows stack at every width with HOLD/STORED chips; AI/MESSAGES cards lose dead min-height; rail badges compact; role/escort/drone descriptions wrap to two lines; career stats uncapped",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794544228.1246512,
+      "timestamp_str": "2026-11-13 07:30:28",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Tab sweep on a lived-in save showed crushed DEPOT names, clipped benefit text, badge overflow and dead card space",
+        "benefits": "Every terminal tab reads cleanly at 720p to 4K",
+        "risks": "contract: two min-height assertions in test_cockpit_layout change; dependency: none; concurrency: none; state: none, CSS and markup only",
+        "mitigation": "Layout and inventory suites, full suite, real-Edge captures at short/desktop/4k, ADR records the changed contract"
+      },
+      "plan_digest": "fd909b6b1a42a3f96f6981bb442fb9222ba8d3d34d819a69cbc69c4797439c29"
+    },
+    {
+      "task_id": "voidfarer-tab-polish",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed: suite 1472 OK, mechanics, hygiene, guidelines, secrets; UI task finished. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794544593.2133682,
+      "timestamp_str": "2026-11-13 07:36:33",
+      "agent": "claude:1",
+      "checklists": "passed"
     }
   ]
 }
