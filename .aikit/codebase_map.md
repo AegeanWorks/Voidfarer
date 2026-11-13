@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `191`
-- **Total Classes**: `459`
-- **Total Top-Level Functions**: `504`
-- **Total Class Methods**: `2417`
-- **Total Source Lines**: `60152`
+- **Total Python Modules**: `192`
+- **Total Classes**: `460`
+- **Total Top-Level Functions**: `505`
+- **Total Class Methods**: `2420`
+- **Total Source Lines**: `60186`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`191` module(s))
+- **Indexed**: python (`192` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -228,6 +228,22 @@
   - Method `.test_cycler_orders_bodies_by_orbit_and_wraps()`
   - Method `.test_only_the_orbit_view_is_affected()`
   - Method `.test_the_controls_reference_documents_the_keys()`
+
+---
+
+### [`tests/test_canvas_font_floor.py`](tests/test_canvas_font_floor.py)
+> *Canvas text meets the same 12px readability floor the DOM audit enforces.*
+
+**Size**: `34` lines (`1331` bytes)
+
+**Classes:**
+- `class TestCanvasFontFloor`
+  - Method `.test_no_canvas_font_in_the_cockpit_script_is_below_12px()`
+  - Method `.test_no_canvas_font_in_the_surface_map_is_below_12px()`
+  - Method `.test_the_surface_callout_box_is_tall_enough_for_two_12px_lines()`
+
+**Functions:**
+- `def _sizes(name)`
 
 ---
 

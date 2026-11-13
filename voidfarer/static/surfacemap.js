@@ -259,15 +259,15 @@ class SurfaceMapRenderer {
             }
             ctx.rotate(Math.PI / 4);
             ctx.fillStyle = color;
-            ctx.fillRect(-4, -4, 8, 8);
+            ctx.fillRect(-5.5, -5.5, 11, 11);
             ctx.strokeStyle = "#06101d";
             ctx.lineWidth = 1.2;
-            ctx.strokeRect(-4, -4, 8, 8);
+            ctx.strokeRect(-5.5, -5.5, 11, 11);
             ctx.restore();
             ctx.fillStyle = "#06101d";
-            ctx.font = "9px 'Cascadia Mono', Consolas, monospace";
+            ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
             ctx.textAlign = "center";
-            ctx.fillText(site.used ? "X" : String(site.index), x, y + 2.6);
+            ctx.fillText(site.used ? "X" : String(site.index), x, y + 3.6);
         }
         const selectedTile = map.tiles.find(tile => tile.site && tile.site.id === selectedOpId);
         if (selectedTile) {
@@ -278,27 +278,27 @@ class SurfaceMapRenderer {
             const lon = (site.x * (360 / map.w) - 180).toFixed(0);
             const line1 = site.name;
             const line2 = `POS [${lat >= 0 ? "+" : ""}${lat}°, ${lon >= 0 ? "+" : ""}${lon}°] · RISK ${site.risk}%`;
-            ctx.font = "10px 'Segoe UI'";
+            ctx.font = "12px 'Segoe UI'";
             const w1 = ctx.measureText(line1).width;
-            ctx.font = "9px 'Cascadia Mono', Consolas, monospace";
+            ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
             const w2 = ctx.measureText(line2).width;
             const width = Math.max(w1, w2) + 12;
             const lx = Math.max(2, Math.min(cssW - width - 2, x - width / 2));
-            const ly = Math.max(2, y - 30);
+            const ly = Math.max(2, y - 38);
             ctx.fillStyle = "rgba(4, 9, 19, 0.92)";
-            ctx.fillRect(lx, ly, width, 26);
+            ctx.fillRect(lx, ly, width, 34);
             ctx.strokeStyle = "#7fb7c9";
             ctx.lineWidth = 1;
-            ctx.strokeRect(lx, ly, width, 26);
-            ctx.font = "10px 'Segoe UI'";
+            ctx.strokeRect(lx, ly, width, 34);
+            ctx.font = "12px 'Segoe UI'";
             ctx.fillStyle = "#ece4d4";
             ctx.textAlign = "left";
-            ctx.fillText(line1, lx + 6, ly + 11);
-            ctx.font = "9px 'Cascadia Mono', Consolas, monospace";
+            ctx.fillText(line1, lx + 6, ly + 13);
+            ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
             ctx.fillStyle = site.risk >= 35 ? "#c96b5a" : site.risk >= 18 ? "#c9a35a" : "#8fbf9f";
-            ctx.fillText(line2, lx + 6, ly + 22);
+            ctx.fillText(line2, lx + 6, ly + 27);
         }
-        ctx.font = "10px 'Cascadia Mono', Consolas, monospace";
+        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.textAlign = "right";
         ctx.fillStyle = "rgba(201, 163, 90, 0.82)";
         ctx.fillText("N", cssW - 8, 14);

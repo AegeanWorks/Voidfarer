@@ -5,30 +5,12 @@
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794587420.2047849,
+    "updated_at": 1794587720.9382958,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-system-hotkeys",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: comma and period cycle linked systems on the galaxy map, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794584740.3348656,
-      "timestamp_str": "2026-11-13 18:45:40",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Jump planning on the galaxy map was mouse-only",
-        "benefits": "Keyboard-only jump targeting",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Linked systems only, dialog-safe, real key probe, ADR-260"
-      },
-      "plan_digest": "29696d5de3abe65803b7a47faafff1dae23d56ebd8568ef9d27cf1eae8c8f564"
-    },
     {
       "task_id": "voidfarer-system-hotkeys",
       "phase": "phase 4",
@@ -278,6 +260,18 @@
       "status": "in_progress",
       "timestamp": 1794587420.2047849,
       "timestamp_str": "2026-11-13 19:30:20",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-canvas-font",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] canvas fonts Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794587720.9382958,
+      "timestamp_str": "2026-11-13 19:35:20",
       "agent": "claude:1",
       "checklists": "passed"
     }

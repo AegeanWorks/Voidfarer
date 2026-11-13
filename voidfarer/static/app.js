@@ -3100,7 +3100,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
 
         // 4. Phosphor telemetry readout
-        ctx.font = "9px 'Cascadia Mono', Consolas, monospace";
+        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.fillStyle = "rgba(143, 191, 159, 0.75)";
         ctx.fillText("FREQ 1420.405 MHz // [CH-A] 50mV/div", 6, 11);
         ctx.fillStyle = "rgba(127, 183, 201, 0.65)";
@@ -7262,7 +7262,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         // Target acquisition crosshair pip & telemetry readouts
         ctx.fillStyle = "rgba(255, 120, 100, 0.9)";
         ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 2, 0, Math.PI * 2); ctx.fill();
-        ctx.font = "11px 'Cascadia Mono', Consolas, monospace";
+        ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
         ctx.textAlign = "center";
         ctx.fillStyle = "rgba(201, 107, 90, 0.85)";
         ctx.fillText("LOCK: TGT-01 // 1.4M KM", enemy.x, enemy.y - boxS - 6);
@@ -7449,8 +7449,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const auDist = radius / Math.max(1, auScale);
                 if (auDist >= 0.25) {
                     ctx.save();
-                    ctx.font = "9px 'Cascadia Mono', Consolas, monospace";
-                    ctx.fillStyle = "rgba(127, 183, 201, 0.32)";
+                    ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
+                    ctx.fillStyle = "rgba(127, 183, 201, 0.5)";
                     ctx.fillText(`${auDist.toFixed(1)} AU`, cx + radius + 4, cy - 3);
                     ctx.restore();
                 }
@@ -7764,7 +7764,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.stroke();
             ctx.setLineDash([]);
             const distAu = Math.hypot(toX - fromX, toY - fromY) / Math.max(1, auScale);
-            ctx.font = "10px 'Cascadia Mono', Consolas, monospace";
+            ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
             ctx.fillStyle = "rgba(236, 228, 212, 0.85)";
             ctx.fillText(`COURSE PLOT // ${distAu.toFixed(2)} AU`, (fromX + toX) / 2 + 8, (fromY + toY) / 2 - 6);
             ctx.restore();

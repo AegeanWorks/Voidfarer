@@ -1175,3 +1175,7 @@ The combat card now takes and returns keyboard focus like the encounter card (AD
 ### Fifty-ninth pass — decision popup focus
 
 Verified a claim I had made without testing, found it false, and fixed it: the decision popup now takes, keeps and returns keyboard focus (ADR-265). Proof: real decision resolved with Enter in Edge.
+
+### Sixtieth pass — canvas text size
+
+The 12px floor now covers canvas text too (ADR-267): ten literals raised, surface callout re-laid out. Along the way the UI contract's inconsistent theme paths were corrected openly (ADR-266). Proof: `ui-review/goal-canvasfont/surface.png`.
