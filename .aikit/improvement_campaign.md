@@ -1191,3 +1191,7 @@ Audit of my own earlier display change found the planner's estimate disagreed wi
 ### Sixty-third pass — scoop in view when it matters
 
 Chose the stranded-ship thread again: the scoop is auto-revealed at a low tank (ADR-270). Transit previews (120 of 120) and drydock quotes (27 of 27) had already been audited exact. Proof: `ui-review/goal-scoopopen/card.png`.
+
+### Sixty-fourth pass — outpost promises
+
+Audited diplomacy thresholds (8 of 8), NAP length and gift cost, outpost prices (5 of 5) and outpost yields (credits exact, goods exact in the depot): all true. Fixed the three presentation gaps they exposed (ADR-271). Proof: `ui-review/goal-outpostcard/outposts.png`.

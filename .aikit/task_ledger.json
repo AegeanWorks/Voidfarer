@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-scoop-auto-open",
+    "task_id": "voidfarer-outpost-text",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794603810.6597865,
+    "updated_at": 1794604464.953197,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-encounter-focus",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794586131.2293994,
-      "timestamp_str": "2026-11-13 19:08:51",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-encounter-focus",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-encounter-focus' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794586220.3937242,
-      "timestamp_str": "2026-11-13 19:10:20",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-combat-focus",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: combat card alertdialog with focus in and restored, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794586532.0336196,
-      "timestamp_str": "2026-11-13 19:15:32",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Combat card left keyboard focus behind",
-        "benefits": "Keyboard players can fight immediately",
-        "risks": "contract: focus handling in the HUD render; dependency: none; concurrency: none; state: none",
-        "mitigation": "Once per encounter id, real combat probe, ADR-264"
-      },
-      "plan_digest": "dec1e2936e19fd212093bea6ce7488ee7d104e1dec278a04a327c628f89309ff"
-    },
     {
       "task_id": "voidfarer-combat-focus",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794603810.6597865,
       "timestamp_str": "2026-11-14 00:03:30",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-scoop-auto-open",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-scoop-auto-open' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794603905.3200524,
+      "timestamp_str": "2026-11-14 00:05:05",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-outpost-text",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: readable outpost goods, depot delivery note and shortfall tooltip, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794604463.9932206,
+      "timestamp_str": "2026-11-14 00:14:23",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Outpost cards showed raw ids, hid the delivery target and gave no shortfall reason",
+        "benefits": "Players understand outputs and why they cannot build",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "Promises audited true first, text-only change, ADR-271"
+      },
+      "plan_digest": "9800db67aff467acd42f656994dd63943a5a9bbdd6bb7d1ac7a33019009d29c2"
+    },
+    {
+      "task_id": "voidfarer-outpost-text",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794604464.953197,
+      "timestamp_str": "2026-11-14 00:14:24",
       "agent": "claude:1",
       "checklists": "passed"
     }

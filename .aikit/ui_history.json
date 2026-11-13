@@ -2012,5 +2012,25 @@
     "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
     "final_snapshot_entries": 1291,
     "surface_digest": "79ecb42c2164eaf9a6b947722e83c0236db3f7ccac2f09e963e6fc26e4f6f4ea"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "fc131b7f30a5ea4cb9abd6338ddf0677a6f680e0",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794604266.3324497,
+    "finished_at": 1794604438.510916,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted Mining Outpost: +3 credits \u00b7 +1 titanium (to depot) per tick, 1800 CR, BUILD disabled with the tooltip ending Need 300 more credits.)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
+    "final_snapshot_entries": 1291,
+    "surface_digest": "4cdd7cdfcf342a9dd2234ddb98b4148500facf131e1136cbe263002a11a88015"
   }
 ]

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `195`
-- **Total Classes**: `463`
-- **Total Top-Level Functions**: `509`
-- **Total Class Methods**: `2434`
-- **Total Source Lines**: `60357`
+- **Total Python Modules**: `196`
+- **Total Classes**: `464`
+- **Total Top-Level Functions**: `510`
+- **Total Class Methods**: `2437`
+- **Total Source Lines**: `60388`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`195` module(s))
+- **Indexed**: python (`196` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2462,6 +2462,22 @@
 - `class NonAggressionWarTest`
   - Method `._systems_and_leaders()`
   - Method `.test_active_pact_blocks_a_new_sol_coalition_war()`
+
+---
+
+### [`tests/test_outpost_card_text.py`](tests/test_outpost_card_text.py)
+> *Outpost build cards use readable names, say where goods are delivered, and explain a credit shortfall.*
+
+**Size**: `31` lines (`1078` bytes)
+
+**Classes:**
+- `class TestOutpostCardText`
+  - Method `.test_commodity_names_are_readable_not_raw_ids()`
+  - Method `.test_goods_are_labelled_as_delivered_to_the_depot()`
+  - Method `.test_a_disabled_build_button_states_the_shortfall()`
+
+**Functions:**
+- `def _block()`
 
 ---
 

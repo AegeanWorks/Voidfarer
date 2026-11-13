@@ -8797,10 +8797,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             return;
         }
         host.innerHTML = `<h4 class="commission-title">FOUND AN OUTPOST AT ${this.escapeHtml(body.name.toUpperCase())}</h4>` + options.map(t => {
-            const yields = Object.entries(t.production || {}).map(([k, v]) => `+${v} ${k}`).join(" · ");
+            // Goods (not credits or research) are delivered to the system's depot, not the ship's hold.
+            const yields = Object.entries(t.production || {}).map(([k, v]) => (
+                k === "credits" || k === "research"
+                    ? `+${v} ${k}`
+                    : `+${v} ${String(k).replace(/_/g, " ")} (to depot)`
+            )).join(" · ");
+            const shortfall = credits < t.cost ? ` Need ${t.cost - credits} more credits.` : "";
             return `
                 <button class="btn-hud fleet-procurement-row" data-outpost-build="${this.escapeHtml(t.id)}" ${credits < t.cost ? "disabled" : ""}
-                    title="${this.escapeHtml(t.description)}">
+                    title="${this.escapeHtml(t.description + shortfall)}">
                     <span class="procurement-info"><strong>${this.escapeHtml(t.name)}</strong><small>${this.escapeHtml(yields)} per tick</small></span>
                     <span class="procurement-value">${t.cost} CR</span>
                     <span class="procurement-action">BUILD</span>
