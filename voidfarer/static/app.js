@@ -1696,7 +1696,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     // Keyboard targeting for the system radar: step through the bodies from the star outward, wrapping.
     cycleBodyTarget(step) {
-        if (this.viewMode !== "ORBITS" || !this.state) return;
+        if (!this.state) return;
+        if (this.viewMode === "GALAXY") {
+            this.cycleSystemTarget(step);
+            return;
+        }
+        if (this.viewMode !== "ORBITS") return;
         const bodies = [...((this.state.current_system || {}).bodies || [])]
             .sort((a, b) => (a.orbit_radius || 0) - (b.orbit_radius || 0));
         if (!bodies.length) return;
@@ -1707,6 +1712,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             : (current + step + bodies.length) % bodies.length;
         this.selectedTarget = bodies[index];
         this.selectedType = "body";
+        this.sound.playBeep(1000);
+        this.updateTargetCard();
+    }
+
+    // Galaxy map: step through the star systems linked to the current one, nearest first, wrapping.
+    cycleSystemTarget(step) {
+        const current = this.state.current_system;
+        if (!current) return;
+        const links = (current.connections || []).map(id => this.galaxySystems[id]).filter(Boolean)
+            .sort((a, b) => Math.hypot(a.x - current.x, a.y - current.y) - Math.hypot(b.x - current.x, b.y - current.y));
+        if (!links.length) return;
+        const at = this.selectedType === "system" && this.selectedTarget
+            ? links.findIndex(s => s.id === this.selectedTarget.id) : -1;
+        const index = at < 0
+            ? (step > 0 ? 0 : links.length - 1)
+            : (at + step + links.length) % links.length;
+        this.selectedTarget = links[index];
+        this.selectedType = "system";
         this.sound.playBeep(1000);
         this.updateTargetCard();
     }

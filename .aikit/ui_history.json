@@ -1826,5 +1826,26 @@
     "final_snapshot_digest": "40938870f691b1538f5bee650e12f14749e452d17b8d06863f1ae6d1c8dd68d0",
     "final_snapshot_entries": 1283,
     "surface_digest": "4b7c44564e56fcc7c942c8594dfe1611ab931c685821e9d7ebd0abe784171d2d"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "3f3a10465e011c72e29d63b2fd82ad759b6df49f",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794584557.8178813,
+    "finished_at": 1794584728.2372208,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; keyboard behaviour; real Edge on the galaxy map: . stepped Alpha Centauri, Sirius Prime, Procyon Nexus matching a nearest-first sort of linked systems, , stepped back, a dialog blocks the keys)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "9e4bd779d7abb7912b84b17c5364712534dc03a342bcd320fb04fb9368899560",
+    "final_snapshot_entries": 1284,
+    "surface_digest": "0f4423e2033a224cc66ddfddcbc015f4351d17d17ecd7c8c7814cb2c199690ee"
   }
 ]

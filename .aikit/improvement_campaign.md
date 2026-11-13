@@ -1151,3 +1151,7 @@ Took the radar interaction call: the body under the pointer is ringed and named 
 ### Fifty-third pass — keyboard targeting
 
 Targeting a body was mouse-only; `,` and `.` now cycle bodies in orbit order (ADR-259). Proof: real key presses in Edge (`ui-review/goal-keys`).
+
+### Fifty-fourth pass — galaxy keyboard targeting
+
+The same keys step through linked star systems on the galaxy map (ADR-260). Proof: real key presses in Edge (`ui-review/goal-keys2`).

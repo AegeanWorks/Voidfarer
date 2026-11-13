@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `185`
-- **Total Classes**: `453`
+- **Total Python Modules**: `186`
+- **Total Classes**: `454`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2395`
-- **Total Source Lines**: `59936`
+- **Total Class Methods**: `2398`
+- **Total Source Lines**: `59968`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`185` module(s))
+- **Indexed**: python (`186` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3186,6 +3186,19 @@
 
 **Functions:**
 - `def _base(orbiting)`
+
+---
+
+### [`tests/test_system_target_hotkeys.py`](tests/test_system_target_hotkeys.py)
+> *On the galaxy map, comma and period cycle the star systems linked to the current one.*
+
+**Size**: `32` lines (`1445` bytes)
+
+**Classes:**
+- `class TestSystemTargetHotkeys`
+  - Method `.test_the_cycler_hands_the_galaxy_view_to_a_system_cycler()`
+  - Method `.test_only_linked_systems_are_cycled_nearest_first_and_wrap()`
+  - Method `.test_the_controls_reference_documents_the_galaxy_behaviour()`
 
 ---
 
