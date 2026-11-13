@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `162`
-- **Total Classes**: `427`
+- **Total Python Modules**: `163`
+- **Total Classes**: `428`
 - **Total Top-Level Functions**: `499`
-- **Total Class Methods**: `2314`
-- **Total Source Lines**: `58986`
+- **Total Class Methods**: `2315`
+- **Total Source Lines**: `59010`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`162` module(s))
+- **Indexed**: python (`163` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1092,6 +1092,17 @@
   - Method `.test_background_matching_is_case_insensitive()`
   - Method `.test_unknown_background_passes_through_without_bonus()`
   - Method `.test_background_bonuses_apply_after_budget_validation()`
+
+---
+
+### [`tests/test_encounter_readability.py`](tests/test_encounter_readability.py)
+> *Encounter cards: action descriptions meet the cockpit's 12px readability floor.*
+
+**Size**: `24` lines (`799` bytes)
+
+**Classes:**
+- `class TestEncounterReadability`
+  - Method `.test_choice_check_is_at_least_12px()`
 
 ---
 

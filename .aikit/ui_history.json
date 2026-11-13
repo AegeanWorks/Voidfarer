@@ -1418,5 +1418,25 @@
     "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
     "final_snapshot_entries": 1264,
     "surface_digest": "e2470cd28973c91a76a6c3b39500fe8d78838afca63d21dba5ecb7182452969e"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "20afcc86cafe204a04551b76bc2e47bbd797a2ac",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794549243.3322177,
+    "finished_at": 1794549354.3667972,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted BRIBE 750 CR / Clear the manifest off the record (+30 XP)., FLEE CORDON (-5 FUEL) at 1280x720)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
+    "final_snapshot_entries": 1264,
+    "surface_digest": "ce2a1e49c59283f546cc11e4f2133e151ca7b9f6173d3711c3a7488e2c96bdc6"
   }
 ]

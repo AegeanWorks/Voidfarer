@@ -994,7 +994,7 @@ body.cockpit-theme {
 
 .choice-check {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 12px;
     color: var(--neon-amber);
     display: block;
     margin-top: 2px;

@@ -5,24 +5,12 @@
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794549052.489272,
+    "updated_at": 1794549365.3610895,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-tab-polish-3",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794545768.4012027,
-      "timestamp_str": "2026-11-13 07:56:08",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-tab-polish-3",
       "phase": "completed",
@@ -272,6 +260,18 @@
       "status": "in_progress",
       "timestamp": 1794549052.489272,
       "timestamp_str": "2026-11-13 08:50:52",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-customs-review",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] 12px fix Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794549365.3610895,
+      "timestamp_str": "2026-11-13 08:56:05",
       "agent": "claude:1",
       "checklists": "passed"
     }
