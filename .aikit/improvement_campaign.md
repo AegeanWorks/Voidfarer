@@ -1101,3 +1101,7 @@ Forced-colors emulation showed every gauge bar vanishing (ADR-246). Fixed with a
 ### Fortieth pass — HUD scale extremes
 
 Layout holds at 85% and 120% (0 off-viewport, no scroll; all 16 tabs clean except two clamped choice buttons and one faction name). Both now expose full text through titles (ADR-247). Proof: `ui-review/goal-scale-120/player.png`, `goal-scale-sweep/`, `goal-titles/`.
+
+### Forty-first pass — REFIT replacement clarity
+
+Took the REFIT redesign judgement call: cards now say what a purchase replaces (ADR-248). Proof: `ui-review/goal-replaces/arsenal.png`.

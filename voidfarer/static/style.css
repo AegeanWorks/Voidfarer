@@ -10995,3 +10995,6 @@ body.cockpit-theme .nav-panel > .panel-header {
     }
     #vitalHullCard.is-low, #vitalFuelCard.is-low { border: 2px solid; border-color: Mark; }
 }
+
+/* REFIT: a purchase into an occupied slot says what it replaces. */
+.arsenal-replaces { margin: 3px 0 0; color: var(--console-gold); font-size: 12px; letter-spacing: 0.05em; }

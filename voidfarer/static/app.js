@@ -3471,6 +3471,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 || (filter === "affordable" ? (equipped[u.slot] !== u.id && credits >= u.cost) : u.slot === filter)
             ).forEach(u => {
                 const isEquipped = equipped[u.slot] === u.id;
+                const installed = upgrades.find(x => x.id === equipped[u.slot]);
                 const card = document.createElement("div");
                 card.className = `arsenal-card ${isEquipped ? 'installed' : ''}`;
 
@@ -3481,6 +3482,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                             <strong class="arsenal-name">${this.escapeHtml(u.name)}</strong>
                         </div>
                         <p class="arsenal-desc">${this.escapeHtml(u.description)}</p>
+                        ${!isEquipped && installed ? `<p class="arsenal-replaces">REPLACES ${this.escapeHtml(installed.name)}</p>` : ""}
                     </div>
                     <button class="btn-upgrade-buy" ${isEquipped || credits < u.cost ? 'disabled' : ''} data-id="${this.escapeHtml(u.id)}">
                         ${isEquipped ? 'EQUIPPED' : `${u.cost} CR`}

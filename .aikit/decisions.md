@@ -2626,3 +2626,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: G-011 keeps the HUD scale user-selectable (85 to 120%). The expanded all-tabs sweep at 1280px with the scale forced to 120% was clean except two MESSAGES choice buttons, whose two-line clamp (pinned by `test_small_card_lists_share_a_rhythm`) hid the consequence clause ("...but Watch standing suffers"), and one ellipsized faction name. A probe that set `uiScale` without `applyViewportProfile()` had silently reported "0 issues"; the corrected probe confirmed `--ui-scale` actually changed.
 - **Decision**: Leave the pinned clamp untouched and give each message choice button a `title` with its label and full description, and each faction card name a `title`. No layout change.
 - **Consequences**: Markup attributes only; hover or screen-reader name exposes the full text. `tests/test_clipped_text_titles.py` (new, failing first: 2 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+
+### ADR-248: REFIT cards say what a purchase replaces
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: Each hardware slot holds one upgrade, so buying into an occupied slot silently replaces the installed one, but the card showed only a price. A captain comparing MK-II against an installed MK-I had to remember or look up what would be lost.
+- **Decision**: A non-installed upgrade whose slot is occupied shows `REPLACES <installed name>` between its description and price. The installed card shows nothing extra. Display only, from existing state.
+- **Consequences**: Render code and one CSS rule; no engine, save, API or CLI change. `tests/test_refit_replaces.py` (new, failing first: 3 failures) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate. Verified in real Edge with the ENGINES filter: three cards read REPLACES Hyperdrive Booster MK-I, the installed one does not.

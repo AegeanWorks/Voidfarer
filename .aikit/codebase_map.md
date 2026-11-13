@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `172`
-- **Total Classes**: `437`
+- **Total Python Modules**: `173`
+- **Total Classes**: `438`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2345`
-- **Total Source Lines**: `59308`
+- **Total Class Methods**: `2348`
+- **Total Source Lines**: `59335`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`172` module(s))
+- **Indexed**: python (`173` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2574,6 +2574,19 @@
   - Method `.test_chips_cover_all_affordable_and_every_slot()`
   - Method `.test_filtering_never_drops_the_equipped_state()`
   - Method `.test_chips_wrap_instead_of_clipping()`
+
+---
+
+### [`tests/test_refit_replaces.py`](tests/test_refit_replaces.py)
+> *REFIT upgrade cards say which installed upgrade a purchase would replace.*
+
+**Size**: `27` lines (`980` bytes)
+
+**Classes:**
+- `class TestRefitReplaces`
+  - Method `.test_installed_name_is_looked_up_per_slot()`
+  - Method `.test_card_renders_a_replaces_line()`
+  - Method `.test_line_is_styled_and_meets_the_12px_floor()`
 
 ---
 
