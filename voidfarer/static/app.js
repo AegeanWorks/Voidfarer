@@ -6512,6 +6512,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!hasSecondary && this.targetMoreActions) {
             this.targetMoreActions.hidden = true;
         }
+        // Low tank and a scoop that would work: open the panel once per target so the fix is in view.
+        // The marker only records that we opened it, so a player who collapses it stays in control.
+        const ship = (this.state && this.state.ship) || {};
+        const fuelFraction = Number(ship.max_fuel) > 0 ? Number(ship.fuel) / Number(ship.max_fuel) : 1;
+        const scoopReady = Boolean(this.btnScoopFuel && this.btnScoopFuel.style.display !== "none"
+            && !this.btnScoopFuel.disabled);
+        const autoKey = scoopReady && fuelFraction <= 0.25
+            ? String(this.selectedTarget && this.selectedTarget.id) : null;
+        if (autoKey && this._scoopAutoOpen !== autoKey && this.targetMoreActions && this.btnToggleTargetActions
+            && this.targetMoreActions.hidden) {
+            this._scoopAutoOpen = autoKey;
+            this.applyDisclosure(this.btnToggleTargetActions, this.targetMoreActions, null);
+        } else if (!autoKey) {
+            this._scoopAutoOpen = null;
+        }
     }
 
     updateTargetCard() {

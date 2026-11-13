@@ -1187,3 +1187,7 @@ Measured canvas label contrast against the sampled nebula (1.6 to 2.6:1), retint
 ### Sixty-second pass — true jump costs
 
 Audit of my own earlier display change found the planner's estimate disagreed with real jumps in 47 of 48 lanes; the engine now has one cost formula shared by the jump and every estimate (ADR-269). Proof: estimates equal spends in tests, and the button matched real jumps at three power settings in Edge.
+
+### Sixty-third pass — scoop in view when it matters
+
+Chose the stranded-ship thread again: the scoop is auto-revealed at a low tank (ADR-270). Transit previews (120 of 120) and drydock quotes (27 of 27) had already been audited exact. Proof: `ui-review/goal-scoopopen/card.png`.

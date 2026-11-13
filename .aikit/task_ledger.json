@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-true-jump-cost",
+    "task_id": "voidfarer-scoop-auto-open",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794602597.7874587,
+    "updated_at": 1794603810.6597865,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-dismiss-hotkey",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794585718.1602643,
-      "timestamp_str": "2026-11-13 19:01:58",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-dismiss-hotkey",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-dismiss-hotkey' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794585814.11429,
-      "timestamp_str": "2026-11-13 19:03:34",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-encounter-focus",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: encounter card alertdialog with focus in, kept across rebuilds and restored, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794586130.9192824,
-      "timestamp_str": "2026-11-13 19:08:50",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Keyboard players had to Tab across the cockpit to reach a blocking encounter",
-        "benefits": "Immediate keyboard resolution of encounters",
-        "risks": "contract: focus handling in a frequent render path; dependency: none; concurrency: none; state: none",
-        "mitigation": "Steals focus once per encounter id, preserves across rebuilds, real server-resolution probe, ADR-263"
-      },
-      "plan_digest": "f4c50c35f928ec3b35052d56f7935ac52659349c052b7e26304f6cb9c2afc219"
-    },
     {
       "task_id": "voidfarer-encounter-focus",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794602597.7874587,
       "timestamp_str": "2026-11-13 23:43:17",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-true-jump-cost",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-true-jump-cost' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794603392.4247272,
+      "timestamp_str": "2026-11-13 23:56:32",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-scoop-auto-open",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: auto-open the more-actions panel for a usable scoop at a low tank, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794603810.2687063,
+      "timestamp_str": "2026-11-14 00:03:30",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "The scoop remedy was hidden behind a collapsed panel",
+        "benefits": "Stranded captains see the scoop",
+        "risks": "contract: none pinned; dependency: reuses applyDisclosure; concurrency: none; state: none",
+        "mitigation": "Once per target, never fights a manual collapse, real Edge probe, ADR-270"
+      },
+      "plan_digest": "a9573690e8425131ff7a91b8ff604acb281161f32d8c9dec6d3841a34358625f"
+    },
+    {
+      "task_id": "voidfarer-scoop-auto-open",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794603810.6597865,
+      "timestamp_str": "2026-11-14 00:03:30",
       "agent": "claude:1",
       "checklists": "passed"
     }

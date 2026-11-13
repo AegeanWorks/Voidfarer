@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `194`
-- **Total Classes**: `462`
-- **Total Top-Level Functions**: `508`
-- **Total Class Methods**: `2430`
-- **Total Source Lines**: `60322`
+- **Total Python Modules**: `195`
+- **Total Classes**: `463`
+- **Total Top-Level Functions**: `509`
+- **Total Class Methods**: `2434`
+- **Total Source Lines**: `60357`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`194` module(s))
+- **Indexed**: python (`195` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2907,6 +2907,23 @@
   - Method `.test_malformed_json_is_a_protocol_error()`
   - Method `.test_blocked_actions_are_not_counted_as_attempted()`
   - Method `.test_missing_catalog_is_an_error_not_silent_coverage()`
+
+---
+
+### [`tests/test_scoop_auto_open.py`](tests/test_scoop_auto_open.py)
+> *With a low tank and a scoop available, the target card opens its more-actions panel once so the scoop is visible.*
+
+**Size**: `35` lines (`1359` bytes)
+
+**Classes:**
+- `class TestScoopAutoOpen`
+  - Method `.test_it_requires_a_low_tank_and_an_enabled_scoop()`
+  - Method `.test_it_opens_once_per_target_through_the_normal_disclosure()`
+  - Method `.test_the_marker_resets_when_the_need_ends_so_it_can_open_again()`
+  - Method `.test_it_never_forces_the_panel_open_after_the_player_closed_it()`
+
+**Functions:**
+- `def _block()`
 
 ---
 

@@ -1992,5 +1992,25 @@
     "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
     "final_snapshot_entries": 1291,
     "surface_digest": "9357666cf1f7ad1fc9320ce584fecd66152cd249c68ddd231fe2ca0f5e62882f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "777a64dd86f65274c4fbfcbc12ed00f1ee407445",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794603600.5939624,
+    "finished_at": 1794603766.5497105,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted the Sol System Primary card at 10/60 fuel showing HIDE MORE ACTIONS then SCOOP FUEL (6/6 TAPS); manual collapse stays collapsed; full fuel stays closed)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "af8a05f761956540e0e8517794df9a2bbba5bd5cd2760c998c2cecd107976b54",
+    "final_snapshot_entries": 1291,
+    "surface_digest": "79ecb42c2164eaf9a6b947722e83c0236db3f7ccac2f09e963e6fc26e4f6f4ea"
   }
 ]
