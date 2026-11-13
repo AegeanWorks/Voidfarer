@@ -5,30 +5,12 @@
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794547914.3522327,
+    "updated_at": 1794548492.6110342,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-tab-polish",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: DEPOT rows stack at every width with HOLD/STORED chips; AI/MESSAGES cards lose dead min-height; rail badges compact; role/escort/drone descriptions wrap to two lines; career stats uncapped",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794544228.1246512,
-      "timestamp_str": "2026-11-13 07:30:28",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Tab sweep on a lived-in save showed crushed DEPOT names, clipped benefit text, badge overflow and dead card space",
-        "benefits": "Every terminal tab reads cleanly at 720p to 4K",
-        "risks": "contract: two min-height assertions in test_cockpit_layout change; dependency: none; concurrency: none; state: none, CSS and markup only",
-        "mitigation": "Layout and inventory suites, full suite, real-Edge captures at short/desktop/4k, ADR records the changed contract"
-      },
-      "plan_digest": "fd909b6b1a42a3f96f6981bb442fb9222ba8d3d34d819a69cbc69c4797439c29"
-    },
     {
       "task_id": "voidfarer-tab-polish",
       "phase": "phase 4",
@@ -278,6 +260,18 @@
       "status": "in_progress",
       "timestamp": 1794547914.3522327,
       "timestamp_str": "2026-11-13 08:31:54",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-fuel-cell-burn",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] cockpit button Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794548492.6110342,
+      "timestamp_str": "2026-11-13 08:41:32",
       "agent": "claude:1",
       "checklists": "passed"
     }

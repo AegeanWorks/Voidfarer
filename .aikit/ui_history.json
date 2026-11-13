@@ -1377,5 +1377,26 @@
     "final_snapshot_digest": "0bbb17a8a92a26998b85d6224650604621896d0ea054d78c32c25eacc924d22d",
     "final_snapshot_entries": 1260,
     "surface_digest": "122df920cfeed29dccefcba2beaafcb4277d29aa6b0b8448187444593f2c8742"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "4d1a4aea9f54928ea66b2c3f5b2c8f46eeddb85f",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794548108.407161,
+    "finished_at": 1794548477.3931031,
+    "strikes": 2,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted FABRICATE FUEL PACK (1x Ti), BURN FUEL CELL; fuel 35 to 39 after the click in real Edge)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
+    "final_snapshot_entries": 1264,
+    "surface_digest": "b41725556900b30e473ed14f6ab66a624280b6fd8c66bd2c6cc166d583898103"
   }
 ]

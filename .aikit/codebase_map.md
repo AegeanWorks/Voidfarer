@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `159`
-- **Total Classes**: `424`
+- **Total Python Modules**: `160`
+- **Total Classes**: `425`
 - **Total Top-Level Functions**: `497`
-- **Total Class Methods**: `2308`
-- **Total Source Lines**: `58891`
+- **Total Class Methods**: `2309`
+- **Total Source Lines**: `58912`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`159` module(s))
+- **Indexed**: python (`160` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1738,6 +1738,17 @@
 
 **Functions:**
 - `def _engine(fuel, cells)`
+
+---
+
+### [`tests/test_fuel_cell_burn_cockpit.py`](tests/test_fuel_cell_burn_cockpit.py)
+> *Cockpit SHIP tab: the fuel-cell burn button sits beside field fabrication.*
+
+**Size**: `21` lines (`721` bytes)
+
+**Classes:**
+- `class TestCockpitButton`
+  - Method `.test_ship_tab_offers_the_burn_beside_fabrication()`
 
 ---
 

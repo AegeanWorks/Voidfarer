@@ -721,6 +721,7 @@ class CockpitApp {
         this.btnSubsystemBridge = document.getElementById("btnSubsystemBridge");
         this.btnFabricatePatch = document.getElementById("btnFabricatePatch");
         this.btnFabricateFuel = document.getElementById("btnFabricateFuel");
+        this.btnBurnCells = document.getElementById("btnBurnCells");
         this.btnCombatAbsorb = document.getElementById("btnCombatAbsorb");
         this.btnCombatEvade = document.getElementById("btnCombatEvade");
         this.btnCombatFlee = document.getElementById("btnCombatFlee");
@@ -1476,6 +1477,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         });
         if (this.btnFabricatePatch) {
             this.btnFabricatePatch.addEventListener("click", () => this.handleFabricate("patch_kit"));
+        }
+        if (this.btnBurnCells) {
+            this.btnBurnCells.addEventListener("click", () => this.handleBurnCells());
         }
         if (this.btnFabricateFuel) {
             this.btnFabricateFuel.addEventListener("click", () => this.handleFabricate("fuel_cell"));
@@ -5524,6 +5528,30 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.renderHUD();
         } catch (e) {
             this.appendLog(`[ERROR] Field fabrication failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleBurnCells() {
+        this.sound?.init();
+        this.sound?.playBeep(440);
+        try {
+            const res = await apiFetch("/api/engineering/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "burn_cells", quantity: 1 })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound?.playChime();
+                this.appendLog(json.message, "reward");
+            } else {
+                this.sound?.playAlarm?.();
+                this.appendLog(`[FUEL CELLS] ${json.message}`, "hazard");
+            }
+            this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Fuel cell burn failed: ${e.message}`, "hazard");
         }
     }
 
