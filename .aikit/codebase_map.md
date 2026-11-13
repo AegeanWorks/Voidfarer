@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `174`
-- **Total Classes**: `439`
+- **Total Python Modules**: `175`
+- **Total Classes**: `440`
 - **Total Top-Level Functions**: `502`
-- **Total Class Methods**: `2352`
-- **Total Source Lines**: `59367`
+- **Total Class Methods**: `2356`
+- **Total Source Lines**: `59404`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`174` module(s))
+- **Indexed**: python (`175` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -964,6 +964,20 @@
   - Method `.test_three_victories_award_the_combat_medal()`
   - Method `.test_away_mission_awards_the_explorer_medal()`
   - Method `.test_codex_counts_all_crew_medals()`
+
+---
+
+### [`tests/test_disabled_reasons.py`](tests/test_disabled_reasons.py)
+> *Disabled perk and upgrade buttons explain themselves instead of failing silently.*
+
+**Size**: `37` lines (`1628` bytes)
+
+**Classes:**
+- `class TestDisabledReasons`
+  - Method `.test_perk_button_names_the_missing_point_or_prerequisite()`
+  - Method `.test_upgrade_button_states_the_credit_shortfall_or_installed_state()`
+  - Method `.test_a_reason_is_only_set_when_the_button_is_disabled()`
+  - Method `.test_training_weapons_modules_and_chassis_explain_a_disabled_state()`
 
 ---
 

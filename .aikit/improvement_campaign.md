@@ -1109,3 +1109,7 @@ Took the REFIT redesign judgement call: cards now say what a purchase replaces (
 ### Forty-second pass — jump fuel cost
 
 The jump button now shows its lane fuel cost and blocks an unaffordable jump with a clear reason (ADR-249). Proof: `ui-review/goal-jumpfuel2/card.png`; Edge states 8 FUEL / NEED 8 FUEL (HAVE 2) / OUT OF HYPERLANE RANGE.
+
+### Forty-third pass — disabled buttons explain themselves
+
+A scan for disabled buttons without a title found silent perks, upgrades, chassis, weapons, skills and modules (ADR-250). Proof: before/after counts in the live page (`ui-review/goal-disabled`, `goal-disabled4`).

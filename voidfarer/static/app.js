@@ -3489,8 +3489,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     </button>
                 `;
 
+                const btn = card.querySelector(".btn-upgrade-buy");
+                const reason = isEquipped
+                    ? `Already installed in the ${u.slot} slot.`
+                    : (credits < u.cost ? `Need ${u.cost - credits} more credits.` : "");
+                if (reason) btn.title = reason;
                 if (!isEquipped) {
-                    card.querySelector(".btn-upgrade-buy").addEventListener("click", () => this.handleBuyUpgrade(u.id));
+                    btn.addEventListener("click", () => this.handleBuyUpgrade(u.id));
                 }
 
                 this.arsenalList.appendChild(card);
@@ -3554,7 +3559,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         </div>
                         <div class="chassis-perk">★ ${this.escapeHtml(c.specialty_perk)}</div>
                     </div>
-                    <button class="btn-upgrade-buy" ${isCurrent || isStarter || !isDocked || !canAfford ? 'disabled' : ''} data-chassis="${this.escapeHtml(c.id)}">
+                    <button class="btn-upgrade-buy" ${isCurrent || isStarter || !isDocked || !canAfford ? `disabled title="${this.escapeHtml(isCurrent ? "Current chassis." : isStarter ? "The starter hull is not for sale." : !isDocked ? "Dock at a station to commission a chassis." : "Need " + (c.cost - credits) + " more credits.")}"` : ''} data-chassis="${this.escapeHtml(c.id)}">
                         ${isCurrent ? 'ACTIVE HULL' : (isStarter ? 'STARTER' : (!isDocked ? 'DRYDOCK REQ.' : `${c.cost} CR`))}
                     </button>
                 `;
@@ -3597,7 +3602,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                             <span>ACC: <strong>${Math.round(w.accuracy * 100)}%</strong></span>
                         </div>
                     </div>
-                    <button class="btn-upgrade-buy" ${isPrimary || (!isOwned && (!isDocked || !canAfford)) ? 'disabled' : ''} data-weapon="${this.escapeHtml(w.id)}">
+                    <button class="btn-upgrade-buy" ${isPrimary || (!isOwned && (!isDocked || !canAfford)) ? `disabled title="${isPrimary ? "Already your primary weapon." : !isDocked ? "Weapons are bought at a drydock: dock at a station first." : "Need " + (w.cost - credits) + " more credits."}"` : ''} data-weapon="${this.escapeHtml(w.id)}">
                         ${isPrimary ? 'PRIMARY' : (isOwned ? 'EQUIP' : (!isDocked ? 'DRYDOCK REQ.' : `${w.cost} CR`))}
                     </button>
                 `;
@@ -3721,7 +3726,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             <div class="skill-row" title="${this.escapeHtml(meta.desc)}">
                 <span class="skill-name"><span class="skill-icon">${meta.icon}</span> ${this.escapeHtml(meta.name)}</span>
                 <span class="skill-level">RANK ${level}/${maxRank}</span>
-                <button class="btn-hud btn-amber skill-train-btn" data-train-skill="${this.escapeHtml(id)}" ${canTrain ? "" : "disabled"}>TRAIN 1 SP</button>
+                <button class="btn-hud btn-amber skill-train-btn" data-train-skill="${this.escapeHtml(id)}" ${canTrain ? "" : `disabled title="${level >= maxRank ? "Already at the maximum rank." : "Needs a skill point: level up to earn one."}"`}>TRAIN 1 SP</button>
                 <div class="skill-bar"><div class="skill-bar-fill" style="width: ${(level / maxRank) * 100}%"></div></div>
             </div>
         `;
@@ -4016,7 +4021,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                         ${effects}
                         <span class="ship-module-cost">${isInstalled ? "INSTALLED" : (slotBusy ? "SLOT BUSY" : `${mod.cost} CR`)}</span>
                     </div>
-                    <button class="btn-hud ${isInstalled ? "btn-amber" : "btn-cyan"}" data-action="${isInstalled ? "uninstall" : "install"}" ${disabled ? "disabled" : ""}>${isInstalled ? "REMOVE" : "INSTALL"}</button>
+                    <button class="btn-hud ${isInstalled ? "btn-amber" : "btn-cyan"}" data-action="${isInstalled ? "uninstall" : "install"}" ${disabled ? `disabled title="${this.escapeHtml(!docked ? "Structural refits need a station: dock first." : slotBusy ? "That slot is occupied: remove the installed module first." : "Need " + (mod.cost - credits) + " more credits.")}"` : ""}>${isInstalled ? "REMOVE" : "INSTALL"}</button>
                 </div>
             `;
         }).join("") : `<p class="panel-intro-text">No structural refits are available.</p>`;
@@ -5391,10 +5396,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     const requires = t.requires || [];
                     const requiresMet = requires.every(r => specs.includes(r));
                     const canUnlock = !unlocked && requiresMet && (mastery.talent_points || 0) > 0;
+                    const perkReason = !requiresMet
+                        ? `Unlock ${requires.map(r => String(r).replace(/_/g, " ")).join(" and ")} first.`
+                        : "Needs a talent point to unlock.";
                     return `<div class="perk-node ${unlocked ? "unlocked" : "locked"}">
                         <strong>${this.escapeHtml(t.name)}</strong>
                         <div>${this.escapeHtml(t.description)}</div>
-                        ${unlocked ? `<span class="perk-state">UNLOCKED</span>` : `<button class="btn-hud" data-talent="${this.escapeHtml(t.id)}" ${canUnlock ? "" : "disabled"}>${requiresMet ? "UNLOCK" : "REQUIRES " + requires.map(r => String(r).replace(/_/g, " ")).join(", ").toUpperCase()}</button>`}
+                        ${unlocked ? `<span class="perk-state">UNLOCKED</span>` : `<button class="btn-hud" data-talent="${this.escapeHtml(t.id)}" ${canUnlock ? "" : `disabled title="${this.escapeHtml(perkReason)}"`}>${requiresMet ? "UNLOCK" : "REQUIRES " + requires.map(r => String(r).replace(/_/g, " ")).join(", ").toUpperCase()}</button>`}
                     </div>`;
                 }).join("")}
             </div>

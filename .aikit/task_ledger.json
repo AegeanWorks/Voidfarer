@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-jump-fuel",
+    "task_id": "voidfarer-disabled-reasons",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794565882.23756,
+    "updated_at": 1794566381.2062068,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-low-hull-gauge",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794551855.3287952,
-      "timestamp_str": "2026-11-13 09:37:35",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-low-hull-gauge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-low-hull-gauge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794551938.0809245,
-      "timestamp_str": "2026-11-13 09:38:58",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-vital-keyboard",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: M1 re-express two gauge tests to accept the helper (no UI task); M2 setVitalAction helper as a UI task plus keyboard test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794552193.1124363,
-      "timestamp_str": "2026-11-13 09:43:13",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "BURN CELL and PATCH HULL cards are mouse-only",
-        "benefits": "Keyboard players can use both remedies",
-        "risks": "contract: two test assertions re-expressed, named in ADR-244; dependency: none; concurrency: none; state: none",
-        "mitigation": "Same contract kept, stricter new test, real Enter-key proof, ADR-244"
-      },
-      "plan_digest": "e85e5c25ca00ac90bccc6dde80315539276126a7f60b14fa898f0b42141927c6"
-    },
     {
       "task_id": "voidfarer-vital-keyboard",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794565882.23756,
       "timestamp_str": "2026-11-13 13:31:22",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-jump-fuel",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-jump-fuel' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794565973.3164532,
+      "timestamp_str": "2026-11-13 13:32:53",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-disabled-reasons",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: reason titles on silent disabled buttons, failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794566380.7192852,
+      "timestamp_str": "2026-11-13 13:39:40",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Greyed buttons gave no reason",
+        "benefits": "Players learn what blocks an action",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first test, live untitled count to 0, ADR-250"
+      },
+      "plan_digest": "57ba6410d44ffe0d06a5da4613b5e96cb733a15b82830a14287cfefa0f5c3ea5"
+    },
+    {
+      "task_id": "voidfarer-disabled-reasons",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794566381.2062068,
+      "timestamp_str": "2026-11-13 13:39:41",
       "agent": "claude:1",
       "checklists": "passed"
     }

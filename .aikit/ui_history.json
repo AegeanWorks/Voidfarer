@@ -1663,5 +1663,25 @@
     "final_snapshot_digest": "03a1c8ec74bb82f11bb24cc9df118f065ce7fb16c041a30b39ca3ac881c2ccb2",
     "final_snapshot_entries": 1270,
     "surface_digest": "a81d7943b16d1766c615919ad39ef195d0a5c4e7ee87a7197b7b44632940c085"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "91be4632e70320f744242a6700a18d2506453df5",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794566244.888085,
+    "finished_at": 1794566367.1729653,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; tooltip-only change, no visual difference; live Edge count of untitled disabled buttons on SKILLS, REFIT, SHIP went from 6/18/0 to 0; samples: Need 500 more credits., Needs a skill point: level up to earn one.)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "03a1c8ec74bb82f11bb24cc9df118f065ce7fb16c041a30b39ca3ac881c2ccb2",
+    "final_snapshot_entries": 1270,
+    "surface_digest": "bcf62831ce2e9d49cd0d4f68820cbefba57afe0b3fef2f949837d48f034e6d07"
   }
 ]
