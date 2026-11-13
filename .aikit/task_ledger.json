@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-settings-controls",
+    "task_id": "voidfarer-customs-review",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794548876.8918083,
+    "updated_at": 1794549052.489272,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-tab-polish-2",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 run after EMPIRE and SKILLS fixes. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794545134.2833867,
-      "timestamp_str": "2026-11-13 07:45:34",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-tab-polish-2",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-tab-polish-2' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794545289.4965389,
-      "timestamp_str": "2026-11-13 07:48:09",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-tab-polish-3",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: AI captain meters and message state chips keep the pinned card heights useful",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794545767.257489,
-      "timestamp_str": "2026-11-13 07:56:07",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Dead space in AI and MESSAGES cards",
-        "benefits": "Scannable captain trust; clear read state",
-        "risks": "contract: pinned min-height test untouched; dependency: none; concurrency: none; state: none",
-        "mitigation": "Layout suites, captures, ADR-232"
-      },
-      "plan_digest": "2602129aa487734aedfc3870f68e3f99237728aa4af9831a4d8653b5261ff556"
-    },
     {
       "task_id": "voidfarer-tab-polish-3",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794548876.8918083,
       "timestamp_str": "2026-11-13 08:47:56",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-settings-controls",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-settings-controls' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794548942.1945076,
+      "timestamp_str": "2026-11-13 08:49:02",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-customs-review",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 tool drives a real customs encounter; M2 encounter action text to 12px as a UI task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794549051.9647524,
+      "timestamp_str": "2026-11-13 08:50:51",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Customs scenario rendered nothing and the card was never audited",
+        "benefits": "Customs card reviewable; readability floor enforced on all encounter cards",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "New failing-first tests, real-Edge audit, ADR-238"
+      },
+      "plan_digest": "670731cfd8b2da376547f493ba956d7959309c10b7a271e93258c2d335338bd9"
+    },
+    {
+      "task_id": "voidfarer-customs-review",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] tool fix Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794549052.489272,
+      "timestamp_str": "2026-11-13 08:50:52",
       "agent": "claude:1",
       "checklists": "passed"
     }

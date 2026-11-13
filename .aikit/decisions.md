@@ -2556,3 +2556,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Reviewing the secondary scenes showed two defects in the SETTINGS overlay: checked toggles drew two crossed gradients that read as a bowtie or hourglass rather than a checkmark, and the sliders showed the browser's default blue thumb because the gold thumb and track rules never took effect without `appearance: none` on the range input.
 - **Decision**: Reset `appearance` on the range input and its WebKit thumb so the existing gold thumb and track apply; draw the checked state as an inline SVG checkmark on the gold fill; add visible `:focus-visible` outlines to both controls for keyboard use. `tests/test_settings_controls.py` (new, failing first) pins all three; it was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
 - **Consequences**: CSS only; no markup, save, API or CLI change. Verified in real Edge at 1920x1080.
+
+### ADR-238: Customs review drives a real encounter; encounter action text meets the 12px floor
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: The browser review tool's `customs` scenario injected `state.active_customs` into the client, a key the cockpit stopped rendering when ADR-215 normalized blocking encounters into `state.encounter`. The scenario therefore showed no customs UI at all, and the card could never be audited. Once it rendered, the audit reported four sub-12px lines: the action descriptions in `.choice-check` (0.7rem = 11.2px), shared by every encounter card.
+- **Decision**: (1) `tools/ui_browser.py` installs a real `CustomsEncounter` in the engine (`_prepare_customs`), like the boarding and relief scenarios, and drops the client-side injection. (2) In a separate UI-task commit, `.choice-check` becomes 12px. `tests/test_ui_browser_customs.py` (new, failing first) pins the tool; the readability test follows with the CSS.
+- **Consequences**: Developer tool and CSS only; no engine, save, API or CLI change.

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `161`
-- **Total Classes**: `426`
-- **Total Top-Level Functions**: `498`
-- **Total Class Methods**: `2312`
-- **Total Source Lines**: `58948`
+- **Total Python Modules**: `162`
+- **Total Classes**: `427`
+- **Total Top-Level Functions**: `499`
+- **Total Class Methods**: `2314`
+- **Total Source Lines**: `58986`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`161` module(s))
+- **Indexed**: python (`162` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3072,6 +3072,18 @@
 
 ---
 
+### [`tests/test_ui_browser_customs.py`](tests/test_ui_browser_customs.py)
+> *The browser review tool drives customs through the engine, not a stale client-side key.*
+
+**Size**: `30` lines (`1120` bytes)
+
+**Classes:**
+- `class TestCustomsScenario`
+  - Method `.test_prepared_customs_surfaces_in_the_unified_encounter_report()`
+  - Method `.test_scenario_no_longer_injects_the_retired_client_key()`
+
+---
+
 ### [`tests/test_ui_inventory.py`](tests/test_ui_inventory.py)
 > *The cockpit inventory proof covers controls, handlers, routes, hotkeys and theme tokens.*
 
@@ -3250,7 +3262,7 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `597` lines (`26746` bytes)
+**Size**: `605` lines (`27088` bytes)
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout, weapon)` - *Wait for the cockpit and move it into the requested review state.*
@@ -3258,6 +3270,7 @@
 - `def _click_probe(page)` - *Enumerate every cockpit control through the shipped click map and prove handles are unique.*
 - `def _run_viewport(browser, url, name, viewport, scenario, tab, out, timeout, scroll, click_map, weapon)` - *Open one real browser viewport, drive it and capture a true screenshot.*
 - `def _prepare_boarding(engine)` - *Put a marine aboard and a crippled hostile in front of the flagship.*
+- `def _prepare_customs(engine)` - *Install a real customs interdiction so the unified encounter card can be reviewed.*
 - `def _prepare_relief(engine)` - *Devastate an inhabited Sol world and put the flagship in orbit for the target card.*
 - `def _prepare_surface(engine)` - *Put the live engine on a landed body so the surface-ops panel has real data.*
 - `def _prepare_waypoint(engine)` - *Fly the flagship to an open-space vector so the void anchor is on screen.*

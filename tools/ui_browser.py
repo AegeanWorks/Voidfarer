@@ -234,24 +234,8 @@ def _open_cockpit(page: Any, scenario: str, tab: str, timeout: int, weapon: str 
         )
         page.wait_for_timeout(500)
     elif scenario == "customs":
-        page.evaluate(
-            """() => {
-                if (window.cockpit && window.cockpit.state) {
-                    window.cockpit.state.active_customs = {
-                        id: "customs_sol_test",
-                        faction: "Sol Coalition",
-                        system_id: "sol",
-                        system_name: "Sol System",
-                        patrol_vessel: "Sol Coalition Customs Cutter 'Vigilant'",
-                        contraband_found: { xenoliths: 2 },
-                        fine_amount: 1450,
-                        bribe_amount: 750,
-                        description: "Sol Coalition Customs Cutter 'Vigilant' hails your ship with tactical locks engaged: 'Unscheduled cargo signature detected. Stand by for customs interdiction inspection.'"
-                    };
-                    window.cockpit.renderHUD();
-                }
-            }"""
-        )
+        # The encounter is installed in the engine (_prepare_customs), so the cockpit renders
+        # the same unified blocking-encounter card a real interdiction produces.
         page.wait_for_timeout(700)
 
     if tab and scenario == "cockpit":
@@ -397,6 +381,26 @@ def _prepare_boarding(engine: SimulationEngine) -> bool:
     return True
 
 
+def _prepare_customs(engine: SimulationEngine) -> bool:
+    """Install a real customs interdiction so the unified encounter card can be reviewed."""
+    from voidfarer.models import CustomsEncounter
+
+    system = engine.current_system
+    engine.state = engine._clone_state(active_customs=CustomsEncounter(
+        id="customs_review",
+        faction=system.faction or "Sol Coalition",
+        system_id=system.id,
+        system_name=system.name,
+        patrol_vessel="Customs Cutter 'Vigilant'",
+        contraband_found={"xenoliths": 2},
+        fine_amount=1450,
+        bribe_amount=750,
+        description="Customs Cutter 'Vigilant' hails your ship with tactical locks engaged: "
+                    "'Unscheduled cargo signature detected. Stand by for interdiction inspection.'",
+    ))
+    return engine.state.active_customs is not None
+
+
 def _prepare_relief(engine: SimulationEngine) -> Optional[str]:
     """Devastate an inhabited Sol world and put the flagship in orbit for the target card."""
     from dataclasses import replace
@@ -524,6 +528,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if args.scenario == "surface" and _prepare_surface(engine) is None:
             print("Why: no landable body was available for the surface scenario.")
             print("Fix: retry with a save that has a habitable body in the current system.")
+            return 1
+        if args.scenario == "customs" and not _prepare_customs(engine):
+            print("Why: the customs scenario could not install an interdiction.")
+            print("Fix: retry with a fresh campaign.")
             return 1
         if args.scenario == "relief" and _prepare_relief(engine) is None:
             print("Why: no inhabited body was available for the relief scenario.")

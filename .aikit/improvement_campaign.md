@@ -1059,3 +1059,7 @@ Cockpit follow-up: the SHIP tab gains a BURN FUEL CELL button beside FABRICATE F
 ### Thirtieth pass — settings controls
 
 Review of the secondary scenes (death, settings, and others) found the SETTINGS toggles and sliders off-theme (ADR-237): crossed-diagonal checked state and default-blue slider thumbs. Proof: `ui-review/goal-scenes/desktop-settings.png` (before), `ui-review/goal-settings2/desktop-settings.png` (after).
+
+### Thirty-first pass — customs review and encounter text size
+
+Reading the last scene captures showed the customs scenario rendering nothing: a stale client-side key since ADR-215. Fixed the tool (ADR-238); the card then audited at `tiny 4`, which the next commit fixes. Proof: `ui-review/goal-scenes/desktop-customs.png` (empty), `ui-review/goal-customs/desktop-customs.png` (card, 4 sub-12px lines).
