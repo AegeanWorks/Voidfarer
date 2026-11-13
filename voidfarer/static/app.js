@@ -6183,11 +6183,19 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!payload || this.state?.pending_decision) {
             this.anomalyCard.style.display = "none";
             this._lastEncounterId = null;
+            // The encounter resolved: hand keyboard focus back to where the player was.
+            if (this._encounterOpener && document.contains(this._encounterOpener)
+                && this.anomalyCard.contains(document.activeElement)) {
+                this._encounterOpener.focus();
+            }
+            this._encounterOpener = null;
             return;
         }
-        if (this._lastEncounterId !== payload.id) {
+        const isNewEncounter = this._lastEncounterId !== payload.id;
+        if (isNewEncounter) {
             this.sound.playAlarm();
             this._lastEncounterId = payload.id;
+            this._encounterOpener = document.activeElement;
         }
         this.anomalyCard.style.display = "flex";
         if (this.encounterTag) this.encounterTag.textContent = payload.tag || "ENCOUNTER";
@@ -6197,6 +6205,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.encounterDetail.textContent = payload.detail || "";
             this.encounterDetail.style.display = payload.detail ? "block" : "none";
         }
+        // The buttons are rebuilt on every refresh, so remember which action holds keyboard focus.
+        const focusedAction = this.anomalyCard.contains(document.activeElement)
+            ? (document.activeElement.dataset || {}).encounterAction : null;
         this.anomalyChoices.innerHTML = "";
         (payload.actions || []).forEach(action => {
             const btn = document.createElement("button");
@@ -6212,6 +6223,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             btn.addEventListener("click", () => this.handleEncounterAction(action.id));
             this.anomalyChoices.appendChild(btn);
         });
+        // A blocking encounter freezes the game until resolved, so a new one takes keyboard focus once.
+        // Otherwise a rebuild puts focus back on the action that had it.
+        const kept = focusedAction
+            ? [...this.anomalyChoices.querySelectorAll(".anomaly-choice-btn:not(:disabled)")]
+                .find(btn => btn.dataset.encounterAction === focusedAction) : null;
+        if (kept) {
+            kept.focus();
+        } else if (isNewEncounter) {
+            const first = this.anomalyChoices.querySelector(".anomaly-choice-btn:not(:disabled)");
+            if (first) first.focus();
+        }
     }
 
     async handleEncounterAction(action) {

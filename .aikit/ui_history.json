@@ -1889,5 +1889,26 @@
     "final_snapshot_digest": "18a3bcccb14fc4991db9a581fe7b3bb3dda0f6b23324525ec6ebb68129cba428",
     "final_snapshot_entries": 1289,
     "surface_digest": "117cfdee499de6b8e8240a1d71380c87db322e4a378db0b112e1b9f13990d4ff"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "4f22a0b844eba6c27a62861c40b9dec1be0d2178",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794585986.9408052,
+    "finished_at": 1794586117.9004748,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; no visual change; real Edge with a customs stop: card role alertdialog, focus on BRIBE 750 CR, Enter cleared the customs on the server and credits 2000 to 1250, focus returned to tabBtnShip)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "3800b151586fbb87560eaf7bb7f0901bb69c09f188dc5ad62f7fe542c5de188e",
+    "final_snapshot_entries": 1290,
+    "surface_digest": "cde346ef14ed7463036db59a9130395b3eb9329e0b4d40a2da46124d49c53e32"
   }
 ]

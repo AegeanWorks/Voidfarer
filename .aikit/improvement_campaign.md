@@ -1163,3 +1163,7 @@ J and O press the target card's own jump and transit buttons, completing a keybo
 ### Fifty-sixth pass — keyboard notification dismissal
 
 `X` dismisses visible notifications (ADR-262). Proof: real engine events dismissed from the keyboard, server count 2 to 0.
+
+### Fifty-seventh pass — encounter keyboard focus
+
+Blocking encounters now take keyboard focus and return it (ADR-263). Proof: real customs stop resolved with Enter in Edge, server state changed, focus restored.

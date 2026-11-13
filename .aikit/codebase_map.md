@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `188`
-- **Total Classes**: `456`
+- **Total Python Modules**: `189`
+- **Total Classes**: `457`
 - **Total Top-Level Functions**: `503`
-- **Total Class Methods**: `2406`
-- **Total Source Lines**: `60036`
+- **Total Class Methods**: `2411`
+- **Total Source Lines**: `60080`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`188` module(s))
+- **Indexed**: python (`189` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1211,6 +1211,21 @@
   - Method `.test_background_matching_is_case_insensitive()`
   - Method `.test_unknown_background_passes_through_without_bonus()`
   - Method `.test_background_bonuses_apply_after_budget_validation()`
+
+---
+
+### [`tests/test_encounter_focus.py`](tests/test_encounter_focus.py)
+> *A blocking encounter card is an alert dialog that takes keyboard focus when it appears and returns it when it resolves.*
+
+**Size**: `44` lines (`1972` bytes)
+
+**Classes:**
+- `class TestEncounterFocus`
+  - Method `.test_the_card_is_declared_an_alert_dialog()`
+  - Method `.test_a_new_encounter_moves_focus_to_its_first_enabled_action()`
+  - Method `.test_resolving_the_encounter_restores_the_previous_focus()`
+  - Method `.test_a_rebuild_keeps_focus_on_the_same_action()`
+  - Method `.test_focus_is_only_stolen_once_per_encounter()`
 
 ---
 
