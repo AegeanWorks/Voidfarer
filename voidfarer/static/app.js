@@ -7645,6 +7645,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     // Body and flagship labels share one collision map so two names never overlap, and
     // every label stays inside the visible radar rather than sliding under the HUD.
+    // Label wordings, longest first: a crowded map retries "Sol System C (Silicate Plains)" as
+    // "Sol System C" instead of leaving the body unnamed.
+    radarLabelVariants(text) {
+        const short = String(text).replace(/\s*\([^)]*\)\s*$/, "").trim();
+        return short && short !== text ? [text, short] : [text];
+    }
+
     placeRadarLabel(ctx, text, x, y, radius, color, priority = 0, mono = false) {
         const rect = this.mapRect || { x: 0, y: 0, w: this.viewW, h: this.viewH };
         const boxes = this._radarLabelBoxes || [];
@@ -7653,43 +7660,54 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             : "12px 'Segoe UI'";
         ctx.save();
         ctx.font = font;
-        const width = ctx.measureText(text).width;
         const height = 14;
         const gap = 6;
-        const candidates = [
-            { x: x + radius + gap, y: y - height / 2 },
-            { x: x - radius - gap - width, y: y - height / 2 },
-            { x: x - width / 2, y: y + radius + gap },
-            { x: x - width / 2, y: y - radius - gap - height },
-        ];
-        const place = box => {
+        const place = (box, label) => {
             ctx.fillStyle = "rgba(4, 9, 19, 0.58)";
             ctx.fillRect(box.x, box.y, box.w, box.h);
             ctx.fillStyle = color;
-            ctx.fillText(text, box.x + 3, box.y + height - 3);
+            ctx.fillText(label, box.x + 3, box.y + height - 3);
             boxes.push(box);
             this._radarLabelBoxes = boxes;
         };
-        for (const candidate of candidates) {
-            const box = { x: candidate.x - 3, y: candidate.y - 2, w: width + 6, h: height + 4 };
-            if (box.x < rect.x + 4 || box.y < rect.y + 4
-                || box.x + box.w > rect.x + rect.w - 4
-                || box.y + box.h > rect.y + rect.h - 4) continue;
-            if (boxes.some(other => box.x < other.x + other.w && box.x + box.w > other.x
-                && box.y < other.y + other.h && box.y + box.h > other.y)) continue;
-            place(box);
-            ctx.restore();
-            return true;
+        const variants = this.radarLabelVariants(text);
+        for (const label of variants) {
+            const width = ctx.measureText(label).width;
+            const candidates = [
+                { x: x + radius + gap, y: y - height / 2 },
+                { x: x - radius - gap - width, y: y - height / 2 },
+                { x: x - width / 2, y: y + radius + gap },
+                { x: x - width / 2, y: y - radius - gap - height },
+                // Crowded maps: nudge sideways labels up or down, then try a second row above and below.
+                { x: x + radius + gap, y: y - height - 2 },
+                { x: x + radius + gap, y: y + 2 },
+                { x: x - radius - gap - width, y: y - height - 2 },
+                { x: x - radius - gap - width, y: y + 2 },
+                { x: x - width / 2, y: y + radius + gap + height + 2 },
+                { x: x - width / 2, y: y - radius - gap - 2 * height - 2 },
+            ];
+            for (const candidate of candidates) {
+                const box = { x: candidate.x - 3, y: candidate.y - 2, w: width + 6, h: height + 4 };
+                if (box.x < rect.x + 4 || box.y < rect.y + 4
+                    || box.x + box.w > rect.x + rect.w - 4
+                    || box.y + box.h > rect.y + rect.h - 4) continue;
+                if (boxes.some(other => box.x < other.x + other.w && box.x + box.w > other.x
+                    && box.y < other.y + other.h && box.y + box.h > other.y)) continue;
+                place(box, label);
+                ctx.restore();
+                return true;
+            }
         }
         if (priority >= 4) {
             // A selected body or the flagship must stay named even in a crowded strip.
+            const width = ctx.measureText(text).width;
             const box = {
                 x: Math.max(rect.x + 4, Math.min(rect.x + rect.w - width - 10, x + radius + gap)),
                 y: Math.max(rect.y + 4, Math.min(rect.y + rect.h - height - 6, y - height / 2)),
                 w: width + 6,
                 h: height + 4,
             };
-            place(box);
+            place(box, text);
         }
         ctx.restore();
         return false;

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `164`
-- **Total Classes**: `429`
+- **Total Python Modules**: `165`
+- **Total Classes**: `430`
 - **Total Top-Level Functions**: `499`
-- **Total Class Methods**: `2317`
-- **Total Source Lines**: `59032`
+- **Total Class Methods**: `2321`
+- **Total Source Lines**: `59062`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`164` module(s))
+- **Indexed**: python (`165` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2409,6 +2409,20 @@
   - Method `.test_cooldown_and_minimum_block_orders()`
   - Method `.test_policy_round_trips()`
   - Method `.test_legacy_payload_defaults_to_off()`
+
+---
+
+### [`tests/test_radar_label_fallback.py`](tests/test_radar_label_fallback.py)
+> *Crowded radar: a body keeps a name by trying a shorter wording and more positions.*
+
+**Size**: `30` lines (`1179` bytes)
+
+**Classes:**
+- `class TestRadarLabelFallback`
+  - Method `.test_variants_drop_only_a_trailing_parenthetical()`
+  - Method `.test_full_text_is_tried_before_the_short_form()`
+  - Method `.test_extra_rows_exist_beyond_the_four_original_positions()`
+  - Method `.test_priority_labels_still_force_the_full_text()`
 
 ---
 

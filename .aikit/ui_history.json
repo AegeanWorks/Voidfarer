@@ -1458,5 +1458,25 @@
     "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
     "final_snapshot_entries": 1264,
     "surface_digest": "4352a41747faabd56a359175f32aa58a36309b202dfa7a63f4465d9931180495"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "98abd2f56572e688b12d84286b3c891277380040",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794550424.995577,
+    "finished_at": 1794550543.4409943,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted Sol System E now labelled, Sol System C (Silicate Plains), Helios Dyson Swarm at 1280x720; labels placed 8 to 11 of 11)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "697c9f6b06ed712fb36ba572831c1d7cd3d2e413f960a5825cd3acaee095a3e2",
+    "final_snapshot_entries": 1265,
+    "surface_digest": "b758a28afaa86a14dbda6777c43cb607217db1495acf1f11c365889c99babe06"
   }
 ]

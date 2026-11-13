@@ -2570,3 +2570,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Reviewing the vector scene, the open-space target card's header showed `6.15 AU TRANSIT // BEARING -138 DEG` on one non-wrapping line, which squeezed the title so "VECTOR 4.20 AU" wrapped and orphaned "AU". The bearing is already one of the card's stat chips directly below.
 - **Decision**: The header distance reads `6.15 AU TRANSIT`; the bearing stays in its chip. `tests/test_vector_target_header.py` (new, failing first) pins both; it was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
 - **Consequences**: Render text only; no engine, save, API or CLI change. A wider review of the cockpit layout found the left terminal is content-fit by design (it already grows to the full row span when a tab needs it), so no layout change was made there.
+
+### ADR-240: Crowded radar labels retry a shorter wording and more positions
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: At 1280x720 the Sol system radar placed only 8 of 11 body labels, so three bodies were unnamed and indistinguishable. An earlier attempt to steer labels away from neighbouring discs made no measurable difference and was reverted.
+- **Decision**: `placeRadarLabel` tries each wording in `radarLabelVariants` (the full name, then the name without its trailing parenthetical, e.g. "Sol System E" for "Sol System E (Magma Forge)") across the four original positions plus six nudged or second-row positions. The full name is always tried first; selected bodies and the flagship still force the full text. This stays within G-007: it moves labels only, never bodies, rings or the AU scale.
+- **Consequences**: Render code only. Measured in real Edge: labels placed 8 to 11 of 11 bodies at 1280x720 and 10 to 11 at 1366x768; 1920x1080 unchanged. `tests/test_radar_label_fallback.py` (new, failing first) was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.

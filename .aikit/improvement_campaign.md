@@ -1069,3 +1069,7 @@ Follow-up (ADR-238, part 2): `.choice-check` 0.7rem to 12px. `tiny` went from 4 
 ### Thirty-second pass — viewport net and vector header
 
 All 16 scenarios across all five viewports audited clean (errors 0, hscroll 0, tiny 0). Visual review of ultrawide and laptop found a wrapped open-space target title (ADR-239). Measured the left terminal before changing it: it is content-fit by design, so it was left alone. Proof: `ui-review/goal-net/`, `ui-review/goal-vector/`.
+
+### Thirty-third pass — radar labels on crowded maps
+
+First radar graphics change: labels try a shorter wording and extra positions so every body is named at 1280x720 (ADR-240). Proof: `ui-review/goal-labels3/short-crop.png`; counts 8 to 11 of 11 labels.
