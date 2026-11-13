@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-customs-review",
+    "task_id": "voidfarer-vector-header",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794549365.3610895,
+    "updated_at": 1794549999.2342906,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-tab-polish-3",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-tab-polish-3' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794545968.91843,
-      "timestamp_str": "2026-11-13 07:59:28",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-refit-filters",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: REFIT slot filter chips with failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794546346.1761732,
-      "timestamp_str": "2026-11-13 08:05:46",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "REFIT list scrolls ~6800px unfiltered",
-        "benefits": "Fast navigation of 23 upgrades",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "New test, real-Edge click proof, ADR-233"
-      },
-      "plan_digest": "3e1cef6e4b2a9d6ba04e328a93892040b515fe94f32e973d61b50a4134667713"
-    },
-    {
-      "task_id": "voidfarer-refit-filters",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794546346.499499,
-      "timestamp_str": "2026-11-13 08:05:46",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-refit-filters",
       "phase": "completed",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794549365.3610895,
       "timestamp_str": "2026-11-13 08:56:05",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-customs-review",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-customs-review' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794549470.043425,
+      "timestamp_str": "2026-11-13 08:57:50",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-vector-header",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: vector target header drops the duplicate bearing, with failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794549998.9448812,
+      "timestamp_str": "2026-11-13 09:06:38",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Open-space target title wrapped and orphaned AU",
+        "benefits": "One-line readable title",
+        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
+        "mitigation": "Failing-first test, real-Edge capture, ADR-239"
+      },
+      "plan_digest": "a5f6e86734b0608d660a8832f52d6dd5216b04c36eff9bf186e5377ceb93d48b"
+    },
+    {
+      "task_id": "voidfarer-vector-header",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794549999.2342906,
+      "timestamp_str": "2026-11-13 09:06:39",
       "agent": "claude:1",
       "checklists": "passed"
     }

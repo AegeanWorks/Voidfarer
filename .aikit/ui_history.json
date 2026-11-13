@@ -1438,5 +1438,25 @@
     "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
     "final_snapshot_entries": 1264,
     "surface_digest": "ce2a1e49c59283f546cc11e4f2133e151ca7b9f6173d3711c3a7488e2c96bdc6"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "8cc9829abba22b2c0cc0649db9d24a41a4b0e3db",
+    "contract_hash": "76265bfa6b0b31e162759147b1198c3e9037d367f5c5228368b3cb77072580bd",
+    "started_at": 1794549898.3748722,
+    "finished_at": 1794549995.5734391,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted VECTOR 4.20 AU on one line, 6.15 AU TRANSIT, BEARING -138 DEG chip)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "03b97256d1adc2ceeba77c72bbe5c67046681273477f4c931b5e52804749ed52",
+    "final_snapshot_entries": 1264,
+    "surface_digest": "4352a41747faabd56a359175f32aa58a36309b202dfa7a63f4465d9931180495"
   }
 ]

@@ -1065,3 +1065,7 @@ Review of the secondary scenes (death, settings, and others) found the SETTINGS 
 Reading the last scene captures showed the customs scenario rendering nothing: a stale client-side key since ADR-215. Fixed the tool (ADR-238); the card then audited at `tiny 4`, which the next commit fixes. Proof: `ui-review/goal-scenes/desktop-customs.png` (empty), `ui-review/goal-customs/desktop-customs.png` (card, 4 sub-12px lines).
 
 Follow-up (ADR-238, part 2): `.choice-check` 0.7rem to 12px. `tiny` went from 4 to 0 on the customs, combat and event scenes at 1920x1080 and 1280x720, and the four-action customs card still fits the 720px window. Proof: `ui-review/goal-readable/`.
+
+### Thirty-second pass — viewport net and vector header
+
+All 16 scenarios across all five viewports audited clean (errors 0, hscroll 0, tiny 0). Visual review of ultrawide and laptop found a wrapped open-space target title (ADR-239). Measured the left terminal before changing it: it is content-fit by design, so it was left alone. Proof: `ui-review/goal-net/`, `ui-review/goal-vector/`.

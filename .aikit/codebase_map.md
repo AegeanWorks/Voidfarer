@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `163`
-- **Total Classes**: `428`
+- **Total Python Modules**: `164`
+- **Total Classes**: `429`
 - **Total Top-Level Functions**: `499`
-- **Total Class Methods**: `2315`
-- **Total Source Lines**: `59010`
+- **Total Class Methods**: `2317`
+- **Total Source Lines**: `59032`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`163` module(s))
+- **Indexed**: python (`164` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3105,6 +3105,18 @@
   - Method `.test_the_inventory_names_the_core_controls_and_handlers()`
   - Method `.test_the_inventory_names_the_ui_routes_and_theme_surface()`
   - Method `.test_the_inventory_is_sorted_and_deduplicated()`
+
+---
+
+### [`tests/test_vector_target_header.py`](tests/test_vector_target_header.py)
+> *Open-space target card: the header carries the transit distance only (bearing lives in the stat chips).*
+
+**Size**: `22` lines (`870` bytes)
+
+**Classes:**
+- `class TestVectorTargetHeader`
+  - Method `.test_header_distance_does_not_repeat_the_bearing()`
+  - Method `.test_bearing_is_still_shown_as_a_stat_chip()`
 
 ---
 

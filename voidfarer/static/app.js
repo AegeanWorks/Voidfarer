@@ -6547,7 +6547,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const estTicks = Math.max(1, Math.ceil(distAu / Math.max(0.35, 1.15 * engineFactor)));
             this.targetType.textContent = "TARGET: OPEN SPACE";
             this.targetName.textContent = `VECTOR ${p.au.toFixed(2)} AU`;
-            this.targetDist.textContent = `${distAu.toFixed(2)} AU TRANSIT // BEARING ${(p.angle * 180 / Math.PI).toFixed(0)} DEG`;
+            this.targetDist.textContent = `${distAu.toFixed(2)} AU TRANSIT`;
             this.targetDesc.textContent = "Empty void: no body, no orbit. Hold station here to cut a lane, lie low, or wait out a patrol.";
             this.setTargetSummary([
                 ["VECTOR", `${p.au.toFixed(2)} AU`],

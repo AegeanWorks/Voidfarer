@@ -2563,3 +2563,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The browser review tool's `customs` scenario injected `state.active_customs` into the client, a key the cockpit stopped rendering when ADR-215 normalized blocking encounters into `state.encounter`. The scenario therefore showed no customs UI at all, and the card could never be audited. Once it rendered, the audit reported four sub-12px lines: the action descriptions in `.choice-check` (0.7rem = 11.2px), shared by every encounter card.
 - **Decision**: (1) `tools/ui_browser.py` installs a real `CustomsEncounter` in the engine (`_prepare_customs`), like the boarding and relief scenarios, and drops the client-side injection. (2) In a separate UI-task commit, `.choice-check` becomes 12px. `tests/test_ui_browser_customs.py` (new, failing first) pins the tool; the readability test follows with the CSS.
 - **Consequences**: Developer tool and CSS only; no engine, save, API or CLI change.
+
+### ADR-239: The open-space target header stops repeating the bearing
+- **Date**: 2026-11-13
+- **Status**: Accepted
+- **Context**: Reviewing the vector scene, the open-space target card's header showed `6.15 AU TRANSIT // BEARING -138 DEG` on one non-wrapping line, which squeezed the title so "VECTOR 4.20 AU" wrapped and orphaned "AU". The bearing is already one of the card's stat chips directly below.
+- **Decision**: The header distance reads `6.15 AU TRANSIT`; the bearing stays in its chip. `tests/test_vector_target_header.py` (new, failing first) pins both; it was added after `ui finish` because the UI guard protects `tests/` during a task and it runs in the Phase 4 gate.
+- **Consequences**: Render text only; no engine, save, API or CLI change. A wider review of the cockpit layout found the left terminal is content-fit by design (it already grows to the full row span when a tab needs it), so no layout change was made there.
