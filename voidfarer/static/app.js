@@ -800,6 +800,8 @@ class CockpitApp {
         this.tabBtnMessages = document.getElementById("tabBtnMessages");
         this.btnToggleAdvancedTabs = document.getElementById("btnToggleAdvancedTabs");
         this.advancedTabsVisible = false;
+        // While the Cadet Academy runs only the core tabs show; skipping or finishing it unlocks the rest.
+        this.cadetTabLock = false;
         this.advancedTabCount = document.querySelectorAll('.deck-tab-btn[data-advanced="true"]').length;
         this.contractsBadge = document.getElementById("contractsBadge");
         this.storyBadge = document.getElementById("storyBadge");
@@ -1819,7 +1821,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     cycleTerminalTab(step) {
         const current = this.activeRightTab || this.lastTerminalTab || "player";
         const index = Math.max(0, TERMINAL_TABS.indexOf(current));
-        const next = TERMINAL_TABS[(index + step + TERMINAL_TABS.length) % TERMINAL_TABS.length];
+        let next = current;
+        for (let hop = 1; hop <= TERMINAL_TABS.length; hop += 1) {
+            next = TERMINAL_TABS[(index + step * hop + TERMINAL_TABS.length * hop) % TERMINAL_TABS.length];
+            const button = document.getElementById("tabBtn" + (next === "ai" ? "AI" : next.charAt(0).toUpperCase() + next.slice(1)));
+            if (!(this.cadetTabLock && button && button.getAttribute("data-advanced") === "true")) break;
+        }
         this.switchRightTab(next);
     }
 
@@ -1906,6 +1913,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    setCadetTabLock(locked) {
+        const lock = Boolean(locked);
+        if (lock === this.cadetTabLock) return;
+        this.cadetTabLock = lock;
+        const header = document.getElementById("deckTabsHeader");
+        if (header) header.classList.toggle("cadet-lock", lock);
+        if (lock) {
+            const activeButton = document.querySelector(".deck-tab-btn.active");
+            if (activeButton && activeButton.getAttribute("data-advanced") === "true") {
+                this.switchRightTab("player", { quiet: true });
+            }
+        }
+    }
+
     switchRightTab(tabName, options = {}) {
         if (!options.quiet) {
             this.drawerUserToggled = true;
@@ -1918,6 +1939,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             player: this.tabBtnPlayer, skills: this.tabBtnSkills, crew: this.tabBtnCrew, empire: this.tabBtnEmpire, codex: this.tabBtnCodex,
         };
         const targetButton = tabButtons[tabName];
+        if (this.cadetTabLock && targetButton && targetButton.getAttribute("data-advanced") === "true") return;
         if (targetButton && targetButton.getAttribute("data-advanced") === "true"
             && !this.advancedTabsVisible) {
             this.setAdvancedTabsVisible(true, { quiet: true, keepActive: true });
@@ -2732,6 +2754,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         // Cadet Academy Ribbon render
         const tut = ship.tutorial;
+        this.setCadetTabLock(Boolean(tut && !tut.completed && !tut.skipped && tut.steps && tut.steps.length > 0));
         if (tut && !tut.completed && !tut.skipped && tut.steps && tut.steps.length > 0) {
             const step = tut.steps[tut.current_step_index] || tut.steps[0];
             const curIdx = tut.current_step_index || 0;

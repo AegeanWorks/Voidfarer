@@ -288,6 +288,25 @@ class TestCockpitLayout(unittest.TestCase):
                           f"#{alert_id} must live in the center column")
 
 
+class TestCadetTabLock(unittest.TestCase):
+    """While the Cadet Academy runs only the five core terminal tabs show (ADR-297)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_lock_hides_advanced_tabs_and_the_more_systems_button(self):
+        self.assertIn(".deck-tabs-header.cadet-lock .deck-tab-btn[data-advanced=\"true\"]", self.css)
+        self.assertIn(".deck-tabs-header.cadet-lock .deck-more-btn", self.css)
+
+    def test_lock_follows_the_tutorial_state_and_guards_tab_switching(self):
+        self.assertIn("setCadetTabLock(", self.js)
+        self.assertIn("!tut.completed && !tut.skipped", self.js)
+        self.assertIn("if (this.cadetTabLock && targetButton", self.js)
+        self.assertIn("this.cadetTabLock && button", self.js)  # [ ] cycling skips locked tabs
+
+
 if __name__ == "__main__":
     unittest.main()
 

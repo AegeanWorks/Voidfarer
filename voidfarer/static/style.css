@@ -7093,6 +7093,8 @@ body.cockpit-theme {
 .panel-left .deck-tab-btn.active { border-left-color: var(--console-gold); background: rgba(201, 163, 90, 0.1); color: var(--console-ivory); box-shadow: none; }
 .panel-left .deck-tab-btn:nth-child(4n) { margin-bottom: 4px; }
 .deck-tabs-header:not(.show-advanced) .deck-tab-btn[data-advanced="true"] { display: none; }
+.deck-tabs-header.cadet-lock .deck-tab-btn[data-advanced="true"],
+.deck-tabs-header.cadet-lock .deck-more-btn { display: none !important; }
 .panel-left .deck-more-btn {
     min-height: 26px;
     margin-top: 4px;

@@ -2436,5 +2436,26 @@
     "final_snapshot_digest": "6ed003a9f60dd3489608be6e6a323507e790c60869ab9c7f556a2802729f564c",
     "final_snapshot_entries": 1316,
     "surface_digest": "a7b663812e75b0f11a8b8470baead5e3cf6f322bebe8647cd07d616899013772"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "ba4f82908424146e22019c39b0bb4d11b7833ac0",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794676639.0377414,
+    "finished_at": 1794677238.80545,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; laptop-market.png and desktop-market.png: rail shows PLAYER SHIP COMMERCE FLEET CONTRACTS, no MORE SYSTEMS, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "0235c2d2696e2504f38f62eb8fc7ae319e8f1a505d955d938e5757decfa7e91c",
+    "final_snapshot_entries": 1317,
+    "surface_digest": "72b9e8b50c9eb1f14de1fc710f2abb75bc63cec3fb1d61647c10d2a024806b78"
   }
 ]

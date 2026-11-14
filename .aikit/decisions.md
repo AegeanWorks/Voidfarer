@@ -2986,3 +2986,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A new captain's first jumps could meet pirate raids and solar-flare damage before the Cadet Flight Academy had taught navigation and trading. The combat card already hides Board, Gambit, Drone and subsystem targeting behind SHOW MORE TACTICS (ADR-294), so no combat-card change was needed.
 - **Decision**: In `SimulationEngine.jump`, while `ship.tutorial.is_active` and the target security is at least `CADET_PROTECTED_SECURITY` (0.5), pirate raids are skipped and a coronal flare is absorbed with a `CADET PROTOCOL` log line instead of hull, shield and heat damage. Low-security systems (below 0.35) and hostile-standing patrols are unchanged.
 - **Consequences**: Engine only, derived from existing tutorial state, no new persisted field. Skipping or finishing the academy ends the protection. Pinned by `tests/test_cadet_protection.py`.
+
+### ADR-297: Cadet Academy locks the terminal to the five core tabs
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: A new captain saw `MORE SYSTEMS` and eleven advanced tabs on the first screen, which the tutorial research names as extraneous cognitive load. Every academy step is reachable from the core tabs (PLAYER, SHIP, COMMERCE, FLEET, CONTRACTS), the radar and the reactor strip.
+- **Decision**: `CockpitApp.setCadetTabLock` follows the same predicate as the cadet banner (tutorial neither completed nor skipped). While locked, `#deckTabsHeader` carries `cadet-lock`, which hides every `data-advanced` tab and the `MORE SYSTEMS` button; `switchRightTab` refuses advanced tabs and `cycleTerminalTab` skips them. Graduating or choosing SKIP TUTORIAL unlocks everything, which is the veteran path, so no separate setting was added.
+- **Consequences**: Cockpit only, no persisted state. Verified in real Edge at laptop and desktop viewports (`ui-review/tab-lock2/`, 0 console errors): the rail shows PLAYER, SHIP, COMMERCE, FLEET, CONTRACTS. Pinned by `TestCadetTabLock` in `tests/test_cockpit_layout.py`. Gradual unlocks by milestone (SKILLS and CREW at first level-up, and so on) are a possible follow-up.

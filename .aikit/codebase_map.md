@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `222`
-- **Total Classes**: `496`
+- **Total Classes**: `497`
 - **Total Top-Level Functions**: `520`
-- **Total Class Methods**: `2514`
-- **Total Source Lines**: `61809`
+- **Total Class Methods**: `2517`
+- **Total Source Lines**: `61828`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`222` module(s))
@@ -470,7 +470,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2828` lines (`127269` bytes)
+**Size**: `2847` lines (`128169` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -502,6 +502,10 @@
   - Method `.test_terminal_uses_a_vertical_rail_beside_the_content()`
   - Method `.test_center_column_keeps_radar_and_reactor_moves_to_bottom_strip()`
   - Method `.test_context_alerts_live_in_the_center_column()`
+- `class TestCadetTabLock` - *While the Cadet Academy runs only the five core terminal tabs show (ADR-297).*
+  - Method `.setUpClass()`
+  - Method `.test_lock_hides_advanced_tabs_and_the_more_systems_button()`
+  - Method `.test_lock_follows_the_tutorial_state_and_guards_tab_switching()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`
