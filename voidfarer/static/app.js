@@ -954,6 +954,8 @@ class CockpitApp {
         this.btnToggleCommission = document.getElementById("btnToggleCommission");
         this.commissionDetails = document.getElementById("commissionDetails");
         this.btnToggleMarketFilters = document.getElementById("btnToggleMarketFilters");
+        this.btnSellAllProfitable = document.getElementById("btnSellAllProfitable");
+        this.btnSellAllProfitable?.addEventListener("click", () => this.handleSellAllProfitable());
         this.marketFilterDetails = document.getElementById("marketFilterDetails");
         this.btnToggleEscorts = document.getElementById("btnToggleEscorts");
         this.escortDetails = document.getElementById("escortDetails");
@@ -3533,6 +3535,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const cargo = this.state.ship.cargo || {};
         const avgCost = this.state.cargo_avg_cost || {};
         const lot = this.tradeLot;
+        if (this.btnSellAllProfitable) {
+            this.btnSellAllProfitable.disabled = !allQuotes.length
+                || !Object.values(cargo).some(units => Number(units) > 0);
+        }
 
         quotes.forEach(q => {
             const tr = document.createElement("tr");
@@ -6458,6 +6464,28 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         } catch (e) {
             this.appendLog(`[ERROR] Trade failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleSellAllProfitable() {
+        this.sound.init();
+        try {
+            const res = await apiFetch("/api/logistics/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "sell_all" })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.sound.playChime();
+                this.appendLog(json.message, "reward");
+            } else {
+                this.appendLog(`[TRADE] ${json.message}`, "hazard");
+            }
+            if (json.state) this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Sell all failed: ${e.message}`, "hazard");
         }
     }
 

@@ -4436,6 +4436,11 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
     letter-spacing: 0.04em;
     cursor: pointer;
 }
+.trade-toolbar { display: flex; gap: 6px; }
+.trade-toolbar .trade-disclosure-toggle { flex: 1 1 0; min-width: 0; width: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trade-toolbar .trade-disclosure-toggle:disabled { opacity: 0.45; cursor: default; }
+.trade-toolbar .trade-sell-all { flex: 0 0 auto; }
+.trade-toolbar #btnToggleMarketFilters { flex: 1 1 auto; text-align: center; }
 .ship-disclosure-toggle:hover, .ship-disclosure-toggle:focus-visible,
 .trade-disclosure-toggle:hover, .trade-disclosure-toggle:focus-visible,
 .fleet-disclosure-toggle:hover, .fleet-disclosure-toggle:focus-visible {

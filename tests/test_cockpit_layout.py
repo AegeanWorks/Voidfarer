@@ -346,6 +346,28 @@ class TestDeathInsuranceButton(unittest.TestCase):
         self.assertIn("this.deathAcknowledged = false;", self.js)
 
 
+class TestSellAllProfitableButton(unittest.TestCase):
+    """COMMERCE offers SELL ALL PROFITABLE beside the filters toggle (ADR-303)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_button_shares_one_row_with_the_filters_toggle(self):
+        toolbar = self.html[self.html.index('class="trade-toolbar"'):]
+        toolbar = toolbar[:toolbar.index("</div>")]
+        self.assertIn('id="btnSellAllProfitable"', toolbar)
+        self.assertIn('id="btnToggleMarketFilters"', toolbar)
+        self.assertIn(".trade-toolbar { display: flex;", self.css)
+
+    def test_button_posts_the_sell_all_logistics_action_and_follows_the_hold(self):
+        self.assertIn('JSON.stringify({ action: "sell_all" })', self.js)
+        self.assertIn('"/api/logistics/action"', self.js)
+        self.assertIn("this.btnSellAllProfitable.disabled", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

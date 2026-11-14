@@ -435,7 +435,10 @@
                             </div>
                         </div>
 
-                        <button class="trade-disclosure-toggle" id="btnToggleMarketFilters" data-label="LOT &amp; CATEGORY FILTERS" aria-expanded="false" aria-controls="marketFilterDetails" title="Show or hide bulk order lot sizes and commodity category filters">SHOW LOT &amp; CATEGORY FILTERS</button>
+                        <div class="trade-toolbar">
+                            <button class="trade-disclosure-toggle trade-sell-all" id="btnSellAllProfitable" title="Sell every held commodity that beats what you paid; rows that would lose money stay in the hold">SELL ALL PROFITABLE</button>
+                            <button class="trade-disclosure-toggle" id="btnToggleMarketFilters" data-label="FILTERS" aria-expanded="false" aria-controls="marketFilterDetails" title="Show or hide bulk order lot sizes and commodity category filters">SHOW FILTERS</button>
+                        </div>
                         <div id="marketFilterDetails" hidden>
                             <!-- Order lot: every BUY/SELL in the table uses it; Shift+click is always MAX -->
                             <div class="market-lot-bar" id="marketLotBar" role="group" aria-label="Order lot size">

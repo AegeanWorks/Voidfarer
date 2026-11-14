@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `225`
-- **Total Classes**: `503`
+- **Total Classes**: `504`
 - **Total Top-Level Functions**: `523`
-- **Total Class Methods**: `2541`
-- **Total Source Lines**: `62184`
+- **Total Class Methods**: `2544`
+- **Total Source Lines**: `62206`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`225` module(s))
@@ -470,7 +470,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2886` lines (`130014` bytes)
+**Size**: `2908` lines (`131026` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -514,6 +514,10 @@
   - Method `.setUpClass()`
   - Method `.test_button_is_first_in_the_death_options_and_hidden_by_default()`
   - Method `.test_button_follows_the_quote_and_claims_through_the_engineering_action()`
+- `class TestSellAllProfitableButton` - *COMMERCE offers SELL ALL PROFITABLE beside the filters toggle (ADR-303).*
+  - Method `.setUpClass()`
+  - Method `.test_button_shares_one_row_with_the_filters_toggle()`
+  - Method `.test_button_posts_the_sell_all_logistics_action_and_follows_the_hold()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

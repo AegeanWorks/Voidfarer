@@ -2499,5 +2499,27 @@
     "final_snapshot_digest": "dda5a163629cdf9882ba48d6ef723da9a6e44fcfb28702688f5fc2505e6ad158",
     "final_snapshot_entries": 1319,
     "surface_digest": "f5d273019d0f3f04f3acba42ade6e4e54e98acf1a2624174ba3acbad6c01dfb7"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "10dd08618c5bd687392049e8c785adcc8dacf76b",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794679979.1606038,
+    "finished_at": 1794680284.5962656,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; sell-all5 laptop-market.png and desktop-market.png: SELL ALL PROFITABLE and SHOW FILTERS fit on one row, table height unchanged, 0 errors; click sold hydroponics and kept loss row",
+    "allowed_removals": [],
+    "final_snapshot_digest": "ccba7a5c9baceef85c20cb7ea53f1a9ba34f4376add1c7232d0d54c2603a7e17",
+    "final_snapshot_entries": 1323,
+    "surface_digest": "9347192fbcae6cb65c59c300db3e9e4fa5f857a65b7f78aa53e5b9b95cf3cf20"
   }
 ]

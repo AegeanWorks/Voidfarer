@@ -3028,3 +3028,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Arriving with a mixed hold of mined ore, salvage and traded goods meant selling each row by hand, and a beginner could not tell which rows would lose money against what they paid.
 - **Decision**: `SimulationEngine.sell_all_profitable` sells every held commodity through the regular market order (so slippage, standings and bonuses apply) and rolls a row back when its real proceeds do not beat its recorded `cargo_cost` basis, so those rows stay in the hold. It is exposed as the `sell_all` logistics action, which gives REST (`/api/logistics/action`), the CLI and the agent catalog (G-012). Docking at a station exchange is required.
 - **Consequences**: Engine, REST and CLI; the cockpit button follows. No new persisted field. Pinned by `tests/test_sell_all_profitable.py`.
+
+### ADR-303: SELL ALL PROFITABLE button in COMMERCE
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: ADR-302 added the engine action; the cockpit still needed a control. A full-width row for it pushed the commodity table down a row and a half at laptop height, undoing the above-the-fold work of ADR-294.
+- **Decision**: `#btnSellAllProfitable` shares a `.trade-toolbar` flex row with the filters toggle, whose visible label is shortened from `LOT & CATEGORY FILTERS` to `FILTERS` (its tooltip keeps the full wording) so both fit at 1366x768. The button posts `{action: "sell_all"}` to `/api/logistics/action`, logs the result, and is disabled when the hold is empty or no market is present.
+- **Consequences**: Cockpit only. Verified in real Edge at laptop and desktop widths (`ui-review/sell-all5/`, 0 console errors; a click sold the profitable row and kept a loss row). Three earlier captures clipped the labels and were fixed. Pinned by `TestSellAllProfitableButton`.

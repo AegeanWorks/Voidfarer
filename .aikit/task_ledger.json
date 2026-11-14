@@ -5,30 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794679885.6752095,
+    "updated_at": 1794680509.8178513,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-modal-radar-galaxy-layout",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Verified modal input focus, keyboard-gated focusin tooltips, z-index 60 combat/anomaly cards, and radar/galaxy label obstacle routing in real Edge and 5/5 check gates",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794670207.6477826,
-      "timestamp_str": "2026-11-14 18:30:07",
-      "agent": "antigravity:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-modal-radar-galaxy-layout",
       "phase": "completed",
@@ -315,6 +297,17 @@
       "status": "in_progress",
       "timestamp": 1794679885.6752095,
       "timestamp_str": "2026-11-14 21:11:25",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-trade-clarity",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/3] SELL ALL PROFITABLE button in COMMERCE (ADR-303); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794680509.8178513,
+      "timestamp_str": "2026-11-14 21:21:49",
       "agent": "claude:1"
     }
   ]
