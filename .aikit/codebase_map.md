@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `201`
-- **Total Classes**: `472`
+- **Total Python Modules**: `202`
+- **Total Classes**: `473`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2463`
-- **Total Source Lines**: `60694`
+- **Total Class Methods**: `2468`
+- **Total Source Lines**: `60741`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`201` module(s))
+- **Indexed**: python (`202` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2295,6 +2295,21 @@
   - Method `.test_critical_threshold_and_patchable_state_are_computed()`
   - Method `.test_only_a_patchable_card_fabricates()`
   - Method `.test_styles_exist_for_both_states()`
+
+---
+
+### [`tests/test_market_empty_state.py`](tests/test_market_empty_state.py)
+> *With no exchange the Commerce tab hides its dead controls, shows the explanation up top and names the stations.*
+
+**Size**: `47` lines (`2304` bytes)
+
+**Classes:**
+- `class TestMarketEmptyState`
+  - Method `.test_the_tab_gets_a_no_exchange_state_that_the_station_branch_clears()`
+  - Method `.test_the_dead_controls_are_hidden_while_there_is_no_exchange()`
+  - Method `.test_the_message_names_up_to_three_stations_in_orbit_order()`
+  - Method `.test_an_empty_category_filter_is_told_apart_from_having_no_exchange()`
+  - Method `.test_the_new_text_styles_meet_the_12px_floor()`
 
 ---
 

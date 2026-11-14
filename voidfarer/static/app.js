@@ -2752,6 +2752,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             // Leave the open tab as it is; the next poll renders it.
         } else if (this.activeRightTab === "market") {
             if (orbBody && orbBody.station_dockable) {
+                this.tabContentMarket.classList.remove("no-exchange");
                 this.noMarketMsg.style.display = "none";
                 this.marketTitle.textContent = `${orbBody.name.toUpperCase()} EXCHANGE`;
                 this.marketTitle.title = this.marketTitle.textContent;
@@ -2766,6 +2767,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 }
             } else {
                 this.noMarketMsg.style.display = "flex";
+                // No exchange: hide the dead trade controls and name where a player can actually trade.
+                this.tabContentMarket.classList.add("no-exchange");
+                const stationNames = [...((this.state.current_system || {}).bodies || [])]
+                    .filter(b => b.station_dockable)
+                    .sort((a, b) => (a.orbit_radius || 0) - (b.orbit_radius || 0))
+                    .map(b => b.name);
+                const stationLine = document.getElementById("noMarketStations");
+                if (stationLine) {
+                    const extra = stationNames.length > 3 ? ` (+${stationNames.length - 3} more)` : "";
+                    stationLine.textContent = stationNames.length
+                        ? `Stations in this system: ${stationNames.slice(0, 3).join(", ")}${extra}.` : "";
+                }
                 this.marketTableBody.innerHTML = "";
                 this.marketTitle.textContent = orbBody ? orbBody.name : "DEEP SPACE";
                 this.marketArch.textContent = "UNPOPULATED";
@@ -3408,6 +3421,15 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
             this.marketTableBody.appendChild(tr);
         });
+        if (!quotes.length && allQuotes.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 6;
+            td.className = "market-empty";
+            td.textContent = "No goods in this category here.";
+            tr.appendChild(td);
+            this.marketTableBody.appendChild(tr);
+        }
     }
 
     renderTradeAutomation() {

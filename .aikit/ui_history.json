@@ -2076,5 +2076,27 @@
     "final_snapshot_digest": "372e16e9a248fc518c6b5d2523f9fbee0cc99e069b319ca83905e5d057563338",
     "final_snapshot_entries": 1296,
     "surface_digest": "4f8babc030b59e3ac445aa450c4da994f8d33bccb4fc66266d211a3b75c44970"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "cd094d16940bacc2bdc053d28e25dc4c1fca8f52",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794638633.4702847,
+    "finished_at": 1794638959.193655,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted COMMERCE at Sol System B (Debris Field): NO ORBITAL EXCHANGE under the cargo box with Stations in this system: Helios Dyson Swarm, Sol System A (Citadel), Sol System Ring World (Orbital Habitat) (+2 more); the lot bar, filters, table and auto-trade panel no longer show)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "0d153f3830490b70b46873b96a87d86e3057d40df49f8e2b0d9ab02357ea034d",
+    "final_snapshot_entries": 1297,
+    "surface_digest": "2525f38104667dd14dcaedaef7870606d3eea47afeca2e1f86ee8bd4e2221f4f"
   }
 ]

@@ -11010,3 +11010,14 @@ body.cockpit-theme .nav-panel > .panel-header {
 /* Character Creation step 2: the origin bonus tag and the unspent-points note. */
 .attr-origin { margin-left: 6px; padding: 0 5px; border: 1px solid rgba(143, 191, 159, 0.55); border-radius: 2px; color: var(--console-green); font-size: 12px; letter-spacing: 0.06em; white-space: nowrap; }
 .creation-note { margin-left: 10px; color: var(--console-gold); font-size: 12px; }
+
+/* Commerce: an empty exchange says why and where to go. */
+.market-table .market-empty { padding: 14px 12px; color: var(--console-gold); font-size: 12px; line-height: 1.5; text-align: left; white-space: normal; }
+
+/* Commerce with no exchange: the dead trade controls step aside and the explanation leads. */
+#tabContentMarket.no-exchange .market-lot-bar,
+#tabContentMarket.no-exchange .market-category-filters,
+#tabContentMarket.no-exchange .commodity-table-container,
+#tabContentMarket.no-exchange .trade-automation,
+#tabContentMarket.no-exchange .quantum-freight-shell { display: none; }
+.no-market-message .no-market-stations { max-width: 300px; margin-top: 4px; color: var(--console-gold); font-size: 12px; line-height: 1.45; }
