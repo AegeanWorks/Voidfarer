@@ -3,25 +3,15 @@
   "active_task": {
     "task_id": "voidfarer-arrive-now",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794683513.4639974,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794683514.2198372
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-first-10-minutes",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[5/6] Insurance rebuild engine, REST and CLI via engineering action (ADR-299); cockpit death button next; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794678627.8195567,
-      "timestamp_str": "2026-11-14 20:50:27",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-first-10-minutes",
       "phase": "in_progress",
@@ -278,6 +268,22 @@
       "timestamp": 1794683513.4639974,
       "timestamp_str": "2026-11-14 22:11:53",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-arrive-now",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-arrive-now' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794683514.2198396,
+      "timestamp_str": "2026-11-14 22:11:54",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
     }
   ]
 }
