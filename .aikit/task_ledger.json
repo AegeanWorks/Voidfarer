@@ -1,51 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-trade-tip",
+    "task_id": "voidfarer-early-tabs",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794682265.8108501,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794682788.500027,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794682267.2025073
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-beginner-cockpit-compaction",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-beginner-cockpit-compaction' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794673462.9807954,
-      "timestamp_str": "2026-11-14 19:24:22",
-      "agent": "antigravity:goal",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-first-10-minutes",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/6] Plan: recover truncated engine/app tree, then cadet protection+basic combat, tutorial tab unlock, fuel/repair chips, insurance+checkpoint, trade clarity (reports/voidfarer-first-10-minutes-plan.md)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794675861.2353842,
-      "timestamp_str": "2026-11-14 20:04:21",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "New players face 16 tabs, hazards and a run-ending death before learning the loop; the working tree also holds truncated engine.py/app.js",
-        "benefits": "Easier first 10 minutes, no lost runs, a parseable tree",
-        "risks": "contract: tutorial/tab state read by cockpit and CLI; dependency: none new; concurrency: none; state: new fields need backward-compatible defaults (G-012)",
-        "mitigation": "Derive from existing tutorial state, failing-first tests, parity checks, one ADR and check per milestone"
-      },
-      "plan_digest": "49c2d43684ce4e1d8fdaf8888693d0036a576f17da9d335f314eff58b4737542"
-    },
     {
       "task_id": "voidfarer-first-10-minutes",
       "phase": "in_progress",
@@ -272,6 +237,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-early-tabs",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: open SKILLS and CREW at Pilot Mastery 2 during the academy",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794682788.2646954,
+      "timestamp_str": "2026-11-14 21:59:48",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "A cadet earns a skill point before graduating but cannot see SKILLS",
+        "benefits": "Skill points are never missed; the rest stays hidden",
+        "risks": "contract: tab guards read the new data attribute; dependency: none; concurrency: none; state: derived from mastery, none persisted",
+        "mitigation": "Guard all three paths, screenshot both levels, layout tests"
+      },
+      "plan_digest": "9f8f6d06424a09a71e48f1fcc5c89fd5a38191301665286aabd201a75499662f"
+    },
+    {
+      "task_id": "voidfarer-early-tabs",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] SKILLS and CREW open at mastery 2 during the academy (ADR-308); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794682788.500027,
+      "timestamp_str": "2026-11-14 21:59:48",
+      "agent": "claude:1"
     }
   ]
 }

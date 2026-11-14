@@ -100,6 +100,8 @@ const ROOM_LAYOUTS = {
     ],
 };
 // Left terminal rail order, top to bottom; [ and ] cycle through it.
+// Pilot Mastery level that opens SKILLS and CREW while the Cadet Academy still locks the other tabs.
+const CADET_EARLY_TAB_LEVEL = 2;
 const TERMINAL_TABS = [
     "player", "skills", "crew", "ship", "market", "arsenal", "fleet", "contracts",
     "empire", "quests", "ai", "depot", "messages", "story", "factions", "codex",
@@ -1831,7 +1833,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         for (let hop = 1; hop <= TERMINAL_TABS.length; hop += 1) {
             next = TERMINAL_TABS[(index + step * hop + TERMINAL_TABS.length * hop) % TERMINAL_TABS.length];
             const button = document.getElementById("tabBtn" + (next === "ai" ? "AI" : next.charAt(0).toUpperCase() + next.slice(1)));
-            if (!(this.cadetTabLock && button && button.getAttribute("data-advanced") === "true")) break;
+            if (!(this.cadetTabLock && button && button.getAttribute("data-advanced") === "true"
+                && button.dataset.cadetUnlocked !== "true")) break;
         }
         this.switchRightTab(next);
     }
@@ -1919,15 +1922,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
-    setCadetTabLock(locked) {
+    setCadetTabLock(locked, masteryLevel = 1) {
         const lock = Boolean(locked);
+        // The first Pilot Mastery level-up earns skill points, so SKILLS and CREW open early.
+        const early = lock && Number(masteryLevel) >= CADET_EARLY_TAB_LEVEL;
+        for (const button of [this.tabBtnSkills, this.tabBtnCrew]) {
+            if (button) button.dataset.cadetUnlocked = early ? "true" : "false";
+        }
         if (lock === this.cadetTabLock) return;
         this.cadetTabLock = lock;
         const header = document.getElementById("deckTabsHeader");
         if (header) header.classList.toggle("cadet-lock", lock);
         if (lock) {
             const activeButton = document.querySelector(".deck-tab-btn.active");
-            if (activeButton && activeButton.getAttribute("data-advanced") === "true") {
+            if (activeButton && activeButton.getAttribute("data-advanced") === "true"
+                && activeButton.dataset.cadetUnlocked !== "true") {
                 this.switchRightTab("player", { quiet: true });
             }
         }
@@ -1945,7 +1954,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             player: this.tabBtnPlayer, skills: this.tabBtnSkills, crew: this.tabBtnCrew, empire: this.tabBtnEmpire, codex: this.tabBtnCodex,
         };
         const targetButton = tabButtons[tabName];
-        if (this.cadetTabLock && targetButton && targetButton.getAttribute("data-advanced") === "true") return;
+        if (this.cadetTabLock && targetButton && targetButton.getAttribute("data-advanced") === "true"
+            && targetButton.dataset.cadetUnlocked !== "true") return;
         if (targetButton && targetButton.getAttribute("data-advanced") === "true"
             && !this.advancedTabsVisible) {
             this.setAdvancedTabsVisible(true, { quiet: true, keepActive: true });
@@ -2771,7 +2781,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         // Cadet Academy Ribbon render
         const tut = ship.tutorial;
-        this.setCadetTabLock(Boolean(tut && !tut.completed && !tut.skipped && tut.steps && tut.steps.length > 0));
+        this.setCadetTabLock(Boolean(tut && !tut.completed && !tut.skipped && tut.steps && tut.steps.length > 0),
+            Number((ship.mastery || {}).level || 1));
         if (tut && !tut.completed && !tut.skipped && tut.steps && tut.steps.length > 0) {
             const step = tut.steps[tut.current_step_index] || tut.steps[0];
             const curIdx = tut.current_step_index || 0;

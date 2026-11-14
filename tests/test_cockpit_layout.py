@@ -414,6 +414,28 @@ class TestTradeTipLine(unittest.TestCase):
         self.assertNotIn("this.btnTradeTip.textContent", table)
 
 
+class TestCadetEarlyTabUnlock(unittest.TestCase):
+    """SKILLS and CREW open at the first Pilot Mastery level-up during the academy (ADR-308)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_threshold_is_the_first_level_up_and_marks_skills_and_crew(self):
+        self.assertIn("const CADET_EARLY_TAB_LEVEL = 2;", self.js)
+        self.assertIn("for (const button of [this.tabBtnSkills, this.tabBtnCrew])", self.js)
+        self.assertIn('button.dataset.cadetUnlocked = early ? "true" : "false";', self.js)
+        self.assertIn("Number((ship.mastery || {}).level || 1)", self.js)
+
+    def test_unlocked_tabs_pass_the_switch_cycle_and_active_tab_guards(self):
+        self.assertGreaterEqual(self.js.count('dataset.cadetUnlocked !== "true"'), 3)
+
+    def test_css_keeps_the_rest_locked_and_shows_the_unlocked_pair(self):
+        self.assertIn('[data-advanced="true"]:not([data-cadet-unlocked="true"])', self.css)
+        self.assertIn('.deck-tab-btn[data-cadet-unlocked="true"] { display: inline-block; }', self.css)
+
+
 if __name__ == "__main__":
     unittest.main()
 

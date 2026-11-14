@@ -2565,5 +2565,26 @@
     "final_snapshot_digest": "32c159d8e3ae71c36aaad1f8a9ffa12a601e13188801e6d58bff6a587be548ca",
     "final_snapshot_entries": 1329,
     "surface_digest": "27329caa28063c8a9aa45fd2ed91132e4aa83c9554926bf300a0962ea1f03ffb"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "dac9b592118919863be908d8bd5e2e08b55b4df6",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794682396.6742756,
+    "finished_at": 1794682572.4775517,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; rail/laptop-rail.png at Pilot Mastery 2: rail shows PLAYER SKILLS(1) CREW SHIP COMMERCE FLEET CONTRACTS, no MORE SYSTEMS; level 1 shows only the five core tabs; 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "32c159d8e3ae71c36aaad1f8a9ffa12a601e13188801e6d58bff6a587be548ca",
+    "final_snapshot_entries": 1329,
+    "surface_digest": "0ae62c25a36c7d041153bb25f06aa027a18c1d9171ea74c609dd65a98f01b29b"
   }
 ]

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `227`
-- **Total Classes**: `508`
+- **Total Classes**: `509`
 - **Total Top-Level Functions**: `524`
-- **Total Class Methods**: `2559`
-- **Total Source Lines**: `62392`
+- **Total Class Methods**: `2563`
+- **Total Source Lines**: `62414`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`227` module(s))
@@ -470,7 +470,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2954` lines (`133299` bytes)
+**Size**: `2976` lines (`134439` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -527,6 +527,11 @@
   - Method `.test_tip_is_a_hidden_button_above_the_trade_toolbar()`
   - Method `.test_tip_leads_with_the_margin_and_click_selects_the_destination()`
   - Method `.test_advice_blocks_live_in_their_own_method_not_the_table_renderer()`
+- `class TestCadetEarlyTabUnlock` - *SKILLS and CREW open at the first Pilot Mastery level-up during the academy (ADR-308).*
+  - Method `.setUpClass()`
+  - Method `.test_threshold_is_the_first_level_up_and_marks_skills_and_crew()`
+  - Method `.test_unlocked_tabs_pass_the_switch_cycle_and_active_tab_guards()`
+  - Method `.test_css_keeps_the_rest_locked_and_shows_the_unlocked_pair()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`
