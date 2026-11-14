@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `222`
-- **Total Classes**: `498`
-- **Total Top-Level Functions**: `520`
-- **Total Class Methods**: `2520`
-- **Total Source Lines**: `61846`
+- **Total Python Modules**: `223`
+- **Total Classes**: `499`
+- **Total Top-Level Functions**: `521`
+- **Total Class Methods**: `2527`
+- **Total Source Lines**: `61982`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`222` module(s))
+- **Indexed**: python (`223` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2253,6 +2253,23 @@
 - `class TestInputNames`
   - Method `.test_each_listed_input_carries_its_aria_label()`
   - Method `.test_no_text_range_or_number_input_is_left_unnamed()`
+
+---
+
+### [`tests/test_insurance_rebuild.py`](tests/test_insurance_rebuild.py)
+> *Coalition insurance: a destroyed hull can be rebuilt at a safe station for a deductible.*
+
+**Size**: `60` lines (`2399` bytes)
+
+**Classes:**
+- `class InsuranceRebuildTest`
+  - Method `.test_rebuild_keeps_story_and_relics_and_loses_cargo_and_a_deductible()`
+  - Method `.test_a_living_hull_is_refused_and_nothing_changes()`
+  - Method `.test_the_snapshot_quotes_the_policy_only_for_a_destroyed_hull()`
+  - Method `.test_it_is_reachable_as_an_engineering_action()`
+
+**Functions:**
+- `def _destroyed(credits)`
 
 ---
 
@@ -4568,7 +4585,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10859` lines (`536066` bytes)
+**Size**: `10932` lines (`539339` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4743,6 +4760,9 @@
   - Method `._scoop_available_here()` - *True when the orbited body can be scooped and its volatile reservoir still has a tap.*
   - Method `.rescue_status()` - *Whether a distress call would be accepted now, and why not.*
   - Method `.distress_call()` - *Summon a rescue tender: fuel for a fee and some lost time, only when truly stranded.*
+  - Method `._insurance_destination()` - *The nearest secure system (by hyperlane hops) with a dockable station.*
+  - Method `.insurance_status()` - *The Coalition rebuild policy, quoted only while the hull is destroyed.*
+  - Method `.insurance_rebuild()` - *Rebuild a destroyed hull at the nearest secure station: cargo and a credit deductible are lost.*
   - Method `.burn_fuel_cells(quantity)` - *Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.*
   - Method `.check_solar_weather(system)` - *Telemetry check for space weather and coronal radiation risk in the specified or current system.*
   - Method `.step_orbits(delta_time)` - *Advance celestial bodies along orbital mechanics paths and cycle fleet drones.*
@@ -4816,7 +4836,7 @@
 ### [`voidfarer/engineering.py`](voidfarer/engineering.py)
 > *One report and action surface for power, reactor, repair, salvage and fabrication.*
 
-**Size**: `132` lines (`4763` bytes)
+**Size**: `135` lines (`4852` bytes)
 
 **Functions:**
 - `def engineering_summary(state)` - *Compact payload for /api/state.*

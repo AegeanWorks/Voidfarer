@@ -14,6 +14,7 @@ from voidfarer.models import GameState
 ENGINEERING_ACTIONS = (
     "power", "reactor_mode", "reactor_vent", "reactor_repair",
     "repair", "refuel", "overhaul", "fabricate", "salvage", "scoop", "burn_cells", "distress",
+    "insurance",
 )
 
 FABRICATION_BLUEPRINTS = ("patch_kit", "fuel_cell")
@@ -126,6 +127,8 @@ def engineering_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, s
         return engine.burn_fuel_cells(_int(kwargs.get("quantity"), 1))
     if action == "distress":
         return engine.distress_call()
+    if action == "insurance":
+        return engine.insurance_rebuild()
     return False, (
         f"Unknown engineering action '{action}'. "
         f"Use one of: {', '.join(ENGINEERING_ACTIONS)}."

@@ -7383,6 +7383,78 @@ class SimulationEngine:
             self.tick(self.RESCUE_WAIT_TICKS)
             return True, msg
 
+    INSURANCE_DEDUCTIBLE = 0.25
+    INSURANCE_MIN_SECURITY = 0.5
+
+    def _insurance_destination(self) -> tuple[StarSystem, CelestialBody] | None:
+        """The nearest secure system (by hyperlane hops) with a dockable station."""
+        systems = self.state.systems
+        seen = {self.state.ship.current_system_id}
+        queue = [self.state.ship.current_system_id]
+        while queue:
+            system = systems.get(queue.pop(0))
+            if system is None:
+                continue
+            if system.security >= self.INSURANCE_MIN_SECURITY:
+                station = next((b for b in system.bodies if b.station_dockable), None)
+                if station is not None:
+                    return system, station
+            for link in system.connections:
+                if link not in seen:
+                    seen.add(link)
+                    queue.append(link)
+        return None
+
+    def insurance_status(self) -> dict[str, Any] | None:
+        """The Coalition rebuild policy, quoted only while the hull is destroyed."""
+        with self.lock:
+            ship = self.state.ship
+            if ship.hull > 0:
+                return None
+            found = self._insurance_destination()
+            return {
+                "available": found is not None,
+                "deductible": int(ship.credits * self.INSURANCE_DEDUCTIBLE),
+                "destination": found[0].name if found else "",
+                "cargo_lost": sum(int(v) for v in ship.cargo.values()),
+            }
+
+    def insurance_rebuild(self) -> tuple[bool, str]:
+        """Rebuild a destroyed hull at the nearest secure station: cargo and a credit deductible are lost.
+
+        Story, relics, crew and every other progress stay; the hull returns at half strength with
+        full shields and a third of a tank so the rebuilt captain is never stranded.
+        """
+        with self.lock:
+            ship = self.state.ship
+            if ship.hull > 0:
+                return False, "Insurance only pays out for a destroyed hull."
+            found = self._insurance_destination()
+            if found is None:
+                return False, "No secure station answers the insurance beacon."
+            system, station = found
+            deductible = int(ship.credits * self.INSURANCE_DEDUCTIBLE)
+            lost = sum(int(v) for v in ship.cargo.values())
+            msg = (
+                f"COALITION INSURANCE: {ship.ship_class} rebuilt at {station.name}, {system.name} "
+                f"(-{deductible} cr deductible, {lost} cargo units lost)."
+            )
+            new_ship = self._clone_ship(
+                hull=max(1, ship.max_hull // 2),
+                shield=ship.max_shield,
+                fuel=max(ship.fuel, ship.max_fuel // 3),
+                credits=ship.credits - deductible,
+                cargo={},
+                current_system_id=system.id,
+                orbiting_body_id=station.id,
+                landed_body_id=None,
+                travel=None,
+                void_traversal=None,
+                flight_log=tuple(list(ship.flight_log[-19:]) + [msg]),
+            )
+            self.state = self._clone_state(ship=new_ship, active_combat=None)
+            return True, msg
+
     def burn_fuel_cells(self, quantity: int = 1) -> tuple[bool, str]:
         """Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.
 
@@ -8382,6 +8454,7 @@ class SimulationEngine:
                     self.rescue_status()
                     if self.state.ship.fuel * 4 <= self.state.ship.max_fuel else None
                 ),
+                "insurance": self.insurance_status(),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),
