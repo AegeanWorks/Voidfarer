@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `213`
-- **Total Classes**: `484`
+- **Total Python Modules**: `214`
+- **Total Classes**: `485`
 - **Total Top-Level Functions**: `516`
-- **Total Class Methods**: `2483`
-- **Total Source Lines**: `61092`
+- **Total Class Methods**: `2484`
+- **Total Source Lines**: `61116`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`213` module(s))
+- **Indexed**: python (`214` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1005,6 +1005,17 @@
 **Classes:**
 - `class ContractCardsKeepSizeTests`
   - Method `.test_cards_do_not_shrink_in_the_fixed_height_list()`
+
+---
+
+### [`tests/test_creation_first_launch.py`](tests/test_creation_first_launch.py)
+> *Character creation works on a first launch, before any game state has loaded (ADR-286).*
+
+**Size**: `24` lines (`1064` bytes)
+
+**Classes:**
+- `class CreationFirstLaunchTests`
+  - Method `.test_origin_catalog_falls_back_to_the_cached_catalogs()`
 
 ---
 

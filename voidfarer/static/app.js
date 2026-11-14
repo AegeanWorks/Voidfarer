@@ -1303,13 +1303,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             });
         }.bind(this);
 
+        // On a first launch no game state has loaded yet, so fall back to the catalogs fetched at startup.
+        this.catalogs = function(key) {
+            return (this.state && this.state[key]) || (catalogCache && catalogCache[key]) || {};
+        }.bind(this);
+
         // The origin's backstory line, read from the engine's catalog so it can never drift from the grant.
         this.syncBackgroundHint = function() {
             const hint = document.getElementById("charBackgroundHint");
             const select = document.getElementById("charBackground");
             if (!hint || !select) return;
-            const catalog = (this.state && this.state.character_background_catalog) || {};
-            const entry = catalog[String(select.value).toLowerCase()];
+            const entry = this.catalogs("character_background_catalog")[String(select.value).toLowerCase()];
             hint.textContent = entry && entry.description ? entry.description : "";
         }.bind(this);
 
@@ -1362,7 +1366,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const maxSkill = this.charMaxSkill || 10;
             // The chosen origin adds its training after the budget; show which skills it boosts.
             const originId = String((document.getElementById("charBackground") || {}).value || "").toLowerCase();
-            const origin = ((this.state && this.state.character_background_catalog) || {})[originId] || {};
+            const origin = this.catalogs("character_background_catalog")[originId] || {};
             const originName = origin.name || "";
             grid.innerHTML = Object.entries(this.charAttrs).map(([attr, val]) => {
                 const label = attrLabels[attr] || attr.toUpperCase();

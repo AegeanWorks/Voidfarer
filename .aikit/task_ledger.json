@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-menu-status",
+    "task_id": "voidfarer-creation-first-launch",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794658881.0050845,
+    "updated_at": 1794659588.2993226,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,46 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-disabled-buttons",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-disabled-buttons' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794640987.294873,
-      "timestamp_str": "2026-11-14 10:23:07",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-contract-cards",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: stop contract cards shrinking inside the fixed-height list so the claim button and rewards stay inside their row; failing-first CSS test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794641072.05443,
-      "timestamp_str": "2026-11-14 10:24:32",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Measured in Edge: #contractsList is a 380px flex column and cards shrink (scrollHeight 78 > clientHeight 70), so CLAIM REWARD crosses the row divider",
-        "benefits": "Rows keep their padding; the list scrolls instead of squashing",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none; CSS only",
-        "mitigation": "Re-measure scrollHeight vs clientHeight and screenshot"
-      },
-      "plan_digest": "0ba6d685ae2229e8691c568bb07f2badab86f5fa87cac66816074ebf7dd8925b"
-    },
-    {
-      "task_id": "voidfarer-contract-cards",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 contract cards",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794641347.9092638,
-      "timestamp_str": "2026-11-14 10:29:07",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-contract-cards",
       "phase": "completed",
@@ -374,6 +334,64 @@
       "status": "in_progress",
       "timestamp": 1794658881.0050845,
       "timestamp_str": "2026-11-14 15:21:21",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-menu-status",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-menu-status' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794658970.8129044,
+      "timestamp_str": "2026-11-14 15:22:50",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-creation-first-launch",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: character creation reads the origin catalog from the cached /api/catalogs payload when no game state has loaded yet; failing-first source pin and a genuine first-launch browser check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794659158.9056165,
+      "timestamp_str": "2026-11-14 15:25:58",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Real Edge on a fresh load: cockpit.state is null before a game starts, so the origin hint and +N ORIGIN skill tags added earlier never appear on a player's first New Game",
+        "benefits": "The first-run creation screen explains each origin, as designed",
+        "risks": "contract: none; dependency: reuses the global catalogCache already loaded at startup; concurrency: none; state: none",
+        "mitigation": "State catalog still wins when present; verify on a fresh page with no forced state load"
+      },
+      "plan_digest": "07b91d8e9cabe7341cb9ea96654bd57a14f413668523fed0e83120b7912b2584",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-creation-first-launch",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 creation first launch",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794659588.2993226,
+      "timestamp_str": "2026-11-14 15:33:08",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [
