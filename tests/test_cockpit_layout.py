@@ -436,6 +436,29 @@ class TestCadetEarlyTabUnlock(unittest.TestCase):
         self.assertIn('.deck-tab-btn[data-cadet-unlocked="true"] { display: inline-block; }', self.css)
 
 
+class TestArriveNowButton(unittest.TestCase):
+    """The radar target card offers ARRIVE NOW while a transit is underway (ADR-310)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_button_is_hidden_by_default_next_to_the_transit_button(self):
+        self.assertIn('id="btnArriveNow" style="display:none;"', self.html)
+        self.assertLess(self.html.index('id="btnOrbitTarget"'), self.html.index('id="btnArriveNow"'))
+        self.assertLess(self.html.index('id="btnArriveNow"'), self.html.index('id="btnQuantumTarget"'))
+
+    def test_button_follows_the_active_travel_for_any_target_type(self):
+        self.assertIn('this.btnArriveNow.style.display = travel ? "inline-block" : "none";', self.js)
+        self.assertIn("`ARRIVE NOW (${eta}T)`", self.js)
+
+    def test_click_posts_the_arrive_flight_action_and_applies_state_even_when_interrupted(self):
+        self.assertIn('JSON.stringify({ action: "arrive" })', self.js)
+        self.assertIn('"/api/flight/action"', self.js)
+        self.assertIn("if (json.state) this.state = json.state;", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -643,6 +643,7 @@ class CockpitApp {
         this.targetDesc = document.getElementById("targetDesc");
         this.btnOrbitTarget = document.getElementById("btnOrbitTarget");
         this.btnQuantumTarget = document.getElementById("btnQuantumTarget");
+        this.btnArriveNow = document.getElementById("btnArriveNow");
         this.btnLandTarget = document.getElementById("btnLandTarget");
         this.surfaceOps = document.getElementById("surfaceOps");
         this.btnSalvageTarget = document.getElementById("btnSalvageTarget");
@@ -1125,6 +1126,7 @@ class CockpitApp {
         // Target actions
         this.btnOrbitTarget.addEventListener("click", () => this.handleTravelAction("sublight"));
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
+        this.btnArriveNow?.addEventListener("click", () => this.handleArriveNow());
         this.btnRebuildTarget?.addEventListener("click", () => this.handleReconstructAction("credits"));
         this.btnReliefTarget?.addEventListener("click", () => this.handleReconstructAction("relief"));
         this.btnRestoreTarget?.addEventListener("click", () => this.postAction("/api/megastructure/restore", { body_id: this.selectedTarget?.id }));
@@ -6869,6 +6871,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         
         // Show target card when target selected
         if (targetCard) targetCard.style.display = "block";
+        if (this.btnArriveNow) {
+            // Skipping the wait is valid for any target while a sublight transit is underway.
+            const eta = travel ? Math.max(1, (travel.arrival_tick || 0) - (this.state.time?.tick || 0)) : 0;
+            this.btnArriveNow.style.display = travel ? "inline-block" : "none";
+            this.btnArriveNow.textContent = `ARRIVE NOW (${eta}T)`;
+        }
 
         if (this.selectedType === "body") {
             const fresh = this.state.current_system.bodies.find(b => b.id === this.selectedTarget.id);
@@ -10416,6 +10424,25 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
             this.sound?.playDock?.();
             this.travelAnimation = null;
+        }
+    }
+
+    async handleArriveNow() {
+        this.sound.init();
+        try {
+            const res = await apiFetch("/api/flight/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "arrive" })
+            });
+            const json = await res.json();
+            // An interrupted skip still advanced time, so the new state is applied either way.
+            if (json.state) this.state = json.state;
+            this.appendLog(json.message, json.ok ? "system" : "hazard");
+            if (json.ok) this.sound.playChime();
+            this.renderHUD();
+        } catch (e) {
+            this.reportProblem(e.message);
         }
     }
 

@@ -2586,5 +2586,26 @@
     "final_snapshot_digest": "32c159d8e3ae71c36aaad1f8a9ffa12a601e13188801e6d58bff6a587be548ca",
     "final_snapshot_entries": 1329,
     "surface_digest": "0ae62c25a36c7d041153bb25f06aa027a18c1d9171ea74c609dd65a98f01b29b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "69880826b7bb0e7e68428790eee8f11711a3a546",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794683132.502107,
+    "finished_at": 1794683316.8974082,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; arrive/laptop-arrive.png: target card shows TRANSIT ACTIVE (3T) and ARRIVE NOW (3T) in the 2-column grid, no clipping; click arrived at sol_body_2 and hid the button, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "031e81ad7714752dbd3844aaa9b9ed09152882b480b431cfd9d26dfab0fd5f4c",
+    "final_snapshot_entries": 1333,
+    "surface_digest": "3d0275b403ab6e1c924618a5f0e026493570b6205abb89480bb48e0e98c8db1b"
   }
 ]

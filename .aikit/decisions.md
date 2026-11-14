@@ -3077,3 +3077,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: After TRANSIT & ORBIT a beginner had to unpause the clock or press +1 repeatedly until the ship arrived, which reads as a broken or slow game.
 - **Decision**: `SimulationEngine.arrive_now` advances an active sublight transit one tick at a time up to its arrival tick, and stops early with the reason when a decision, pirate, customs check, combat or anomaly freezes flight (`_action_lock_reason`) or the clock is blocked. It is exposed as the `arrive` flight action (REST `/api/flight/action`, CLI and agent catalog, G-012).
 - **Consequences**: Engine, REST and CLI; the radar target-card button follows. No persisted field. Pinned by `tests/test_arrive_now.py`.
+
+### ADR-310: ARRIVE NOW button on the radar target card
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: ADR-309 added the `arrive` flight action; the cockpit still left a beginner waiting out each transit tick by tick.
+- **Decision**: `#btnArriveNow` sits in the target-card action grid between TRANSIT & ORBIT and QUANTUM TRANSIT, hidden until a transit is active and then shown for any selected target type with the remaining ticks (`ARRIVE NOW (3T)`). `handleArriveNow` posts `{action: "arrive"}` to `/api/flight/action` and applies the returned state even when the skip was interrupted, since time still advanced, logging an interruption as a hazard line.
+- **Consequences**: Cockpit only. Verified in real Edge at 1366x768 (`ui-review/arrive/`, 0 console errors): the card showed `TRANSIT ACTIVE (3T)` beside `ARRIVE NOW (3T)`, and a click arrived in orbit at the target and hid the button. Pinned by `TestArriveNowButton`.

@@ -5,23 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794683021.820363,
+    "updated_at": 1794683513.4639974,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-first-10-minutes",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[4/6] Docked REPAIR chip on the HULL card; fuel stranding already covered by ADR-255 (ADR-298); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794678278.1643016,
-      "timestamp_str": "2026-11-14 20:44:38",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-first-10-minutes",
       "phase": "in_progress",
@@ -277,6 +266,17 @@
       "status": "in_progress",
       "timestamp": 1794683021.820363,
       "timestamp_str": "2026-11-14 22:03:41",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-arrive-now",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] ARRIVE NOW button on the radar target card (ADR-310); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794683513.4639974,
+      "timestamp_str": "2026-11-14 22:11:53",
       "agent": "claude:1"
     }
   ]

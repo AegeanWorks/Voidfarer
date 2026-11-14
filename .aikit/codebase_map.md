@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `228`
-- **Total Classes**: `510`
+- **Total Classes**: `511`
 - **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2568`
-- **Total Source Lines**: `62498`
+- **Total Class Methods**: `2572`
+- **Total Source Lines**: `62521`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`228` module(s))
@@ -487,7 +487,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2976` lines (`134439` bytes)
+**Size**: `2999` lines (`135619` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -549,6 +549,11 @@
   - Method `.test_threshold_is_the_first_level_up_and_marks_skills_and_crew()`
   - Method `.test_unlocked_tabs_pass_the_switch_cycle_and_active_tab_guards()`
   - Method `.test_css_keeps_the_rest_locked_and_shows_the_unlocked_pair()`
+- `class TestArriveNowButton` - *The radar target card offers ARRIVE NOW while a transit is underway (ADR-310).*
+  - Method `.setUpClass()`
+  - Method `.test_button_is_hidden_by_default_next_to_the_transit_button()`
+  - Method `.test_button_follows_the_active_travel_for_any_target_type()`
+  - Method `.test_click_posts_the_arrive_flight_action_and_applies_state_even_when_interrupted()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`
