@@ -9403,7 +9403,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     async menuAction(endpoint, successMessage, slotOverride = null) {
         const status = document.getElementById("mainMenuStatus");
         const slot = slotOverride || this.getSelectedSaveSlot();
-        if (status) status.textContent = "TRANSMITTING...";
+        if (status) {
+            status.textContent = "TRANSMITTING...";
+            status.classList.toggle("is-error", false);
+        }
         try {
             const res = await apiFetch(endpoint, {
                 method: "POST",
@@ -9421,7 +9424,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else {
                 this.fetchSaves();
             }
-            if (status) status.textContent = (json.ok ? "OK: " : "ERROR: ") + (json.message || successMessage);
+            if (status) {
+                status.textContent = (json.ok ? "OK: " : "ERROR: ") + (json.message || successMessage);
+                status.classList.toggle("is-error", !json.ok);
+            }
             if (json.ok && ["/api/load", "/api/new-game"].includes(endpoint)) {
                 this.closeMainMenu();
                 this.viewMode = "ORBITS";
@@ -9431,7 +9437,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
             if (json.ok) this.sound.playChime();
         } catch (e) {
-            if (status) status.textContent = `ERROR: ${e.message}`;
+            if (status) {
+                status.textContent = `ERROR: ${e.message}`;
+                status.classList.toggle("is-error", true);
+            }
         }
     }
 

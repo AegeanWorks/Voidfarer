@@ -11037,3 +11037,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* Settings is launched from the main menu (z-index 10000), so it must open above it or its controls are unreachable. */
 #settingsOverlay { z-index: 10100; }
+
+/* A failed menu action (empty slot, failed save) must not read as a success. */
+.main-menu-status.is-error { color: var(--console-red); }

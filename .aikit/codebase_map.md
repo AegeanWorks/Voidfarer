@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `212`
-- **Total Classes**: `483`
+- **Total Python Modules**: `213`
+- **Total Classes**: `484`
 - **Total Top-Level Functions**: `516`
-- **Total Class Methods**: `2482`
-- **Total Source Lines**: `61065`
+- **Total Class Methods**: `2483`
+- **Total Source Lines**: `61092`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`212` module(s))
+- **Indexed**: python (`213` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2384,6 +2384,17 @@
   - Method `.test_motif_is_gated_to_roomy_windows()`
   - Method `.test_motif_never_blocks_the_menu()`
   - Method `.test_only_the_planet_animates_and_reduced_motion_stops_it()`
+
+---
+
+### [`tests/test_menu_status_error.py`](tests/test_menu_status_error.py)
+> *A failed menu action does not read as a success (ADR-285).*
+
+**Size**: `27` lines (`1228` bytes)
+
+**Classes:**
+- `class MenuStatusErrorTests`
+  - Method `.test_error_state_is_styled_announced_and_set()`
 
 ---
 

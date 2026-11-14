@@ -2897,3 +2897,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Walking the first screen in real Edge at 1280x720, clicking SETTINGS in the main menu opened the settings overlay at z-index 5100 underneath the main menu at 10000. The menu stayed displayed, was the topmost element over the settings window, and took every click, so display, audio, gameplay and controls settings could not be reached from the menu that launches them.
 - **Decision**: `#settingsOverlay { z-index: 10100; }`, above the menu. Other overlays keep their order; Esc still closes settings first and leaves the menu.
 - **Consequences**: CSS only. `tests/test_settings_above_menu.py` (new, failing first) compares the two declared z-indexes. Verified in real Edge: the topmost element at the settings window is its own body, a real click toggled a checkbox (true to false), and Esc closed settings while the menu stayed. Added after `ui finish` because the UI guard protects `tests/` during a UI task.
+
+### ADR-285: A failed menu action does not read as a success
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: Clicking LOAD FROM SLOT on an empty slot in real Edge printed "ERROR: No save file is available for slot 'default'." in the same green as every success message, and the status line was not a live region, so assistive technology did not announce results.
+- **Decision**: `menuAction` toggles an `is-error` class on `#mainMenuStatus` (cleared while transmitting, set on a failed reply and on a network error); `.main-menu-status.is-error` uses `--console-red`; the element gains `role="status"`.
+- **Consequences**: Cockpit only. `tests/test_menu_status_error.py` (new, failing first) pins the style, the role and the toggles. Verified in real Edge: failed load `rgb(201, 107, 90)` with the error class and role "status"; a successful save `rgb(143, 191, 159)` with the class cleared. Added after `ui finish` because the UI guard protects `tests/` during a UI task.

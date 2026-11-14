@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-settings-layer",
+    "task_id": "voidfarer-menu-status",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794658495.2216926,
+    "updated_at": 1794658881.0050845,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,46 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-schematic",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-schematic' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794640527.8831918,
-      "timestamp_str": "2026-11-14 10:15:27",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-disabled-buttons",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: dim disabled btn-hud buttons (TRAIN, UNLOCK, INSTALL, HIRE, diplomacy, VENT) so they read as unavailable; failing-first CSS test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794640656.19384,
-      "timestamp_str": "2026-11-14 10:17:36",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Measured in real Edge: every disabled btn-hud keeps opacity 1 and bright gold, so TRAIN 1 SP with 0 skill points looks clickable",
-        "benefits": "Clear affordance on every tab with these buttons; titles already explain why",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none; CSS only, applies to all btn-hud variants",
-        "mitigation": "Opacity range kept legible (0.4-0.65); re-measure and screenshot"
-      },
-      "plan_digest": "bc712f9e41aa0c071cde2829cd96ab41ee75ce5e33f0ca6c7fa951d0b2d177c2"
-    },
-    {
-      "task_id": "voidfarer-disabled-buttons",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 disabled buttons",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794640881.6884172,
-      "timestamp_str": "2026-11-14 10:21:21",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-disabled-buttons",
       "phase": "completed",
@@ -356,6 +316,64 @@
       "status": "in_progress",
       "timestamp": 1794658495.2216926,
       "timestamp_str": "2026-11-14 15:14:55",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-settings-layer",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-settings-layer' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794658591.0864172,
+      "timestamp_str": "2026-11-14 15:16:31",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-menu-status",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: menu status line shows failures in the error colour and is a live region; failing-first source pin and browser check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794658634.2745154,
+      "timestamp_str": "2026-11-14 15:17:14",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Real Edge: LOAD FROM SLOT on an empty slot prints 'ERROR: No save file...' in the same green as success, and the line is not announced to assistive tech",
+        "benefits": "A failed save/load/delete reads as a failure at a glance and is announced",
+        "risks": "contract: none; dependency: none; concurrency: none; state: one CSS class toggled",
+        "mitigation": "Check colour in the browser for failure and success"
+      },
+      "plan_digest": "a7c6d1bd1d1b4e15f8ab24d732fa8c4602fbd9d0d0ea0556dea17dfbc2524b16",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-menu-status",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 menu status",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794658881.0050845,
+      "timestamp_str": "2026-11-14 15:21:21",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [
