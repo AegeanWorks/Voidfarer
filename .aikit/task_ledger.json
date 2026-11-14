@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-tutorial-trade",
+    "task_id": "voidfarer-rail-labels",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794638971.2661097,
+    "updated_at": 1794639709.4913979,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-true-jump-cost",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-true-jump-cost' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794603392.4247272,
-      "timestamp_str": "2026-11-13 23:56:32",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-scoop-auto-open",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: auto-open the more-actions panel for a usable scoop at a low tank, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794603810.2687063,
-      "timestamp_str": "2026-11-14 00:03:30",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "The scoop remedy was hidden behind a collapsed panel",
-        "benefits": "Stranded captains see the scoop",
-        "risks": "contract: none pinned; dependency: reuses applyDisclosure; concurrency: none; state: none",
-        "mitigation": "Once per target, never fights a manual collapse, real Edge probe, ADR-270"
-      },
-      "plan_digest": "a9573690e8425131ff7a91b8ff604acb281161f32d8c9dec6d3841a34358625f"
-    },
-    {
-      "task_id": "voidfarer-scoop-auto-open",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794603810.6597865,
-      "timestamp_str": "2026-11-14 00:03:30",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-scoop-auto-open",
       "phase": "completed",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794638971.2661097,
       "timestamp_str": "2026-11-14 09:49:31",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-tutorial-trade",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-tutorial-trade' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794639060.784095,
+      "timestamp_str": "2026-11-14 09:51:00",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-rail-labels",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: shorten the two sidebar labels that overflow the rail beside a badge (AI COMMAND, CAPTAIN'S LOG); failing-first label-length test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794639397.2956514,
+      "timestamp_str": "2026-11-14 09:56:37",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Measured in real Edge: CAPTAIN'S LOG overflows the 138px rail by 13px and AI COMMAND by 5px, clipping the unread badge",
+        "benefits": "Badges stay visible so unread counts are never hidden",
+        "risks": "contract: tab ids and handlers untouched; dependency: none; concurrency: none; state: none; label wording changes only",
+        "mitigation": "Keep ids/titles; full tooltip keeps the long name; test pins max length"
+      },
+      "plan_digest": "baacbbea00a3e8f15e2db31aeffb6e1d2165ac8b0c73f80eb43aff3dfe171e1e"
+    },
+    {
+      "task_id": "voidfarer-rail-labels",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 rail labels",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794639709.4913979,
+      "timestamp_str": "2026-11-14 10:01:49",
       "agent": "claude:1",
       "checklists": "passed"
     }

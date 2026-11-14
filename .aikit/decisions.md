@@ -2832,3 +2832,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Consequences**: Text only. `tests/test_tutorial_trade_hint.py` (new, failing first: 1 failure) pins that the hint requires a station and names the Citadel, keeps the BUY and Commerce wording, and leaves the other milestone hints unchanged.
 
 - **UI commit (second part)**: reproducing the dead end in the real tab showed that an explanation already existed (`#noMarketMsg`: "NO ORBITAL EXCHANGE ... Orbit a space station or colony to trade.") but sat at the very bottom of the Commerce tab, below an empty table, the lot buttons, the category filters and the auto-trade broker, so it was below the fold. My first attempt, an explanatory table row, was the wrong place (the table body is cleared in that branch) and was replaced. The tab now gets a `no-exchange` state that hides the lot bar, category filters, table, auto-trade panel and freight panel, so the message leads, and the message gains a line naming up to three stations in the system in orbit order with a "(+N more)" count ("Stations in this system: ..."). The category-filter-empty case keeps a small table row ("No goods in this category here."). `tests/test_market_empty_state.py` (new, failing first: 5 failures) was added after `ui finish` because the UI guard protects `tests/` during a task. Verified by replaying the tutorial with real clicks in Edge to the Debris Field.
+
+### ADR-276: Sidebar tab labels fit beside their unread badge
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: Measured in real Edge after 120 lived steps: the 138px sidebar rail clipped the badge of "CAPTAIN'S LOG" (13px past the edge) and "AI COMMAND" (5px), so an unread count was hidden exactly when it mattered.
+- **Decision**: The two tabs are labelled "LOGBOOK" and "CAPTAINS"; their `title` tooltips keep the full names. Tab ids and handlers are untouched.
+- **Consequences**: Cockpit markup only. `tests/test_rail_labels_fit.py` (new, failing first) caps every rail label at 9 characters, the longest measured to fit (CONTRACTS). The test was added after `ui finish` because the UI guard protects `tests/` during a UI task.

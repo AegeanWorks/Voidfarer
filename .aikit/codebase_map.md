@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `202`
-- **Total Classes**: `473`
+- **Total Python Modules**: `203`
+- **Total Classes**: `474`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2468`
-- **Total Source Lines**: `60741`
+- **Total Class Methods**: `2469`
+- **Total Source Lines**: `60765`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`202` module(s))
+- **Indexed**: python (`203` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2811,6 +2811,17 @@
   - Method `.test_full_text_is_tried_before_the_short_form()`
   - Method `.test_extra_rows_exist_beyond_the_four_original_positions()`
   - Method `.test_priority_labels_still_force_the_full_text()`
+
+---
+
+### [`tests/test_rail_labels_fit.py`](tests/test_rail_labels_fit.py)
+> *Every sidebar tab label must fit beside its notification badge (ADR-276).*
+
+**Size**: `24` lines (`878` bytes)
+
+**Classes:**
+- `class RailLabelsFitTests`
+  - Method `.test_labels_fit_beside_badges()`
 
 ---
 
