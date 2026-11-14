@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-skill-buttons",
+    "task_id": "voidfarer-tutorial-trade",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794638259.2529109,
+    "updated_at": 1794638477.1527734,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-radar-contrast",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794588111.4305174,
-      "timestamp_str": "2026-11-13 19:41:51",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-radar-contrast",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-radar-contrast' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794602157.515864,
-      "timestamp_str": "2026-11-13 23:35:57",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-true-jump-cost",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: one jump cost formula shared by jump and every estimate, failing-first tests",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794602595.071061,
-      "timestamp_str": "2026-11-13 23:43:15",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Planner estimate disagreed with real jump spend in 47 of 48 lanes",
-        "benefits": "Trustworthy cockpit, CLI and rescue numbers",
-        "risks": "contract: plan_route estimate values change; dependency: none; concurrency: engine lock reused; state: none",
-        "mitigation": "Formula moved unchanged, jump behaviour pinned by tests, real Edge proof, ADR-269"
-      },
-      "plan_digest": "f68ac69f0958aa52c72b93b4780fbfbe7523d5637726ba145a49e80d01fee6ea"
-    },
     {
       "task_id": "voidfarer-true-jump-cost",
       "phase": "phase 4",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794638259.2529109,
       "timestamp_str": "2026-11-14 09:37:39",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-skill-buttons",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-skill-buttons' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794638356.9870687,
+      "timestamp_str": "2026-11-14 09:39:16",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-tutorial-trade",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 trade milestone hint requires a station; M2 Commerce empty-state message as a UI task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794638476.7573404,
+      "timestamp_str": "2026-11-14 09:41:16",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Players parked at a wilderness body hit an unexplained empty Commerce tab at milestone 4",
+        "benefits": "A visible way forward in the tutorial",
+        "risks": "contract: hint wording pinned by a new test; dependency: none; concurrency: none; state: none",
+        "mitigation": "Other hints verified unchanged, real click probe, ADR-275"
+      },
+      "plan_digest": "959ce3e96b88dd65cc621242f3a7ea1414d80bd3b11eb99b4fb1c5d26d91072f"
+    },
+    {
+      "task_id": "voidfarer-tutorial-trade",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] hint Phase 4 passed. checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794638477.1527734,
+      "timestamp_str": "2026-11-14 09:41:17",
       "agent": "claude:1",
       "checklists": "passed"
     }

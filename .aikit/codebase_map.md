@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `200`
-- **Total Classes**: `471`
+- **Total Python Modules**: `201`
+- **Total Classes**: `472`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2459`
-- **Total Source Lines**: `60663`
+- **Total Class Methods**: `2463`
+- **Total Source Lines**: `60694`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`200` module(s))
+- **Indexed**: python (`201` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3567,6 +3567,20 @@
 
 ---
 
+### [`tests/test_tutorial_trade_hint.py`](tests/test_tutorial_trade_hint.py)
+> *The trade milestone tells the player they need a station, so a player parked at a wilderness body is not stranded.*
+
+**Size**: `31` lines (`1132` bytes)
+
+**Classes:**
+- `class TestTutorialTradeHint`
+  - Method `._step(step_id)`
+  - Method `.test_the_trade_hint_says_a_station_is_required_and_names_the_start_station()`
+  - Method `.test_the_trade_hint_still_names_the_live_controls()`
+  - Method `.test_the_other_milestone_hints_are_unchanged()`
+
+---
+
 ### [`tests/test_ui_audit.py`](tests/test_ui_audit.py)
 > *The headless cockpit audit has deterministic viewport, parsing and wrapper helpers.*
 
@@ -5309,7 +5323,7 @@
 ### [`voidfarer/story.py`](voidfarer/story.py)
 > *Interactive Cadet Flight Academy tutorial and branching narrative campaign systems.*
 
-**Size**: `541` lines (`24681` bytes)
+**Size**: `541` lines (`24750` bytes)
 
 **Functions:**
 - `def generate_initial_tutorial()` - *Construct a fresh Cadet Flight Academy tutorial state.*

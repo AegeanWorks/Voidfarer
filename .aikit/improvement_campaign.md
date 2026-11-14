@@ -1207,3 +1207,7 @@ Walking character creation found 2 of 6 dropdown origins granting nothing and 2 
 ### Sixty-seventh pass — first-run walkthrough: dead skill buttons
 
 Step 2 of Character Creation had never worked: the +/- buttons were not wired (ADR-274). Found by clicking them as a player; fixed with a delegated listener, full-row re-enable, accessible names, origin tags and an unspent-points note. Proof: `ui-review/goal-skills2`, `goal-skills3/step2.png`.
+
+### Sixty-eighth pass — tutorial walkthrough: the trade dead end
+
+Played milestones 1 to 3 with real clicks; milestone 4 stranded a player parked at a wilderness body behind an empty, unexplained Commerce tab (ADR-275). Hint fixed first; the empty-state message follows.

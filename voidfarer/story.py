@@ -47,7 +47,7 @@ INITIAL_TUTORIAL_STEPS: tuple[TutorialStep, ...] = (
         id="step_trade",
         title="Orbital Station Commerce",
         instruction="Access a station commodity exchange and execute a buy or sell trade.",
-        hint="Run `buy fuel_cells 1` or click BUY on the Commerce terminal.",
+        hint="Orbit a station first (the Citadel, where you started, is one); then run `buy fuel_cells 1` or click BUY on the Commerce terminal.",
         reward_credits=300,
         reward_xp=120,
     ),
