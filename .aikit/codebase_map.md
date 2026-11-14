@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `203`
-- **Total Classes**: `474`
+- **Total Python Modules**: `204`
+- **Total Classes**: `475`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2469`
-- **Total Source Lines**: `60765`
+- **Total Class Methods**: `2471`
+- **Total Source Lines**: `60794`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`203` module(s))
+- **Indexed**: python (`204` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3379,6 +3379,17 @@
 
 ---
 
+### [`tests/test_story_objective_names.py`](tests/test_story_objective_names.py)
+> *Story objectives name systems the way the galaxy map does (ADR-277).*
+
+**Size**: `23` lines (`706` bytes)
+
+**Classes:**
+- `class StoryObjectiveNamesTests`
+  - Method `.test_travel_objective_uses_display_names()`
+
+---
+
 ### [`tests/test_surface_ops.py`](tests/test_surface_ops.py)
 > *Unified surface report/action, REST and CLI tests.*
 
@@ -4310,7 +4321,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10587` lines (`522910` bytes)
+**Size**: `10593` lines (`523256` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4490,6 +4501,7 @@
   - Method `.claim_contract(contract_id)` - *Claim rewards for a fulfilled contract and immediately draw a new assignment.*
   - Method `.swap_contract_offer(offer_id, drop_id)` - *Swap a pending contract offer into the active board, free and unpunished.*
   - Method `.unlock_talent(talent_id)` - *Unlock a Pilot Specialization Perk using available talent points.*
+  - Method `._system_display_name(system_id)` - *The galaxy-map name of a system, or a readable form of its id.*
   - Method `._story_unmet_requirements(requirements, *, chapter)` - *List human-readable unmet gating conditions for a chapter or choice.*
   - Method `.story_status()` - *Objective snapshot of the narrative campaign for CLI, REST, and cockpit parity.*
   - Method `.make_story_choice(choice_id)` - *Resolve a branching story dilemma in the active campaign chapter.*

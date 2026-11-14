@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-rail-labels",
+    "task_id": "voidfarer-story-names",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794639709.4913979,
+    "updated_at": 1794639912.7461262,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-scoop-auto-open",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-scoop-auto-open' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794603905.3200524,
-      "timestamp_str": "2026-11-14 00:05:05",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-outpost-text",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: readable outpost goods, depot delivery note and shortfall tooltip, failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794604463.9932206,
-      "timestamp_str": "2026-11-14 00:14:23",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Outpost cards showed raw ids, hid the delivery target and gave no shortfall reason",
-        "benefits": "Players understand outputs and why they cannot build",
-        "risks": "contract: none pinned; dependency: none; concurrency: none; state: none",
-        "mitigation": "Promises audited true first, text-only change, ADR-271"
-      },
-      "plan_digest": "9800db67aff467acd42f656994dd63943a5a9bbdd6bb7d1ac7a33019009d29c2"
-    },
-    {
-      "task_id": "voidfarer-outpost-text",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794604464.953197,
-      "timestamp_str": "2026-11-14 00:14:24",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-outpost-text",
       "phase": "completed",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794639709.4913979,
       "timestamp_str": "2026-11-14 10:01:49",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-rail-labels",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-rail-labels' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794639801.4525828,
+      "timestamp_str": "2026-11-14 10:03:21",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-story-names",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: story travel objectives use galaxy display names, not title-cased ids; failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794639901.4983966,
+      "timestamp_str": "2026-11-14 10:05:01",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "The Comms tab showed 'currently in Alpha_Centauri' and 'Sirius System' for 'Sirius Prime'",
+        "benefits": "Objectives match the names on the galaxy map",
+        "risks": "contract: message text only; dependency: none; concurrency: none; state: none",
+        "mitigation": "Existing story test assertions updated to real names, same strength"
+      },
+      "plan_digest": "e497afff2df508d53db32eb70db80d8ab7628fed580eb13c45f74e25a63d420b"
+    },
+    {
+      "task_id": "voidfarer-story-names",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 story names",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794639912.7461262,
+      "timestamp_str": "2026-11-14 10:05:12",
       "agent": "claude:1",
       "checklists": "passed"
     }

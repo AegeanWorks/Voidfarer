@@ -275,7 +275,7 @@ class TestStoryAndTutorial(unittest.TestCase):
         # Act II target is Sirius; attempting choice in Sol must be rejected
         ok, msg = self.engine.make_story_choice("choice_salvage_core")
         self.assertFalse(ok)
-        self.assertIn("Travel to Sirius System", msg)
+        self.assertIn("Travel to Sirius Prime", msg)
 
         # Jump to Sirius
         ok, msg = self.engine.jump("sirius")
@@ -290,7 +290,7 @@ class TestStoryAndTutorial(unittest.TestCase):
         # Act III target is Vega; attempting choice in Sirius must be rejected
         ok, msg = self.engine.make_story_choice("choice_unleash_gateways")
         self.assertFalse(ok)
-        self.assertIn("Travel to Vega System", msg)
+        self.assertIn("Travel to Vega Outpost", msg)
 
         # Ensure sufficient fuel for jump to Vega
         with self.engine.lock:

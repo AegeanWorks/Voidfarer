@@ -7567,6 +7567,13 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship)
             return True, f"Specialization unlocked: {talent['name']}."
 
+    def _system_display_name(self, system_id: str) -> str:
+        """The galaxy-map name of a system, or a readable form of its id."""
+        system = self.state.systems.get(system_id)
+        if system is not None and system.name:
+            return system.name
+        return system_id.replace("_", " ").title()
+
     def _story_unmet_requirements(
         self,
         requirements: StoryRequirements | None,
@@ -7580,10 +7587,9 @@ class SimulationEngine:
         unmet: list[str] = []
         if chapter is not None:
             if chapter.target_system_id and self.state.ship.current_system_id != chapter.target_system_id:
-                unmet.append(
-                    f"Travel to {chapter.target_system_id.title()} System "
-                    f"(currently in {self.state.ship.current_system_id.title()})"
-                )
+                target = self._system_display_name(chapter.target_system_id)
+                here = self._system_display_name(self.state.ship.current_system_id)
+                unmet.append(f"Travel to {target} (currently in {here})")
         if requirements is None:
             return unmet
         for flag in requirements.required_flags:

@@ -2839,3 +2839,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Measured in real Edge after 120 lived steps: the 138px sidebar rail clipped the badge of "CAPTAIN'S LOG" (13px past the edge) and "AI COMMAND" (5px), so an unread count was hidden exactly when it mattered.
 - **Decision**: The two tabs are labelled "LOGBOOK" and "CAPTAINS"; their `title` tooltips keep the full names. Tab ids and handlers are untouched.
 - **Consequences**: Cockpit markup only. `tests/test_rail_labels_fit.py` (new, failing first) caps every rail label at 9 characters, the longest measured to fit (CONTRACTS). The test was added after `ui finish` because the UI guard protects `tests/` during a UI task.
+
+### ADR-277: Story travel objectives use the galaxy-map name of a system
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: Reviewing the Comms tab showed the objective "Travel to Sol System (currently in Alpha_Centauri)": the engine title-cased raw ids, leaking an underscore and inventing names ("Sirius System" for the map's "Sirius Prime", "Vega System" for "Vega Outpost").
+- **Decision**: `_story_unmet_requirements` asks the new `_system_display_name` for the real system name and no longer appends " System".
+- **Consequences**: Message text only. `tests/test_story_objective_names.py` (new, failing first) pins the display names. Two assertions in `tests/test_story.py` named the old wrong text ("Travel to Sirius System", "Travel to Vega System"); they now assert "Travel to Sirius Prime" and "Travel to Vega Outpost", the same check on the same message, not weakened.
