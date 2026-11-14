@@ -4964,6 +4964,37 @@ class SimulationEngine:
             ),
         )
 
+    def _sale_multipliers(self, commodity_id: str) -> tuple[float, float]:
+        """The trade-margin and corporate-specialty multipliers a sale of this commodity here earns.
+
+        One source for the sale itself and for the net price the Commerce tab displays.
+        """
+        faction_id = get_faction_id_from_name(self.current_system.faction)
+        standing = self.state.ship.faction_standings.get(faction_id, 0)
+        passives = calculate_passive_multipliers(self.state.ship)
+        equipment = self._combined_equipment()
+        faction_perks = get_faction_service_perks(faction_id, standing)
+        margin_mult = passives.get("trade_margin", 1.0) * (
+            1.0
+            + equipment["trade_margin"]
+            + float(self._map_effects()["trade_margin"])
+            + len(self.state.ship.allies) * 0.05
+            + self._skill("trade")
+            + float(faction_perks["trade_margin"])
+        )
+        corp_mult = 1.0
+        dom_corp_id = self.current_system.dominant_corp
+        if dom_corp_id:
+            corp = get_corporation(dom_corp_id)
+            if corp and corp.specialty_commodity == commodity_id:
+                corp_mult = 1.0 + corp.bonus_trade_margin
+        return max(0.25, margin_mult), corp_mult
+
+    def net_sell_price(self, commodity_id: str, quoted: int) -> int:
+        """What one unit of a normal sale pays after the margin and specialty multipliers."""
+        margin_mult, corp_mult = self._sale_multipliers(commodity_id)
+        return int(quoted * margin_mult * corp_mult)
+
     def trade(self, commodity_id: str, quantity: int, is_buy: bool) -> tuple[bool, str]:
         """Execute buy or sell commodity order at orbiting market."""
         with self.lock:
@@ -5045,23 +5076,12 @@ class SimulationEngine:
                 if owned < quantity:
                     return False, f"Insufficient inventory: you have {owned} units, tried to sell {quantity}."
 
-                map_trade_bonus = float(self._map_effects()["trade_margin"])
-                margin_mult = passives.get("trade_margin", 1.0) * (
-                    1.0
-                    + equipment["trade_margin"]
-                    + map_trade_bonus
-                    + len(self.state.ship.allies) * 0.05
-                    + self._skill("trade")
-                    + float(faction_perks["trade_margin"])
-                )
-                margin_mult = max(0.25, margin_mult)
-                corp_mult = 1.0
+                margin_mult, corp_mult = self._sale_multipliers(commodity_id)
                 corp_note = ""
                 dom_corp_id = self.current_system.dominant_corp
                 if dom_corp_id:
                     corp = get_corporation(dom_corp_id)
                     if corp and corp.specialty_commodity == commodity_id:
-                        corp_mult = 1.0 + corp.bonus_trade_margin
                         corp_note = f" [{corp.name} specialty: +{int(corp.bonus_trade_margin*100)}%]"
                         new_corp_standings[dom_corp_id] = min(100, new_corp_standings.get(dom_corp_id, 0) + 2)
 
@@ -7893,6 +7913,7 @@ class SimulationEngine:
                         "category": q.category,
                         "buy_price": q.buy_price,
                         "sell_price": q.sell_price,
+                        "sell_price_net": self.net_sell_price(q.commodity_id, q.sell_price),
                         "supply": q.supply,
                         "demand": q.demand,
                         "max_buy": self.max_trade_quantity(q.commodity_id, is_buy=True),

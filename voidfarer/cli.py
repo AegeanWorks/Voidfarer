@@ -530,7 +530,7 @@ def cmd_market(engine: SimulationEngine) -> int:
     cargo = engine.state.ship.cargo
     for q in quotes:
         hold_qty = cargo.get(q.commodity_id, 0)
-        print(f"{q.name:<22} {GREEN}{q.buy_price:>6} cr{RESET} {YELLOW}{q.sell_price:>6} cr{RESET} {q.supply:>8} {q.demand:>8} {BOLD}{hold_qty:>8}{RESET}")
+        print(f"{q.name:<22} {GREEN}{q.buy_price:>6} cr{RESET} {YELLOW}{engine.net_sell_price(q.commodity_id, q.sell_price):>6} cr{RESET} {q.supply:>8} {q.demand:>8} {BOLD}{hold_qty:>8}{RESET}")
     print(f"{'-' * 70}")
     return 0
 

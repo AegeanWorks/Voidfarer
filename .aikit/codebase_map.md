@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `208`
-- **Total Classes**: `479`
-- **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2475`
-- **Total Source Lines**: `60905`
+- **Total Python Modules**: `209`
+- **Total Classes**: `480`
+- **Total Top-Level Functions**: `515`
+- **Total Class Methods**: `2479`
+- **Total Source Lines**: `60979`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`208` module(s))
+- **Indexed**: python (`209` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3046,6 +3046,21 @@
 
 ---
 
+### [`tests/test_sell_price_net.py`](tests/test_sell_price_net.py)
+> *The Commerce quote reports what a sale actually pays (ADR-282).*
+
+**Size**: `53` lines (`1933` bytes)
+
+**Classes:**
+- `class SellPriceNetTests`
+  - Method `.test_net_price_matches_a_one_unit_sale_for_every_commodity()`
+  - Method `.test_cli_market_prints_the_net_price()`
+
+**Functions:**
+- `def _docked_engine(cargo)`
+
+---
+
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
@@ -4105,7 +4120,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4841` lines (`238532` bytes)
+**Size**: `4841` lines (`238571` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -4365,7 +4380,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10593` lines (`523256` bytes)
+**Size**: `10614` lines (`524384` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4507,6 +4522,8 @@
   - Method `.set_quantum_automation(enabled, min_net)` - *Configure automatic quantum freight while docked.*
   - Method `.get_quantum_automation_report()`
   - Method `._run_quantum_automation()` - *Ship surplus cargo along the best qualifying route on a cooldown.*
+  - Method `._sale_multipliers(commodity_id)` - *The trade-margin and corporate-specialty multipliers a sale of this commodity here earns.*
+  - Method `.net_sell_price(commodity_id, quoted)` - *What one unit of a normal sale pays after the margin and specialty multipliers.*
   - Method `.trade(commodity_id, quantity, is_buy)` - *Execute buy or sell commodity order at orbiting market.*
   - Method `._destination_market_body(system)`
   - Method `._quantum_fee(commodity, quantity, jumps)`
