@@ -356,6 +356,7 @@
                 <strong class="reward-val" id="cadetMilestoneReward">+250 CR / +100 XP</strong>
             </div>
             <div class="cadet-actions">
+                <button class="btn-cadet-guide" id="btnCadetGuide" title="Position ship and open the active milestone control">GUIDE ME</button>
                 <button class="btn-cadet-skip" id="btnSkipCadet" title="Dismiss flight academy tutorial">SKIP TUTORIAL</button>
             </div>
         </div>
@@ -433,24 +434,27 @@
                             </div>
                         </div>
 
-                        <!-- Order lot: every BUY/SELL in the table uses it; Shift+click is always MAX -->
-                        <div class="market-lot-bar" id="marketLotBar" role="group" aria-label="Order lot size">
-                            <span class="market-lot-label">ORDER LOT</span>
-                            <button class="market-lot-btn" data-lot="1">×1</button>
-                            <button class="market-lot-btn" data-lot="5">×5</button>
-                            <button class="market-lot-btn" data-lot="10">×10</button>
-                            <button class="market-lot-btn" data-lot="max">MAX</button>
-                            <span class="market-lot-hint">⇧ CLICK = MAX</span>
-                        </div>
+                        <button class="trade-disclosure-toggle" id="btnToggleMarketFilters" data-label="LOT &amp; CATEGORY FILTERS" aria-expanded="false" aria-controls="marketFilterDetails" title="Show or hide bulk order lot sizes and commodity category filters">SHOW LOT &amp; CATEGORY FILTERS</button>
+                        <div id="marketFilterDetails" hidden>
+                            <!-- Order lot: every BUY/SELL in the table uses it; Shift+click is always MAX -->
+                            <div class="market-lot-bar" id="marketLotBar" role="group" aria-label="Order lot size">
+                                <span class="market-lot-label">ORDER LOT</span>
+                                <button class="market-lot-btn" data-lot="1">×1</button>
+                                <button class="market-lot-btn" data-lot="5">×5</button>
+                                <button class="market-lot-btn" data-lot="10">×10</button>
+                                <button class="market-lot-btn" data-lot="max">MAX</button>
+                                <span class="market-lot-hint">⇧ CLICK = MAX</span>
+                            </div>
 
-                        <!-- Commodity Category Filter Pills -->
-                        <div class="market-category-filters" id="marketCategoryFilters" role="group" aria-label="Commodity category filters">
-                            <button class="market-cat-pill active" data-action="filter-cat" data-cat="all">ALL</button>
-                            <button class="market-cat-pill" data-action="filter-cat" data-cat="ore">ORE</button>
-                            <button class="market-cat-pill" data-action="filter-cat" data-cat="tech">TECH</button>
-                            <button class="market-cat-pill" data-action="filter-cat" data-cat="food">FOOD</button>
-                            <button class="market-cat-pill" data-action="filter-cat" data-cat="medi">MED</button>
-                            <button class="market-cat-pill" data-action="filter-cat" data-cat="cont">CONTRABAND</button>
+                            <!-- Commodity Category Filter Pills -->
+                            <div class="market-category-filters" id="marketCategoryFilters" role="group" aria-label="Commodity category filters">
+                                <button class="market-cat-pill active" data-action="filter-cat" data-cat="all">ALL</button>
+                                <button class="market-cat-pill" data-action="filter-cat" data-cat="ore">ORE</button>
+                                <button class="market-cat-pill" data-action="filter-cat" data-cat="tech">TECH</button>
+                                <button class="market-cat-pill" data-action="filter-cat" data-cat="food">FOOD</button>
+                                <button class="market-cat-pill" data-action="filter-cat" data-cat="medi">MED</button>
+                                <button class="market-cat-pill" data-action="filter-cat" data-cat="cont">CONTRABAND</button>
+                            </div>
                         </div>
 
                         <!-- Commodity Exchange List -->
@@ -599,17 +603,20 @@
                         <div class="fleet-manager-box">
                             <h4 class="commission-title">FLEET MANAGER // ESCORT WING</h4>
                             <div class="fleet-upkeep-line" id="fleetUpkeepLine">Fleet upkeep: -- cr/month</div>
-                            <div class="fleet-stance-row" id="fleetStanceRow" role="group" aria-label="Fleet battle stance">
-                                <span class="fleet-stance-label">BATTLE STANCE</span>
-                                <div class="fleet-stance-actions">
-                                    <button class="btn-hud fleet-stance-btn" id="btnFleetStanceBalanced" data-fleet-stance="balanced" aria-pressed="true">BALANCED</button>
-                                    <button class="btn-hud fleet-stance-btn" id="btnFleetStanceAggressive" data-fleet-stance="aggressive" aria-pressed="false">AGGRESSIVE</button>
-                                    <button class="btn-hud fleet-stance-btn" id="btnFleetStanceDefensive" data-fleet-stance="defensive" aria-pressed="false">DEFENSIVE</button>
+                            <button class="fleet-disclosure-toggle" id="btnToggleEscorts" data-label="ESCORT WING" aria-expanded="false" aria-controls="escortDetails" title="Show or hide escort wing battle stance and ship procurement">SHOW ESCORT WING</button>
+                            <div id="escortDetails" hidden>
+                                <div class="fleet-stance-row" id="fleetStanceRow" role="group" aria-label="Fleet battle stance">
+                                    <span class="fleet-stance-label">BATTLE STANCE</span>
+                                    <div class="fleet-stance-actions">
+                                        <button class="btn-hud fleet-stance-btn" id="btnFleetStanceBalanced" data-fleet-stance="balanced" aria-pressed="true">BALANCED</button>
+                                        <button class="btn-hud fleet-stance-btn" id="btnFleetStanceAggressive" data-fleet-stance="aggressive" aria-pressed="false">AGGRESSIVE</button>
+                                        <button class="btn-hud fleet-stance-btn" id="btnFleetStanceDefensive" data-fleet-stance="defensive" aria-pressed="false">DEFENSIVE</button>
+                                    </div>
+                                    <span class="fleet-stance-hint" id="fleetStanceHint">Even damage and evasion.</span>
                                 </div>
-                                <span class="fleet-stance-hint" id="fleetStanceHint">Even damage and evasion.</span>
+                                <div class="fleet-ship-roster" id="fleetShipRoster"></div>
+                                <div class="escort-shop-grid" id="escortShopGrid"></div>
                             </div>
-                            <div class="fleet-ship-roster" id="fleetShipRoster"></div>
-                            <div class="escort-shop-grid" id="escortShopGrid"></div>
                         </div>
 
                         <!-- Commission New Drone -->
@@ -838,10 +845,13 @@
                                 <span>FIELD MUNITIONS &amp; REPAIR FABRICATION</span>
                                 <small>// TITANIUM ALLOY BLUEPRINTS</small>
                             </div>
-                            <div class="fabrication-actions">
-                                <button class="btn-fabricate" id="btnFabricatePatch" title="Synthesize an emergency armor patch kit from 1x titanium alloy (+25 Hull)">⚙ FABRICATE ARMOR PATCH (1x Ti)</button>
-                                <button class="btn-fabricate" id="btnFabricateFuel" title="Synthesize an emergency quantum fuel pack from 1x titanium alloy (+25 Fuel)">⚡ FABRICATE FUEL PACK (1x Ti)</button>
-                                <button class="btn-fabricate" id="btnBurnCells" title="Burn a hold Quantum Fuel Cell in the drive injectors (+4 Fuel). Dearer than a station refuel, but works anywhere.">✦ BURN FUEL CELL</button>
+                            <button class="ship-disclosure-toggle" id="btnToggleFabrication" data-label="FIELD FABRICATION" aria-expanded="false" aria-controls="fabricationDetails" title="Show or hide field munitions and fuel fabrication">SHOW FIELD FABRICATION</button>
+                            <div id="fabricationDetails" hidden>
+                                <div class="fabrication-actions">
+                                    <button class="btn-fabricate" id="btnFabricatePatch" title="Synthesize an emergency armor patch kit from 1x titanium alloy (+25 Hull)">⚙ FABRICATE ARMOR PATCH (1x Ti)</button>
+                                    <button class="btn-fabricate" id="btnFabricateFuel" title="Synthesize an emergency quantum fuel pack from 1x titanium alloy (+25 Fuel)">⚡ FABRICATE FUEL PACK (1x Ti)</button>
+                                    <button class="btn-fabricate" id="btnBurnCells" title="Burn a hold Quantum Fuel Cell in the drive injectors (+4 Fuel). Dearer than a station refuel, but works anywhere.">✦ BURN FUEL CELL</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -978,7 +988,8 @@
                                 </div>
                                 <span class="badge-arch" id="voidStatusBadge">VOID DRIVE OFFLINE</span>
                             </div>
-                            <div class="void-body" id="voidBody">
+                            <button class="section-disclosure-toggle" id="btnToggleVoid" data-label="VOID TRAVERSAL" aria-expanded="false" aria-controls="voidBody" title="Show or hide the Hollow Between void traversal controls">SHOW VOID TRAVERSAL</button>
+                            <div class="void-body" id="voidBody" hidden>
                                 <!-- Populated dynamically by app.js -->
                             </div>
                         </div>
@@ -989,11 +1000,14 @@
                                 <span>DECRYPTED COMMS STREAM</span>
                                 <small id="commsLogCount">0 TRANSMISSIONS</small>
                             </div>
-                            <div class="comms-oscilloscope-container">
-                                <canvas class="comms-oscilloscope-canvas" id="commsOscilloscope" width="340" height="42"></canvas>
-                            </div>
-                            <div class="transmissions-stream" id="transmissionsStream">
-                                <!-- Populated dynamically with character avatars, badges, and typewriter effect -->
+                            <button class="section-disclosure-toggle" id="btnToggleTransmissions" data-label="COMMS STREAM" aria-expanded="false" aria-controls="transmissionsDetails" title="Show or hide decrypted comms stream history">SHOW COMMS STREAM</button>
+                            <div id="transmissionsDetails" hidden>
+                                <div class="comms-oscilloscope-container">
+                                    <canvas class="comms-oscilloscope-canvas" id="commsOscilloscope" width="340" height="42"></canvas>
+                                </div>
+                                <div class="transmissions-stream" id="transmissionsStream">
+                                    <!-- Populated dynamically with character avatars, badges, and typewriter effect -->
+                                </div>
                             </div>
                         </div>
 

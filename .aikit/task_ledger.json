@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-flexible-cadet-academy",
+    "task_id": "voidfarer-beginner-cockpit-compaction",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794672515.5871704,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794673462.359311,
     "owner": "antigravity:goal",
     "started_by": "antigravity:goal",
     "continuations": [],
@@ -14,50 +14,9 @@
         "name": "voidfarer",
         "path": "projects/voidfarer"
       }
-    ],
-    "completed_at": 1794672516.1751966
+    ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-origin-cap",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-origin-cap' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794660880.1922529,
-      "timestamp_str": "2026-11-14 15:54:40",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-market-gaps",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: compress the archetype price swing and the stock-factor clamp so the best neighbouring-market lane pays at most about 2x while ordinary good lanes stay profitable; re-measure credit trajectories",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794660966.206328,
-      "timestamp_str": "2026-11-14 15:56:06",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Measured: a greedy trader compounds 2,000 to ~17k by trip 3 and ~86k by trip 8 on lanes up to 3.05x; every ship (4.5k to 12k), upgrade (max 2.6k) and escort (max 9.8k) is bought within a few jumps",
-        "benefits": "Progression content stays meaningful for far longer; route-finding still pays",
-        "risks": "contract: quotes and API unchanged in shape, values change; dependency: tests that pin exact prices; concurrency: none; state: saves keep stockpiles, prices shift after load",
-        "mitigation": "Full suite and mechanics gate; tail-gap test; before/after trajectory measurement recorded in the ADR"
-      },
-      "plan_digest": "7e36619b7a77e267b9088994cb8998029b17773b8bef7df888b91f249c967333",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-market-gaps",
       "phase": "phase 4",
@@ -400,6 +359,48 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-beginner-cockpit-compaction",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Add GUIDE ME button on Cadet Academy banner and collapse advanced sub-panels in Commerce, Fleet, Ship, and Story tabs by default",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794672703.5111566,
+      "timestamp_str": "2026-11-14 19:11:43",
+      "agent": "antigravity:goal",
+      "impact_assessment": {
+        "why": "Beginners face tall scrolling panels in Commerce, Fleet, Ship, and Story with advanced sub-mechanics expanded by default, and the Cadet Academy banner lacked a one-click control to navigate to or auto-dock for the active step",
+        "benefits": "Default Commerce, Fleet, Ship, and Story tabs fit cleanly at 1280x720 without scrolling, and clicking GUIDE ME on the Cadet Academy banner positions the ship and opens the exact UI control for the current step",
+        "risks": "contract: existing UI inventory and layout tests check DOM IDs and disclosure selectors; dependency: none; concurrency: none; state: hidden disclosures must remain expandable via their SHOW/HIDE toggles",
+        "mitigation": "Preserve all DOM IDs and CSS selector substrings, use standard applyDisclosure wiring, and verify in real Edge via G-015 visual inspection"
+      },
+      "plan_digest": "edb27c68cfc30f2bd84358bc0e36dcc414eb7410b2083e9cf297282c8b2a1ae6",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-beginner-cockpit-compaction",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Verified compacted Commerce, Fleet, Ship, and Story tabs and Cadet GUIDE ME button in real Edge with 5/5 gates",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794673462.359311,
+      "timestamp_str": "2026-11-14 19:24:22",
+      "agent": "antigravity:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
     }
   ]
 }

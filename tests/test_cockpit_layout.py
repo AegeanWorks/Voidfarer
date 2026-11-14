@@ -2796,3 +2796,33 @@ class TestModalFocusRadarAndGalaxyLayout(unittest.TestCase):
         self.assertIn("const maxPopups = window.innerHeight < 820 ? 1 : 3;", body)
 
 
+class TestBeginnerCockpitCompaction(unittest.TestCase):
+    """Cadet Academy GUIDE ME control and default disclosures for Market filters, Escort Wing, Field Fabrication, and Story panels."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_cadet_banner_has_guide_me_button_and_handler(self):
+        self.assertIn('id="btnCadetGuide"', self.html)
+        self.assertIn("GUIDE ME", self.html)
+        self.assertIn("handleGuideCadet()", self.js)
+        self.assertIn('action: "tutorial_guide"', self.js)
+        self.assertIn(".btn-cadet-guide", self.css)
+
+    def test_market_fleet_ship_and_story_use_default_disclosures(self):
+        for toggle_id, panel_id in (
+            ("btnToggleMarketFilters", "marketFilterDetails"),
+            ("btnToggleEscorts", "escortDetails"),
+            ("btnToggleFabrication", "fabricationDetails"),
+            ("btnToggleVoid", "voidBody"),
+            ("btnToggleTransmissions", "transmissionsDetails"),
+        ):
+            self.assertIn(f'id="{toggle_id}"', self.html)
+            self.assertIn(f'id="{panel_id}" hidden', self.html)
+            self.assertIn(f"this.{toggle_id}", self.js)
+        self.assertIn(".ship-interior-panel.is-collapsed { min-height: 0; max-height: none; }", self.css)
+
+

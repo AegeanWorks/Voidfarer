@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `220`
-- **Total Classes**: `493`
+- **Total Classes**: `494`
 - **Total Top-Level Functions**: `519`
-- **Total Class Methods**: `2508`
-- **Total Source Lines**: `61628`
+- **Total Class Methods**: `2511`
+- **Total Source Lines**: `61658`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`220` module(s))
@@ -455,7 +455,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2798` lines (`125851` bytes)
+**Size**: `2828` lines (`127269` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -875,6 +875,10 @@
   - Method `.test_target_card_obstacle_includes_event_combat_and_anomaly_cards()`
   - Method `.test_galaxy_view_routes_star_labels_around_obstacles_and_neighbors()`
   - Method `.test_event_popups_hide_during_combat_or_anomaly_and_cap_on_short_viewports()`
+- `class TestBeginnerCockpitCompaction` - *Cadet Academy GUIDE ME control and default disclosures for Market filters, Escort Wing, Field Fabrication, and Story panels.*
+  - Method `.setUpClass()`
+  - Method `.test_cadet_banner_has_guide_me_button_and_handler()`
+  - Method `.test_market_fleet_ship_and_story_use_default_disclosures()`
 
 ---
 

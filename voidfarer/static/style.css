@@ -2316,6 +2316,27 @@ body.cockpit-theme {
 
 .cadet-actions {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-cadet-guide {
+    background: rgba(127, 183, 201, 0.14);
+    border: 1px solid rgba(127, 183, 201, 0.55);
+    color: var(--console-cyan-bright, #9ee5ff);
+    padding: 0.35rem 0.7rem;
+    font-size: 12px;
+    font-family: var(--font-display);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cadet-guide:hover {
+    border-color: var(--console-gold);
+    color: var(--console-gold-bright);
+    background: rgba(201, 163, 90, 0.16);
 }
 
 .btn-cadet-skip {
@@ -4426,6 +4447,9 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 .ship-room-details[hidden], .ship-modules-grid[hidden],
 #autoTradeDetails[hidden], #quantumFreightDetails[hidden],
 #mercenaryDetails[hidden], #commissionDetails[hidden] { display: none; }
+#marketFilterDetails[hidden], #escortDetails[hidden],
+#fabricationDetails[hidden], #voidBody[hidden],
+#transmissionsDetails[hidden] { display: none; }
 .quantum-freight-shell { margin-top: 8px; }
 .fleet-optional-section { display: flex; flex-direction: column; min-width: 0; }
 .fleet-optional-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -6037,6 +6061,7 @@ body.cockpit-theme { overflow: hidden; }
 body.cockpit-theme .cadet-tag,
 body.cockpit-theme .cadet-hint-label,
 body.cockpit-theme .reward-tag,
+body.cockpit-theme .btn-cadet-guide,
 body.cockpit-theme .btn-cadet-skip,
 body.cockpit-theme #cargoDetailed,
 body.cockpit-theme .radar-coords,
@@ -8450,7 +8475,10 @@ body.cockpit-theme .panel-center {
         max-height: 232px;
         padding: 8px;
     }
+    .ship-interior-panel.is-collapsed { min-height: 0; max-height: none; }
     .ship-interior-panel:not(.is-collapsed) { flex-shrink: 0; max-height: 360px; }
+    .story-panel { gap: 8px; }
+    .story-panel .faction-chip { padding: 4px 8px; }
     .ship-interior-title {
         font-size: 0.78rem;
         white-space: normal;

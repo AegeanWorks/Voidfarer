@@ -763,6 +763,7 @@ class CockpitApp {
         this.cadetMilestoneDesc = document.getElementById("cadetMilestoneDesc");
         this.cadetMilestoneHint = document.getElementById("cadetMilestoneHint");
         this.cadetMilestoneReward = document.getElementById("cadetMilestoneReward");
+        this.btnCadetGuide = document.getElementById("btnCadetGuide");
         this.btnSkipCadet = document.getElementById("btnSkipCadet");
         this.btnResetCadetAcademy = document.getElementById("btnResetCadetAcademy");
         this.cadetGraduationDismissed = false;
@@ -949,6 +950,15 @@ class CockpitApp {
         this.mercenaryCount = document.getElementById("mercenaryCount");
         this.btnToggleCommission = document.getElementById("btnToggleCommission");
         this.commissionDetails = document.getElementById("commissionDetails");
+        this.btnToggleMarketFilters = document.getElementById("btnToggleMarketFilters");
+        this.marketFilterDetails = document.getElementById("marketFilterDetails");
+        this.btnToggleEscorts = document.getElementById("btnToggleEscorts");
+        this.escortDetails = document.getElementById("escortDetails");
+        this.btnToggleFabrication = document.getElementById("btnToggleFabrication");
+        this.fabricationDetails = document.getElementById("fabricationDetails");
+        this.btnToggleVoid = document.getElementById("btnToggleVoid");
+        this.btnToggleTransmissions = document.getElementById("btnToggleTransmissions");
+        this.transmissionsDetails = document.getElementById("transmissionsDetails");
         this.characterProfile = document.getElementById("characterProfile");
         this.characterAbilities = document.getElementById("characterAbilities");
         this.characterPerks = document.getElementById("characterPerks");
@@ -1275,6 +1285,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 link.classList.add("active");
             });
         });
+        this.btnCadetGuide?.addEventListener("click", () => this.handleGuideCadet());
         this.btnSkipCadet.addEventListener("click", () => this.handleSkipCadet());
         if (this.btnResetCadetAcademy) {
             this.btnResetCadetAcademy.addEventListener("click", () => this.handleResetCadet());
@@ -1512,6 +1523,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleCompletedQuests, this.completedQuestsDetails],
             [this.btnToggleAI, this.aiDetails],
             [this.btnToggleMessages, this.messagesDetails],
+            [this.btnToggleMarketFilters, this.marketFilterDetails],
+            [this.btnToggleEscorts, this.escortDetails],
+            [this.btnToggleFabrication, this.fabricationDetails],
+            [this.btnToggleVoid, this.voidBody],
+            [this.btnToggleTransmissions, this.transmissionsDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -2726,10 +2742,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.cadetMilestoneReward.textContent = `+${step.reward_credits} CR / +${step.reward_xp} XP`;
             const pipsEl = document.getElementById("cadetStepPips");
             if (pipsEl && tut.steps) {
-                pipsEl.innerHTML = tut.steps.map((_, i) =>
-                    `<span class="cadet-pip ${i < curIdx ? "pip-done" : (i === curIdx ? "pip-active" : "pip-locked")}">${i < curIdx ? "✓" : i + 1}</span>`
+                pipsEl.innerHTML = tut.steps.map((s, i) =>
+                    `<span class="cadet-pip ${s.completed || i < curIdx ? "pip-done" : (i === curIdx ? "pip-active" : "pip-locked")}">${s.completed || i < curIdx ? "✓" : i + 1}</span>`
                 ).join('<span class="cadet-pip-divider">·</span>');
             }
+            if (this.btnCadetGuide) this.btnCadetGuide.style.display = "inline-block";
             this.btnSkipCadet.textContent = "SKIP TUTORIAL";
             this.btnSkipCadet.style.display = "inline-block";
         } else if (tut && tut.completed && !this.cadetGraduationDismissed) {
@@ -2738,6 +2755,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.cadetMilestoneDesc.textContent = "Congratulations Commander Astraea! Full flight credentials unlocked. Cadet Honor Wings active.";
             this.cadetMilestoneHint.textContent = "+1,500 CR, +400 XP, and Cadet Honor Wings Precursor Relic awarded.";
             this.cadetMilestoneReward.textContent = "GRADUATED";
+            if (this.btnCadetGuide) this.btnCadetGuide.style.display = "none";
             this.btnSkipCadet.textContent = "DISMISS";
             this.btnSkipCadet.style.display = "inline-block";
         } else {
@@ -3362,6 +3380,71 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
         } catch (e) {
             console.error("Error resetting tutorial:", e);
+        }
+    }
+
+    async handleGuideCadet() {
+        this.sound.init();
+        this.sound.playBeep(920);
+        try {
+            const res = await apiFetch("/api/narrative/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "tutorial_guide" }),
+            });
+            const json = await res.json();
+            if (json.ok && json.state) {
+                this.appendLog(json.message, "system");
+                this.state = json.state;
+                this.renderHUD();
+            }
+        } catch (e) {
+            console.error("Error guiding tutorial:", e);
+        }
+        const tut = this.state?.ship?.tutorial;
+        const step = tut?.steps?.[tut?.current_step_index || 0];
+        if (!step) return;
+        const bodies = this.state?.current_system?.bodies || [];
+        if (step.id === "step_orbit") {
+            this.viewOrbitBtn?.click();
+            const target = bodies.find(b => b.id !== this.state.ship.orbiting_body_id && b.body_type !== "star") || bodies[0];
+            if (target) {
+                this.selectedTarget = target;
+                this.selectedType = "body";
+                this.updateTargetCard();
+                this.btnOrbitTarget?.focus();
+            }
+        } else if (step.id === "step_scan") {
+            this.viewOrbitBtn?.click();
+            const cur = bodies.find(b => b.id === this.state.ship.orbiting_body_id);
+            if (cur) {
+                this.selectedTarget = cur;
+                this.selectedType = "body";
+                this.updateTargetCard();
+            }
+            this.btnScanTarget?.focus();
+        } else if (step.id === "step_power") {
+            if (this.reactorPanel?.classList.contains("is-collapsed")) this.btnToggleReactor?.click();
+            this.reactorPanel?.querySelector('[data-reactor-mode="economy"]')?.focus();
+        } else if (step.id === "step_trade") {
+            this.switchRightTab("market");
+            this.marketTableBody?.querySelector(".btn-market-buy:not([disabled])")?.focus();
+        } else if (step.id === "step_drone") {
+            this.switchRightTab("fleet");
+            if (this.commissionDetails?.hidden) {
+                this.toggleFleetDisclosure(this.btnToggleCommission, this.commissionDetails);
+            }
+            this.commissionDetails?.querySelector(".btn-drone-buy")?.focus();
+        } else if (step.id === "step_jump") {
+            this.viewGalaxyBtn?.click();
+            const connId = this.state?.current_system?.connections?.[0];
+            const sys = connId ? this.galaxySystems?.[connId] : null;
+            if (sys) {
+                this.selectedTarget = sys;
+                this.selectedType = "system";
+                this.updateTargetCard();
+                this.btnOrbitTarget?.focus();
+            }
         }
     }
 
