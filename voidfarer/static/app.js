@@ -1040,8 +1040,7 @@ class CockpitApp {
         this.audioToggleBtn.addEventListener("click", () => {
             this.sound.init();
             const on = this.sound.toggle();
-            this.audioIcon.textContent = on ? "◉" : "◌";
-            this.audioToggleBtn.style.opacity = on ? "1" : "0.5";
+            this.syncAudioControlState();
             const settingSound = document.getElementById("settingSound");
             if (settingSound) settingSound.checked = on;
             this.saveSettings();
@@ -2112,6 +2111,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const json = await res.json();
             if (json.ok && json.systems) {
                 this.galaxySystems = json.systems;
+                if (this.state) {
+                    this.renderStory();
+                    this.renderSaveSlots();
+                    if (this.activeLeftTab === "factions") this.renderFactions();
+                    if (this.activeLeftTab === "ai") this.renderAICaptains();
+                    if (this.activeRightTab === "empire") this.renderEmpire();
+                }
             }
         } catch (e) {
             console.error("Error fetching galaxy:", e);
@@ -2978,7 +2984,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.storyChapterTitle.title = this.storyChapterTitle.textContent;
             const targetText = curChap.completed
                 ? "ACT OBJECTIVE COMPLETE"
-                : (curChap.target_system_id ? `TARGET: ${curChap.target_system_id.toUpperCase()}` : "TARGET: DEEP SPACE");
+                : (curChap.target_system_id ? `TARGET: ${this.systemDisplayName(curChap.target_system_id).toUpperCase()}` : "TARGET: DEEP SPACE");
             this.storyTargetBadge.textContent = targetText;
             this.storySynopsisText.textContent = curChap.synopsis || curChap.objective || "";
 
@@ -5152,7 +5158,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const canNap = !isEliminated && !isNap && !isAllied && !ownWar
                 && l.faction_id !== "sol_coalition" && standing >= 30;
             const petition = ownWar && Number(this.state.ship.credits || 0) >= 500;
-            const creed = l.ideology ? `<br><small class="faction-creed" title="${this.escapeHtml(l.description || "")}">${this.escapeHtml(l.ideology)} · HQ: ${this.escapeHtml(l.headquarters_system || "unknown")}</small>` : "";
+            const creed = l.ideology ? `<br><small class="faction-creed" title="${this.escapeHtml(l.description || "")}">${this.escapeHtml(l.ideology)} · HQ: ${this.escapeHtml(this.systemDisplayName(l.headquarters_system || "unknown"))}</small>` : "";
             return `<div class="diplomacy-row ${isEliminated ? "eliminated" : ""}">
                 <span><strong>${this.escapeHtml(l.name)}</strong> (${this.escapeHtml(l.faction_id)})<br>
                 <small>${this.escapeHtml(l.title)} — <span class="leader-behavior">${this.escapeHtml(l.behavior)}</span></small>${creed}</span>
@@ -5185,7 +5191,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
         const totals = codex.totals || { entries: 0, completed: 0, claimed: 0, ready: 0, completion_pct: 0 };
         if (this.codexProgressBadge) {
-            this.codexProgressBadge.textContent = `${totals.claimed} / ${totals.entries} CLAIMED (${totals.completion_pct}%)`;
+            const claimedPct = totals.entries ? Math.round((Number(totals.claimed || 0) / Number(totals.entries)) * 100) : 0;
+            this.codexProgressBadge.textContent = `${totals.claimed} / ${totals.entries} CLAIMED (${claimedPct}%)`;
         }
 
         if (this.codexSummaryStrip) {
@@ -9013,7 +9020,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <span class="faction-name" title="${this.escapeHtml(f.name)}" style="color: ${factionColor};">${this.escapeHtml(f.name)}</span>
                     <span class="standing-badge ${tierClass}">${this.escapeHtml(f.standing_tier.toUpperCase())} (${f.standing > 0 ? "+" : ""}${f.standing})</span>
                 </div>
-                <div class="faction-ideology">Ideology: ${this.escapeHtml(f.ideology)} // HQ: ${this.escapeHtml(f.headquarters_system.toUpperCase())}</div>
+                <div class="faction-ideology">Ideology: ${this.escapeHtml(f.ideology)} // HQ: ${this.escapeHtml(this.systemDisplayName(f.headquarters_system).toUpperCase())}</div>
                 <div class="standing-bar-wrap">
                     <div class="standing-bar-fill" style="width: ${barPct}%; background: ${factionColor};"></div>
                 </div>
@@ -9043,7 +9050,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <span class="corp-name">${this.escapeHtml(c.name)}</span>
                     <span class="standing-badge tier-friendly">STANDING: ${c.standing > 0 ? "+" : ""}${c.standing}</span>
                 </div>
-                <div class="corp-desc">HQ: ${this.escapeHtml(c.headquarters_system.toUpperCase())} // Commercial Specialty: <strong style="color: var(--neon-cyan);">${commTitle}</strong> (+${Math.round(c.bonus_trade_margin * 100)}% Sale Profit)</div>
+                <div class="corp-desc">HQ: ${this.escapeHtml(this.systemDisplayName(c.headquarters_system).toUpperCase())} // Commercial Specialty: <strong style="color: var(--neon-cyan);">${commTitle}</strong> (+${Math.round(c.bonus_trade_margin * 100)}% Sale Profit)</div>
                 <div class="standing-bar-wrap">
                     <div class="standing-bar-fill" style="width: ${barPct}%; background: #ffd700;"></div>
                 </div>
@@ -9062,7 +9069,52 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     safeColor(value, fallback = "#7fb7c9") {
-        return /^#[0-9a-fA-F]{6}$/.test(String(value || "")) ? value : fallback;
+        const raw = String(value || "");
+        if (raw.toLowerCase() === "#8b5cf6") return "#9d74f7";
+        return /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : fallback;
+    }
+
+    systemDisplayName(systemId) {
+        const key = String(systemId || "").trim();
+        if (!key) return "";
+        const gal = this.galaxySystems;
+        const galMatch = Array.isArray(gal) ? gal.find(s => s && s.id === key) : (gal && gal[key]);
+        if (galMatch && galMatch.name) return galMatch.name;
+        if (this.state?.current_system?.id === key && this.state.current_system.name) {
+            return this.state.current_system.name;
+        }
+        const connMatch = (this.state?.connected_systems || []).find(s => s && s.id === key);
+        if (connMatch && connMatch.name) return connMatch.name;
+        return key.replace(/_/g, " ").replace(/\b\w/g, ch => ch.toUpperCase());
+    }
+
+    commodityDisplayName(commodityId) {
+        const key = String(commodityId || "").trim();
+        if (!key) return "";
+        const quote = (this.state?.market_quotes || []).find(q => q && q.commodity_id === key);
+        if (quote && quote.name) return quote.name;
+        const manifest = (this.state?.inventory_manifest || []).find(m => m && m.id === key);
+        if (manifest && manifest.name) return manifest.name;
+        const canonical = {
+            fuel_cells: "Quantum Fuel Cells",
+            titanium: "Titanium Alloy",
+            hydroponics: "Hydroponic Nutrients",
+            medicines: "Cryo-Antibiotics",
+            microchips: "Quantum Substrates",
+            xenoliths: "Xenolith Relics",
+        };
+        return canonical[key] || key.replace(/_/g, " ").replace(/\b\w/g, ch => ch.toUpperCase());
+    }
+
+    syncAudioControlState() {
+        const on = Boolean(this.sound && this.sound.enabled);
+        const audioIcon = this.audioIcon || document.getElementById("audioIcon");
+        if (audioIcon) audioIcon.textContent = on ? "◉" : "◌";
+        const audioButton = this.audioToggleBtn || document.getElementById("audioToggleBtn");
+        if (audioButton) {
+            audioButton.style.opacity = on ? "1" : "0.5";
+            audioButton.setAttribute("aria-pressed", String(on));
+        }
     }
 
     loadSettings() {
@@ -9071,10 +9123,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             saved = JSON.parse(localStorage.getItem("voidfarer_settings") || "{}") || {};
         } catch (e) {}
         this.applySettingsProfile({ ...SETTINGS_DEFAULTS, ...saved });
-        const audioIcon = document.getElementById("audioIcon");
-        if (audioIcon) audioIcon.textContent = this.sound.enabled ? "◉" : "MUTED";
-        const audioButton = document.getElementById("audioToggleBtn");
-        if (audioButton) audioButton.style.opacity = this.sound.enabled ? "1" : "0.5";
+        this.syncAudioControlState();
     }
 
     applySettingsProfile(profile) {
@@ -9131,8 +9180,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.tradeLot = TRADE_LOTS.includes(lot) ? lot : "1";
         const volumeValue = document.getElementById("settingVolumeValue");
         if (volumeValue) volumeValue.textContent = `${Math.round(this.sound.volume * 100)}%`;
-        const audioIcon = document.getElementById("audioIcon");
-        if (audioIcon) audioIcon.textContent = this.sound.enabled ? "SFX" : "MUTED";
+        this.syncAudioControlState();
         this.applyViewportProfile();
         this.renderMarketTable();
         this.saveSettings();
@@ -9385,7 +9433,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             row.innerHTML = `
                 <div class="save-slot-info">
                     <strong>[${this.escapeHtml(s.slot)}]</strong> ${this.escapeHtml(s.commander_name)} // ${this.escapeHtml(s.ship_class)}
-                    <small>${this.escapeHtml(s.current_system_id.toUpperCase())} | DATE ${this.escapeHtml(s.stardate)} (TICK #${Number(s.tick || 0)}) | ${Number(s.credits || 0).toLocaleString()} CR</small>
+                    <small>${this.escapeHtml(this.systemDisplayName(s.current_system_id).toUpperCase())} | DATE ${this.escapeHtml(s.stardate)} (TICK #${Number(s.tick || 0)}) | ${Number(s.credits || 0).toLocaleString()} CR</small>
                 </div>
                 <div class="save-slot-actions">
                     <button type="button" class="btn-slot-act" data-act="load">LOAD</button>
@@ -9596,7 +9644,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 const status = c.hired ? "HIRED" : (c.ally ? "ALLY" : "OPEN");
                 return `<div class="ai-summary-row">
                     <strong>${this.escapeHtml(c.name)} <small>[${this.escapeHtml(c.archetype.toUpperCase())}]</small></strong>
-                    <span>${this.escapeHtml(c.system_id)} · TRUST ${trust} · STANDING ${c.standing} · ${status}</span>
+                    <span>${this.escapeHtml(this.systemDisplayName(c.system_id))} · TRUST ${trust} · STANDING ${c.standing} · ${status}</span>
                 </div>`;
             }).join("") : `<p class="panel-intro-text">No AI captains in range.</p>`;
         }
@@ -9618,8 +9666,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             <div class="ai-card">
                 <h4>${this.escapeHtml(c.name)} <small>[${this.escapeHtml(c.archetype.toUpperCase())}]</small></h4>
                 <div>${this.escapeHtml(c.description)}</div>
-                <div>SYSTEM: ${this.escapeHtml(c.system_id)} // TRUST: ${trust} // STANDING: ${c.standing}</div>
-                <div>CARGO: ${Object.entries(c.cargo || {}).map(([k, v]) => `${this.escapeHtml(k)} x${v}`).join(", ") || "empty"}</div>
+                <div>SYSTEM: ${this.escapeHtml(this.systemDisplayName(c.system_id))} // TRUST: ${trust} // STANDING: ${c.standing}</div>
+                <div>CARGO: ${Object.entries(c.cargo || {}).map(([k, v]) => `${this.escapeHtml(this.commodityDisplayName(k))} x${v}`).join(", ") || "empty"}</div>
                 <div class="ai-meters" aria-hidden="true">
                     <span class="ai-meter ai-meter-trust" title="Trust ${trust}/100 (alliance at 50)"><i style="width:${Math.max(0, Math.min(100, trust))}%"></i></span>
                     <span class="ai-meter ai-meter-standing ${Number(c.standing) < 0 ? "is-negative" : ""}" title="Standing ${c.standing}"><i style="width:${Math.min(50, Math.abs(Number(c.standing) || 0) / 2)}%"></i></span>
@@ -9658,7 +9706,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.depotSummary.textContent = `${depot.name} // STORED VOLUME: ${used}/${depot.capacity}`;
         const depotRows = Object.entries(depot.cargo || {}).map(([item, qty]) => `
             <div class="depot-card">
-                <h4><span class="depot-tag is-stored">STORED</span>${this.escapeHtml(item)}<span class="depot-qty">x${qty}</span></h4>
+                <h4><span class="depot-tag is-stored">STORED</span>${this.escapeHtml(this.commodityDisplayName(item))}<span class="depot-qty">x${qty}</span></h4>
                 <div class="depot-actions">
                     <button class="btn-hud" data-action="withdraw" data-qty="1" data-item="${this.escapeHtml(item)}">WITHDRAW 1</button>
                     ${qty > 1 ? `<button class="btn-hud" data-action="withdraw" data-qty="${qty}" data-item="${this.escapeHtml(item)}">WITHDRAW ALL</button>` : ""}
@@ -9728,11 +9776,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <span>${this.escapeHtml(choice.description || "")}</span>
                 </button>
             `).join("");
+            const treeLabel = m.tree_id ? String(m.tree_id).replace(/_/g, " ").toUpperCase() : "";
+            const resolvedLabel = m.resolved_choice ? String(m.resolved_choice).replace(/_/g, " ").toUpperCase() : "";
             return `
                 <div class="message-card ${m.read ? "" : "unread"}">
                     <h4>${this.escapeHtml(m.subject)}<span class="message-state">${m.read ? "READ" : "UNREAD"}</span></h4>
                     <div>FROM: ${this.escapeHtml(m.sender)} // TO: ${this.escapeHtml(m.recipient)} // TICK ${m.tick}
-                        ${m.tree_id ? ` // TREE ${this.escapeHtml(m.tree_id)}` : ""}${m.resolved_choice ? ` // RESOLVED: ${this.escapeHtml(m.resolved_choice)}` : ""}</div>
+                        ${treeLabel ? ` // TREE: ${this.escapeHtml(treeLabel)}` : ""}${resolvedLabel ? ` // RESOLVED: ${this.escapeHtml(resolvedLabel)}` : ""}</div>
                     <div>${this.escapeHtml(m.body)}</div>
                     ${choices ? `<div class="message-choices">${choices}</div>` : ""}
                     ${m.read ? "" : `<button class="btn-hud" data-message="${this.escapeHtml(m.id)}">MARK READ</button>`}

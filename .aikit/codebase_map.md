@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `220`
-- **Total Classes**: `491`
+- **Total Classes**: `492`
 - **Total Top-Level Functions**: `519`
-- **Total Class Methods**: `2492`
-- **Total Source Lines**: `61314`
+- **Total Class Methods**: `2499`
+- **Total Source Lines**: `61366`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`220` module(s))
@@ -455,7 +455,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2706` lines (`120859` bytes)
+**Size**: `2758` lines (`123779` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -859,6 +859,14 @@
 - `class TestWarBondsCockpit` - *War cards must explain the bond payout terms.*
   - Method `.setUpClass()`
   - Method `.test_war_cards_show_bond_terms()`
+- `class TestCockpitReadabilityAndContrastPolish` - *Audio icon state, display name resolvers, Codex claimed %, card line-clamp reset, and WCAG AA faction color.*
+  - Method `.setUpClass()`
+  - Method `.test_audio_toggle_uses_single_sync_helper()`
+  - Method `.test_system_and_commodity_display_names_are_resolved()`
+  - Method `.test_codex_badge_reports_claimed_percentage()`
+  - Method `.test_procurement_small_resets_line_clamp_when_overflow_visible()`
+  - Method `.test_character_profile_and_message_choice_prevent_clipping()`
+  - Method `.test_safe_color_lifts_precursor_watch_violet_to_wcag_aa()`
 
 ---
 

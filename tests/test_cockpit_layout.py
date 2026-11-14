@@ -2704,3 +2704,55 @@ class TestWarBondsCockpit(unittest.TestCase):
         self.assertIn("war-bond-note", self.js)
         self.assertIn("1.5x", self.js)
         self.assertIn(".war-bond-note", self.css)
+
+
+class TestCockpitReadabilityAndContrastPolish(unittest.TestCase):
+    """Audio icon state, display name resolvers, Codex claimed %, card line-clamp reset, and WCAG AA faction color."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_audio_toggle_uses_single_sync_helper(self):
+        self.assertIn('id="audioToggleBtn" aria-pressed="true"', self.html)
+        self.assertIn("syncAudioControlState()", self.js)
+        body = self.js.split("syncAudioControlState() {", 1)[1].split("\n    }", 1)[0]
+        self.assertIn('audioIcon.textContent = on ? "◉" : "◌"', body)
+        self.assertIn('audioButton.setAttribute("aria-pressed", String(on))', body)
+        self.assertNotIn('"SFX"', self.js.split("applySettingsFromUI()", 1)[1][:600])
+
+    def test_system_and_commodity_display_names_are_resolved(self):
+        self.assertIn("systemDisplayName(systemId)", self.js)
+        self.assertIn("commodityDisplayName(commodityId)", self.js)
+        self.assertIn("this.systemDisplayName(curChap.target_system_id)", self.js)
+        self.assertIn("this.systemDisplayName(f.headquarters_system)", self.js)
+        self.assertIn("this.systemDisplayName(c.headquarters_system)", self.js)
+        self.assertIn("this.systemDisplayName(c.system_id)", self.js)
+        self.assertIn("this.commodityDisplayName(k)", self.js)
+        self.assertIn("this.commodityDisplayName(item)", self.js)
+
+    def test_codex_badge_reports_claimed_percentage(self):
+        block = self.js.split("renderCodex() {", 1)[1][:650]
+        self.assertIn("const claimedPct = totals.entries ? Math.round((Number(totals.claimed || 0) / Number(totals.entries)) * 100) : 0;", block)
+        self.assertIn("CLAIMED (${claimedPct}%)", block)
+
+    def test_procurement_small_resets_line_clamp_when_overflow_visible(self):
+        anchor = "#escortShopGrid .procurement-info small,"
+        block = self.css.split(anchor, 1)[1].split("}", 1)[0]
+        self.assertIn("display: block;", block)
+        self.assertIn("-webkit-line-clamp: unset;", block)
+        self.assertIn("overflow: visible;", block)
+
+    def test_character_profile_and_message_choice_prevent_clipping(self):
+        self.assertIn(".character-profile { display: grid; grid-template-columns: 60px minmax(0, 1fr);", self.css)
+        self.assertIn(".character-info { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }", self.css)
+        msg_span = self.css.rsplit(".message-choice-btn span {", 1)[1].split("}", 1)[0]
+        self.assertIn("text-overflow: ellipsis;", msg_span)
+
+    def test_safe_color_lifts_precursor_watch_violet_to_wcag_aa(self):
+        block = self.js.split("safeColor(value", 1)[1][:260]
+        self.assertIn('"#8b5cf6"', block)
+        self.assertIn('"#9d74f7"', block)
+
