@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `223`
-- **Total Classes**: `499`
+- **Total Classes**: `500`
 - **Total Top-Level Functions**: `521`
-- **Total Class Methods**: `2527`
-- **Total Source Lines**: `61982`
+- **Total Class Methods**: `2530`
+- **Total Source Lines**: `62003`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`223` module(s))
@@ -470,7 +470,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2865` lines (`128969` bytes)
+**Size**: `2886` lines (`130014` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -510,6 +510,10 @@
   - Method `.setUpClass()`
   - Method `.test_docked_repair_wins_below_sixty_percent_out_of_combat()`
   - Method `.test_the_chip_never_crowds_out_the_hull_value()`
+- `class TestDeathInsuranceButton` - *The death screen offers the Coalition insurance rebuild (ADR-300).*
+  - Method `.setUpClass()`
+  - Method `.test_button_is_first_in_the_death_options_and_hidden_by_default()`
+  - Method `.test_button_follows_the_quote_and_claims_through_the_engineering_action()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

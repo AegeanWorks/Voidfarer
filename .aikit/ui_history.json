@@ -2478,5 +2478,26 @@
     "final_snapshot_digest": "0235c2d2696e2504f38f62eb8fc7ae319e8f1a505d955d938e5757decfa7e91c",
     "final_snapshot_entries": 1317,
     "surface_digest": "bf5f5adac31c29125b840dd7b01ab3a0e1b8a21d9acab63925c92fbb76e98397"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "628fdf7ade41ffc3e898e74c2032b2882a4c8cb7",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794678695.1503098,
+    "finished_at": 1794678903.2282102,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; death-ins2 laptop-death.png and desktop-death.png: first button reads INSURANCE REBUILD - -500 CR, fits both viewports, 0 errors, click rebuilds to hull 50 and closes overlay",
+    "allowed_removals": [],
+    "final_snapshot_digest": "dda5a163629cdf9882ba48d6ef723da9a6e44fcfb28702688f5fc2505e6ad158",
+    "final_snapshot_entries": 1319,
+    "surface_digest": "f5d273019d0f3f04f3acba42ade6e4e54e98acf1a2624174ba3acbad6c01dfb7"
   }
 ]

@@ -873,6 +873,7 @@ class CockpitApp {
         this.deathTitle = document.getElementById("deathTitle");
         this.deathMessage = document.getElementById("deathMessage");
         this.deathStats = document.getElementById("deathStats");
+        this.btnDeathInsurance = document.getElementById("btnDeathInsurance");
         this.btnDeathNewGame = document.getElementById("btnDeathNewGame");
         this.btnDeathLoadSave = document.getElementById("btnDeathLoadSave");
         this.btnDeathMainMenu = document.getElementById("btnDeathMainMenu");
@@ -2971,6 +2972,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             </div>
         `;
         
+        // Coalition insurance (ADR-299): rebuild at the nearest secure station for a deductible.
+        const policy = this.state.insurance;
+        if (this.btnDeathInsurance) {
+            const offer = Boolean(policy && policy.available);
+            this.btnDeathInsurance.style.display = offer ? "" : "none";
+            if (offer) {
+                this.btnDeathInsurance.textContent = `INSURANCE REBUILD · -${Number(policy.deductible).toLocaleString()} CR`;
+                this.btnDeathInsurance.title = `Respawn at ${policy.destination} with story, relics and crew intact; ${policy.cargo_lost} cargo units are lost.`;
+                this.btnDeathInsurance.onclick = () => this.handleInsuranceRebuild();
+            }
+        }
+
         this.deathOverlay.style.display = "flex";
         this.sound.playAlarm();
         
@@ -2988,6 +3001,30 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.hideDeathOverlay();
             this.openMainMenu();
         };
+    }
+
+    async handleInsuranceRebuild() {
+        this.sound?.init();
+        try {
+            const res = await apiFetch("/api/engineering/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "insurance" })
+            });
+            const json = await res.json();
+            if (json.state) this.state = json.state;
+            if (json.ok) {
+                this.deathAcknowledged = false;
+                this.hideDeathOverlay();
+                this.sound?.playChime();
+                this.appendLog(json.message, "reward");
+            } else {
+                this.appendLog(`[INSURANCE] ${json.message}`, "hazard");
+            }
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Insurance claim failed: ${e.message}`, "hazard");
+        }
     }
 
     hideDeathOverlay() {

@@ -5,36 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794678627.8195567,
+    "updated_at": 1794679110.3571224,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-audio-icon-sync",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: unify top-bar audio button icon (\u25c9/\u25cc), opacity and aria-pressed across toggle, loadSettings and applySettingsFromUI; failing-first unit test and browser check",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794667627.6277535,
-      "timestamp_str": "2026-11-14 17:47:07",
-      "agent": "antigravity:goal",
-      "impact_assessment": {
-        "why": "applySettingsFromUI sets #audioIcon to 'SFX'/'MUTED' (producing 'SFX SOUND FX') without updating button opacity, and loadSettings sets 'MUTED' instead of '\u25cc'",
-        "benefits": "Top-bar SOUND FX button keeps its \u25c9/\u25cc icon, opacity and aria-pressed state whether toggled directly, loaded from storage, or changed in Settings",
-        "risks": "contract: none; dependency: none; concurrency: none; state: localStorage settings unchanged",
-        "mitigation": "Failing-first test pinning syncAudioButton and browser verification before/after opening Settings"
-      },
-      "plan_digest": "f7130f83b780cc0062aa2ae860d6f0f8528bd450f22bcecd819230661a23e03a",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-audio-icon-sync",
       "phase": "phase 2",
@@ -354,6 +330,17 @@
       "status": "in_progress",
       "timestamp": 1794678627.8195567,
       "timestamp_str": "2026-11-14 20:50:27",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-first-10-minutes",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[5/6] Death screen insurance button (ADR-300); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794679110.3571224,
+      "timestamp_str": "2026-11-14 20:58:30",
       "agent": "claude:1"
     }
   ]

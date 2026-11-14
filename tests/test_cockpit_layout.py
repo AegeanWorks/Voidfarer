@@ -325,6 +325,27 @@ class TestDockedHullRepairChip(unittest.TestCase):
         self.assertIn("#vitalHullCard.is-patchable #hullVal { flex: none; }", self.css)
 
 
+class TestDeathInsuranceButton(unittest.TestCase):
+    """The death screen offers the Coalition insurance rebuild (ADR-300)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_button_is_first_in_the_death_options_and_hidden_by_default(self):
+        options = self.html[self.html.index('class="death-options"'):]
+        self.assertLess(options.index('id="btnDeathInsurance"'), options.index('id="btnDeathNewGame"'))
+        self.assertIn('id="btnDeathInsurance" style="display: none;"', self.html)
+
+    def test_button_follows_the_quote_and_claims_through_the_engineering_action(self):
+        self.assertIn("const policy = this.state.insurance;", self.js)
+        self.assertIn("policy && policy.available", self.js)
+        self.assertIn("async handleInsuranceRebuild()", self.js)
+        self.assertIn('JSON.stringify({ action: "insurance" })', self.js)
+        self.assertIn("this.deathAcknowledged = false;", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

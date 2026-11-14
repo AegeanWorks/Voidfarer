@@ -3007,3 +3007,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A destroyed hull ended the run: the only ways on were loading a save or a new commander, so one bad ambush could cost a beginner hours of progress.
 - **Decision**: `SimulationEngine.insurance_rebuild` (only when hull is 0) rebuilds the ship at the nearest secure station: a breadth-first search over hyperlanes for a system with security at least 0.5 and a dockable station. The rebuild costs 25% of credits and all cargo; story, relics, crew, fleet and standings stay. The hull returns at half strength, shields full, fuel at least a third of the tank. `insurance_status` quotes the policy in the status snapshot (`insurance`, `null` while the hull is alive). It is exposed as the `insurance` engineering action, which gives REST (`/api/engineering/action`), the CLI `engineering insurance` and the agent catalog for free (G-012). No new persisted field.
 - **Consequences**: Engine, REST and CLI only; the cockpit death screen button follows in the next change. Pinned by `tests/test_insurance_rebuild.py`.
+
+### ADR-300: Death screen offers the insurance rebuild
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: ADR-299 added the insurance rebuild to the engine, REST and CLI, but the cockpit death screen still offered only NEW COMMANDER, LOAD SAVE and MAIN MENU.
+- **Decision**: `#btnDeathInsurance` is the first button in `.death-options`, hidden until `showDeathOverlay` reads `state.insurance` and finds `available`. It reads `INSURANCE REBUILD · -<deductible> CR` with the destination and lost cargo in its tooltip, and `handleInsuranceRebuild` posts the `insurance` engineering action, then resets `deathAcknowledged`, closes the overlay and re-renders so a later death shows the screen again.
+- **Consequences**: Cockpit only. Verified in real Edge at 1366x768 and 1920x1080 with a destroyed hull (`ui-review/death-ins2/`, 0 console errors, click rebuilt to hull 50 and 1500 of 2000 credits). Pinned by `TestDeathInsuranceButton`.
