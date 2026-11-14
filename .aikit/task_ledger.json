@@ -5,36 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794681462.801607,
+    "updated_at": 1794682265.8108501,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-beginner-cockpit-compaction",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Add GUIDE ME button on Cadet Academy banner and collapse advanced sub-panels in Commerce, Fleet, Ship, and Story tabs by default",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794672703.5111566,
-      "timestamp_str": "2026-11-14 19:11:43",
-      "agent": "antigravity:goal",
-      "impact_assessment": {
-        "why": "Beginners face tall scrolling panels in Commerce, Fleet, Ship, and Story with advanced sub-mechanics expanded by default, and the Cadet Academy banner lacked a one-click control to navigate to or auto-dock for the active step",
-        "benefits": "Default Commerce, Fleet, Ship, and Story tabs fit cleanly at 1280x720 without scrolling, and clicking GUIDE ME on the Cadet Academy banner positions the ship and opens the exact UI control for the current step",
-        "risks": "contract: existing UI inventory and layout tests check DOM IDs and disclosure selectors; dependency: none; concurrency: none; state: hidden disclosures must remain expandable via their SHOW/HIDE toggles",
-        "mitigation": "Preserve all DOM IDs and CSS selector substrings, use standard applyDisclosure wiring, and verify in real Edge via G-015 visual inspection"
-      },
-      "plan_digest": "edb27c68cfc30f2bd84358bc0e36dcc414eb7410b2083e9cf297282c8b2a1ae6",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-beginner-cockpit-compaction",
       "phase": "phase 4",
@@ -285,6 +261,17 @@
       "status": "in_progress",
       "timestamp": 1794681462.801607,
       "timestamp_str": "2026-11-14 21:37:42",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-trade-tip",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] COMMERCE trade tip line plotting its destination (ADR-307); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794682265.8108501,
+      "timestamp_str": "2026-11-14 21:51:05",
       "agent": "claude:1"
     }
   ]

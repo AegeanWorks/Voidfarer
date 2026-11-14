@@ -389,6 +389,31 @@ class TestCustomsRiskBanner(unittest.TestCase):
         self.assertIn("this.customsRiskBanner.title = risk.hint;", self.js)
 
 
+class TestTradeTipLine(unittest.TestCase):
+    """COMMERCE shows the best-trade tip and plots its destination (ADR-307)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_tip_is_a_hidden_button_above_the_trade_toolbar(self):
+        self.assertIn('id="btnTradeTip" hidden', self.html)
+        self.assertLess(self.html.index('id="btnTradeTip"'), self.html.index('class="trade-toolbar"'))
+        self.assertIn(".trade-tip[hidden] { display: none; }", self.css)
+
+    def test_tip_leads_with_the_margin_and_click_selects_the_destination(self):
+        self.assertIn("`TIP +${tip.margin} · ${tip.name} → ${tip.system_name}`", self.js)
+        self.assertIn("handleTradeTipPlot()", self.js)
+        self.assertIn("this.galaxySystems?.[tip.system_id]", self.js)
+
+    def test_advice_blocks_live_in_their_own_method_not_the_table_renderer(self):
+        table = self.js.split("    renderMarketTable() {", 1)[1].split("    renderTradeAdvice(", 1)[0]
+        self.assertIn("this.renderTradeAdvice(allQuotes, cargo);", table)
+        self.assertNotIn("this.btnTradeTip.textContent", table)
+
+
 if __name__ == "__main__":
     unittest.main()
 

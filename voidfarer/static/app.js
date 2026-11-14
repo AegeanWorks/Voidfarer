@@ -956,6 +956,8 @@ class CockpitApp {
         this.btnToggleMarketFilters = document.getElementById("btnToggleMarketFilters");
         this.btnSellAllProfitable = document.getElementById("btnSellAllProfitable");
         this.customsRiskBanner = document.getElementById("customsRiskBanner");
+        this.btnTradeTip = document.getElementById("btnTradeTip");
+        this.btnTradeTip?.addEventListener("click", () => this.handleTradeTipPlot());
         this.btnSellAllProfitable?.addEventListener("click", () => this.handleSellAllProfitable());
         this.marketFilterDetails = document.getElementById("marketFilterDetails");
         this.btnToggleEscorts = document.getElementById("btnToggleEscorts");
@@ -3536,20 +3538,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const cargo = this.state.ship.cargo || {};
         const avgCost = this.state.cargo_avg_cost || {};
         const lot = this.tradeLot;
-        if (this.customsRiskBanner) {
-            const risk = this.state.customs_risk;
-            this.customsRiskBanner.hidden = !risk;
-            if (risk) {
-                this.customsRiskBanner.textContent = risk.chance > 0
-                    ? `⚠ CONTRABAND IN HOLD (${risk.units}) · CUSTOMS RISK ${Math.round(risk.chance * 100)}% AT ${risk.system_name.toUpperCase()}`
-                    : `⚠ CONTRABAND IN HOLD (${risk.units}) · NO CUSTOMS CORDON NEXT DOOR`;
-                this.customsRiskBanner.title = risk.hint;
-            }
-        }
-        if (this.btnSellAllProfitable) {
-            this.btnSellAllProfitable.disabled = !allQuotes.length
-                || !Object.values(cargo).some(units => Number(units) > 0);
-        }
+        this.renderTradeAdvice(allQuotes, cargo);
 
         quotes.forEach(q => {
             const tr = document.createElement("tr");
@@ -3625,6 +3614,32 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             td.textContent = "No goods in this category here.";
             tr.appendChild(td);
             this.marketTableBody.appendChild(tr);
+        }
+    }
+
+    // Tip, customs warning and SELL ALL state above the exchange table (ADR-303, 305, 306).
+    renderTradeAdvice(allQuotes, cargo) {
+        if (this.btnTradeTip) {
+            const tip = this.state.trade_tip;
+            this.btnTradeTip.hidden = !tip;
+            if (tip) {
+                this.btnTradeTip.textContent = `TIP +${tip.margin} · ${tip.name} → ${tip.system_name}`;
+                this.btnTradeTip.title = `Buy ${tip.name} here for ${tip.buy_price} cr and sell it next door at ${tip.system_name} for ${tip.sell_price} cr. That is +${tip.margin} cr per unit. Click to select ${tip.system_name} on the Galaxy Map.`;
+            }
+        }
+        if (this.customsRiskBanner) {
+            const risk = this.state.customs_risk;
+            this.customsRiskBanner.hidden = !risk;
+            if (risk) {
+                this.customsRiskBanner.textContent = risk.chance > 0
+                    ? `⚠ CONTRABAND IN HOLD (${risk.units}) · CUSTOMS RISK ${Math.round(risk.chance * 100)}% AT ${risk.system_name.toUpperCase()}`
+                    : `⚠ CONTRABAND IN HOLD (${risk.units}) · NO CUSTOMS CORDON NEXT DOOR`;
+                this.customsRiskBanner.title = risk.hint;
+            }
+        }
+        if (this.btnSellAllProfitable) {
+            this.btnSellAllProfitable.disabled = !allQuotes.length
+                || !Object.values(cargo).some(units => Number(units) > 0);
         }
     }
 
@@ -6476,6 +6491,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         } catch (e) {
             this.appendLog(`[ERROR] Trade failed: ${e.message}`, "hazard");
         }
+    }
+
+    handleTradeTipPlot() {
+        const tip = this.state?.trade_tip;
+        const system = tip ? this.galaxySystems?.[tip.system_id] : null;
+        if (!system) return;
+        this.sound.init();
+        this.viewGalaxyBtn?.click();
+        this.selectedTarget = system;
+        this.selectedType = "system";
+        this.updateTargetCard();
+        this.btnJumpTarget?.focus();
     }
 
     async handleSellAllProfitable() {

@@ -2543,5 +2543,27 @@
     "final_snapshot_digest": "ba9848f75420c24375c0a4d60520c2f5921d35b26f45adde4ea5eae03a3790e3",
     "final_snapshot_entries": 1325,
     "surface_digest": "1a500be9f48a1d5f366fd26459d87a3dcf15058088af00811dbd9bfbde0eac5d"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "d52ec7ca5a48862453c54249177b92a75711fdc6",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794681537.6684368,
+    "finished_at": 1794682066.1683218,
+    "strikes": 3,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; tip3 laptop-market.png and desktop-market.png: TIP +108 Cryo-Antibiotics line, full on desktop, destination tail ellipsized at laptop with full tooltip, 0 errors; click selects the destination on the galaxy map; tip, customs banner and sell-all re-verified after extracting renderTradeAdvice",
+    "allowed_removals": [],
+    "final_snapshot_digest": "32c159d8e3ae71c36aaad1f8a9ffa12a601e13188801e6d58bff6a587be548ca",
+    "final_snapshot_entries": 1329,
+    "surface_digest": "27329caa28063c8a9aa45fd2ed91132e4aa83c9554926bf300a0962ea1f03ffb"
   }
 ]
