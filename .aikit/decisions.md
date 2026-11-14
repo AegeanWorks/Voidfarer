@@ -2853,3 +2853,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A real Edge capture of the Ship tab showed the FRM and CORE module chips sitting on the long hull caption ("SEC-0N // CLASS-NAME") at the bottom of the silhouette, leaving garbled fragments of it visible.
 - **Decision**: Each of the five silhouettes keeps one 12px label, shortened to its section code ("SEC-01") and moved to the top-left corner, where no chip reaches. The class name is already shown in the panel header. `test_ship_labels_and_portrait_initials_use_12px` was left untouched: it still passes because the label stays at 12px.
 - **Consequences**: Cockpit markup only. `tests/test_ship_schematic_clear.py` (new, failing first) pins one short corner tag per silhouette. It was added after `ui finish` because the UI guard protects `tests/` during a UI task.
+
+### ADR-279: Disabled HUD buttons look disabled
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: Measuring every disabled button across all expanded tabs in real Edge showed every `btn-hud` variant keeping full opacity and its bright accent colour when disabled: TRAIN 1 SP with 0 skill points, UNLOCK, INSTALL, HIRE, NAP/PACT/R&D/ALLY and VENT all looked clickable. Their `title` text explained why, but only on hover.
+- **Decision**: One late rule, `.btn-hud:disabled` (and its hover), dims to opacity 0.55, mutes the border and background, shows `not-allowed`, and removes the hover glow. The skill cooldown chip keeps its own deliberate style.
+- **Consequences**: CSS only, no behaviour change. `tests/test_disabled_buttons_dim.py` (new, failing first) pins the rule and an opacity range of 0.4 to 0.65 so labels such as "REQUIRES DREADNOUGHT" stay legible. Added after `ui finish` because the UI guard protects `tests/` during a UI task.

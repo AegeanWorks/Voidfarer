@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `205`
-- **Total Classes**: `476`
+- **Total Python Modules**: `206`
+- **Total Classes**: `477`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2472`
-- **Total Source Lines**: `60822`
+- **Total Class Methods**: `2473`
+- **Total Source Lines**: `60852`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`205` module(s))
+- **Indexed**: python (`206` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1078,6 +1078,17 @@
   - Method `.test_each_overlay_is_a_labelled_modal_dialog()`
   - Method `.test_one_observer_manages_focus_for_every_open_and_close_path()`
   - Method `.test_focus_moves_in_on_open_and_is_restored_on_close()`
+
+---
+
+### [`tests/test_disabled_buttons_dim.py`](tests/test_disabled_buttons_dim.py)
+> *Disabled HUD buttons look disabled (ADR-279).*
+
+**Size**: `30` lines (`1051` bytes)
+
+**Classes:**
+- `class DisabledButtonsDimTests`
+  - Method `.test_btn_hud_disabled_is_dimmed_and_blocked()`
 
 ---
 

@@ -11021,3 +11021,13 @@ body.cockpit-theme .nav-panel > .panel-header {
 #tabContentMarket.no-exchange .trade-automation,
 #tabContentMarket.no-exchange .quantum-freight-shell { display: none; }
 .no-market-message .no-market-stations { max-width: 300px; margin-top: 4px; color: var(--console-gold); font-size: 12px; line-height: 1.45; }
+
+/* Disabled HUD buttons read as off: dimmed, no hover lift. Their title says why (TRAIN, UNLOCK, INSTALL, HIRE, diplomacy, VENT). */
+.btn-hud:disabled,
+.btn-hud:disabled:hover {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: rgba(18, 25, 37, 0.6);
+    border-color: var(--console-line);
+    box-shadow: none;
+}
