@@ -7463,6 +7463,48 @@ class SimulationEngine:
                     queue.append(link)
         return None
 
+    def trade_tip(self) -> dict[str, Any] | None:
+        """The best legal buy-here, sell-next-door margin while docked; none away from a station."""
+        with self.lock:
+            body = self.docked_body
+            if body is None or not body.station_dockable:
+                return None
+            origin = self.current_system
+            ship = self.state.ship
+            local_faction = get_faction_id_from_name(origin.faction)
+            best: dict[str, Any] | None = None
+            for commodity in CANONICAL_COMMODITIES:
+                if is_contraband(commodity.id):
+                    continue
+                local = calculate_dynamic_market_quote(
+                    origin, body, commodity, self.state.economy,
+                    faction_standing=ship.faction_standings.get(local_faction, 0),
+                    trade_pact=self.trade_pact_active(local_faction),
+                )
+                for link in origin.connections:
+                    system = self.state.systems.get(link)
+                    dest_body = self._destination_market_body(system) if system else None
+                    if dest_body is None:
+                        continue
+                    faction_id = get_faction_id_from_name(system.faction)
+                    quote = calculate_dynamic_market_quote(
+                        system, dest_body, commodity, self.state.economy,
+                        faction_standing=ship.faction_standings.get(faction_id, 0),
+                        trade_pact=self.trade_pact_active(faction_id),
+                    )
+                    margin = quote.sell_price - local.buy_price
+                    if margin > 0 and (best is None or margin > best["margin"]):
+                        best = {
+                            "commodity_id": commodity.id,
+                            "name": commodity.name,
+                            "buy_price": local.buy_price,
+                            "sell_price": quote.sell_price,
+                            "margin": margin,
+                            "system_id": system.id,
+                            "system_name": system.name,
+                        }
+            return best
+
     def customs_risk_status(self) -> dict[str, Any] | None:
         """Customs scan risk for the worst adjacent high-security cordon, only while contraband is held."""
         with self.lock:
@@ -8537,6 +8579,7 @@ class SimulationEngine:
                 ),
                 "insurance": self.insurance_status(),
                 "customs_risk": self.customs_risk_status(),
+                "trade_tip": self.trade_tip(),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),

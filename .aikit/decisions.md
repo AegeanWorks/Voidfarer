@@ -3049,3 +3049,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-304 publishes the customs scan quote, but the exchange still gave no warning before a beginner jumped with contraband.
 - **Decision**: `#customsRiskBanner` sits above the trade toolbar, hidden until `state.customs_risk` exists. It reads `CONTRABAND IN HOLD (n) · CUSTOMS RISK x% AT <SYSTEM>`, or says no cordon is next door when the chance is zero, and its tooltip carries the real levers (sensor and engine power; `SILENT` is not one of them). It adds height only while contraband is held.
 - **Consequences**: Cockpit only. Verified in real Edge at laptop width with 3 contraband units (`ui-review/customs/`, 41% at Alpha Centauri, 0 console errors, wraps to two lines without clipping). Pinned by `TestCustomsRiskBanner`.
+
+### ADR-306: Best-trade tip in the status snapshot
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: A beginner looking at six commodities could not tell what to buy or where to sell it without visiting neighbouring markets.
+- **Decision**: `SimulationEngine.trade_tip` compares the docked market's buy price for each legal commodity against the sell price at every adjacent system's market (the same `calculate_dynamic_market_quote` the exchange and quantum freight use, with the captain's standings and pacts) and returns the single best positive margin: commodity, buy and sell prices, margin and destination. Contraband is never tipped. It is published as `trade_tip` in the status snapshot (`null` away from a station or when nothing beats its price).
+- **Consequences**: Engine and REST snapshot only; the COMMERCE line follows. No persisted field; the quote is deterministic for a given state. Pinned by `tests/test_trade_tip.py`.

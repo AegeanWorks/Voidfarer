@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `226`
-- **Total Classes**: `506`
+- **Total Python Modules**: `227`
+- **Total Classes**: `507`
 - **Total Top-Level Functions**: `524`
-- **Total Class Methods**: `2551`
-- **Total Source Lines**: `62290`
+- **Total Class Methods**: `2555`
+- **Total Source Lines**: `62367`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`226` module(s))
+- **Indexed**: python (`227` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3894,6 +3894,19 @@
 
 ---
 
+### [`tests/test_trade_tip.py`](tests/test_trade_tip.py)
+> *The status snapshot names the best buy-here, sell-next-door tip while docked.*
+
+**Size**: `34` lines (`1346` bytes)
+
+**Classes:**
+- `class TradeTipTest`
+  - Method `.test_docked_tip_names_a_profitable_adjacent_route()`
+  - Method `.test_the_tip_is_the_best_margin_among_legal_goods()`
+  - Method `.test_no_tip_away_from_a_station()`
+
+---
+
 ### [`tests/test_transit_civ_events.py`](tests/test_transit_civ_events.py)
 > *Tests for in-system transit (TravelState), planetary civilization metadata, and cockpit GameEvents.*
 
@@ -4648,7 +4661,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11014` lines (`543311` bytes)
+**Size**: `11057` lines (`545535` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4826,6 +4839,7 @@
   - Method `.rescue_status()` - *Whether a distress call would be accepted now, and why not.*
   - Method `.distress_call()` - *Summon a rescue tender: fuel for a fee and some lost time, only when truly stranded.*
   - Method `._insurance_destination()` - *The nearest secure system (by hyperlane hops) with a dockable station.*
+  - Method `.trade_tip()` - *The best legal buy-here, sell-next-door margin while docked; none away from a station.*
   - Method `.customs_risk_status()` - *Customs scan risk for the worst adjacent high-security cordon, only while contraband is held.*
   - Method `.insurance_status()` - *The Coalition rebuild policy, quoted only while the hull is destroyed.*
   - Method `.insurance_rebuild()` - *Rebuild a destroyed hull at the nearest secure station: cargo and a credit deductible are lost.*
