@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-audio-icon-sync",
+    "task_id": "voidfarer-modal-radar-galaxy-layout",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794668806.8400102,
+    "updated_at": 1794670207.6477826,
     "owner": "antigravity:goal",
     "started_by": "antigravity:goal",
     "continuations": [],
@@ -15,67 +15,9 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794668820.3903854
+    "completed_at": 1794670208.424322
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-creation-first-launch",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 creation first launch",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794659588.2993226,
-      "timestamp_str": "2026-11-14 15:33:08",
-      "agent": "claude:1",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "voidfarer-creation-first-launch",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-creation-first-launch' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794659689.6946514,
-      "timestamp_str": "2026-11-14 15:34:49",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-ruler-labels",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: AU ruler tick labels reserve their rectangle in the radar label collision list so body and flagship names route around them; failing-first pin and 720p/1080p captures",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794659744.0364892,
-      "timestamp_str": "2026-11-14 15:35:44",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Real Edge at 1280x720: the VF-FLAGSHIP label sits on the 13.0 AU ruler mark; tick text is drawn without registering in the collision list",
-        "benefits": "Names and ruler marks stay legible together",
-        "risks": "contract: none; dependency: ticks reserve space so a crowded map may drop a variant to its short name; concurrency: none; state: none",
-        "mitigation": "Compare label counts before and after at 720p and 1080p; priority-4 labels still always drawn"
-      },
-      "plan_digest": "c192a27cea89d63dcf35a3d413efc03e7434412aa361a20e8131d15a05de3498",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-ruler-labels",
       "phase": "phase 4",
@@ -395,6 +337,64 @@
       "status": "completed",
       "timestamp": 1794668820.390389,
       "timestamp_str": "2026-11-14 18:07:00",
+      "agent": "antigravity:goal",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-modal-radar-galaxy-layout",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Focus first input control in modal dialogs, gate focusin tooltips to keyboard navigation, elevate combat/anomaly alert cards to z-index 60, cap event popups at 1 on short viewports and hide during combat/anomalies, and route radar/galaxy labels around floating cards and neighbor labels",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794669256.3512163,
+      "timestamp_str": "2026-11-14 18:14:16",
+      "agent": "antigravity:goal",
+      "impact_assessment": {
+        "why": "Real-Edge visual and DOM audits showed programmatic modal focus opening unsolicited tooltips and focusing Close instead of Name in Character Creation, combat/anomaly alertdialogs at z-index 9 colliding with reactor controls and event toasts, stacked event toasts covering the galaxy legend at 720p, and galaxy star labels overlapping each other",
+        "benefits": "Zero overlap violations in combat, customs, and boarding scenarios, clean modal opening focus without floating tooltip clutter, unobstructed galaxy map legend and star labels, and orbit labels that route around active event toasts",
+        "risks": "Contract: none; Dependency: none; Concurrency: none; State: UI-only focus, z-index, and canvas label placement",
+        "mitigation": "Preserve existing initDialogFocus, targetCardObstacle, and drawGalaxyView signatures and test anchors; verify in real Edge across all scenarios and unit tests"
+      },
+      "plan_digest": "d850410f50dfb716023610f8360dfe2a15d707dc9373ac0a059efdaa25bddd90",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-modal-radar-galaxy-layout",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Verified modal input focus, keyboard-gated focusin tooltips, z-index 60 combat/anomaly cards, and radar/galaxy label obstacle routing in real Edge and 5/5 check gates",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794670207.6477826,
+      "timestamp_str": "2026-11-14 18:30:07",
+      "agent": "antigravity:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-modal-radar-galaxy-layout",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-modal-radar-galaxy-layout' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794670208.4243245,
+      "timestamp_str": "2026-11-14 18:30:08",
       "agent": "antigravity:goal",
       "delivery": {
         "roots": [

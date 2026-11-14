@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `220`
-- **Total Classes**: `492`
+- **Total Classes**: `493`
 - **Total Top-Level Functions**: `519`
-- **Total Class Methods**: `2499`
-- **Total Source Lines**: `61366`
+- **Total Class Methods**: `2506`
+- **Total Source Lines**: `61406`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`220` module(s))
@@ -455,7 +455,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2758` lines (`123779` bytes)
+**Size**: `2798` lines (`125851` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -867,6 +867,14 @@
   - Method `.test_procurement_small_resets_line_clamp_when_overflow_visible()`
   - Method `.test_character_profile_and_message_choice_prevent_clipping()`
   - Method `.test_safe_color_lifts_precursor_watch_violet_to_wcag_aa()`
+- `class TestModalFocusRadarAndGalaxyLayout` - *Modal initial input focus, keyboard-only focusin tooltips, z-index 60 combat/anomaly overlays, and radar/galaxy label obstacles.*
+  - Method `.setUpClass()`
+  - Method `.test_dialog_focus_prefers_form_controls_before_close_buttons()`
+  - Method `.test_focusin_tooltips_only_open_after_keyboard_navigation()`
+  - Method `.test_combat_and_anomaly_cards_sit_in_modal_overlay_layer()`
+  - Method `.test_target_card_obstacle_includes_event_combat_and_anomaly_cards()`
+  - Method `.test_galaxy_view_routes_star_labels_around_obstacles_and_neighbors()`
+  - Method `.test_event_popups_hide_during_combat_or_anomaly_and_cap_on_short_viewports()`
 
 ---
 

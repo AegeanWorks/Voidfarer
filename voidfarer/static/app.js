@@ -8035,19 +8035,29 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     // The open target card floats over the radar. Seeding the label collision list with its
     // rectangle makes names route to free space instead of running underneath it.
     targetCardObstacle() {
-        const card = this.navTargetCard || document.getElementById("navTargetCard");
-        if (!card || getComputedStyle(card).display === "none") return [];
-        const rect = card.getBoundingClientRect();
         const canvasRect = this.canvas.getBoundingClientRect();
         const dpr = this.dpr || 1;
         const scaleX = (this.canvas.width / Math.max(1, canvasRect.width)) / dpr;
         const scaleY = (this.canvas.height / Math.max(1, canvasRect.height)) / dpr;
-        return [{
-            x: (rect.left - canvasRect.left) * scaleX,
-            y: (rect.top - canvasRect.top) * scaleY,
-            w: rect.width * scaleX,
-            h: rect.height * scaleY,
-        }];
+        const cards = [
+            this.navTargetCard || document.getElementById("navTargetCard"),
+            this.eventPopupContainer || document.getElementById("eventPopupContainer"),
+            this.combatCard || document.getElementById("combatCard"),
+            this.anomalyCard || document.getElementById("anomalyCard"),
+        ];
+        const boxes = [];
+        for (const card of cards) {
+            if (!card || getComputedStyle(card).display === "none") continue;
+            const rect = card.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) continue;
+            boxes.push({
+                x: (rect.left - canvasRect.left) * scaleX,
+                y: (rect.top - canvasRect.top) * scaleY,
+                w: rect.width * scaleX,
+                h: rect.height * scaleY,
+            });
+        }
+        return boxes;
     }
 
     // The outermost orbit must stay inside the visible radar: at 720p the center panel
@@ -8233,6 +8243,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }));
         ctx.restore();
 
+        const galaxyLabelBoxes = this.targetCardObstacle();
+        const mapBounds = this.mapRect || { x: 0, y: 0, w: this.viewW, h: this.viewH };
         systems.forEach(s => {
             const [sx, sy] = at(s);
             const owner = owners[s.id] || {};
@@ -8273,13 +8285,43 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ctx.font = `${fontSize}px 'Segoe UI'`;
             const label = s.name;
             const labelWidth = ctx.measureText(label).width;
-            const lx = sx + radius + 9 * nodeScale;
+            const boxW = labelWidth + 8 * nodeScale;
+            const boxH = 18 * nodeScale;
+            const gap = 9 * nodeScale;
+            const candidates = [
+                { lx: sx + radius + gap, ly: sy - 11 * nodeScale },
+                { lx: sx - radius - gap - labelWidth, ly: sy - 11 * nodeScale },
+                { lx: sx - labelWidth / 2, ly: sy + radius + 4 * nodeScale },
+                { lx: sx - labelWidth / 2, ly: sy - radius - boxH - 4 * nodeScale },
+            ];
+            let chosen = null;
+            for (const cand of candidates) {
+                const bx = cand.lx - 4 * nodeScale;
+                const by = cand.ly;
+                if (bx < mapBounds.x + 4 || by < mapBounds.y + 4
+                    || bx + boxW > mapBounds.x + mapBounds.w - 4
+                    || by + boxH > mapBounds.y + mapBounds.h - 28) continue;
+                const collides = galaxyLabelBoxes.some(other =>
+                    bx < other.x + other.w && bx + boxW > other.x
+                    && by < other.y + other.h && by + boxH > other.y
+                );
+                if (!collides) {
+                    chosen = { lx: cand.lx, bx, by };
+                    break;
+                }
+            }
+            if (!chosen && (isCurrent || isSelected || s.id === hoveredId)) {
+                const lx = sx + radius + gap;
+                chosen = { lx, bx: lx - 4 * nodeScale, by: sy - 11 * nodeScale };
+            }
+            if (!chosen) return;
+            galaxyLabelBoxes.push({ x: chosen.bx, y: chosen.by, w: boxW, h: boxH });
             ctx.fillStyle = "rgba(4, 9, 19, 0.78)";
-            ctx.fillRect(lx - 4 * nodeScale, sy - 11 * nodeScale, labelWidth + 8 * nodeScale, 18 * nodeScale);
+            ctx.fillRect(chosen.bx, chosen.by, boxW, boxH);
             ctx.fillStyle = owner.color || "#7f8a99";
-            ctx.fillRect(lx - 4 * nodeScale, sy - 11 * nodeScale, 2 * nodeScale, 18 * nodeScale);
+            ctx.fillRect(chosen.bx, chosen.by, 2 * nodeScale, boxH);
             ctx.fillStyle = isCurrent ? "#8fbf9f" : "#ece4d4";
-            ctx.fillText(label, lx, sy + 4 * nodeScale);
+            ctx.fillText(label, chosen.lx, chosen.by + 15 * nodeScale);
         });
 
         this.drawGalaxyTraffic(ctx, transform, now);
@@ -9280,7 +9322,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 wasOpen = open;
                 if (open) {
                     opener = document.activeElement;
-                    const first = overlay.querySelector("button, input, select, [tabindex]:not([tabindex='-1'])");
+                    const first = overlay.querySelector("input:not([type='hidden']), select, textarea")
+                        || overlay.querySelector("button, [tabindex]:not([tabindex='-1'])");
                     if (first) first.focus();
                 } else if (opener && typeof opener.focus === "function" && document.contains(opener)) {
                     opener.focus();
@@ -9380,7 +9423,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (target && event.relatedTarget && target.contains(event.relatedTarget)) return;
             hide();
         });
+        let keyboardNav = false;
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Tab" || event.key.startsWith("Arrow")) keyboardNav = true;
+        }, true);
+        document.addEventListener("pointerdown", () => { keyboardNav = false; }, true);
         document.addEventListener("focusin", (event) => {
+            if (!keyboardNav) return;
             const target = find(event);
             if (target) schedule(target, 120);
         });
@@ -9890,13 +9939,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     renderEventPopups() {
         if (!this.eventPopupContainer || !this.state) return;
         const events = this.state.undismissed_events || (this.state.events || []).filter(e => !e.dismissed);
-        if (!events || events.length === 0) {
+        if (!events || events.length === 0 || this.state.active_combat || this.state.active_anomaly) {
             this.eventPopupContainer.style.display = "none";
             this.eventPopupContainer.innerHTML = "";
             return;
         }
+        const maxPopups = window.innerHeight < 820 ? 1 : 3;
         this.eventPopupContainer.style.display = "flex";
-        this.eventPopupContainer.innerHTML = events.slice(-3).map(evt => `
+        this.eventPopupContainer.innerHTML = events.slice(-maxPopups).map(evt => `
             <div class="event-popup-card">
                 <div class="event-popup-body">
                     <div class="event-popup-meta">[${this.escapeHtml(String(evt.kind || "system").toUpperCase())} // TICK #${Number(evt.tick || 0)}]</div>

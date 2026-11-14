@@ -7652,7 +7652,7 @@ input[type="text"], input[type="number"], select, textarea { min-height: 30px; b
     top: 88px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 9;
+    z-index: 60;
     width: min(460px, 48vw);
     max-height: calc(100vh - 220px);
     overflow-y: auto;
@@ -7687,7 +7687,7 @@ input[type="text"], input[type="number"], select, textarea { min-height: 30px; b
 .combat-combo-badge { border-radius: 0; border-top: 1px solid rgba(201, 163, 90, 0.2); padding-top: 6px; color: var(--console-gold-bright); font-size: 12px; }
 .crit-ready-text { color: var(--console-green); }
 
-.anomaly-alert-card { position: fixed; top: 88px; left: 50%; transform: translateX(-50%); z-index: 9; width: min(460px, 48vw); padding: 12px 14px; border: 1px solid rgba(201, 107, 90, 0.45); border-top: 2px solid var(--console-red); border-radius: 0; background: #08111f; box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5); animation: none; }
+.anomaly-alert-card { position: fixed; top: 88px; left: 50%; transform: translateX(-50%); z-index: 60; width: min(460px, 48vw); padding: 12px 14px; border: 1px solid rgba(201, 107, 90, 0.45); border-top: 2px solid var(--console-red); border-radius: 0; background: #08111f; box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5); animation: none; }
 .anomaly-header { gap: 8px; }
 .alert-icon { font-size: 1.4rem; color: var(--console-red); }
 .alert-tag { font-family: var(--font-mono); font-size: 12px; color: var(--console-red); }
@@ -8270,7 +8270,7 @@ body.cockpit-theme .panel-center {
 .nav-target-card { z-index: 6; }
 .event-popup-container { z-index: 8; }
 .combat-alert-card,
-.anomaly-alert-card { z-index: 9; }
+.anomaly-alert-card { z-index: 60; }
 .map-controls-panel,
 .hud-strip-right > *,
 .hud-strip-panel { pointer-events: auto; }

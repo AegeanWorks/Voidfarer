@@ -2756,3 +2756,43 @@ class TestCockpitReadabilityAndContrastPolish(unittest.TestCase):
         self.assertIn('"#8b5cf6"', block)
         self.assertIn('"#9d74f7"', block)
 
+
+class TestModalFocusRadarAndGalaxyLayout(unittest.TestCase):
+    """Modal initial input focus, keyboard-only focusin tooltips, z-index 60 combat/anomaly overlays, and radar/galaxy label obstacles."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_dialog_focus_prefers_form_controls_before_close_buttons(self):
+        body = self.js.split("initDialogFocus() {", 1)[1][:1200]
+        self.assertIn("input:not([type='hidden']), select, textarea", body)
+        self.assertIn("first.focus()", body)
+
+    def test_focusin_tooltips_only_open_after_keyboard_navigation(self):
+        body = self.js.split("initTooltips() {", 1)[1][:4000]
+        self.assertIn("let keyboardNav = false;", body)
+        self.assertIn("if (!keyboardNav) return;", body)
+
+    def test_combat_and_anomaly_cards_sit_in_modal_overlay_layer(self):
+        self.assertRegex(self.css, r"\.combat-alert-card\s*\{[^}]*z-index:\s*60;", re.S)
+        self.assertRegex(self.css, r"\.anomaly-alert-card\s*\{[^}]*z-index:\s*60;", re.S)
+
+    def test_target_card_obstacle_includes_event_combat_and_anomaly_cards(self):
+        body = self.js.split("targetCardObstacle() {", 1)[1][:1400]
+        for card_id in ("navTargetCard", "eventPopupContainer", "combatCard", "anomalyCard"):
+            self.assertIn(card_id, body)
+
+    def test_galaxy_view_routes_star_labels_around_obstacles_and_neighbors(self):
+        body = self.js.split("drawGalaxyView(cx, cy) {", 1)[1][:8000]
+        self.assertIn("const galaxyLabelBoxes = this.targetCardObstacle();", body)
+        self.assertIn("galaxyLabelBoxes.some(", body)
+        self.assertIn("galaxyLabelBoxes.push(", body)
+
+    def test_event_popups_hide_during_combat_or_anomaly_and_cap_on_short_viewports(self):
+        body = self.js.split("renderEventPopups() {", 1)[1][:700]
+        self.assertIn("this.state.active_combat || this.state.active_anomaly", body)
+        self.assertIn("const maxPopups = window.innerHeight < 820 ? 1 : 3;", body)
+
+
