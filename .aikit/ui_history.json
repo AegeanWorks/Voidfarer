@@ -2414,5 +2414,27 @@
     "final_snapshot_digest": "e85f39b6681858103c9f93130a827714e02972d527f36d546c1dcfb540552695",
     "final_snapshot_entries": 1303,
     "surface_digest": "adcfb683383fb601162eddec701140624d0524b3e14f31a72e10d2340c14b332"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "50cc0a81cd99385804f6080bf0516c205451c170",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794672763.7004354,
+    "finished_at": 1794673285.0288498,
+    "strikes": 0,
+    "reviewer": "antigravity:goal (Gemini 4 Argon multimodal G-015)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "6ed003a9f60dd3489608be6e6a323507e790c60869ab9c7f556a2802729f564c",
+    "final_snapshot_entries": 1316,
+    "surface_digest": "a7b663812e75b0f11a8b8470baead5e3cf6f322bebe8647cd07d616899013772"
   }
 ]
