@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `210`
-- **Total Classes**: `481`
+- **Total Python Modules**: `211`
+- **Total Classes**: `482`
 - **Total Top-Level Functions**: `515`
-- **Total Class Methods**: `2480`
-- **Total Source Lines**: `61004`
+- **Total Class Methods**: `2481`
+- **Total Source Lines**: `61031`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`210` module(s))
+- **Indexed**: python (`211` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1661,6 +1661,17 @@
 
 **Functions:**
 - `def _engine()`
+
+---
+
+### [`tests/test_flee_needs_fuel_ui.py`](tests/test_flee_needs_fuel_ui.py)
+> *The Flee button says when there is too little fuel to use it (ADR-283).*
+
+**Size**: `27` lines (`1151` bytes)
+
+**Classes:**
+- `class FleeNeedsFuelUiTests`
+  - Method `.test_button_disables_below_the_engine_fuel_cost()`
 
 ---
 

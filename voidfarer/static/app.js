@@ -2560,6 +2560,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                             ? `Board only below ${crippledAt} hull`
                             : "Send the marine party across";
             }
+            if (this.btnCombatFlee) {
+                // The emergency micro-jump is the guaranteed way out; it burns 8 fuel (engine combat_action "flee").
+                const fuel = Number(ship.fuel || 0);
+                const tooLow = fuel < 8;
+                this.btnCombatFlee.disabled = tooLow;
+                this.btnCombatFlee.textContent = tooLow ? "↯ NEED 8 FUEL TO FLEE" : "↯ FLEE SECTOR (-8 FUEL)";
+                this.btnCombatFlee.title = tooLow
+                    ? `The emergency jump burns 8 fuel and you have ${fuel}: fight on, or burn a fuel cell from the Ship tab`
+                    : "Guaranteed escape: an emergency micro-jump out of the sector";
+            }
             if (this.btnCombatGambit) {
                 const localCaptains = (ship.fleet_ships || []).filter(escort =>
                     escort.assigned_system_id === ship.current_system_id

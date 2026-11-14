@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-net-sell-price",
+    "task_id": "voidfarer-flee-fuel",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794657644.7994854,
+    "updated_at": 1794658042.5295427,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,58 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-rail-labels",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 rail labels",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794639709.4913979,
-      "timestamp_str": "2026-11-14 10:01:49",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-rail-labels",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-rail-labels' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794639801.4525828,
-      "timestamp_str": "2026-11-14 10:03:21",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-story-names",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: story travel objectives use galaxy display names, not title-cased ids; failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794639901.4983966,
-      "timestamp_str": "2026-11-14 10:05:01",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "The Comms tab showed 'currently in Alpha_Centauri' and 'Sirius System' for 'Sirius Prime'",
-        "benefits": "Objectives match the names on the galaxy map",
-        "risks": "contract: message text only; dependency: none; concurrency: none; state: none",
-        "mitigation": "Existing story test assertions updated to real names, same strength"
-      },
-      "plan_digest": "e497afff2df508d53db32eb70db80d8ab7628fed580eb13c45f74e25a63d420b"
-    },
-    {
-      "task_id": "voidfarer-story-names",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 story names",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794639912.7461262,
-      "timestamp_str": "2026-11-14 10:05:12",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-story-names",
       "phase": "completed",
@@ -308,6 +256,88 @@
       "status": "in_progress",
       "timestamp": 1794657644.7994854,
       "timestamp_str": "2026-11-14 15:00:44",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-net-sell-price",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-net-sell-price' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794657728.5205524,
+      "timestamp_str": "2026-11-14 15:02:08",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-flee-fuel",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: disable the combat FLEE button with a plain reason when fuel is below the 8 the engine requires; failing-first source pin and browser check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794657801.866335,
+      "timestamp_str": "2026-11-14 15:03:21",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Reading the combat code: flee is the guaranteed escape but costs 8 fuel; the button never disables, so a low-fuel player clicks it and only gets a log error",
+        "benefits": "Players see why the escape is unavailable before an unwinnable fight goes wrong",
+        "risks": "contract: none; dependency: literal 8 matches the engine and the button label, pinned by the test; concurrency: none; state: none",
+        "mitigation": "Test reads the engine constant and fails if they drift"
+      },
+      "plan_digest": "466d2b9528e66302ccaafe2bf42b7efab2309ad03e06a2063229b7bd9e2d8791",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-flee-fuel",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: disable the combat FLEE button with a plain reason when fuel is below the 8 the engine requires; failing-first source pin and browser check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794657869.3297586,
+      "timestamp_str": "2026-11-14 15:04:29",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Reading the combat code: flee is the guaranteed escape but costs 8 fuel; the button never disables, so a low-fuel player clicks it and only gets a log error",
+        "benefits": "Players see why the escape is unavailable before an unwinnable fight goes wrong",
+        "risks": "contract: none; dependency: literal 8 matches the engine and the button label, pinned by the test; concurrency: none; state: none",
+        "mitigation": "Test reads the engine constant and fails if they drift"
+      },
+      "plan_digest": "466d2b9528e66302ccaafe2bf42b7efab2309ad03e06a2063229b7bd9e2d8791",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-flee-fuel",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 flee fuel",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794658042.5295427,
+      "timestamp_str": "2026-11-14 15:07:22",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [
