@@ -172,13 +172,14 @@
                     <div class="creation-field">
                         <label>BACKGROUND</label>
                         <select id="charBackground">
-                            <option value="Navigator">Navigator</option>
-                            <option value="Engineer">Engineer</option>
-                            <option value="Scientist">Scientist</option>
-                            <option value="Marine">Marine</option>
-                            <option value="Trader">Trader</option>
-                            <option value="Diplomat">Diplomat</option>
+                            <option value="Navigator">Navigator (+2 piloting, +1 science)</option>
+                            <option value="Engineer">Engineer (+2 engineering, +1 piloting)</option>
+                            <option value="Marine">Marine (+2 combat, +1 engineering)</option>
+                            <option value="Merchant">Merchant (+2 trade, +1 diplomacy)</option>
+                            <option value="Diplomat">Diplomat (+2 diplomacy, +1 trade)</option>
+                            <option value="Prospector">Prospector (+2 science, +1 trade)</option>
                         </select>
+                        <p class="creation-hint" id="charBackgroundHint"></p>
                     </div>
                     <button class="btn-hud btn-cyan" id="btnCharNext1">NEXT: SKILLS</button>
                 </div>

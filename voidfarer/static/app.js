@@ -1291,6 +1291,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             document.getElementById("btnCharNext1")?.addEventListener("click", () => this.charStep(1, 2));
             document.getElementById("btnCharBack2")?.addEventListener("click", () => this.charStep(2, 1));
             document.getElementById("btnCharCreate")?.addEventListener("click", () => this.createCharacter());
+            document.getElementById("charBackground")?.addEventListener("change", () => this.syncBackgroundHint());
+        }.bind(this);
+
+        // The origin's backstory line, read from the engine's catalog so it can never drift from the grant.
+        this.syncBackgroundHint = function() {
+            const hint = document.getElementById("charBackgroundHint");
+            const select = document.getElementById("charBackground");
+            if (!hint || !select) return;
+            const catalog = (this.state && this.state.character_background_catalog) || {};
+            const entry = catalog[String(select.value).toLowerCase()];
+            hint.textContent = entry && entry.description ? entry.description : "";
         }.bind(this);
 
         this.setupCharacterCreation();
@@ -1317,6 +1328,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (nameInput) nameInput.value = "";
             if (ageInput) ageInput.value = "30";
             if (backgroundInput) backgroundInput.value = "Navigator";
+            this.syncBackgroundHint();
             this.charCreationOverlay.style.display = "flex";
             this.charStep(0, 1);
             this.renderAttrGrid();

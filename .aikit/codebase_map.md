@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `198`
-- **Total Classes**: `469`
-- **Total Top-Level Functions**: `511`
-- **Total Class Methods**: `2449`
-- **Total Source Lines**: `60564`
+- **Total Python Modules**: `199`
+- **Total Classes**: `470`
+- **Total Top-Level Functions**: `512`
+- **Total Class Methods**: `2453`
+- **Total Source Lines**: `60608`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`198` module(s))
+- **Indexed**: python (`199` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -983,6 +983,23 @@
 
 **Functions:**
 - `def _base()`
+
+---
+
+### [`tests/test_creation_origins_ui.py`](tests/test_creation_origins_ui.py)
+> *The Character Creation origin dropdown offers exactly the engine's origins and shows what each grants.*
+
+**Size**: `44` lines (`1899` bytes)
+
+**Classes:**
+- `class TestCreationOrigins`
+  - Method `.test_the_dropdown_offers_exactly_the_catalog_origins()`
+  - Method `.test_every_option_label_states_its_skill_bonuses()`
+  - Method `.test_every_option_value_grants_training_in_the_engine()`
+  - Method `.test_a_description_line_follows_the_selection()`
+
+**Functions:**
+- `def _options()`
 
 ---
 

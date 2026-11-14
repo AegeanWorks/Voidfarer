@@ -11003,3 +11003,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 #vitalFuelCard.is-rescuable { cursor: pointer; }
 #vitalFuelCard.is-rescuable #fuelBurnChip { display: inline-block; }
 #vitalFuelCard.is-rescuable:hover #fuelBurnChip { background: rgba(217, 112, 95, 0.2); }
+
+/* Character Creation: the selected origin's backstory sits under the dropdown. */
+.creation-hint { margin: 6px 0 0; min-height: 2.6em; color: var(--console-muted); font-size: 12px; line-height: 1.4; font-style: italic; }
