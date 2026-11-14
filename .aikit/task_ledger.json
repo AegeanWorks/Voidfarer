@@ -5,28 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794680761.039359,
+    "updated_at": 1794681216.0723696,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-modal-radar-galaxy-layout",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-modal-radar-galaxy-layout' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794670362.2730901,
-      "timestamp_str": "2026-11-14 18:32:42",
-      "agent": "antigravity:goal",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-flexible-cadet-academy",
       "phase": "phase 2",
@@ -303,6 +287,17 @@
       "status": "in_progress",
       "timestamp": 1794680761.039359,
       "timestamp_str": "2026-11-14 21:26:01",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-trade-clarity",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[3/3] Customs risk banner in COMMERCE (ADR-305); best-trade tip #2 deferred; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794681216.0723696,
+      "timestamp_str": "2026-11-14 21:33:36",
       "agent": "claude:1"
     }
   ]

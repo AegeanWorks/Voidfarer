@@ -955,6 +955,7 @@ class CockpitApp {
         this.commissionDetails = document.getElementById("commissionDetails");
         this.btnToggleMarketFilters = document.getElementById("btnToggleMarketFilters");
         this.btnSellAllProfitable = document.getElementById("btnSellAllProfitable");
+        this.customsRiskBanner = document.getElementById("customsRiskBanner");
         this.btnSellAllProfitable?.addEventListener("click", () => this.handleSellAllProfitable());
         this.marketFilterDetails = document.getElementById("marketFilterDetails");
         this.btnToggleEscorts = document.getElementById("btnToggleEscorts");
@@ -3535,6 +3536,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const cargo = this.state.ship.cargo || {};
         const avgCost = this.state.cargo_avg_cost || {};
         const lot = this.tradeLot;
+        if (this.customsRiskBanner) {
+            const risk = this.state.customs_risk;
+            this.customsRiskBanner.hidden = !risk;
+            if (risk) {
+                this.customsRiskBanner.textContent = risk.chance > 0
+                    ? `⚠ CONTRABAND IN HOLD (${risk.units}) · CUSTOMS RISK ${Math.round(risk.chance * 100)}% AT ${risk.system_name.toUpperCase()}`
+                    : `⚠ CONTRABAND IN HOLD (${risk.units}) · NO CUSTOMS CORDON NEXT DOOR`;
+                this.customsRiskBanner.title = risk.hint;
+            }
+        }
         if (this.btnSellAllProfitable) {
             this.btnSellAllProfitable.disabled = !allQuotes.length
                 || !Object.values(cargo).some(units => Number(units) > 0);

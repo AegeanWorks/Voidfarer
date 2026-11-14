@@ -3042,3 +3042,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Beginners who bought contraband were surprised by customs interdictions on the next jump with no hint why. The engine already computes the scan chance from the system security, cargo volume, sensor and engine power, stealth and pilot mastery (`calculate_customs_scan_risk`), but nothing showed it. `SILENT` reactor mode only helps against pirates, not customs, so it must not be advertised as a fix.
 - **Decision**: `SimulationEngine.customs_risk_status` returns, only while contraband is in the hold, the contraband unit count and the worst scan chance across adjacent high-security systems with that system's name, plus the real levers (35% or more power to sensors, 40% or more to engines). It is published as `customs_risk` in the status snapshot (`null` when clean).
 - **Consequences**: Engine and REST snapshot only; the COMMERCE banner follows. No persisted field. Pinned by `tests/test_customs_risk_status.py`.
+
+### ADR-305: Customs risk banner in COMMERCE
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: ADR-304 publishes the customs scan quote, but the exchange still gave no warning before a beginner jumped with contraband.
+- **Decision**: `#customsRiskBanner` sits above the trade toolbar, hidden until `state.customs_risk` exists. It reads `CONTRABAND IN HOLD (n) · CUSTOMS RISK x% AT <SYSTEM>`, or says no cordon is next door when the chance is zero, and its tooltip carries the real levers (sensor and engine power; `SILENT` is not one of them). It adds height only while contraband is held.
+- **Consequences**: Cockpit only. Verified in real Edge at laptop width with 3 contraband units (`ui-review/customs/`, 41% at Alpha Centauri, 0 console errors, wraps to two lines without clipping). Pinned by `TestCustomsRiskBanner`.

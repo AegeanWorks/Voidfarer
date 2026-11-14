@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `226`
-- **Total Classes**: `505`
+- **Total Classes**: `506`
 - **Total Top-Level Functions**: `524`
-- **Total Class Methods**: `2548`
-- **Total Source Lines**: `62269`
+- **Total Class Methods**: `2551`
+- **Total Source Lines**: `62290`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`226` module(s))
@@ -470,7 +470,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2908` lines (`131026` bytes)
+**Size**: `2929` lines (`132037` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -518,6 +518,10 @@
   - Method `.setUpClass()`
   - Method `.test_button_shares_one_row_with_the_filters_toggle()`
   - Method `.test_button_posts_the_sell_all_logistics_action_and_follows_the_hold()`
+- `class TestCustomsRiskBanner` - *COMMERCE warns about customs risk while contraband is held (ADR-305).*
+  - Method `.setUpClass()`
+  - Method `.test_banner_is_hidden_by_default_above_the_trade_toolbar()`
+  - Method `.test_banner_follows_the_customs_risk_quote()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

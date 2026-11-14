@@ -368,6 +368,27 @@ class TestSellAllProfitableButton(unittest.TestCase):
         self.assertIn("this.btnSellAllProfitable.disabled", self.js)
 
 
+class TestCustomsRiskBanner(unittest.TestCase):
+    """COMMERCE warns about customs risk while contraband is held (ADR-305)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_banner_is_hidden_by_default_above_the_trade_toolbar(self):
+        self.assertIn('id="customsRiskBanner" role="status" hidden', self.html)
+        self.assertLess(self.html.index('id="customsRiskBanner"'), self.html.index('class="trade-toolbar"'))
+        self.assertIn(".customs-risk-banner[hidden] { display: none; }", self.css)
+
+    def test_banner_follows_the_customs_risk_quote(self):
+        self.assertIn("const risk = this.state.customs_risk;", self.js)
+        self.assertIn("this.customsRiskBanner.hidden = !risk;", self.js)
+        self.assertIn("CUSTOMS RISK", self.js)
+        self.assertIn("this.customsRiskBanner.title = risk.hint;", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 
