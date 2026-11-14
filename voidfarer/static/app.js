@@ -2379,7 +2379,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const winners = quotes.filter(q => {
                 const hold = Number(cargo[q.commodity_id] || 0);
                 const avg = Number(avgCost[q.commodity_id] || 0);
-                return hold > 0 && avg > 0 && Number(q.sell_price || 0) > avg;
+                return hold > 0 && avg > 0 && Number(q.sell_price_net ?? q.sell_price) > avg;
             }).length;
             if (winners > 0) {
                 this.marketBadge.style.display = "inline-block";
@@ -3365,10 +3365,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             // A fixed lot is clamped to what the hold and credits allow, so the button never lies.
             const buyQty = lot === "max" ? maxBuy : Math.min(Number(lot), maxBuy);
             const sellQty = lot === "max" ? holdCount : Math.min(Number(lot), holdCount);
-            const margin = avg ? (q.sell_price >= avg ? "td-profit" : "td-loss") : "";
+            // A sale pays the quote after your trade margin and any specialty bonus: show and judge that.
+            const sellNet = Number(q.sell_price_net ?? q.sell_price);
+            const margin = avg ? (sellNet >= avg ? "td-profit" : "td-loss") : "";
             const commId = this.escapeHtml(q.commodity_id);
 
-            const diff = avg ? (q.sell_price - avg) : 0;
+            const diff = avg ? (sellNet - avg) : 0;
             const marginChip = avg
                 ? `<span class="market-margin-chip ${diff >= 0 ? "margin-pos" : "margin-neg"}">${diff >= 0 ? `+${diff} ▲` : `${diff} ▼`}</span>`
                 : "";
@@ -3398,7 +3400,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     </div>
                 </td>
                 <td class="td-buy">${q.buy_price}</td>
-                <td class="td-sell ${margin}">${q.sell_price}</td>
+                <td class="td-sell ${margin}" title="${sellNet !== Number(q.sell_price) ? `Net per unit after your trade margin (market quote ${q.sell_price})` : "Paid per unit"}">${sellNet}</td>
                 <td class="td-hold">${holdCount}${avg ? `<small class="td-avg" title="Average paid per unit held">@${avg}</small>` : ""}</td>
                 <td>
                     <div class="trade-btn-group">

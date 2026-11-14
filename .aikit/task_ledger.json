@@ -5,7 +5,7 @@
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794657357.7796485,
+    "updated_at": 1794657644.7994854,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,24 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-rail-labels",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: shorten the two sidebar labels that overflow the rail beside a badge (AI COMMAND, CAPTAIN'S LOG); failing-first label-length test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794639397.2956514,
-      "timestamp_str": "2026-11-14 09:56:37",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Measured in real Edge: CAPTAIN'S LOG overflows the 138px rail by 13px and AI COMMAND by 5px, clipping the unread badge",
-        "benefits": "Badges stay visible so unread counts are never hidden",
-        "risks": "contract: tab ids and handlers untouched; dependency: none; concurrency: none; state: none; label wording changes only",
-        "mitigation": "Keep ids/titles; full tooltip keeps the long name; test pins max length"
-      },
-      "plan_digest": "baacbbea00a3e8f15e2db31aeffb6e1d2165ac8b0c73f80eb43aff3dfe171e1e"
-    },
     {
       "task_id": "voidfarer-rail-labels",
       "phase": "phase 4",
@@ -308,6 +290,24 @@
       "status": "in_progress",
       "timestamp": 1794657357.7796485,
       "timestamp_str": "2026-11-14 14:55:57",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-net-sell-price",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] cockpit net price Phase 4",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794657644.7994854,
+      "timestamp_str": "2026-11-14 15:00:44",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [

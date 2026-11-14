@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `209`
-- **Total Classes**: `480`
+- **Total Python Modules**: `210`
+- **Total Classes**: `481`
 - **Total Top-Level Functions**: `515`
-- **Total Class Methods**: `2479`
-- **Total Source Lines**: `60979`
+- **Total Class Methods**: `2480`
+- **Total Source Lines**: `61004`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`209` module(s))
+- **Indexed**: python (`210` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -953,6 +953,17 @@
   - Method `.test_arrival_pays_resonance_credits_and_xp()`
   - Method `.test_emergency_emerge_pays_only_prorated_resonance()`
   - Method `.test_cli_and_cockpit_expose_resonance()`
+
+---
+
+### [`tests/test_commerce_net_price_ui.py`](tests/test_commerce_net_price_ui.py)
+> *The Commerce table shows, and judges profit by, the net sell price (ADR-282).*
+
+**Size**: `25` lines (`968` bytes)
+
+**Classes:**
+- `class CommerceNetPriceUiTests`
+  - Method `.test_table_and_winners_use_the_net_price()`
 
 ---
 
