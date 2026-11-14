@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `220`
-- **Total Classes**: `494`
+- **Total Python Modules**: `221`
+- **Total Classes**: `495`
 - **Total Top-Level Functions**: `519`
-- **Total Class Methods**: `2511`
-- **Total Source Lines**: `61658`
+- **Total Class Methods**: `2512`
+- **Total Source Lines**: `61761`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`220` module(s))
+- **Indexed**: python (`221` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3816,6 +3816,17 @@
 
 ---
 
+### [`tests/test_tutorial_arrival_relic.py`](tests/test_tutorial_arrival_relic.py)
+> *A relic won by the orbit step on a transit arrival is kept and applied.*
+
+**Size**: `36` lines (`1426` bytes)
+
+**Classes:**
+- `class TutorialArrivalRelicTest`
+  - Method `.test_transit_arrival_keeps_the_tutorial_relic_and_its_hull_bonus()`
+
+---
+
 ### [`tests/test_tutorial_trade_hint.py`](tests/test_tutorial_trade_hint.py)
 > *The trade milestone tells the player they need a station, so a player parked at a wilderness body is not stranded.*
 
@@ -4534,7 +4545,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10778` lines (`532582` bytes)
+**Size**: `10845` lines (`535369` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

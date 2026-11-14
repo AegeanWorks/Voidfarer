@@ -2036,8 +2036,19 @@ class SimulationEngine:
             new_log.extend(tut_logs)
             new_mastery, xp_logs = self._award_pilot_xp(tut_xp, self.state.ship.mastery) if tut_xp > 0 else (self.state.ship.mastery, [])
             new_log.extend(xp_logs)
+            new_hull, new_max_hull, new_shield, new_max_shield = self._apply_relic_stat_bonuses(
+                self.state.ship.hull,
+                self.state.ship.max_hull,
+                self.state.ship.shield,
+                self.state.ship.max_shield,
+                tut_relics,
+            )
 
             new_ship = self._clone_ship(
+                hull=new_hull,
+                max_hull=new_max_hull,
+                shield=new_shield,
+                max_shield=new_max_shield,
                 orbiting_body_id=body_id,
                 landed_body_id=None,
                 travel=None,
@@ -2584,8 +2595,19 @@ class SimulationEngine:
             new_log.extend(tut_logs)
             new_mastery, xp_logs = self._award_pilot_xp(tut_xp, self.state.ship.mastery) if tut_xp > 0 else (self.state.ship.mastery, [])
             new_log.extend(xp_logs)
+            new_hull, new_max_hull, new_shield, new_max_shield = self._apply_relic_stat_bonuses(
+                self.state.ship.hull,
+                self.state.ship.max_hull,
+                self.state.ship.shield,
+                self.state.ship.max_shield,
+                tut_relics,
+            )
 
             new_ship = self._clone_ship(
+                hull=new_hull,
+                max_hull=new_max_hull,
+                shield=new_shield,
+                max_shield=new_max_shield,
                 power=new_power,
                 credits=self.state.ship.credits + tut_cr,
                 mastery=new_mastery,
@@ -2619,7 +2641,18 @@ class SimulationEngine:
                 if tut_xp > 0 else (self.state.ship.mastery, [])
             )
             new_log.extend(xp_logs)
+            new_hull, new_max_hull, new_shield, new_max_shield = self._apply_relic_stat_bonuses(
+                self.state.ship.hull,
+                self.state.ship.max_hull,
+                self.state.ship.shield,
+                self.state.ship.max_shield,
+                tut_relics,
+            )
             new_ship = self._clone_ship(
+                hull=new_hull,
+                max_hull=new_max_hull,
+                shield=new_shield,
+                max_shield=new_max_shield,
                 reactor=reactor,
                 credits=self.state.ship.credits + tut_cr,
                 mastery=new_mastery,
@@ -5171,8 +5204,19 @@ class SimulationEngine:
             if tut_xp > 0:
                 new_mastery, tut_xp_logs = self._award_pilot_xp(tut_xp, new_mastery)
                 new_log.extend(tut_xp_logs)
+            new_hull, new_max_hull, new_shield, new_max_shield = self._apply_relic_stat_bonuses(
+                self.state.ship.hull,
+                self.state.ship.max_hull,
+                self.state.ship.shield,
+                self.state.ship.max_shield,
+                tut_relics,
+            )
 
             new_ship = self._clone_ship(
+                hull=new_hull,
+                max_hull=new_max_hull,
+                shield=new_shield,
+                max_shield=new_max_shield,
                 credits=new_credits + tut_cr,
                 cargo=cargo,
                 cargo_cost=cargo_cost,
@@ -5746,8 +5790,19 @@ class SimulationEngine:
             new_log.extend(tut_logs)
             new_mastery, xp_logs = self._award_pilot_xp(tut_xp, self.state.ship.mastery) if tut_xp > 0 else (self.state.ship.mastery, [])
             new_log.extend(xp_logs)
+            new_hull, new_max_hull, new_shield, new_max_shield = self._apply_relic_stat_bonuses(
+                self.state.ship.hull,
+                self.state.ship.max_hull,
+                self.state.ship.shield,
+                self.state.ship.max_shield,
+                tut_relics,
+            )
 
             new_ship = self._clone_ship(
+                hull=new_hull,
+                max_hull=new_max_hull,
+                shield=new_shield,
+                max_shield=new_max_shield,
                 credits=new_credits + tut_cr,
                 fleet_drones=tuple(drones),
                 mastery=new_mastery,
@@ -10138,6 +10193,7 @@ class SimulationEngine:
             new_tutorial = cur_ship.tutorial
             tutorial_credits = 0
             tutorial_xp = 0
+            tutorial_relics: list[PrecursorRelic] = []
             if cur_ship.travel is not None and new_tick >= cur_ship.travel.arrival_tick:
                 new_orbiting_body_id = cur_ship.travel.destination_body_id
                 new_landed_body_id = None
@@ -10163,11 +10219,12 @@ class SimulationEngine:
                 new_flight_log.append(arr_msg)
                 if new_orbiting_body_id is not None:
                     # Arrival establishes orbit, so it is an orbit action for the academy.
-                    new_tutorial, tut_cr, tut_xp, _tut_relics, tut_logs = (
+                    new_tutorial, tut_cr, tut_xp, tut_relics, tut_logs = (
                         self._progress_tutorial("orbit")
                     )
                     tutorial_credits += tut_cr
                     tutorial_xp += tut_xp
+                    tutorial_relics.extend(tut_relics)
                     new_flight_log.extend(tut_logs)
                 evt_id = f"evt_{new_tick}_{len(new_events) + 1}"
                 new_events.append(
@@ -10596,9 +10653,19 @@ class SimulationEngine:
             new_flight_log.extend(crew_logs[-2:])
             new_flight_log.extend(away_logs[-6:])
             new_flight_log.extend(delivery_logs[-4:])
+            new_hull, new_max_hull, new_shield, new_max_shield = self._apply_relic_stat_bonuses(
+                new_hull,
+                cur_ship.max_hull,
+                new_shield,
+                cur_ship.max_shield,
+                tutorial_relics,
+            )
             new_ship = self._clone_ship(
                 hull=new_hull,
+                max_hull=new_max_hull,
                 shield=new_shield,
+                max_shield=new_max_shield,
+                relics=tuple(list(cur_ship.relics) + tutorial_relics),
                 credits=new_credits,
                 cargo=new_cargo,
                 crew=new_crew,

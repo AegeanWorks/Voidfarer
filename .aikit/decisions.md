@@ -2972,3 +2972,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Consequences**: Cockpit only. Verified in real Edge at 1280x720 (`G-015` multimodal review of `tab_market.png`, `tab_fleet.png`, `tab_ship.png`, `tab_story.png`), bringing commodity trading, drone commissioning, ship telemetry, and campaign choices above the fold while preserving 100% of UI inventory controls behind one-click `SHOW`/`HIDE` disclosures. Pinned by `TestBeginnerCockpitCompaction` in `tests/test_cockpit_layout.py` (added after `ui finish` because the UI guard protects `tests/` during a UI task).
 
 
+
+### ADR-295: Tutorial relics won on a transit arrival are kept and applied
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: `SimulationEngine.tick` collected the relic a Cadet Academy step awards when a transit arrival establishes orbit, but discarded it (`_tut_relics`), so the reward and its hull/shield bonus were lost on that path while the direct `orbit`, `scan`, `power`, `trade` and `drone` actions kept them. A working-tree snapshot of `engine.py` and `app.js` had also been truncated mid-statement and was restored from HEAD.
+- **Decision**: The tick path now adds the awarded relics to `ship.relics` and applies `_apply_relic_stat_bonuses` to hull, max hull, shield and max shield, the same as the other tutorial paths.
+- **Consequences**: Engine only, no new persisted field. Pinned by `tests/test_tutorial_arrival_relic.py`. The truncated snapshot is kept as `reports/voidfarer-damaged-tree-2026-11-14.patch` in the AIKit workspace.
