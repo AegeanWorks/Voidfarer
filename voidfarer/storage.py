@@ -10,11 +10,14 @@ import threading
 import time
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from voidfarer.models import GameState
 
 _SLOT_NAME_RE = re.compile(r"^[A-Za-z0-9_-]{1,40}$")
+
+
+CHECKPOINT_SLOT = "checkpoint"
 
 
 class StorageManager:
@@ -96,6 +99,10 @@ class StorageManager:
         """Atomically persist universe and ship state into the requested save slot."""
         _, target_path = self._slot_path(slot)
         return self._write_atomic(target_path, state.to_dict())
+
+    def checkpoint_writer(self) -> Callable[[GameState], None]:
+        """A hook that rolls the 'checkpoint' slot, for an engine to call before a risky move."""
+        return lambda state: self.save(state, CHECKPOINT_SLOT)
 
     def load(self, slot: str | None = None) -> GameState | None:
         """Load game state from disk for the given slot, quarantining corrupt primary data and trying the backup."""

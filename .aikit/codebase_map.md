@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `223`
-- **Total Classes**: `500`
-- **Total Top-Level Functions**: `521`
-- **Total Class Methods**: `2530`
-- **Total Source Lines**: `62003`
+- **Total Python Modules**: `224`
+- **Total Classes**: `502`
+- **Total Top-Level Functions**: `522`
+- **Total Class Methods**: `2536`
+- **Total Source Lines**: `62094`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`223` module(s))
+- **Indexed**: python (`224` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2917,6 +2917,24 @@
 
 ---
 
+### [`tests/test_prejump_checkpoint.py`](tests/test_prejump_checkpoint.py)
+> *A rolling 'checkpoint' save slot is written before a risky jump or a void dive.*
+
+**Size**: `59` lines (`2351` bytes)
+
+**Classes:**
+- `class PreJumpCheckpointTest`
+  - Method `.test_a_low_security_jump_writes_the_pre_jump_state()`
+  - Method `.test_a_secure_jump_writes_no_checkpoint()`
+  - Method `.test_the_hook_defaults_to_none_so_a_bare_engine_never_writes()`
+- `class CheckpointWiringTest`
+  - Method `.test_the_cli_and_the_server_install_the_checkpoint_hook()`
+
+**Functions:**
+- `def _engine_with_neighbour_security(security)`
+
+---
+
 ### [`tests/test_progress.py`](tests/test_progress.py)
 > *Unified progression report/action, REST and CLI tests.*
 
@@ -4328,7 +4346,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4847` lines (`238816` bytes)
+**Size**: `4848` lines (`238873` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -4589,7 +4607,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10932` lines (`539339` bytes)
+**Size**: `10954` lines (`540241` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4627,6 +4645,7 @@
   - Method `._body_by_id(body_id)` - *Look up a celestial body anywhere in the known galaxy.*
   - Method `._void_storm_chance()` - *Current void storm probability, calmed by open gateways.*
   - Method `._void_resonance_payout(resonance, share)` - *Convert weathered-storm resonance into credits and pilot XP.*
+  - Method `._write_checkpoint()` - *Roll the checkpoint slot with the current state; a disk failure never blocks the move.*
   - Method `.void_dive(target_system_id)` - *Slip through a black-hole event horizon into the Hollow Between.*
   - Method `.void_emerge()` - *Emergency surfacing from an active void traversal, back through the entry horizon.*
   - Method `.void_status()` - *Void traversal readiness, lanes, and active traversal state (CLI/REST/cockpit parity).*
@@ -5504,7 +5523,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1774` lines (`75910` bytes)
+**Size**: `1776` lines (`76024` bytes)
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -5611,7 +5630,7 @@
 ### [`voidfarer/storage.py`](voidfarer/storage.py)
 > *Crash-resilient storage engine and atomic persistence for VoidFarer.*
 
-**Size**: `205` lines (`8177` bytes)
+**Size**: `212` lines (`8446` bytes)
 
 **Classes:**
 - `class StorageManager` - *Manages power-loss safe atomic persistence and shadow backups.*
@@ -5621,6 +5640,7 @@
   - Method `._quarantine(target_path)`
   - Method `._slot_path(slot)`
   - Method `.save(state, slot)` - *Atomically persist universe and ship state into the requested save slot.*
+  - Method `.checkpoint_writer()` - *A hook that rolls the 'checkpoint' slot, for an engine to call before a risky move.*
   - Method `.load(slot)` - *Load game state from disk for the given slot, quarantining corrupt primary data and trying the backup.*
   - Method `.clear(slot)` - *Remove save file and shadow backup for the given slot.*
   - Method `.delete_save(slot)` - *Delete a save slot and its shadow backup.*

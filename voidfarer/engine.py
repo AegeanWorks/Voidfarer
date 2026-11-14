@@ -8,9 +8,10 @@ import copy
 import hashlib
 import math
 import random
+import sys
 import threading
 import time
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 from voidfarer.enemies import (
     ENEMY_ARCHETYPES,
@@ -420,6 +421,10 @@ def _cargo_cost_after(previous_cargo: dict[str, int], previous_cost: dict[str, i
 CADET_PROTECTED_SECURITY = 0.5
 
 
+# Jumping into a system below this security rating rolls the 'checkpoint' save first.
+CHECKPOINT_SECURITY = 0.3
+
+
 class SimulationEngine:
     """Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat."""
 
@@ -496,6 +501,9 @@ class SimulationEngine:
         self.seed = seed
         self.rng = random.Random(seed)
         self.allow_decision_events = False
+        # Called with the pre-move state before a risky jump or void dive; a front end sets it to roll
+        # a 'checkpoint' save slot. None means a bare engine writes nothing (ADR-301).
+        self.checkpoint_hook: Callable[[GameState], None] | None = None
         # Cadence is a preference, so it lives in the save's stats rather than only in RAM.
         self.decision_cadence = (
             self._cadence_from_state(state) if state is not None else self.DEFAULT_DECISION_CADENCE
@@ -1383,6 +1391,16 @@ class SimulationEngine:
             int(round(value * self.VOID_RESONANCE_XP)),
         )
 
+    def _write_checkpoint(self) -> None:
+        """Roll the checkpoint slot with the current state; a disk failure never blocks the move."""
+        hook = self.checkpoint_hook
+        if hook is None:
+            return
+        try:
+            hook(self.state)
+        except OSError as exc:
+            sys.stderr.write(f"[WARN] Checkpoint save failed: {exc}\n")
+
     def void_dive(self, target_system_id: str) -> tuple[bool, str]:
         """Slip through a black-hole event horizon into the Hollow Between."""
         with self.lock:
@@ -1417,6 +1435,7 @@ class SimulationEngine:
             if self.state.ship.fuel < fuel_cost:
                 return False, f"Insufficient Quantum Fuel: {fuel_cost} units required, {self.state.ship.fuel} available."
 
+            self._write_checkpoint()
             min_shield = max(10, int(self.state.ship.max_shield * 0.25))
             if self.state.ship.shield < min_shield:
                 return False, f"Void shear demands {min_shield}+ MW shields ({self.state.ship.shield} available)."
@@ -1678,6 +1697,9 @@ class SimulationEngine:
 
             if self.state.ship.fuel < fuel_cost:
                 return False, f"Insufficient Quantum Fuel: {fuel_cost} units required, {self.state.ship.fuel} available."
+
+            if target_sys.security < CHECKPOINT_SECURITY:
+                self._write_checkpoint()
 
             # Execute jump
             self._local_dock_purchases.clear()

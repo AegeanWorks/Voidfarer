@@ -180,6 +180,7 @@ def _get_engine(storage_dir: Path | None = None) -> tuple[SimulationEngine, Stor
         storage = StorageManager(storage_dir)
     saved_state = storage.load()
     engine = SimulationEngine(state=saved_state)
+    engine.checkpoint_hook = storage.checkpoint_writer()
     return engine, storage
 
 

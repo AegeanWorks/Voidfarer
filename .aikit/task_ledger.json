@@ -5,36 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794679110.3571224,
+    "updated_at": 1794679397.3702416,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-audio-icon-sync",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Unify #audioToggleBtn icon/opacity/aria-pressed via syncAudioControlState(), resolve readable system/commodity/tree names and accurate Codex claimed % in app.js, and fix card line-clamp bleed, character profile clipping, and Factions WCAG AA contrast in style.css and app.js",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794668120.934459,
-      "timestamp_str": "2026-11-14 17:55:20",
-      "agent": "antigravity:goal",
-      "impact_assessment": {
-        "why": "Real-Edge visual and DOM audits showed #audioIcon mutating to SFX/MUTED after Settings changes, raw system/commodity/tree IDs across AI/Depot/Story/Empire/Factions/Save/Messages views, contradictory 0 / 62 CLAIMED (3%) in Codex, Chromium line-clamp+overflow:visible text bleed on mercenary cards, right-edge clipping on .character-profile at 1280x720, and 4.36:1 contrast on Precursor Watch (#8b5cf6)",
-        "benefits": "Consistent audio button indicator, human-readable star system and commodity names across all cockpit tabs, accurate Codex claimed percentage, zero card text overlaps/clips, and WCAG AA contrast compliance",
-        "risks": "Contract: none; Dependency: none; Concurrency: none; State: UI-only rendering and CSS layout rules",
-        "mitigation": "Preserve existing DOM IDs, data attributes, and CSS selector anchors; verify in real Edge via Playwright screenshot inspection and unit tests"
-      },
-      "plan_digest": "b1c759a3aa7b2cf8b448b24367b71833fa18dc668ba163aad7f0fc077f37dd91",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-audio-icon-sync",
       "phase": "phase 4",
@@ -341,6 +317,17 @@
       "status": "in_progress",
       "timestamp": 1794679110.3571224,
       "timestamp_str": "2026-11-14 20:58:30",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-first-10-minutes",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[6/6] Rolling pre-jump checkpoint slot via checkpoint_hook (ADR-301); trade clarity #2/#24/#23 deferred to a follow-up task; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794679397.3702416,
+      "timestamp_str": "2026-11-14 21:03:17",
       "agent": "claude:1"
     }
   ]

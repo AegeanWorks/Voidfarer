@@ -1634,6 +1634,7 @@ def start_background_server(
     static_dir = Path(__file__).parent / "static"
     VoidFarerHandler.engine = engine
     engine.allow_decision_events = True
+    engine.checkpoint_hook = storage.checkpoint_writer()
     VoidFarerHandler.storage = storage
     VoidFarerHandler.static_dir = static_dir
 
@@ -1691,6 +1692,7 @@ def run_server(
         return 1
     VoidFarerHandler.engine = engine
     engine.allow_decision_events = True
+    engine.checkpoint_hook = storage.checkpoint_writer()
     VoidFarerHandler.storage = storage
     VoidFarerHandler.static_dir = static_dir
 

@@ -3014,3 +3014,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-299 added the insurance rebuild to the engine, REST and CLI, but the cockpit death screen still offered only NEW COMMANDER, LOAD SAVE and MAIN MENU.
 - **Decision**: `#btnDeathInsurance` is the first button in `.death-options`, hidden until `showDeathOverlay` reads `state.insurance` and finds `available`. It reads `INSURANCE REBUILD · -<deductible> CR` with the destination and lost cargo in its tooltip, and `handleInsuranceRebuild` posts the `insurance` engineering action, then resets `deathAcknowledged`, closes the overlay and re-renders so a later death shows the screen again.
 - **Consequences**: Cockpit only. Verified in real Edge at 1366x768 and 1920x1080 with a destroyed hull (`ui-review/death-ins2/`, 0 console errors, click rebuilt to hull 50 and 1500 of 2000 credits). Pinned by `TestDeathInsuranceButton`.
+
+### ADR-301: Rolling pre-jump checkpoint save slot
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: The only automatic save was the single-slot 15-second autosave, so a bad ambush in a dangerous system could not be undone, and beginners rarely save by hand.
+- **Decision**: `SimulationEngine.checkpoint_hook` (default `None`, so a bare engine writes nothing) is called with the pre-move state before a hyperspace jump into a system with security below `CHECKPOINT_SECURITY` (0.3) and before a void dive. `StorageManager.checkpoint_writer()` returns the hook that rolls the named `checkpoint` slot (`CHECKPOINT_SLOT`); the CLI engine builder and both cockpit server entry points install it. An `OSError` while saving is logged to stderr and never blocks the move. The slot appears with the other named saves in MENU [ESC], so one click loads the state from just before the jump.
+- **Consequences**: Engine, storage, CLI and REST parity (G-012); no change to the save format. Pinned by `tests/test_prejump_checkpoint.py`.
