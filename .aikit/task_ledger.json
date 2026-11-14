@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-origin-cap",
+    "task_id": "voidfarer-market-gaps",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794660791.332176,
+    "updated_at": 1794661078.8146894,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,64 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-net-sell-price",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] cockpit net price Phase 4",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794657644.7994854,
-      "timestamp_str": "2026-11-14 15:00:44",
-      "agent": "claude:1",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "voidfarer-net-sell-price",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-net-sell-price' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794657728.5205524,
-      "timestamp_str": "2026-11-14 15:02:08",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-flee-fuel",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: disable the combat FLEE button with a plain reason when fuel is below the 8 the engine requires; failing-first source pin and browser check",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794657801.866335,
-      "timestamp_str": "2026-11-14 15:03:21",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Reading the combat code: flee is the guaranteed escape but costs 8 fuel; the button never disables, so a low-fuel player clicks it and only gets a log error",
-        "benefits": "Players see why the escape is unavailable before an unwinnable fight goes wrong",
-        "risks": "contract: none; dependency: literal 8 matches the engine and the button label, pinned by the test; concurrency: none; state: none",
-        "mitigation": "Test reads the engine constant and fails if they drift"
-      },
-      "plan_digest": "466d2b9528e66302ccaafe2bf42b7efab2309ad03e06a2063229b7bd9e2d8791",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-flee-fuel",
       "phase": "phase 2",
@@ -398,6 +340,64 @@
       "status": "in_progress",
       "timestamp": 1794660791.332176,
       "timestamp_str": "2026-11-14 15:53:11",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-origin-cap",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-origin-cap' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794660880.1922529,
+      "timestamp_str": "2026-11-14 15:54:40",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-market-gaps",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: compress the archetype price swing and the stock-factor clamp so the best neighbouring-market lane pays at most about 2x while ordinary good lanes stay profitable; re-measure credit trajectories",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794660966.206328,
+      "timestamp_str": "2026-11-14 15:56:06",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Measured: a greedy trader compounds 2,000 to ~17k by trip 3 and ~86k by trip 8 on lanes up to 3.05x; every ship (4.5k to 12k), upgrade (max 2.6k) and escort (max 9.8k) is bought within a few jumps",
+        "benefits": "Progression content stays meaningful for far longer; route-finding still pays",
+        "risks": "contract: quotes and API unchanged in shape, values change; dependency: tests that pin exact prices; concurrency: none; state: saves keep stockpiles, prices shift after load",
+        "mitigation": "Full suite and mechanics gate; tail-gap test; before/after trajectory measurement recorded in the ADR"
+      },
+      "plan_digest": "7e36619b7a77e267b9088994cb8998029b17773b8bef7df888b91f249c967333",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-market-gaps",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 market gaps",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794661078.8146894,
+      "timestamp_str": "2026-11-14 15:57:58",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [

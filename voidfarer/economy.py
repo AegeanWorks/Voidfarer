@@ -188,6 +188,18 @@ def generate_initial_economy(systems: dict[str, StarSystem], rng: random.Random 
 MIN_STOCK = 5
 MAX_STOCK = 300
 
+# Price-gap tuning (ADR-289). Archetype discounts and premiums were 0.65x to 1.60x, and the stock factor
+# swung 0.75x to 1.35x, so the best neighbouring lane paid up to 3x and a trader compounded past every
+# purchase within a few jumps. The swing is scaled toward 1.0 and the stock clamp narrowed.
+ARCHETYPE_SWING = 0.55
+STOCK_FACTOR_MIN = 0.85
+STOCK_FACTOR_MAX = 1.20
+
+
+def _swing(multiplier: float) -> float:
+    """An archetype price multiplier scaled toward 1.0 by ARCHETYPE_SWING."""
+    return 1.0 + (multiplier - 1.0) * ARCHETYPE_SWING
+
 
 def tick_global_economy(
     state: GlobalEconomyState,
@@ -317,38 +329,38 @@ def calculate_dynamic_market_quote(
         if commodity.id == "titanium":
             supply = 120
             demand = 20
-            base = int(base * 0.70)
+            base = int(base * _swing(0.70))
         elif commodity.id in ("hydroponics", "microchips"):
             supply = 15
             demand = 110
-            base = int(base * 1.35)
+            base = int(base * _swing(1.35))
     elif arch == "agricultural":
         if commodity.id == "hydroponics":
             supply = 140
             demand = 15
-            base = int(base * 0.65)
+            base = int(base * _swing(0.65))
         elif commodity.id in ("titanium", "medicines"):
             supply = 20
             demand = 100
-            base = int(base * 1.30)
+            base = int(base * _swing(1.30))
     elif arch == "high_tech":
         if commodity.id == "microchips":
             supply = 110
             demand = 25
-            base = int(base * 0.75)
+            base = int(base * _swing(0.75))
         elif commodity.id in ("titanium", "fuel_cells"):
             supply = 30
             demand = 120
-            base = int(base * 1.25)
+            base = int(base * _swing(1.25))
     elif arch == "black_market":
         if commodity.id == "xenoliths":
             supply = 60
             demand = 150
-            base = int(base * 1.60)
+            base = int(base * _swing(1.60))
         elif commodity.id == "medicines":
             supply = 30
             demand = 130
-            base = int(base * 1.40)
+            base = int(base * _swing(1.40))
 
     # 2. Stockpile influence from GlobalEconomyState
     sys_market = economy.markets.get(system.id)
@@ -357,8 +369,8 @@ def calculate_dynamic_market_quote(
         supply = stock
         # Stockpile ratio to baseline (60 units)
         stock_ratio = stock / 60.0
-        # High stock lowers price, low stock raises price (0.75x to 1.35x clamp)
-        stock_factor = max(0.75, min(1.35, 1.0 / (stock_ratio ** 0.35)))
+        # High stock lowers price, low stock raises price (clamped, see STOCK_FACTOR_MIN/MAX)
+        stock_factor = max(STOCK_FACTOR_MIN, min(STOCK_FACTOR_MAX, 1.0 / (stock_ratio ** 0.35)))
         base = int(base * stock_factor)
 
     # 3. Macroeconomic Event multiplier

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `216`
-- **Total Classes**: `487`
-- **Total Top-Level Functions**: `516`
-- **Total Class Methods**: `2487`
-- **Total Source Lines**: `61169`
+- **Total Python Modules**: `217`
+- **Total Classes**: `488`
+- **Total Top-Level Functions**: `518`
+- **Total Class Methods**: `2488`
+- **Total Source Lines**: `61224`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`216` module(s))
+- **Indexed**: python (`217` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2368,6 +2368,20 @@
 
 ---
 
+### [`tests/test_market_price_gaps.py`](tests/test_market_price_gaps.py)
+> *Neighbouring markets never pay absurd arbitrage, and trading still pays (ADR-289).*
+
+**Size**: `43` lines (`1788` bytes)
+
+**Classes:**
+- `class MarketPriceGapTests`
+  - Method `.test_the_best_lane_is_bounded_and_trading_still_pays()`
+
+**Functions:**
+- `def _lane_ratios(seed)`
+
+---
+
 ### [`tests/test_megastructure_restoration.py`](tests/test_megastructure_restoration.py)
 > *Megastructure restoration: orbit/cost gates, bonuses and persistence.*
 
@@ -4400,10 +4414,11 @@
 ### [`voidfarer/economy.py`](voidfarer/economy.py)
 > *Dynamic Global Economy, supply/demand simulation, economic events, and galactic trade network.*
 
-**Size**: `492` lines (`19192` bytes)
+**Size**: `504` lines (`19839` bytes)
 
 **Functions:**
 - `def generate_initial_economy(systems, rng)` - *Construct baseline economy state with localized stockpiles and initial macroeconomic conditions.*
+- `def _swing(multiplier)` - *An archetype price multiplier scaled toward 1.0 by ARCHETYPE_SWING.*
 - `def tick_global_economy(state, num_ticks, systems, rng)` - *Advance economic simulation: update stockpiles, decrement event clocks, spawn emergent news.*
 - `def faction_standing_price_factor(faction_standing)` - *Return the single diplomatic price multiplier for a faction standing value.*
 - `def calculate_dynamic_market_quote(system, body, commodity, economy, faction_standing, trade_pact)` - *Compute precision localized pricing reflecting global stockpile supply/demand and macroeconomic events.*
