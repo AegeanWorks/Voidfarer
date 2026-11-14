@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `225`
-- **Total Classes**: `504`
-- **Total Top-Level Functions**: `523`
-- **Total Class Methods**: `2544`
-- **Total Source Lines**: `62206`
+- **Total Python Modules**: `226`
+- **Total Classes**: `505`
+- **Total Top-Level Functions**: `524`
+- **Total Class Methods**: `2548`
+- **Total Source Lines**: `62269`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`225` module(s))
+- **Indexed**: python (`226` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1133,6 +1133,22 @@
   - Method `.test_three_victories_award_the_combat_medal()`
   - Method `.test_away_mission_awards_the_explorer_medal()`
   - Method `.test_codex_counts_all_crew_medals()`
+
+---
+
+### [`tests/test_customs_risk_status.py`](tests/test_customs_risk_status.py)
+> *The status snapshot warns about customs risk while contraband is in the hold.*
+
+**Size**: `39` lines (`1571` bytes)
+
+**Classes:**
+- `class CustomsRiskStatusTest`
+  - Method `.test_clean_hold_has_no_warning()`
+  - Method `.test_contraband_quotes_the_worst_adjacent_high_security_cordon()`
+  - Method `.test_routing_power_to_the_sensors_lowers_the_quote()`
+
+**Functions:**
+- `def _engine(cargo)`
 
 ---
 
@@ -4628,7 +4644,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10990` lines (`542046` bytes)
+**Size**: `11014` lines (`543311` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4806,6 +4822,7 @@
   - Method `.rescue_status()` - *Whether a distress call would be accepted now, and why not.*
   - Method `.distress_call()` - *Summon a rescue tender: fuel for a fee and some lost time, only when truly stranded.*
   - Method `._insurance_destination()` - *The nearest secure system (by hyperlane hops) with a dockable station.*
+  - Method `.customs_risk_status()` - *Customs scan risk for the worst adjacent high-security cordon, only while contraband is held.*
   - Method `.insurance_status()` - *The Coalition rebuild policy, quoted only while the hull is destroyed.*
   - Method `.insurance_rebuild()` - *Rebuild a destroyed hull at the nearest secure station: cargo and a credit deductible are lost.*
   - Method `.burn_fuel_cells(quantity)` - *Burn hold Quantum Fuel Cells in the drive injectors: the emergency refuel away from a station.*

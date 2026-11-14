@@ -7463,6 +7463,29 @@ class SimulationEngine:
                     queue.append(link)
         return None
 
+    def customs_risk_status(self) -> dict[str, Any] | None:
+        """Customs scan risk for the worst adjacent high-security cordon, only while contraband is held."""
+        with self.lock:
+            ship = self.state.ship
+            contraband = get_contraband_in_cargo(ship.cargo)
+            if not contraband:
+                return None
+            equipment = self._combined_equipment()
+            worst: tuple[float, StarSystem] | None = None
+            for link in self.current_system.connections:
+                system = self.state.systems.get(link)
+                if system is None:
+                    continue
+                chance, _ = calculate_customs_scan_risk(system, ship.cargo, ship, ship.power, equipment)
+                if chance > 0.0 and (worst is None or chance > worst[0]):
+                    worst = (chance, system)
+            return {
+                "units": sum(contraband.values()),
+                "chance": round(worst[0], 3) if worst else 0.0,
+                "system_name": worst[1].name if worst else "",
+                "hint": "Route 35%+ power to sensors (ECM) and 40%+ to engines to cut the odds; low-security sectors have no customs.",
+            }
+
     def insurance_status(self) -> dict[str, Any] | None:
         """The Coalition rebuild policy, quoted only while the hull is destroyed."""
         with self.lock:
@@ -8513,6 +8536,7 @@ class SimulationEngine:
                     if self.state.ship.fuel * 4 <= self.state.ship.max_fuel else None
                 ),
                 "insurance": self.insurance_status(),
+                "customs_risk": self.customs_risk_status(),
                 "cash_flow": self.cash_flow(),
                 "allies": list(self.state.ship.allies),
                 "quests": self.get_quests(),

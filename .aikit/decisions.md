@@ -3035,3 +3035,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-302 added the engine action; the cockpit still needed a control. A full-width row for it pushed the commodity table down a row and a half at laptop height, undoing the above-the-fold work of ADR-294.
 - **Decision**: `#btnSellAllProfitable` shares a `.trade-toolbar` flex row with the filters toggle, whose visible label is shortened from `LOT & CATEGORY FILTERS` to `FILTERS` (its tooltip keeps the full wording) so both fit at 1366x768. The button posts `{action: "sell_all"}` to `/api/logistics/action`, logs the result, and is disabled when the hold is empty or no market is present.
 - **Consequences**: Cockpit only. Verified in real Edge at laptop and desktop widths (`ui-review/sell-all5/`, 0 console errors; a click sold the profitable row and kept a loss row). Three earlier captures clipped the labels and were fixed. Pinned by `TestSellAllProfitableButton`.
+
+### ADR-304: Customs risk quote while contraband is held
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: Beginners who bought contraband were surprised by customs interdictions on the next jump with no hint why. The engine already computes the scan chance from the system security, cargo volume, sensor and engine power, stealth and pilot mastery (`calculate_customs_scan_risk`), but nothing showed it. `SILENT` reactor mode only helps against pirates, not customs, so it must not be advertised as a fix.
+- **Decision**: `SimulationEngine.customs_risk_status` returns, only while contraband is in the hold, the contraband unit count and the worst scan chance across adjacent high-security systems with that system's name, plus the real levers (35% or more power to sensors, 40% or more to engines). It is published as `customs_risk` in the status snapshot (`null` when clean).
+- **Consequences**: Engine and REST snapshot only; the COMMERCE banner follows. No persisted field. Pinned by `tests/test_customs_risk_status.py`.
