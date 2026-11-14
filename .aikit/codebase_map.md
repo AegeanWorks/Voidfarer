@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `204`
-- **Total Classes**: `475`
+- **Total Python Modules**: `205`
+- **Total Classes**: `476`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2471`
-- **Total Source Lines**: `60794`
+- **Total Class Methods**: `2472`
+- **Total Source Lines**: `60822`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`204` module(s))
+- **Indexed**: python (`205` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3096,6 +3096,17 @@
 
 **Functions:**
 - `def _last_rule(selector)`
+
+---
+
+### [`tests/test_ship_schematic_clear.py`](tests/test_ship_schematic_clear.py)
+> *The ship schematic's caption stays clear of the module chips (ADR-278).*
+
+**Size**: `28` lines (`1011` bytes)
+
+**Classes:**
+- `class ShipSchematicClearTests`
+  - Method `.test_caption_is_a_short_corner_tag()`
 
 ---
 

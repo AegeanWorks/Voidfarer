@@ -1,56 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-story-names",
+    "task_id": "voidfarer-schematic",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794639912.7461262,
+    "updated_at": 1794640447.0511565,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-outpost-text",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-outpost-text' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794604586.6016016,
-      "timestamp_str": "2026-11-14 00:16:26",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-promise-tests",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: pin the cockpit's advertised numbers with regression tests, mutation-checked",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794604811.6421137,
-      "timestamp_str": "2026-11-14 00:20:11",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Audits found one false promise that no test caught",
-        "benefits": "Promises cannot silently drift from the engine",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "Fast tests (0.36s), four mutations caught, ADR-272"
-      },
-      "plan_digest": "f95a3d3237db2058032ad9965bf969e6326921cec92d39486d6914fa94088e5e"
-    },
-    {
-      "task_id": "voidfarer-promise-tests",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794604812.1618066,
-      "timestamp_str": "2026-11-14 00:20:12",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-promise-tests",
       "phase": "completed",
@@ -272,6 +232,46 @@
       "status": "in_progress",
       "timestamp": 1794639912.7461262,
       "timestamp_str": "2026-11-14 10:05:12",
+      "agent": "claude:1",
+      "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-story-names",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-story-names' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794639999.4311414,
+      "timestamp_str": "2026-11-14 10:06:39",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-schematic",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: drop the decorative hull captions the module chips cover on the Ship schematic; failing-first test",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794640073.6684606,
+      "timestamp_str": "2026-11-14 10:07:53",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Real Edge capture of the Ship tab: the FRM and CORE chips cover 'SEC-.. // VF-CORVETTE', leaving garbled fragments",
+        "benefits": "A clean schematic; class name already shown in the panel header",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none; five inline SVG strings edited",
+        "mitigation": "Test pins the five SVGs; visual re-capture"
+      },
+      "plan_digest": "0e36fd2ab6198bd11efd8280c156f5ef7e44af9550393d80db725dadf9f29cfb"
+    },
+    {
+      "task_id": "voidfarer-schematic",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 schematic",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794640447.0511565,
+      "timestamp_str": "2026-11-14 10:14:07",
       "agent": "claude:1",
       "checklists": "passed"
     }
