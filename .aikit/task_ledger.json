@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-market-gaps",
+    "task_id": "voidfarer-freight-profit",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794661078.8146894,
+    "updated_at": 1794661317.0238833,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,64 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-flee-fuel",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: disable the combat FLEE button with a plain reason when fuel is below the 8 the engine requires; failing-first source pin and browser check",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794657869.3297586,
-      "timestamp_str": "2026-11-14 15:04:29",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Reading the combat code: flee is the guaranteed escape but costs 8 fuel; the button never disables, so a low-fuel player clicks it and only gets a log error",
-        "benefits": "Players see why the escape is unavailable before an unwinnable fight goes wrong",
-        "risks": "contract: none; dependency: literal 8 matches the engine and the button label, pinned by the test; concurrency: none; state: none",
-        "mitigation": "Test reads the engine constant and fails if they drift"
-      },
-      "plan_digest": "466d2b9528e66302ccaafe2bf42b7efab2309ad03e06a2063229b7bd9e2d8791",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "voidfarer-flee-fuel",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 flee fuel",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794658042.5295427,
-      "timestamp_str": "2026-11-14 15:07:22",
-      "agent": "claude:1",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "voidfarer-flee-fuel",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-flee-fuel' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794658137.2729886,
-      "timestamp_str": "2026-11-14 15:08:57",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-settings-layer",
       "phase": "phase 2",
@@ -398,6 +340,64 @@
       "status": "in_progress",
       "timestamp": 1794661078.8146894,
       "timestamp_str": "2026-11-14 15:57:58",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-market-gaps",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-market-gaps' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794661174.9695466,
+      "timestamp_str": "2026-11-14 15:59:34",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-freight-profit",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Plan: M1 engine adds cost_basis and profit to each quantum route (net unchanged); M2 cockpit shows and colours by profit as a UI task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794661300.6353803,
+      "timestamp_str": "2026-11-14 16:01:40",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "4K capture: 'Quantum Substrates x2 ... +811 CR NET' reads as profit but net is payout minus fee, ignoring the ~736 the cargo cost (real profit about +75); green colouring follows net",
+        "benefits": "Freight rows stop overstating gains; players can tell a losing shipment from a winning one",
+        "risks": "contract: additive fields, net and the auto-freight min-net threshold keep their meaning; dependency: cargo_cost per commodity; concurrency: read under the engine lock; state: none",
+        "mitigation": "Failing-first tests for both cost-known and cost-unknown cargo; existing automation tests rerun"
+      },
+      "plan_digest": "38a858d00b78e4ac42c0f8572ecb767a84443197de3ef0184e737fdc5f0507e4",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-freight-profit",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] engine profit Phase 4",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794661317.0238833,
+      "timestamp_str": "2026-11-14 16:01:57",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [

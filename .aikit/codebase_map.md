@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `217`
-- **Total Classes**: `488`
-- **Total Top-Level Functions**: `518`
-- **Total Class Methods**: `2488`
-- **Total Source Lines**: `61224`
+- **Total Python Modules**: `218`
+- **Total Classes**: `489`
+- **Total Top-Level Functions**: `519`
+- **Total Class Methods**: `2490`
+- **Total Source Lines**: `61267`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`217` module(s))
+- **Indexed**: python (`218` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1889,6 +1889,21 @@
 
 **Functions:**
 - `def _block()`
+
+---
+
+### [`tests/test_freight_profit.py`](tests/test_freight_profit.py)
+> *Quantum freight routes report real profit against what the cargo cost (ADR-290).*
+
+**Size**: `40` lines (`1566` bytes)
+
+**Classes:**
+- `class FreightProfitTests`
+  - Method `.test_routes_carry_the_cost_basis_and_profit()`
+  - Method `.test_cargo_without_a_recorded_cost_has_profit_equal_to_net()`
+
+**Functions:**
+- `def _docked_with_cargo()`
 
 ---
 
@@ -4476,7 +4491,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10614` lines (`524384` bytes)
+**Size**: `10617` lines (`524581` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

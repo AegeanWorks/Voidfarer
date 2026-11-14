@@ -5271,6 +5271,7 @@ class SimulationEngine:
                     )
                     fee = self._quantum_fee(commodity, quantity, int(plan["jumps"]))
                     payout = int(quote.sell_price * quantity * 0.97)
+                    cost_basis = int(self.state.ship.cargo_cost.get(commodity.id, 0))
                     routes.append({
                         "commodity_id": commodity.id,
                         "commodity_name": commodity.name,
@@ -5285,6 +5286,8 @@ class SimulationEngine:
                         "fee": fee,
                         "payout": payout,
                         "net": payout - fee,
+                        "cost_basis": cost_basis,
+                        "profit": payout - fee - cost_basis,
                     })
             routes.sort(key=lambda route: (-route["net"], route["destination_system_name"], route["commodity_id"]))
             return {
