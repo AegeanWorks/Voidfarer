@@ -2457,5 +2457,26 @@
     "final_snapshot_digest": "0235c2d2696e2504f38f62eb8fc7ae319e8f1a505d955d938e5757decfa7e91c",
     "final_snapshot_entries": 1317,
     "surface_digest": "72b9e8b50c9eb1f14de1fc710f2abb75bc63cec3fb1d61647c10d2a024806b78"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "14e035238cccc1c91773f7618bc7da69adb4115c",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794677546.3442569,
+    "finished_at": 1794678080.7624311,
+    "strikes": 4,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; hull-chip4 laptop-hull.png and desktop-hull.png: HULL 40/100 with REPAIR chip, value not clipped",
+    "allowed_removals": [],
+    "final_snapshot_digest": "0235c2d2696e2504f38f62eb8fc7ae319e8f1a505d955d938e5757decfa7e91c",
+    "final_snapshot_entries": 1317,
+    "surface_digest": "bf5f5adac31c29125b840dd7b01ab3a0e1b8a21d9acab63925c92fbb76e98397"
   }
 ]

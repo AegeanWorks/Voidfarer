@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `222`
-- **Total Classes**: `497`
+- **Total Classes**: `498`
 - **Total Top-Level Functions**: `520`
-- **Total Class Methods**: `2517`
-- **Total Source Lines**: `61828`
+- **Total Class Methods**: `2520`
+- **Total Source Lines**: `61846`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`222` module(s))
@@ -470,7 +470,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2847` lines (`128169` bytes)
+**Size**: `2865` lines (`128969` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -506,6 +506,10 @@
   - Method `.setUpClass()`
   - Method `.test_lock_hides_advanced_tabs_and_the_more_systems_button()`
   - Method `.test_lock_follows_the_tutorial_state_and_guards_tab_switching()`
+- `class TestDockedHullRepairChip` - *A hurt hull offers a one-click drydock repair while docked (ADR-298).*
+  - Method `.setUpClass()`
+  - Method `.test_docked_repair_wins_below_sixty_percent_out_of_combat()`
+  - Method `.test_the_chip_never_crowds_out_the_hull_value()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

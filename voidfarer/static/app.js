@@ -2210,6 +2210,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     : "HULL CRITICAL // Dock for repairs, or carry titanium to fabricate patch kits.")
                 : "Hull integrity // Hits below zero destroy the command ship.";
             this.setVitalAction(hullCard, lowHull && titanium > 0, () => this.handleFabricate("patch_kit"));
+            // Docked and hurt (below 60%, out of combat): the drydock is the cheapest repair, so it wins.
+            const dock = this.state.drydock || null;
+            const dockRepair = hullPct <= 60 && !this.state.active_combat && Boolean(dock && dock.docked
+                && Number(dock.repair_hp || 0) > 0 && Number(dock.credits || 0) >= Number(dock.repair_cost || 0));
+            const hullChip = document.getElementById("hullPatchChip");
+            if (hullChip) hullChip.textContent = dockRepair ? "REPAIR" : "PATCH HULL";
+            if (dockRepair) {
+                hullCard.classList.add("is-patchable");
+                hullCard.dataset.tooltip = `HULL ${hullPct}% // Docked: click to repair ${dock.repair_hp} HP at the drydock for ${dock.repair_cost} CR.`;
+                this.setVitalAction(hullCard, true, () => this.handleRepair());
+            }
         }
 
         const shieldPct = Math.round((ship.shield / ship.max_shield) * 100);

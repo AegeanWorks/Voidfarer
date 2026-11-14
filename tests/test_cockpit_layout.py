@@ -307,6 +307,24 @@ class TestCadetTabLock(unittest.TestCase):
         self.assertIn("this.cadetTabLock && button", self.js)  # [ ] cycling skips locked tabs
 
 
+class TestDockedHullRepairChip(unittest.TestCase):
+    """A hurt hull offers a one-click drydock repair while docked (ADR-298)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_docked_repair_wins_below_sixty_percent_out_of_combat(self):
+        self.assertIn("hullPct <= 60 && !this.state.active_combat", self.js)
+        self.assertIn("dock.docked", self.js)
+        self.assertIn("this.setVitalAction(hullCard, true, () => this.handleRepair());", self.js)
+        self.assertIn('dockRepair ? "REPAIR" : "PATCH HULL"', self.js)
+
+    def test_the_chip_never_crowds_out_the_hull_value(self):
+        self.assertIn("#vitalHullCard.is-patchable #hullVal { flex: none; }", self.css)
+
+
 if __name__ == "__main__":
     unittest.main()
 

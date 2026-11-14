@@ -5,31 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794677446.1644456,
+    "updated_at": 1794678278.1643016,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-freight-profit",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[2/2] cockpit freight profit Phase 4 (fixed test_freight_profit_ui slice index)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794666096.6213725,
-      "timestamp_str": "2026-11-14 17:21:36",
-      "agent": "antigravity:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ],
-      "continued_from": "claude:1"
-    },
     {
       "task_id": "voidfarer-freight-profit",
       "phase": "completed",
@@ -367,6 +348,17 @@
       "status": "in_progress",
       "timestamp": 1794677446.1644456,
       "timestamp_str": "2026-11-14 20:30:46",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-first-10-minutes",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[4/6] Docked REPAIR chip on the HULL card; fuel stranding already covered by ADR-255 (ADR-298); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794678278.1643016,
+      "timestamp_str": "2026-11-14 20:44:38",
       "agent": "claude:1"
     }
   ]
