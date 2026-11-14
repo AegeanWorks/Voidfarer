@@ -416,6 +416,10 @@ def _cargo_cost_after(previous_cargo: dict[str, int], previous_cost: dict[str, i
     return {item_id: cost for item_id, cost in costs.items() if cost > 0}
 
 
+# Systems at or above this security rating are calm while the Cadet Academy is active.
+CADET_PROTECTED_SECURITY = 0.5
+
+
 class SimulationEngine:
     """Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat."""
 
@@ -1747,8 +1751,14 @@ class SimulationEngine:
                 anomaly = GalaxyGenerator.get_random_anomaly(self.rng.randint(1, 99999))
                 new_log.append(f"WARNING: Deep-space anomaly detected! [{anomaly.title}]")
 
+            # Cadet protection: while the academy runs, secure systems stay calm so a
+            # new captain learns to navigate and trade before facing emergencies.
+            cadet_safe = (
+                self.state.ship.tutorial.is_active
+                and target_sys.security >= CADET_PROTECTED_SECURITY
+            )
             active_pirate = None
-            if not combat and not anomaly and self.allow_decision_events:
+            if not combat and not anomaly and not cadet_safe and self.allow_decision_events:
                 patrol_escorts = sum(
                     1 for escort in self.state.ship.fleet_ships
                     if escort.assigned_system_id == target_system_id and escort.hull > 0
@@ -1842,7 +1852,11 @@ class SimulationEngine:
                     self.state.galaxy_seed, "solar_weather", target_system_id, self.state.time.tick
                 )
                 if weather_roll < 0.35:
-                    if self.state.ship.power.shields >= 35:
+                    if cadet_safe:
+                        new_log.append(
+                            f"CADET PROTOCOL: Academy deflector relays absorbed a coronal solar flare from {target_sys.name}."
+                        )
+                    elif self.state.ship.power.shields >= 35:
                         new_log.append(
                             f"SPACE WEATHER DEFLECTION: Deflector grid ({self.state.ship.power.shields}% power) deflected high-energy coronal solar flare from {target_sys.name} (+25 Pilot XP)."
                         )

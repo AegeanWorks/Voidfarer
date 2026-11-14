@@ -2979,3 +2979,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: `SimulationEngine.tick` collected the relic a Cadet Academy step awards when a transit arrival establishes orbit, but discarded it (`_tut_relics`), so the reward and its hull/shield bonus were lost on that path while the direct `orbit`, `scan`, `power`, `trade` and `drone` actions kept them. A working-tree snapshot of `engine.py` and `app.js` had also been truncated mid-statement and was restored from HEAD.
 - **Decision**: The tick path now adds the awarded relics to `ship.relics` and applies `_apply_relic_stat_bonuses` to hull, max hull, shield and max shield, the same as the other tutorial paths.
 - **Consequences**: Engine only, no new persisted field. Pinned by `tests/test_tutorial_arrival_relic.py`. The truncated snapshot is kept as `reports/voidfarer-damaged-tree-2026-11-14.patch` in the AIKit workspace.
+
+### ADR-296: Cadet protection keeps secure systems calm while the academy runs
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: A new captain's first jumps could meet pirate raids and solar-flare damage before the Cadet Flight Academy had taught navigation and trading. The combat card already hides Board, Gambit, Drone and subsystem targeting behind SHOW MORE TACTICS (ADR-294), so no combat-card change was needed.
+- **Decision**: In `SimulationEngine.jump`, while `ship.tutorial.is_active` and the target security is at least `CADET_PROTECTED_SECURITY` (0.5), pirate raids are skipped and a coronal flare is absorbed with a `CADET PROTOCOL` log line instead of hull, shield and heat damage. Low-security systems (below 0.35) and hostile-standing patrols are unchanged.
+- **Consequences**: Engine only, derived from existing tutorial state, no new persisted field. Skipping or finishing the academy ends the protection. Pinned by `tests/test_cadet_protection.py`.

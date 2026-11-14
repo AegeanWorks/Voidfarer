@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `221`
-- **Total Classes**: `495`
-- **Total Top-Level Functions**: `519`
-- **Total Class Methods**: `2512`
-- **Total Source Lines**: `61761`
+- **Total Python Modules**: `222`
+- **Total Classes**: `496`
+- **Total Top-Level Functions**: `520`
+- **Total Class Methods**: `2514`
+- **Total Source Lines**: `61809`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`221` module(s))
+- **Indexed**: python (`222` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -242,6 +242,21 @@
   - Method `.test_cycler_orders_bodies_by_orbit_and_wraps()`
   - Method `.test_only_the_orbit_view_is_affected()`
   - Method `.test_the_controls_reference_documents_the_keys()`
+
+---
+
+### [`tests/test_cadet_protection.py`](tests/test_cadet_protection.py)
+> *Cadet protection: secure systems stay calm while the academy is active.*
+
+**Size**: `34` lines (`1108` bytes)
+
+**Classes:**
+- `class CadetProtectionTest`
+  - Method `.test_secure_system_raises_no_pirates_while_the_academy_runs()`
+  - Method `.test_the_same_jump_meets_pirates_once_the_academy_is_skipped()`
+
+**Functions:**
+- `def _jump(skip_academy)`
 
 ---
 
@@ -4545,7 +4560,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10845` lines (`535369` bytes)
+**Size**: `10859` lines (`536066` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
