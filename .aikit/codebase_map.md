@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `207`
-- **Total Classes**: `478`
+- **Total Python Modules**: `208`
+- **Total Classes**: `479`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2474`
-- **Total Source Lines**: `60878`
+- **Total Class Methods**: `2475`
+- **Total Source Lines**: `60905`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`207` module(s))
+- **Indexed**: python (`208` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2833,6 +2833,17 @@
   - Method `.test_full_text_is_tried_before_the_short_form()`
   - Method `.test_extra_rows_exist_beyond_the_four_original_positions()`
   - Method `.test_priority_labels_still_force_the_full_text()`
+
+---
+
+### [`tests/test_radar_labels_avoid_target_card.py`](tests/test_radar_labels_avoid_target_card.py)
+> *Orbit-view labels route around the open target card (ADR-281).*
+
+**Size**: `27` lines (`1076` bytes)
+
+**Classes:**
+- `class RadarLabelsAvoidTargetCardTests`
+  - Method `.test_label_collision_list_starts_with_the_card_rect()`
 
 ---
 

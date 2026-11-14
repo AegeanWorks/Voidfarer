@@ -1,56 +1,22 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-contract-cards",
+    "task_id": "voidfarer-label-card",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794641347.9092638,
+    "updated_at": 1794657095.3898168,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "workspaces": [
+      {
+        "name": "voidfarer",
+        "path": "projects/voidfarer"
+      }
+    ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-skill-buttons",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 passed. checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794638259.2529109,
-      "timestamp_str": "2026-11-14 09:37:39",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
-    {
-      "task_id": "voidfarer-skill-buttons",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-skill-buttons' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794638356.9870687,
-      "timestamp_str": "2026-11-14 09:39:16",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-tutorial-trade",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Plan: M1 trade milestone hint requires a station; M2 Commerce empty-state message as a UI task",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794638476.7573404,
-      "timestamp_str": "2026-11-14 09:41:16",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Players parked at a wilderness body hit an unexplained empty Commerce tab at milestone 4",
-        "benefits": "A visible way forward in the tutorial",
-        "risks": "contract: hint wording pinned by a new test; dependency: none; concurrency: none; state: none",
-        "mitigation": "Other hints verified unchanged, real click probe, ADR-275"
-      },
-      "plan_digest": "959ce3e96b88dd65cc621242f3a7ea1414d80bd3b11eb99b4fb1c5d26d91072f"
-    },
     {
       "task_id": "voidfarer-tutorial-trade",
       "phase": "phase 4",
@@ -274,6 +240,58 @@
       "timestamp_str": "2026-11-14 10:29:07",
       "agent": "claude:1",
       "checklists": "passed"
+    },
+    {
+      "task_id": "voidfarer-contract-cards",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-contract-cards' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794641457.0768402,
+      "timestamp_str": "2026-11-14 10:30:57",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-label-card",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: orbit-view labels avoid the open target card by seeding the label collision list with its rect; failing-first source pin plus real-browser check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794656878.655413,
+      "timestamp_str": "2026-11-14 14:47:58",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Real Edge capture: with a target selected, labels like 'Sol System H (Fertile' and 'Sol System E (Magma' run under the target card and are cut off",
+        "benefits": "Every body keeps a readable name while the card is open",
+        "risks": "contract: none; dependency: reads one DOM rect per frame only when the card is visible; concurrency: none; state: none",
+        "mitigation": "Skip the read when the card is hidden; verify labels in the browser"
+      },
+      "plan_digest": "86c128cca2bdd1a8a3797279f3f2e9fc6ace505952be5468cfb61a04a62ab059",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-label-card",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 label card",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794657095.3898168,
+      "timestamp_str": "2026-11-14 14:51:35",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
     }
   ]
 }

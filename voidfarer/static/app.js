@@ -7505,7 +7505,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const now = Date.now() * 0.001;
         const auScale = this.orbitFitScale(bodies);
         const labels = [];
-        this._radarLabelBoxes = [];
+        this._radarLabelBoxes = this.targetCardObstacle();
         this.lastShipPosition = { x: cx, y: cy };
         // A Dyson swarm encloses its primary. Drawing the star's corona underneath would
         // bury the collector shell in glare, so the swarm replaces the star sprite.
@@ -7997,6 +7997,24 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (/freight|hauler|transport/.test(cls)) return "freighter";
         if (/stealth|ghost|shadow/.test(cls)) return "stealth";
         return "standard";
+    }
+
+    // The open target card floats over the radar. Seeding the label collision list with its
+    // rectangle makes names route to free space instead of running underneath it.
+    targetCardObstacle() {
+        const card = this.navTargetCard || document.getElementById("navTargetCard");
+        if (!card || getComputedStyle(card).display === "none") return [];
+        const rect = card.getBoundingClientRect();
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const dpr = this.dpr || 1;
+        const scaleX = (this.canvas.width / Math.max(1, canvasRect.width)) / dpr;
+        const scaleY = (this.canvas.height / Math.max(1, canvasRect.height)) / dpr;
+        return [{
+            x: (rect.left - canvasRect.left) * scaleX,
+            y: (rect.top - canvasRect.top) * scaleY,
+            w: rect.width * scaleX,
+            h: rect.height * scaleY,
+        }];
     }
 
     // The outermost orbit must stay inside the visible radar: at 720p the center panel

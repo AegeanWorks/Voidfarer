@@ -2867,3 +2867,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: In the Contracts tab the CLAIM REWARD button and reward lines crossed the row divider. Measured in real Edge, `#contractsList` is a 380px flex column and its cards (flex-shrink 1) were squashed below their content (scrollHeight 78 against clientHeight 70) instead of letting the list scroll.
 - **Decision**: `#contractsList > .contract-card { flex-shrink: 0; }`. Cards keep their padding and the list scrolls.
 - **Consequences**: CSS only. `tests/test_contract_cards_keep_size.py` (new, failing first) pins the rule. After the change every card measures scrollHeight equal to clientHeight. Added after `ui finish` because the UI guard protects `tests/` during a UI task.
+
+### ADR-281: Orbit-view labels route around the open target card
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: Reviewing the orbit radar in real Edge with a target selected showed names such as "Sol System H (Fertile Plains)" and "Sol System E (Magma Forge)" running underneath the target card and being cut off: the label placer clamps to the centre panel, which extends beneath the floating card.
+- **Decision**: `targetCardObstacle()` returns the visible target card's rectangle in canvas coordinates (nothing when it is hidden), and each frame seeds `_radarLabelBoxes` with it. The existing collision logic then places every label on the free side of its body.
+- **Consequences**: Cockpit only. One DOM rectangle read per frame, and only while the card is open. `tests/test_radar_labels_avoid_target_card.py` (new, failing first) pins the seeding and the hidden-card case. After the change both clipped labels are placed in full. Added after `ui finish` because the UI guard protects `tests/` during a UI task.
