@@ -3,30 +3,15 @@
   "active_task": {
     "task_id": "voidfarer-multihop-route",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794684076.9736662,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794684077.6699934
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-first-10-minutes",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-first-10-minutes' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794679404.9382699,
-      "timestamp_str": "2026-11-14 21:03:24",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-trade-clarity",
       "phase": "in_progress",
@@ -290,6 +275,22 @@
       "timestamp": 1794684076.9736662,
       "timestamp_str": "2026-11-14 22:21:16",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-multihop-route",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-multihop-route' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794684077.6699958,
+      "timestamp_str": "2026-11-14 22:21:17",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
     }
   ]
 }
