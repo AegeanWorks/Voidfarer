@@ -3070,3 +3070,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-297 locked the terminal to five core tabs for the whole academy, but the academy's step rewards total 530 XP, so a cadet reaches Pilot Mastery 2 (with a skill point to spend) just before graduating, while SKILLS stayed hidden.
 - **Decision**: `setCadetTabLock` now takes the Pilot Mastery level. At `CADET_EARLY_TAB_LEVEL` (2) or above, it marks `#tabBtnSkills` and `#tabBtnCrew` with `data-cadet-unlocked="true"`; the lock CSS hides only advanced tabs without that mark, and `switchRightTab`, `cycleTerminalTab` and the active-tab guard all honour it. The remaining nine tabs and `MORE SYSTEMS` still wait for graduation or SKIP TUTORIAL. Later milestone unlocks are not added: they would hide systems from players who graduate.
 - **Consequences**: Cockpit only, derived from existing mastery state, no persisted field. Verified in real Edge: at level 1 the rail shows the five core tabs; at level 2 it adds SKILLS (with its unspent-point badge) and CREW, 0 console errors. Pinned by `TestCadetEarlyTabUnlock`.
+
+### ADR-309: Arrive now skips a sublight transit without skipping emergencies
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: After TRANSIT & ORBIT a beginner had to unpause the clock or press +1 repeatedly until the ship arrived, which reads as a broken or slow game.
+- **Decision**: `SimulationEngine.arrive_now` advances an active sublight transit one tick at a time up to its arrival tick, and stops early with the reason when a decision, pirate, customs check, combat or anomaly freezes flight (`_action_lock_reason`) or the clock is blocked. It is exposed as the `arrive` flight action (REST `/api/flight/action`, CLI and agent catalog, G-012).
+- **Consequences**: Engine, REST and CLI; the radar target-card button follows. No persisted field. Pinned by `tests/test_arrive_now.py`.

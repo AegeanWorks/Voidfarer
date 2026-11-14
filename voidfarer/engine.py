@@ -10016,6 +10016,32 @@ class SimulationEngine:
                 return True, f"{log} {morale_log}"
             return True, log
 
+    def arrive_now(self) -> tuple[bool, str]:
+        """Step an active sublight transit to its arrival tick, one tick at a time.
+
+        Stops early, with the reason, the moment a decision, pirate, customs check, combat or
+        anomaly freezes flight, so a skipped wait never skips an emergency.
+        """
+        with self.lock:
+            if self.state.ship.travel is None:
+                return False, "Not in transit: nothing to skip."
+            start = self.state.time.tick
+            budget = max(1, self.state.ship.travel.arrival_tick - start) + 1
+            interrupted = ""
+            for _ in range(budget):
+                if self.tick(1).get("ticks_advanced", 0) == 0:
+                    interrupted = "the clock is blocked by an unresolved decision"
+                    break
+                if self.state.ship.travel is None:
+                    break
+                interrupted = self._action_lock_reason()
+                if interrupted:
+                    break
+            elapsed = self.state.time.tick - start
+            if self.state.ship.travel is None:
+                return True, f"Arrived after {elapsed} ticks."
+            return False, f"Transit interrupted after {elapsed} ticks: {interrupted or 'still underway'}"
+
     def tick(self, num_ticks: int = 1) -> dict[str, Any]:
         """Advance the simulation universe by num_ticks."""
         with self.lock:

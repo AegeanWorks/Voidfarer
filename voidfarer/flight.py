@@ -11,7 +11,7 @@ from typing import Any
 
 from voidfarer.models import GameState
 
-FLIGHT_ACTIONS = ("plot", "navigate", "jump", "orbit", "travel")
+FLIGHT_ACTIONS = ("plot", "navigate", "jump", "orbit", "travel", "arrive")
 
 
 def flight_summary(state: GameState) -> dict[str, Any]:
@@ -111,6 +111,8 @@ def flight_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, str]:
         return engine.jump(_text(kwargs.get("system_id")))
     if action == "orbit":
         return engine.orbit(_text(kwargs.get("body_id")))
+    if action == "arrive":
+        return engine.arrive_now()
     if action == "travel":
         return engine.start_travel(
             _text(kwargs.get("body_id")), mode=_text(kwargs.get("mode")) or "sublight"

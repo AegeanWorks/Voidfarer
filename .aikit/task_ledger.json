@@ -1,39 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-early-tabs",
+    "task_id": "voidfarer-arrive-now",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794682788.500027,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794683021.820363,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794682789.1790173
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-first-10-minutes",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/6] Cadet protection: no pirates or flare damage in secure systems during academy; combat card already compact (ADR-294); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794676548.1329436,
-      "timestamp_str": "2026-11-14 20:15:48",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-first-10-minutes",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[3/6] Cadet tab lock: five core tabs only during the academy (ADR-297); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794677446.1644456,
-      "timestamp_str": "2026-11-14 20:30:46",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-first-10-minutes",
       "phase": "in_progress",
@@ -272,6 +249,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-arrive-now",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: arrive_now engine and flight action, then an ARRIVE NOW button on the radar target card during transit",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794683021.5240011,
+      "timestamp_str": "2026-11-14 22:03:41",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Waiting out sublight transit tick by tick feels broken to beginners",
+        "benefits": "One click to arrive, never skipping an emergency",
+        "risks": "contract: new flight action feeds REST, CLI, agent catalog; dependency: none; concurrency: engine lock held while ticking; state: none",
+        "mitigation": "Tick one at a time and stop on _action_lock_reason; failing-first tests"
+      },
+      "plan_digest": "4abd9ccda5188591a69213e06f19d4e3dec9b39a011e2aa5572ebbc4964fd27e"
+    },
+    {
+      "task_id": "voidfarer-arrive-now",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] arrive_now engine and arrive flight action (ADR-309); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794683021.820363,
+      "timestamp_str": "2026-11-14 22:03:41",
+      "agent": "claude:1"
     }
   ]
 }

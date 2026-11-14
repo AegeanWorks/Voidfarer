@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `227`
-- **Total Classes**: `509`
-- **Total Top-Level Functions**: `524`
-- **Total Class Methods**: `2563`
-- **Total Source Lines**: `62414`
+- **Total Python Modules**: `228`
+- **Total Classes**: `510`
+- **Total Top-Level Functions**: `525`
+- **Total Class Methods**: `2568`
+- **Total Source Lines**: `62498`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`227` module(s))
+- **Indexed**: python (`228` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -142,6 +142,23 @@
   - Method `.setUp()`
   - Method `.test_alliance_requires_standing_and_forms_once()`
   - Method `.test_allied_territory_reduces_pirate_risk()`
+
+---
+
+### [`tests/test_arrive_now.py`](tests/test_arrive_now.py)
+> *ARRIVE NOW steps a sublight transit to its arrival tick and stops at the first interruption.*
+
+**Size**: `56` lines (`2123` bytes)
+
+**Classes:**
+- `class ArriveNowTest`
+  - Method `.test_steps_to_arrival_and_enters_orbit()`
+  - Method `.test_stops_after_one_tick_when_an_encounter_locks_flight()`
+  - Method `.test_refused_when_not_in_transit()`
+  - Method `.test_it_is_reachable_as_a_flight_action()`
+
+**Functions:**
+- `def _in_transit()`
 
 ---
 
@@ -4671,7 +4688,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11057` lines (`545535` bytes)
+**Size**: `11083` lines (`546799` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4909,6 +4926,7 @@
   - Method `.decisions_ready_in()` - *Ticks left before another blocking decision may be evaluated.*
   - Method `.maybe_trigger_decision(trigger, elapsed_ticks)` - *Evaluate conditional events and open at most one blocking decision.*
   - Method `.resolve_decision(choice_id)` - *Apply a decision choice; time and flight remain locked until this succeeds.*
+  - Method `.arrive_now()` - *Step an active sublight transit to its arrival tick, one tick at a time.*
   - Method `.tick(num_ticks)` - *Advance the simulation universe by num_ticks.*
   - Method `.emit_event(kind, title, message)` - *Create and append a cockpit popup GameEvent.*
   - Method `.dismiss_event(event_id)` - *Mark a cockpit popup GameEvent as dismissed.*
@@ -5102,7 +5120,7 @@
 ### [`voidfarer/flight.py`](voidfarer/flight.py)
 > *One report and action surface for route plotting, navigation and local flight.*
 
-**Size**: `121` lines (`4471` bytes)
+**Size**: `123` lines (`4543` bytes)
 
 **Functions:**
 - `def flight_summary(state)` - *Compact payload for /api/state.*
