@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `214`
-- **Total Classes**: `485`
+- **Total Python Modules**: `215`
+- **Total Classes**: `486`
 - **Total Top-Level Functions**: `516`
-- **Total Class Methods**: `2484`
-- **Total Source Lines**: `61116`
+- **Total Class Methods**: `2485`
+- **Total Source Lines**: `61139`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`214` module(s))
+- **Indexed**: python (`215` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3057,6 +3057,17 @@
   - Method `.test_malformed_json_is_a_protocol_error()`
   - Method `.test_blocked_actions_are_not_counted_as_attempted()`
   - Method `.test_missing_catalog_is_an_error_not_silent_coverage()`
+
+---
+
+### [`tests/test_ruler_ticks_reserve_space.py`](tests/test_ruler_ticks_reserve_space.py)
+> *Orbit-view names route around the AU ruler marks (ADR-287).*
+
+**Size**: `23` lines (`953` bytes)
+
+**Classes:**
+- `class RulerTicksReserveSpaceTests`
+  - Method `.test_each_tick_label_registers_its_box_before_names_are_placed()`
 
 ---
 

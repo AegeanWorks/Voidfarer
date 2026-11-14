@@ -7545,6 +7545,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     ctx.font = "12px 'Cascadia Mono', Consolas, monospace";
                     ctx.fillStyle = "rgba(236, 228, 212, 0.6)";
                     ctx.fillText(`${auDist.toFixed(1)} AU`, cx + radius + 4, cy - 3);
+                    // Reserve the mark so body and flagship names route around it instead of printing over it.
+                    const tickWidth = ctx.measureText(`${auDist.toFixed(1)} AU`).width;
+                    this._radarLabelBoxes.push({ x: cx + radius + 2, y: cy - 16, w: tickWidth + 4, h: 17 });
                     ctx.restore();
                 }
             }
