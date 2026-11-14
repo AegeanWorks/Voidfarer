@@ -11040,3 +11040,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* A failed menu action (empty slot, failed save) must not read as a success. */
 .main-menu-status.is-error { color: var(--console-red); }
+
+/* An origin bonus the rank cap swallows reads as spent, not as a promise. */
+.attr-origin[data-maxed="true"] { color: var(--console-muted); border-style: dashed; }

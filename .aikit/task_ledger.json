@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-ruler-labels",
+    "task_id": "voidfarer-origin-cap",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794660179.580964,
+    "updated_at": 1794660791.332176,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,64 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-label-card",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-label-card' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794657182.453973,
-      "timestamp_str": "2026-11-14 14:53:02",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-net-sell-price",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: report the net sell price (quote x trade margin x specialty) from one engine helper, show it in the Commerce table and CLI market, judge profit colouring by it; failing-first tests",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794657345.1406534,
-      "timestamp_str": "2026-11-14 14:55:45",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Trade bot: a sale paid 554/unit for medicines while the Commerce table quoted 418; the table also coloured profit against the raw quote",
-        "benefits": "Displayed price equals the cash received; profit/loss chips are right",
-        "risks": "contract: additive sell_price_net field, sell_price unchanged; dependency: sale and display share _sale_multipliers; concurrency: helper runs under the engine lock; state: none",
-        "mitigation": "Test compares the displayed net with a real one-unit sale for every commodity; existing trade tests rerun"
-      },
-      "plan_digest": "569aae6147f182e0dc13490fe3d7fdafb49e4fcb77807b7effc82a689b4551e4",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "voidfarer-net-sell-price",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/2] engine and CLI net price Phase 4",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794657357.7796485,
-      "timestamp_str": "2026-11-14 14:55:57",
-      "agent": "claude:1",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-net-sell-price",
       "phase": "phase 4",
@@ -398,6 +340,64 @@
       "status": "in_progress",
       "timestamp": 1794660179.580964,
       "timestamp_str": "2026-11-14 15:42:59",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-ruler-labels",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-ruler-labels' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794660259.7034655,
+      "timestamp_str": "2026-11-14 15:44:19",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-origin-cap",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: the creation origin tag shows the gain the rank-10 cap leaves, and 'ORIGIN MAXED' when none; failing-first pin and browser check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794660369.9319253,
+      "timestamp_str": "2026-11-14 15:46:09",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Real Edge: maxing Engineering as an Engineer leaves it at 10 because origin training is capped at rank 10, yet the tag still promised +2 ORIGIN",
+        "benefits": "Players see what the origin will really add before spending points",
+        "risks": "contract: none; dependency: cap mirrors character.py's rank-10 rule, pinned by a test; concurrency: none; state: none",
+        "mitigation": "Test ties the UI cap to the engine rule text; browser check at 9, 10 and low values"
+      },
+      "plan_digest": "5f2fdb97c481519237e88374a07b468eb5705e8eceb84bdc5a3085d7b1cfb872",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-origin-cap",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 origin cap",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794660791.332176,
+      "timestamp_str": "2026-11-14 15:53:11",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `215`
-- **Total Classes**: `486`
+- **Total Python Modules**: `216`
+- **Total Classes**: `487`
 - **Total Top-Level Functions**: `516`
-- **Total Class Methods**: `2485`
-- **Total Source Lines**: `61139`
+- **Total Class Methods**: `2487`
+- **Total Source Lines**: `61169`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`215` module(s))
+- **Indexed**: python (`216` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2574,6 +2574,18 @@
 - `class NonAggressionWarTest`
   - Method `._systems_and_leaders()`
   - Method `.test_active_pact_blocks_a_new_sol_coalition_war()`
+
+---
+
+### [`tests/test_origin_tag_cap.py`](tests/test_origin_tag_cap.py)
+> *The creation origin tag shows the gain the rank-10 cap leaves (ADR-288).*
+
+**Size**: `30` lines (`1223` bytes)
+
+**Classes:**
+- `class OriginTagCapTests`
+  - Method `.test_engine_caps_origin_training_at_rank_ten()`
+  - Method `.test_tag_uses_the_capped_gain()`
 
 ---
 

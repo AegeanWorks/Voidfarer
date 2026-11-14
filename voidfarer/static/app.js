@@ -1371,8 +1371,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             grid.innerHTML = Object.entries(this.charAttrs).map(([attr, val]) => {
                 const label = attrLabels[attr] || attr.toUpperCase();
                 const bonus = Number(((origin.skills) || {})[attr] || 0);
+                // Origin training stops at the rank cap, so show what it will really add.
+                const gain = Math.min(bonus, Math.max(0, maxSkill - val));
+                const capNote = gain < bonus ? `; ranks stop at ${maxSkill}, so ${gain ? `only +${gain}` : "none of it"} lands here` : "";
                 const tag = bonus
-                    ? ` <small class="attr-origin" title="${this.escapeHtml(originName)} training is added after your points">+${bonus} ORIGIN</small>`
+                    ? ` <small class="attr-origin" data-maxed="${gain ? "false" : "true"}" title="${this.escapeHtml(originName)} training is added after your points${capNote}">${gain ? `+${gain} ORIGIN` : "ORIGIN MAXED"}</small>`
                     : "";
                 return `
                 <div class="attr-item">
