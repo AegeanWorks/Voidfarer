@@ -6419,15 +6419,45 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    // The hyperlane route to a star, cached per start system; fetched once and the card redrawn when it lands.
+    routeTo(systemId) {
+        const from = this.state?.current_system?.id;
+        const key = `${from}>${systemId}`;
+        this.routeCache = this.routeCache || new Map();
+        const cached = this.routeCache.get(key);
+        // Fuel estimates follow power routing, so a cached route older than 5 s refreshes in the background.
+        if (cached && Date.now() - cached.at < 5000) return cached.route;
+        if (!this._routePending) this._routePending = new Set();
+        if (!this._routePending.has(key)) {
+            this._routePending.add(key);
+            apiFetch("/api/route", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ system_id: systemId })
+            }).then(res => res.json()).then(json => {
+                this.routeCache.set(key, { route: json.route || { reachable: false }, at: Date.now() });
+            }).catch(() => {
+                this.routeCache.set(key, { route: { reachable: false }, at: Date.now() });
+            }).finally(() => {
+                this._routePending.delete(key);
+                if (this.selectedType === "system" && this.selectedTarget && this.selectedTarget.id === systemId) {
+                    this.updateTargetCard();
+                }
+            });
+        }
+        return cached ? cached.route : null;
+    }
+
     async handleJumpAction() {
         if (!this.selectedTarget || this.selectedType !== "system") return;
         this.sound.init();
         this.sound.playQuantumWarp();
+        const adjacent = this.state.current_system.connections.includes(this.selectedTarget.id);
         try {
-            const res = await apiFetch("/api/jump", {
+            const res = await apiFetch(adjacent ? "/api/jump" : "/api/navigate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ target: this.selectedTarget.id })
+                body: JSON.stringify(adjacent ? { target: this.selectedTarget.id } : { system_id: this.selectedTarget.id })
             });
             const json = await res.json();
             if (json.ok) {
@@ -7261,6 +7291,22 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.btnJumpTarget.title = short
                     ? "Not enough quantum fuel for this lane: refuel, scoop, burn a fuel cell or fabricate a fuel pack."
                     : `This lane costs ${lane} quantum fuel at your current power routing.`;
+            }
+            // A star beyond the adjacent lanes is reached by plotting the whole hyperlane route (ADR-311).
+            if (!isConn && s.id !== curSys.id) {
+                const route = this.routeTo(s.id);
+                if (!route) {
+                    this.btnJumpTarget.textContent = "PLOTTING ROUTE...";
+                } else if (route.reachable) {
+                    const need = Number(route.fuel_estimate || 0);
+                    const fuel = Number(this.state.ship.fuel || 0);
+                    const short = fuel < need;
+                    this.btnJumpTarget.disabled = short;
+                    this.btnJumpTarget.textContent = short
+                        ? `ROUTE NEEDS ${need} FUEL (HAVE ${fuel})`
+                        : `PLOT ROUTE & JUMP (${route.jumps} HOPS · ${need} FUEL)`;
+                    this.btnJumpTarget.title = `${route.jumps} hyperlane jumps via ${(route.path || []).slice(1).join(" → ")}; the run stops early if an encounter interrupts it.`;
+                }
             }
             if (this.btnHailTarget) this.btnHailTarget.style.display = "none";
             if (this.btnClearTarget) this.btnClearTarget.style.display = "inline-block";

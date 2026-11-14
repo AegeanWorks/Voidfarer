@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `228`
-- **Total Classes**: `511`
+- **Total Classes**: `512`
 - **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2572`
-- **Total Source Lines**: `62521`
+- **Total Class Methods**: `2576`
+- **Total Source Lines**: `62543`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`228` module(s))
@@ -487,7 +487,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `2999` lines (`135619` bytes)
+**Size**: `3021` lines (`136671` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -554,6 +554,11 @@
   - Method `.test_button_is_hidden_by_default_next_to_the_transit_button()`
   - Method `.test_button_follows_the_active_travel_for_any_target_type()`
   - Method `.test_click_posts_the_arrive_flight_action_and_applies_state_even_when_interrupted()`
+- `class TestMultiHopRouteButton` - *A distant star offers PLOT ROUTE & JUMP through the existing route and navigate endpoints (ADR-311).*
+  - Method `.setUpClass()`
+  - Method `.test_non_adjacent_star_shows_hops_and_fuel_and_blocks_when_short()`
+  - Method `.test_route_is_fetched_from_the_route_endpoint_and_cached_briefly()`
+  - Method `.test_click_navigates_only_when_the_star_is_not_adjacent()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

@@ -459,6 +459,28 @@ class TestArriveNowButton(unittest.TestCase):
         self.assertIn("if (json.state) this.state = json.state;", self.js)
 
 
+class TestMultiHopRouteButton(unittest.TestCase):
+    """A distant star offers PLOT ROUTE & JUMP through the existing route and navigate endpoints (ADR-311)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_non_adjacent_star_shows_hops_and_fuel_and_blocks_when_short(self):
+        self.assertIn("if (!isConn && s.id !== curSys.id) {", self.js)
+        self.assertIn("`PLOT ROUTE & JUMP (${route.jumps} HOPS · ${need} FUEL)`", self.js)
+        self.assertIn("`ROUTE NEEDS ${need} FUEL (HAVE ${fuel})`", self.js)
+        self.assertIn('"PLOTTING ROUTE..."', self.js)
+
+    def test_route_is_fetched_from_the_route_endpoint_and_cached_briefly(self):
+        self.assertIn('apiFetch("/api/route"', self.js)
+        self.assertIn("Date.now() - cached.at < 5000", self.js)
+
+    def test_click_navigates_only_when_the_star_is_not_adjacent(self):
+        self.assertIn('adjacent ? "/api/jump" : "/api/navigate"', self.js)
+        self.assertIn("{ system_id: this.selectedTarget.id }", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

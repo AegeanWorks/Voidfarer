@@ -2607,5 +2607,25 @@
     "final_snapshot_digest": "031e81ad7714752dbd3844aaa9b9ed09152882b480b431cfd9d26dfab0fd5f4c",
     "final_snapshot_entries": 1333,
     "surface_digest": "3d0275b403ab6e1c924618a5f0e026493570b6205abb89480bb48e0e98c8db1b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "72a15b1ba7e6d17d6f6d39cb33e4ebe27680852a",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794683655.9888697,
+    "finished_at": 1794683877.2678447,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; route/laptop-route.png: Vega target card shows PLOT ROUTE & JUMP (2 HOPS - 16 FUEL) on two lines inside the button, no clipping; click ran the route and stopped at Procyon on an anomaly as designed, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "3cd057305145e83139152b6b5045e8857f4b64336dc44b28e51dd467a6af39ad",
+    "final_snapshot_entries": 1336,
+    "surface_digest": "9f42e6a151b1d18b5327659482f23f894313263a4891761a9e4de0028733a1e5"
   }
 ]
