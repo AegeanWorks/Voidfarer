@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-modal-radar-galaxy-layout",
+    "task_id": "voidfarer-flexible-cadet-academy",
     "last_phase": "phase 4",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794670207.6477826,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794672515.5871704,
     "owner": "antigravity:goal",
     "started_by": "antigravity:goal",
     "continuations": [],
@@ -14,50 +14,9 @@
         "name": "voidfarer",
         "path": "projects/voidfarer"
       }
-    ],
-    "completed_at": 1794670362.2730877
+    ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-ruler-labels",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-ruler-labels' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794660259.7034655,
-      "timestamp_str": "2026-11-14 15:44:19",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-origin-cap",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: the creation origin tag shows the gain the rank-10 cap leaves, and 'ORIGIN MAXED' when none; failing-first pin and browser check",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794660369.9319253,
-      "timestamp_str": "2026-11-14 15:46:09",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Real Edge: maxing Engineering as an Engineer leaves it at 10 because origin training is capped at rank 10, yet the tag still promised +2 ORIGIN",
-        "benefits": "Players see what the origin will really add before spending points",
-        "risks": "contract: none; dependency: cap mirrors character.py's rank-10 rule, pinned by a test; concurrency: none; state: none",
-        "mitigation": "Test ties the UI cap to the engine rule text; browser check at 9, 10 and low values"
-      },
-      "plan_digest": "5f2fdb97c481519237e88374a07b468eb5705e8eceb84bdc5a3085d7b1cfb872",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-origin-cap",
       "phase": "phase 4",
@@ -400,6 +359,48 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-flexible-cadet-academy",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Allow out-of-order Cadet Flight Academy milestone completion and thread graduation relics across all tutorial actions",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794671308.035782,
+      "timestamp_str": "2026-11-14 18:48:28",
+      "agent": "antigravity:goal",
+      "impact_assessment": {
+        "why": "Previously _progress_tutorial only checked cur.steps[cur.current_step_index], so beginners who traded, scanned, routed power, or bought a drone at the starting Citadel station before orbiting sol_body_1 received no credit and were later stranded away from a station on step 4",
+        "benefits": "Beginners can complete Cadet Flight Academy milestones in any natural order without losing rewards or getting stranded, while sequential 0..5 play remains identical",
+        "risks": "contract: existing sequential tutorial tests check current_step_index; dependency: none; concurrency: none; state: graduating on a non-jump step must still award relic_cadet_wings and +15 max_hull",
+        "mitigation": "Keep current_step_index pointed at the first remaining uncompleted step (or len(steps) on graduation) and apply _apply_relic_stat_bonuses for tut_relics across orbit, power, trade, drone, and tick arrival"
+      },
+      "plan_digest": "be037ddbdd9b4c849dd29f7efe64eca1a992d5e56fd844e384a06f835f747719",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-flexible-cadet-academy",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Verified guide_tutorial() across engine, CLI, and narrative action with 5/5 gates",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794672515.5871704,
+      "timestamp_str": "2026-11-14 19:08:35",
+      "agent": "antigravity:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
     }
   ]
 }

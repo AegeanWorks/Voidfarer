@@ -12,7 +12,7 @@ from typing import Any
 from voidfarer.models import GameState
 
 NARRATIVE_ACTIONS = (
-    "story_choose", "tutorial_skip", "tutorial_reset",
+    "story_choose", "tutorial_skip", "tutorial_reset", "tutorial_guide",
     "contract_refresh", "contract_claim", "contract_swap", "event_dismiss",
 )
 
@@ -103,6 +103,9 @@ def narrative_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, str
         return engine.skip_tutorial()
     if action == "tutorial_reset":
         return engine.reset_tutorial()
+    if action == "tutorial_guide":
+        ok, message, _guidance = engine.guide_tutorial()
+        return ok, message
     if action == "contract_refresh":
         return engine.refresh_contracts()
     if action == "contract_claim":

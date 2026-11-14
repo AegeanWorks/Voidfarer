@@ -55,7 +55,7 @@ INITIAL_TUTORIAL_STEPS: tuple[TutorialStep, ...] = (
         id="step_drone",
         title="Autonomous Fleet Command",
         instruction="Commission an autonomous drone asset to begin harvesting remote star systems.",
-        hint="Run `fleet buy mining` or commission an asset in the Fleet tab.",
+        hint="While orbiting a station (such as the Citadel), run `fleet buy mining` or commission an asset in the Fleet tab.",
         reward_credits=350,
         reward_xp=150,
     ),

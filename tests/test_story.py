@@ -192,6 +192,58 @@ class TestStoryAndTutorial(unittest.TestCase):
             before_logs + 1,
         )
 
+    def test_tutorial_guide_autopilot_and_progression(self):
+        """guide_tutorial() points to the active step and auto-docks at stations when needed."""
+        from voidfarer.narrative import narrative_action
+
+        # Step 0: step_orbit
+        ok, msg, guidance = self.engine.guide_tutorial()
+        self.assertTrue(ok, msg)
+        self.assertEqual(guidance["step_id"], "step_orbit")
+        self.assertEqual(guidance["ui_tab"], "radar")
+        self.assertIsNotNone(guidance["target_body_id"])
+        ok, msg = self.engine.orbit(guidance["target_body_id"])
+        self.assertTrue(ok, msg)
+
+        # Step 1: step_scan
+        ok, msg, guidance = self.engine.guide_tutorial()
+        self.assertTrue(ok, msg)
+        self.assertEqual(guidance["step_id"], "step_scan")
+        ok, msg, _ = self.engine.scan()
+        self.assertTrue(ok, msg)
+
+        # Step 2: step_power
+        ok, msg, guidance = self.engine.guide_tutorial()
+        self.assertTrue(ok, msg)
+        self.assertEqual(guidance["step_id"], "step_power")
+        self.assertEqual(guidance["ui_tab"], "reactor")
+        ok, msg = self.engine.set_reactor_mode("economy")
+        self.assertTrue(ok, msg)
+
+        # Step 3: step_trade -> ship is currently at a non-station planet (sol_body_1);
+        # guide_tutorial() auto-orbits the local dockable station so BUY succeeds immediately!
+        self.assertFalse(self.engine.docked_body.station_dockable)
+        ok, msg, guidance = self.engine.guide_tutorial()
+        self.assertTrue(ok, msg)
+        self.assertEqual(guidance["step_id"], "step_trade")
+        self.assertTrue(guidance["auto_orbited"])
+        self.assertTrue(self.engine.docked_body.station_dockable)
+        ok, msg = self.engine.trade(guidance["commodity_id"], 1, is_buy=True)
+        self.assertTrue(ok, msg)
+
+        # Step 4: step_drone -> move away from station first, verify narrative_action("tutorial_guide") re-docks
+        self.engine.orbit(self.engine.current_system.bodies[2].id)
+        self.assertFalse(self.engine.docked_body.station_dockable)
+        ok, msg = narrative_action(self.engine, "tutorial_guide")
+        self.assertTrue(ok, msg)
+        self.assertTrue(self.engine.docked_body.station_dockable)
+
+        # Step 5: step_jump
+        self.engine.skip_tutorial()
+        ok, msg, guidance = self.engine.guide_tutorial()
+        self.assertFalse(ok)
+        self.assertEqual(guidance["status"], "skipped")
+
     def test_tutorial_skip_and_reset(self):
         self.assertTrue(self.engine.state.ship.tutorial.is_active)
 

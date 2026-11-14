@@ -2500,8 +2500,14 @@ def cmd_tutorial(engine: SimulationEngine, storage: StorageManager, parts: list[
             if ok:
                 storage.save(engine.state)
             return 0 if ok else 1
+        elif sub == "guide":
+            ok, msg, _guidance = engine.guide_tutorial()
+            print((GREEN if ok else RED) + msg + RESET)
+            if ok:
+                storage.save(engine.state)
+            return 0 if ok else 1
         else:
-            print(f"{RED}Unknown tutorial command '{sub}'. Options: skip, reset.{RESET}")
+            print(f"{RED}Unknown tutorial command '{sub}'. Options: guide, skip, reset.{RESET}")
             return 1
 
     print(f"\n{BOLD}{CYAN}=== CADET FLIGHT ACADEMY: ONBOARDING SCRIPT ==={RESET}")

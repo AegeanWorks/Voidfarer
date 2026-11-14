@@ -7875,6 +7875,167 @@ class SimulationEngine:
             self.state = self._clone_state(ship=self._clone_ship(tutorial=new_tut, flight_log=tuple(new_log[-20:])))
             return True, "Cadet Flight Academy reset to Step 1."
 
+    def guide_tutorial(self) -> tuple[bool, str, dict[str, Any]]:
+        """Position the ship for the active Cadet Flight Academy milestone and return actionable UI/CLI guidance."""
+        with self.lock:
+            cur = self.state.ship.tutorial
+            if not cur.is_active:
+                status = "graduated" if cur.completed else ("skipped" if cur.skipped else "inactive")
+                return (
+                    False,
+                    f"Cadet Flight Academy is {status}. Run `tutorial reset` to restart training.",
+                    {"active": False, "status": status},
+                )
+
+            step = cur.current_step
+            step_num = cur.current_step_index + 1
+            total = len(cur.steps)
+            cur_sys = self.current_system
+            docked = self.docked_body
+            auto_orbited = False
+
+            def _autopilot_orbit(target_body: CelestialBody) -> None:
+                nonlocal docked, auto_orbited
+                if self.state.ship.travel is not None or self.state.ship.orbiting_body_id == target_body.id:
+                    return
+                log_line = f"ACADEMY GUIDE: Autopilot positioned ship in orbit around {target_body.name}."
+                new_log = list(self.state.ship.flight_log[-19:]) + [log_line]
+                self.state = self._clone_state(
+                    ship=self._clone_ship(
+                        orbiting_body_id=target_body.id,
+                        landed_body_id=None,
+                        waypoint_au=0.0,
+                        waypoint_angle=0.0,
+                        flight_log=tuple(new_log[-20:]),
+                    )
+                )
+                docked = target_body
+                auto_orbited = True
+
+            if step.id == "step_orbit":
+                target = next(
+                    (b for b in cur_sys.bodies if b.id != self.state.ship.orbiting_body_id and b.body_type != "star"),
+                    next((b for b in cur_sys.bodies if b.id != self.state.ship.orbiting_body_id), cur_sys.bodies[0]),
+                )
+                msg = (
+                    f"Academy Guide [{step_num}/{total}]: Target {target.name} ({target.id}) "
+                    f"and click 'TRANSIT & ORBIT' (or run `orbit {target.id}`)."
+                )
+                return True, msg, {
+                    "active": True,
+                    "step_id": step.id,
+                    "step_index": cur.current_step_index,
+                    "ui_tab": "radar",
+                    "target_body_id": target.id,
+                    "target_body_name": target.name,
+                    "recommended_command": f"orbit {target.id}",
+                    "auto_orbited": False,
+                }
+
+            if step.id == "step_scan":
+                target = docked if (docked is not None and not docked.scan_completed) else None
+                if target is None:
+                    target = next((b for b in cur_sys.bodies if not b.scan_completed), cur_sys.bodies[0])
+                    if not target.scan_completed:
+                        _autopilot_orbit(target)
+                prefix = f"Autopilot orbited {target.name}. " if auto_orbited else ""
+                msg = (
+                    f"Academy Guide [{step_num}/{total}]: {prefix}"
+                    f"Click 'SCAN' in the radar controls (or run `scan`) to survey {target.name}."
+                )
+                return True, msg, {
+                    "active": True,
+                    "step_id": step.id,
+                    "step_index": cur.current_step_index,
+                    "ui_tab": "radar",
+                    "target_body_id": target.id,
+                    "target_body_name": target.name,
+                    "recommended_command": "scan",
+                    "auto_orbited": auto_orbited,
+                }
+
+            if step.id == "step_power":
+                msg = (
+                    f"Academy Guide [{step_num}/{total}]: Click 'ECONOMY' or 'OVERDRIVE' in the bottom "
+                    f"reactor strip (or run `power 30 25 25 20`)."
+                )
+                return True, msg, {
+                    "active": True,
+                    "step_id": step.id,
+                    "step_index": cur.current_step_index,
+                    "ui_tab": "reactor",
+                    "recommended_command": "power 30 25 25 20",
+                    "auto_orbited": False,
+                }
+
+            if step.id == "step_trade":
+                station = docked if (docked is not None and docked.station_dockable) else None
+                if station is None:
+                    station = next((b for b in cur_sys.bodies if b.station_dockable), None)
+                    if station is not None:
+                        _autopilot_orbit(station)
+                commodity_id = "fuel_cells"
+                if station is not None:
+                    quotes = GalaxyGenerator.get_market_quotes(cur_sys, station)
+                    if quotes:
+                        commodity_id = min(quotes, key=lambda q: q.buy_price).commodity_id
+                prefix = f"Autopilot docked at {station.name}. " if (auto_orbited and station is not None) else ""
+                msg = (
+                    f"Academy Guide [{step_num}/{total}]: {prefix}"
+                    f"Open COMMERCE and click 'BUY' on {commodity_id} (or run `buy {commodity_id} 1`)."
+                )
+                return True, msg, {
+                    "active": True,
+                    "step_id": step.id,
+                    "step_index": cur.current_step_index,
+                    "ui_tab": "market",
+                    "target_body_id": station.id if station else None,
+                    "target_body_name": station.name if station else None,
+                    "commodity_id": commodity_id,
+                    "recommended_command": f"buy {commodity_id} 1",
+                    "auto_orbited": auto_orbited,
+                }
+
+            if step.id == "step_drone":
+                station = docked if (docked is not None and docked.station_dockable) else None
+                if station is None:
+                    station = next((b for b in cur_sys.bodies if b.station_dockable), None)
+                    if station is not None:
+                        _autopilot_orbit(station)
+                prefix = f"Autopilot docked at {station.name}. " if (auto_orbited and station is not None) else ""
+                msg = (
+                    f"Academy Guide [{step_num}/{total}]: {prefix}"
+                    f"Open FLEET, expand 'SHOW COMMISSION', and commission a drone (or run `fleet buy mining`)."
+                )
+                return True, msg, {
+                    "active": True,
+                    "step_id": step.id,
+                    "step_index": cur.current_step_index,
+                    "ui_tab": "fleet",
+                    "target_body_id": station.id if station else None,
+                    "target_body_name": station.name if station else None,
+                    "recommended_command": "fleet buy mining",
+                    "auto_orbited": auto_orbited,
+                }
+
+            target_sys_id = cur_sys.connections[0] if cur_sys.connections else "alpha_centauri"
+            target_sys = self.state.systems.get(target_sys_id)
+            target_sys_name = target_sys.name if target_sys else target_sys_id
+            msg = (
+                f"Academy Guide [{step_num}/{total}]: Switch radar to GALAXY MAP, select {target_sys_name} "
+                f"({target_sys_id}), and click 'HYPERSPACE JUMP' (or run `jump {target_sys_id}`)."
+            )
+            return True, msg, {
+                "active": True,
+                "step_id": step.id,
+                "step_index": cur.current_step_index,
+                "ui_tab": "galaxy",
+                "target_system_id": target_sys_id,
+                "target_system_name": target_sys_name,
+                "recommended_command": f"jump {target_sys_id}",
+                "auto_orbited": False,
+            }
+
     @property
     def current_chassis_id(self) -> str:
         """Id of the chassis matching the ship's commissioned class (falls back to the class name)."""

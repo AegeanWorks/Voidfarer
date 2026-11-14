@@ -9,8 +9,8 @@
 - **Total Python Modules**: `220`
 - **Total Classes**: `493`
 - **Total Top-Level Functions**: `519`
-- **Total Class Methods**: `2506`
-- **Total Source Lines**: `61406`
+- **Total Class Methods**: `2508`
+- **Total Source Lines**: `61628`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`220` module(s))
@@ -3536,7 +3536,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `819` lines (`35292` bytes)
+**Size**: `871` lines (`37722` bytes)
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -3547,6 +3547,7 @@
   - Method `.test_transit_arrival_advances_orbit_milestone()` - *Timed transit is an orbit action and must advance the academy once.*
   - Method `.test_tutorial_hints_name_live_cockpit_controls()`
   - Method `.test_reactor_mode_preset_advances_power_milestone()`
+  - Method `.test_tutorial_guide_autopilot_and_progression()` - *guide_tutorial() points to the active step and auto-docks at stations when needed.*
   - Method `.test_tutorial_skip_and_reset()`
   - Method `.test_story_initialization_and_first_chapter()`
   - Method `.test_story_arrival_transmissions()`
@@ -4268,7 +4269,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4841` lines (`238571` bytes)
+**Size**: `4847` lines (`238816` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -4529,7 +4530,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10617` lines (`524581` bytes)
+**Size**: `10778` lines (`532582` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4717,6 +4718,7 @@
   - Method `.make_story_choice(choice_id)` - *Resolve a branching story dilemma in the active campaign chapter.*
   - Method `.skip_tutorial()` - *Skip Cadet Flight Academy and unlock unrestricted operational status.*
   - Method `.reset_tutorial()` - *Reset Cadet Flight Academy to step 1 for revision or retraining.*
+  - Method `.guide_tutorial()` - *Position the ship for the active Cadet Flight Academy milestone and return actionable UI/CLI guidance.*
   - Property `.current_chassis_id` - *Id of the chassis matching the ship's commissioned class (falls back to the class name).*
   - Method `.get_status_snapshot(include_static)` - *Produce a JSON serializable telemetry snapshot for the HUD.*
   - Method `._resolve_war_bonds(wars)` - *Settle pledged war bonds once a war ends; no double payouts.*
@@ -5304,7 +5306,7 @@
 ### [`voidfarer/narrative.py`](voidfarer/narrative.py)
 > *One report and action surface for story, tutorial, quests, contracts and events.*
 
-**Size**: `120` lines (`4403` bytes)
+**Size**: `123` lines (`4540` bytes)
 
 **Functions:**
 - `def _rows(items)`
@@ -5571,7 +5573,7 @@
 ### [`voidfarer/story.py`](voidfarer/story.py)
 > *Interactive Cadet Flight Academy tutorial and branching narrative campaign systems.*
 
-**Size**: `541` lines (`24750` bytes)
+**Size**: `541` lines (`24798` bytes)
 
 **Functions:**
 - `def generate_initial_tutorial()` - *Construct a fresh Cadet Flight Academy tutorial state.*
