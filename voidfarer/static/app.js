@@ -3557,7 +3557,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         const allRoutes = data?.routes || [];
         const routes = allRoutes.slice(0, window.innerWidth < 1500 ? 4 : 6);
         const routeRows = routes.length ? routes.map(route => {
-            const netClass = route.net >= 0 ? "q-net-positive" : "q-net-negative";
+            // net is payout minus fee; the colour and the label follow what is actually earned over the cargo's cost.
+            const profit = Number(route.profit ?? route.net);
+            const netClass = profit >= 0 ? "q-net-positive" : "q-net-negative";
+            const netTip = `Payout ${route.payout} CR minus fee ${route.fee} CR = ${route.net} CR. `
+                + (Number(route.cost_basis) > 0 ? `You paid ${route.cost_basis} CR for this cargo, so the profit is ${profit >= 0 ? "+" : ""}${profit} CR.` : "No purchase cost is recorded for this cargo.");
             return `<div class="quantum-route-row">
                 <div class="q-route-main">
                     <strong>${this.escapeHtml(route.commodity_name)} x${route.quantity}</strong>
@@ -3567,9 +3571,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <span>${route.jumps}J · ${route.duration_ticks}T</span>
                     <small>FEE ${route.fee} CR</small>
                 </div>
-                <div class="q-route-net ${netClass}">
+                <div class="q-route-net ${netClass}" title="${this.escapeHtml(netTip)}">
                     <strong>${route.net >= 0 ? "+" : ""}${route.net} CR</strong>
-                    <small>NET</small>
+                    <small>NET${Number(route.cost_basis) > 0 ? ` · ${profit >= 0 ? "+" : ""}${profit} PROFIT` : ""}</small>
                 </div>
                 <button class="btn-hud" data-q-comm="${this.escapeHtml(route.commodity_id)}"
                     data-q-dest="${this.escapeHtml(route.destination_system_id)}"

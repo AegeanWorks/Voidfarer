@@ -5,10 +5,16 @@
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794661317.0238833,
-    "owner": "claude:1",
+    "updated_at": 1794666096.6213725,
+    "owner": "antigravity:goal",
     "started_by": "claude:1",
-    "continuations": [],
+    "continuations": [
+      {
+        "agent": "antigravity:goal",
+        "from": "claude:1",
+        "at": 1794666096.6213725
+      }
+    ],
     "workspaces": [
       {
         "name": "voidfarer",
@@ -17,48 +23,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-settings-layer",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: raise the settings overlay above the main menu so SETTINGS opened from the menu is visible and clickable; failing-first CSS test and real-click check",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794658256.8232043,
-      "timestamp_str": "2026-11-14 15:10:56",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Real Edge at 1280x720: clicking SETTINGS in the main menu opens the overlay at z-index 5100 beneath the menu at 10000, which still covers it and takes the clicks",
-        "benefits": "Settings (display, audio, gameplay, controls) are reachable from the first screen",
-        "risks": "contract: none; dependency: other overlays keep their order; concurrency: none; state: none; CSS only",
-        "mitigation": "Click a settings control and the close button in a real browser; layering test"
-      },
-      "plan_digest": "8662c375de7a4182d59d9707aca7355abbb3f12107bb2dee7a3738149c86c721",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "voidfarer-settings-layer",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 settings layer",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794658495.2216926,
-      "timestamp_str": "2026-11-14 15:14:55",
-      "agent": "claude:1",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-settings-layer",
       "phase": "completed",
@@ -406,6 +370,43 @@
           "path": "projects/voidfarer"
         }
       ]
+    },
+    {
+      "task_id": "voidfarer-freight-profit",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] cockpit freight profit Phase 4",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794661825.5871184,
+      "timestamp_str": "2026-11-14 16:10:25",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-freight-profit",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[2/2] cockpit freight profit Phase 4 (fixed test_freight_profit_ui slice index)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794666096.6213725,
+      "timestamp_str": "2026-11-14 17:21:36",
+      "agent": "antigravity:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ],
+      "continued_from": "claude:1"
     }
   ]
 }

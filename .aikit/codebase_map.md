@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `218`
-- **Total Classes**: `489`
+- **Total Python Modules**: `220`
+- **Total Classes**: `491`
 - **Total Top-Level Functions**: `519`
-- **Total Class Methods**: `2490`
-- **Total Source Lines**: `61267`
+- **Total Class Methods**: `2492`
+- **Total Source Lines**: `61314`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`218` module(s))
+- **Indexed**: python (`220` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1904,6 +1904,28 @@
 
 **Functions:**
 - `def _docked_with_cargo()`
+
+---
+
+### [`tests/test_freight_profit_ui.py`](tests/test_freight_profit_ui.py)
+> *The freight row shows and colours by real profit (ADR-290).*
+
+**Size**: `24` lines (`962` bytes)
+
+**Classes:**
+- `class FreightProfitUiTests`
+  - Method `.test_row_is_coloured_and_labelled_by_profit()`
+
+---
+
+### [`tests/test_freight_row_narrow.py`](tests/test_freight_row_narrow.py)
+> *At laptop widths the freight row gives the net line its own full-width row (ADR-290).*
+
+**Size**: `23` lines (`905` bytes)
+
+**Classes:**
+- `class FreightRowNarrowTests`
+  - Method `.test_net_line_does_not_share_the_button_column()`
 
 ---
 

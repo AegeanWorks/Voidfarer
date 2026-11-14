@@ -2350,5 +2350,26 @@
     "final_snapshot_digest": "f7af2cf6528e315e91cf5f5744548133dcd83ccc34acbb232801ceaeeabba126",
     "final_snapshot_entries": 1300,
     "surface_digest": "f629c3eeb812cecd2f2d4a7e11663719b022f4b610931f58325ac675099cfd12"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "3a68f09f98d0438855bdc9aea95c128b0ad419a9",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794661493.1145627,
+    "finished_at": 1794661821.5396793,
+    "strikes": 0,
+    "reviewer": "claude:1",
+    "allowed_removals": [],
+    "final_snapshot_digest": "f7af2cf6528e315e91cf5f5744548133dcd83ccc34acbb232801ceaeeabba126",
+    "final_snapshot_entries": 1300,
+    "surface_digest": "580c785b8db703633f9ad8a9003c71d9fea30b68ab0b677af454f56890c8123d"
   }
 ]

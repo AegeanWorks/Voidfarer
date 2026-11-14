@@ -8989,12 +8989,13 @@ body.cockpit-theme .panel-center {
         grid-template-columns: minmax(0, 1fr) auto;
         grid-template-areas:
             "main action"
-            "meta net";
+            "meta meta"
+            "net net";
         row-gap: 4px;
     }
     .q-route-main { grid-area: main; }
     .q-route-meta { grid-area: meta; flex-direction: row; align-items: baseline; justify-content: flex-start; gap: 7px; }
-    .q-route-net { grid-area: net; flex-direction: row; align-items: baseline; justify-content: flex-end; gap: 5px; }
+    .q-route-net { grid-area: net; flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: flex-start; gap: 3px 8px; }
     .quantum-route-row .btn-hud { grid-area: action; align-self: center; }
 }
 
