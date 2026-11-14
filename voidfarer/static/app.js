@@ -1291,7 +1291,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             document.getElementById("btnCharNext1")?.addEventListener("click", () => this.charStep(1, 2));
             document.getElementById("btnCharBack2")?.addEventListener("click", () => this.charStep(2, 1));
             document.getElementById("btnCharCreate")?.addEventListener("click", () => this.createCharacter());
-            document.getElementById("charBackground")?.addEventListener("change", () => this.syncBackgroundHint());
+            document.getElementById("charBackground")?.addEventListener("change", () => {
+                this.syncBackgroundHint();
+                this.renderAttrGrid();
+            });
+            // One delegated listener drives every +/- button; the rows are rebuilt on each change.
+            document.getElementById("attrGrid")?.addEventListener("click", event => {
+                const button = event.target.closest("[data-attr-delta]");
+                if (!button || button.disabled) return;
+                this.adjustAttr(button.dataset.attr, Number(button.dataset.attrDelta));
+            });
         }.bind(this);
 
         // The origin's backstory line, read from the engine's catalog so it can never drift from the grant.
@@ -1351,17 +1360,29 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (!grid) return;
             const attrLabels = { piloting: "PILOTING", engineering: "ENGINEERING", science: "SCIENCE", combat: "COMBAT", diplomacy: "DIPLOMACY", trade: "TRADE" };
             const maxSkill = this.charMaxSkill || 10;
-            grid.innerHTML = Object.entries(this.charAttrs).map(([attr, val]) => `
+            // The chosen origin adds its training after the budget; show which skills it boosts.
+            const originId = String((document.getElementById("charBackground") || {}).value || "").toLowerCase();
+            const origin = ((this.state && this.state.character_background_catalog) || {})[originId] || {};
+            const originName = origin.name || "";
+            grid.innerHTML = Object.entries(this.charAttrs).map(([attr, val]) => {
+                const label = attrLabels[attr] || attr.toUpperCase();
+                const bonus = Number(((origin.skills) || {})[attr] || 0);
+                const tag = bonus
+                    ? ` <small class="attr-origin" title="${this.escapeHtml(originName)} training is added after your points">+${bonus} ORIGIN</small>`
+                    : "";
+                return `
                 <div class="attr-item">
-                    <label>${this.escapeHtml(attrLabels[attr] || attr.toUpperCase())}</label>
+                    <label>${this.escapeHtml(label)}${tag}</label>
                     <div class="attr-controls">
-                        <button class="attr-btn" id="attrMinus-${attr}" ${val <= 1 ? "disabled" : ""}>−</button>
+                        <button class="attr-btn" id="attrMinus-${attr}" data-attr="${attr}" data-attr-delta="-1" aria-label="Decrease ${label.toLowerCase()}" ${val <= 1 ? "disabled" : ""}>−</button>
                         <span class="attr-value" id="attrVal-${attr}">${val}</span>
-                        <button class="attr-btn" id="attrPlus-${attr}" ${val >= maxSkill || this.charPoints2 <= 0 ? "disabled" : ""}>+</button>
+                        <button class="attr-btn" id="attrPlus-${attr}" data-attr="${attr}" data-attr-delta="1" aria-label="Increase ${label.toLowerCase()}" ${val >= maxSkill || this.charPoints2 <= 0 ? "disabled" : ""}>+</button>
                     </div>
-                </div>
-            `).join("");
+                </div>`;
+            }).join("");
             document.getElementById("charPointsRemaining2").textContent = this.charPoints2;
+            const note = document.getElementById("charPointsNote");
+            if (note) note.textContent = this.charPoints2 > 0 ? "Spend them all: unspent points are lost." : "";
         }.bind(this);
 
         this.adjustAttr = function(attr, delta) {
@@ -1376,10 +1397,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.charAttrs[attr]--;
                 this.charPoints2++;
             }
-            document.getElementById(`attrVal-${attr}`).textContent = this.charAttrs[attr];
-            document.getElementById(`attrMinus-${attr}`).disabled = this.charAttrs[attr] <= 1;
-            document.getElementById(`attrPlus-${attr}`).disabled = this.charAttrs[attr] >= maxSkill || this.charPoints2 <= 0;
-            document.getElementById("charPointsRemaining2").textContent = this.charPoints2;
+            // Rebuild every row so freed or spent points re-enable or disable all the other + buttons too,
+            // then keep keyboard focus on the control that was pressed (or its twin if it just disabled).
+            this.renderAttrGrid();
+            const pressed = document.getElementById(`${delta > 0 ? "attrPlus" : "attrMinus"}-${attr}`);
+            const twin = document.getElementById(`${delta > 0 ? "attrMinus" : "attrPlus"}-${attr}`);
+            const target = pressed && !pressed.disabled ? pressed : twin;
+            if (target) target.focus();
         }.bind(this);
 
         this.createCharacter = async function() {

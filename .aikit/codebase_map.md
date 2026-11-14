@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `199`
-- **Total Classes**: `470`
-- **Total Top-Level Functions**: `512`
-- **Total Class Methods**: `2453`
-- **Total Source Lines**: `60608`
+- **Total Python Modules**: `200`
+- **Total Classes**: `471`
+- **Total Top-Level Functions**: `514`
+- **Total Class Methods**: `2459`
+- **Total Source Lines**: `60663`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`199` module(s))
+- **Indexed**: python (`200` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3143,6 +3143,26 @@
 
 **Functions:**
 - `def _member(member_id, morale, status, wage)`
+
+---
+
+### [`tests/test_skill_allocation_ui.py`](tests/test_skill_allocation_ui.py)
+> *Character Creation step 2: the +/- buttons are wired, re-enable every row, are named, and show the origin bonus.*
+
+**Size**: `55` lines (`2419` bytes)
+
+**Classes:**
+- `class TestSkillAllocationUi`
+  - Method `.test_a_single_delegated_listener_drives_every_plus_and_minus_button()`
+  - Method `.test_buttons_carry_their_skill_and_direction_and_an_accessible_name()`
+  - Method `.test_a_change_re_renders_every_row_so_freed_points_re_enable_all_plus_buttons()`
+  - Method `.test_the_selected_origin_bonus_is_shown_on_the_skills_it_boosts()`
+  - Method `.test_unspent_points_are_called_out_as_lost()`
+  - Method `.test_changing_the_origin_refreshes_the_bonus_tags()`
+
+**Functions:**
+- `def _setup()`
+- `def _render()`
 
 ---
 

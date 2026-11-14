@@ -1203,3 +1203,7 @@ The audit scripts are now a permanent suite (ADR-272), checked by mutation: four
 ### Sixty-sixth pass — first-run walkthrough: origins that did nothing
 
 Walking character creation found 2 of 6 dropdown origins granting nothing and 2 real origins unreachable (ADR-273). Engine aliases first; the dropdown follows in the next commit.
+
+### Sixty-seventh pass — first-run walkthrough: dead skill buttons
+
+Step 2 of Character Creation had never worked: the +/- buttons were not wired (ADR-274). Found by clicking them as a player; fixed with a delegated listener, full-row re-enable, accessible names, origin tags and an unspent-points note. Proof: `ui-review/goal-skills2`, `goal-skills3/step2.png`.

@@ -2054,5 +2054,27 @@
     "final_snapshot_digest": "6560a51ca458567c20dcd8db67098dfe010dcde32d153231a3dbc463bb8de74d",
     "final_snapshot_entries": 1294,
     "surface_digest": "38b0df9f43c61b908df670566f4660539942e5107249cbb9a6a4345b16dfce1d"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "f26549e0666c823f7c6b4657468ec11765f95549",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794638080.6335652,
+    "finished_at": 1794638242.0517116,
+    "strikes": 0,
+    "reviewer": "claude:1 multimodal (G-015 fallback; quoted STARTING SKILLS step: SCIENCE +2 ORIGIN at 7, TRADE +1 ORIGIN at 6, POINTS REMAINING 17 Spend them all: unspent points are lost.; the +/- buttons now change the points on the server-created commander)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "372e16e9a248fc518c6b5d2523f9fbee0cc99e069b319ca83905e5d057563338",
+    "final_snapshot_entries": 1296,
+    "surface_digest": "4f8babc030b59e3ac445aa450c4da994f8d33bccb4fc66266d211a3b75c44970"
   }
 ]
