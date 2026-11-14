@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `211`
-- **Total Classes**: `482`
-- **Total Top-Level Functions**: `515`
-- **Total Class Methods**: `2481`
-- **Total Source Lines**: `61031`
+- **Total Python Modules**: `212`
+- **Total Classes**: `483`
+- **Total Top-Level Functions**: `516`
+- **Total Class Methods**: `2482`
+- **Total Source Lines**: `61065`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`211` module(s))
+- **Indexed**: python (`212` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3150,6 +3150,20 @@
   - Method `.test_customs_resolve_endpoint()`
   - Method `.test_overhaul_endpoint()`
   - Method `.test_relic_fuse_endpoint()`
+
+---
+
+### [`tests/test_settings_above_menu.py`](tests/test_settings_above_menu.py)
+> *Settings opens above the main menu that launches it (ADR-284).*
+
+**Size**: `34` lines (`1122` bytes)
+
+**Classes:**
+- `class SettingsAboveMenuTests`
+  - Method `.test_settings_overlay_outranks_the_main_menu()`
+
+**Functions:**
+- `def _last_z(css, selector)`
 
 ---
 

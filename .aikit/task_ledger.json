@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-flee-fuel",
+    "task_id": "voidfarer-settings-layer",
     "last_phase": "phase 4",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794658042.5295427,
+    "updated_at": 1794658495.2216926,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": [],
@@ -17,46 +17,6 @@
     ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-story-names",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-story-names' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794639999.4311414,
-      "timestamp_str": "2026-11-14 10:06:39",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-schematic",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/1] Plan: drop the decorative hull captions the module chips cover on the Ship schematic; failing-first test",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794640073.6684606,
-      "timestamp_str": "2026-11-14 10:07:53",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Real Edge capture of the Ship tab: the FRM and CORE chips cover 'SEC-.. // VF-CORVETTE', leaving garbled fragments",
-        "benefits": "A clean schematic; class name already shown in the panel header",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none; five inline SVG strings edited",
-        "mitigation": "Test pins the five SVGs; visual re-capture"
-      },
-      "plan_digest": "0e36fd2ab6198bd11efd8280c156f5ef7e44af9550393d80db725dadf9f29cfb"
-    },
-    {
-      "task_id": "voidfarer-schematic",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "Phase 4 schematic",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794640447.0511565,
-      "timestamp_str": "2026-11-14 10:14:07",
-      "agent": "claude:1",
-      "checklists": "passed"
-    },
     {
       "task_id": "voidfarer-schematic",
       "phase": "completed",
@@ -338,6 +298,64 @@
       "status": "in_progress",
       "timestamp": 1794658042.5295427,
       "timestamp_str": "2026-11-14 15:07:22",
+      "agent": "claude:1",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-flee-fuel",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-flee-fuel' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794658137.2729886,
+      "timestamp_str": "2026-11-14 15:08:57",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-settings-layer",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/1] Plan: raise the settings overlay above the main menu so SETTINGS opened from the menu is visible and clickable; failing-first CSS test and real-click check",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794658256.8232043,
+      "timestamp_str": "2026-11-14 15:10:56",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Real Edge at 1280x720: clicking SETTINGS in the main menu opens the overlay at z-index 5100 beneath the menu at 10000, which still covers it and takes the clicks",
+        "benefits": "Settings (display, audio, gameplay, controls) are reachable from the first screen",
+        "risks": "contract: none; dependency: other overlays keep their order; concurrency: none; state: none; CSS only",
+        "mitigation": "Click a settings control and the close button in a real browser; layering test"
+      },
+      "plan_digest": "8662c375de7a4182d59d9707aca7355abbb3f12107bb2dee7a3738149c86c721",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-settings-layer",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "Phase 4 settings layer",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794658495.2216926,
+      "timestamp_str": "2026-11-14 15:14:55",
       "agent": "claude:1",
       "checklists": "passed",
       "workspaces": [
