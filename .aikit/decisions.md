@@ -2860,3 +2860,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Measuring every disabled button across all expanded tabs in real Edge showed every `btn-hud` variant keeping full opacity and its bright accent colour when disabled: TRAIN 1 SP with 0 skill points, UNLOCK, INSTALL, HIRE, NAP/PACT/R&D/ALLY and VENT all looked clickable. Their `title` text explained why, but only on hover.
 - **Decision**: One late rule, `.btn-hud:disabled` (and its hover), dims to opacity 0.55, mutes the border and background, shows `not-allowed`, and removes the hover glow. The skill cooldown chip keeps its own deliberate style.
 - **Consequences**: CSS only, no behaviour change. `tests/test_disabled_buttons_dim.py` (new, failing first) pins the rule and an opacity range of 0.4 to 0.65 so labels such as "REQUIRES DREADNOUGHT" stay legible. Added after `ui finish` because the UI guard protects `tests/` during a UI task.
+
+### ADR-280: Contract cards keep their content height
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: In the Contracts tab the CLAIM REWARD button and reward lines crossed the row divider. Measured in real Edge, `#contractsList` is a 380px flex column and its cards (flex-shrink 1) were squashed below their content (scrollHeight 78 against clientHeight 70) instead of letting the list scroll.
+- **Decision**: `#contractsList > .contract-card { flex-shrink: 0; }`. Cards keep their padding and the list scrolls.
+- **Consequences**: CSS only. `tests/test_contract_cards_keep_size.py` (new, failing first) pins the rule. After the change every card measures scrollHeight equal to clientHeight. Added after `ui finish` because the UI guard protects `tests/` during a UI task.

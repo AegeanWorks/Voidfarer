@@ -11031,3 +11031,6 @@ body.cockpit-theme .nav-panel > .panel-header {
     border-color: var(--console-line);
     box-shadow: none;
 }
+
+/* The contracts list is a fixed-height flex column: cards keep their content height and the list scrolls, instead of squashing the claim button across the row divider. */
+#contractsList > .contract-card { flex-shrink: 0; }

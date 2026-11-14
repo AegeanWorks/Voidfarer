@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `206`
-- **Total Classes**: `477`
+- **Total Python Modules**: `207`
+- **Total Classes**: `478`
 - **Total Top-Level Functions**: `514`
-- **Total Class Methods**: `2473`
-- **Total Source Lines**: `60852`
+- **Total Class Methods**: `2474`
+- **Total Source Lines**: `60878`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`206` module(s))
+- **Indexed**: python (`207` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -983,6 +983,17 @@
 
 **Functions:**
 - `def _base()`
+
+---
+
+### [`tests/test_contract_cards_keep_size.py`](tests/test_contract_cards_keep_size.py)
+> *Contract cards keep their content height inside the scrolling list (ADR-280).*
+
+**Size**: `26` lines (`877` bytes)
+
+**Classes:**
+- `class ContractCardsKeepSizeTests`
+  - Method `.test_cards_do_not_shrink_in_the_fixed_height_list()`
 
 ---
 
