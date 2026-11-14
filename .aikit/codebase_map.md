@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `224`
-- **Total Classes**: `502`
-- **Total Top-Level Functions**: `522`
-- **Total Class Methods**: `2536`
-- **Total Source Lines**: `62094`
+- **Total Python Modules**: `225`
+- **Total Classes**: `503`
+- **Total Top-Level Functions**: `523`
+- **Total Class Methods**: `2541`
+- **Total Source Lines**: `62184`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`224` module(s))
+- **Indexed**: python (`225` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3246,6 +3246,23 @@
 
 ---
 
+### [`tests/test_sell_all_profitable.py`](tests/test_sell_all_profitable.py)
+> *SELL ALL PROFITABLE sells every held commodity that beats its cost basis and keeps the rest.*
+
+**Size**: `52` lines (`2053` bytes)
+
+**Classes:**
+- `class SellAllProfitableTest`
+  - Method `.test_sells_the_profitable_row_and_keeps_the_one_that_would_lose()`
+  - Method `.test_nothing_profitable_changes_nothing()`
+  - Method `.test_undocked_ship_is_refused()`
+  - Method `.test_it_is_reachable_as_a_logistics_action()`
+
+**Functions:**
+- `def _engine(cost_basis)`
+
+---
+
 ### [`tests/test_sell_price_net.py`](tests/test_sell_price_net.py)
 > *The Commerce quote reports what a sale actually pays (ADR-282).*
 
@@ -4607,7 +4624,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `10954` lines (`540241` bytes)
+**Size**: `10990` lines (`542046` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4744,6 +4761,7 @@
   - Method `._bulk_buy_cost(body, comm, quantity, standing, unit_price, trade_pact)` - *Price a buy order by walking the local stockpile, so bulk orders move the price they pay.*
   - Method `.max_trade_quantity(commodity_id, is_buy)` - *Largest order that would succeed now: affordable and in-hold for buys, all held units for sells.*
   - Method `.trade_max(commodity_id, is_buy)` - *Buy as many units as credits and hold allow, or sell every unit held.*
+  - Method `.sell_all_profitable()` - *Sell every held commodity whose real local proceeds beat its recorded cost basis.*
   - Method `.set_trade_automation(commodity_id, buy_below, sell_above, quantity, enabled)` - *Configure the docked broker that buys low and sells high on a cooldown.*
   - Method `.get_trade_automation_report()`
   - Method `._run_trade_automation()` - *Execute at most one automated trade per cooldown while docked.*
@@ -5133,7 +5151,7 @@
 ### [`voidfarer/logistics.py`](voidfarer/logistics.py)
 > *One report and action surface for trade, freight, depots and inventory.*
 
-**Size**: `148` lines (`5727` bytes)
+**Size**: `150` lines (`5812` bytes)
 
 **Functions:**
 - `def _depot_row(state)`

@@ -3021,3 +3021,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The only automatic save was the single-slot 15-second autosave, so a bad ambush in a dangerous system could not be undone, and beginners rarely save by hand.
 - **Decision**: `SimulationEngine.checkpoint_hook` (default `None`, so a bare engine writes nothing) is called with the pre-move state before a hyperspace jump into a system with security below `CHECKPOINT_SECURITY` (0.3) and before a void dive. `StorageManager.checkpoint_writer()` returns the hook that rolls the named `checkpoint` slot (`CHECKPOINT_SLOT`); the CLI engine builder and both cockpit server entry points install it. An `OSError` while saving is logged to stderr and never blocks the move. The slot appears with the other named saves in MENU [ESC], so one click loads the state from just before the jump.
 - **Consequences**: Engine, storage, CLI and REST parity (G-012); no change to the save format. Pinned by `tests/test_prejump_checkpoint.py`.
+
+### ADR-302: Sell all profitable cargo
+- **Date**: 2026-11-14
+- **Status**: Accepted
+- **Context**: Arriving with a mixed hold of mined ore, salvage and traded goods meant selling each row by hand, and a beginner could not tell which rows would lose money against what they paid.
+- **Decision**: `SimulationEngine.sell_all_profitable` sells every held commodity through the regular market order (so slippage, standings and bonuses apply) and rolls a row back when its real proceeds do not beat its recorded `cargo_cost` basis, so those rows stay in the hold. It is exposed as the `sell_all` logistics action, which gives REST (`/api/logistics/action`), the CLI and the agent catalog (G-012). Docking at a station exchange is required.
+- **Consequences**: Engine, REST and CLI; the cockpit button follows. No new persisted field. Pinned by `tests/test_sell_all_profitable.py`.

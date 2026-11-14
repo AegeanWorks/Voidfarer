@@ -4836,6 +4836,42 @@ class SimulationEngine:
                 return False, f"Insufficient credits: {ship.credits} cr available is below one unit's price."
             return self.trade(commodity_id, quantity, is_buy)
 
+    def sell_all_profitable(self) -> tuple[bool, str]:
+        """Sell every held commodity whose real local proceeds beat its recorded cost basis.
+
+        Each row is sold through the regular market order (so slippage, bonuses and standings all
+        apply) and rolled back when it would have sold at a loss, so the hold keeps those rows.
+        """
+        with self.lock:
+            body = self.docked_body
+            if not body or not body.station_dockable:
+                return False, "Dock at a station exchange to sell cargo."
+            sold: list[str] = []
+            kept: list[str] = []
+            for commodity_id in sorted(self.state.ship.cargo):
+                held = int(self.state.ship.cargo[commodity_id])
+                if held <= 0 or commodity_id not in COMMODITY_MAP:
+                    continue
+                name = COMMODITY_MAP[commodity_id].name
+                before = self.state
+                purchases = dict(self._local_dock_purchases)
+                basis = int(before.ship.cargo_cost.get(commodity_id, 0))
+                ok, _ = self.trade_max(commodity_id, False)
+                profit = self.state.ship.credits - before.ship.credits - basis
+                if ok and profit > 0:
+                    sold.append(f"{held} {name} (+{profit} cr profit)")
+                    continue
+                self.state = before
+                self._local_dock_purchases.clear()
+                self._local_dock_purchases.update(purchases)
+                kept.append(name)
+            if not sold:
+                return False, "Nothing in the hold is profitable to sell here."
+            message = f"Sold {', '.join(sold)}."
+            if kept:
+                message += f" Kept {', '.join(kept)} (would sell at a loss)."
+            return True, message
+
     def set_trade_automation(
         self,
         commodity_id: str = "",

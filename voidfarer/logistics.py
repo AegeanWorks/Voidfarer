@@ -13,7 +13,7 @@ from voidfarer.inventory import calculate_cargo_volume
 from voidfarer.models import GameState
 
 LOGISTICS_ACTIONS = (
-    "buy", "sell", "buy_max", "sell_max",
+    "buy", "sell", "buy_max", "sell_max", "sell_all",
     "automation_on", "automation_off",
     "quantum_automation_on", "quantum_automation_off",
     "quantum_order",
@@ -106,6 +106,8 @@ def logistics_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, str
             max(1, _int(kwargs.get("quantity"), 1)),
             action == "buy",
         )
+    if action == "sell_all":
+        return engine.sell_all_profitable()
     if action in ("buy_max", "sell_max"):
         return engine.trade_max(_text(kwargs.get("commodity_id")), action == "buy_max")
     if action == "automation_on":
