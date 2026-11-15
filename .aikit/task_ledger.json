@@ -3,30 +3,17 @@
   "active_task": {
     "task_id": "audit-post-tutorial",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794771185.6579485,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794771323.0266645,
+    "completed_head": "5de52bdd3205cc8727e095aa721ce537315c1d94",
+    "completed_tree": "d1e5e9848720f2f891382568f1741d9a1fde6ba6"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-click-targets-2",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-click-targets-2' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794742568.9644952,
-      "timestamp_str": "2026-11-15 14:36:08",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-auto-staff",
       "phase": "in_progress",
@@ -303,6 +290,22 @@
       "timestamp": 1794771185.6579485,
       "timestamp_str": "2026-11-15 22:33:05",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "audit-post-tutorial",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'audit-post-tutorial' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794771323.0988986,
+      "timestamp_str": "2026-11-15 22:35:23",
+      "agent": "kilo:goal",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
