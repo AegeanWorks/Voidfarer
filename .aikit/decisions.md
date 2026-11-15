@@ -3196,3 +3196,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: After ADR-325, sweeping the other audit scenarios found the target card's `SHOW DETAILS` toggle at 22px, and the stylesheet sets other interactive controls to 20 to 22px under compact-height rules: surface-op buttons, fleet ship actions, surface site chips and disclosure toggles, skill-train buttons and the skills card toggle.
 - **Decision**: The ADR-325 final rule now also lists those selectors with `min-height: 24px`; they have the same specificity as the compact rules and come last, so they win. Non-interactive badges are left alone.
 - **Consequences**: CSS only. `ui_audit --check` reports 0 small targets on the target, skills and fleet states at 1366x768 and 1280x720, every terminal tab at laptop size, and the menu, settings, character, event and combat scenarios; the surface-operations scenario renders with its chips and RUN button intact. Pinned by `TestRemainingClickTargets`.
+
+### ADR-327: Auto-staff the bridge stations
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: Hiring crew and seating them at the five bridge stations (helm, tactical, engineering, science, medical) took one manual assignment per officer, and nothing told a beginner which role belonged where.
+- **Decision**: `SimulationEngine.auto_staff_stations` seats, for each role (pilot to helm, marine to tactical, engineer to engineering, scientist to science, medic to medical), the active officer with the highest skill (then experience), replaces a worse or mismatched assignment, and clears stations held by officers whose role has none (the quartermaster). Injured or away officers are skipped. It changes nothing and says so when stations are already optimal. It is exposed as the `autostaff` crew action, which gives REST (`/api/crew/action`), the CLI and the agent catalog (G-012).
+- **Consequences**: Engine, REST and CLI; the CREW tab button follows. No new persisted field (stations already live on each crew member). Pinned by `tests/test_auto_staff.py`.

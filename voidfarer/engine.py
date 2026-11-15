@@ -4354,6 +4354,36 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship)
             return True, msg
 
+    # Each role's natural bridge station; the quartermaster has none (trade is not a station duty).
+    STATION_BY_ROLE = {
+        "pilot": "helm", "marine": "tactical", "engineer": "engineering",
+        "scientist": "science", "medic": "medical",
+    }
+
+    def auto_staff_stations(self) -> tuple[bool, str]:
+        """Seat the most skilled active officer of the matching role at every bridge station."""
+        with self.lock:
+            crew = self.state.ship.crew
+            wanted: dict[str, str] = {}
+            for role, station in self.STATION_BY_ROLE.items():
+                candidates = [c for c in crew if c.role == role and c.status == "active"]
+                if candidates:
+                    best = max(candidates, key=lambda c: (c.skill, c.xp, c.id))
+                    wanted[best.id] = station
+            changes = [c for c in crew if getattr(c, "station", "") != wanted.get(c.id, "")]
+            if not changes:
+                return False, "Stations are already staffed by the best officers aboard."
+            updated = tuple(replace(c, station=wanted.get(c.id, "")) for c in crew)
+            seated = [f"{c.name} to {wanted[c.id].upper()}" for c in updated if c.id in wanted
+                      and any(o.id == c.id for o in changes)]
+            msg = "AUTO-STAFF: " + ("; ".join(seated) if seated else "stations cleared of mismatched officers") + "."
+            new_ship = self._clone_ship(
+                crew=updated,
+                flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [msg]),
+            )
+            self.state = self._clone_state(ship=new_ship)
+            return True, msg
+
     def get_crew_report(self) -> dict[str, Any]:
         with self.lock:
             crew = self.state.ship.crew

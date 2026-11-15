@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `232`
-- **Total Classes**: `528`
-- **Total Top-Level Functions**: `529`
-- **Total Class Methods**: `2624`
-- **Total Source Lines**: `63043`
+- **Total Python Modules**: `233`
+- **Total Classes**: `529`
+- **Total Top-Level Functions**: `532`
+- **Total Class Methods**: `2630`
+- **Total Source Lines**: `63145`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`232` module(s))
+- **Indexed**: python (`233` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -180,6 +180,26 @@
 
 **Functions:**
 - `def _in_transit()`
+
+---
+
+### [`tests/test_auto_staff.py`](tests/test_auto_staff.py)
+> *AUTO-STAFF seats the best matching officer at every bridge station in one action.*
+
+**Size**: `70` lines (`2847` bytes)
+
+**Classes:**
+- `class AutoStaffTest`
+  - Method `.test_each_role_takes_its_station()`
+  - Method `.test_the_most_skilled_matching_officer_wins_and_the_injured_are_skipped()`
+  - Method `.test_a_worse_manual_assignment_is_replaced_and_a_quartermaster_has_no_station()`
+  - Method `.test_already_optimal_changes_nothing_and_says_so()`
+  - Method `.test_it_is_reachable_as_a_crew_action()`
+
+**Functions:**
+- `def _crew(role, index, skill, status, station)`
+- `def _engine(*crew)`
+- `def _stations(engine)`
 
 ---
 
@@ -4684,7 +4704,7 @@
 ### [`voidfarer/crew_command.py`](voidfarer/crew_command.py)
 > *One report and action surface for crew, stations, shore leave and away teams.*
 
-**Size**: `87` lines (`3140` bytes)
+**Size**: `89` lines (`3227` bytes)
 
 **Functions:**
 - `def crew_summary(state)` - *Compact payload for /api/state.*
@@ -4804,7 +4824,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11148` lines (`549670` bytes)
+**Size**: `11178` lines (`551318` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4928,6 +4948,7 @@
   - Method `.recruit_crew(role_id)`
   - Method `.dismiss_crew(crew_id)`
   - Method `.assign_crew_station(crew_id, station)` - *Assign an active crew specialist to a flagship bridge/departmental station.*
+  - Method `.auto_staff_stations()` - *Seat the most skilled active officer of the matching role at every bridge station.*
   - Method `.get_crew_report()`
   - Method `._away_assigned_ids(ship)`
   - Method `._away_reward_preview(mission_type)`

@@ -1,52 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-click-targets-2",
+    "task_id": "voidfarer-auto-staff",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794742560.4658134,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794742888.256186,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794742568.94353,
-    "completed_head": "bac74dd1d1e9e7f10db4ca20433f79ec1d12dcc4"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-mission-pins",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-mission-pins' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794739257.5515916,
-      "timestamp_str": "2026-11-15 13:40:57",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-more-button-fit",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: stop the MORE SYSTEMS rail button truncating its count at laptop width",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794739702.504148,
-      "timestamp_str": "2026-11-15 13:48:22",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "The label clipped to MORE SYSTEMS ... after graduation, hiding the count",
-        "benefits": "Players can see how many systems are folded away",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "CSS-only, measured scrollWidth, layout test"
-      },
-      "plan_digest": "1ebcaea3ae20a70539d53c477d587b473a13373265201f021db9eb043d2434d6"
-    },
     {
       "task_id": "voidfarer-more-button-fit",
       "phase": "in_progress",
@@ -309,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-auto-staff",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: auto_staff_stations engine and crew action, then an AUTO-STAFF button on the CREW tab",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794742887.9754882,
+      "timestamp_str": "2026-11-15 14:41:27",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Beginners cannot tell which officer belongs at which station and seat them one by one",
+        "benefits": "One click seats the best officer at every station",
+        "risks": "contract: new crew action feeds REST, CLI, agent catalog; dependency: none; concurrency: engine lock; state: stations already persisted on crew",
+        "mitigation": "Role-to-station map, skill ranking, injured skipped, no-op reported, failing-first tests"
+      },
+      "plan_digest": "995fad3953017e99b014edfbd6f41ed4b3c9e4da53a69c521b884b7c204fc22c"
+    },
+    {
+      "task_id": "voidfarer-auto-staff",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] auto_staff_stations and autostaff crew action (ADR-327); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794742888.256186,
+      "timestamp_str": "2026-11-15 14:41:28",
+      "agent": "claude:1"
     }
   ]
 }

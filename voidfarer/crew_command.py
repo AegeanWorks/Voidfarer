@@ -12,7 +12,7 @@ from typing import Any
 from voidfarer.models import GameState
 
 CREW_ACTIONS = (
-    "recruit", "train", "dismiss", "shore", "station",
+    "recruit", "train", "dismiss", "shore", "station", "autostaff",
     "away_launch", "away_recall",
 )
 
@@ -68,6 +68,8 @@ def crew_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, str]:
         return engine.dismiss_crew(_text(kwargs.get("crew_id")))
     if action in ("shore", "leave"):
         return engine.shore_leave()
+    if action == "autostaff":
+        return engine.auto_staff_stations()
     if action == "station":
         return engine.assign_crew_station(
             _text(kwargs.get("crew_id")), _text(kwargs.get("station"))
