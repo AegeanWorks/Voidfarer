@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `233`
-- **Total Classes**: `530`
+- **Total Classes**: `531`
 - **Total Top-Level Functions**: `532`
-- **Total Class Methods**: `2633`
-- **Total Source Lines**: `63169`
+- **Total Class Methods**: `2634`
+- **Total Source Lines**: `63199`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`233` module(s))
@@ -186,7 +186,7 @@
 ### [`tests/test_auto_staff.py`](tests/test_auto_staff.py)
 > *AUTO-STAFF seats the best matching officer at every bridge station in one action.*
 
-**Size**: `70` lines (`2847` bytes)
+**Size**: `94` lines (`3849` bytes)
 
 **Classes:**
 - `class AutoStaffTest`
@@ -195,6 +195,8 @@
   - Method `.test_a_worse_manual_assignment_is_replaced_and_a_quartermaster_has_no_station()`
   - Method `.test_already_optimal_changes_nothing_and_says_so()`
   - Method `.test_it_is_reachable_as_a_crew_action()`
+- `class AutoStaffCliTest`
+  - Method `.test_crew_autostaff_seats_officers_and_persists()`
 
 **Functions:**
 - `def _crew(role, index, skill, status, station)`
@@ -4567,7 +4569,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4848` lines (`238873` bytes)
+**Size**: `4854` lines (`239169` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*

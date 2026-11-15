@@ -3210,3 +3210,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-327 added the engine action; the CREW roster still required seating each officer by hand.
 - **Decision**: `#btnAutoStaff` sits full-width between the crew summary and the roster toggle, always visible so a new captain finds it right after hiring. `handleAutoStaff` posts `{action: "autostaff"}` to `/api/crew/action`, applies the returned state, logs the result (a reward line when it seated anyone, a plain line when stations were already optimal), and redraws the roster when the CREW tab is open. It shares the width rule with the outposts button.
 - **Consequences**: Cockpit only. Verified in real Edge at 1366x768 (`ui-review/staff2/`, 0 console errors) with six crew: the roster showed all `NO STATION` before and HELM, TACTICAL, ENGINEERING (the skill-6 engineer), SCIENCE and MEDICAL after, with the skill-2 engineer unassigned, and a second click reported the stations already staffed. Pinned by `TestAutoStaffButton`.
+
+### ADR-329: CLI parity for the crew autostaff action
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: A command-line sweep of this session's new actions (`logistics sell_all`, `empire outpost_repair_all`, `flight arrive`, `engineering insurance`, `crew autostaff`) found that `crew autostaff` was refused by the argument parser: the `crew` subcommand keeps its own hard-coded action list instead of reading `CREW_ACTIONS`, so the REST and agent paths worked while the CLI did not, against G-012.
+- **Decision**: `crew autostaff` (alias `auto-staff`) is a valid CLI action in `cmd_crew` and the parser choices, prints the engine message, saves on success and exits 1 when stations are already optimal; the roster help line mentions it.
+- **Consequences**: CLI only. The other four new actions already worked through their shared dispatchers. Pinned by `AutoStaffCliTest`, which runs `cmd_crew` against a temporary save and reloads it.

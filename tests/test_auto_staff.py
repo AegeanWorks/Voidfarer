@@ -66,5 +66,29 @@ class AutoStaffTest(unittest.TestCase):
         self.assertTrue(ok)
 
 
+class AutoStaffCliTest(unittest.TestCase):
+    def test_crew_autostaff_seats_officers_and_persists(self):
+        import contextlib
+        import io
+        import tempfile
+        from pathlib import Path
+
+        from voidfarer.cli import cmd_crew
+        from voidfarer.storage import StorageManager
+
+        engine = _engine(_crew("pilot", 1, 4), _crew("engineer", 2, 5))
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        storage = StorageManager(Path(tmp.name))
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = cmd_crew(engine, storage, ["crew", "autostaff"])
+        self.assertEqual(code, 0)
+        self.assertIn("AUTO-STAFF", out.getvalue())
+        saved = storage.load()
+        self.assertEqual({c.station for c in saved.ship.crew}, {"helm", "engineering"})
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(cmd_crew(engine, storage, ["crew", "autostaff"]), 1)  # already optimal
+
+
 if __name__ == "__main__":
     unittest.main()

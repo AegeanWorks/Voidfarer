@@ -3224,7 +3224,7 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
                 f"{' ' + CYAN + 'STATION ' + member['station'].upper() + RESET if member.get('station') else ''}{injury_note}{medal_note}"
             )
         print(f"\n{DIM}Recruit: crew recruit <{'|'.join(r.id for r in CREW_ROLES)}> | Drill: crew train <id> | Dismiss: crew dismiss <id> | Shore leave: crew shore{RESET}")
-        print(f"{DIM}Assign a bridge station: crew station <id> <helm|engineering|science|medical|tactical|unassigned>{RESET}")
+        print(f"{DIM}Assign a bridge station: crew station <id> <helm|engineering|science|medical|tactical|unassigned> | crew autostaff seats the best officer at every station{RESET}")
         print(f"{DIM}Away teams: crew away | crew away_launch <mission_type> [crew_ids] | crew away_recall <mission_id>{RESET}")
         return 0
     if sub in ("recruit", "hire"):
@@ -3241,6 +3241,12 @@ def cmd_crew(engine: SimulationEngine, storage: StorageManager, parts: list[str]
             print(f"{RED}Usage:{RESET} crew train <crew_id>")
             return 1
         ok, msg = engine.train_crew_member(parts[2])
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
+    if sub in ("autostaff", "auto-staff"):
+        ok, msg = engine.auto_staff_stations()
         print((GREEN if ok else RED) + msg + RESET)
         if ok:
             storage.save(engine.state)
@@ -4228,7 +4234,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "action", nargs="?", default="list",
         choices=[
             "list", "overview", "away", "recruit", "train", "shore",
-            "dismiss", "station", "away_launch", "away_recall",
+            "dismiss", "station", "autostaff", "away_launch", "away_recall",
         ],
     )
     crew_p.add_argument("value", nargs="?", help="Role, crew id, or crew id for station assignment")
