@@ -3001,5 +3001,25 @@
     "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
     "final_snapshot_entries": 1370,
     "surface_digest": "2b4605fc6d7a4f0d1263d038703303d66c3b5ec4c618259a17604a8c5f17eb60"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "bb375924a231f18f21f201d29d2f22e9cbfbd8f2",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794779193.2053585,
+    "finished_at": 1794780044.9087253,
+    "strikes": 0,
+    "reviewer": "kilo:goal main multimodal agent per G-015; ui-review/rail-notices laptop-rail-notices.png: 0 notices in the academy, one graduation hint at skip, one unlock notice per real transition (veteran toggle on, then mastery 3), no repeats on re-render, 0 console errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
+    "final_snapshot_entries": 1370,
+    "surface_digest": "3f9dce98db02dc90b9417eb2935ff206cb15350fa8ed31ba531484e35f581073"
   }
 ]

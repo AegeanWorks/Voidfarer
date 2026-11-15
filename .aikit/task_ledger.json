@@ -1,53 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "staged-tab-unlocks",
+    "task_id": "rail-unlock-notices",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794776900.6561532,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794780318.8131356,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794778067.4134283,
-    "completed_head": "293abfe7f6cf8bb1d3200421abd6c94392373ca3",
-    "completed_tree": "e263b72694ab39988356ff1bfb4ce02c93fca061"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cli-parity",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-cli-parity' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794743680.1501582,
-      "timestamp_str": "2026-11-15 14:54:40",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-refit-damaged",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: refit_damaged_drones engine, fleet action and CLI, then a REFIT DAMAGED button on the FLEET tab",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794743938.0812223,
-      "timestamp_str": "2026-11-15 14:58:58",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Each worn drone needs its own 300 cr refit click; automatic spending was rejected as it levels drones up and spends credits unasked",
-        "benefits": "One deliberate click refits all worn drones within credits",
-        "risks": "contract: new fleet action feeds REST, CLI, agent catalog; dependency: none; concurrency: re-entrant engine lock; state: none new",
-        "mitigation": "Reuse refit_fleet_unit, explicit click only, failing-first tests incl. shortfall and no-op, CLI parser updated together"
-      },
-      "plan_digest": "32a4495fbc0eef835fe500972dfc18725fc97a6faf9307df27edf17bcd3eb97d"
-    },
     {
       "task_id": "voidfarer-refit-damaged",
       "phase": "in_progress",
@@ -314,6 +277,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "rail-unlock-notices",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] One-time flight-log notices for the growing terminal rail",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794780111.7448826,
+      "timestamp_str": "2026-11-16 01:01:51",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The staged rail hid three tabs with no explanation; hidden features look missing",
+        "benefits": "Players learn where advanced terminals live and why three are late, without a modal or repeat spam",
+        "risks": "contract: none; dependency: none; concurrency: none; state: two page-memory flags only",
+        "mitigation": "transition detection with explicit flags; repeat renders asserted stable in Edge; static pins"
+      },
+      "plan_digest": "e991dccaae5b84324bc75342654b6a542961d1b84067bc28b5602c8d13a17e8a"
+    },
+    {
+      "task_id": "rail-unlock-notices",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Rail notices verified in Edge (silent academy, one hint at graduation, one notice per unlock, no repeats) (ADR-337); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794780318.8131356,
+      "timestamp_str": "2026-11-16 01:05:18",
+      "agent": "kilo:goal"
     }
   ]
 }

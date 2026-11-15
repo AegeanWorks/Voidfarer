@@ -555,6 +555,24 @@ class TestStagedTabUnlocks(unittest.TestCase):
         self.assertIn("settingUnlockTabs: this.unlockAllTabs,", self.js)
 
 
+class TestRailUnlockNotices(unittest.TestCase):
+    """The growing rail explains itself once per real transition (ADR-337)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_graduation_explains_more_systems_once(self):
+        self.assertIn("if (this._academyWasLocked === true && !this.cadetTabLock) {", self.js)
+        self.assertIn("[RAIL] Advanced terminals are under MORE SYSTEMS;", self.js)
+        self.assertIn("this._academyWasLocked = this.cadetTabLock;", self.js)
+
+    def test_late_unlock_is_announced_only_on_the_transition(self):
+        self.assertIn("if (this._lateTabsUnlocked === false && lateAvailable) {", self.js)
+        self.assertIn("[RAIL] EMPIRE, CAPTAINS and DEPOT terminals are unlocked.", self.js)
+        self.assertIn("this._lateTabsUnlocked = lateAvailable;", self.js)
+
+
 class TestGalaxySeedControls(unittest.TestCase):
     """The galaxy seed is shown with a COPY button and can be chosen on a new game (ADR-315)."""
 

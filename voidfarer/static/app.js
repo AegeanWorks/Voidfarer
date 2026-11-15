@@ -811,6 +811,8 @@ class CockpitApp {
         this.cadetTabLock = false;
         this.unlockAllTabs = false;
         this._advancedCountLabel = "";
+        this._academyWasLocked = null;
+        this._lateTabsUnlocked = null;
         this.advancedTabCount = document.querySelectorAll('.deck-tab-btn[data-advanced="true"]').length;
         this.contractsBadge = document.getElementById("contractsBadge");
         this.storyBadge = document.getElementById("storyBadge");
@@ -2004,12 +2006,22 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     applyTabUnlocks(masteryLevel = null) {
         const mastery = Number(masteryLevel ?? this.state?.ship?.mastery?.level ?? 1);
         const lateLocked = !this.cadetTabLock && !this.unlockAllTabs && mastery < LATE_TAB_MASTERY;
+        const lateAvailable = !this.cadetTabLock && (this.unlockAllTabs || mastery >= LATE_TAB_MASTERY);
         const lateButtons = { empire: this.tabBtnEmpire, ai: this.tabBtnAI, depot: this.tabBtnDepot };
         for (const [name, button] of Object.entries(lateButtons)) {
             if (!button) continue;
             if (lateLocked) button.dataset.masteryLocked = "true";
             else delete button.dataset.masteryLocked;
         }
+        // Announce the rail growth once per page session (ADR-337); repeats would bury the log.
+        if (this._academyWasLocked === true && !this.cadetTabLock) {
+            this.appendLog("[RAIL] Advanced terminals are under MORE SYSTEMS; EMPIRE, CAPTAINS and DEPOT open at Pilot Mastery 3 (SETTINGS can unlock all).", "system");
+        }
+        if (this._lateTabsUnlocked === false && lateAvailable) {
+            this.appendLog("[RAIL] EMPIRE, CAPTAINS and DEPOT terminals are unlocked.", "reward");
+        }
+        this._academyWasLocked = this.cadetTabLock;
+        this._lateTabsUnlocked = lateAvailable;
         this.updateAdvancedTabCount();
         if (lateLocked && LATE_TAB_IDS.includes(this.activeRightTab || "")) {
             this.appendLog("[MASTERY] That terminal opens at Pilot Mastery 3; showing PLAYER instead.", "system");

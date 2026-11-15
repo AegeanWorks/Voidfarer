@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `234`
-- **Total Classes**: `539`
+- **Total Classes**: `540`
 - **Total Top-Level Functions**: `535`
-- **Total Class Methods**: `2664`
-- **Total Source Lines**: `63568`
+- **Total Class Methods**: `2667`
+- **Total Source Lines**: `63586`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -536,7 +536,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3353` lines (`153713` bytes)
+**Size**: `3371` lines (`154579` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -623,6 +623,10 @@
   - Method `.test_the_count_and_cycle_follow_the_available_tabs()`
   - Method `.test_a_locked_tab_request_explains_the_mastery_rule()`
   - Method `.test_the_veteran_setting_persists_and_reapplies()`
+- `class TestRailUnlockNotices` - *The growing rail explains itself once per real transition (ADR-337).*
+  - Method `.setUpClass()`
+  - Method `.test_graduation_explains_more_systems_once()`
+  - Method `.test_late_unlock_is_announced_only_on_the_transition()`
 - `class TestGalaxySeedControls` - *The galaxy seed is shown with a COPY button and can be chosen on a new game (ADR-315).*
   - Method `.setUpClass()`
   - Method `.test_player_tab_shows_the_seed_with_a_copy_button()`
