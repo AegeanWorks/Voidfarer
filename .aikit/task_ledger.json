@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "audit-mastery-seed",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794783578.2423403,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794783811.1217716,
+    "completed_head": "a1e262b7cafa4a943fdfbb242db793f08622be24",
+    "completed_tree": "2f97fa0299d77fe9a273b2f362d4acb31aa9d0dd"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-more-systems-fit",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Tighten the MORE SYSTEMS rail button so its count fits at 1366x768 and 1280x720",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794768367.7547991,
-      "timestamp_str": "2026-11-15 21:46:07",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Measured label needed 122.53px inside a 117px inner width after the tutorial unlocks the rail; ADR-320's pin only checked constants, never fit",
-        "benefits": "The collapsed count/caret and the expanded FEWER label are fully visible at the two smallest supported widths",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "override only, ADR-320 block and pin untouched; real Edge geometry captured before and after; new static pin plus full suite"
-      },
-      "plan_digest": "d144abb56a50ad38a10dbd9b2e3314d67e01ac0a0b23e8d7aa3d2b434388cec9"
-    },
     {
       "task_id": "voidfarer-more-systems-fit",
       "phase": "in_progress",
@@ -314,6 +299,23 @@
       "timestamp": 1794783578.2423403,
       "timestamp_str": "2026-11-16 01:59:38",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "audit-mastery-seed",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'audit-mastery-seed' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794783811.1804545,
+      "timestamp_str": "2026-11-16 02:03:31",
+      "agent": "kilo:goal",
+      "head": "a1e262b7cafa4a943fdfbb242db793f08622be24",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
