@@ -3,32 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-repair-all-outposts",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794740549.6339598,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794740550.4505446,
+    "completed_head": "08e151807cf14d7837b55833be58a54651727e64"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-galaxy-seed",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: publish galaxy_seed in the snapshot, then show it with a COPY SEED button and a seed input on character creation",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794736438.42739,
-      "timestamp_str": "2026-11-15 12:53:58",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Every cockpit new game was seed 42 and the seed was never shown, so good galaxies could not be shared",
-        "benefits": "Replayable, shareable galaxies",
-        "risks": "contract: new snapshot key; dependency: none; concurrency: none; state: none new, seed already saved",
-        "mitigation": "Blank input keeps the old default 42, failing-first tests, real-browser check"
-      },
-      "plan_digest": "6308f7ecc1b4025c7eb778e54f7fc7b79c5bae0acf9f094bf2db4fb9d7bfac8a"
-    },
     {
       "task_id": "voidfarer-galaxy-seed",
       "phase": "in_progress",
@@ -297,6 +281,22 @@
       "timestamp": 1794740549.6339598,
       "timestamp_str": "2026-11-15 14:02:29",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-repair-all-outposts",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-repair-all-outposts' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794740550.4719732,
+      "timestamp_str": "2026-11-15 14:02:30",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
