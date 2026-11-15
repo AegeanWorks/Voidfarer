@@ -3,25 +3,17 @@
   "active_task": {
     "task_id": "story-disclosure-targets",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794772241.2207441,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794772406.527352,
+    "completed_head": "5be252f4a58bd8e312172a7b7dbe744b05dedc7c",
+    "completed_tree": "1ae6c6c0e253ec5af46c2a2a5519fc9de8d912ac"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-auto-staff",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] AUTO-STAFF STATIONS button on the CREW tab (ADR-328); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794743356.4498682,
-      "timestamp_str": "2026-11-15 14:49:16",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-auto-staff",
       "phase": "completed",
@@ -305,6 +297,22 @@
       "timestamp_str": "2026-11-15 22:50:41",
       "agent": "kilo:goal",
       "head": "4d9361ccb3ebc370f2567ded897fa1bb0b374086"
+    },
+    {
+      "task_id": "story-disclosure-targets",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'story-disclosure-targets' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794772406.6024463,
+      "timestamp_str": "2026-11-15 22:53:26",
+      "agent": "kilo:goal",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
