@@ -2774,5 +2774,27 @@
     "final_snapshot_digest": "a0af65eb9476dbdec5a5959f979cf7779f524cb3bca0b092d39e37a371809b38",
     "final_snapshot_entries": 1357,
     "surface_digest": "ebf5748fe6d99be45badd89bd3c2a9951063aca4a65674df8c3d872c24644a04"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "f9aea2b87b0e3037beb3227b49d1004e50f35ad6",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794740163.06695,
+    "finished_at": 1794740350.850471,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; outposts2/laptop-outposts.png: REPAIR ALL OUTPOSTS (2) full-width under HIDE OUTPOSTS; click repaired both damaged outposts (40 and 70 to 100) and hid the button, 0 errors; pre-existing right-edge clipping of per-row buttons noted, not part of this change",
+    "allowed_removals": [],
+    "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
+    "final_snapshot_entries": 1360,
+    "surface_digest": "5ae4bbf8ce645871a83e1d30d87d1f963097d9d8e7115efcfe777af18a2d9573"
   }
 ]

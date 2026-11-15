@@ -634,6 +634,26 @@ class TestMoreSystemsButtonFits(unittest.TestCase):
         self.assertIn("white-space: nowrap;", block)
 
 
+class TestRepairAllOutpostsButton(unittest.TestCase):
+    """EMPIRE offers one button for several raid-damaged outposts (ADR-322)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_button_is_hidden_by_default_above_the_outpost_list(self):
+        self.assertIn('id="btnRepairAllOutposts" hidden', self.html)
+        self.assertLess(self.html.index('id="btnRepairAllOutposts"'), self.html.index('id="outpostList"'))
+
+    def test_it_appears_only_for_two_or_more_damaged_outposts_and_posts_the_empire_action(self):
+        block = self.js.split("    renderRepairAllOutposts(outposts) {", 1)[1].split("    async copyGalaxySeed() {", 1)[0]
+        self.assertIn("Number(o.integrity || 0) < 100", block)
+        self.assertIn("button.hidden = damaged.length < 2;", block)
+        self.assertIn('"/api/empire/action", { action: "outpost_repair_all" }', block)
+        self.assertIn("this.renderRepairAllOutposts(outposts);", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

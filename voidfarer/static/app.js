@@ -5238,6 +5238,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ? `${outposts.length} outpost(s) producing each tick.`
             : "No outposts founded yet. Orbit a world and found one below.";
         this.renderOutpostBuild();
+        this.renderRepairAllOutposts(outposts);
         const moduleCatalog = this.state.outpost_modules || {};
         const moduleOptions = Object.entries(moduleCatalog).map(([id, module]) =>
             `<option value="${this.escapeHtml(id)}">${this.escapeHtml(module.name)} (${Number(module.cost || 0)} CR)</option>`
@@ -10603,6 +10604,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.selectedTarget = system;
         this.selectedType = "system";
         this.updateTargetCard();
+    }
+
+    // One button for several raid-damaged outposts; a single damaged outpost keeps its own REPAIR (ADR-322).
+    renderRepairAllOutposts(outposts) {
+        const button = document.getElementById("btnRepairAllOutposts");
+        if (!button) return;
+        const damaged = outposts.filter(o => Number(o.integrity || 0) < 100);
+        button.hidden = damaged.length < 2;
+        button.textContent = `REPAIR ALL OUTPOSTS (${damaged.length})`;
+        button.title = "Repair every damaged outpost, most damaged first, until credits run out.";
+        if (!button.dataset.bound) {
+            button.dataset.bound = "true";
+            button.addEventListener("click", () => this.postAction("/api/empire/action", { action: "outpost_repair_all" }, null));
+        }
     }
 
     async copyGalaxySeed() {

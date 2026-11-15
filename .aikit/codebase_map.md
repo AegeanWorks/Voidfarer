@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `232`
-- **Total Classes**: `523`
+- **Total Classes**: `524`
 - **Total Top-Level Functions**: `529`
-- **Total Class Methods**: `2615`
-- **Total Source Lines**: `62973`
+- **Total Class Methods**: `2618`
+- **Total Source Lines**: `62993`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`232` module(s))
@@ -508,7 +508,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3174` lines (`144194` bytes)
+**Size**: `3194` lines (`145244` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -611,6 +611,10 @@
   - Method `.test_the_helpers_stay_outside_the_fleet_renderer_window()`
 - `class TestMoreSystemsButtonFits` - *The MORE SYSTEMS rail button keeps its count visible at laptop width (ADR-320).*
   - Method `.test_button_uses_tight_padding_and_no_letter_spacing()`
+- `class TestRepairAllOutpostsButton` - *EMPIRE offers one button for several raid-damaged outposts (ADR-322).*
+  - Method `.setUpClass()`
+  - Method `.test_button_is_hidden_by_default_above_the_outpost_list()`
+  - Method `.test_it_appears_only_for_two_or_more_damaged_outposts_and_posts_the_empire_action()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

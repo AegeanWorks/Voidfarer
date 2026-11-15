@@ -3161,3 +3161,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: War raids can damage several remote outposts at once, and each repair was a separate click on a separate card.
 - **Decision**: `SimulationEngine.repair_all_outposts` repairs every outpost below full integrity, most damaged first, through the existing `repair_outpost` (so cost and logging are unchanged), and stops spending when credits run short, reporting how many were repaired, the total cost and how many stay damaged. It changes nothing when no outpost is damaged or none is affordable. It is exposed as the `outpost_repair_all` empire action, which gives REST, the CLI and the agent catalog (G-012).
 - **Consequences**: Engine, REST and CLI; the EMPIRE tab button follows. No new persisted field. Pinned by `tests/test_repair_all_outposts.py`.
+
+### ADR-322: REPAIR ALL OUTPOSTS button on the EMPIRE tab
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: ADR-321 added the engine action; the cockpit still showed one REPAIR per damaged outpost card.
+- **Decision**: `#btnRepairAllOutposts` sits full-width above the outpost list, drawn by `renderRepairAllOutposts` (a separate method so the large outposts renderer does not grow). It is hidden unless two or more outposts are below full integrity, reads `REPAIR ALL OUTPOSTS (n)`, and posts `{action: "outpost_repair_all"}` to `/api/empire/action`. A single damaged outpost keeps its own REPAIR button.
+- **Consequences**: Cockpit only. Verified in real Edge at 1366x768 (`ui-review/outposts2/`, 0 console errors): with outposts at 40%, 70% and 100% the button read `(2)`, one click repaired both and hid the button. The per-row buttons were already clipped at the right edge at this width before this change; that is a separate layout issue. Pinned by `TestRepairAllOutpostsButton`.
