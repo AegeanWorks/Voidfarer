@@ -3,30 +3,17 @@
   "active_task": {
     "task_id": "voidfarer-more-systems-fit",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794768378.5829265,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794768511.1681502,
+    "completed_head": "b36014b82b84b96736e5ce928569ece1bd51091f",
+    "completed_tree": "16614b859e582763663cd2870bf9e51fdb25be90"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-click-targets",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-click-targets' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794742112.8372543,
-      "timestamp_str": "2026-11-15 14:28:32",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-click-targets-2",
       "phase": "in_progress",
@@ -303,6 +290,22 @@
       "timestamp": 1794768378.5829265,
       "timestamp_str": "2026-11-15 21:46:18",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "voidfarer-more-systems-fit",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-more-systems-fit' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794768511.278055,
+      "timestamp_str": "2026-11-15 21:48:31",
+      "agent": "kilo:goal",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
