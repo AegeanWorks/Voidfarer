@@ -588,6 +588,7 @@ New System Surveyor and Sector Cartographer milestones track full-system sweeps.
 ### 21. UI Guard & Visual Audit
 `.aikit/ui.json` bounds cockpit work to `voidfarer/static/**` and `voidfarer/server.py`.
 Tests are the fast proof; `tools/ui_inventory.py`, `tools/ui_audit.py` and `tools/ui_browser.py` audit controls, layout and Edge rendering (ADR-041/047).
+`tools/ui_audit.py --post-tutorial` skips the Cadet Academy first, so the eleven advanced terminal tabs (SKILLS through LOGBOOK) can be measured too (ADR-334).
 
 ---
 
