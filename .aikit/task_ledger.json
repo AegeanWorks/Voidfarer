@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "strict-quantity-residual",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794785017.0740516,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794785185.4583964,
+    "completed_head": "67432d76fe431a8fe3698008a0ab6d201dbef5ee",
+    "completed_tree": "66aab9687225440d3f70f35fb990dee6ffc52be2"
   },
   "checkpoints": [
-    {
-      "task_id": "audit-post-tutorial",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Add --post-tutorial to the headless cockpit audit so the 11 advanced tabs are measurable",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794770854.4636374,
-      "timestamp_str": "2026-11-15 22:27:34",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ui_audit starts from a fresh save; the cadet lock hides every advanced tab until graduation, so no audit has ever measured them",
-        "benefits": "All 11 advanced tabs can now be audited at every supported viewport with the same severity rules; the first run already found a real target-size defect on STORY",
-        "risks": "contract: a new optional flag only, default behaviour unchanged; dependency: none; concurrency: none; state: none",
-        "mitigation": "calls the engine's own skip_tutorial action; pre/post behaviour pinned by a recording-engine test; fresh-save audits keep their labels"
-      },
-      "plan_digest": "d6c8fd9525da5f64cd986f7d5aadd75fbb9aad704922dda3efaaeb9f4a7ae96a"
-    },
     {
       "task_id": "audit-post-tutorial",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794785017.0740516,
       "timestamp_str": "2026-11-16 02:23:37",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "strict-quantity-residual",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'strict-quantity-residual' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794785185.5171597,
+      "timestamp_str": "2026-11-16 02:26:25",
+      "agent": "kilo:goal",
+      "head": "67432d76fe431a8fe3698008a0ab6d201dbef5ee",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
