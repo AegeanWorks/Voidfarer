@@ -2648,5 +2648,25 @@
     "final_snapshot_digest": "ae7e014b207050c190dabaf2b246bb3a3413e1643bdca0713a85179307960c4c",
     "final_snapshot_entries": 1338,
     "surface_digest": "1b74412e0472a4480247c8ee95d3b2561dbd287dcc5c20f08361ce4810135344"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "1824b07ceb2bc6aa821b5e1b904091aaed8c70c2",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794734986.042772,
+    "finished_at": 1794735944.7965932,
+    "strikes": 2,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; dossier/laptop-dossier.png and dossier2 run: DOSSIER at Pilot Mastery 1 shows the PLAYER tab and the academy unlock log line, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "162567493235b49fd72c16143d2595a57a6801c9b8602487acd963e86c057345",
+    "final_snapshot_entries": 1339,
+    "surface_digest": "cef946cf669669a8bfcf1ce9fc3db9b44fbbb02ad021e4abf4e39d28e0ab1cc9"
   }
 ]

@@ -1947,6 +1947,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    // While the academy locks a terminal, a control such as DOSSIER can still ask for it: explain, then show PLAYER.
+    redirectLockedTab(tabName, targetButton, options) {
+        const locked = targetButton.getAttribute("data-advanced") === "true"
+            && targetButton.dataset.cadetUnlocked !== "true";
+        if (!locked) return false;
+        this.appendLog("[ACADEMY] That terminal unlocks after the Cadet Academy; showing PLAYER instead.", "system");
+        if (tabName !== "player") this.switchRightTab("player", options);
+        return true;
+    }
+
     switchRightTab(tabName, options = {}) {
         if (!options.quiet) {
             this.drawerUserToggled = true;
@@ -1959,8 +1969,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             player: this.tabBtnPlayer, skills: this.tabBtnSkills, crew: this.tabBtnCrew, empire: this.tabBtnEmpire, codex: this.tabBtnCodex,
         };
         const targetButton = tabButtons[tabName];
-        if (this.cadetTabLock && targetButton && targetButton.getAttribute("data-advanced") === "true"
-            && targetButton.dataset.cadetUnlocked !== "true") return;
+        if (this.cadetTabLock && targetButton && this.redirectLockedTab(tabName, targetButton, options)) return;
         if (targetButton && targetButton.getAttribute("data-advanced") === "true"
             && !this.advancedTabsVisible) {
             this.setAdvancedTabsVisible(true, { quiet: true, keepActive: true });

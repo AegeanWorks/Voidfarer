@@ -3098,3 +3098,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Collapsing the left drawer (`\`), reactor strip (P), abilities (K) and log (L) took four key presses, so the radar rarely got the whole screen during flight. Also checked and dropped: the flight-log filter idea does not apply, because the cockpit log only receives lines from player actions (`appendLog`), not the galaxy war and AI-trade chatter held in the engine's log for the CLI.
 - **Decision**: `V` calls `toggleCleanView`, which collapses whichever of the four panels is open and remembers exactly those; a second press reopens only them, so a panel the player had already hidden stays hidden and the terminal returns to the same tab. The rail's existing hint block gains a third line, `V    CLEAN VIEW`, for discovery.
 - **Consequences**: Cockpit only, no persisted state, one added key. Verified in real Edge at 1366x768 (`ui-review/clean/`, 0 console errors): all panels collapsed on the first press and the open set (with the Commerce tab) was restored on the second, a pre-hidden log staying hidden. Pinned by `TestCleanViewHotkey`.
+
+### ADR-313: Locked terminals redirect to PLAYER instead of failing silently
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: The academy tab lock (ADR-297, ADR-308) made `switchRightTab` return silently for a locked advanced tab. The DOSSIER button in the abilities strip opens SKILLS, so at Pilot Mastery 1 it became a dead control. A programmatic audit found it as the only other caller that asks for an advanced tab by name.
+- **Decision**: `redirectLockedTab` handles a locked request: it logs `[ACADEMY] That terminal unlocks after the Cadet Academy; showing PLAYER instead.` and opens PLAYER (the character and abilities summary), without looping when PLAYER itself was requested. The inline guard in `switchRightTab` stays one short line and the logic lives in the helper, because `test_tab_rail_state` reads a fixed window of that method.
+- **Consequences**: Cockpit only. Verified in real Edge: DOSSIER at level 1 shows PLAYER and the log line (0 console errors). Pinned by `TestLockedTabRedirect`.

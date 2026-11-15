@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `228`
-- **Total Classes**: `513`
+- **Total Classes**: `514`
 - **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2580`
-- **Total Source Lines**: `62566`
+- **Total Class Methods**: `2583`
+- **Total Source Lines**: `62583`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`228` module(s))
@@ -487,7 +487,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3044` lines (`137673` bytes)
+**Size**: `3061` lines (`138605` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -564,6 +564,10 @@
   - Method `.test_hotkey_calls_the_toggle()`
   - Method `.test_toggle_covers_the_four_panels_and_restores_only_what_was_open()`
   - Method `.test_rail_hint_lists_the_key()`
+- `class TestLockedTabRedirect` - *A control that asks for a locked terminal shows PLAYER and says why (ADR-313).*
+  - Method `.setUpClass()`
+  - Method `.test_switch_hands_locked_tabs_to_the_redirect_helper()`
+  - Method `.test_helper_explains_then_shows_player_without_looping()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

@@ -504,6 +504,23 @@ class TestCleanViewHotkey(unittest.TestCase):
         self.assertIn("V    CLEAN VIEW", self.css)
 
 
+class TestLockedTabRedirect(unittest.TestCase):
+    """A control that asks for a locked terminal shows PLAYER and says why (ADR-313)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_switch_hands_locked_tabs_to_the_redirect_helper(self):
+        self.assertIn("if (this.cadetTabLock && targetButton && this.redirectLockedTab(tabName, targetButton, options)) return;", self.js)
+
+    def test_helper_explains_then_shows_player_without_looping(self):
+        block = self.js.split("    redirectLockedTab(tabName, targetButton, options) {", 1)[1].split("    switchRightTab(", 1)[0]
+        self.assertIn("[ACADEMY] That terminal unlocks after the Cadet Academy; showing PLAYER instead.", block)
+        self.assertIn('if (tabName !== "player") this.switchRightTab("player", options);', block)
+        self.assertIn('targetButton.dataset.cadetUnlocked !== "true"', block)
+
+
 if __name__ == "__main__":
     unittest.main()
 

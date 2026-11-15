@@ -1,40 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-clean-view",
+    "task_id": "voidfarer-locked-tab-redirect",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794734807.5419059,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794736184.0006044,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794734817.599121,
-    "completed_head": "c4969f6d7e706506f5e56ecb54754c4048094fa7"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-trade-clarity",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[3/3] Customs risk quote in the status snapshot (ADR-304); COMMERCE banner next; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794680761.039359,
-      "timestamp_str": "2026-11-14 21:26:01",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-trade-clarity",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[3/3] Customs risk banner in COMMERCE (ADR-305); best-trade tip #2 deferred; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794681216.0723696,
-      "timestamp_str": "2026-11-14 21:33:36",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-trade-clarity",
       "phase": "completed",
@@ -297,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-locked-tab-redirect",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: redirect a request for a locked academy tab to PLAYER with an explanation",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794736183.7204518,
+      "timestamp_str": "2026-11-15 12:49:43",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "DOSSIER opened SKILLS and silently did nothing at level 1 after the tab lock",
+        "benefits": "No dead controls during the academy",
+        "risks": "contract: switchRightTab guard; dependency: none; concurrency: none; state: none",
+        "mitigation": "Helper method, no-loop check, real-browser click, layout test"
+      },
+      "plan_digest": "657e10921558893c0697d7f0fece6bac8fc52cfd88ed0531a500147b163fce30"
+    },
+    {
+      "task_id": "voidfarer-locked-tab-redirect",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Locked tab redirect to PLAYER (ADR-313); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794736184.0006044,
+      "timestamp_str": "2026-11-15 12:49:44",
+      "agent": "claude:1"
     }
   ]
 }
