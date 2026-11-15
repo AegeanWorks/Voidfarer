@@ -73,6 +73,7 @@ voidfarer/
 ├── play.bat              <- 1-click interactive Windows launcher (default: Windows Cockpit)
 ├── voidfarer.bat         <- 1-click Windows CLI passthrough launcher
 ├── README.md             <- living documentation
+├── .gitattributes
 ├── voidfarer/            <- core simulation package
 │   ├── __init__.py       <- package metadata
 │   ├── models.py         <- frozen dataclass DTOs and schema validators
