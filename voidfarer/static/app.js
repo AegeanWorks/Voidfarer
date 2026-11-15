@@ -809,7 +809,6 @@ class CockpitApp {
         // While the Cadet Academy runs only the core tabs show; finishing or skipping it unlocks
         // the advanced rail except the three late tabs, which wait for Pilot Mastery 3 (ADR-297, ADR-336).
         this.cadetTabLock = false;
-        this.unlockAllTabs = false;
         this._advancedCountLabel = "";
         this._academyWasLocked = null;
         this._lateTabsUnlocked = null;

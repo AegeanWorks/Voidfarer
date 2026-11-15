@@ -3273,3 +3273,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-336 staged EMPIRE, CAPTAINS and DEPOT behind Pilot Mastery 3 and added the veteran toggle, but nothing told the player the rail would grow; a hidden tab reads as a missing feature.
 - **Decision**: applyTabUnlocks tracks two page-memory flags. Leaving the academy logs one hint that advanced terminals sit under MORE SYSTEMS and that the last three open at Pilot Mastery 3, with SETTINGS able to unlock all. A false-to-true late-tab transition logs one unlock notice. Re-renders cannot duplicate either line, and a reload does not replay them.
 - **Consequences**: Cockpit only. Verified in real Edge at 1366x768 (ui-review/rail-notices/, 0 console errors): silent through the academy, one graduation hint when the academy ends, one notice when the veteran toggle opens the tabs, one more at mastery 3, and none on repeated renders. Pinned by TestRailUnlockNotices.
+
+### ADR-338: Keep the veteran tab preference across reloads
+- **Date**: 2026-11-16
+- **Status**: Accepted
+- **Context**: ADR-336 persisted unlockTabs in voidfarer_settings, but the constructor assigned this.unlockAllTabs = false after loadSettings() had already read the stored profile, so every launch silently relocked the three late tabs while localStorage still said true.
+- **Decision**: Remove that constructor assignment. applySettingsProfile is the only loader and applySettingsFromUI the only writer, so the persisted value survives a reload and RESET DEFAULTS still clears it.
+- **Consequences**: Verified in real Edge at 1366x768: default 8 advanced tabs, the toggle gives 11, and a reload keeps 11 with unlockAllTabs true and zero console errors (ui-review/staged-tabs/persistence.json). Pinned by TestStagedTabUnlocks.test_constructor_defaults_cannot_clobber_the_loaded_setting.

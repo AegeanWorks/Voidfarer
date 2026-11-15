@@ -9,8 +9,8 @@
 - **Total Python Modules**: `234`
 - **Total Classes**: `540`
 - **Total Top-Level Functions**: `535`
-- **Total Class Methods**: `2667`
-- **Total Source Lines**: `63586`
+- **Total Class Methods**: `2668`
+- **Total Source Lines**: `63591`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -536,7 +536,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3371` lines (`154579` bytes)
+**Size**: `3376` lines (`154876` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -623,6 +623,7 @@
   - Method `.test_the_count_and_cycle_follow_the_available_tabs()`
   - Method `.test_a_locked_tab_request_explains_the_mastery_rule()`
   - Method `.test_the_veteran_setting_persists_and_reapplies()`
+  - Method `.test_constructor_defaults_cannot_clobber_the_loaded_setting()`
 - `class TestRailUnlockNotices` - *The growing rail explains itself once per real transition (ADR-337).*
   - Method `.setUpClass()`
   - Method `.test_graduation_explains_more_systems_once()`

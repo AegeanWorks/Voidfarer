@@ -554,6 +554,11 @@ class TestStagedTabUnlocks(unittest.TestCase):
         self.assertIn("unlockTabs: this.unlockAllTabs,", self.js)
         self.assertIn("settingUnlockTabs: this.unlockAllTabs,", self.js)
 
+    def test_constructor_defaults_cannot_clobber_the_loaded_setting(self):
+        # loadSettings() runs before the rail fields; a field initializer after it would
+        # silently reset a persisted veteran preference (ADR-338).
+        self.assertNotIn("this.unlockAllTabs = false;", self.js)
+
 
 class TestRailUnlockNotices(unittest.TestCase):
     """The growing rail explains itself once per real transition (ADR-337)."""

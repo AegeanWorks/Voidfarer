@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "rail-unlock-notices",
+    "task_id": "veteran-tab-persistence",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794780318.8131356,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794781555.6022453,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794780548.9940345,
-    "completed_head": "f848937bd4c03db1d4ef4604f6007d6885e888ce",
-    "completed_tree": "240c90bc8c8017a31a272491ee94eeb2cd8eb0a9"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-refit-damaged",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] REFIT DAMAGED DRONES button on the FLEET tab (ADR-331), verified in Edge and UI-task closed; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794758908.697228,
-      "timestamp_str": "2026-11-15 19:08:28",
-      "agent": "kilo:goal",
-      "continued_from": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-refit-damaged",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-refit-damaged' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794759160.3474238,
-      "timestamp_str": "2026-11-15 19:12:40",
-      "agent": "kilo:goal",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-ai-captain-coverage",
       "phase": "in_progress",
@@ -315,6 +284,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "veteran-tab-persistence",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Keep the persisted veteran tab preference across reloads",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794781555.4024692,
+      "timestamp_str": "2026-11-16 01:25:55",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Constructor defaults overwrote the loaded unlockTabs value, so the saved preference never took effect",
+        "benefits": "The SETTINGS escape hatch works on every launch, matching what the checkbox stores",
+        "risks": "contract: none, save untouched; dependency: none; concurrency: none; state: localStorage only",
+        "mitigation": "single loader/single writer; a pin forbids the constructor reset; reload verified in Edge with 0 errors"
+      },
+      "plan_digest": "43f4d92c69fd83526c00778ab52d99fd3eef902c6ffad3241b5b4f14663269e9"
+    },
+    {
+      "task_id": "veteran-tab-persistence",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Veteran tab preference survives reload (ADR-338); Edge 8 -> 11 -> reload 11, 0 errors; 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794781555.6022453,
+      "timestamp_str": "2026-11-16 01:25:55",
+      "agent": "kilo:goal"
     }
   ]
 }
