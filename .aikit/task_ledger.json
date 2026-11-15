@@ -1,48 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-ai-captain-coverage",
+    "task_id": "voidfarer-more-systems-fit",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794763381.558817,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794768378.5829265,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794763492.219966,
-    "completed_head": "bbb10d5bfc1b5b848d6e149690280ff0df7d9e20",
-    "completed_tree": "32458bd03ef58ddd8b608d1ae2abf6f4dd02c1f8"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-click-targets",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: lift the flagged trade, tip and harvest buttons to the 24px minimum click target",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794742101.0524316,
-      "timestamp_str": "2026-11-15 14:28:21",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "A full tab audit at 1366x768 flagged BUY/SELL, my TIP line and HARVEST ALL as under 24px",
-        "benefits": "All terminal tabs pass the target-size audit",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "Min-height only, audit at two sizes, screenshot the COMMERCE tab, layout test"
-      },
-      "plan_digest": "0f2b41ffff4d0d760ac0d0d55779fcf36ffce030b7da6628ca5fecdfdfc49818"
-    },
-    {
-      "task_id": "voidfarer-click-targets",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] 24px click targets for trade, tip and harvest buttons (ADR-325); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794742101.2827067,
-      "timestamp_str": "2026-11-15 14:28:21",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-click-targets",
       "phase": "completed",
@@ -306,6 +274,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-more-systems-fit",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Tighten the MORE SYSTEMS rail button so its count fits at 1366x768 and 1280x720",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794768367.7547991,
+      "timestamp_str": "2026-11-15 21:46:07",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Measured label needed 122.53px inside a 117px inner width after the tutorial unlocks the rail; ADR-320's pin only checked constants, never fit",
+        "benefits": "The collapsed count/caret and the expanded FEWER label are fully visible at the two smallest supported widths",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "override only, ADR-320 block and pin untouched; real Edge geometry captured before and after; new static pin plus full suite"
+      },
+      "plan_digest": "d144abb56a50ad38a10dbd9b2e3314d67e01ac0a0b23e8d7aa3d2b434388cec9"
+    },
+    {
+      "task_id": "voidfarer-more-systems-fit",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] MORE SYSTEMS rail label fits at 1366x768 and 1280x720 (ADR-333); Edge geometry 120.53 <= 123; suite 1784 OK; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794768378.5829265,
+      "timestamp_str": "2026-11-15 21:46:18",
+      "agent": "kilo:goal"
     }
   ]
 }

@@ -7144,6 +7144,11 @@ body.cockpit-theme {
 }
 .panel-left .deck-more-btn:hover { background: rgba(201, 163, 90, 0.14); color: var(--console-ivory); }
 .panel-left .deck-more-count { color: var(--console-muted); margin-left: 3px; font-size: 12px; }
+/* ADR-320's 3px/5px padding left the label 5.5px short of the 127px rail at 1366x768 and
+   1280x720, so the count and caret were ellipsized. Tighten the horizontal padding and the
+   count gap so the full label fits with room to spare (ADR-333). */
+.panel-left .deck-more-btn { padding-left: 2px; padding-right: 2px; }
+.panel-left .deck-more-count { margin-left: 1px; }
 
 .terminal-content-stack { gap: 10px; font-size: 13px; line-height: 1.45; }
 .tab-content { display: flex; flex-direction: column; gap: 10px; padding: 0 2px 10px; min-width: 0; }

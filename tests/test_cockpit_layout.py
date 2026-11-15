@@ -624,7 +624,7 @@ class TestMissionPins(unittest.TestCase):
 
 
 class TestMoreSystemsButtonFits(unittest.TestCase):
-    """The MORE SYSTEMS rail button keeps its count visible at laptop width (ADR-320)."""
+    """The MORE SYSTEMS rail button keeps its count visible at laptop width (ADR-320, ADR-333)."""
 
     def test_button_uses_tight_padding_and_no_letter_spacing(self):
         css = STYLE_CSS.read_text(encoding="utf-8")
@@ -632,6 +632,14 @@ class TestMoreSystemsButtonFits(unittest.TestCase):
         self.assertIn("padding: 3px 5px;", block)
         self.assertIn("letter-spacing: 0;", block)
         self.assertIn("white-space: nowrap;", block)
+
+    def test_a_later_override_tightens_the_rail_budget_for_the_measured_shortfall(self):
+        css = STYLE_CSS.read_text(encoding="utf-8")
+        self.assertIn(
+            ".panel-left .deck-more-btn { padding-left: 2px; padding-right: 2px; }\n"
+            ".panel-left .deck-more-count { margin-left: 1px; }",
+            css,
+        )
 
 
 class TestRepairAllOutpostsButton(unittest.TestCase):

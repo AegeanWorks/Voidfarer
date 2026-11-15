@@ -9,8 +9,8 @@
 - **Total Python Modules**: `234`
 - **Total Classes**: `535`
 - **Total Top-Level Functions**: `534`
-- **Total Class Methods**: `2652`
-- **Total Source Lines**: `63469`
+- **Total Class Methods**: `2653`
+- **Total Source Lines**: `63477`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -536,7 +536,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3293` lines (`150508` bytes)
+**Size**: `3301` lines (`150861` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -637,8 +637,9 @@
   - Method `.test_card_prefers_the_academy_then_the_campaign_and_adds_the_next_payout()`
   - Method `.test_contracts_render_draws_the_card_and_plotting_selects_the_system()`
   - Method `.test_the_helpers_stay_outside_the_fleet_renderer_window()`
-- `class TestMoreSystemsButtonFits` - *The MORE SYSTEMS rail button keeps its count visible at laptop width (ADR-320).*
+- `class TestMoreSystemsButtonFits` - *The MORE SYSTEMS rail button keeps its count visible at laptop width (ADR-320, ADR-333).*
   - Method `.test_button_uses_tight_padding_and_no_letter_spacing()`
+  - Method `.test_a_later_override_tightens_the_rail_budget_for_the_measured_shortfall()`
 - `class TestRepairAllOutpostsButton` - *EMPIRE offers one button for several raid-damaged outposts (ADR-322).*
   - Method `.setUpClass()`
   - Method `.test_button_is_hidden_by_default_above_the_outpost_list()`

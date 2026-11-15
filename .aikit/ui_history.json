@@ -2920,5 +2920,25 @@
     "final_snapshot_digest": "f74dfa5b157b712752a36cfcd2a1fe7b97cfb88a4a88e80c24433c7975e8b76d",
     "final_snapshot_entries": 1367,
     "surface_digest": "fa018d31ad9a70bbdfce4258054a89ddaeca1c779a36ce4d32c2947926946b64"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "a7fd9238092f94a4aeb31d05ae1bee531d07741f",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794767615.5195181,
+    "finished_at": 1794767962.638469,
+    "strikes": 0,
+    "reviewer": "kilo:goal main multimodal agent per G-015; ui-review/more-systems-333 laptop+short: 'MORE SYSTEMS 11 v' and 'FEWER 11 ^' fully visible, content 120.53 <= inner 123, 0 console errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "f74dfa5b157b712752a36cfcd2a1fe7b97cfb88a4a88e80c24433c7975e8b76d",
+    "final_snapshot_entries": 1367,
+    "surface_digest": "a7288f4c19e9a9cc5d75a417b91a7423a918c5600e0fe91d476a79e2ef205d59"
   }
 ]
