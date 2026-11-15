@@ -3,30 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-hotkey-whisper",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794737559.9232218,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794737560.6274095,
+    "completed_head": "f6454da84b9b3dd7ad2cbb95c73f7666d22b8e98"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-early-tabs",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-early-tabs' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794682789.17902,
-      "timestamp_str": "2026-11-14 21:59:49",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-arrive-now",
       "phase": "in_progress",
@@ -302,6 +288,22 @@
       "timestamp": 1794737559.9232218,
       "timestamp_str": "2026-11-15 13:12:39",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-hotkey-whisper",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-hotkey-whisper' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794737560.6493742,
+      "timestamp_str": "2026-11-15 13:12:40",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
