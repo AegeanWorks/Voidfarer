@@ -3126,3 +3126,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The cockpit has useful shortcuts (`[` `]` cycle terminal tabs, backslash hides the drawer, `V` clears the radar) that beginners rarely discover, and the rail hint is easy to overlook.
 - **Decision**: A click listener on `#deckTabsHeader` counts clicks on `.deck-tab-btn`; on the third it logs one `[TIP]` line naming the three keys, then records `voidfarer_tip_tab_keys` in `localStorage` so it never repeats for that browser profile. Storage reads and writes are wrapped so a blocked or private profile falls back to once per session. The tip text avoids a literal backslash and says "the backslash key".
 - **Consequences**: Cockpit only, no game state. Verified in real Edge (`ui-review/whisper/`, 0 console errors): no tip after two clicks, one on the third, none after six, and none after a reload. Pinned by `TestHotkeyWhisper`.
+
+### ADR-317: Quick-start archetypes (engine)
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: Character creation asks a first-time player for a name, origin and a 20-point skill allocation before they have seen the game, which is the heaviest choice in the first minute.
+- **Decision**: New module `voidfarer/archetypes.py` holds three archetypes, each a creation-budget skill spread, an origin and a summary: Coalition Vanguard (Navigator, academy kept, default ship), Free Spacer Merchant (Merchant, +20 hold, a Free Spacers trade pact, academy skipped) and Syndicate Smuggler (Prospector, silent reactor, 25/15/40/20 power so sensors clear the 35% ECM line, one xenolith crate, academy skipped). `profile.archetype` is validated against the catalogue in `_validate_commander_profile` and its loadout is applied by `_apply_archetype_loadout` after the commander profile; the status snapshot lists the archetypes under `character_creation.archetypes`. No archetype is the unchanged default start.
+- **Consequences**: Engine and REST profile only; the creation-screen buttons follow. No new persisted field (the loadout is ordinary ship state). Pinned by `tests/test_archetypes.py`.

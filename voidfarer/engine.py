@@ -67,6 +67,14 @@ from voidfarer.character import (
 from voidfarer.codex import build_codex_report, get_codex_entry
 from voidfarer.decisions import eligible_decisions, make_decision_event
 from voidfarer.pirates import generate_pirate_encounter, pirate_risk
+from voidfarer.archetypes import (
+    ARCHETYPES,
+    MERCHANT_EXTRA_HOLD,
+    MERCHANT_PACT_FACTION,
+    SMUGGLER_CRATE,
+    SMUGGLER_POWER,
+    archetype_catalog,
+)
 from voidfarer.smuggling import (
     calculate_customs_scan_risk,
     generate_customs_encounter,
@@ -1136,6 +1144,9 @@ class SimulationEngine:
     @staticmethod
     def _validate_commander_profile(profile: dict[str, Any]) -> str | None:
         """Reject commander profiles whose starting skills exceed the creation budget."""
+        archetype = profile.get("archetype")
+        if archetype not in (None, "") and archetype not in ARCHETYPES:
+            return f"Unknown archetype '{archetype}'. Choose one of: {', '.join(ARCHETYPES)}."
         raw_skills = profile.get("skills") if isinstance(profile.get("skills"), dict) else {}
         total = 0
         for skill in SKILL_CATALOG:
@@ -1177,6 +1188,26 @@ class SimulationEngine:
         updated_character, _ = reconcile_abilities(updated_character)
         updated_ship = self._clone_ship(commander_name=name)
         self.state = self._clone_state(character=updated_character, ship=updated_ship)
+        self._apply_archetype_loadout(str(profile.get("archetype") or ""))
+
+    def _apply_archetype_loadout(self, archetype: str) -> None:
+        """Give a quick-start archetype its starting loadout; the vanguard keeps the default ship."""
+        if archetype not in ("merchant", "smuggler"):
+            return
+        ship = self.state.ship
+        if archetype == "merchant":
+            self.state = self._clone_state(ship=self._clone_ship(
+                cargo_capacity=ship.cargo_capacity + MERCHANT_EXTRA_HOLD,
+                trade_pacts=tuple(dict.fromkeys(ship.trade_pacts + (MERCHANT_PACT_FACTION,))),
+            ))
+        else:
+            cargo = dict(ship.cargo)
+            crate, units = SMUGGLER_CRATE
+            cargo[crate] = cargo.get(crate, 0) + units
+            self.state = self._clone_state(ship=self._clone_ship(cargo=cargo))
+            self.set_reactor_mode("silent")
+            self.route_power(*SMUGGLER_POWER)
+        self.skip_tutorial()
 
     def load_state(self, state: GameState) -> tuple[bool, str]:
         """Replace the live universe with a loaded save and reseed its RNG stream."""
@@ -8441,6 +8472,7 @@ class SimulationEngine:
                     "skill_points": STARTING_SKILL_POINTS,
                     "max_skill": 10,
                     "skills": list(SKILL_CATALOG),
+                    "archetypes": archetype_catalog(),
                 },
                 "character_abilities": {
                     aid: {

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `229`
-- **Total Classes**: `517`
-- **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2592`
-- **Total Source Lines**: `62657`
+- **Total Python Modules**: `231`
+- **Total Classes**: `519`
+- **Total Top-Level Functions**: `527`
+- **Total Class Methods**: `2600`
+- **Total Source Lines**: `62809`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`229` module(s))
+- **Indexed**: python (`231` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -142,6 +142,27 @@
   - Method `.setUp()`
   - Method `.test_alliance_requires_standing_and_forms_once()`
   - Method `.test_allied_territory_reduces_pirate_risk()`
+
+---
+
+### [`tests/test_archetypes.py`](tests/test_archetypes.py)
+> *Quick-start archetypes: one choice gives a coherent skill spread and starting loadout.*
+
+**Size**: `76` lines (`3383` bytes)
+
+**Classes:**
+- `class ArchetypeCatalogTest`
+  - Method `.test_every_archetype_spends_exactly_the_creation_budget()`
+  - Method `.test_the_snapshot_lists_the_archetypes_for_the_creation_screen()`
+- `class ArchetypeLoadoutTest`
+  - Method `.test_vanguard_keeps_the_academy_and_the_default_ship()`
+  - Method `.test_merchant_gets_a_bigger_hold_a_trade_pact_and_skips_the_academy()`
+  - Method `.test_smuggler_runs_silent_with_sensor_heavy_power_and_one_contraband_unit()`
+  - Method `.test_an_unknown_archetype_is_refused()`
+  - Method `.test_no_archetype_is_unchanged_default_start()`
+
+**Functions:**
+- `def _start(archetype)`
 
 ---
 
@@ -4421,6 +4442,16 @@
 
 ---
 
+### [`voidfarer/archetypes.py`](voidfarer/archetypes.py)
+> *Quick-start commander archetypes: a skill spread, an origin and a small starting loadout.*
+
+**Size**: `44` lines (`1874` bytes)
+
+**Functions:**
+- `def archetype_catalog()` - *The archetypes as a list for the creation screen, in display order.*
+
+---
+
 ### [`voidfarer/away.py`](voidfarer/away.py)
 > *Away-team expeditions: body missions, deterministic outcomes, and crew risk.*
 
@@ -4728,7 +4759,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11084` lines (`546854` bytes)
+**Size**: `11116` lines (`548267` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4758,6 +4789,7 @@
   - Method `.reset(seed, profile)` - *Reset the simulation to a fresh galaxy with an isolated deterministic RNG stream.*
   - Method `._validate_commander_profile(profile)` - *Reject commander profiles whose starting skills exceed the creation budget.*
   - Method `._apply_commander_profile(profile)` - *Apply the commander name, age, background and starting skills chosen at creation.*
+  - Method `._apply_archetype_loadout(archetype)` - *Give a quick-start archetype its starting loadout; the vanguard keeps the default ship.*
   - Method `.load_state(state)` - *Replace the live universe with a loaded save and reseed its RNG stream.*
   - Method `._create_initial_state(seed)` - *Construct a fresh universe state rooted at Sol System.*
   - Property `.current_system`

@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-hotkey-whisper",
+    "task_id": "voidfarer-archetypes",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794737559.9232218,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794737826.2243876,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794737560.6274095,
-    "completed_head": "f6454da84b9b3dd7ad2cbb95c73f7666d22b8e98"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-arrive-now",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: arrive_now engine and flight action, then an ARRIVE NOW button on the radar target card during transit",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794683021.5240011,
-      "timestamp_str": "2026-11-14 22:03:41",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Waiting out sublight transit tick by tick feels broken to beginners",
-        "benefits": "One click to arrive, never skipping an emergency",
-        "risks": "contract: new flight action feeds REST, CLI, agent catalog; dependency: none; concurrency: engine lock held while ticking; state: none",
-        "mitigation": "Tick one at a time and stop on _action_lock_reason; failing-first tests"
-      },
-      "plan_digest": "4abd9ccda5188591a69213e06f19d4e3dec9b39a011e2aa5572ebbc4964fd27e"
-    },
-    {
-      "task_id": "voidfarer-arrive-now",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] arrive_now engine and arrive flight action (ADR-309); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794683021.820363,
-      "timestamp_str": "2026-11-14 22:03:41",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-arrive-now",
       "phase": "in_progress",
@@ -304,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-archetypes",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: archetypes module and engine loadout, then three QUICK START buttons on character creation",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794737825.9825516,
+      "timestamp_str": "2026-11-15 13:17:05",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "The 20-point skill allocation is the heaviest choice a first-time player meets",
+        "benefits": "One click to a coherent start",
+        "risks": "contract: profile gains an archetype key validated against a catalogue; dependency: none; concurrency: loadout applied inside the engine lock via re-entrant calls; state: none new, loadout is ordinary ship state",
+        "mitigation": "Failing-first tests for every archetype, unknown archetype refused, default start unchanged"
+      },
+      "plan_digest": "e612fc4732642fe8d3ab26fc579d6e7bca8cb3c9f0cc9d97f312ffe088d8ba6a"
+    },
+    {
+      "task_id": "voidfarer-archetypes",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] archetypes module and engine loadout (ADR-317); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794737826.2243876,
+      "timestamp_str": "2026-11-15 13:17:06",
+      "agent": "claude:1"
     }
   ]
 }
