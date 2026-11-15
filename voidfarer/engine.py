@@ -412,6 +412,13 @@ def static_catalogs() -> dict[str, Any]:
     }
 
 
+def _positive_quantity(value: Any) -> int | None:
+    """Accept only a positive int; bool is not a count and floats/strings never truncate."""
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        return None
+    return value
+
+
 def _cargo_cost_after(previous_cargo: dict[str, int], previous_cost: dict[str, int],
                       cargo: dict[str, int]) -> dict[str, int]:
     """Carry the paid basis of held cargo through any mutation outside a market trade."""
@@ -5525,11 +5532,8 @@ class SimulationEngine:
             commodity = COMMODITY_MAP.get(str(commodity_id))
             if commodity is None:
                 return False, f"Unknown commodity '{commodity_id}'."
-            try:
-                quantity = int(quantity)
-            except (TypeError, ValueError):
-                return False, "Quantity must be a positive integer."
-            if quantity <= 0:
+            quantity = _positive_quantity(quantity)
+            if quantity is None:
                 return False, "Quantity must be a positive integer."
             held = int(self.state.ship.cargo.get(commodity.id, 0))
             if held < quantity:
@@ -8933,7 +8937,9 @@ class SimulationEngine:
             if action in ("buy", "sell"):
                 if not commodity_id or commodity_id not in COMMODITY_MAP:
                     return False, "A valid commodity is required for captain trade."
-                quantity = max(1, int(quantity))
+                quantity = _positive_quantity(quantity)
+                if quantity is None:
+                    return False, "Quantity must be a positive integer."
                 price = COMMODITY_MAP[commodity_id].base_price
                 cargo = dict(self.state.ship.cargo)
                 captain_cargo = dict(captain.cargo)
@@ -9068,8 +9074,8 @@ class SimulationEngine:
             ok, msg = self._require_docked()
             if not ok:
                 return False, msg
-            quantity = int(quantity)
-            if quantity <= 0:
+            quantity = _positive_quantity(quantity)
+            if quantity is None:
                 return False, "Deposit quantity must be positive."
             depot = self._depot_for_current_system()
             if not depot:
@@ -9095,8 +9101,8 @@ class SimulationEngine:
             ok, msg = self._require_docked()
             if not ok:
                 return False, msg
-            quantity = int(quantity)
-            if quantity <= 0:
+            quantity = _positive_quantity(quantity)
+            if quantity is None:
                 return False, "Withdraw quantity must be positive."
             depot = self._depot_for_current_system()
             if not depot:
@@ -9122,8 +9128,8 @@ class SimulationEngine:
             ok, msg = self._require_docked()
             if not ok:
                 return False, msg
-            quantity = int(quantity)
-            if quantity <= 0:
+            quantity = _positive_quantity(quantity)
+            if quantity is None:
                 return False, "Sale quantity must be positive."
             depot = self._depot_for_current_system()
             if not depot:

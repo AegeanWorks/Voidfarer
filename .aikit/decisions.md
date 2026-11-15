@@ -3287,3 +3287,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-336 locks EMPIRE, CAPTAINS and DEPOT until Pilot Mastery 3, so the post-tutorial audit could no longer open those three tabs; the audit tool had no way to reproduce a late-game rail.
 - **Decision**: tools/ui_audit.py gains --mastery N. It replaces the ship's PilotMastery level with dataclasses.replace before the server starts, preserving xp, talent points and specializations, and prefixes screenshots with mN- so mastery captures never overwrite fresh-save ones. Below level 3 the tabs stay locked exactly as in play, so the flag proves rather than bypasses the rule.
 - **Consequences**: The three late tabs audit clean at 1366x768 and 1280x720 (ui-review/audit-post-m3/, screenshots post-m3-*). Documented in README section 21 and the cockpit guide. Pinned by AuditStateTest's mastery and no-op tests.
+
+### ADR-340: Strict quantity guards on the residual economy entry points
+- **Date**: 2026-11-16
+- **Status**: Accepted
+- **Context**: ADR-162 deferred deposit_cargo, withdraw_cargo, sell_from_depot, place_quantum_order and interact_ai: each coerced with int() (or clamped with max(1)), so True deposited 1, 1.5 truncated, 0 became 1 and strings converted. REST's _int_field masked this at the HTTP boundary, but direct engine and test calls stayed lenient.
+- **Decision**: Add engine._positive_quantity(value), which accepts only an int that is not bool and is greater than zero, and use it in all five entry points. Each keeps its existing message, and state is untouched on refusal. Positive ints behave exactly as before.
+- **Consequences**: Six failing-first tests in tests/test_quantity_guards_residual.py (5 guard failures plus 1 error before the fix) now pass; full suite Ran 1802 OK; README tree suite count 172 -> 173. No save-schema change; REST and CLI already parse integers before the engine call.

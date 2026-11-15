@@ -1,46 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "audit-mastery-seed",
+    "task_id": "strict-quantity-residual",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794783578.2423403,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794785017.0740516,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794783811.1217716,
-    "completed_head": "a1e262b7cafa4a943fdfbb242db793f08622be24",
-    "completed_tree": "2f97fa0299d77fe9a273b2f362d4acb31aa9d0dd"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-more-systems-fit",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] MORE SYSTEMS rail label fits at 1366x768 and 1280x720 (ADR-333); Edge geometry 120.53 <= 123; suite 1784 OK; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794768378.5829265,
-      "timestamp_str": "2026-11-15 21:46:18",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "voidfarer-more-systems-fit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-more-systems-fit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794768511.278055,
-      "timestamp_str": "2026-11-15 21:48:31",
-      "agent": "kilo:goal",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "audit-post-tutorial",
       "phase": "in_progress",
@@ -316,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "strict-quantity-residual",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Strict positive-integer guards on deposit, withdraw, depot sale, quantum order and AI trade",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794785016.889839,
+      "timestamp_str": "2026-11-16 02:23:36",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-162 left these coercing bool/float/string quantities by int() or max(1), so direct engine calls could mint or truncate cargo",
+        "benefits": "All quantity entry points now match the repair convention; nothing changes for REST/CLI callers that already parse ints",
+        "risks": "contract: stricter direct-engine API, no save change; dependency: none; concurrency: none; state: untouched on refusal",
+        "mitigation": "one shared helper, six failing-first tests including state snapshots, full suite and mechanics gates"
+      },
+      "plan_digest": "ca4bf9526732865ac841422abe807cfebc0e93873e53bed62d5fc5c29e23e50f"
+    },
+    {
+      "task_id": "strict-quantity-residual",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Strict guards verified: 6/6 guard tests, full suite 1802 OK, README suite count fixed (ADR-340); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794785017.0740516,
+      "timestamp_str": "2026-11-16 02:23:37",
+      "agent": "kilo:goal"
     }
   ]
 }

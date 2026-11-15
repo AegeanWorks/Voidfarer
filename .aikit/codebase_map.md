@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `234`
-- **Total Classes**: `540`
-- **Total Top-Level Functions**: `535`
-- **Total Class Methods**: `2672`
-- **Total Source Lines**: `63628`
+- **Total Python Modules**: `235`
+- **Total Classes**: `541`
+- **Total Top-Level Functions**: `536`
+- **Total Class Methods**: `2680`
+- **Total Source Lines**: `63693`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`234` module(s))
+- **Indexed**: python (`235` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3155,6 +3155,24 @@
 
 ---
 
+### [`tests/test_quantity_guards_residual.py`](tests/test_quantity_guards_residual.py)
+> *Strict positive-integer guards on the residual economy entry points (ADR-162 residual).*
+
+**Size**: `59` lines (`2715` bytes)
+
+**Classes:**
+- `class StrictQuantityResidualTest`
+  - Method `.setUp()`
+  - Method `.assert_refused(call, message_part)`
+  - Method `.test_deposit_rejects_bool_float_string_zero_and_negative()`
+  - Method `.test_withdraw_rejects_bool_float_string_zero_and_negative()`
+  - Method `.test_sell_from_depot_rejects_bool_float_string_zero_and_negative()`
+  - Method `.test_quantum_order_rejects_bool_float_string_zero_and_negative()`
+  - Method `.test_ai_trade_rejects_bool_float_string_zero_and_negative()`
+  - Method `.test_positive_ints_still_work()`
+
+---
+
 ### [`tests/test_quantum_automation.py`](tests/test_quantum_automation.py)
 > *Quantum auto-freight: policy, route selection, cooldown and persistence.*
 
@@ -4890,7 +4908,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11214` lines (`552817` bytes)
+**Size**: `11220` lines (`553130` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5143,6 +5161,7 @@
 
 **Functions:**
 - `def static_catalogs()` - *Build the code-constant catalogs once per process; callers must treat them as read-only.*
+- `def _positive_quantity(value)` - *Accept only a positive int; bool is not a count and floats/strings never truncate.*
 - `def _cargo_cost_after(previous_cargo, previous_cost, cargo)` - *Carry the paid basis of held cargo through any mutation outside a market trade.*
 
 ---
