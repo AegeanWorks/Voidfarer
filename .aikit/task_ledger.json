@@ -3,30 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-more-button-fit",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794739702.73239,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794739703.426955,
+    "completed_head": "846faf6077296a8082187f168d8588a826fd7f4c"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-clean-view",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-clean-view' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794734817.6480236,
-      "timestamp_str": "2026-11-15 12:26:57",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-locked-tab-redirect",
       "phase": "in_progress",
@@ -302,6 +288,22 @@
       "timestamp": 1794739702.73239,
       "timestamp_str": "2026-11-15 13:48:22",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-more-button-fit",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-more-button-fit' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794739703.4465334,
+      "timestamp_str": "2026-11-15 13:48:23",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
