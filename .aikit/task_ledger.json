@@ -3,30 +3,17 @@
   "active_task": {
     "task_id": "voidfarer-ai-captain-coverage",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794763381.558817,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794763492.219966,
+    "completed_head": "bbb10d5bfc1b5b848d6e149690280ff0df7d9e20",
+    "completed_tree": "32458bd03ef58ddd8b608d1ae2abf6f4dd02c1f8"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-rail-target-size",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-rail-target-size' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794741619.3794377,
-      "timestamp_str": "2026-11-15 14:20:19",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-click-targets",
       "phase": "in_progress",
@@ -303,6 +290,22 @@
       "timestamp": 1794763381.558817,
       "timestamp_str": "2026-11-15 20:23:01",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "voidfarer-ai-captain-coverage",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-ai-captain-coverage' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794763492.294631,
+      "timestamp_str": "2026-11-15 20:24:52",
+      "agent": "kilo:goal",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
