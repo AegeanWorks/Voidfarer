@@ -1,52 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-click-targets",
+    "task_id": "voidfarer-click-targets-2",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794742101.2827067,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794742560.4658134,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794742112.8089695,
-    "completed_head": "67066f73ef75fb6e85b4235a81719dcb3f57a904"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-archetypes",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-archetypes' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794738463.4628878,
-      "timestamp_str": "2026-11-15 13:27:43",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-mission-pins",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: pinned campaign and next-payout card at the top of CONTRACTS",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794739256.3712301,
-      "timestamp_str": "2026-11-15 13:40:56",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Three tabs had to be checked to answer what the captain is working toward",
-        "benefits": "One tab shows the current goal and the next reward",
-        "risks": "contract: reads the existing quests and story state; dependency: none; concurrency: none; state: none",
-        "mitigation": "UI-only, real-browser check of both states, layout tests, helpers kept out of the fleet renderer window"
-      },
-      "plan_digest": "70793d03f17a3b06b2bb38c7ea9b7a3fa1c5870ef2b0dda5b4a168fa3c1de45c"
-    },
     {
       "task_id": "voidfarer-mission-pins",
       "phase": "in_progress",
@@ -309,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-click-targets-2",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: lift the remaining 20-22px compact controls to the 24px minimum click target",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794742560.2295754,
+      "timestamp_str": "2026-11-15 14:36:00",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "A scenario sweep found the target-card toggle and several more controls under 24px",
+        "benefits": "All audited states pass the target-size check",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "Min-height only via the last rule, audit in four states at two sizes, surface screenshot, layout test"
+      },
+      "plan_digest": "084045f86bbbc2621dd3a6ad216fc5c0bab5a9acb9b42d970e18a7496c35fc40"
+    },
+    {
+      "task_id": "voidfarer-click-targets-2",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Remaining controls at 24px (ADR-326); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794742560.4658134,
+      "timestamp_str": "2026-11-15 14:36:00",
+      "agent": "claude:1"
     }
   ]
 }

@@ -2856,5 +2856,25 @@
     "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
     "final_snapshot_entries": 1360,
     "surface_digest": "41eb112a85eeed1abe214123484174544e81ec31d0cb770631b12f828c20a27f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "b420a2b4ac394dcbf50921596083bd0e97375450",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794742227.4257877,
+    "finished_at": 1794742385.4368784,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; surface5/laptop-surface.png and ui_audit target, skills, fleet at laptop and short: surface chips, RUN, disclosure toggles and skill-train buttons reach 24px with layout intact, smallTargets 0, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
+    "final_snapshot_entries": 1360,
+    "surface_digest": "0875e00e18e1febb87ef3c9d7d16a99513bba3de9fa6899e7a9ec2b3259c6f1b"
   }
 ]

@@ -11112,3 +11112,5 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* Click targets: nothing interactive in the left terminal is shorter than 24px (ADR-325). */
 .btn-trade, #btnHarvestFleet, .trade-tip { min-height: 24px; }
+.surface-op-side .btn-hud, .fleet-ship-card > .ship-actions .btn-hud, .target-disclosure-toggle,
+.surface-site-chip, .surface-disclosure-toggle, .skill-row .skill-train-btn, .skills-card-toggle { min-height: 24px; }

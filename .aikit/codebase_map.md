@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `232`
-- **Total Classes**: `527`
+- **Total Classes**: `528`
 - **Total Top-Level Functions**: `529`
-- **Total Class Methods**: `2623`
-- **Total Source Lines**: `63030`
+- **Total Class Methods**: `2624`
+- **Total Source Lines**: `63043`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`232` module(s))
@@ -508,7 +508,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3231` lines (`147116` bytes)
+**Size**: `3244` lines (`147857` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -623,6 +623,8 @@
   - Method `.setUpClass()`
   - Method `.test_final_rule_sets_the_minimum_for_the_flagged_controls()`
   - Method `.test_compact_market_rule_no_longer_shrinks_trade_buttons_below_it()`
+- `class TestRemainingClickTargets` - *Every compact-height 22px interactive control is lifted to the 24px minimum (ADR-326).*
+  - Method `.test_final_rule_lists_the_target_surface_fleet_and_skill_controls()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

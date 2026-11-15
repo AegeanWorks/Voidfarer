@@ -3189,3 +3189,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Auditing every terminal tab with `tools/ui_audit.py --check` at 1366x768 flagged `smallTargets` on two tabs: the COMMERCE `BUY`/`SELL` buttons (22px under the compact market rule), the TIP line I added in ADR-307 (23px), and FLEET `HARVEST ALL` (22px). Every other tab was clean.
 - **Decision**: A final rule gives `.btn-trade`, `#btnHarvestFleet` and `.trade-tip` `min-height: 24px`, and the compact market rule that set the trade buttons to 22px now uses 24px.
 - **Consequences**: CSS only. `ui_audit --check` reports 0 small targets on market and fleet at 1366x768 and 1280x720, and the COMMERCE table still shows about two and a half rows at laptop height. The rest of the audit (all 16 tabs at laptop) is clean. Pinned by `TestTerminalClickTargets`.
+
+### ADR-326: Remaining compact-height controls reach the 24px click target
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: After ADR-325, sweeping the other audit scenarios found the target card's `SHOW DETAILS` toggle at 22px, and the stylesheet sets other interactive controls to 20 to 22px under compact-height rules: surface-op buttons, fleet ship actions, surface site chips and disclosure toggles, skill-train buttons and the skills card toggle.
+- **Decision**: The ADR-325 final rule now also lists those selectors with `min-height: 24px`; they have the same specificity as the compact rules and come last, so they win. Non-interactive badges are left alone.
+- **Consequences**: CSS only. `ui_audit --check` reports 0 small targets on the target, skills and fleet states at 1366x768 and 1280x720, every terminal tab at laptop size, and the menu, settings, character, event and combat scenarios; the surface-operations scenario renders with its chips and RUN button intact. Pinned by `TestRemainingClickTargets`.

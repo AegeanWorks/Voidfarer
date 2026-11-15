@@ -691,6 +691,19 @@ class TestTerminalClickTargets(unittest.TestCase):
         self.assertNotIn(".market-table .btn-trade { min-height: 22px;", self.css)
 
 
+class TestRemainingClickTargets(unittest.TestCase):
+    """Every compact-height 22px interactive control is lifted to the 24px minimum (ADR-326)."""
+
+    def test_final_rule_lists_the_target_surface_fleet_and_skill_controls(self):
+        css = STYLE_CSS.read_text(encoding="utf-8")
+        for selector in (".surface-op-side .btn-hud", ".fleet-ship-card > .ship-actions .btn-hud",
+                         ".target-disclosure-toggle", ".surface-site-chip", ".surface-disclosure-toggle",
+                         ".skill-row .skill-train-btn", ".skills-card-toggle"):
+            self.assertIn(selector, css.rsplit("ADR-325", 1)[1], selector)
+        tail = css.rsplit("ADR-325", 1)[1]
+        self.assertIn("{ min-height: 24px; }", tail)
+
+
 if __name__ == "__main__":
     unittest.main()
 
