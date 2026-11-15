@@ -8577,6 +8577,7 @@ class SimulationEngine:
                     self.rescue_status()
                     if self.state.ship.fuel * 4 <= self.state.ship.max_fuel else None
                 ),
+                "galaxy_seed": self.state.galaxy_seed,
                 "insurance": self.insurance_status(),
                 "customs_risk": self.customs_risk_status(),
                 "trade_tip": self.trade_tip(),

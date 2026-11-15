@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-locked-tab-redirect",
+    "task_id": "voidfarer-galaxy-seed",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794736184.0006044,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794736438.7046154,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794736184.7363124,
-    "completed_head": "fd97aec81bb26421738611be42d0985f559201f8"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-trade-tip",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: trade_tip engine quote, then a one-line COMMERCE tip with click-to-select destination",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794681462.522229,
-      "timestamp_str": "2026-11-14 21:37:42",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Beginners cannot tell what to buy or where to sell it",
-        "benefits": "One clear profitable action at the exchange",
-        "risks": "contract: new snapshot key; dependency: none; concurrency: engine lock; state: none",
-        "mitigation": "Reuse the exchange quote function, deterministic failing-first tests"
-      },
-      "plan_digest": "5cb1737d473988d18c3661c9d02f6c4bac0d44940a0d6c2acef01b916abe59e2"
-    },
-    {
-      "task_id": "voidfarer-trade-tip",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] trade_tip engine quote and snapshot key (ADR-306); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794681462.801607,
-      "timestamp_str": "2026-11-14 21:37:42",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-trade-tip",
       "phase": "in_progress",
@@ -64,7 +33,7 @@
       "agent": "claude:1",
       "delivery": {
         "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+          "."
         ],
         "forced": false
       }
@@ -109,7 +78,7 @@
       "agent": "claude:1",
       "delivery": {
         "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+          "."
         ],
         "forced": false
       }
@@ -165,7 +134,7 @@
       "agent": "claude:1",
       "delivery": {
         "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+          "."
         ],
         "forced": false
       }
@@ -210,7 +179,7 @@
       "agent": "claude:1",
       "delivery": {
         "roots": [
-          "C:\\Users\\Yunus-Emre\\Desktop\\portable_agent_kit\\projects\\voidfarer"
+          "."
         ],
         "forced": false
       }
@@ -304,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-galaxy-seed",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: publish galaxy_seed in the snapshot, then show it with a COPY SEED button and a seed input on character creation",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794736438.42739,
+      "timestamp_str": "2026-11-15 12:53:58",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Every cockpit new game was seed 42 and the seed was never shown, so good galaxies could not be shared",
+        "benefits": "Replayable, shareable galaxies",
+        "risks": "contract: new snapshot key; dependency: none; concurrency: none; state: none new, seed already saved",
+        "mitigation": "Blank input keeps the old default 42, failing-first tests, real-browser check"
+      },
+      "plan_digest": "6308f7ecc1b4025c7eb778e54f7fc7b79c5bae0acf9f094bf2db4fb9d7bfac8a"
+    },
+    {
+      "task_id": "voidfarer-galaxy-seed",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] galaxy_seed in the status snapshot (ADR-314); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794736438.7046154,
+      "timestamp_str": "2026-11-15 12:53:58",
+      "agent": "claude:1"
     }
   ]
 }

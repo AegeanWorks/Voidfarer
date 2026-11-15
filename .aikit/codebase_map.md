@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `228`
-- **Total Classes**: `514`
+- **Total Python Modules**: `229`
+- **Total Classes**: `515`
 - **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2583`
-- **Total Source Lines**: `62583`
+- **Total Class Methods**: `2585`
+- **Total Source Lines**: `62611`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`228` module(s))
+- **Indexed**: python (`229` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2290,6 +2290,18 @@
   - Method `.test_random_anomaly_generation()`
   - Method `.test_population_mechanics_and_colony_tiers()`
   - Method `.test_orbit_and_sublight_distance_parity()`
+
+---
+
+### [`tests/test_galaxy_seed_snapshot.py`](tests/test_galaxy_seed_snapshot.py)
+> *The status snapshot exposes the galaxy seed so a galaxy can be replayed or shared.*
+
+**Size**: `27` lines (`1033` bytes)
+
+**Classes:**
+- `class GalaxySeedSnapshotTest`
+  - Method `.test_snapshot_reports_the_seed_the_game_was_built_from()`
+  - Method `.test_a_reset_with_a_new_seed_changes_the_reported_seed_and_the_galaxy()`
 
 ---
 
@@ -4707,7 +4719,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11083` lines (`546799` bytes)
+**Size**: `11084` lines (`546854` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

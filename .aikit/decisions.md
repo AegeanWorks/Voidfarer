@@ -3105,3 +3105,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The academy tab lock (ADR-297, ADR-308) made `switchRightTab` return silently for a locked advanced tab. The DOSSIER button in the abilities strip opens SKILLS, so at Pilot Mastery 1 it became a dead control. A programmatic audit found it as the only other caller that asks for an advanced tab by name.
 - **Decision**: `redirectLockedTab` handles a locked request: it logs `[ACADEMY] That terminal unlocks after the Cadet Academy; showing PLAYER instead.` and opens PLAYER (the character and abilities summary), without looping when PLAYER itself was requested. The inline guard in `switchRightTab` stays one short line and the logic lives in the helper, because `test_tab_rail_state` reads a fixed window of that method.
 - **Consequences**: Cockpit only. Verified in real Edge: DOSSIER at level 1 shows PLAYER and the log line (0 console errors). Pinned by `TestLockedTabRedirect`.
+
+### ADR-314: Galaxy seed in the status snapshot
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: Every galaxy is deterministic per seed (G-012), and `/api/new-game` already accepts one, but the cockpit never sent a seed (every new game was seed 42) and the snapshot did not say which seed a game was built from, so a good galaxy could not be shared or replayed.
+- **Decision**: `get_status_snapshot` publishes `galaxy_seed` from the game state. The cockpit controls that show and choose the seed follow in the next change.
+- **Consequences**: Engine and REST snapshot only; no new persisted field (the seed was already saved). Pinned by `tests/test_galaxy_seed_snapshot.py`.
