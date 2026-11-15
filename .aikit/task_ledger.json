@@ -3,8 +3,8 @@
   "active_task": {
     "task_id": "voidfarer-refit-damaged",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794758908.697228,
     "owner": "kilo:goal",
     "started_by": "claude:1",
@@ -14,25 +14,12 @@
         "from": "claude:1",
         "at": 1794758908.697228
       }
-    ]
+    ],
+    "completed_at": 1794759160.2681437,
+    "completed_head": "f095bd713b87677c12407411cebce3f8e059aad5",
+    "completed_tree": "9e0f7ee2e950cd384b237716ef0db1a162c0d980"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-outpost-rows-fit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-outpost-rows-fit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794741045.9629102,
-      "timestamp_str": "2026-11-15 14:10:45",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-rail-target-size",
       "phase": "in_progress",
@@ -309,6 +296,22 @@
       "timestamp_str": "2026-11-15 19:08:28",
       "agent": "kilo:goal",
       "continued_from": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-refit-damaged",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-refit-damaged' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794759160.3474238,
+      "timestamp_str": "2026-11-15 19:12:40",
+      "agent": "kilo:goal",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
