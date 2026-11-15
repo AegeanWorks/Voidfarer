@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-mission-pins",
+    "task_id": "voidfarer-more-button-fit",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794739256.6863337,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794739702.73239,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794739257.522945,
-    "completed_head": "52bc0352f3bcc0ee561c2c251d45ddd94d1e3025"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-clean-view",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: V toggles a clean radar view that restores only the panels that were open",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794734806.7640498,
-      "timestamp_str": "2026-11-15 12:26:46",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Four key presses were needed to give the radar the whole screen",
-        "benefits": "One key for a clean flying view, discoverable in the rail",
-        "risks": "contract: reuses the existing panel collapse classes; dependency: none; concurrency: none; state: session-only restore list",
-        "mitigation": "Remember and restore the exact open set, real-browser check, layout tests"
-      },
-      "plan_digest": "a1442b41c7faef190e2f0fe4839de2739850b49817c36510f07416e55499ab77"
-    },
-    {
-      "task_id": "voidfarer-clean-view",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] V clean radar view (ADR-312); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794734807.5419059,
-      "timestamp_str": "2026-11-15 12:26:47",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-clean-view",
       "phase": "completed",
@@ -304,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-more-button-fit",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: stop the MORE SYSTEMS rail button truncating its count at laptop width",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794739702.504148,
+      "timestamp_str": "2026-11-15 13:48:22",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "The label clipped to MORE SYSTEMS ... after graduation, hiding the count",
+        "benefits": "Players can see how many systems are folded away",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "CSS-only, measured scrollWidth, layout test"
+      },
+      "plan_digest": "1ebcaea3ae20a70539d53c477d587b473a13373265201f021db9eb043d2434d6"
+    },
+    {
+      "task_id": "voidfarer-more-button-fit",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] MORE SYSTEMS button fits (ADR-320); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794739702.73239,
+      "timestamp_str": "2026-11-15 13:48:22",
+      "agent": "claude:1"
     }
   ]
 }

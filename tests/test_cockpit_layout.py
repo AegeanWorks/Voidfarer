@@ -623,6 +623,17 @@ class TestMissionPins(unittest.TestCase):
         self.assertNotIn("renderMissionPins", window)
 
 
+class TestMoreSystemsButtonFits(unittest.TestCase):
+    """The MORE SYSTEMS rail button keeps its count visible at laptop width (ADR-320)."""
+
+    def test_button_uses_tight_padding_and_no_letter_spacing(self):
+        css = STYLE_CSS.read_text(encoding="utf-8")
+        block = css.split(".panel-left .deck-more-btn {", 1)[1].split("}", 1)[0]
+        self.assertIn("padding: 3px 5px;", block)
+        self.assertIn("letter-spacing: 0;", block)
+        self.assertIn("white-space: nowrap;", block)
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -2754,5 +2754,25 @@
     "final_snapshot_digest": "a0af65eb9476dbdec5a5959f979cf7779f524cb3bca0b092d39e37a371809b38",
     "final_snapshot_entries": 1357,
     "surface_digest": "3e185e58b5009e8e9c0bb9b2e142a3af91f57d8e55374624d7db52fb1492381b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "6c29dfe5b929a0b381faa25485e23a14e17375ea",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794739348.6152854,
+    "finished_at": 1794739515.3632872,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; more/laptop-more.png: after graduation the rail button reads MORE SYSTEMS 11 with the arrow, scrollWidth equals clientWidth (no clipping), 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "a0af65eb9476dbdec5a5959f979cf7779f524cb3bca0b092d39e37a371809b38",
+    "final_snapshot_entries": 1357,
+    "surface_digest": "ebf5748fe6d99be45badd89bd3c2a9951063aca4a65674df8c3d872c24644a04"
   }
 ]

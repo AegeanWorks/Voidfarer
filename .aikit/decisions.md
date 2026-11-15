@@ -3147,3 +3147,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A player had to check CONTRACTS, QUESTS and COMMS LOG to answer "what am I working toward?". The unified `state.quests` list already carries the campaign step and the open contracts.
 - **Decision**: `#missionPins` sits above the refresh button and is drawn by `renderMissionPins` at the start of `renderContracts`. It shows the Cadet Academy step while the academy runs, otherwise the active campaign act with its objective, then the contract closest to paying out (`NEXT PAYOUT`, by progress ratio, with its reward). When the campaign target is another system it adds `PLOT CAMPAIGN TARGET ON MAP`, which opens the Galaxy Map with that system selected. The helpers live beside the other cockpit helpers, not between `renderFleet` and `renderContracts`, because `TestFleetDisclosures` reads that window.
 - **Consequences**: Cockpit only, no engine change and no persisted state. Verified in real Edge at 1366x768 (`ui-review/pins2/`, `pins3/`, 0 console errors) in both the academy and campaign states, and a plot click selected Sirius. Pinned by `TestMissionPins`.
+
+### ADR-320: MORE SYSTEMS button keeps its count visible
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: After graduating (or skipping) the academy, the left rail's `MORE SYSTEMS 11 ▾` button truncated to `MORE SYSTEMS …` at 1366x768, hiding the count and arrow.
+- **Decision**: `.panel-left .deck-more-btn` drops its letter spacing to 0 and tightens horizontal padding to 5px, so the full label fits the rail without changing its font size or the markup.
+- **Consequences**: CSS only. Verified in real Edge (`ui-review/more/`): the label reads `MORE SYSTEMS 11 ▾` and `scrollWidth` equals `clientWidth`. Pinned by `TestMoreSystemsButtonFits`.

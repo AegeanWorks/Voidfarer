@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `231`
-- **Total Classes**: `521`
+- **Total Classes**: `522`
 - **Total Top-Level Functions**: `527`
-- **Total Class Methods**: `2609`
-- **Total Source Lines**: `62865`
+- **Total Class Methods**: `2610`
+- **Total Source Lines**: `62876`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`231` module(s))
@@ -508,7 +508,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3163` lines (`143694` bytes)
+**Size**: `3174` lines (`144194` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -609,6 +609,8 @@
   - Method `.test_card_prefers_the_academy_then_the_campaign_and_adds_the_next_payout()`
   - Method `.test_contracts_render_draws_the_card_and_plotting_selects_the_system()`
   - Method `.test_the_helpers_stay_outside_the_fleet_renderer_window()`
+- `class TestMoreSystemsButtonFits` - *The MORE SYSTEMS rail button keeps its count visible at laptop width (ADR-320).*
+  - Method `.test_button_uses_tight_padding_and_no_letter_spacing()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`
