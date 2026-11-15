@@ -3119,3 +3119,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-314 published `galaxy_seed`, but the cockpit still never showed it and never sent one, so every new game was the standard seed-42 galaxy and a good galaxy could not be shared.
 - **Decision**: The PLAYER tab opens with `GALAXY SEED <n> [COPY]`; COPY writes the seed to the clipboard and logs a `[SEED]` line, falling back to showing the number when the clipboard is unavailable. Character-creation step one gains an optional `GALAXY SEED` number field with a `RANDOM` button; `createCharacter` sends `seed` to `/api/new-game` only when the field holds 1 to 9 digits, so blank keeps the standard galaxy and existing behaviour.
 - **Consequences**: Cockpit only, no new persisted field. Verified in real Edge at 1366x768 (`ui-review/seed/`, 0 console errors): the creation dialog still fits, a typed seed of 777 built a seed-777 galaxy, and the clipboard held 777. Pinned by `TestGalaxySeedControls`.
+
+### ADR-316: One-time hotkey whisper after three tab clicks
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: The cockpit has useful shortcuts (`[` `]` cycle terminal tabs, backslash hides the drawer, `V` clears the radar) that beginners rarely discover, and the rail hint is easy to overlook.
+- **Decision**: A click listener on `#deckTabsHeader` counts clicks on `.deck-tab-btn`; on the third it logs one `[TIP]` line naming the three keys, then records `voidfarer_tip_tab_keys` in `localStorage` so it never repeats for that browser profile. Storage reads and writes are wrapped so a blocked or private profile falls back to once per session. The tip text avoids a literal backslash and says "the backslash key".
+- **Consequences**: Cockpit only, no game state. Verified in real Edge (`ui-review/whisper/`, 0 console errors): no tip after two clicks, one on the third, none after six, and none after a reload. Pinned by `TestHotkeyWhisper`.

@@ -1128,6 +1128,9 @@ class CockpitApp {
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
         this.btnArriveNow?.addEventListener("click", () => this.handleArriveNow());
         document.getElementById("btnCopySeed")?.addEventListener("click", () => this.copyGalaxySeed());
+        document.getElementById("deckTabsHeader")?.addEventListener("click", event => {
+            if (event.target.closest && event.target.closest(".deck-tab-btn")) this.noteTabClick();
+        });
         document.getElementById("btnSeedRandom")?.addEventListener("click", () => {
             const input = document.getElementById("charSeed");
             if (input) input.value = String(1 + Math.floor(Math.random() * 999999));
@@ -10515,6 +10518,18 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.sound?.playDock?.();
             this.travelAnimation = null;
         }
+    }
+
+    // After three tab clicks, whisper the keyboard shortcuts once per browser profile (ADR-316).
+    noteTabClick() {
+        this._tabClicks = (this._tabClicks || 0) + 1;
+        if (this._tabClicks < 3) return;
+        let shown = false;
+        try { shown = localStorage.getItem("voidfarer_tip_tab_keys") === "1"; } catch (e) { shown = false; }
+        if (shown || this._tabTipShown) return;
+        this._tabTipShown = true;
+        try { localStorage.setItem("voidfarer_tip_tab_keys", "1"); } catch (e) {}
+        this.appendLog("[TIP] Press [ and ] to cycle terminal tabs, the backslash key to hide the drawer, V for a clean radar view.", "system");
     }
 
     async copyGalaxySeed() {

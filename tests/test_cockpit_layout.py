@@ -546,6 +546,27 @@ class TestGalaxySeedControls(unittest.TestCase):
         self.assertIn("{1,9}$/.test(seedText)", self.js)
 
 
+class TestHotkeyWhisper(unittest.TestCase):
+    """A one-time log tip teaches the tab shortcuts after three tab clicks (ADR-316)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_clicks_on_the_tab_header_are_counted(self):
+        self.assertIn('document.getElementById("deckTabsHeader")?.addEventListener("click"', self.js)
+        self.assertIn('event.target.closest(".deck-tab-btn")', self.js)
+
+    def test_the_tip_fires_on_the_third_click_once_per_profile_and_names_the_keys(self):
+        block = self.js.split("    noteTabClick() {", 1)[1].split("    async copyGalaxySeed() {", 1)[0]
+        self.assertIn("if (this._tabClicks < 3) return;", block)
+        self.assertIn('"voidfarer_tip_tab_keys"', block)
+        self.assertIn("this._tabTipShown", block)
+        for key in ("[ and ]", "backslash", "V for a clean radar view"):
+            self.assertIn(key, block)
+        self.assertGreaterEqual(block.count("catch (e)"), 2)  # storage failures never break the cockpit
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -2690,5 +2690,25 @@
     "final_snapshot_digest": "af4789c36299becae7faa7dfc56fe4c138ab8eb0a3377502bfcc1280ace9eb28",
     "final_snapshot_entries": 1347,
     "surface_digest": "47c779f543b621020157461f00eaf5081bc59fa65e6e0abe77de1e0b64b706a2"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "e9b1089780a7481db4c32127be72146cfb75bf9a",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794737168.5441885,
+    "finished_at": 1794737357.0245533,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; whisper/laptop-tip.png: the one-time [TIP] shortcut line appears in the flight log after three tab clicks, wraps readably; 0 on 2 clicks, 1 on 3, no repeat after reload, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "db053cbbdcf9703f7dd000b50fb8d5775366396ba09d69169e74aade7e029ea0",
+    "final_snapshot_entries": 1349,
+    "surface_digest": "4d88bc4b0a249410c64385e2d4e615680f15241454bb5d6958590abd2db9e26f"
   }
 ]

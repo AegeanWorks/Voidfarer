@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `229`
-- **Total Classes**: `516`
+- **Total Classes**: `517`
 - **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2589`
-- **Total Source Lines**: `62636`
+- **Total Class Methods**: `2592`
+- **Total Source Lines**: `62657`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`229` module(s))
@@ -487,7 +487,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3086` lines (`139786` bytes)
+**Size**: `3107` lines (`140830` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -573,6 +573,10 @@
   - Method `.test_player_tab_shows_the_seed_with_a_copy_button()`
   - Method `.test_creation_step_one_offers_an_optional_seed_and_random()`
   - Method `.test_a_valid_seed_is_sent_and_blank_keeps_the_standard_galaxy()`
+- `class TestHotkeyWhisper` - *A one-time log tip teaches the tab shortcuts after three tab clicks (ADR-316).*
+  - Method `.setUpClass()`
+  - Method `.test_clicks_on_the_tab_header_are_counted()`
+  - Method `.test_the_tip_fires_on_the_third_click_once_per_profile_and_names_the_keys()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`
