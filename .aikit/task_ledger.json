@@ -3,8 +3,8 @@
   "active_task": {
     "task_id": "ai-play-step-cap",
     "last_phase": "in_progress",
-    "active_phase": 2,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794786948.8960884,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
@@ -14,28 +14,12 @@
       "benefits": "Explicit long runs execute, and any clamp is visible in both text and JSON",
       "risks": "contract: JSON gains two fields; dependency: none; concurrency: none; state: none",
       "mitigation": "guard stays far above the 180-step gate; tests pin clamped and full-run reports; the 600-step run is verified"
-    }
+    },
+    "completed_at": 1794787117.442167,
+    "completed_head": "60746d64078b24fc02cfbc8b770124a032f475dd",
+    "completed_tree": "081b40f47643d0372b74fa9f341c7310c211e6fb"
   },
   "checkpoints": [
-    {
-      "task_id": "story-disclosure-targets",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Bring the STORY disclosure toggles up to the 24px target floor",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794771947.4872744,
-      "timestamp_str": "2026-11-15 22:45:47",
-      "agent": "kilo:goal",
-      "head": "4d9361ccb3ebc370f2567ded897fa1bb0b374086",
-      "impact_assessment": {
-        "why": "Post-tutorial audit measured btnToggleVoid and btnToggleTransmissions at 18px tall; they were invisible to every cadet-locked audit",
-        "benefits": "Both STORY disclosures meet the target floor and share the existing disclosure styling and hover treatment",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "reuses the shared disclosure rule; before/after post-tutorial audits at both laptop widths; static pin plus full suite"
-      },
-      "plan_digest": "cbb22d7acd3648259121a49cacb871b100b7c20bab926634cabb9e7ba72d5ea9"
-    },
     {
       "task_id": "story-disclosure-targets",
       "phase": "in_progress",
@@ -322,6 +306,23 @@
         "mitigation": "guard stays far above the 180-step gate; tests pin clamped and full-run reports; the 600-step run is verified"
       },
       "plan_digest": "791acc77a1677a849176cb085ecd9989fcdc1e9e5bae9c198164aa706441fe20"
+    },
+    {
+      "task_id": "ai-play-step-cap",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-play-step-cap' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794787117.5018933,
+      "timestamp_str": "2026-11-16 02:58:37",
+      "agent": "kilo:goal",
+      "head": "60746d64078b24fc02cfbc8b770124a032f475dd",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
