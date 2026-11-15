@@ -3021,5 +3021,25 @@
     "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
     "final_snapshot_entries": 1370,
     "surface_digest": "3f9dce98db02dc90b9417eb2935ff206cb15350fa8ed31ba531484e35f581073"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "d7591c21fe36936ef5ff956e16799e9bd39a7b5a",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794781000.7608266,
+    "finished_at": 1794781238.35237,
+    "strikes": 0,
+    "reviewer": "kilo:goal main multimodal agent per G-015; reload proof: default 8 advanced, toggle on gives 11, reload keeps 11 with unlockAllTabs true and 0 console errors (ui-review/staged-tabs persistence probe)",
+    "allowed_removals": [],
+    "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
+    "final_snapshot_entries": 1370,
+    "surface_digest": "e48c5b47c8d201f70e3a97af6c221e14781893dedbf16c15326f423d0f9988c6"
   }
 ]
