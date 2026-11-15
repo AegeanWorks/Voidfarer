@@ -3,30 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-galaxy-seed",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794737004.1309273,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794737006.520702,
+    "completed_head": "fdece2996f7f8ad3f174cb545eb7179337de524b"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-trade-tip",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-trade-tip' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794682267.2025096,
-      "timestamp_str": "2026-11-14 21:51:07",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-early-tabs",
       "phase": "in_progress",
@@ -302,6 +288,22 @@
       "timestamp": 1794737004.1309273,
       "timestamp_str": "2026-11-15 13:03:24",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-galaxy-seed",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-galaxy-seed' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794737006.6160169,
+      "timestamp_str": "2026-11-15 13:03:26",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
