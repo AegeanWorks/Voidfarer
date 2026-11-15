@@ -3,30 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-outpost-rows-fit",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794741045.2236667,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794741045.9416676,
+    "completed_head": "9cf1d8f7fc7b98fd9aaaff9c6bdbfb347c64a3e4"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-galaxy-seed",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-galaxy-seed' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794737006.6160169,
-      "timestamp_str": "2026-11-15 13:03:26",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-hotkey-whisper",
       "phase": "in_progress",
@@ -302,6 +288,22 @@
       "timestamp": 1794741045.2236667,
       "timestamp_str": "2026-11-15 14:10:45",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-outpost-rows-fit",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-outpost-rows-fit' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794741045.9629102,
+      "timestamp_str": "2026-11-15 14:10:45",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
