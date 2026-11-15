@@ -4421,7 +4421,8 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
     flex-wrap: wrap;
     gap: 8px;
 }
-.ship-disclosure-toggle, .trade-disclosure-toggle, .fleet-disclosure-toggle {
+.ship-disclosure-toggle, .trade-disclosure-toggle, .fleet-disclosure-toggle,
+.section-disclosure-toggle {
     display: block;
     width: 100%;
     margin-top: 6px;
@@ -4466,7 +4467,8 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 .trade-toolbar #btnToggleMarketFilters { flex: 1 1 auto; text-align: center; }
 .ship-disclosure-toggle:hover, .ship-disclosure-toggle:focus-visible,
 .trade-disclosure-toggle:hover, .trade-disclosure-toggle:focus-visible,
-.fleet-disclosure-toggle:hover, .fleet-disclosure-toggle:focus-visible {
+.fleet-disclosure-toggle:hover, .fleet-disclosure-toggle:focus-visible,
+.section-disclosure-toggle:hover, .section-disclosure-toggle:focus-visible {
     border-color: var(--console-gold);
     color: var(--console-gold-bright);
     background: rgba(201, 163, 90, 0.12);

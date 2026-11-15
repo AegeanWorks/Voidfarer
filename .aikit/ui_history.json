@@ -2940,5 +2940,25 @@
     "final_snapshot_digest": "f74dfa5b157b712752a36cfcd2a1fe7b97cfb88a4a88e80c24433c7975e8b76d",
     "final_snapshot_entries": 1367,
     "surface_digest": "a7288f4c19e9a9cc5d75a417b91a7423a918c5600e0fe91d476a79e2ef205d59"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "4d9361ccb3ebc370f2567ded897fa1bb0b374086",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794771441.145969,
+    "finished_at": 1794771782.6985204,
+    "strikes": 0,
+    "reviewer": "kilo:goal main multimodal agent per G-015; ui-review/audit-post/story-after laptop+short post-tutorial STORY: 0 small targets (was 2 at 18px), 0 errors, 0 clipped/offscreen, disclosure toggles now 26px",
+    "allowed_removals": [],
+    "final_snapshot_digest": "f74dfa5b157b712752a36cfcd2a1fe7b97cfb88a4a88e80c24433c7975e8b76d",
+    "final_snapshot_entries": 1367,
+    "surface_digest": "96f567ae98e3dea68064a2daa4943421004bd0272b05f66e03c179e43d64e99f"
   }
 ]

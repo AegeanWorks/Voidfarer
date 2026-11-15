@@ -2616,6 +2616,24 @@ class TestCommerceDisclosures(unittest.TestCase):
         self.assertLess(auto, quantum)
 
 
+class TestStoryDisclosureTargets(unittest.TestCase):
+    """STORY's disclosure toggles keep the 24px target floor at laptop widths (ADR-335)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_void_and_comms_toggles_share_the_sized_disclosure_rule(self):
+        self.assertIn('class="section-disclosure-toggle" id="btnToggleVoid"', self.html)
+        self.assertIn('class="section-disclosure-toggle" id="btnToggleTransmissions"', self.html)
+        self.assertIn(".ship-disclosure-toggle, .trade-disclosure-toggle, .fleet-disclosure-toggle,\n"
+                      ".section-disclosure-toggle {", self.css)
+        block = self.css.split(".section-disclosure-toggle {", 1)[1].split("}", 1)[0]
+        self.assertIn("min-height: 26px;", block)
+        self.assertIn("padding: 3px 8px;", block)
+
+
 class TestPlayerAbilityDedup(unittest.TestCase):
     """The PLAYER card points at the command strip instead of duplicating its controls."""
 

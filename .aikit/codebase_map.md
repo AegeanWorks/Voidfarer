@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `234`
-- **Total Classes**: `537`
+- **Total Classes**: `538`
 - **Total Top-Level Functions**: `535`
-- **Total Class Methods**: `2657`
-- **Total Source Lines**: `63516`
+- **Total Class Methods**: `2659`
+- **Total Source Lines**: `63534`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -536,7 +536,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3301` lines (`150861` bytes)
+**Size**: `3319` lines (`151781` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -937,6 +937,9 @@
   - Method `.setUpClass()`
   - Method `.test_auto_trade_and_freight_use_named_disclosures()`
   - Method `.test_market_table_stays_above_the_optional_broker_panels()`
+- `class TestStoryDisclosureTargets` - *STORY's disclosure toggles keep the 24px target floor at laptop widths (ADR-335).*
+  - Method `.setUpClass()`
+  - Method `.test_void_and_comms_toggles_share_the_sized_disclosure_rule()`
 - `class TestPlayerAbilityDedup` - *The PLAYER card points at the command strip instead of duplicating its controls.*
   - Method `.setUpClass()`
   - Method `.test_player_card_has_no_second_ability_use_set()`

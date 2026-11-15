@@ -3252,3 +3252,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Every headless audit started from a fresh save, and the cadet lock hides all 11 advanced tabs until graduation, so those tabs had never been measured at any viewport.
 - **Decision**: tools/ui_audit.py gains --post-tutorial, which calls the engine's own skip_tutorial() before the audit server starts, exactly as the player's SKIP TUTORIAL button does; screenshots and reports gain a post- prefix so they cannot overwrite a fresh-save capture.
 - **Consequences**: Tool coverage only; default behaviour is unchanged. The first post-tutorial pass (11 tabs at 1366x768 and 1280x720, ui-review/audit-post/) found STORY's two section disclosure toggles at 18px against the 24px target floor (ADR-335 fixes it). Pinned by AuditStateTest.
+
+### ADR-335: STORY disclosure toggles meet the target floor
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: The first post-tutorial audit found button#btnToggleVoid and button#btnToggleTransmissions at 18px tall against the 24px target floor (ADR-334 made those tabs measurable).
+- **Decision**: section-disclosure-toggle joins the sized disclosure rule shared by the SHIP, COMMERCE and FLEET toggles, giving it min-height 26px and 3px/8px padding, plus the same hover and focus-visible treatment.
+- **Consequences**: Cockpit only. Verified in real Edge post-tutorial at 1366x768 and 1280x720 (ui-review/audit-post/story-after/): 0 small targets, 0 errors, 0 clipped or offscreen. Pinned by TestStoryDisclosureTargets.
