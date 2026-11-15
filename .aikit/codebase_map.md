@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `231`
-- **Total Classes**: `519`
+- **Total Classes**: `520`
 - **Total Top-Level Functions**: `527`
-- **Total Class Methods**: `2600`
-- **Total Source Lines**: `62809`
+- **Total Class Methods**: `2604`
+- **Total Source Lines**: `62835`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`231` module(s))
@@ -508,7 +508,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3107` lines (`140830` bytes)
+**Size**: `3133` lines (`142139` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -598,6 +598,11 @@
   - Method `.setUpClass()`
   - Method `.test_clicks_on_the_tab_header_are_counted()`
   - Method `.test_the_tip_fires_on_the_third_click_once_per_profile_and_names_the_keys()`
+- `class TestQuickStartArchetypes` - *Character creation opens with three one-click archetypes (ADR-318).*
+  - Method `.setUpClass()`
+  - Method `.test_quick_start_sits_above_basic_info_and_is_hidden_until_populated()`
+  - Method `.test_buttons_come_from_the_engine_archetype_list()`
+  - Method `.test_a_click_fills_origin_and_skills_then_launches_with_the_archetype_tag()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

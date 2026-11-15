@@ -1372,9 +1372,38 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (ageInput) ageInput.value = "30";
             if (backgroundInput) backgroundInput.value = "Navigator";
             this.syncBackgroundHint();
+            this.charArchetype = null;
+            this.renderQuickStart(meta.archetypes || []);
             this.charCreationOverlay.style.display = "flex";
             this.charStep(0, 1);
             this.renderAttrGrid();
+        }.bind(this);
+
+        // Quick-start archetypes (ADR-317): one click fills the origin and skills and launches.
+        this.renderQuickStart = function(archetypes) {
+            const box = document.getElementById("quickStart");
+            const row = document.getElementById("quickStartButtons");
+            if (!box || !row) return;
+            box.hidden = !archetypes.length;
+            row.innerHTML = "";
+            for (const entry of archetypes) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "btn-hud btn-cyan quick-start-btn";
+                button.dataset.archetype = entry.id;
+                button.textContent = String(entry.name).toUpperCase();
+                button.title = `${entry.summary} (${entry.background})`;
+                button.addEventListener("click", () => this.startArchetype(entry));
+                row.appendChild(button);
+            }
+        }.bind(this);
+
+        this.startArchetype = function(entry) {
+            this.charAttrs = { ...entry.skills };
+            const background = document.getElementById("charBackground");
+            if (background) background.value = entry.background;
+            this.charArchetype = entry.id;
+            return this.createCharacter();
         }.bind(this);
 
         this.closeCharacterCreation = function() {
@@ -1452,6 +1481,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             // An empty seed keeps the standard galaxy; a number picks that galaxy (ADR-315).
             const seedText = (document.getElementById("charSeed")?.value || "").trim();
             const order = { profile: { name, age, background, skills: this.charAttrs }, slot };
+            if (this.charArchetype) order.profile.archetype = this.charArchetype;
+            this.charArchetype = null;
             if (/^\d{1,9}$/.test(seedText)) order.seed = Number(seedText);
 
             this.gameStarted = true;

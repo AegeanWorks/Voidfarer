@@ -2710,5 +2710,27 @@
     "final_snapshot_digest": "db053cbbdcf9703f7dd000b50fb8d5775366396ba09d69169e74aade7e029ea0",
     "final_snapshot_entries": 1349,
     "surface_digest": "4d88bc4b0a249410c64385e2d4e615680f15241454bb5d6958590abd2db9e26f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "831474ab791d149a72de8f9ce1f63172c6c9d38c",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794737895.880324,
+    "finished_at": 1794738081.3819969,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; archetype/laptop-creation.png: QUICK START row with three buttons above BASIC INFO, dialog still fits at 768 with NEXT visible; merchant click produced hold 60, Free Spacers pact, Merchant origin, trade 10, academy skipped, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "d9c9c61821c46e9f23235a4ea00e45055de04409319fd12616a7950736fd9178",
+    "final_snapshot_entries": 1353,
+    "surface_digest": "abf5e7f6adfad225fd14f5334574fbe289fc296fe98fb37a76946427079435fd"
   }
 ]

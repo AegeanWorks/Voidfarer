@@ -567,6 +567,32 @@ class TestHotkeyWhisper(unittest.TestCase):
         self.assertGreaterEqual(block.count("catch (e)"), 2)  # storage failures never break the cockpit
 
 
+class TestQuickStartArchetypes(unittest.TestCase):
+    """Character creation opens with three one-click archetypes (ADR-318)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_quick_start_sits_above_basic_info_and_is_hidden_until_populated(self):
+        step = self.html[self.html.index('id="charStep1"'):]
+        self.assertIn('id="quickStart" hidden', step)
+        self.assertLess(step.index('id="quickStartButtons"'), step.index("<h3>BASIC INFO</h3>"))
+
+    def test_buttons_come_from_the_engine_archetype_list(self):
+        self.assertIn("this.renderQuickStart(meta.archetypes || []);", self.js)
+        self.assertIn("button.dataset.archetype = entry.id;", self.js)
+
+    def test_a_click_fills_origin_and_skills_then_launches_with_the_archetype_tag(self):
+        block = self.js.split("this.startArchetype = function(entry) {", 1)[1][:500]
+        self.assertIn("this.charAttrs = { ...entry.skills };", block)
+        self.assertIn("this.charArchetype = entry.id;", block)
+        self.assertIn("return this.createCharacter();", block)
+        self.assertIn("order.profile.archetype = this.charArchetype;", self.js)
+        self.assertIn("this.charArchetype = null;", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

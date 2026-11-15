@@ -99,6 +99,7 @@ voidfarer/
 │   ├── mapmods.py        <- procedural sector map modifiers
 │   ├── shipmods.py       <- structural ship modification catalog
 │   ├── character.py      <- commander age, skills & abilities
+│   ├── archetypes.py     <- quick-start captains: skill spread, origin & starting loadout
 │   ├── research.py       <- research projects & technology bonuses
 │   ├── outposts.py       <- outpost catalogs & tick production
 │   ├── faction_state.py  <- faction leaders, behaviors, wars & elimination
