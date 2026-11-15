@@ -1,40 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-repair-all-outposts",
+    "task_id": "voidfarer-outpost-rows-fit",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794740549.6339598,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794741045.2236667,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794740550.4505446,
-    "completed_head": "08e151807cf14d7837b55833be58a54651727e64"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-galaxy-seed",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] galaxy_seed in the status snapshot (ADR-314); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794736438.7046154,
-      "timestamp_str": "2026-11-15 12:53:58",
-      "agent": "claude:1"
-    },
-    {
-      "task_id": "voidfarer-galaxy-seed",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Seed row with COPY and seed input with RANDOM (ADR-315); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794737004.1309273,
-      "timestamp_str": "2026-11-15 13:03:24",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-galaxy-seed",
       "phase": "completed",
@@ -297,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-outpost-rows-fit",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: make outpost rows wrap inside the EMPIRE drawer",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794741044.9320588,
+      "timestamp_str": "2026-11-15 14:10:44",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Outpost rows overflowed the drawer by 73 px and clipped UPGRADE, INSTALL and ASSIGN at laptop width",
+        "benefits": "Every outpost control is reachable",
+        "risks": "contract: shared grid list class; dependency: none; concurrency: none; state: none",
+        "mitigation": "Scope the fix to .outpost-list and .outpost-row, measure overflow in a real browser, layout test"
+      },
+      "plan_digest": "68ad3fd6ffa39e393a71c4160cb4b0740d43fa3052f54e71aa7a3971cc9a3b8a"
+    },
+    {
+      "task_id": "voidfarer-outpost-rows-fit",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Outpost rows wrap inside the drawer (ADR-323); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794741045.2236667,
+      "timestamp_str": "2026-11-15 14:10:45",
+      "agent": "claude:1"
     }
   ]
 }

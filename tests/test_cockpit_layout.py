@@ -654,6 +654,17 @@ class TestRepairAllOutpostsButton(unittest.TestCase):
         self.assertIn("this.renderRepairAllOutposts(outposts);", self.js)
 
 
+class TestOutpostRowsFit(unittest.TestCase):
+    """Outpost rows wrap inside the drawer instead of clipping their buttons (ADR-323)."""
+
+    def test_list_column_can_shrink_and_rows_and_actions_wrap(self):
+        css = STYLE_CSS.read_text(encoding="utf-8")
+        self.assertIn(".outpost-list { grid-template-columns: minmax(0, 1fr); }", css)
+        self.assertIn(".outpost-row { flex-wrap: wrap; }", css)
+        self.assertIn(".outpost-row > span:first-child { flex: 1 1 150px; min-width: 0; }", css)
+        self.assertRegex(css, r"\.outpost-row-actions \{[^}]*flex-wrap: wrap")
+
+
 if __name__ == "__main__":
     unittest.main()
 

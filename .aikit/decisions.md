@@ -3168,3 +3168,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-321 added the engine action; the cockpit still showed one REPAIR per damaged outpost card.
 - **Decision**: `#btnRepairAllOutposts` sits full-width above the outpost list, drawn by `renderRepairAllOutposts` (a separate method so the large outposts renderer does not grow). It is hidden unless two or more outposts are below full integrity, reads `REPAIR ALL OUTPOSTS (n)`, and posts `{action: "outpost_repair_all"}` to `/api/empire/action`. A single damaged outpost keeps its own REPAIR button.
 - **Consequences**: Cockpit only. Verified in real Edge at 1366x768 (`ui-review/outposts2/`, 0 console errors): with outposts at 40%, 70% and 100% the button read `(2)`, one click repaired both and hid the button. The per-row buttons were already clipped at the right edge at this width before this change; that is a separate layout issue. Pinned by `TestRepairAllOutpostsButton`.
+
+### ADR-323: Outpost rows wrap inside the drawer
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: At 1366x768 every outpost row, module bar, crew bar and supply bar overflowed the EMPIRE drawer by 73 px, clipping UPGRADE, INSTALL MODULE and ASSIGN at the right edge. `.outpost-list` is a CSS grid whose automatic column grew to the widest row.
+- **Decision**: `.outpost-list` gets a single `minmax(0, 1fr)` column so it can shrink; `.outpost-row` and its actions wrap, and the row's text takes the remaining space (`flex: 1 1 150px; min-width: 0`). No markup or script change.
+- **Consequences**: CSS only. Measured in real Edge at 1366x768 (`ui-review/m2/`, `outposts3/`): no descendant of the list extends past it, and every per-row button is fully visible. Pinned by `TestOutpostRowsFit`.

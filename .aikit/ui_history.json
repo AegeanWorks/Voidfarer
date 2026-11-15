@@ -2796,5 +2796,25 @@
     "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
     "final_snapshot_entries": 1360,
     "surface_digest": "5ae4bbf8ce645871a83e1d30d87d1f963097d9d8e7115efcfe777af18a2d9573"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "b2687c6aa2f338b503e5a14ac013058fad787d4c",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794740638.5457141,
+    "finished_at": 1794740839.4181333,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; outposts3/laptop-outposts.png: outpost rows wrap inside the list (measured overflow list empty), REPAIR (479 CR) UPGRADE INSTALL MODULE ASSIGN LINK all fully visible at 1366x768, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
+    "final_snapshot_entries": 1360,
+    "surface_digest": "d2d4f105042a2279c17cecff2358ba41559c29b13f416c10d1a80028178f64b3"
   }
 ]

@@ -9460,7 +9460,10 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* Outpost integrity and defense readout beside the repair control. */
 .outpost-integrity { margin-left: 4px; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
-.outpost-row-actions { display: flex; gap: 4px; align-items: center; }
+.outpost-list { grid-template-columns: minmax(0, 1fr); }
+.outpost-row { flex-wrap: wrap; }
+.outpost-row > span:first-child { flex: 1 1 150px; min-width: 0; }
+.outpost-row-actions { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 .outpost-row-actions .btn-hud { min-height: 26px; padding: 2px 6px; font-size: 12px; }
 
 /* War bond terms in the faction war card. */
