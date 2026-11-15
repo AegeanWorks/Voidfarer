@@ -3280,3 +3280,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-336 persisted unlockTabs in voidfarer_settings, but the constructor assigned this.unlockAllTabs = false after loadSettings() had already read the stored profile, so every launch silently relocked the three late tabs while localStorage still said true.
 - **Decision**: Remove that constructor assignment. applySettingsProfile is the only loader and applySettingsFromUI the only writer, so the persisted value survives a reload and RESET DEFAULTS still clears it.
 - **Consequences**: Verified in real Edge at 1366x768: default 8 advanced tabs, the toggle gives 11, and a reload keeps 11 with unlockAllTabs true and zero console errors (ui-review/staged-tabs/persistence.json). Pinned by TestStagedTabUnlocks.test_constructor_defaults_cannot_clobber_the_loaded_setting.
+
+### ADR-339: Seed Pilot Mastery in the headless audit
+- **Date**: 2026-11-16
+- **Status**: Accepted
+- **Context**: ADR-336 locks EMPIRE, CAPTAINS and DEPOT until Pilot Mastery 3, so the post-tutorial audit could no longer open those three tabs; the audit tool had no way to reproduce a late-game rail.
+- **Decision**: tools/ui_audit.py gains --mastery N. It replaces the ship's PilotMastery level with dataclasses.replace before the server starts, preserving xp, talent points and specializations, and prefixes screenshots with mN- so mastery captures never overwrite fresh-save ones. Below level 3 the tabs stay locked exactly as in play, so the flag proves rather than bypasses the rule.
+- **Consequences**: The three late tabs audit clean at 1366x768 and 1280x720 (ui-review/audit-post-m3/, screenshots post-m3-*). Documented in README section 21 and the cockpit guide. Pinned by AuditStateTest's mastery and no-op tests.

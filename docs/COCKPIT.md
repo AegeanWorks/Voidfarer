@@ -10,6 +10,7 @@ Open **`http://127.0.0.1:8080`** in Edge or Chrome on Windows to access:
 - **Background Radar HUD (`G-004`, `G-005`, `G-013`)**: Map, left terminal, and a two-column bottom strip: one combined reactor+abilities panel beside radar settings above the log. The imperial outliner ends with its sections instead of stretching to the footer.
 - **Menu, Settings & Saves (`ESC`)**: volume, auto-pause on intercepts/events, auto-claim, order lot, key list, reset; saves.
 - **Left Terminal & Commerce**: `[`/`]` cycle tabs, `\` hides the drawer; order lots, cost and margins.
+- **Progressive Terminal Rail**: the Cadet Academy shows only PLAYER, SHIP, COMMERCE, FLEET and CONTRACTS. SKILLS and CREW open at Pilot Mastery 2, the remaining advanced tabs at graduation, and EMPIRE, CAPTAINS and DEPOT at Pilot Mastery 3. MORE SYSTEMS counts only the tabs currently available, [ and ] skip the locked ones, and SETTINGS offers "Unlock all terminal tabs (veteran)" for an immediate full rail (ADR-336, ADR-337, ADR-338).
 - **Planet Inspector**: Gravity, atmosphere, habitability, orbit, moons, resources, colony tiers.
 - **Transit, Landing & Fleet**: Timed transit, quantum jumps, surveys and drones.
 - **Living Galaxy**: Procedural worlds, AI traders, dynamic markets and reputation.

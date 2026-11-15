@@ -12,11 +12,23 @@ from tools.ui_audit import (ERROR_COLLECTOR, WRAPPER_JS, audit_timeout, browser_
 
 
 class _RecordingEngine:
-    def __init__(self):
+    def __init__(self, mastery_level=1, xp=0):
+        from types import SimpleNamespace
+        from voidfarer.models import PilotMastery
         self.skipped = 0
+        self.cloned = {}
+        self.state = SimpleNamespace(ship=SimpleNamespace(mastery=PilotMastery(level=mastery_level, xp=xp)))
 
     def skip_tutorial(self):
         self.skipped += 1
+
+    def _clone_ship(self, **kwargs):
+        self.cloned["ship"] = kwargs
+        return kwargs
+
+    def _clone_state(self, **kwargs):
+        from types import SimpleNamespace
+        return SimpleNamespace(**kwargs)
 
 
 class AuditStateTest(unittest.TestCase):
@@ -30,6 +42,18 @@ class AuditStateTest(unittest.TestCase):
         engine = _RecordingEngine()
         seed_audit_state(engine, True)
         self.assertEqual(engine.skipped, 1, "the advanced tabs only exist after graduation")
+
+    def test_mastery_seed_raises_the_level_and_keeps_progress(self):
+        engine = _RecordingEngine(mastery_level=1, xp=140)
+        seed_audit_state(engine, True, 3)
+        mastery = engine.state.ship["mastery"]
+        self.assertEqual(mastery.level, 3)
+        self.assertEqual(mastery.xp, 140, "a seeded audit must keep the save's progress fields")
+
+    def test_mastery_seed_is_a_no_op_at_the_same_level(self):
+        engine = _RecordingEngine(mastery_level=3)
+        seed_audit_state(engine, True, 3)
+        self.assertEqual(engine.cloned, {})
 
 
 class AuditHelpersTest(unittest.TestCase):

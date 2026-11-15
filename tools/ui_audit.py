@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -714,15 +715,22 @@ def run_browser(browser: Path, url: str, viewport: Tuple[int, int], profile: Pat
     return (result.stdout, result.stderr, result.returncode)
 
 
-def seed_audit_state(engine: Any, post_tutorial: bool) -> None:
-    """Skip the Cadet Academy when the audit must reach the advanced terminal tabs.
+def seed_audit_state(engine: Any, post_tutorial: bool,
+                     mastery: int | None = None) -> None:
+    """Skip the Cadet Academy and optionally raise Pilot Mastery for the audit.
 
     Every advanced tab is hidden behind the cadet lock until graduation, so a fresh-save
     audit can only ever see the five core tabs. This uses the engine's own skip action,
-    which is what the player's SKIP TUTORIAL button calls (ADR-334).
+    which is what the player's SKIP TUTORIAL button calls (ADR-334). EMPIRE, CAPTAINS and
+    DEPOT additionally wait for Pilot Mastery 3 (ADR-336), so `mastery` seeds the level a
+    saved game would have reached; nothing here changes the shipped save.
     """
     if post_tutorial:
         engine.skip_tutorial()
+    if mastery is not None and mastery != engine.state.ship.mastery.level:
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(
+                mastery=replace(engine.state.ship.mastery, level=int(mastery))))
 
 
 def audit_viewport(browser: Path, port: int, name: str, viewport: Tuple[int, int],
@@ -867,6 +875,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--post-tutorial", action="store_true",
                         help="start after the Cadet Academy is skipped, so the advanced "
                              "terminal tabs are reachable; screenshots get a 'post-' prefix")
+    parser.add_argument("--mastery", type=int, default=None, metavar="N",
+                        help="raise Pilot Mastery to N before the audit; 3 opens EMPIRE, "
+                             "CAPTAINS and DEPOT, which stay locked below it (ADR-339)")
     parser.add_argument("--check", action="store_true", help="exit 1 when severe findings exist")
     args = parser.parse_args(argv)
 
@@ -895,7 +906,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         static = prepare_static(STATIC_DIR, workdir)
         storage = StorageManager(workdir / "save")
         engine = SimulationEngine(state=storage.load())
-        seed_audit_state(engine, args.post_tutorial)
+        seed_audit_state(engine, args.post_tutorial, args.mastery)
         handle = start_background_server(engine, storage, port=0)
         if handle is None:
             print("Why: the cockpit server could not bind a local port.")
@@ -913,7 +924,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             try:
                 report = audit_viewport(browser, handle.port, name, viewport, workdir, out,
                                         timeout, args.scenario, args.tab, args.dpr,
-                                        label_prefix="post-" if args.post_tutorial else "")
+                                        label_prefix=(
+                                            ("post-" if args.post_tutorial else "")
+                                            + (f"m{args.mastery}-" if args.mastery else "")))
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
                 print(f"[FAIL] {name}: {exc}")
                 continue
