@@ -2816,5 +2816,25 @@
     "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
     "final_snapshot_entries": 1360,
     "surface_digest": "d2d4f105042a2279c17cecff2358ba41559c29b13f416c10d1a80028178f64b3"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "1043b5c1547ddf644f8abe5f297fcf9d9ab6bd03",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794741160.888168,
+    "finished_at": 1794741319.5879726,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; railfit/short1280x720-rail.png and ui_audit laptop,short: 16 tabs at 24px with FEWER 11 and the key hints fit with no scrolling, smallTargets 0 at both sizes, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
+    "final_snapshot_entries": 1360,
+    "surface_digest": "b7424359d267a947129b2d3fe4586c9cd6b6ccdd811f96698bad0ed2b032e93f"
   }
 ]

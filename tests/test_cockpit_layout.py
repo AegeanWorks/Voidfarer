@@ -665,6 +665,17 @@ class TestOutpostRowsFit(unittest.TestCase):
         self.assertRegex(css, r"\.outpost-row-actions \{[^}]*flex-wrap: wrap")
 
 
+class TestRailTabTargetSize(unittest.TestCase):
+    """Compact-height rail tabs still meet the 24px minimum click target (ADR-324)."""
+
+    def test_short_viewport_rule_keeps_tabs_at_24px_and_drops_the_group_gap(self):
+        css = STYLE_CSS.read_text(encoding="utf-8")
+        block = css.split("@media (max-height: 800px) {"+chr(10)+"  .panel-left .deck-tabs-header", 1)[1][:600]
+        self.assertIn(".panel-left .deck-tab-btn { min-height: 24px;", block)
+        self.assertIn(".panel-left .deck-tab-btn:nth-child(4n) { margin-bottom: 0; }", block)
+        self.assertNotIn("min-height: 23px", block)
+
+
 if __name__ == "__main__":
     unittest.main()
 

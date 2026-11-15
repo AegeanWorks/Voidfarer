@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-outpost-rows-fit",
+    "task_id": "voidfarer-rail-target-size",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794741045.2236667,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794741618.2831156,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794741045.9416676,
-    "completed_head": "9cf1d8f7fc7b98fd9aaaff9c6bdbfb347c64a3e4"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-hotkey-whisper",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: one-time log tip about the tab shortcuts after three tab clicks",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794737559.6192782,
-      "timestamp_str": "2026-11-15 13:12:39",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Beginners rarely discover the keyboard shortcuts",
-        "benefits": "Faster navigation learned in context, once",
-        "risks": "contract: none; dependency: none; concurrency: none; state: one localStorage flag, wrapped in try/catch",
-        "mitigation": "Count only tab header clicks, show once per profile, real-browser check"
-      },
-      "plan_digest": "36a485aef96a36a0466dbc7847b21c46137af30f3965b6670190aad4960df396"
-    },
-    {
-      "task_id": "voidfarer-hotkey-whisper",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Hotkey whisper after three tab clicks (ADR-316); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794737559.9232218,
-      "timestamp_str": "2026-11-15 13:12:39",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-hotkey-whisper",
       "phase": "completed",
@@ -304,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-rail-target-size",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: bring the compact rail tabs up to the 24px minimum click target",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794741618.0153697,
+      "timestamp_str": "2026-11-15 14:20:18",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "ui_audit flagged five 23px tabs at 1366x768, present before this session",
+        "benefits": "Meets the target-size minimum with no clipping",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "Pay for the pixel by dropping the group gap, measure all 16 tabs at 1366x768 and 1280x720, audit check, layout test"
+      },
+      "plan_digest": "0a2fafda06aab7cd085bad4693aea22438477d0e97631d2cc49726184d3915b2"
+    },
+    {
+      "task_id": "voidfarer-rail-target-size",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Rail tabs at 24px (ADR-324); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794741618.2831156,
+      "timestamp_str": "2026-11-15 14:20:18",
+      "agent": "claude:1"
     }
   ]
 }

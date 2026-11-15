@@ -3175,3 +3175,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: At 1366x768 every outpost row, module bar, crew bar and supply bar overflowed the EMPIRE drawer by 73 px, clipping UPGRADE, INSTALL MODULE and ASSIGN at the right edge. `.outpost-list` is a CSS grid whose automatic column grew to the widest row.
 - **Decision**: `.outpost-list` gets a single `minmax(0, 1fr)` column so it can shrink; `.outpost-row` and its actions wrap, and the row's text takes the remaining space (`flex: 1 1 150px; min-width: 0`). No markup or script change.
 - **Consequences**: CSS only. Measured in real Edge at 1366x768 (`ui-review/m2/`, `outposts3/`): no descendant of the list extends past it, and every per-row button is fully visible. Pinned by `TestOutpostRowsFit`.
+
+### ADR-324: Rail tabs keep a 24px click target at short heights
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: `tools/ui_audit.py --check` flagged `smallTargets` at 1366x768: under the `max-height: 800px` compaction the five core rail tabs were 23px tall, one pixel under the 24px minimum, and the same five violations existed before this session's changes.
+- **Decision**: In that media rule, `.deck-tab-btn` is `min-height: 24px` and the extra gap after every fourth tab is removed (`margin-bottom: 0`), which pays for the extra pixel so all 16 tabs, `FEWER 11` and the key hints still fit.
+- **Consequences**: CSS only. Measured in real Edge at 1366x768 and 1280x720 with every tab open: each tab is 24px, the last tab ends well inside the rail, nothing scrolls, and `ui_audit --check` reports 0 small targets at both sizes. Pinned by `TestRailTabTargetSize`.

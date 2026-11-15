@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `232`
-- **Total Classes**: `525`
+- **Total Classes**: `526`
 - **Total Top-Level Functions**: `529`
-- **Total Class Methods**: `2619`
-- **Total Source Lines**: `63004`
+- **Total Class Methods**: `2620`
+- **Total Source Lines**: `63015`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`232` module(s))
@@ -508,7 +508,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3205` lines (`145831` bytes)
+**Size**: `3216` lines (`146440` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -617,6 +617,8 @@
   - Method `.test_it_appears_only_for_two_or_more_damaged_outposts_and_posts_the_empire_action()`
 - `class TestOutpostRowsFit` - *Outpost rows wrap inside the drawer instead of clipping their buttons (ADR-323).*
   - Method `.test_list_column_can_shrink_and_rows_and_actions_wrap()`
+- `class TestRailTabTargetSize` - *Compact-height rail tabs still meet the 24px minimum click target (ADR-324).*
+  - Method `.test_short_viewport_rule_keeps_tabs_at_24px_and_drops_the_group_gap()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

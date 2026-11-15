@@ -9024,8 +9024,8 @@ body.cockpit-theme .panel-center {
 /* Compact outliner rows at short viewports so every tab reaches the last row without clipping. */
 @media (max-height: 800px) {
   .panel-left .deck-tabs-header { padding-top: 28px; padding-bottom: 4px; gap: 0; }
-  .panel-left .deck-tab-btn { min-height: 23px; padding: 2px 8px; font-size: 12px; }
-  .panel-left .deck-tab-btn:nth-child(4n) { margin-bottom: 2px; }
+  .panel-left .deck-tab-btn { min-height: 24px; padding: 2px 8px; font-size: 12px; }
+  .panel-left .deck-tab-btn:nth-child(4n) { margin-bottom: 0; }
   .panel-left .deck-more-btn { min-height: 24px; margin-top: 2px; }
   .panel-left .deck-tabs-header::before { top: 6px; padding-bottom: 4px; }
   .panel-left .deck-tabs-header::after { padding: 4px 4px 0; line-height: 1.35; }
