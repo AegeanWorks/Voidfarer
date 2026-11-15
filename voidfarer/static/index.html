@@ -181,6 +181,14 @@
                         </select>
                         <p class="creation-hint" id="charBackgroundHint"></p>
                     </div>
+                    <div class="creation-field">
+                        <label>GALAXY SEED (OPTIONAL)</label>
+                        <div class="seed-input-row">
+                            <input type="number" id="charSeed" aria-label="Galaxy seed" min="0" step="1" placeholder="42">
+                            <button class="text-btn" id="btnSeedRandom" type="button" title="Pick a random galaxy">RANDOM</button>
+                        </div>
+                        <p class="creation-hint">The same seed always builds the same galaxy. Blank keeps the standard one.</p>
+                    </div>
                     <button class="btn-hud btn-cyan" id="btnCharNext1">NEXT: SKILLS</button>
                 </div>
 
@@ -736,6 +744,11 @@
                         <div class="panel-header">
                             <div class="panel-tag"><span class="badge-dot dot-cyan"></span> PLAYER</div>
                             <h2 class="panel-title">CHARACTER & ABILITIES</h2>
+                        </div>
+                        <div class="galaxy-seed-row" id="galaxySeedRow">
+                            <span>GALAXY SEED</span>
+                            <strong id="galaxySeedValue">--</strong>
+                            <button class="text-btn" id="btnCopySeed" title="Copy this galaxy's seed so you or a friend can start the same galaxy again">COPY</button>
                         </div>
                         <div class="character-profile" id="characterProfile"></div>
                         <div class="character-abilities" id="characterAbilities"></div>

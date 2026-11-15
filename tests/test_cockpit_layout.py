@@ -521,6 +521,31 @@ class TestLockedTabRedirect(unittest.TestCase):
         self.assertIn('targetButton.dataset.cadetUnlocked !== "true"', block)
 
 
+class TestGalaxySeedControls(unittest.TestCase):
+    """The galaxy seed is shown with a COPY button and can be chosen on a new game (ADR-315)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_player_tab_shows_the_seed_with_a_copy_button(self):
+        player = self.html[self.html.index('id="tabContentPlayer"'):]
+        self.assertLess(player.index('id="galaxySeedValue"'), player.index('id="characterProfile"'))
+        self.assertIn('id="btnCopySeed"', player)
+        self.assertIn("this.state.galaxy_seed", self.js)
+        self.assertIn("navigator.clipboard.writeText(seed)", self.js)
+
+    def test_creation_step_one_offers_an_optional_seed_and_random(self):
+        step = self.html[self.html.index('id="charStep1"'):self.html.index('id="btnCharNext1"')]
+        self.assertIn('id="charSeed"', step)
+        self.assertIn('id="btnSeedRandom"', step)
+
+    def test_a_valid_seed_is_sent_and_blank_keeps_the_standard_galaxy(self):
+        self.assertIn("order.seed = Number(seedText);", self.js)
+        self.assertIn("{1,9}$/.test(seedText)", self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

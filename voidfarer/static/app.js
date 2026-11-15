@@ -1127,6 +1127,11 @@ class CockpitApp {
         this.btnOrbitTarget.addEventListener("click", () => this.handleTravelAction("sublight"));
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
         this.btnArriveNow?.addEventListener("click", () => this.handleArriveNow());
+        document.getElementById("btnCopySeed")?.addEventListener("click", () => this.copyGalaxySeed());
+        document.getElementById("btnSeedRandom")?.addEventListener("click", () => {
+            const input = document.getElementById("charSeed");
+            if (input) input.value = String(1 + Math.floor(Math.random() * 999999));
+        });
         this.btnRebuildTarget?.addEventListener("click", () => this.handleReconstructAction("credits"));
         this.btnReliefTarget?.addEventListener("click", () => this.handleReconstructAction("relief"));
         this.btnRestoreTarget?.addEventListener("click", () => this.postAction("/api/megastructure/restore", { body_id: this.selectedTarget?.id }));
@@ -1441,12 +1446,13 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const background = document.getElementById("charBackground").value;
             const slot = this.getSelectedSaveSlot();
             const wasStarted = this.gameStarted;
+            // An empty seed keeps the standard galaxy; a number picks that galaxy (ADR-315).
+            const seedText = (document.getElementById("charSeed")?.value || "").trim();
+            const order = { profile: { name, age, background, skills: this.charAttrs }, slot };
+            if (/^\d{1,9}$/.test(seedText)) order.seed = Number(seedText);
 
             this.gameStarted = true;
-            const json = await this.postAction("/api/new-game", {
-                profile: { name, age, background, skills: this.charAttrs },
-                slot
-            }, null);
+            const json = await this.postAction("/api/new-game", order, null);
             if (json.ok) {
                 this.viewMode = "ORBITS";
                 this.selectedTarget = null;
@@ -2246,6 +2252,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.sound.playLevelUp();
         }
         this._lastMasteryLevel = masteryLevel;
+
+        const seedValue = document.getElementById("galaxySeedValue");
+        if (seedValue && this.state.galaxy_seed != null) seedValue.textContent = String(this.state.galaxy_seed);
 
         // Vitals
         const hullPct = Math.round((ship.hull / ship.max_hull) * 100);
@@ -10505,6 +10514,17 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             }
             this.sound?.playDock?.();
             this.travelAnimation = null;
+        }
+    }
+
+    async copyGalaxySeed() {
+        const seed = String(this.state?.galaxy_seed ?? "");
+        if (!seed) return;
+        try {
+            await navigator.clipboard.writeText(seed);
+            this.appendLog(`[SEED] Galaxy seed ${seed} copied. Enter it on the next new game to fly this galaxy again.`, "reward");
+        } catch (e) {
+            this.appendLog(`[SEED] Galaxy seed is ${seed} (clipboard unavailable).`, "system");
         }
     }
 

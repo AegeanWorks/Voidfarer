@@ -5,23 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794736438.7046154,
+    "updated_at": 1794737004.1309273,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-trade-tip",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] COMMERCE trade tip line plotting its destination (ADR-307); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794682265.8108501,
-      "timestamp_str": "2026-11-14 21:51:05",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-trade-tip",
       "phase": "completed",
@@ -301,6 +290,17 @@
       "status": "in_progress",
       "timestamp": 1794736438.7046154,
       "timestamp_str": "2026-11-15 12:53:58",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-galaxy-seed",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Seed row with COPY and seed input with RANDOM (ADR-315); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794737004.1309273,
+      "timestamp_str": "2026-11-15 13:03:24",
       "agent": "claude:1"
     }
   ]

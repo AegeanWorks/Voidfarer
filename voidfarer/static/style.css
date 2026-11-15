@@ -4441,6 +4441,10 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 .trade-tip { display: block; width: 100%; margin-top: 6px; padding: 3px 8px; text-align: left; border: 1px solid rgba(127, 183, 201, 0.45); background: rgba(127, 183, 201, 0.08); color: var(--console-cyan); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .trade-tip[hidden] { display: none; }
 .trade-tip:hover, .trade-tip:focus-visible { border-color: var(--console-gold); color: var(--console-gold-bright); outline: none; }
+.galaxy-seed-row { display: flex; align-items: baseline; gap: 8px; margin: 4px 0 6px; font-family: var(--font-mono); font-size: 12px; color: var(--console-muted); letter-spacing: 0.04em; }
+.galaxy-seed-row strong { color: var(--console-ivory); }
+.seed-input-row { display: flex; gap: 8px; align-items: center; }
+.seed-input-row input { flex: 1 1 auto; min-width: 0; }
 .trade-toolbar { display: flex; gap: 6px; }
 .trade-toolbar .trade-disclosure-toggle { flex: 1 1 0; min-width: 0; width: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .trade-toolbar .trade-disclosure-toggle:disabled { opacity: 0.45; cursor: default; }

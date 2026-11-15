@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `229`
-- **Total Classes**: `515`
+- **Total Classes**: `516`
 - **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2585`
-- **Total Source Lines**: `62611`
+- **Total Class Methods**: `2589`
+- **Total Source Lines**: `62636`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`229` module(s))
@@ -487,7 +487,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3061` lines (`138605` bytes)
+**Size**: `3086` lines (`139786` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -568,6 +568,11 @@
   - Method `.setUpClass()`
   - Method `.test_switch_hands_locked_tabs_to_the_redirect_helper()`
   - Method `.test_helper_explains_then_shows_player_without_looping()`
+- `class TestGalaxySeedControls` - *The galaxy seed is shown with a COPY button and can be chosen on a new game (ADR-315).*
+  - Method `.setUpClass()`
+  - Method `.test_player_tab_shows_the_seed_with_a_copy_button()`
+  - Method `.test_creation_step_one_offers_an_optional_seed_and_random()`
+  - Method `.test_a_valid_seed_is_sent_and_blank_keeps_the_standard_galaxy()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`
