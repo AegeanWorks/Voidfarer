@@ -3,30 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-archetypes",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794738462.290096,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794738463.4422529,
+    "completed_head": "085670d7a2d9d2451de1d4ed135d21dbe5d04896"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-arrive-now",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-arrive-now' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794683514.2198396,
-      "timestamp_str": "2026-11-14 22:11:54",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "voidfarer-multihop-route",
       "phase": "in_progress",
@@ -302,6 +288,22 @@
       "timestamp": 1794738462.290096,
       "timestamp_str": "2026-11-15 13:27:42",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-archetypes",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-archetypes' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794738463.4628878,
+      "timestamp_str": "2026-11-15 13:27:43",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
