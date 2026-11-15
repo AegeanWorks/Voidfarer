@@ -3,25 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-click-targets-2",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794742560.4658134,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794742568.94353,
+    "completed_head": "bac74dd1d1e9e7f10db4ca20433f79ec1d12dcc4"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-mission-pins",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Pinned mission card on CONTRACTS (ADR-319); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794739256.6863337,
-      "timestamp_str": "2026-11-15 13:40:56",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-mission-pins",
       "phase": "completed",
@@ -302,6 +293,22 @@
       "timestamp": 1794742560.4658134,
       "timestamp_str": "2026-11-15 14:36:00",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-click-targets-2",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-click-targets-2' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794742568.9644952,
+      "timestamp_str": "2026-11-15 14:36:08",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
