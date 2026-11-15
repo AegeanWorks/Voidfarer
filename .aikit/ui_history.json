@@ -2982,5 +2982,24 @@
     "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
     "final_snapshot_entries": 1370,
     "surface_digest": "ab16a0a7a804a4fba5ceb997fdbb68f6a0b17ecbb85f6322079d2f14be054ea7"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [],
+    "no_visual_reason": "",
+    "no_change_reason": "Re-reviewed the committed cockpit surface at 6dde943: mastery 1 rail shows 8 advanced tabs and 'MORE SYSTEMS 8', the veteran toggle opens 11, mastery 3 opens 11, [ ] skips locked tabs, 0 console errors (ui-review/staged-tabs)",
+    "baseline_commit": "6dde943c54246550c74b76c72ae2e7517c154dd2",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794777146.8149014,
+    "finished_at": 1794777796.3181126,
+    "strikes": 0,
+    "reviewer": "kilo:goal main multimodal agent per G-015",
+    "allowed_removals": [],
+    "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
+    "final_snapshot_entries": 1370,
+    "surface_digest": "2b4605fc6d7a4f0d1263d038703303d66c3b5ec4c618259a17604a8c5f17eb60"
   }
 ]
