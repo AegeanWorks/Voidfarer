@@ -122,6 +122,61 @@ class AgentPlayTest(unittest.TestCase):
         self.assertIsNotNone(restored.ship)
 
 
+class AiCaptainTourCoverageTest(unittest.TestCase):
+    """The fleet and crew alias sub-actions stay reachable from the AI captain."""
+
+    def _captain(self, state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = state
+        return captain
+
+    def test_station_map_and_wear_mark_match_the_engine(self):
+        self.assertEqual(AiCaptain.STATION_BY_ROLE, SimulationEngine.STATION_BY_ROLE)
+        self.assertEqual(AiCaptain.REFIT_WORN_INTEGRITY, SimulationEngine.REFIT_WORN_INTEGRITY)
+
+    def test_autostaff_tour_fires_only_when_the_seating_is_not_optimal(self):
+        crew = [{"id": "c1", "role": "pilot", "status": "active", "skill": 4, "xp": 0, "station": ""}]
+        self.assertEqual(
+            self._captain({"crew": crew})._tour_crew_autostaff(),
+            ("/api/crew/action", {"action": "autostaff"}, "crew_autostaff"),
+        )
+        seated = [dict(crew[0], station="helm")]
+        self.assertIsNone(self._captain({"crew": seated})._tour_crew_autostaff())
+
+    def test_refit_tour_needs_a_dock_a_worn_drone_and_credits(self):
+        docked = {"orbiting_body": {"station_dockable": True}}
+        worn = {"id": "d1", "integrity": 20}
+
+        def action(state):
+            return self._captain(state)._tour_fleet_refit_damaged()
+
+        self.assertEqual(
+            action({**docked, "ship": {"credits": 300, "fleet_drones": [worn]}}),
+            ("/api/fleet/action", {"action": "refit_damaged"}, "fleet_refit"),
+        )
+        self.assertIsNone(action({"ship": {"credits": 300, "fleet_drones": [worn]}}))
+        self.assertIsNone(action({**docked, "ship": {"credits": 300, "fleet_drones": [dict(worn, integrity=80)]}}))
+        self.assertIsNone(action({**docked, "ship": {"credits": 299, "fleet_drones": [worn]}}))
+
+    def test_two_alias_subactions_can_fire_in_one_run(self):
+        captain = self._captain({
+            "orbiting_body": {"station_dockable": True},
+            "ship": {"credits": 600, "fleet_drones": [{"id": "d1", "integrity": 20}]},
+            "crew": [{"id": "c1", "role": "pilot", "status": "active", "skill": 4, "xp": 0, "station": ""}],
+        })
+        families = []
+        for _ in range(500):
+            action = captain._next_tour_action()
+            if action is None:
+                break
+            path, body, family = action
+            families.append(family)
+            captain.attempted.add(path)
+            captain.attempted_signatures.add((path, str((body or {}).get("action") or "")))
+        self.assertIn("fleet_refit", families)
+        self.assertIn("crew_autostaff", families)
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

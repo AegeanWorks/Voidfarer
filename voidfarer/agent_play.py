@@ -151,6 +151,7 @@ class AiCaptain:
         self.travelled = 0
         self.visited_bodies: set[str] = set()
         self.attempted: set[str] = set()
+        self.attempted_signatures: set[tuple[str, str]] = set()
         self.succeeded: set[str] = set()
         self.catalog_paths: list[str] = []
         self.tour_cursor = 0
@@ -180,6 +181,7 @@ class AiCaptain:
                 self.refusals.append(f"{family}: blocked by prompt")
                 continue
             self.attempted.add(path)
+            self.attempted_signatures.add((path, str((body or {}).get("action") or "")))
             if status != 200:
                 self.errors.append(f"POST {path} -> {status}: {payload.get('message', '')}")
                 if payload.get("state"):
@@ -335,6 +337,8 @@ class AiCaptain:
             self._tour_ability,
             self._tour_drone_buy,
             self._tour_drone_deploy,
+            self._tour_fleet_refit_damaged,
+            self._tour_crew_autostaff,
             self._tour_mercenary,
             self._tour_escort,
             self._tour_time_speed,
@@ -360,11 +364,21 @@ class AiCaptain:
             attempts += 1
             action = builder()
             if action is not None:
-                path = action[0]
-                if path not in self.attempted:
+                path, body, _family = action
+                if not self._tour_action_attempted(path, body):
                     return action
         self.tour_exhausted = True
         return None
+
+    # One route can carry several sub-actions (the fleet and crew aliases); the tour keys
+    # those on the sub-action so a newly added one is not starved by its sibling.
+    SUBACTION_ROUTES = frozenset({"/api/fleet/action", "/api/crew/action"})
+
+    def _tour_action_attempted(self, path: str, body: dict[str, Any]) -> bool:
+        action = str((body or {}).get("action") or "")
+        if path in self.SUBACTION_ROUTES:
+            return (path, action) in self.attempted_signatures
+        return path in self.attempted
 
     def _tour_swap(self):
         """Exercise the free contract-offer swap once offers exist."""
@@ -625,6 +639,57 @@ class AiCaptain:
             "drone_id": str(drones[0].get("id", "")),
             "system_id": (self.state.get("current_system") or {}).get("id", ""),
         }, "drone"
+
+    # Bridge station per role and the drone wear mark; keep in step with the engine
+    # (SimulationEngine.STATION_BY_ROLE and SimulationEngine.REFIT_WORN_INTEGRITY).
+    STATION_BY_ROLE = {
+        "pilot": "helm", "marine": "tactical", "engineer": "engineering",
+        "scientist": "science", "medic": "medical",
+    }
+    REFIT_WORN_INTEGRITY = 40
+    REFIT_COST = 300
+
+    def _tour_fleet_refit_damaged(self):
+        """Refit the whole worn drone line at once when a dock and credits allow it."""
+        ship = self.state.get("ship") or {}
+        worn = [
+            drone for drone in ship.get("fleet_drones") or []
+            if isinstance(drone, dict)
+            and int(drone.get("integrity") or 0) <= self.REFIT_WORN_INTEGRITY
+        ]
+        if not worn or not self._is_docked():
+            return None
+        if int(ship.get("credits") or 0) < self.REFIT_COST:
+            return None
+        return "/api/fleet/action", {"action": "refit_damaged"}, "fleet_refit"
+
+    def _tour_crew_autostaff(self):
+        """Seat the best officer at every bridge station when the current mix is not optimal."""
+        crew = [
+            member for member in self.state.get("crew") or []
+            if isinstance(member, dict) and member.get("status") == "active"
+        ]
+        if not crew:
+            return None
+        wanted: dict[str, str] = {}
+        for role, station in self.STATION_BY_ROLE.items():
+            candidates = [member for member in crew if member.get("role") == role]
+            if candidates:
+                best = max(
+                    candidates,
+                    key=lambda member: (
+                        int(member.get("skill") or 0),
+                        int(member.get("xp") or 0),
+                        str(member.get("id") or ""),
+                    ),
+                )
+                wanted[str(best.get("id"))] = station
+        if all(
+            str(member.get("station") or "") == wanted.get(str(member.get("id")), "")
+            for member in crew
+        ):
+            return None
+        return "/api/crew/action", {"action": "autostaff"}, "crew_autostaff"
 
     def _tour_orbit(self):
         body = self.state.get("orbiting_body") or {}

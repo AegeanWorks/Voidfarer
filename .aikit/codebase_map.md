@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `234`
-- **Total Classes**: `534`
+- **Total Classes**: `535`
 - **Total Top-Level Functions**: `534`
-- **Total Class Methods**: `2644`
-- **Total Source Lines**: `63349`
+- **Total Class Methods**: `2652`
+- **Total Source Lines**: `63469`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `135` lines (`6354` bytes)
+**Size**: `190` lines (`8958` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -86,6 +86,12 @@
   - Method `.test_every_catalog_action_is_attempted_or_documented()`
   - Method `.test_coverage_gap_detection()`
   - Method `.test_the_engine_state_stays_loadable_after_play()`
+- `class AiCaptainTourCoverageTest` - *The fleet and crew alias sub-actions stay reachable from the AI captain.*
+  - Method `._captain(state)`
+  - Method `.test_station_map_and_wear_mark_match_the_engine()`
+  - Method `.test_autostaff_tour_fires_only_when_the_seating_is_not_optimal()`
+  - Method `.test_refit_tour_needs_a_dock_a_worn_drone_and_credits()`
+  - Method `.test_two_alias_subactions_can_fire_in_one_run()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4466,7 +4472,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `812` lines (`36638` bytes)
+**Size**: `877` lines (`39570` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4479,6 +4485,7 @@
   - Method `.play(steps)`
   - Method `._choose(step)`
   - Method `._next_tour_action()`
+  - Method `._tour_action_attempted(path, body)`
   - Method `._tour_swap()` - *Exercise the free contract-offer swap once offers exist.*
   - Method `._tour_power()`
   - Method `._tour_reactor()`
@@ -4509,6 +4516,8 @@
   - Method `._tour_ability()`
   - Method `._tour_drone_buy()`
   - Method `._tour_drone_deploy()`
+  - Method `._tour_fleet_refit_damaged()` - *Refit the whole worn drone line at once when a dock and credits allow it.*
+  - Method `._tour_crew_autostaff()` - *Seat the best officer at every bridge station when the current mix is not optimal.*
   - Method `._tour_orbit()`
   - Method `._tour_salvage()`
   - Method `._tour_scoop()`

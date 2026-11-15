@@ -1,54 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-refit-damaged",
+    "task_id": "voidfarer-ai-captain-coverage",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794758908.697228,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794763381.558817,
     "owner": "kilo:goal",
-    "started_by": "claude:1",
-    "continuations": [
-      {
-        "agent": "kilo:goal",
-        "from": "claude:1",
-        "at": 1794758908.697228
-      }
-    ],
-    "completed_at": 1794759160.2681437,
-    "completed_head": "f095bd713b87677c12407411cebce3f8e059aad5",
-    "completed_tree": "9e0f7ee2e950cd384b237716ef0db1a162c0d980"
+    "started_by": "kilo:goal",
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-rail-target-size",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: bring the compact rail tabs up to the 24px minimum click target",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794741618.0153697,
-      "timestamp_str": "2026-11-15 14:20:18",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "ui_audit flagged five 23px tabs at 1366x768, present before this session",
-        "benefits": "Meets the target-size minimum with no clipping",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "Pay for the pixel by dropping the group gap, measure all 16 tabs at 1366x768 and 1280x720, audit check, layout test"
-      },
-      "plan_digest": "0a2fafda06aab7cd085bad4693aea22438477d0e97631d2cc49726184d3915b2"
-    },
-    {
-      "task_id": "voidfarer-rail-target-size",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Rail tabs at 24px (ADR-324); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794741618.2831156,
-      "timestamp_str": "2026-11-15 14:20:18",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-rail-target-size",
       "phase": "completed",
@@ -312,6 +274,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-ai-captain-coverage",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Tour the new fleet refit_damaged and crew autostaff sub-actions from the AI captain",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794763236.172514,
+      "timestamp_str": "2026-11-15 20:20:36",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The agent catalog lists the fleet and crew routes as aliases, so the mechanics gate had no path into ADR-327/330's new sub-actions",
+        "benefits": "ai_play now exercises crew autostaff live and is ready to exercise refit_damaged; a regression in either reaches the mechanics gate",
+        "risks": "contract: no API or schema change; dependency: none; concurrency: none; state: none",
+        "mitigation": "alias routes keep path-level de-duplication except for the two sub-action routes; gated builders never post an action the engine would refuse; unit tests pin the gates"
+      },
+      "plan_digest": "18f26bd024ff0e304c1eea79d15b491fa9f42be0385cf8ba581378afb531eab4"
+    },
+    {
+      "task_id": "voidfarer-ai-captain-coverage",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] AI captain tours fleet refit_damaged and crew autostaff (ADR-332); ai_play 41/53 actions, 40 families, 0 gaps; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794763381.558817,
+      "timestamp_str": "2026-11-15 20:23:01",
+      "agent": "kilo:goal"
     }
   ]
 }
