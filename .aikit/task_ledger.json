@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "veteran-tab-persistence",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794781555.6022453,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794781864.8527193,
+    "completed_head": "4a84daba72148ca4e52879d45de9a762f632dc89",
+    "completed_tree": "bcc749aeeb0ffef0cc65207446e4bd0398f06794"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-ai-captain-coverage",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Tour the new fleet refit_damaged and crew autostaff sub-actions from the AI captain",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794763236.172514,
-      "timestamp_str": "2026-11-15 20:20:36",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The agent catalog lists the fleet and crew routes as aliases, so the mechanics gate had no path into ADR-327/330's new sub-actions",
-        "benefits": "ai_play now exercises crew autostaff live and is ready to exercise refit_damaged; a regression in either reaches the mechanics gate",
-        "risks": "contract: no API or schema change; dependency: none; concurrency: none; state: none",
-        "mitigation": "alias routes keep path-level de-duplication except for the two sub-action routes; gated builders never post an action the engine would refuse; unit tests pin the gates"
-      },
-      "plan_digest": "18f26bd024ff0e304c1eea79d15b491fa9f42be0385cf8ba581378afb531eab4"
-    },
     {
       "task_id": "voidfarer-ai-captain-coverage",
       "phase": "in_progress",
@@ -313,6 +298,23 @@
       "timestamp": 1794781555.6022453,
       "timestamp_str": "2026-11-16 01:25:55",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "veteran-tab-persistence",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'veteran-tab-persistence' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794781864.914103,
+      "timestamp_str": "2026-11-16 01:31:04",
+      "agent": "kilo:goal",
+      "head": "4a84daba72148ca4e52879d45de9a762f632dc89",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
