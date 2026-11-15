@@ -714,14 +714,26 @@ def run_browser(browser: Path, url: str, viewport: Tuple[int, int], profile: Pat
     return (result.stdout, result.stderr, result.returncode)
 
 
+def seed_audit_state(engine: Any, post_tutorial: bool) -> None:
+    """Skip the Cadet Academy when the audit must reach the advanced terminal tabs.
+
+    Every advanced tab is hidden behind the cadet lock until graduation, so a fresh-save
+    audit can only ever see the five core tabs. This uses the engine's own skip action,
+    which is what the player's SKIP TUTORIAL button calls (ADR-334).
+    """
+    if post_tutorial:
+        engine.skip_tutorial()
+
+
 def audit_viewport(browser: Path, port: int, name: str, viewport: Tuple[int, int],
                    workdir: Path, out: Path, timeout: int, scenario: str,
-                   tab: str = "", dpr: float = 1) -> Dict[str, Any]:
+                   tab: str = "", dpr: float = 1, label_prefix: str = "") -> Dict[str, Any]:
     """Capture one viewport and return its parsed audit report."""
     width, height = viewport
     label = f"{name}-{tab}" if tab else name
     if dpr != 1:
         label = f"{label}@{dpr:g}x"
+    label = f"{label_prefix}{label}"
     url = (f"http://127.0.0.1:{port}/__ui_audit__.html?w={width}&h={height}"
            f"&target=/&scenario={scenario}")
     if tab:
@@ -852,6 +864,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                         help="device pixel ratio to emulate Windows display scaling "
                              "(1.5 = 150%%, 2 = 200%%); default 1. The per-viewport "
                              "timeout scales with dpr squared because raster cost does")
+    parser.add_argument("--post-tutorial", action="store_true",
+                        help="start after the Cadet Academy is skipped, so the advanced "
+                             "terminal tabs are reachable; screenshots get a 'post-' prefix")
     parser.add_argument("--check", action="store_true", help="exit 1 when severe findings exist")
     args = parser.parse_args(argv)
 
@@ -880,6 +895,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         static = prepare_static(STATIC_DIR, workdir)
         storage = StorageManager(workdir / "save")
         engine = SimulationEngine(state=storage.load())
+        seed_audit_state(engine, args.post_tutorial)
         handle = start_background_server(engine, storage, port=0)
         if handle is None:
             print("Why: the cockpit server could not bind a local port.")
@@ -896,7 +912,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             viewport = VIEWPORTS[name]
             try:
                 report = audit_viewport(browser, handle.port, name, viewport, workdir, out,
-                                        timeout, args.scenario, args.tab, args.dpr)
+                                        timeout, args.scenario, args.tab, args.dpr,
+                                        label_prefix="post-" if args.post_tutorial else "")
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
                 print(f"[FAIL] {name}: {exc}")
                 continue

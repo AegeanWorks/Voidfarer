@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `234`
-- **Total Classes**: `535`
-- **Total Top-Level Functions**: `534`
-- **Total Class Methods**: `2653`
-- **Total Source Lines**: `63477`
+- **Total Classes**: `537`
+- **Total Top-Level Functions**: `535`
+- **Total Class Methods**: `2657`
+- **Total Source Lines**: `63516`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -4151,9 +4151,15 @@
 ### [`tests/test_ui_audit.py`](tests/test_ui_audit.py)
 > *The headless cockpit audit has deterministic viewport, parsing and wrapper helpers.*
 
-**Size**: `82` lines (`4061` bytes)
+**Size**: `104` lines (`4690` bytes)
 
 **Classes:**
+- `class _RecordingEngine`
+  - Method `.__init__()`
+  - Method `.skip_tutorial()`
+- `class AuditStateTest`
+  - Method `.test_a_fresh_save_keeps_the_cadet_academy()`
+  - Method `.test_post_tutorial_uses_the_engine_skip_action()`
 - `class AuditHelpersTest`
   - Method `.test_wide_viewports_get_only_window_chrome()`
   - Method `.test_laptop_keeps_an_exact_iframe()`
@@ -4388,7 +4394,7 @@
 ### [`tools/ui_audit.py`](tools/ui_audit.py)
 > *Capture VoidFarer cockpit screenshots and a measurable UI audit with headless Edge or Chrome.*
 
-**Size**: `928` lines (`36791` bytes)
+**Size**: `945` lines (`37703` bytes)
 
 **Functions:**
 - `def find_browser()` - *Locate an installed Edge or Chrome executable without a third-party dependency.*
@@ -4397,7 +4403,8 @@
 - `def parse_audit(dom)` - *Read the JSON audit payload out of a dumped wrapper DOM.*
 - `def browser_command(browser, viewport, profile, screenshot, url, dpr)` - *Headless Edge/Chrome argument list for one capture at a device scale factor.*
 - `def run_browser(browser, url, viewport, profile, screenshot, timeout, dpr)` - *Run one headless capture at a viewport and return stdout, stderr and the exit code.*
-- `def audit_viewport(browser, port, name, viewport, workdir, out, timeout, scenario, tab, dpr)` - *Capture one viewport and return its parsed audit report.*
+- `def seed_audit_state(engine, post_tutorial)` - *Skip the Cadet Academy when the audit must reach the advanced terminal tabs.*
+- `def audit_viewport(browser, port, name, viewport, workdir, out, timeout, scenario, tab, dpr, label_prefix)` - *Capture one viewport and return its parsed audit report.*
 - `def summary_line(report)` - *One ASCII-safe console line for a viewport report.*
 - `def severe_findings(report)` - *Names of findings that should fail an explicit audit check.*
 - `def write_report(reports, out, browser)` - *Write the combined JSON and Markdown evidence packet.*

@@ -7,7 +7,29 @@ import unittest
 from pathlib import Path
 
 from tools.ui_audit import (ERROR_COLLECTOR, WRAPPER_JS, audit_timeout, browser_command, outer_window,
-                            parse_audit, prepare_static, severe_findings, summary_line)
+                            parse_audit, prepare_static, seed_audit_state, severe_findings,
+                            summary_line)
+
+
+class _RecordingEngine:
+    def __init__(self):
+        self.skipped = 0
+
+    def skip_tutorial(self):
+        self.skipped += 1
+
+
+class AuditStateTest(unittest.TestCase):
+
+    def test_a_fresh_save_keeps_the_cadet_academy(self):
+        engine = _RecordingEngine()
+        seed_audit_state(engine, False)
+        self.assertEqual(engine.skipped, 0)
+
+    def test_post_tutorial_uses_the_engine_skip_action(self):
+        engine = _RecordingEngine()
+        seed_audit_state(engine, True)
+        self.assertEqual(engine.skipped, 1, "the advanced tabs only exist after graduation")
 
 
 class AuditHelpersTest(unittest.TestCase):
