@@ -481,6 +481,29 @@ class TestMultiHopRouteButton(unittest.TestCase):
         self.assertIn("{ system_id: this.selectedTarget.id }", self.js)
 
 
+class TestCleanViewHotkey(unittest.TestCase):
+    """V toggles a clean radar view and the rail advertises it (ADR-312)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_hotkey_calls_the_toggle(self):
+        self.assertIn('} else if (hotkey === "v") {', self.js)
+        self.assertIn("this.toggleCleanView();", self.js)
+
+    def test_toggle_covers_the_four_panels_and_restores_only_what_was_open(self):
+        block = self.js.split("    toggleCleanView() {", 1)[1].split("    nudgeReactorPower(", 1)[0]
+        for flag in ("drawer-collapsed", "reactor-collapsed", "skills-collapsed", "log-collapsed"):
+            self.assertIn(flag, block)
+        self.assertIn("this._cleanViewRestore = open;", block)
+        self.assertIn("if (!isOpen(panels[name])) panels[name][2]();", block)
+
+    def test_rail_hint_lists_the_key(self):
+        self.assertIn("V    CLEAN VIEW", self.css)
+
+
 if __name__ == "__main__":
     unittest.main()
 

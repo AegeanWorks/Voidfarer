@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `228`
-- **Total Classes**: `512`
+- **Total Classes**: `513`
 - **Total Top-Level Functions**: `525`
-- **Total Class Methods**: `2576`
-- **Total Source Lines**: `62543`
+- **Total Class Methods**: `2580`
+- **Total Source Lines**: `62566`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`228` module(s))
@@ -487,7 +487,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3021` lines (`136671` bytes)
+**Size**: `3044` lines (`137673` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -559,6 +559,11 @@
   - Method `.test_non_adjacent_star_shows_hops_and_fuel_and_blocks_when_short()`
   - Method `.test_route_is_fetched_from_the_route_endpoint_and_cached_briefly()`
   - Method `.test_click_navigates_only_when_the_star_is_not_adjacent()`
+- `class TestCleanViewHotkey` - *V toggles a clean radar view and the rail advertises it (ADR-312).*
+  - Method `.setUpClass()`
+  - Method `.test_hotkey_calls_the_toggle()`
+  - Method `.test_toggle_covers_the_four_panels_and_restores_only_what_was_open()`
+  - Method `.test_rail_hint_lists_the_key()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

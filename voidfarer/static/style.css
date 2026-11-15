@@ -8575,7 +8575,7 @@ body.cockpit-theme .panel-center {
     letter-spacing: 0.04em;
 }
 .panel-left .deck-tabs-header::after {
-    content: "[ ]  CYCLE TABS\A\005C    HIDE DRAWER";
+    content: "[ ]  CYCLE TABS\A\005C    HIDE DRAWER\A V    CLEAN VIEW";
     white-space: pre;
     margin-top: auto;
     padding: 8px 4px 2px;

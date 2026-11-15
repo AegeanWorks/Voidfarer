@@ -2627,5 +2627,26 @@
     "final_snapshot_digest": "3cd057305145e83139152b6b5045e8857f4b64336dc44b28e51dd467a6af39ad",
     "final_snapshot_entries": 1336,
     "surface_digest": "9f42e6a151b1d18b5327659482f23f894313263a4891761a9e4de0028733a1e5"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "5f9021104f397e7beb8e1c2733c687a7a7fcf752",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794684212.33615,
+    "finished_at": 1794734328.1602507,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; clean/laptop-clean.png and laptop-restored.png: V collapses drawer and bottom panels leaving the radar, rail hint shows V CLEAN VIEW, second press restores only the panels that were open (a pre-hidden log stays hidden), 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "ae7e014b207050c190dabaf2b246bb3a3413e1643bdca0713a85179307960c4c",
+    "final_snapshot_entries": 1338,
+    "surface_digest": "1b74412e0472a4480247c8ee95d3b2561dbd287dcc5c20f08361ce4810135344"
   }
 ]

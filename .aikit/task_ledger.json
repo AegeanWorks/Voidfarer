@@ -1,46 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-multihop-route",
+    "task_id": "voidfarer-clean-view",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794684076.9736662,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794734807.5419059,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794684077.6699934
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-trade-clarity",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/3] Plan: sell-all-profitable engine and logistics action, COMMERCE button, best-trade tip and contraband banner",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794679885.3467293,
-      "timestamp_str": "2026-11-14 21:11:25",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Beginners cannot tell what to sell or buy and get surprised by customs; selling rows one by one is slow",
-        "benefits": "Clear trade loop, fewer surprise losses and interdictions",
-        "risks": "contract: logistics actions feed REST, CLI and agent catalog; dependency: none; concurrency: engine lock held during dry-run rollback; state: none new",
-        "mitigation": "Reuse trade_max with rollback, failing-first tests, parity via logistics_action"
-      },
-      "plan_digest": "14e98eca3406b3c04be6367c4d501c4eaa96154cbc221f58b5c21c4f557c959a"
-    },
-    {
-      "task_id": "voidfarer-trade-clarity",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/3] Sell-all-profitable engine and logistics action (ADR-302); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794679885.6752095,
-      "timestamp_str": "2026-11-14 21:11:25",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-trade-clarity",
       "phase": "in_progress",
@@ -291,6 +261,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-clean-view",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: V toggles a clean radar view that restores only the panels that were open",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794734806.7640498,
+      "timestamp_str": "2026-11-15 12:26:46",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Four key presses were needed to give the radar the whole screen",
+        "benefits": "One key for a clean flying view, discoverable in the rail",
+        "risks": "contract: reuses the existing panel collapse classes; dependency: none; concurrency: none; state: session-only restore list",
+        "mitigation": "Remember and restore the exact open set, real-browser check, layout tests"
+      },
+      "plan_digest": "a1442b41c7faef190e2f0fe4839de2739850b49817c36510f07416e55499ab77"
+    },
+    {
+      "task_id": "voidfarer-clean-view",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] V clean radar view (ADR-312); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794734807.5419059,
+      "timestamp_str": "2026-11-15 12:26:47",
+      "agent": "claude:1"
     }
   ]
 }

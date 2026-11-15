@@ -1723,6 +1723,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             } else if (hotkey === "l") {
                 e.preventDefault();
                 this.toggleLogPanel();
+            } else if (hotkey === "v") {
+                e.preventDefault();
+                this.toggleCleanView();
             } else if (hotkey === "c") {
                 e.preventDefault();
                 document.getElementById("btnResetView")?.click();
@@ -2094,6 +2097,29 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.btnToggleLog.textContent = collapsed ? "SHOW" : "HIDE";
             this.btnToggleLog.setAttribute("aria-expanded", String(!collapsed));
         }
+    }
+
+    // V: collapse the left drawer and the bottom panels so the radar fills the screen, then restore
+    // exactly the panels that were open (ADR-312).
+    toggleCleanView() {
+        const panels = {
+            drawer: [this.panelLeft, "drawer-collapsed", () => this.switchRightTab(this.activeRightTab || this.lastTerminalTab || "player", { quiet: true })],
+            reactor: [this.panelReactor, "reactor-collapsed", () => this.toggleReactorPanel()],
+            skills: [this.hudSkillsPanel, "skills-collapsed", () => this.toggleSkillsPanel()],
+            log: [this.logPanel, "log-collapsed", () => this.toggleLogPanel()],
+        };
+        const isOpen = ([el, cls]) => Boolean(el) && !el.classList.contains(cls);
+        if (this._cleanViewRestore) {
+            for (const name of this._cleanViewRestore) {
+                if (!isOpen(panels[name])) panels[name][2]();
+            }
+            this._cleanViewRestore = null;
+            return;
+        }
+        const open = Object.keys(panels).filter(name => isOpen(panels[name]));
+        if (!open.length) return;
+        this._cleanViewRestore = open;
+        for (const name of open) panels[name][2]();
     }
 
     nudgeReactorPower(channel) {
