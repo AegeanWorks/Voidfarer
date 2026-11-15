@@ -138,7 +138,9 @@ class ApiClient:
 class AiCaptain:
     """A deterministic policy that exercises every mechanic family it can reach."""
 
-    MAX_STEPS = 200
+    # A runaway guard, not a comfort limit: the CLI honours any request up to this bound
+    # and reports when it has to clamp (ADR-341).
+    MAX_STEPS = 2000
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -148,6 +150,7 @@ class AiCaptain:
         self.refusals: list[str] = []
         self.errors: list[str] = []
         self.steps_taken = 0
+        self.steps_requested = 0
         self.travelled = 0
         self.visited_bodies: set[str] = set()
         self.attempted: set[str] = set()
@@ -158,6 +161,7 @@ class AiCaptain:
         self.tour_exhausted = False
 
     def play(self, steps: int = 40) -> dict[str, Any]:
+        self.steps_requested = max(1, int(steps))
         status, payload = self.client.get("/api/agent/actions")
         if status == 200:
             self.catalog_paths = [entry["path"] for entry in payload.get("actions") or []]
@@ -169,7 +173,7 @@ class AiCaptain:
             return self.report()
         self.state = payload.get("state") or payload.get("data") or payload
 
-        for step in range(max(1, min(steps, self.MAX_STEPS))):
+        for step in range(min(self.steps_requested, self.MAX_STEPS)):
             self.steps_taken = step + 1
             path, body, family = self._choose(step)
             if path is None:
@@ -858,6 +862,8 @@ class AiCaptain:
         return {
             "ok": not self.errors and len(self.families) >= 4,
             "steps": self.steps_taken,
+            "steps_requested": self.steps_requested,
+            "steps_capped": self.steps_requested > self.MAX_STEPS,
             "families": dict(sorted(self.families.items())),
             "family_count": len(self.families),
             "attempted": sorted(self.attempted),

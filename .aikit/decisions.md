@@ -3294,3 +3294,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-162 deferred deposit_cargo, withdraw_cargo, sell_from_depot, place_quantum_order and interact_ai: each coerced with int() (or clamped with max(1)), so True deposited 1, 1.5 truncated, 0 became 1 and strings converted. REST's _int_field masked this at the HTTP boundary, but direct engine and test calls stayed lenient.
 - **Decision**: Add engine._positive_quantity(value), which accepts only an int that is not bool and is greater than zero, and use it in all five entry points. Each keeps its existing message, and state is untouched on refusal. Positive ints behave exactly as before.
 - **Consequences**: Six failing-first tests in tests/test_quantity_guards_residual.py (5 guard failures plus 1 error before the fix) now pass; full suite Ran 1802 OK; README tree suite count 172 -> 173. No save-schema change; REST and CLI already parse integers before the engine call.
+
+### ADR-341: Honour --steps to a runaway guard and report clamping
+- **Date**: 2026-11-16
+- **Status**: Accepted
+- **Context**: MAX_STEPS was 200 inside play(), so ai_play --steps 600 silently ran 200 steps; the summary printed 200 with no mention of the request and the JSON carried no requested count, which made long soaks look like they had run far longer than they did.
+- **Decision**: MAX_STEPS becomes a 2000-step runaway guard, well above the 180-step gate. play() records steps_requested and reports steps_requested and steps_capped, and the text summary appends '(requested N; capped at 2000)' only when the guard actually clamps. Requests below the guard run in full.
+- **Consequences**: ai_play --steps 600 --seed 2 now runs 600 steps (tick 348, 0 coverage gaps, 0 errors). Two tests pin the clamped and full-run reports; the mechanics gate stays at 180 steps, so gate time is unchanged.

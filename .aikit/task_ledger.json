@@ -1,46 +1,22 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "strict-quantity-residual",
+    "task_id": "ai-play-step-cap",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794785017.0740516,
+    "active_phase": 2,
+    "status": "in_progress",
+    "updated_at": 1794786948.8960884,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1794785185.4583964,
-    "completed_head": "67432d76fe431a8fe3698008a0ab6d201dbef5ee",
-    "completed_tree": "66aab9687225440d3f70f35fb990dee6ffc52be2"
+    "impact_assessment": {
+      "why": "A 600-step request silently ran 200 steps with no indication the request was ignored, so soak evidence overstated its length",
+      "benefits": "Explicit long runs execute, and any clamp is visible in both text and JSON",
+      "risks": "contract: JSON gains two fields; dependency: none; concurrency: none; state: none",
+      "mitigation": "guard stays far above the 180-step gate; tests pin clamped and full-run reports; the 600-step run is verified"
+    }
   },
   "checkpoints": [
-    {
-      "task_id": "audit-post-tutorial",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] --post-tutorial audit flag committed; 5/5 gates; 11 advanced tabs audited and STORY target defect isolated; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794771185.6579485,
-      "timestamp_str": "2026-11-15 22:33:05",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "audit-post-tutorial",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'audit-post-tutorial' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794771323.0988986,
-      "timestamp_str": "2026-11-15 22:35:23",
-      "agent": "kilo:goal",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "story-disclosure-targets",
       "phase": "in_progress",
@@ -317,6 +293,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-play-step-cap",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] 600-step request runs in full (tick 348, 0 gaps, 0 errors) and clamp reports are pinned (ADR-341); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794786934.127711,
+      "timestamp_str": "2026-11-16 02:55:34",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-play-step-cap",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Honour ai_play step requests up to a 2000-step guard and report any clamp",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794786948.8960884,
+      "timestamp_str": "2026-11-16 02:55:48",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "A 600-step request silently ran 200 steps with no indication the request was ignored, so soak evidence overstated its length",
+        "benefits": "Explicit long runs execute, and any clamp is visible in both text and JSON",
+        "risks": "contract: JSON gains two fields; dependency: none; concurrency: none; state: none",
+        "mitigation": "guard stays far above the 180-step gate; tests pin clamped and full-run reports; the 600-step run is verified"
+      },
+      "plan_digest": "791acc77a1677a849176cb085ecd9989fcdc1e9e5bae9c198164aa706441fe20"
     }
   ]
 }

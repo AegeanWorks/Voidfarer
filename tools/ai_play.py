@@ -52,7 +52,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.json:
         print(json.dumps(report, indent=2))
     else:
-        print(f"AI captain: {report['steps']} steps, {report['family_count']} mechanic families")
+        run = f"AI captain: {report['steps']} steps"
+        if report.get("steps_capped"):
+            run += f" (requested {report['steps_requested']}; capped at {AiCaptain.MAX_STEPS})"
+        print(f"{run}, {report['family_count']} mechanic families")
         for family, count in report["families"].items():
             print(f"  {family:<12} {count}")
         print(

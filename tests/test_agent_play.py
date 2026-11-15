@@ -177,6 +177,40 @@ class AiCaptainTourCoverageTest(unittest.TestCase):
         self.assertIn("crew_autostaff", families)
 
 
+class _StubClient:
+    """Minimal API stand-in so play() can be exercised without a server."""
+
+    def __init__(self, state=None):
+        self.state = state or {"ship": {"credits": 1000}, "time": {"tick": 0}}
+
+    def get(self, path):
+        if path == "/api/agent/actions":
+            return 200, {"ok": True, "actions": [{"path": "/api/time/step"}]}
+        return 200, {"ok": True, "state": self.state}
+
+    def post(self, path, body):
+        return 200, {"ok": True, "state": self.state}
+
+
+class PlayStepCapTest(unittest.TestCase):
+    """The CLI honours --steps and says when the runaway guard clamps it (ADR-341)."""
+
+    def test_a_request_beyond_the_guard_is_clamped_and_reported(self):
+        captain = AiCaptain(_StubClient(), seed=42)
+        captain.MAX_STEPS = 3
+        report = captain.play(steps=10)
+        self.assertEqual(report["steps"], 3)
+        self.assertEqual(report["steps_requested"], 10)
+        self.assertTrue(report["steps_capped"])
+
+    def test_a_request_inside_the_guard_runs_in_full_and_is_not_flagged(self):
+        captain = AiCaptain(_StubClient(), seed=42)
+        report = captain.play(steps=3)
+        self.assertEqual(report["steps"], 3)
+        self.assertEqual(report["steps_requested"], 3)
+        self.assertFalse(report["steps_capped"])
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main
