@@ -593,6 +593,36 @@ class TestQuickStartArchetypes(unittest.TestCase):
         self.assertIn("this.charArchetype = null;", self.js)
 
 
+class TestMissionPins(unittest.TestCase):
+    """CONTRACTS opens with one pinned card answering what the captain is working toward (ADR-319)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_card_is_hidden_by_default_above_the_refresh_button(self):
+        panel = self.html[self.html.index('id="tabContentContracts"'):]
+        self.assertIn('id="missionPins" hidden', panel)
+        self.assertLess(panel.index('id="missionPins"'), panel.index('id="btnRefreshContracts"'))
+
+    def test_card_prefers_the_academy_then_the_campaign_and_adds_the_next_payout(self):
+        block = self.js.split("    renderMissionPins() {", 1)[1].split("    plotSystemOnMap(", 1)[0]
+        self.assertLess(block.index("ACADEMY "), block.index("CAMPAIGN"))
+        self.assertIn("NEXT PAYOUT", block)
+        self.assertIn("(b.progress / b.target_count) - (a.progress / a.target_count)", block)
+        self.assertIn('id="btnPinPlot"', block)
+
+    def test_contracts_render_draws_the_card_and_plotting_selects_the_system(self):
+        self.assertIn("this.renderMissionPins();", self.js)
+        plot = self.js.split("    plotSystemOnMap(systemId) {", 1)[1][:400]
+        self.assertIn('this.selectedType = "system";', plot)
+
+    def test_the_helpers_stay_outside_the_fleet_renderer_window(self):
+        window = self.js.split("    renderFleet() {", 1)[1].split("    renderContracts() {", 1)[0]
+        self.assertNotIn("renderMissionPins", window)
+
+
 if __name__ == "__main__":
     unittest.main()
 

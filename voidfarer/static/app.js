@@ -5808,6 +5808,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     renderContracts() {
         if (!this.state) return;
+        this.renderMissionPins();
         this.contractsList.innerHTML = "";
         const contracts = this.state.ship.active_contracts || [];
 
@@ -10561,6 +10562,47 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this._tabTipShown = true;
         try { localStorage.setItem("voidfarer_tip_tab_keys", "1"); } catch (e) {}
         this.appendLog("[TIP] Press [ and ] to cycle terminal tabs, the backslash key to hide the drawer, V for a clean radar view.", "system");
+    }
+
+    // Pinned "what am I working toward?" card above the board: the active campaign (or academy) step
+    // and the contract closest to paying out, so one tab answers it (ADR-319).
+    renderMissionPins() {
+        const box = document.getElementById("missionPins");
+        if (!box || !this.state) return;
+        const ship = this.state.ship || {};
+        const tut = ship.tutorial || {};
+        const story = ship.story || {};
+        const chapter = (story.chapters || [])[story.current_chapter_index || 0];
+        const lines = [];
+        let plotId = "";
+        if (tut.steps && !tut.completed && !tut.skipped && tut.steps.length) {
+            const step = tut.steps[tut.current_step_index || 0] || tut.steps[0];
+            lines.push(`<div class="mission-pin"><span class="mission-pin-tag">ACADEMY ${(tut.current_step_index || 0) + 1}/${tut.steps.length}</span> ${this.escapeHtml(step.title)}</div>`);
+        } else if (chapter && !story.completed && !chapter.completed) {
+            lines.push(`<div class="mission-pin"><span class="mission-pin-tag">CAMPAIGN</span> ${this.escapeHtml(chapter.title)}<small>${this.escapeHtml(chapter.objective || "")}</small></div>`);
+            if (chapter.target_system_id && chapter.target_system_id !== this.state.current_system?.id) plotId = chapter.target_system_id;
+        }
+        const open = (this.state.quests || []).filter(q => q.kind === "contract" && !q.completed && q.target_count > 0);
+        open.sort((a, b) => (b.progress / b.target_count) - (a.progress / a.target_count));
+        if (open.length) {
+            const q = open[0];
+            lines.push(`<div class="mission-pin"><span class="mission-pin-tag">NEXT PAYOUT</span> ${this.escapeHtml(q.title)} ${q.progress}/${q.target_count}<small>${this.escapeHtml(q.reward || "")}</small></div>`);
+        }
+        box.hidden = !lines.length;
+        box.innerHTML = lines.join("") + (plotId
+            ? `<button class="text-btn mission-pin-plot" id="btnPinPlot" data-system="${this.escapeHtml(plotId)}">PLOT CAMPAIGN TARGET ON MAP</button>` : "");
+        const plot = document.getElementById("btnPinPlot");
+        if (plot) plot.addEventListener("click", () => this.plotSystemOnMap(plot.dataset.system));
+    }
+
+    plotSystemOnMap(systemId) {
+        const system = this.galaxySystems?.[systemId];
+        if (!system) return;
+        this.sound.init();
+        this.viewGalaxyBtn?.click();
+        this.selectedTarget = system;
+        this.selectedType = "system";
+        this.updateTargetCard();
     }
 
     async copyGalaxySeed() {

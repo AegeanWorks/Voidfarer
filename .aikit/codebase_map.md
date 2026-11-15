@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `231`
-- **Total Classes**: `520`
+- **Total Classes**: `521`
 - **Total Top-Level Functions**: `527`
-- **Total Class Methods**: `2604`
-- **Total Source Lines**: `62835`
+- **Total Class Methods**: `2609`
+- **Total Source Lines**: `62865`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`231` module(s))
@@ -508,7 +508,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3133` lines (`142139` bytes)
+**Size**: `3163` lines (`143694` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -603,6 +603,12 @@
   - Method `.test_quick_start_sits_above_basic_info_and_is_hidden_until_populated()`
   - Method `.test_buttons_come_from_the_engine_archetype_list()`
   - Method `.test_a_click_fills_origin_and_skills_then_launches_with_the_archetype_tag()`
+- `class TestMissionPins` - *CONTRACTS opens with one pinned card answering what the captain is working toward (ADR-319).*
+  - Method `.setUpClass()`
+  - Method `.test_card_is_hidden_by_default_above_the_refresh_button()`
+  - Method `.test_card_prefers_the_academy_then_the_campaign_and_adds_the_next_payout()`
+  - Method `.test_contracts_render_draws_the_card_and_plotting_selects_the_system()`
+  - Method `.test_the_helpers_stay_outside_the_fleet_renderer_window()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

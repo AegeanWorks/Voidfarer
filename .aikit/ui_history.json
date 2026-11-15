@@ -2732,5 +2732,27 @@
     "final_snapshot_digest": "d9c9c61821c46e9f23235a4ea00e45055de04409319fd12616a7950736fd9178",
     "final_snapshot_entries": 1353,
     "surface_digest": "abf5e7f6adfad225fd14f5334574fbe289fc296fe98fb37a76946427079435fd"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "19165ccf7731842268b0686c0e5640f4f8f3fcc6",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794738557.662279,
+    "finished_at": 1794739052.3793643,
+    "strikes": 2,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; pins2/laptop-academy.png and laptop-campaign.png: CONTRACTS opens with a pinned card (ACADEMY 1/6 + NEXT PAYOUT, or CAMPAIGN act + objective + NEXT PAYOUT + PLOT CAMPAIGN TARGET ON MAP), no clipping; plot click selected sirius on the map, 0 errors; re-run after moving the methods",
+    "allowed_removals": [],
+    "final_snapshot_digest": "a0af65eb9476dbdec5a5959f979cf7779f524cb3bca0b092d39e37a371809b38",
+    "final_snapshot_entries": 1357,
+    "surface_digest": "3e185e58b5009e8e9c0bb9b2e142a3af91f57d8e55374624d7db52fb1492381b"
   }
 ]
