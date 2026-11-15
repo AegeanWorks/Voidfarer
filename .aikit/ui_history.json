@@ -2898,5 +2898,27 @@
     "final_snapshot_digest": "483b5b1384c8857c4b0ab5845ff2cbcb95d3c388ddf8bfa76d429629be8d9224",
     "final_snapshot_entries": 1364,
     "surface_digest": "21ed9b9aef61d0e72d2a3cac34dce976de16fdc271f0c55826458a9182605a88"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "3f2e1c9eeae920369bea81d4cfbd7db5ed4b8706",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794756732.9026814,
+    "finished_at": 1794757692.343125,
+    "strikes": 1,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; drones3 laptop-fleet.png: REFIT DAMAGED DRONES (2 - 600 CR) full-width above the roster, click refit d1/d3 to 100 and hid the button, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "f74dfa5b157b712752a36cfcd2a1fe7b97cfb88a4a88e80c24433c7975e8b76d",
+    "final_snapshot_entries": 1367,
+    "surface_digest": "fa018d31ad9a70bbdfce4258054a89ddaeca1c779a36ce4d32c2947926946b64"
   }
 ]

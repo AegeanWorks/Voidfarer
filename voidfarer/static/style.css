@@ -4447,6 +4447,8 @@ html[data-density="comfortable"] .panel-right .flight-log-stream {
 .quick-start-buttons { display: flex; gap: 6px; }
 .quick-start-btn { flex: 1 1 0; min-width: 0; padding: 6px 4px; font-size: 12px; white-space: normal; line-height: 1.2; }
 #btnRepairAllOutposts, #btnAutoStaff { width: 100%; margin: 6px 0; }
+#btnRefitDamaged { width: 100%; margin: 6px 0; }
+#btnRefitDamaged[hidden] { display: none; }
 #btnRepairAllOutposts[hidden] { display: none; }
 .mission-pins { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; padding: 6px 8px; border: 1px solid rgba(201, 163, 90, 0.45); background: rgba(201, 163, 90, 0.07); font-family: var(--font-mono); font-size: 12px; }
 .mission-pins[hidden] { display: none; }

@@ -728,6 +728,31 @@ class TestAutoStaffButton(unittest.TestCase):
         self.assertIn('document.getElementById("btnAutoStaff")?.addEventListener("click"', self.js)
 
 
+class TestRefitDamagedButton(unittest.TestCase):
+    """FLEET offers one button that refits every worn drone (ADR-331)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_button_is_hidden_by_default_above_the_drone_roster(self):
+        self.assertIn('id="btnRefitDamaged" hidden', self.html)
+        self.assertLess(self.html.index('id="btnRefitDamaged"'), self.html.index('id="fleetRoster"'))
+
+    def test_it_appears_only_for_two_or_more_worn_drones_and_posts_the_fleet_action(self):
+        block = self.js.split("    renderRefitDamaged(drones) {", 1)[1].split("    async copyGalaxySeed() {", 1)[0]
+        self.assertIn("Number(d.integrity || 0) <= 40", block)
+        self.assertIn("button.hidden = worn.length < 2;", block)
+        self.assertIn('"/api/fleet/action", { action: "refit_damaged" }', block)
+        self.assertIn("this.renderRefitDamaged(drones);", self.js)
+
+    def test_it_gets_the_same_full_width_treatment_and_stays_hidden_when_flagged(self):
+        self.assertIn("#btnRefitDamaged { width: 100%; margin: 6px 0; }", self.css)
+        self.assertIn("#btnRefitDamaged[hidden] { display: none; }", self.css)
+
+
 if __name__ == "__main__":
     unittest.main()
 

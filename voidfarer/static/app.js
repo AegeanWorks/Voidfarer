@@ -5747,6 +5747,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.renderFleetManager();
         this.fleetRoster.innerHTML = "";
         const drones = this.state.ship.fleet_drones || [];
+        this.renderRefitDamaged(drones);
 
         if (drones.length === 0) {
             this.fleetRoster.innerHTML = `<p class="fleet-empty">No fleet drones active. Use SHOW COMMISSION below to procure one.</p>`;
@@ -10638,6 +10639,20 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             if (this.activeRightTab === "crew") this.renderCrew();
         } catch (e) {
             this.reportProblem(e.message);
+        }
+    }
+
+    // One deliberate click refits every worn drone; never automatic, since a refit spends 300 cr and levels it up (ADR-331).
+    renderRefitDamaged(drones) {
+        const button = document.getElementById("btnRefitDamaged");
+        if (!button) return;
+        const worn = drones.filter(d => Number(d.integrity || 0) <= 40);
+        button.hidden = worn.length < 2;
+        button.textContent = `REFIT DAMAGED DRONES (${worn.length} · ${worn.length * 300} CR)`;
+        button.title = "Refit every drone at 40% integrity or below, worst first, until credits run out. Each refit costs 300 cr and also levels the drone up.";
+        if (!button.dataset.bound) {
+            button.dataset.bound = "true";
+            button.addEventListener("click", () => this.postAction("/api/fleet/action", { action: "refit_damaged" }, null));
         }
     }
 

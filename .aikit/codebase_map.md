@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `234`
-- **Total Classes**: `533`
+- **Total Classes**: `534`
 - **Total Top-Level Functions**: `534`
-- **Total Class Methods**: `2640`
-- **Total Source Lines**: `63324`
+- **Total Class Methods**: `2644`
+- **Total Source Lines**: `63349`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -530,7 +530,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3268` lines (`149200` bytes)
+**Size**: `3293` lines (`150508` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -651,6 +651,11 @@
   - Method `.setUpClass()`
   - Method `.test_button_sits_between_the_crew_summary_and_the_roster_toggle()`
   - Method `.test_click_posts_the_autostaff_crew_action_and_redraws_the_roster()`
+- `class TestRefitDamagedButton` - *FLEET offers one button that refits every worn drone (ADR-331).*
+  - Method `.setUpClass()`
+  - Method `.test_button_is_hidden_by_default_above_the_drone_roster()`
+  - Method `.test_it_appears_only_for_two_or_more_worn_drones_and_posts_the_fleet_action()`
+  - Method `.test_it_gets_the_same_full_width_treatment_and_stays_hidden_when_flagged()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

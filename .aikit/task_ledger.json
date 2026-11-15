@@ -5,23 +5,18 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794743938.428781,
-    "owner": "claude:1",
+    "updated_at": 1794758908.697228,
+    "owner": "kilo:goal",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [
+      {
+        "agent": "kilo:goal",
+        "from": "claude:1",
+        "at": 1794758908.697228
+      }
+    ]
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-outpost-rows-fit",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Outpost rows wrap inside the drawer (ADR-323); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794741045.2236667,
-      "timestamp_str": "2026-11-15 14:10:45",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-outpost-rows-fit",
       "phase": "completed",
@@ -302,6 +297,18 @@
       "timestamp": 1794743938.428781,
       "timestamp_str": "2026-11-15 14:58:58",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-refit-damaged",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] REFIT DAMAGED DRONES button on the FLEET tab (ADR-331), verified in Edge and UI-task closed; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794758908.697228,
+      "timestamp_str": "2026-11-15 19:08:28",
+      "agent": "kilo:goal",
+      "continued_from": "claude:1"
     }
   ]
 }
