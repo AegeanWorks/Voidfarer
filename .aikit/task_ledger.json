@@ -3,25 +3,17 @@
   "active_task": {
     "task_id": "staged-tab-unlocks",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794776900.6561532,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794778067.4134283,
+    "completed_head": "293abfe7f6cf8bb1d3200421abd6c94392373ca3",
+    "completed_tree": "e263b72694ab39988356ff1bfb4ce02c93fca061"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-cli-parity",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] crew autostaff on the CLI (ADR-329); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794743679.3607092,
-      "timestamp_str": "2026-11-15 14:54:39",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-cli-parity",
       "phase": "completed",
@@ -305,6 +297,23 @@
       "timestamp": 1794776900.6561532,
       "timestamp_str": "2026-11-16 00:08:20",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "staged-tab-unlocks",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'staged-tab-unlocks' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794778067.5020468,
+      "timestamp_str": "2026-11-16 00:27:47",
+      "agent": "kilo:goal",
+      "head": "293abfe7f6cf8bb1d3200421abd6c94392373ca3",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
