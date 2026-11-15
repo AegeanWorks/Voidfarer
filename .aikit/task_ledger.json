@@ -3,25 +3,17 @@
   "active_task": {
     "task_id": "rail-unlock-notices",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794780318.8131356,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794780548.9940345,
+    "completed_head": "f848937bd4c03db1d4ef4604f6007d6885e888ce",
+    "completed_tree": "240c90bc8c8017a31a272491ee94eeb2cd8eb0a9"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-refit-damaged",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] refit_damaged_drones, refit_damaged fleet action and CLI (ADR-330); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794743938.428781,
-      "timestamp_str": "2026-11-15 14:58:58",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-refit-damaged",
       "phase": "in_progress",
@@ -306,6 +298,23 @@
       "timestamp": 1794780318.8131356,
       "timestamp_str": "2026-11-16 01:05:18",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "rail-unlock-notices",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'rail-unlock-notices' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794780549.3307173,
+      "timestamp_str": "2026-11-16 01:09:09",
+      "agent": "kilo:goal",
+      "head": "f848937bd4c03db1d4ef4604f6007d6885e888ce",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
