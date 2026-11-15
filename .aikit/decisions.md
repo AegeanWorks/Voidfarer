@@ -3154,3 +3154,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: After graduating (or skipping) the academy, the left rail's `MORE SYSTEMS 11 ▾` button truncated to `MORE SYSTEMS …` at 1366x768, hiding the count and arrow.
 - **Decision**: `.panel-left .deck-more-btn` drops its letter spacing to 0 and tightens horizontal padding to 5px, so the full label fits the rail without changing its font size or the markup.
 - **Consequences**: CSS only. Verified in real Edge (`ui-review/more/`): the label reads `MORE SYSTEMS 11 ▾` and `scrollWidth` equals `clientWidth`. Pinned by `TestMoreSystemsButtonFits`.
+
+### ADR-321: Repair all outposts as one empire action
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: War raids can damage several remote outposts at once, and each repair was a separate click on a separate card.
+- **Decision**: `SimulationEngine.repair_all_outposts` repairs every outpost below full integrity, most damaged first, through the existing `repair_outpost` (so cost and logging are unchanged), and stops spending when credits run short, reporting how many were repaired, the total cost and how many stay damaged. It changes nothing when no outpost is damaged or none is affordable. It is exposed as the `outpost_repair_all` empire action, which gives REST, the CLI and the agent catalog (G-012).
+- **Consequences**: Engine, REST and CLI; the EMPIRE tab button follows. No new persisted field. Pinned by `tests/test_repair_all_outposts.py`.

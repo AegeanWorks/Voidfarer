@@ -3454,6 +3454,38 @@ class SimulationEngine:
             )
             return True, line
 
+    def repair_all_outposts(self) -> tuple[bool, str]:
+        """Repair every damaged outpost, most damaged first, for as long as credits last."""
+        with self.lock:
+            damaged = sorted(
+                (o for o in self.state.outposts if o.integrity < 100.0),
+                key=lambda o: (o.integrity, o.id),
+            )
+            if not damaged:
+                return False, "Every outpost is at full integrity."
+            repaired = 0
+            spent = 0
+            short = 0
+            for outpost in damaged:
+                cost = outpost_repair_cost(outpost)
+                if self.state.ship.credits < cost:
+                    short += 1
+                    continue
+                ok, _ = self.repair_outpost(outpost.id)
+                if ok:
+                    repaired += 1
+                    spent += cost
+                else:
+                    short += 1
+            if not repaired:
+                cheapest = min(outpost_repair_cost(o) for o in damaged)
+                return False, f"Insufficient credits: the cheapest outpost repair costs {cheapest} cr."
+            plural = "outpost" if repaired == 1 else "outposts"
+            message = f"OUTPOST REPAIR: {repaired} {plural} restored to full integrity for {spent} cr."
+            if short:
+                message += f" {short} still damaged (credits short)."
+            return True, message
+
     def _crew_ship_id(self, crew_id: str) -> str | None:
         for ship in self.state.ship.fleet_ships:
             if ship.captain_id == crew_id:

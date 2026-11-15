@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `231`
-- **Total Classes**: `522`
-- **Total Top-Level Functions**: `527`
-- **Total Class Methods**: `2610`
-- **Total Source Lines**: `62876`
+- **Total Python Modules**: `232`
+- **Total Classes**: `523`
+- **Total Top-Level Functions**: `529`
+- **Total Class Methods**: `2615`
+- **Total Source Lines**: `62973`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`231` module(s))
+- **Indexed**: python (`232` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3263,6 +3263,24 @@
 
 ---
 
+### [`tests/test_repair_all_outposts.py`](tests/test_repair_all_outposts.py)
+> *REPAIR ALL OUTPOSTS restores every damaged outpost, worst first, as far as credits stretch.*
+
+**Size**: `63` lines (`2597` bytes)
+
+**Classes:**
+- `class RepairAllOutpostsTest`
+  - Method `.test_repairs_every_damaged_outpost_and_charges_the_sum()`
+  - Method `.test_worst_damage_is_repaired_first_when_credits_run_short()`
+  - Method `.test_nothing_damaged_or_nothing_affordable_changes_nothing()`
+  - Method `.test_it_is_reachable_as_an_empire_action()`
+
+**Functions:**
+- `def _outpost(oid, integrity)`
+- `def _engine(credits, *integrities)`
+
+---
+
 ### [`tests/test_research_pacts.py`](tests/test_research_pacts.py)
 > *Research pacts: standing gate, war suspension and passive research bonus.*
 
@@ -4725,7 +4743,7 @@
 ### [`voidfarer/empire.py`](voidfarer/empire.py)
 > *One report and action surface for research, outposts, megastructures and diplomacy.*
 
-**Size**: `162` lines (`6250` bytes)
+**Size**: `164` lines (`6355` bytes)
 
 **Functions:**
 - `def _leader_rows(state)`
@@ -4772,7 +4790,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11116` lines (`548267` bytes)
+**Size**: `11148` lines (`549670` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -4857,6 +4875,7 @@
   - Method `.restore_megastructure(body_id)` - *Restore one ancient structure while orbiting it.*
   - Method `._outpost_capture_damage(outpost, old_system, new_system, crew_by_id)` - *Damage a player outpost when its system falls to a non-player power.*
   - Method `.repair_outpost(outpost_id)` - *Restore an outpost to full integrity with a remote repair contract.*
+  - Method `.repair_all_outposts()` - *Repair every damaged outpost, most damaged first, for as long as credits last.*
   - Method `._crew_ship_id(crew_id)`
   - Method `.assign_fleet_captain(ship_id, crew_id)` - *Assign one active specialist as an escort captain.*
   - Method `.recall_fleet_captain(ship_id)` - *Return an escort captain to the flagship roster.*

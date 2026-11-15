@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-more-button-fit",
+    "task_id": "voidfarer-repair-all-outposts",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794739702.73239,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794740096.9969585,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794739703.426955,
-    "completed_head": "846faf6077296a8082187f168d8588a826fd7f4c"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-locked-tab-redirect",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: redirect a request for a locked academy tab to PLAYER with an explanation",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794736183.7204518,
-      "timestamp_str": "2026-11-15 12:49:43",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "DOSSIER opened SKILLS and silently did nothing at level 1 after the tab lock",
-        "benefits": "No dead controls during the academy",
-        "risks": "contract: switchRightTab guard; dependency: none; concurrency: none; state: none",
-        "mitigation": "Helper method, no-loop check, real-browser click, layout test"
-      },
-      "plan_digest": "657e10921558893c0697d7f0fece6bac8fc52cfd88ed0531a500147b163fce30"
-    },
-    {
-      "task_id": "voidfarer-locked-tab-redirect",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Locked tab redirect to PLAYER (ADR-313); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794736184.0006044,
-      "timestamp_str": "2026-11-15 12:49:44",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-locked-tab-redirect",
       "phase": "completed",
@@ -304,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-repair-all-outposts",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: repair_all_outposts engine and empire action, then a REPAIR ALL button on the EMPIRE tab",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794740096.7630606,
+      "timestamp_str": "2026-11-15 13:54:56",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "War raids damage several outposts and each repair was a separate click",
+        "benefits": "One action restores them all, worst first, within credits",
+        "risks": "contract: new empire action feeds REST, CLI, agent catalog; dependency: none; concurrency: re-entrant engine lock; state: none new",
+        "mitigation": "Reuse repair_outpost per outpost, failing-first tests incl. credit shortfall and no-op"
+      },
+      "plan_digest": "3fc26428acefb0d7ec26cb9135e8b1e461d7b52130ed92b29b92bdc56957ad13"
+    },
+    {
+      "task_id": "voidfarer-repair-all-outposts",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] repair_all_outposts and outpost_repair_all (ADR-321); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794740096.9969585,
+      "timestamp_str": "2026-11-15 13:54:56",
+      "agent": "claude:1"
     }
   ]
 }

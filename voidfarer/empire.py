@@ -13,7 +13,7 @@ from voidfarer.models import GameState
 
 EMPIRE_ACTIONS = (
     "research_start", "research_queue", "research_cancel",
-    "outpost_build", "outpost_upgrade", "outpost_module", "outpost_repair",
+    "outpost_build", "outpost_upgrade", "outpost_module", "outpost_repair", "outpost_repair_all",
     "outpost_specialize", "outpost_crew", "outpost_recall",
     "outpost_link", "outpost_unlink",
     "megastructure_restore",
@@ -124,6 +124,8 @@ def empire_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, str]:
         )
     if action == "outpost_repair":
         return engine.repair_outpost(_text(kwargs.get("outpost_id")))
+    if action == "outpost_repair_all":
+        return engine.repair_all_outposts()
     if action == "outpost_specialize":
         return engine.specialize_outpost(
             _text(kwargs.get("outpost_id")), _text(kwargs.get("specialization"))
