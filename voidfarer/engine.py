@@ -9843,6 +9843,42 @@ class SimulationEngine:
             self.state = self._clone_state(ship=new_ship)
             return True, f"Refit {drone.name} to level {updated.level} (efficiency {updated.efficiency:.2f})."
 
+    REFIT_WORN_INTEGRITY = 40
+
+    def refit_damaged_drones(self) -> tuple[bool, str]:
+        """Refit every worn drone (integrity at or below 40), worst first, for as long as credits last.
+
+        An explicit click, never automatic: each refit costs 300 cr and also levels the drone up.
+        """
+        with self.lock:
+            ok, msg = self._require_service_dock()
+            if not ok:
+                return False, msg
+            worn = sorted(
+                (d for d in self.state.ship.fleet_drones if d.integrity <= self.REFIT_WORN_INTEGRITY),
+                key=lambda d: (d.integrity, d.id),
+            )
+            if not worn:
+                return False, "No drone is worn enough to need a refit."
+            refitted = 0
+            short = 0
+            spent = 0
+            for drone in worn:
+                before = self.state.ship.credits
+                ok, _ = self.refit_fleet_unit(drone.id)
+                if ok:
+                    refitted += 1
+                    spent += before - self.state.ship.credits
+                else:
+                    short += 1
+            if not refitted:
+                return False, "Insufficient credits: a drone refit costs 300 cr."
+            plural = "drone" if refitted == 1 else "drones"
+            message = f"FLEET REFIT: {refitted} {plural} restored to full integrity for {spent} cr."
+            if short:
+                message += f" {short} still worn (credits short)."
+            return True, message
+
     def form_alliance(self, captain_id: str) -> tuple[bool, str]:
         return self.interact_ai(captain_id, "ally")
 

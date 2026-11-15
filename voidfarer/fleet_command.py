@@ -24,7 +24,7 @@ from voidfarer.models import GameState
 from voidfarer.upgrades import CATALOG_DRONE_TEMPLATES
 
 FLEET_ACTIONS = (
-    "buy_drone", "deploy", "collect", "dismiss", "refit",
+    "buy_drone", "deploy", "collect", "dismiss", "refit", "refit_damaged",
     "buy_escort", "assign", "role", "train", "captain", "recall_captain",
     "repair", "sell", "dismiss_escort",
     "hire", "ally",
@@ -147,6 +147,8 @@ def fleet_action(engine: Any, action: str, **kwargs: Any) -> tuple[bool, str]:
         return engine.dismiss_fleet_unit(_text(kwargs.get("unit_id")))
     if action in ("refit", "refit_unit"):
         return engine.refit_fleet_unit(_text(kwargs.get("unit_id")))
+    if action == "refit_damaged":
+        return engine.refit_damaged_drones()
     if action in ("ally", "form_alliance"):
         return engine.form_alliance(_text(kwargs.get("captain_id")))
     if action in ("buy_drone", "buy"):

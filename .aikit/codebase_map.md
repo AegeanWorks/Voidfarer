@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `233`
-- **Total Classes**: `531`
-- **Total Top-Level Functions**: `532`
-- **Total Class Methods**: `2634`
-- **Total Source Lines**: `63199`
+- **Total Python Modules**: `234`
+- **Total Classes**: `533`
+- **Total Top-Level Functions**: `534`
+- **Total Class Methods**: `2640`
+- **Total Source Lines**: `63324`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`233` module(s))
+- **Indexed**: python (`234` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3275,6 +3275,26 @@
 
 ---
 
+### [`tests/test_refit_damaged_drones.py`](tests/test_refit_damaged_drones.py)
+> *REFIT DAMAGED refits every worn drone, worst first, as far as credits stretch.*
+
+**Size**: `81` lines (`3135` bytes)
+
+**Classes:**
+- `class RefitDamagedDronesTest`
+  - Method `.test_refits_only_worn_drones_and_charges_each()`
+  - Method `.test_worst_first_when_credits_run_short()`
+  - Method `.test_nothing_worn_or_nothing_affordable_changes_nothing()`
+  - Method `.test_it_is_reachable_as_a_fleet_action()`
+- `class RefitDamagedCliTest`
+  - Method `.test_fleet_refit_damaged_refits_and_persists()`
+
+**Functions:**
+- `def _drone(i, integrity)`
+- `def _engine(credits, *integrities)`
+
+---
+
 ### [`tests/test_refit_filters.py`](tests/test_refit_filters.py)
 > *REFIT upgrade list: slot filter chips keep the long catalogue navigable.*
 
@@ -4569,7 +4589,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4854` lines (`239169` bytes)
+**Size**: `4860` lines (`239409` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -4830,7 +4850,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11178` lines (`551318` bytes)
+**Size**: `11214` lines (`552817` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5059,6 +5079,7 @@
   - Method `.hire_mercenary(merc_id)`
   - Method `.dismiss_fleet_unit(drone_id)`
   - Method `.refit_fleet_unit(drone_id)`
+  - Method `.refit_damaged_drones()` - *Refit every worn drone (integrity at or below 40), worst first, for as long as credits last.*
   - Method `.form_alliance(captain_id)`
   - Method `._decision_lock_reason()`
   - Method `._action_lock_reason()` - *Reason flight or exploration actions are frozen.*
@@ -5248,7 +5269,7 @@
 ### [`voidfarer/fleet_command.py`](voidfarer/fleet_command.py)
 > *One report and action surface for every fleet asset.*
 
-**Size**: `180` lines (`6766` bytes)
+**Size**: `182` lines (`6862` bytes)
 
 **Functions:**
 - `def _drone_rows(state)`

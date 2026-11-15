@@ -1,52 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-cli-parity",
+    "task_id": "voidfarer-refit-damaged",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794743679.3607092,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794743938.428781,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794743680.130168,
-    "completed_head": "e8021c8ffc228f2b2ec299e8b03b571b83e82a95"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-repair-all-outposts",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-repair-all-outposts' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794740550.4719732,
-      "timestamp_str": "2026-11-15 14:02:30",
-      "agent": "claude:1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-outpost-rows-fit",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Plan: make outpost rows wrap inside the EMPIRE drawer",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794741044.9320588,
-      "timestamp_str": "2026-11-15 14:10:44",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "Outpost rows overflowed the drawer by 73 px and clipped UPGRADE, INSTALL and ASSIGN at laptop width",
-        "benefits": "Every outpost control is reachable",
-        "risks": "contract: shared grid list class; dependency: none; concurrency: none; state: none",
-        "mitigation": "Scope the fix to .outpost-list and .outpost-row, measure overflow in a real browser, layout test"
-      },
-      "plan_digest": "68ad3fd6ffa39e393a71c4160cb4b0740d43fa3052f54e71aa7a3971cc9a3b8a"
-    },
     {
       "task_id": "voidfarer-outpost-rows-fit",
       "phase": "in_progress",
@@ -309,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-refit-damaged",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Plan: refit_damaged_drones engine, fleet action and CLI, then a REFIT DAMAGED button on the FLEET tab",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794743938.0812223,
+      "timestamp_str": "2026-11-15 14:58:58",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "Each worn drone needs its own 300 cr refit click; automatic spending was rejected as it levels drones up and spends credits unasked",
+        "benefits": "One deliberate click refits all worn drones within credits",
+        "risks": "contract: new fleet action feeds REST, CLI, agent catalog; dependency: none; concurrency: re-entrant engine lock; state: none new",
+        "mitigation": "Reuse refit_fleet_unit, explicit click only, failing-first tests incl. shortfall and no-op, CLI parser updated together"
+      },
+      "plan_digest": "32a4495fbc0eef835fe500972dfc18725fc97a6faf9307df27edf17bcd3eb97d"
+    },
+    {
+      "task_id": "voidfarer-refit-damaged",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] refit_damaged_drones, refit_damaged fleet action and CLI (ADR-330); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794743938.428781,
+      "timestamp_str": "2026-11-15 14:58:58",
+      "agent": "claude:1"
     }
   ]
 }

@@ -1560,6 +1560,12 @@ def cmd_fleet(engine: SimulationEngine, storage: StorageManager, parts: list[str
             )
         print(f"{DIM}Form: fleet ally <captain_id>{RESET}")
         return 0
+    if sub == "refit_damaged":
+        ok, msg = fleet_action(engine, "refit_damaged")
+        print((GREEN if ok else RED) + msg + RESET)
+        if ok:
+            storage.save(engine.state)
+        return 0 if ok else 1
     if sub in ("hire", "dismiss", "refit", "ally"):
         if len(parts) < 3:
             print(f"{RED}Usage:{RESET} fleet {sub} <id>")
@@ -4087,7 +4093,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "list", "overview", "harvest", "buy", "deploy", "ships",
         "buy_escort", "assign", "train", "role", "captain", "recall_captain",
         "repair_escorts", "dismiss_escort", "sell_escort",
-        "mercs", "allies", "hire", "dismiss", "refit", "ally",
+        "mercs", "allies", "hire", "dismiss", "refit", "refit_damaged", "ally",
     ])
     fleet_p.add_argument("arg1", nargs="?", help="Drone type or drone ID")
     fleet_p.add_argument("arg2", nargs="?", help="Target star system ID")

@@ -3217,3 +3217,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: A command-line sweep of this session's new actions (`logistics sell_all`, `empire outpost_repair_all`, `flight arrive`, `engineering insurance`, `crew autostaff`) found that `crew autostaff` was refused by the argument parser: the `crew` subcommand keeps its own hard-coded action list instead of reading `CREW_ACTIONS`, so the REST and agent paths worked while the CLI did not, against G-012.
 - **Decision**: `crew autostaff` (alias `auto-staff`) is a valid CLI action in `cmd_crew` and the parser choices, prints the engine message, saves on success and exits 1 when stations are already optimal; the roster help line mentions it.
 - **Consequences**: CLI only. The other four new actions already worked through their shared dispatchers. Pinned by `AutoStaffCliTest`, which runs `cmd_crew` against a temporary save and reloads it.
+
+### ADR-330: Refit damaged drones as an explicit one-click action
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: Drones wear one integrity point per sortie and each refit is a separate 300 cr click. An automatic refit was rejected because a refit also levels the drone up and spends credits, which should never happen without the player choosing it.
+- **Decision**: `SimulationEngine.refit_damaged_drones` refits every drone at 40 integrity or below, worst first, through the existing `refit_fleet_unit` (so cost, level-up and logging are unchanged), stops when credits run short and reports how many were refitted, the total cost and how many remain worn. It needs a service dock like a single refit, and changes nothing when no drone is worn or none is affordable. It is the `refit_damaged` fleet action (REST `/api/fleet/action`, agent catalog) and `fleet refit_damaged` on the CLI, whose parser keeps its own action list and was updated in the same change so parity holds (G-012, ADR-329).
+- **Consequences**: Engine, REST and CLI; the FLEET button follows. No new persisted field. Pinned by `tests/test_refit_damaged_drones.py`.
