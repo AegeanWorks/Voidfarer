@@ -3203,3 +3203,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: Hiring crew and seating them at the five bridge stations (helm, tactical, engineering, science, medical) took one manual assignment per officer, and nothing told a beginner which role belonged where.
 - **Decision**: `SimulationEngine.auto_staff_stations` seats, for each role (pilot to helm, marine to tactical, engineer to engineering, scientist to science, medic to medical), the active officer with the highest skill (then experience), replaces a worse or mismatched assignment, and clears stations held by officers whose role has none (the quartermaster). Injured or away officers are skipped. It changes nothing and says so when stations are already optimal. It is exposed as the `autostaff` crew action, which gives REST (`/api/crew/action`), the CLI and the agent catalog (G-012).
 - **Consequences**: Engine, REST and CLI; the CREW tab button follows. No new persisted field (stations already live on each crew member). Pinned by `tests/test_auto_staff.py`.
+
+### ADR-328: AUTO-STAFF STATIONS button on the CREW tab
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: ADR-327 added the engine action; the CREW roster still required seating each officer by hand.
+- **Decision**: `#btnAutoStaff` sits full-width between the crew summary and the roster toggle, always visible so a new captain finds it right after hiring. `handleAutoStaff` posts `{action: "autostaff"}` to `/api/crew/action`, applies the returned state, logs the result (a reward line when it seated anyone, a plain line when stations were already optimal), and redraws the roster when the CREW tab is open. It shares the width rule with the outposts button.
+- **Consequences**: Cockpit only. Verified in real Edge at 1366x768 (`ui-review/staff2/`, 0 console errors) with six crew: the roster showed all `NO STATION` before and HELM, TACTICAL, ENGINEERING (the skill-6 engineer), SCIENCE and MEDICAL after, with the skill-2 engineer unassigned, and a second click reported the stations already staffed. Pinned by `TestAutoStaffButton`.

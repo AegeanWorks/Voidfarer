@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `233`
-- **Total Classes**: `529`
+- **Total Classes**: `530`
 - **Total Top-Level Functions**: `532`
-- **Total Class Methods**: `2630`
-- **Total Source Lines**: `63145`
+- **Total Class Methods**: `2633`
+- **Total Source Lines**: `63169`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`233` module(s))
@@ -528,7 +528,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3244` lines (`147857` bytes)
+**Size**: `3268` lines (`149200` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -645,6 +645,10 @@
   - Method `.test_compact_market_rule_no_longer_shrinks_trade_buttons_below_it()`
 - `class TestRemainingClickTargets` - *Every compact-height 22px interactive control is lifted to the 24px minimum (ADR-326).*
   - Method `.test_final_rule_lists_the_target_surface_fleet_and_skill_controls()`
+- `class TestAutoStaffButton` - *CREW offers one button that seats the best officer at every station (ADR-328).*
+  - Method `.setUpClass()`
+  - Method `.test_button_sits_between_the_crew_summary_and_the_roster_toggle()`
+  - Method `.test_click_posts_the_autostaff_crew_action_and_redraws_the_roster()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`

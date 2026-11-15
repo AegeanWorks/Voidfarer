@@ -1128,6 +1128,7 @@ class CockpitApp {
         this.btnQuantumTarget?.addEventListener("click", () => this.handleTravelAction("quantum"));
         this.btnArriveNow?.addEventListener("click", () => this.handleArriveNow());
         document.getElementById("btnCopySeed")?.addEventListener("click", () => this.copyGalaxySeed());
+        document.getElementById("btnAutoStaff")?.addEventListener("click", () => this.handleAutoStaff());
         document.getElementById("deckTabsHeader")?.addEventListener("click", event => {
             if (event.target.closest && event.target.closest(".deck-tab-btn")) this.noteTabClick();
         });
@@ -10617,6 +10618,26 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (!button.dataset.bound) {
             button.dataset.bound = "true";
             button.addEventListener("click", () => this.postAction("/api/empire/action", { action: "outpost_repair_all" }, null));
+        }
+    }
+
+    // Seat the best matching officer at every bridge station in one click (ADR-328).
+    async handleAutoStaff() {
+        this.sound.init();
+        try {
+            const res = await apiFetch("/api/crew/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "autostaff" })
+            });
+            const json = await res.json();
+            if (json.state) this.state = json.state;
+            this.appendLog(json.message, json.ok ? "reward" : "system");
+            if (json.ok) this.sound.playChime();
+            this.renderHUD();
+            if (this.activeRightTab === "crew") this.renderCrew();
+        } catch (e) {
+            this.reportProblem(e.message);
         }
     }
 

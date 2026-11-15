@@ -704,6 +704,30 @@ class TestRemainingClickTargets(unittest.TestCase):
         self.assertIn("{ min-height: 24px; }", tail)
 
 
+class TestAutoStaffButton(unittest.TestCase):
+    """CREW offers one button that seats the best officer at every station (ADR-328)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_button_sits_between_the_crew_summary_and_the_roster_toggle(self):
+        crew = self.html[self.html.index('id="tabContentCrew"'):]
+        self.assertLess(crew.index('id="crewSummary"'), crew.index('id="btnAutoStaff"'))
+        self.assertLess(crew.index('id="btnAutoStaff"'), crew.index('id="btnToggleCrewRoster"'))
+        self.assertIn("#btnRepairAllOutposts, #btnAutoStaff { width: 100%;", self.css)
+
+    def test_click_posts_the_autostaff_crew_action_and_redraws_the_roster(self):
+        block = self.js.split("    async handleAutoStaff() {", 1)[1].split("    async copyGalaxySeed() {", 1)[0]
+        self.assertIn('"/api/crew/action"', block)
+        self.assertIn('JSON.stringify({ action: "autostaff" })', block)
+        self.assertIn("if (json.state) this.state = json.state;", block)
+        self.assertIn('if (this.activeRightTab === "crew") this.renderCrew();', block)
+        self.assertIn('document.getElementById("btnAutoStaff")?.addEventListener("click"', self.js)
+
+
 if __name__ == "__main__":
     unittest.main()
 

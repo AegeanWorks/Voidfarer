@@ -5,23 +5,12 @@
     "last_phase": "in_progress",
     "active_phase": 4,
     "status": "in_progress",
-    "updated_at": 1794742888.256186,
+    "updated_at": 1794743356.4498682,
     "owner": "claude:1",
     "started_by": "claude:1",
     "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-more-button-fit",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] MORE SYSTEMS button fits (ADR-320); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794739702.73239,
-      "timestamp_str": "2026-11-15 13:48:22",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-more-button-fit",
       "phase": "completed",
@@ -301,6 +290,17 @@
       "status": "in_progress",
       "timestamp": 1794742888.256186,
       "timestamp_str": "2026-11-15 14:41:28",
+      "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-auto-staff",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] AUTO-STAFF STATIONS button on the CREW tab (ADR-328); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794743356.4498682,
+      "timestamp_str": "2026-11-15 14:49:16",
       "agent": "claude:1"
     }
   ]

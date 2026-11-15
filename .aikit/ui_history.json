@@ -2876,5 +2876,27 @@
     "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
     "final_snapshot_entries": 1360,
     "surface_digest": "0875e00e18e1febb87ef3c9d7d16a99513bba3de9fa6899e7a9ec2b3259c6f1b"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "38ae3292148b430a288f68ce631f906ff1435d66",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794742949.5591545,
+    "finished_at": 1794743149.715039,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; staff2/laptop-crew-after.png: AUTO-STAFF STATIONS full-width under the crew summary; click seated HELM TACTICAL ENGINEERING(S6) SCIENCE MEDICAL and left the S2 engineer unassigned, roster re-rendered, second click reported already staffed, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "483b5b1384c8857c4b0ab5845ff2cbcb95d3c388ddf8bfa76d429629be8d9224",
+    "final_snapshot_entries": 1364,
+    "surface_digest": "21ed9b9aef61d0e72d2a3cac34dce976de16fdc271f0c55826458a9182605a88"
   }
 ]
