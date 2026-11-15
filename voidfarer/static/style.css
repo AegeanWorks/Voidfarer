@@ -9367,7 +9367,7 @@ body.cockpit-theme .nav-panel > .panel-header {
     .market-table .commodity-info-cell { gap: 1px; }
     .market-table td { padding-top: 5px; padding-bottom: 5px; }
     .market-table .trade-btn-group { gap: 2px; }
-    .market-table .btn-trade { min-height: 22px; padding: 1px 4px; }
+    .market-table .btn-trade { min-height: 24px; padding: 1px 4px; }
     .market-category-filters { flex-wrap: wrap; row-gap: 4px; }
 }
 .auto-trade-note { margin: 4px 0 0; color: var(--console-muted); font-family: var(--font-mono); font-size: 12px; }
@@ -11109,3 +11109,6 @@ body.cockpit-theme .nav-panel > .panel-header {
 
 /* An origin bonus the rank cap swallows reads as spent, not as a promise. */
 .attr-origin[data-maxed="true"] { color: var(--console-muted); border-style: dashed; }
+
+/* Click targets: nothing interactive in the left terminal is shorter than 24px (ADR-325). */
+.btn-trade, #btnHarvestFleet, .trade-tip { min-height: 24px; }

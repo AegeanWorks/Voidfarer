@@ -2836,5 +2836,25 @@
     "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
     "final_snapshot_entries": 1360,
     "surface_digest": "b7424359d267a947129b2d3fe4586c9cd6b6ccdd811f96698bad0ed2b032e93f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "d8d95764dada9c18e30ab242f8ae082a56112d88",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794741749.1031072,
+    "finished_at": 1794741927.6309059,
+    "strikes": 0,
+    "reviewer": "claude:1 main multimodal agent per G-015, user-authorized; targets/laptop-market.png and ui_audit market,fleet at laptop and short: BUY/SELL, TIP and HARVEST ALL reach 24px, smallTargets 0, layout intact, 0 errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "b7a5b14be859c56a8352f2a96c214a4a8828cdf22ccd1159c1b195f518d5a683",
+    "final_snapshot_entries": 1360,
+    "surface_digest": "41eb112a85eeed1abe214123484174544e81ec31d0cb770631b12f828c20a27f"
   }
 ]

@@ -3182,3 +3182,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: `tools/ui_audit.py --check` flagged `smallTargets` at 1366x768: under the `max-height: 800px` compaction the five core rail tabs were 23px tall, one pixel under the 24px minimum, and the same five violations existed before this session's changes.
 - **Decision**: In that media rule, `.deck-tab-btn` is `min-height: 24px` and the extra gap after every fourth tab is removed (`margin-bottom: 0`), which pays for the extra pixel so all 16 tabs, `FEWER 11` and the key hints still fit.
 - **Consequences**: CSS only. Measured in real Edge at 1366x768 and 1280x720 with every tab open: each tab is 24px, the last tab ends well inside the rail, nothing scrolls, and `ui_audit --check` reports 0 small targets at both sizes. Pinned by `TestRailTabTargetSize`.
+
+### ADR-325: 24px click targets for trade, tip and harvest buttons
+- **Date**: 2026-11-15
+- **Status**: Accepted
+- **Context**: Auditing every terminal tab with `tools/ui_audit.py --check` at 1366x768 flagged `smallTargets` on two tabs: the COMMERCE `BUY`/`SELL` buttons (22px under the compact market rule), the TIP line I added in ADR-307 (23px), and FLEET `HARVEST ALL` (22px). Every other tab was clean.
+- **Decision**: A final rule gives `.btn-trade`, `#btnHarvestFleet` and `.trade-tip` `min-height: 24px`, and the compact market rule that set the trade buttons to 22px now uses 24px.
+- **Consequences**: CSS only. `ui_audit --check` reports 0 small targets on market and fleet at 1366x768 and 1280x720, and the COMMERCE table still shows about two and a half rows at laptop height. The rest of the audit (all 16 tabs at laptop) is clean. Pinned by `TestTerminalClickTargets`.

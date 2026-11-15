@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-rail-target-size",
+    "task_id": "voidfarer-click-targets",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794741618.2831156,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794742101.2827067,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": [],
-    "completed_at": 1794741619.3595164,
-    "completed_head": "91ebaa742b1948b6fff55c7862360df9183e7de1"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-archetypes",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Plan: archetypes module and engine loadout, then three QUICK START buttons on character creation",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794737825.9825516,
-      "timestamp_str": "2026-11-15 13:17:05",
-      "agent": "claude:1",
-      "impact_assessment": {
-        "why": "The 20-point skill allocation is the heaviest choice a first-time player meets",
-        "benefits": "One click to a coherent start",
-        "risks": "contract: profile gains an archetype key validated against a catalogue; dependency: none; concurrency: loadout applied inside the engine lock via re-entrant calls; state: none new, loadout is ordinary ship state",
-        "mitigation": "Failing-first tests for every archetype, unknown archetype refused, default start unchanged"
-      },
-      "plan_digest": "e612fc4732642fe8d3ab26fc579d6e7bca8cb3c9f0cc9d97f312ffe088d8ba6a"
-    },
-    {
-      "task_id": "voidfarer-archetypes",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] archetypes module and engine loadout (ADR-317); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794737826.2243876,
-      "timestamp_str": "2026-11-15 13:17:06",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-archetypes",
       "phase": "in_progress",
@@ -304,6 +273,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "voidfarer-click-targets",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Plan: lift the flagged trade, tip and harvest buttons to the 24px minimum click target",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794742101.0524316,
+      "timestamp_str": "2026-11-15 14:28:21",
+      "agent": "claude:1",
+      "impact_assessment": {
+        "why": "A full tab audit at 1366x768 flagged BUY/SELL, my TIP line and HARVEST ALL as under 24px",
+        "benefits": "All terminal tabs pass the target-size audit",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "Min-height only, audit at two sizes, screenshot the COMMERCE tab, layout test"
+      },
+      "plan_digest": "0f2b41ffff4d0d760ac0d0d55779fcf36ffce030b7da6628ca5fecdfdfc49818"
+    },
+    {
+      "task_id": "voidfarer-click-targets",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] 24px click targets for trade, tip and harvest buttons (ADR-325); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794742101.2827067,
+      "timestamp_str": "2026-11-15 14:28:21",
+      "agent": "claude:1"
     }
   ]
 }

@@ -676,6 +676,21 @@ class TestRailTabTargetSize(unittest.TestCase):
         self.assertNotIn("min-height: 23px", block)
 
 
+class TestTerminalClickTargets(unittest.TestCase):
+    """Trade, tip and harvest buttons keep the 24px minimum click target (ADR-325)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_final_rule_sets_the_minimum_for_the_flagged_controls(self):
+        self.assertIn(".btn-trade, #btnHarvestFleet, .trade-tip { min-height: 24px; }", self.css)
+
+    def test_compact_market_rule_no_longer_shrinks_trade_buttons_below_it(self):
+        self.assertIn(".market-table .btn-trade { min-height: 24px; padding: 1px 4px; }", self.css)
+        self.assertNotIn(".market-table .btn-trade { min-height: 22px;", self.css)
+
+
 if __name__ == "__main__":
     unittest.main()
 

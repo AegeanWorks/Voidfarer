@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `232`
-- **Total Classes**: `526`
+- **Total Classes**: `527`
 - **Total Top-Level Functions**: `529`
-- **Total Class Methods**: `2620`
-- **Total Source Lines**: `63015`
+- **Total Class Methods**: `2623`
+- **Total Source Lines**: `63030`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`232` module(s))
@@ -508,7 +508,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3216` lines (`146440` bytes)
+**Size**: `3231` lines (`147116` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -619,6 +619,10 @@
   - Method `.test_list_column_can_shrink_and_rows_and_actions_wrap()`
 - `class TestRailTabTargetSize` - *Compact-height rail tabs still meet the 24px minimum click target (ADR-324).*
   - Method `.test_short_viewport_rule_keeps_tabs_at_24px_and_drops_the_group_gap()`
+- `class TestTerminalClickTargets` - *Trade, tip and harvest buttons keep the 24px minimum click target (ADR-325).*
+  - Method `.setUpClass()`
+  - Method `.test_final_rule_sets_the_minimum_for_the_flagged_controls()`
+  - Method `.test_compact_market_rule_no_longer_shrinks_trade_buttons_below_it()`
 - `class TestCockpitRuntimeContracts` - *Static regression checks for runtime wiring that the DOM structure cannot exercise.*
   - Method `.setUpClass()`
   - Method `.test_pointer_coordinates_are_scaled_to_canvas_space()`
