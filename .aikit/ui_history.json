@@ -2960,5 +2960,27 @@
     "final_snapshot_digest": "f74dfa5b157b712752a36cfcd2a1fe7b97cfb88a4a88e80c24433c7975e8b76d",
     "final_snapshot_entries": 1367,
     "surface_digest": "96f567ae98e3dea68064a2daa4943421004bd0272b05f66e03c179e43d64e99f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "0b6e20279ee47fbb23bff16dd69676b2889c8025",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794773364.0066633,
+    "finished_at": 1794776007.2119718,
+    "strikes": 2,
+    "reviewer": "kilo:goal main multimodal agent per G-015; ui-review/staged-tabs mastery1+veteran-on+mastery3: rail shows 8 advanced at mastery 1 with EMPIRE/CAPTAINS/DEPOT hidden, MORE SYSTEMS 8 v; veteran setting opens all 11 (FEWER 11 ^); mastery 3 opens all 11; turning it off hides 3 and returns to PLAYER; cycle skips locked tabs; 0 console errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
+    "final_snapshot_entries": 1370,
+    "surface_digest": "ab16a0a7a804a4fba5ceb997fdbb68f6a0b17ecbb85f6322079d2f14be054ea7"
   }
 ]

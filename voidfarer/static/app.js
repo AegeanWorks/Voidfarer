@@ -102,6 +102,9 @@ const ROOM_LAYOUTS = {
 // Left terminal rail order, top to bottom; [ and ] cycle through it.
 // Pilot Mastery level that opens SKILLS and CREW while the Cadet Academy still locks the other tabs.
 const CADET_EARLY_TAB_LEVEL = 2;
+// After the academy, these late terminals wait for the third Pilot Mastery level (ADR-336).
+const LATE_TAB_MASTERY = 3;
+const LATE_TAB_IDS = ["empire", "ai", "depot"];
 const TERMINAL_TABS = [
     "player", "skills", "crew", "ship", "market", "arsenal", "fleet", "contracts",
     "empire", "quests", "ai", "depot", "messages", "story", "factions", "codex",
@@ -130,7 +133,7 @@ async function loadCatalogs() {
 const SETTINGS_DEFAULTS = {
     sound: true, volume: 0.8, radarGrid: true, radarLabels: true, travelAnimation: true,
     starDensity: 220, uiDensity: "auto", uiScale: 1, rememberTab: true, lastTab: "player",
-    tradeLot: "1", autoPause: true, autoClaim: false,
+    tradeLot: "1", autoPause: true, autoClaim: false, unlockTabs: false,
 };
 
 class SoundController {
@@ -803,8 +806,11 @@ class CockpitApp {
         this.tabBtnMessages = document.getElementById("tabBtnMessages");
         this.btnToggleAdvancedTabs = document.getElementById("btnToggleAdvancedTabs");
         this.advancedTabsVisible = false;
-        // While the Cadet Academy runs only the core tabs show; skipping or finishing it unlocks the rest.
+        // While the Cadet Academy runs only the core tabs show; finishing or skipping it unlocks
+        // the advanced rail except the three late tabs, which wait for Pilot Mastery 3 (ADR-297, ADR-336).
         this.cadetTabLock = false;
+        this.unlockAllTabs = false;
+        this._advancedCountLabel = "";
         this.advancedTabCount = document.querySelectorAll('.deck-tab-btn[data-advanced="true"]').length;
         this.contractsBadge = document.getElementById("contractsBadge");
         this.storyBadge = document.getElementById("storyBadge");
@@ -1293,6 +1299,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         [
             "settingSound", "settingVolume", "settingGrid", "settingLabels", "settingAnimation", "settingStarDensity",
             "settingDensity", "settingUiScale", "settingRememberTab", "settingAutoPause", "settingAutoClaim", "settingTradeLot",
+            "settingUnlockTabs",
         ].forEach(id => {
             document.getElementById(id)?.addEventListener("input", () => this.applySettingsFromUI());
         });
@@ -1879,8 +1886,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         for (let hop = 1; hop <= TERMINAL_TABS.length; hop += 1) {
             next = TERMINAL_TABS[(index + step * hop + TERMINAL_TABS.length * hop) % TERMINAL_TABS.length];
             const button = document.getElementById("tabBtn" + (next === "ai" ? "AI" : next.charAt(0).toUpperCase() + next.slice(1)));
-            if (!(this.cadetTabLock && button && button.getAttribute("data-advanced") === "true"
-                && button.dataset.cadetUnlocked !== "true")) break;
+            const blocked = Boolean(button) && (button.dataset.masteryLocked === "true"
+                || (this.cadetTabLock && button.getAttribute("data-advanced") === "true"
+                    && button.dataset.cadetUnlocked !== "true"));
+            if (!blocked) break;
         }
         this.switchRightTab(next);
     }
@@ -1957,6 +1966,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.btnToggleAdvancedTabs.innerHTML = show
                 ? `FEWER <span class="deck-more-count">${count}</span> ▴`
                 : `MORE SYSTEMS <span class="deck-more-count">${count}</span> ▾`;
+            this._advancedCountLabel = `${count}:${show}`;
         }
         // Hiding the advanced set while one of its tabs is open returns the
         // player to the core bridge rather than leaving invisible content.
@@ -1970,15 +1980,16 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
     setCadetTabLock(locked, masteryLevel = 1) {
         const lock = Boolean(locked);
+        const mastery = Number(masteryLevel) || 1;
         // The first Pilot Mastery level-up earns skill points, so SKILLS and CREW open early.
-        const early = lock && Number(masteryLevel) >= CADET_EARLY_TAB_LEVEL;
+        const early = lock && mastery >= CADET_EARLY_TAB_LEVEL;
         for (const button of [this.tabBtnSkills, this.tabBtnCrew]) {
             if (button) button.dataset.cadetUnlocked = early ? "true" : "false";
         }
-        if (lock === this.cadetTabLock) return;
         this.cadetTabLock = lock;
         const header = document.getElementById("deckTabsHeader");
         if (header) header.classList.toggle("cadet-lock", lock);
+        this.applyTabUnlocks(mastery);
         if (lock) {
             const activeButton = document.querySelector(".deck-tab-btn.active");
             if (activeButton && activeButton.getAttribute("data-advanced") === "true"
@@ -1988,12 +1999,50 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
-    // While the academy locks a terminal, a control such as DOSSIER can still ask for it: explain, then show PLAYER.
+    // After the academy, EMPIRE, CAPTAINS and DEPOT wait for the third Pilot Mastery level.
+    // The veteran setting opens everything at once; nothing here is persisted in the save (ADR-336).
+    applyTabUnlocks(masteryLevel = null) {
+        const mastery = Number(masteryLevel ?? this.state?.ship?.mastery?.level ?? 1);
+        const lateLocked = !this.cadetTabLock && !this.unlockAllTabs && mastery < LATE_TAB_MASTERY;
+        const lateButtons = { empire: this.tabBtnEmpire, ai: this.tabBtnAI, depot: this.tabBtnDepot };
+        for (const [name, button] of Object.entries(lateButtons)) {
+            if (!button) continue;
+            if (lateLocked) button.dataset.masteryLocked = "true";
+            else delete button.dataset.masteryLocked;
+        }
+        this.updateAdvancedTabCount();
+        if (lateLocked && LATE_TAB_IDS.includes(this.activeRightTab || "")) {
+            this.appendLog("[MASTERY] That terminal opens at Pilot Mastery 3; showing PLAYER instead.", "system");
+            this.switchRightTab("player", { quiet: true });
+        }
+    }
+
+    updateAdvancedTabCount() {
+        let available = 0;
+        document.querySelectorAll('.deck-tab-btn[data-advanced="true"]').forEach(button => {
+            if (button.dataset.masteryLocked !== "true") available += 1;
+        });
+        this.advancedTabCount = available;
+        const signature = `${available}:${this.advancedTabsVisible}`;
+        if (this._advancedCountLabel === signature) return;
+        this._advancedCountLabel = signature;
+        const button = this.btnToggleAdvancedTabs;
+        if (!button) return;
+        const label = this.advancedTabsVisible ? "FEWER" : "MORE SYSTEMS";
+        const caret = this.advancedTabsVisible ? "▴" : "▾";
+        button.innerHTML = `${label} <span class="deck-more-count">${available}</span> ${caret}`;
+    }
+
+    // While a terminal is locked, a control such as DOSSIER can still ask for it: explain, then show PLAYER.
     redirectLockedTab(tabName, targetButton, options) {
-        const locked = targetButton.getAttribute("data-advanced") === "true"
+        const masteryLocked = targetButton.dataset.masteryLocked === "true";
+        const cadetLocked = Boolean(this.cadetTabLock)
+            && targetButton.getAttribute("data-advanced") === "true"
             && targetButton.dataset.cadetUnlocked !== "true";
-        if (!locked) return false;
-        this.appendLog("[ACADEMY] That terminal unlocks after the Cadet Academy; showing PLAYER instead.", "system");
+        if (!masteryLocked && !cadetLocked) return false;
+        this.appendLog(masteryLocked
+            ? "[MASTERY] That terminal opens at Pilot Mastery 3; showing PLAYER instead."
+            : "[ACADEMY] That terminal unlocks after the Cadet Academy; showing PLAYER instead.", "system");
         if (tabName !== "player") this.switchRightTab("player", options);
         return true;
     }
@@ -2010,6 +2059,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             player: this.tabBtnPlayer, skills: this.tabBtnSkills, crew: this.tabBtnCrew, empire: this.tabBtnEmpire, codex: this.tabBtnCodex,
         };
         const targetButton = tabButtons[tabName];
+        if (targetButton && targetButton.dataset.masteryLocked === "true"
+            && this.redirectLockedTab(tabName, targetButton, options)) return;
         if (this.cadetTabLock && targetButton && this.redirectLockedTab(tabName, targetButton, options)) return;
         if (targetButton && targetButton.getAttribute("data-advanced") === "true"
             && !this.advancedTabsVisible) {
@@ -9550,6 +9601,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.tradeLot = TRADE_LOTS.includes(String(profile.tradeLot)) ? String(profile.tradeLot) : "1";
         this.autoPauseOnAlert = profile.autoPause !== false;
         this.autoClaimContracts = profile.autoClaim === true;
+        this.unlockAllTabs = profile.unlockTabs === true;
+        this.applyTabUnlocks();
     }
 
     saveSettings() {
@@ -9567,6 +9620,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             tradeLot: this.tradeLot,
             autoPause: this.autoPauseOnAlert,
             autoClaim: this.autoClaimContracts,
+            unlockTabs: this.unlockAllTabs,
         };
         try { localStorage.setItem("voidfarer_settings", JSON.stringify(payload)); } catch (e) {}
     }
@@ -9585,6 +9639,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         this.rememberTerminalTab = document.getElementById("settingRememberTab")?.checked !== false;
         this.autoPauseOnAlert = document.getElementById("settingAutoPause")?.checked !== false;
         this.autoClaimContracts = document.getElementById("settingAutoClaim")?.checked === true;
+        this.unlockAllTabs = document.getElementById("settingUnlockTabs")?.checked === true;
+        this.applyTabUnlocks();
         const lot = document.getElementById("settingTradeLot")?.value;
         this.tradeLot = TRADE_LOTS.includes(lot) ? lot : "1";
         const volumeValue = document.getElementById("settingVolumeValue");
@@ -9611,6 +9667,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             settingRememberTab: this.rememberTerminalTab,
             settingAutoPause: this.autoPauseOnAlert,
             settingAutoClaim: this.autoClaimContracts,
+            settingUnlockTabs: this.unlockAllTabs,
         };
         Object.entries(toggles).forEach(([id, checked]) => {
             const input = document.getElementById(id);

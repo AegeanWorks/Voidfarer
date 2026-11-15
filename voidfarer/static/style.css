@@ -7126,6 +7126,8 @@ body.cockpit-theme {
 .deck-tabs-header.cadet-lock .deck-tab-btn[data-advanced="true"]:not([data-cadet-unlocked="true"]),
 .deck-tabs-header.cadet-lock .deck-more-btn { display: none !important; }
 .deck-tabs-header.cadet-lock .deck-tab-btn[data-cadet-unlocked="true"] { display: inline-block; }
+/* EMPIRE, CAPTAINS and DEPOT stay out of the rail until Pilot Mastery 3 (ADR-336). */
+.deck-tabs-header .deck-tab-btn[data-mastery-locked="true"] { display: none !important; }
 .panel-left .deck-more-btn {
     min-height: 26px;
     margin-top: 4px;

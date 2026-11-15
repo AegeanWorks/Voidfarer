@@ -521,6 +521,40 @@ class TestLockedTabRedirect(unittest.TestCase):
         self.assertIn('targetButton.dataset.cadetUnlocked !== "true"', block)
 
 
+class TestStagedTabUnlocks(unittest.TestCase):
+    """After the academy, EMPIRE, CAPTAINS and DEPOT wait for Pilot Mastery 3 (ADR-336)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_three_late_tabs_are_hidden_by_a_css_mastery_lock(self):
+        self.assertIn("const LATE_TAB_MASTERY = 3;", self.js)
+        self.assertIn('const LATE_TAB_IDS = ["empire", "ai", "depot"];', self.js)
+        self.assertIn('.deck-tabs-header .deck-tab-btn[data-mastery-locked="true"] { display: none !important; }',
+                      self.css)
+
+    def test_the_count_and_cycle_follow_the_available_tabs(self):
+        self.assertIn("applyTabUnlocks(masteryLevel = null)", self.js)
+        self.assertIn("if (button.dataset.masteryLocked !== \"true\") available += 1;", self.js)
+        self.assertIn("button.dataset.masteryLocked === \"true\"", self.js)
+        self.assertIn("const blocked = Boolean(button) && (button.dataset.masteryLocked === \"true\"", self.js)
+
+    def test_a_locked_tab_request_explains_the_mastery_rule(self):
+        self.assertIn('if (targetButton && targetButton.dataset.masteryLocked === "true"', self.js)
+        self.assertIn("[MASTERY] That terminal opens at Pilot Mastery 3; showing PLAYER instead.", self.js)
+
+    def test_the_veteran_setting_persists_and_reapplies(self):
+        self.assertIn('id="settingUnlockTabs"', self.html)
+        self.assertIn('"settingUnlockTabs",', self.js)
+        self.assertIn("this.unlockAllTabs = profile.unlockTabs === true;", self.js)
+        self.assertIn("this.unlockAllTabs = document.getElementById(\"settingUnlockTabs\")?.checked === true;", self.js)
+        self.assertIn("unlockTabs: this.unlockAllTabs,", self.js)
+        self.assertIn("settingUnlockTabs: this.unlockAllTabs,", self.js)
+
+
 class TestGalaxySeedControls(unittest.TestCase):
     """The galaxy seed is shown with a COPY button and can be chosen on a new game (ADR-315)."""
 

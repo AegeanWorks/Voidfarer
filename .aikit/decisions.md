@@ -3259,3 +3259,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The first post-tutorial audit found button#btnToggleVoid and button#btnToggleTransmissions at 18px tall against the 24px target floor (ADR-334 made those tabs measurable).
 - **Decision**: section-disclosure-toggle joins the sized disclosure rule shared by the SHIP, COMMERCE and FLEET toggles, giving it min-height 26px and 3px/8px padding, plus the same hover and focus-visible treatment.
 - **Consequences**: Cockpit only. Verified in real Edge post-tutorial at 1366x768 and 1280x720 (ui-review/audit-post/story-after/): 0 small targets, 0 errors, 0 clipped or offscreen. Pinned by TestStoryDisclosureTargets.
+
+### ADR-336: Stage the last three terminal tabs behind Pilot Mastery 3
+- **Date**: 2026-11-16
+- **Status**: Accepted
+- **Context**: ADR-297 hid every advanced tab during the Cadet Academy and opened all of them at graduation. The first-ten-minutes plan asks for natural unlocks (SKILLS and CREW at the first level-up, REFIT and FACTIONS at graduation, EMPIRE, CAPTAINS and DEPOT at Pilot Mastery 3) plus a veteran escape hatch.
+- **Decision**: After the academy, EMPIRE, CAPTAINS and DEPOT stay hidden through data-mastery-locked until Pilot Mastery 3; the MORE SYSTEMS count reflects only available tabs (8 before level 3); switching, bracket cycling and redirects treat a mastery-locked tab like a cadet-locked one and fall back to PLAYER with a [MASTERY] log. SETTINGS gains 'Unlock all terminal tabs (veteran)', persisted as unlockTabs in voidfarer_settings, default off and restored by RESET DEFAULTS. The save format is untouched; every lock is derived from existing mastery state.
+- **Consequences**: Verified in real Edge at 1366x768 (ui-review/staged-tabs/, 0 console errors): mastery 1 shows 8 advanced tabs and 'MORE SYSTEMS 8'; the veteran toggle opens all 11 immediately; turning it off while EMPIRE is active returns to PLAYER and hides the three; mastery 3 shows 11. Pinned by TestStagedTabUnlocks.

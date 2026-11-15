@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `234`
-- **Total Classes**: `538`
+- **Total Classes**: `539`
 - **Total Top-Level Functions**: `535`
-- **Total Class Methods**: `2659`
-- **Total Source Lines**: `63534`
+- **Total Class Methods**: `2664`
+- **Total Source Lines**: `63568`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`234` module(s))
@@ -536,7 +536,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3319` lines (`151781` bytes)
+**Size**: `3353` lines (`153713` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -617,6 +617,12 @@
   - Method `.setUpClass()`
   - Method `.test_switch_hands_locked_tabs_to_the_redirect_helper()`
   - Method `.test_helper_explains_then_shows_player_without_looping()`
+- `class TestStagedTabUnlocks` - *After the academy, EMPIRE, CAPTAINS and DEPOT wait for Pilot Mastery 3 (ADR-336).*
+  - Method `.setUpClass()`
+  - Method `.test_three_late_tabs_are_hidden_by_a_css_mastery_lock()`
+  - Method `.test_the_count_and_cycle_follow_the_available_tabs()`
+  - Method `.test_a_locked_tab_request_explains_the_mastery_rule()`
+  - Method `.test_the_veteran_setting_persists_and_reapplies()`
 - `class TestGalaxySeedControls` - *The galaxy seed is shown with a COPY button and can be chosen on a new game (ADR-315).*
   - Method `.setUpClass()`
   - Method `.test_player_tab_shows_the_seed_with_a_copy_button()`
