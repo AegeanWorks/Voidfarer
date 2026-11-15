@@ -3,25 +3,16 @@
   "active_task": {
     "task_id": "voidfarer-cli-parity",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794743679.3607092,
     "owner": "claude:1",
     "started_by": "claude:1",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794743680.130168,
+    "completed_head": "e8021c8ffc228f2b2ec299e8b03b571b83e82a95"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-repair-all-outposts",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] REPAIR ALL OUTPOSTS button on the EMPIRE tab (ADR-322); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794740549.6339598,
-      "timestamp_str": "2026-11-15 14:02:29",
-      "agent": "claude:1"
-    },
     {
       "task_id": "voidfarer-repair-all-outposts",
       "phase": "completed",
@@ -302,6 +293,22 @@
       "timestamp": 1794743679.3607092,
       "timestamp_str": "2026-11-15 14:54:39",
       "agent": "claude:1"
+    },
+    {
+      "task_id": "voidfarer-cli-parity",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-cli-parity' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794743680.1501582,
+      "timestamp_str": "2026-11-15 14:54:40",
+      "agent": "claude:1",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
