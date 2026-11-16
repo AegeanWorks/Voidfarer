@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "drone-harvest-message",
+    "task_id": "ai-captain-shipmods",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794802295.8481092,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794803844.9708214,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794802472.847174,
-    "completed_head": "de0b31158f84a014ce400f08cfffe7ebc4c4ad00",
-    "completed_tree": "9e02504870947b12e025c09b40d2c8128a3acb74"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-escort-tier",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Escort tier succeeds, trade 1802 -> 12, credits 5,137, tick 1,812; suite 1825 OK and gate 0 gaps (ADR-345); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794792631.2100868,
-      "timestamp_str": "2026-11-16 04:30:31",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-captain-escort-tier",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-escort-tier' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794792784.1875956,
-      "timestamp_str": "2026-11-16 04:33:04",
-      "agent": "kilo:goal",
-      "head": "e661182a834897864fca12f7522d0b2c4863be19",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-outpost-tier",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-shipmods",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Fit ship mods and key install attempts per mod id",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794803844.7917702,
+      "timestamp_str": "2026-11-16 07:37:24",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The captain never installed a mod, path-level de-duplication locked the route after one refusal, and a full hold made capacity-shedding choices always fail",
+        "benefits": "The structural refit mechanic is exercised end to end and a refusal no longer blocks every later mod",
+        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory signatures only",
+        "mitigation": "per-mod attempt slots, capacity-safe preference, engine remains authority on overflow, six tests plus the mechanics gate"
+      },
+      "plan_digest": "cfd9c84a3574d716879407dc48f70d6d3ba9d289472f6a1eeb0e99616ec95784"
+    },
+    {
+      "task_id": "ai-captain-shipmods",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Gate 44/54 actions (was 41/53), 0 gaps/errors; suite 1865 OK; install+remove both exercised (ADR-352); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794803844.9708214,
+      "timestamp_str": "2026-11-16 07:37:24",
+      "agent": "kilo:goal"
     }
   ]
 }

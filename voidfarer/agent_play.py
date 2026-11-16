@@ -457,6 +457,7 @@ class AiCaptain:
             self._tour_reactor_repair,
             self._tour_time_pause,
             self._tour_time_resume,
+            self._tour_shipmods,
             self._tour_shipmod_remove,
             self._tour_orbit,
             self._tour_salvage,
@@ -485,6 +486,10 @@ class AiCaptain:
         "/api/fleet/action": "action",
         "/api/crew/action": "action",
         "/api/contract/claim": "contract_id",
+        # One route installs twelve different mods; keying on the path meant a single
+        # early refusal (or a removal) locked every later install (ADR-352).
+        "/api/shipmods/install": "mod_id",
+        "/api/shipmods/remove": "slot",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1102,6 +1107,32 @@ class AiCaptain:
         if not (self.state.get("time") or {}).get("is_paused"):
             return None
         return "/api/time/resume", {}, "time_resume"
+
+    def _tour_shipmods(self):
+        """Fit a structural mod at a drydock; the tour only ever removed them before (ADR-352)."""
+        if not self._is_docked():
+            return None
+        ship_mods = self.state.get("ship_mods") or {}
+        installed = ship_mods.get("installed") or {}
+        catalog = [mod for mod in ship_mods.get("catalog") or []
+                   if isinstance(mod, dict) and mod.get("id") and mod.get("slot")]
+        if not catalog:
+            return None
+        credits = int((self.state.get("ship") or {}).get("credits") or 0)
+        used = int((self.state.get("ship") or {}).get("cargo_used_volume") or 0)
+        # A full hold makes every capacity-shedding mod impossible, so fit the cheaper
+        # capacity-neutral or capacity-raising mods first and only then try the rest
+        # (ADR-352); the engine stays the final authority on overflow.
+        candidates = [
+            mod for mod in sorted(catalog, key=lambda item: int(item.get("cost") or 0))
+            if not str(installed.get(mod["slot"]) or "")
+            and credits >= int(mod.get("cost") or 0)
+        ]
+        roomy = [mod for mod in candidates
+                 if int((mod.get("effects") or {}).get("cargo_capacity") or 0) >= 0]
+        for mod in roomy or candidates:
+            return "/api/shipmods/install", {"mod_id": mod["id"]}, "shipmods"
+        return None
 
     def _tour_shipmod_remove(self):
         installed = (self.state.get("ship_mods") or {}).get("installed") or {}

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `236`
-- **Total Classes**: `558`
+- **Total Classes**: `559`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2773`
-- **Total Source Lines**: `64732`
+- **Total Class Methods**: `2781`
+- **Total Source Lines**: `64825`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`236` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `765` lines (`35984` bytes)
+**Size**: `827` lines (`39197` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -175,6 +175,14 @@
   - Method `.test_the_volume_constant_matches_the_catalog()`
   - Method `.test_a_destroyed_hull_collects_nothing()`
   - Method `.test_selling_out_of_a_full_hold_ignores_the_buy_cap()`
+- `class ShipModInstallTourTest` - *The captain fits a structural mod, not just removes one (ADR-352).*
+  - Method `._captain(*, docked, credits, installed, used)`
+  - Method `.test_a_free_slot_is_fitted_with_the_cheapest_affordable_mod()`
+  - Method `.test_it_needs_a_dock_and_credits()`
+  - Method `.test_a_mod_that_would_overflow_cargo_is_skipped()`
+  - Method `.test_an_occupied_slot_is_left_alone()`
+  - Method `.test_a_capacity_shedding_mod_is_not_chosen_for_a_full_hold()`
+  - Method `.test_each_mod_id_gets_its_own_attempt_slot()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4620,7 +4628,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1197` lines (`54985` bytes)
+**Size**: `1228` lines (`56650` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4699,6 +4707,7 @@
   - Method `._tour_reactor_repair()`
   - Method `._tour_time_pause()`
   - Method `._tour_time_resume()`
+  - Method `._tour_shipmods()` - *Fit a structural mod at a drydock; the tour only ever removed them before (ADR-352).*
   - Method `._tour_shipmod_remove()`
   - Method `._is_docked()`
   - Method `._dockable_body()`

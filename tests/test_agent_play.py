@@ -752,6 +752,68 @@ class DroneCollectTourTest(unittest.TestCase):
         self.assertFalse(action[1]["is_buy"])
 
 
+class ShipModInstallTourTest(unittest.TestCase):
+    """The captain fits a structural mod, not just removes one (ADR-352)."""
+
+    def _captain(self, *, docked=True, credits=5000, installed=None, used=0):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "orbiting_body": {"station_dockable": True} if docked else {},
+            "ship": {"credits": credits, "cargo_capacity": 40, "cargo_used_volume": used},
+            "ship_mods": {
+                "installed": installed or {},
+                "catalog": [
+                    {"id": "cheap", "slot": "ops", "cost": 300, "effects": {}},
+                    {"id": "hangar", "slot": "frame", "cost": 1600,
+                     "effects": {"cargo_capacity": 30}},
+                    {"id": "tight", "slot": "thermal", "cost": 900,
+                     "effects": {"cargo_capacity": -20}},
+                ],
+            },
+        }
+        return captain
+
+    def test_a_free_slot_is_fitted_with_the_cheapest_affordable_mod(self):
+        action = self._captain()._tour_shipmods()
+        self.assertEqual(action[0], "/api/shipmods/install")
+        self.assertEqual(action[1]["mod_id"], "cheap")
+
+    def test_it_needs_a_dock_and_credits(self):
+        self.assertIsNone(self._captain(docked=False)._tour_shipmods())
+        self.assertIsNone(self._captain(credits=0)._tour_shipmods())
+
+    def test_a_mod_that_would_overflow_cargo_is_skipped(self):
+        # 35 volume used + -20 capacity would overflow the 40-volume hold.
+        action = self._captain(credits=1000, used=35)._tour_shipmods()
+        self.assertEqual(action[1]["mod_id"], "cheap", "the cheap ops mod has no capacity cost")
+
+    def test_an_occupied_slot_is_left_alone(self):
+        action = self._captain(installed={"ops": "cheap"})._tour_shipmods()
+        self.assertNotEqual(action[1]["mod_id"], "cheap")
+        self.assertIn(action[1]["mod_id"], ("hangar", "tight"))
+
+
+    def test_a_capacity_shedding_mod_is_not_chosen_for_a_full_hold(self):
+        # 19 titanium = 38 of 40 volume; the cheapest mods shed capacity, so the neutral
+        # salvage processor must be preferred or every attempt overflows (ADR-352).
+        captain = self._captain(credits=5000, used=38)
+        captain.state["ship_mods"]["catalog"] = [
+            {"id": "shunt", "slot": "thermal", "cost": 900, "effects": {"cargo_capacity": -15}},
+            {"id": "salvage", "slot": "ops", "cost": 1300, "effects": {}},
+        ]
+        self.assertEqual(captain._tour_shipmods()[1]["mod_id"], "salvage")
+
+    def test_each_mod_id_gets_its_own_attempt_slot(self):
+        # Keying installs on the path meant one refusal locked every later mod (ADR-352).
+        captain = self._captain()
+        signature = captain._tour_signature("/api/shipmods/install", {"mod_id": "cheap"})
+        self.assertEqual(signature, ("/api/shipmods/install", "cheap"))
+        captain.attempted.add("/api/shipmods/install")
+        captain.attempted_signatures.add(signature)
+        self.assertTrue(captain._tour_action_attempted("/api/shipmods/install", {"mod_id": "cheap"}))
+        self.assertFalse(captain._tour_action_attempted("/api/shipmods/install", {"mod_id": "hangar"}))
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main
