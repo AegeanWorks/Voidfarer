@@ -300,6 +300,7 @@ python -m voidfarer.cli economy
 python -m voidfarer.cli inventory
 python -m voidfarer.cli inventory buy nanite_repair_paste 2
 python -m voidfarer.cli inventory use nanite_repair_paste
+python -m voidfarer.cli inventory jettison titanium 1
 
 # Leave a docked broker buying low and selling high while you handle other work
 python -m voidfarer.cli autotrade on fuel_cells 55 85 1
