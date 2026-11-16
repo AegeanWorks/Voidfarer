@@ -148,6 +148,12 @@ class AiCaptain:
     # would otherwise be retried every cooldown for the whole run; three honest
     # attempts are enough to prove it was tried later (ADR-348).
     REFUSAL_RETRY_LIMIT = 3
+    # Experience and credit gates open much later than 80 steps: a 2,000-step campaign
+    # reached Pilot Mastery 6 with 21,775 cr while its level-1 outpost refusal had
+    # already been written off (ADR-361). After the fast attempts, the gate is released
+    # on a slow horizon until the action is actually attempted.
+    SLOW_RETRY_STEPS = 180
+    SLOW_RETRY_LIMIT = 12
     RETRYABLE_REFUSAL_WORDS = (
         "insufficient credits", "cr required", "costs", "skill point",
         "level", "not enough", "requires",
@@ -387,11 +393,15 @@ class AiCaptain:
         return "/api/time/step", {"ticks": 1}, "time"
 
     def _note_refusal(self, signature: tuple[str, str], message: str) -> None:
-        """Schedule one bounded retry for a resource gate; drop the cooldown after the last."""
+        """Schedule a fast retry, then a slow one, then drop a gate that never opens."""
         attempts = self.refusal_attempts.get(signature, 0) + 1
         self.refusal_attempts[signature] = attempts
-        if self._refusal_may_pass(message) and attempts < self.REFUSAL_RETRY_LIMIT:
+        if not self._refusal_may_pass(message):
+            self.retry_at.pop(signature, None)
+        elif attempts < self.REFUSAL_RETRY_LIMIT:
             self.retry_at[signature] = self.total_steps + self.REFUSAL_RETRY_STEPS
+        elif attempts < self.SLOW_RETRY_LIMIT:
+            self.retry_at[signature] = self.total_steps + self.SLOW_RETRY_STEPS
         else:
             # A stale cooldown would read as expired and allow one more attempt.
             self.retry_at.pop(signature, None)

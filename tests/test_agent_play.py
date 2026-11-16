@@ -363,21 +363,37 @@ class RefusalRetryTest(unittest.TestCase):
         self.assertTrue(all(action is not None for action in taken))
         self.assertIsNone(captain._trade_choice(4))
 
-    def test_a_never_opening_gate_is_retried_but_not_forever(self):
+    def test_a_gate_that_opens_late_is_retried_on_a_slow_horizon(self):
         captain = self._captain()
-        signature = ("/api/fleet/escort/buy", "buy")
+        signature = ("/api/fleet/escort/buy", "")
         message = "Insufficient credits: 3200 cr required."
-        scheduled = []
-        for attempt in range(1, captain.REFUSAL_RETRY_LIMIT + 1):
+        captain.total_steps = 100
+        captain._note_refusal(signature, message)
+        self.assertEqual(captain.retry_at[signature], 100 + captain.REFUSAL_RETRY_STEPS)
+        captain.total_steps = 200
+        captain._note_refusal(signature, message)
+        captain.total_steps = 300
+        captain._note_refusal(signature, message)
+        self.assertEqual(captain.retry_at[signature], 300 + captain.SLOW_RETRY_STEPS,
+                         "the third attempt must fall back to the slow horizon")
+        captain.attempted.add(signature[0])
+        captain.total_steps = 300 + captain.SLOW_RETRY_STEPS - 1
+        self.assertTrue(captain._tour_action_attempted(signature[0], {}))
+        captain.total_steps = 300 + captain.SLOW_RETRY_STEPS
+        self.assertFalse(captain._tour_action_attempted(signature[0], {}),
+                         "a released gate stays available until the action is attempted")
+
+    def test_a_never_opening_gate_is_still_bounded(self):
+        captain = self._captain()
+        signature = ("/api/fleet/escort/buy", "")
+        message = "Insufficient credits: 3200 cr required."
+        for attempt in range(1, captain.SLOW_RETRY_LIMIT + 1):
             captain.total_steps = attempt * 100
             captain._note_refusal(signature, message)
-            scheduled.append(signature in captain.retry_at)
-        self.assertEqual(scheduled, [True] * (captain.REFUSAL_RETRY_LIMIT - 1) + [False],
-                         "the last attempt must drop the cooldown, not extend it")
+        self.assertNotIn(signature, captain.retry_at,
+                         "the slow budget must end, not extend forever")
         captain.attempted.add(signature[0])
-        captain.attempted_signatures.add(signature)
-        self.assertTrue(captain._tour_action_attempted(signature[0], {"action": "buy"}),
-                        "an exhausted gate must stay suppressed")
+        self.assertTrue(captain._tour_action_attempted(signature[0], {}))
 
     def test_a_hard_refusal_never_schedules_a_retry(self):
         captain = self._captain()

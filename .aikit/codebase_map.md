@@ -9,8 +9,8 @@
 - **Total Python Modules**: `237`
 - **Total Classes**: `565`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2835`
-- **Total Source Lines**: `65495`
+- **Total Class Methods**: `2836`
+- **Total Source Lines**: `65521`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1093` lines (`52490` bytes)
+**Size**: `1109` lines (`53346` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -124,7 +124,8 @@
   - Method `.test_a_hard_refusal_is_not_retried()`
   - Method `.test_a_retry_stays_suppressed_until_the_cooldown_passes()`
   - Method `.test_fallback_trades_are_capped()`
-  - Method `.test_a_never_opening_gate_is_retried_but_not_forever()`
+  - Method `.test_a_gate_that_opens_late_is_retried_on_a_slow_horizon()`
+  - Method `.test_a_never_opening_gate_is_still_bounded()`
   - Method `.test_a_hard_refusal_never_schedules_a_retry()`
   - Method `.test_a_success_clears_the_retry_budget()`
 - `class EscortTierTourTest` - *Once an escort is purchased, its role, training, captain and repair are tour steps.*
@@ -4681,7 +4682,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1489` lines (`69426` bytes)
+**Size**: `1499` lines (`69982` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4693,7 +4694,7 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
-  - Method `._note_refusal(signature, message)` - *Schedule one bounded retry for a resource gate; drop the cooldown after the last.*
+  - Method `._note_refusal(signature, message)` - *Schedule a fast retry, then a slow one, then drop a gate that never opens.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*
   - Method `._trade_choice(step)` - *Sell one unit when the hold is volume-full, otherwise buy one on even steps.*
   - Method `._next_tour_action()`
