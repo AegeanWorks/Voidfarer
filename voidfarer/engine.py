@@ -4284,8 +4284,16 @@ class SimulationEngine:
             if not ok:
                 return False, " ".join(messages)
             if self.state.active_combat or self.state.active_anomaly:
-                messages.append("Route interrupted by a hostile or anomaly encounter.")
-                break
+                # A cut-short course is not an arrival: callers must be able to retry it
+                # instead of recording the destination as reached (ADR-359).
+                target_name = self._system_display_name(target_system_id)
+                arrived = self.state.ship.current_system_id == target_system_id
+                messages.append(
+                    f"Arrived at {target_name}, but an encounter blocks the system."
+                    if arrived else
+                    f"Route interrupted before reaching {target_name}."
+                )
+                return False, " ".join(messages)
         return True, " ".join(messages)
 
     def recruit_crew(self, role_id: str) -> tuple[bool, str]:

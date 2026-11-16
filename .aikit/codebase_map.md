@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `236`
-- **Total Classes**: `563`
+- **Total Python Modules**: `237`
+- **Total Classes**: `564`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2818`
-- **Total Source Lines**: `65225`
+- **Total Class Methods**: `2823`
+- **Total Source Lines**: `65286`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`236` module(s))
+- **Indexed**: python (`237` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2984,6 +2984,21 @@
 
 ---
 
+### [`tests/test_navigation_contract.py`](tests/test_navigation_contract.py)
+> *navigate_to must not claim success when an encounter cuts the route short (ADR-359).*
+
+**Size**: `53` lines (`1945` bytes)
+
+**Classes:**
+- `class NavigateContractTest`
+  - Method `.setUp()`
+  - Method `._patch_jump(encounter_after_first)`
+  - Method `.test_a_completed_route_reports_success_and_reaches_the_target()`
+  - Method `.test_an_interrupted_route_reports_failure()`
+  - Method `.test_an_unreachable_target_still_reports_failure()`
+
+---
+
 ### [`tests/test_navigation_traffic.py`](tests/test_navigation_traffic.py)
 > *Open-space transit vectors and the NPC traffic that shares the map.*
 
@@ -5080,7 +5095,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11264` lines (`555350` bytes)
+**Size**: `11272` lines (`555853` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

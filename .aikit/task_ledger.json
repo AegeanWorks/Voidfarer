@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "cockpit-drone-yield-badge",
+    "task_id": "navigation-interrupted-contract",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794812409.2722752,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794818712.1946058,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794812844.3047163,
-    "completed_head": "e32c3d4c0840124384be54995aa6ba430bcdd08d",
-    "completed_tree": "c984f83df0695ae7766271d90b203b0193d53768"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "drone-harvest-message",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Edge shows '1 unit from fleet. 639 units remain...', 0 console errors; suite 1859 OK (ADR-351); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794802295.8481092,
-      "timestamp_str": "2026-11-16 07:11:35",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "drone-harvest-message",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'drone-harvest-message' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794802472.905371,
-      "timestamp_str": "2026-11-16 07:14:32",
-      "agent": "kilo:goal",
-      "head": "de0b31158f84a014ce400f08cfffe7ebc4c4ad00",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-shipmods",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "navigation-interrupted-contract",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Report an interrupted multi-hop route as a failure",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794818711.9824173,
+      "timestamp_str": "2026-11-16 11:45:11",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "navigate_to returned success after an encounter cut the course short, so arrival could not be distinguished from a partial trip",
+        "benefits": "CLI, REST and agent callers can retry a cut-short course; de-duplication no longer records the destination as reached",
+        "risks": "contract: navigate_to bool changes from True to False on interruption; dependency: none; concurrency: none; state: none",
+        "mitigation": "failing-first test pinned the old bug, completed and unreachable routes pinned too, message names arrival vs interruption"
+      },
+      "plan_digest": "a55fd0c3b38ede68fe85119633a9f66a43684a99ab9d97996fe8ff01bdbc53a3"
+    },
+    {
+      "task_id": "navigation-interrupted-contract",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Failing-first fix passes; suite 1889 OK, gate 55/65 with 0 gaps (ADR-359); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794818712.1946058,
+      "timestamp_str": "2026-11-16 11:45:12",
+      "agent": "kilo:goal"
     }
   ]
 }
