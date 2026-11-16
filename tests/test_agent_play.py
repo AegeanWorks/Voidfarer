@@ -1193,6 +1193,83 @@ class StoryTravelTourTest(unittest.TestCase):
                          ("/api/orbit", self.BODY))
 
 
+class VoidTraversalTourTest(unittest.TestCase):
+    """The Act IV void beat dives, emerges and still resolves the chapter (ADR-366)."""
+
+    CHAPTER = "act4_hollow_between"
+    SYSTEM = "cygnus_x1"
+    HORIZON = "cygnus_x1_black_hole"
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "current_system": {"id": self.SYSTEM},
+            "ship": {
+                "hull": 75, "max_hull": 115, "shield": 125, "max_shield": 125,
+                "fuel": 35, "orbiting_body_id": self.HORIZON, "void_traversal": None,
+            },
+            "void": {
+                "dive_ready": True, "blockers": [],
+                "destinations": [
+                    {"system_id": "capella", "fuel_estimate": 17, "duration_ticks": 6},
+                    {"system_id": "golconda", "fuel_estimate": 12, "duration_ticks": 4},
+                ],
+            },
+            "story_status": {
+                "completed": False, "ready": True, "target_system_id": self.SYSTEM,
+                "chapter_id": self.CHAPTER, "unmet_requirements": [],
+                "choices": [{"id": "choice_horizon_witness", "locked": False}],
+            },
+            "story_chapters_map": {
+                self.CHAPTER: {"requirements": {"orbit_body_id": self.HORIZON}},
+            },
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_oath_beat_dives_to_the_cheapest_lane_once(self):
+        captain = self._captain()
+        action = captain._choose(3)
+        self.assertEqual(action[0], "/api/void/dive")
+        self.assertEqual(action[1]["target_system_id"], "golconda")
+        self.assertNotEqual(captain._choose(3)[0], "/api/void/dive")
+
+    def test_no_dive_off_the_required_horizon(self):
+        off_horizon = self._captain(ship={"orbiting_body_id": "cygnus_x1_body_1"})
+        self.assertEqual(off_horizon._choose(3)[0], "/api/story/choice")
+        other_chapter = self._captain(
+            story_chapters_map={self.CHAPTER: {"requirements": {"orbit_body_id": "elsewhere"}}})
+        self.assertEqual(other_chapter._choose(3)[0], "/api/story/choice")
+
+    def test_no_dive_with_thin_shields_hull_or_tank(self):
+        for weak in ({"shield": 20}, {"hull": 30}, {"fuel": 16}):
+            captain = self._captain(ship=weak)
+            self.assertEqual(captain._choose(3)[0], "/api/story/choice", weak)
+
+    def test_a_traversal_time_steps_then_emerges(self):
+        traversal = {"destination_system_id": "golconda", "arrival_tick": 10,
+                     "duration_ticks": 4, "started_tick": 5}
+        captain = self._captain(
+            ship={"void_traversal": traversal},
+            void={"traversal": traversal, "traversal_progress": 0.1},
+        )
+        self.assertEqual(captain._choose(4)[0], "/api/time/step")
+        captain.state["void"]["traversal_progress"] = 0.3
+        self.assertEqual(captain._choose(4)[0], "/api/void/emerge")
+        captain.state["void"]["traversal_progress"] = 0.5
+        self.assertEqual(captain._choose(4)[0], "/api/time/step")
+
+    def test_the_chapter_resolves_after_emergence(self):
+        captain = self._captain()
+        captain.void_attempted = True
+        self.assertEqual(captain._choose(3)[0], "/api/story/choice")
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

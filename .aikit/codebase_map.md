@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `568`
+- **Total Classes**: `569`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2857`
-- **Total Source Lines**: `65826`
+- **Total Class Methods**: `2865`
+- **Total Source Lines**: `66001`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1206` lines (`58221` bytes)
+**Size**: `1283` lines (`61692` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -226,6 +226,13 @@
   - Method `.test_story_travel_waits_for_combat_transit_and_anomalies()`
   - Method `.test_story_navigation_retries_but_generic_navigation_stays_one_shot()`
   - Method `.test_shared_routes_key_de_duplication_on_the_sub_action()`
+- `class VoidTraversalTourTest` - *The Act IV void beat dives, emerges and still resolves the chapter (ADR-366).*
+  - Method `._captain(**state)`
+  - Method `.test_the_oath_beat_dives_to_the_cheapest_lane_once()`
+  - Method `.test_no_dive_off_the_required_horizon()`
+  - Method `.test_no_dive_with_thin_shields_hull_or_tank()`
+  - Method `.test_a_traversal_time_steps_then_emerges()`
+  - Method `.test_the_chapter_resolves_after_emergence()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4478,7 +4485,7 @@
 ### [`tests/test_void_traversal.py`](tests/test_void_traversal.py)
 > *Unit and integration tests for the Hollow Between void traversal mechanics.*
 
-**Size**: `455` lines (`18823` bytes)
+**Size**: `474` lines (`19682` bytes)
 
 **Classes:**
 - `class TestVoidLanes`
@@ -4497,6 +4504,7 @@
   - Method `._goto_cygnus_horizon()`
   - Method `.test_dive_requires_black_hole_orbit()`
   - Method `.test_dive_validation_errors()`
+  - Method `.test_status_matches_the_shield_gate()`
   - Method `.test_dive_initializes_traversal()`
   - Method `.test_relic_grants_starting_stability()`
   - Method `.test_emergency_emergence_restores_horizon_orbit()`
@@ -4705,7 +4713,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1566` lines (`73651` bytes)
+**Size**: `1637` lines (`77124` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4731,6 +4739,7 @@
   - Method `._tour_messages()`
   - Method `._tour_contracts()`
   - Method `._tour_story_choice()` - *Resolve the active chapter's first unlocked choice; the tour never touched the arc.*
+  - Method `._void_dive_action()` - *Take the story's own void beat once: dive at the required horizon.*
   - Method `._story_hold_action()` - *Resolve the local chapter instead of letting a dock trip or body travel leave it.*
   - Method `._tour_story_travel()` - *Fly to the chapter target when the tank can cover the whole route plus a reserve.*
   - Method `._tour_story_orbit()` - *Orbit the body a chapter explicitly demands (Act IV's black hole, ADR-360).*
@@ -5132,7 +5141,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11287` lines (`556548` bytes)
+**Size**: `11295` lines (`556995` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

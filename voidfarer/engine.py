@@ -1605,6 +1605,14 @@ class SimulationEngine:
             orbiting = self.orbiting_body
             if orbiting is None or orbiting.body_type != "black_hole":
                 reasons.append("Orbit a black-hole event horizon to dive")
+            min_shield = max(10, int(self.state.ship.max_shield * 0.25))
+            if self.state.ship.shield < min_shield:
+                # void_dive refuses on the same gate; a ready status that fails on dive
+                # would make the cockpit lie (ADR-366).
+                reasons.append(
+                    f"Void shear demands {min_shield}+ MW shields "
+                    f"({self.state.ship.shield} available)"
+                )
 
             destinations = []
             if not reasons:

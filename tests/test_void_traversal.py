@@ -161,6 +161,25 @@ class TestVoidDiveAndTraversal(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("shields", msg)
 
+    def test_status_matches_the_shield_gate(self):
+        self._goto_cygnus_horizon()
+        with self.engine.lock:
+            self.engine.state = self.engine._clone_state(
+                ship=self.engine._clone_ship(shield=5, max_shield=100)
+            )
+        status = self.engine.void_status()
+        self.assertFalse(status["dive_ready"])
+        self.assertTrue(any("shields" in blocker for blocker in status["blockers"]))
+        self.assertEqual(status["destinations"], [])
+        ok, msg = self.engine.void_dive("golconda")
+        self.assertFalse(ok)
+        self.assertIn("shields", msg)
+        with self.engine.lock:
+            self.engine.state = self.engine._clone_state(
+                ship=self.engine._clone_ship(shield=100, max_shield=100, fuel=80)
+            )
+        self.assertTrue(self.engine.void_status()["dive_ready"])
+
     def test_dive_initializes_traversal(self):
         self._goto_cygnus_horizon()
         ok, msg = self.engine.void_dive("golconda")

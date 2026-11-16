@@ -47,8 +47,8 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/surface/action": "alias: routes the existing land/surface-operation/reconstruct actions",
     "/api/flight/action": "alias: routes the existing plot/navigate/jump/orbit/travel actions",
     "/api/reconstruct": "needs a devastated inhabited world in orbit",
-    "/api/void/dive": "needs a black-hole horizon",
-    "/api/void/emerge": "needs an active void traversal",
+    "/api/void/dive": "needs the Act IV black-hole orbit, which only a 2,000-step campaign reaches",
+    "/api/void/emerge": "needs an active void traversal after that dive",
     "/api/inventory/buy": "no item shop catalog is exposed by the API",
     "/api/inventory/use": "no consumable is in the hold",
     "/api/inventory/jettison": "no item catalog is exposed by the API",
@@ -169,6 +169,9 @@ class AiCaptain:
     REPEATABLE_MIN_INTERVAL = {"/api/refuel": 60, "/api/drone/collect": 30}
     NAVIGATION_FUEL_RESERVE = 5
     STORY_TRAVEL_RETRY_STEPS = 30
+    # Act IV asks for the Cygnus horizon and the Voidfarer's Oath; surfacing after a
+    # quarter of the crossing proves the lane without sailing past the chapter (ADR-366).
+    VOID_EMERGE_PROGRESS = 0.25
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -195,6 +198,9 @@ class AiCaptain:
         # One-shot combat tricks are remembered per encounter so a spent action is not
         # chosen again while the snapshot is one call behind (ADR-362).
         self.combat_used: dict[str, set[str]] = {}
+        # The Hollow Between is entered and surfaced once per campaign (ADR-366).
+        self.void_attempted = False
+        self.void_emerged = False
         # Two emergency fuel burns per campaign, chosen by state rather than tour
         # position so adding steps cannot starve the mechanic (ADR-355).
         self.emergency_burns = 0
@@ -294,6 +300,16 @@ class AiCaptain:
         if ship.get("travel"):
             return "/api/time/step", {"ticks": 1}, "time"
 
+        # A void crossing freezes every flight action; ride it a little, then surface
+        # back at the entry horizon before the chapter choice (ADR-366).
+        void = state.get("void") or {}
+        if ship.get("void_traversal") or void.get("traversal"):
+            progress = float(void.get("traversal_progress") or 0.0)
+            if not self.void_emerged and progress >= self.VOID_EMERGE_PROGRESS:
+                self.void_emerged = True
+                return "/api/void/emerge", {}, "void_emerge"
+            return "/api/time/step", {"ticks": 1}, "time"
+
         if step == 0:
             return "/api/settings/decisions", {"cadence": "relaxed"}, "settings"
 
@@ -306,6 +322,12 @@ class AiCaptain:
             faction = self._current_faction_id()
             if faction:
                 return "/api/diplomacy", {"faction_id": faction, "action": "improve"}, "diplomacy"
+
+        # Act IV's void beat: dive at the required horizon and surface again, which
+        # exercises the Hollow Between and restores the orbit the chapter needs.
+        dive = self._void_dive_action()
+        if dive is not None:
+            return dive
 
         # Resolve a chapter standing in its own target system before any dock trip or body
         # travel can carry the ship away from the required place (ADR-360).
@@ -701,6 +723,55 @@ class AiCaptain:
             if isinstance(choice, dict) and choice.get("id") and not choice.get("locked"):
                 return "/api/story/choice", {"choice_id": choice["id"]}, "story"
         return None
+
+    def _void_dive_action(self):
+        """Take the story's own void beat once: dive at the required horizon.
+
+        Shadowing every black-hole orbit would wander the galaxy for no story reason, so
+        this triggers only when the active chapter requires orbit around the body the ship
+        is already orbiting, with shields, hull and fuel to survive the crossing (ADR-366).
+        """
+        if self.void_attempted:
+            return None
+        story = self.state.get("story_status") or {}
+        if story.get("completed"):
+            return None
+        target = str(story.get("target_system_id") or "")
+        current = str((self.state.get("current_system") or {}).get("id") or "")
+        if not target or current != target:
+            return None
+        chapter = (self.state.get("story_chapters_map") or {}).get(
+            str(story.get("chapter_id") or "")
+        ) or {}
+        required = str((chapter.get("requirements") or {}).get("orbit_body_id") or "")
+        ship = self.state.get("ship") or {}
+        if not required or required != str(ship.get("orbiting_body_id") or ""):
+            return None
+        void = self.state.get("void") or {}
+        if not void.get("dive_ready"):
+            return None
+        hull = int(ship.get("hull") or 0)
+        max_hull = max(1, int(ship.get("max_hull") or 1))
+        shield = int(ship.get("shield") or 0)
+        max_shield = max(1, int(ship.get("max_shield") or 1))
+        if hull * 2 < max_hull or shield * 10 < max_shield * 3:
+            return None
+        fuel = int(ship.get("fuel") or 0)
+        affordable = [
+            destination
+            for destination in void.get("destinations") or []
+            if isinstance(destination, dict)
+            and int(destination.get("fuel_estimate") or 0) + self.NAVIGATION_FUEL_RESERVE <= fuel
+        ]
+        if not affordable:
+            return None
+        target_system = str(min(
+            affordable, key=lambda destination: int(destination.get("fuel_estimate") or 0)
+        ).get("system_id") or "")
+        if not target_system:
+            return None
+        self.void_attempted = True
+        return "/api/void/dive", {"target_system_id": target_system}, "void"
 
     def _story_hold_action(self):
         """Resolve the local chapter instead of letting a dock trip or body travel leave it.

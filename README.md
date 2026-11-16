@@ -399,7 +399,9 @@ mechanic families, succeeds on 57 endpoints, attempts 67 and reports **zero cove
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
 `CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither. Story chapters are flown on the
 route published in the `/api/state` snapshot, and a chapter standing in its target system is
-resolved before any dock trip can carry the ship away.
+resolved before any dock trip can carry the ship away. In the 2,000-step campaign the Act IV
+void beat also dives into the Hollow Between at the Cygnus horizon and surfaces again, which
+exercises the void lanes without losing the chapter orbit.
 
 Click-map: dup/missing
 184 controls, 39 visible, 0 dup.
