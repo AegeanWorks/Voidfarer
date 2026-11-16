@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "progression-gate-retry",
+    "task_id": "combat-action-policy",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794848755.8227026,
+    "updated_at": 1794853905.2605631,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,57 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794848841.8171823,
-    "completed_head": "996a4c4a6dbe09cba643133886748588461bd8e7",
-    "completed_tree": "95848cdd76c300b0e969d3f5ab7a0ea738b31d21"
+    "completed_at": 1794853959.0651834,
+    "completed_head": "a1c09d923b8000ddb6b0f3e8c06c1363973a939d",
+    "completed_tree": "7b4d70c28ff820f18ecc1b864d0d1a20c464cf05"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-narrative-tour",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-narrative-tour' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794806639.5915096,
-      "timestamp_str": "2026-11-16 08:23:59",
-      "agent": "kilo:goal",
-      "head": "9438f659e8d524c27befc3d005f5f6876fec7b5f",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "ai-captain-overhaul-burn",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Add a drydock overhaul step and make the emergency fuel burn state-driven",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794808922.1109939,
-      "timestamp_str": "2026-11-16 09:02:02",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Frame wear was never scrubbed, and the burn mechanic kept being displaced by tour additions",
-        "benefits": "Overhaul is covered once wear exists, and the burn can no longer be starved by ordering",
-        "risks": "contract: none; dependency: none; concurrency: none; state: two page-memory burn counters",
-        "mitigation": "wear and quote gates, a two-burn cap below one third tank, unit tests and a 600-step run"
-      },
-      "plan_digest": "30845f26b37e58cccae67da1cd6c2052b6e80ab7b5ed8100227792dd99aaa9e9"
-    },
-    {
-      "task_id": "ai-captain-overhaul-burn",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Overhaul fires in a 600-step run (76/69, 0 gaps); 180-step gate unchanged 56/65, 0 gaps; suite 1880 OK (ADR-355); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794808922.3251152,
-      "timestamp_str": "2026-11-16 09:02:02",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "ai-captain-overhaul-burn",
       "phase": "completed",
@@ -347,6 +301,64 @@
       "timestamp_str": "2026-11-16 20:07:21",
       "agent": "kilo:goal",
       "head": "996a4c4a6dbe09cba643133886748588461bd8e7",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "combat-action-policy",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Choose combat actions by state instead of always firing lasers",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794849998.2554398,
+      "timestamp_str": "2026-11-16 20:26:38",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The captain fires lasers on every combat step; 2,000-step probes die repeatedly (up to 5 insurance claims on seed 42) and never exercise shield absorb, reactor venting, subsystem targeting, boarding, drone strike, evasive burn or flee",
+        "benefits": "Combat survives longer and the tactical surface is genuinely exercised by the shared headless core; the 180-step gate can show several combat actions",
+        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory per-encounter action memory",
+        "mitigation": "failing-first unit tests per action and per gate, three-seed 2,000-step probes, unchanged 180-step gate gaps, full suite and 5/5 gates"
+      },
+      "plan_digest": "6f1e48712b2e207a059c0d1610382b604aa1920dd7523b9b3dee84ae55926d8e",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "combat-action-policy",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/4] Seeds 1/2/42 complete Act VI with 7 combat actions observed and 0-2 insurance rebuilds; gate unchanged 57/67, 0 gaps; suite Ran 1909 OK (ADR-362); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794853905.2605631,
+      "timestamp_str": "2026-11-16 21:31:45",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "combat-action-policy",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'combat-action-policy' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794853959.129573,
+      "timestamp_str": "2026-11-16 21:32:39",
+      "agent": "kilo:goal",
+      "head": "a1c09d923b8000ddb6b0f3e8c06c1363973a939d",
       "delivery": {
         "roots": [
           "."
