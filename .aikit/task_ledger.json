@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-play-honest-counts",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794788232.3997488,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794788442.832449,
+    "completed_head": "800f63e43bcb9a9be1dc08a646f52a29eb8d5ad2",
+    "completed_tree": "5810b06cceb5601343cd61c358ffd645dad505f5"
   },
   "checkpoints": [
-    {
-      "task_id": "staged-tab-unlocks",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Stage EMPIRE, CAPTAINS and DEPOT behind Pilot Mastery 3 with a veteran unlock setting",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794776717.1877158,
-      "timestamp_str": "2026-11-16 00:05:17",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "All advanced tabs opened at graduation; the first-ten-minutes plan asks for natural unlock milestones and a veteran override",
-        "benefits": "New captains get a smaller rail that grows with mastery; veterans can open everything from SETTINGS without touching the save",
-        "risks": "contract: none, save format unchanged; dependency: none; concurrency: none; state: localStorage settings only",
-        "mitigation": "locks derive from existing mastery, default off and restored by RESET DEFAULTS; real Edge verification at mastery 1, 3 and both toggle states; static pins"
-      },
-      "plan_digest": "6aa6b9dc6f0308b971c5d93e763e886c5f1115d5a62e44a0590e7de2a7a97542"
-    },
     {
       "task_id": "staged-tab-unlocks",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794788232.3997488,
       "timestamp_str": "2026-11-16 03:17:12",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-play-honest-counts",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-play-honest-counts' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794788442.8945851,
+      "timestamp_str": "2026-11-16 03:20:42",
+      "agent": "kilo:goal",
+      "head": "800f63e43bcb9a9be1dc08a646f52a29eb8d5ad2",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
