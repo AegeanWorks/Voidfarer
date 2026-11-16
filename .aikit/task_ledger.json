@@ -1,54 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-campaign-clock",
+    "task_id": "ai-captain-honest-friction",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794795986.3228145,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794797061.226729,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794796146.2583888,
-    "completed_head": "a0339565939872c9de59ace539152155db333c7c",
-    "completed_tree": "b15b560e02f2b006c3c9752c1bb43aac52994a53"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-play-step-cap",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Honour ai_play step requests up to a 2000-step guard and report any clamp",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794786948.8960884,
-      "timestamp_str": "2026-11-16 02:55:48",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "A 600-step request silently ran 200 steps with no indication the request was ignored, so soak evidence overstated its length",
-        "benefits": "Explicit long runs execute, and any clamp is visible in both text and JSON",
-        "risks": "contract: JSON gains two fields; dependency: none; concurrency: none; state: none",
-        "mitigation": "guard stays far above the 180-step gate; tests pin clamped and full-run reports; the 600-step run is verified"
-      },
-      "plan_digest": "791acc77a1677a849176cb085ecd9989fcdc1e9e5bae9c198164aa706441fe20"
-    },
-    {
-      "task_id": "ai-play-step-cap",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-play-step-cap' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794787117.5018933,
-      "timestamp_str": "2026-11-16 02:58:37",
-      "agent": "kilo:goal",
-      "head": "60746d64078b24fc02cfbc8b770124a032f475dd",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-play-honest-counts",
       "phase": "in_progress",
@@ -324,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-honest-friction",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Bound refusal retries and publish real hop fuel costs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794797061.050013,
+      "timestamp_str": "2026-11-16 05:44:21",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Bounded retries stop an unaffordable gate being retried forever, and a published hop price stops jumps the tank cannot pay for",
+        "benefits": "Refusals become a meaningful signal: long runs drop from 110 to 21, all one-off or genuinely gated",
+        "risks": "contract: snapshot gains a mapping; dependency: none; concurrency: none; state: page-memory retry budget only",
+        "mitigation": "three-attempt budget with stale cooldown cleanup, cost derived from the engine jump formula, tests and a 2,000-step measurement"
+      },
+      "plan_digest": "c9f6a6d6975454e0f1ec68febed07cde62da3299fc4422b0da4bec9789b1c467"
+    },
+    {
+      "task_id": "ai-captain-honest-friction",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Refusals 110 -> 21, gate 0 gaps/0 errors, suite 1841 OK, ADR-348 references corrected (ADR-348); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794797061.226729,
+      "timestamp_str": "2026-11-16 05:44:21",
+      "agent": "kilo:goal"
     }
   ]
 }

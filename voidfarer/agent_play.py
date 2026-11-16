@@ -144,6 +144,10 @@ class AiCaptain:
     # Affordability gates can pass later (contracts pay out), so a refused action is
     # retried after a cooldown instead of being written off for the whole run (ADR-345).
     REFUSAL_RETRY_STEPS = 40
+    # A gate that never opens (an unaffordable 3,200 cr hire on a 143 cr treasury)
+    # would otherwise be retried every cooldown for the whole run; three honest
+    # attempts are enough to prove it was tried later (ADR-348).
+    REFUSAL_RETRY_LIMIT = 3
     RETRYABLE_REFUSAL_WORDS = (
         "insufficient credits", "cr required", "costs", "skill point",
         "level", "not enough", "requires",
@@ -172,6 +176,7 @@ class AiCaptain:
         self.tour_cursor = 0
         self.tour_exhausted = False
         self.retry_at: dict[tuple[str, str], int] = {}
+        self.refusal_attempts: dict[tuple[str, str], int] = {}
         self.fallback_trades = 0
 
     def play(self, steps: int = 40) -> dict[str, Any]:
@@ -212,14 +217,14 @@ class AiCaptain:
             if not payload.get("ok"):
                 message = str(payload.get("message", "refused"))
                 self.refusals.append(f"{family}: {message}")
-                if self._refusal_may_pass(message):
-                    self.retry_at[signature] = self.total_steps + self.REFUSAL_RETRY_STEPS
+                self._note_refusal(signature, message)
                 if payload.get("state"):
                     self.state = payload["state"]
                 continue
             self.families[family] = self.families.get(family, 0) + 1
             self.succeeded.add(path)
             self.retry_at.pop(signature, None)
+            self.refusal_attempts.pop(signature, None)
             if payload.get("state"):
                 self.state = payload["state"]
         return self.report()
@@ -303,12 +308,19 @@ class AiCaptain:
         if body and body.get("landable") and not ship.get("landed_body_id") and step % 3 == 0:
             return "/api/land", {"target": body["id"]}, "land"
 
-        # A jump burns quantum fuel; with an empty tank an attempt can only be refused
-        # (33 wasted refusals in a 2,000-step run), so wait for fuel or a refuel instead.
-        if step % 20 == 5 and int(ship.get("fuel") or 0) > 0:
+        # A jump burns the real hop cost, not one unit; using the published estimates
+        # stopped 47 attempts that could only be refused (ADR-348).
+        if step % 20 == 5:
             system = (state.get("current_system") or {}).get("connections") or []
-            if system:
-                return "/api/jump", {"target": system[step % len(system)]}, "jump"
+            costs = state.get("jump_fuel_costs") or {}
+            fuel = int(ship.get("fuel") or 0)
+            # Without a published estimate the old floor still applies: some fuel.
+            affordable = [
+                sid for sid in system
+                if ((fuel >= int(costs[sid])) if sid in costs else fuel > 0)
+            ]
+            if affordable:
+                return "/api/jump", {"target": affordable[step % len(affordable)]}, "jump"
 
         # Touristing between bodies is the last resort, not the default: otherwise the
         # captain spends the whole run in transit and never exercises a station mechanic.
@@ -321,6 +333,16 @@ class AiCaptain:
                 return "/api/travel", {"body_id": target_body["id"], "mode": "sublight"}, "travel"
 
         return "/api/time/step", {"ticks": 1}, "time"
+
+    def _note_refusal(self, signature: tuple[str, str], message: str) -> None:
+        """Schedule one bounded retry for a resource gate; drop the cooldown after the last."""
+        attempts = self.refusal_attempts.get(signature, 0) + 1
+        self.refusal_attempts[signature] = attempts
+        if self._refusal_may_pass(message) and attempts < self.REFUSAL_RETRY_LIMIT:
+            self.retry_at[signature] = self.total_steps + self.REFUSAL_RETRY_STEPS
+        else:
+            # A stale cooldown would read as expired and allow one more attempt.
+            self.retry_at.pop(signature, None)
 
     def _refusal_may_pass(self, message: str) -> bool:
         """True when the refusal is a resource gate that later play can satisfy."""

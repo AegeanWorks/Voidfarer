@@ -363,6 +363,39 @@ class RefusalRetryTest(unittest.TestCase):
         self.assertTrue(all(action is not None for action in taken))
         self.assertIsNone(captain._trade_choice(4))
 
+    def test_a_never_opening_gate_is_retried_but_not_forever(self):
+        captain = self._captain()
+        signature = ("/api/fleet/escort/buy", "buy")
+        message = "Insufficient credits: 3200 cr required."
+        scheduled = []
+        for attempt in range(1, captain.REFUSAL_RETRY_LIMIT + 1):
+            captain.total_steps = attempt * 100
+            captain._note_refusal(signature, message)
+            scheduled.append(signature in captain.retry_at)
+        self.assertEqual(scheduled, [True] * (captain.REFUSAL_RETRY_LIMIT - 1) + [False],
+                         "the last attempt must drop the cooldown, not extend it")
+        captain.attempted.add(signature[0])
+        captain.attempted_signatures.add(signature)
+        self.assertTrue(captain._tour_action_attempted(signature[0], {"action": "buy"}),
+                        "an exhausted gate must stay suppressed")
+
+    def test_a_hard_refusal_never_schedules_a_retry(self):
+        captain = self._captain()
+        signature = ("/api/reactor/mode", "balanced")
+        for attempt in range(3):
+            captain.total_steps = attempt * 100
+            captain._note_refusal(signature, "Reactor already operating in balanced mode.")
+        self.assertNotIn(signature, captain.retry_at)
+
+    def test_a_success_clears_the_retry_budget(self):
+        captain = self._captain()
+        signature = ("/api/fleet/escort/buy", "buy")
+        captain._note_refusal(signature, "Insufficient credits: 3200 cr required.")
+        self.assertIn(signature, captain.retry_at)
+        captain.retry_at.pop(signature, None)
+        captain.refusal_attempts.pop(signature, None)
+        self.assertNotIn(signature, captain.refusal_attempts)
+
 
 class EscortTierTourTest(unittest.TestCase):
     """Once an escort is purchased, its role, training, captain and repair are tour steps."""
@@ -534,6 +567,13 @@ class CampaignPhaseTest(unittest.TestCase):
     def test_an_empty_tank_does_not_attempt_a_jump(self):
         action = self._captain(fuel=0)._choose(5)
         self.assertNotEqual(action[0], "/api/jump")
+
+    def test_the_published_hop_cost_decides_the_attempt(self):
+        captain = self._captain(fuel=1)
+        captain.state["jump_fuel_costs"] = {"altair": 4}
+        self.assertNotEqual(captain._choose(5)[0], "/api/jump")
+        captain.state["ship"]["fuel"] = 4
+        self.assertEqual(captain._choose(5)[0], "/api/jump")
 
 
 class OutpostTierEndToEndTest(unittest.TestCase):

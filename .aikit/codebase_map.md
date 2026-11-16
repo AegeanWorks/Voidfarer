@@ -9,8 +9,8 @@
 - **Total Python Modules**: `235`
 - **Total Classes**: `553`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2746`
-- **Total Source Lines**: `64390`
+- **Total Class Methods**: `2751`
+- **Total Source Lines**: `64460`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `603` lines (`28524` bytes)
+**Size**: `643` lines (`30557` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -124,6 +124,9 @@
   - Method `.test_a_hard_refusal_is_not_retried()`
   - Method `.test_a_retry_stays_suppressed_until_the_cooldown_passes()`
   - Method `.test_fallback_trades_are_capped()`
+  - Method `.test_a_never_opening_gate_is_retried_but_not_forever()`
+  - Method `.test_a_hard_refusal_never_schedules_a_retry()`
+  - Method `.test_a_success_clears_the_retry_budget()`
 - `class EscortTierTourTest` - *Once an escort is purchased, its role, training, captain and repair are tour steps.*
   - Method `._captain(*, docked, **state)`
   - Method `._ship(**fields)`
@@ -147,6 +150,7 @@
   - Method `.test_batched_play_calls_continue_the_global_phase()`
   - Method `.test_a_jump_is_attempted_with_fuel()`
   - Method `.test_an_empty_tank_does_not_attempt_a_jump()`
+  - Method `.test_the_published_hop_cost_decides_the_attempt()`
 - `class OutpostTierEndToEndTest` - *A seeded outpost really is upgraded, fitted, crewed and specialized via the API (ADR-347).*
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
@@ -4578,7 +4582,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1130` lines (`51209` bytes)
+**Size**: `1152` lines (`52389` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4590,6 +4594,7 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
+  - Method `._note_refusal(signature, message)` - *Schedule one bounded retry for a resource gate; drop the cooldown after the last.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*
   - Method `._trade_choice(step)` - *Sell one unit when the hold is volume-full, otherwise buy one on even steps.*
   - Method `._next_tour_action()`
@@ -4986,7 +4991,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11225` lines (`553424` bytes)
+**Size**: `11233` lines (`553888` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

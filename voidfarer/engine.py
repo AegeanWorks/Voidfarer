@@ -8483,6 +8483,13 @@ class SimulationEngine:
                         ),
                     }
             survey_scanned = sum(1 for b in cur_sys.bodies if b.scan_completed)
+            # Clients cannot price a hop without the engine formula, so publish the real
+            # cost of every current connection; a plan must match the jump (ADR-348).
+            jump_fuel_costs = {
+                target_id: self._hop_fuel_cost(cur_sys, self.state.systems[target_id])
+                for target_id in cur_sys.connections
+                if target_id in self.state.systems
+            }
             ship_snapshot = self.state.ship.to_dict()
             used_volume = calculate_cargo_volume(self.state.ship.cargo)
             ship_snapshot["cargo_used_volume"] = used_volume
@@ -8507,6 +8514,7 @@ class SimulationEngine:
                     "complete": survey_scanned >= len(cur_sys.bodies),
                 },
                 "visited_systems": list(self.state.visited_systems),
+                "jump_fuel_costs": jump_fuel_costs,
                 "active_anomaly": self.state.active_anomaly.to_dict() if self.state.active_anomaly else None,
                 "active_combat": self.state.active_combat.to_dict() if self.state.active_combat else None,
                 "active_pirate": self.state.active_pirate.to_dict() if self.state.active_pirate else None,
