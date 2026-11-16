@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "navigation-interrupted-contract",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794818712.1946058,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794819012.3896084,
+    "completed_head": "2d6c2e3ded261d073e323e80a23f260e1b6f2e47",
+    "completed_tree": "ba679b9401502556d9b65e95cc35b5b6c2c5c303"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-shipmods",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Fit ship mods and key install attempts per mod id",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794803844.7917702,
-      "timestamp_str": "2026-11-16 07:37:24",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The captain never installed a mod, path-level de-duplication locked the route after one refusal, and a full hold made capacity-shedding choices always fail",
-        "benefits": "The structural refit mechanic is exercised end to end and a refusal no longer blocks every later mod",
-        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory signatures only",
-        "mitigation": "per-mod attempt slots, capacity-safe preference, engine remains authority on overflow, six tests plus the mechanics gate"
-      },
-      "plan_digest": "cfd9c84a3574d716879407dc48f70d6d3ba9d289472f6a1eeb0e99616ec95784"
-    },
     {
       "task_id": "ai-captain-shipmods",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794818712.1946058,
       "timestamp_str": "2026-11-16 11:45:12",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "navigation-interrupted-contract",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'navigation-interrupted-contract' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794819012.4576054,
+      "timestamp_str": "2026-11-16 11:50:12",
+      "agent": "kilo:goal",
+      "head": "2d6c2e3ded261d073e323e80a23f260e1b6f2e47",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
