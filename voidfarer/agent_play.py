@@ -408,6 +408,8 @@ class AiCaptain:
             self._tour_route,
             self._tour_messages,
             self._tour_contracts,
+            self._tour_research_queue,
+            self._tour_research_cancel,
             self._tour_contract_claim,
             self._tour_swap,
             self._tour_refuel,
@@ -430,11 +432,14 @@ class AiCaptain:
             self._tour_mastery,
             self._tour_training,
             self._tour_depot,
+            self._tour_depot_withdraw,
+            self._tour_depot_sell,
             self._tour_preview,
             self._tour_stance,
             self._tour_weapon_set,
             self._tour_events,
             self._tour_crew_train,
+            self._tour_crew_station,
             self._tour_ability,
             self._tour_drone_buy,
             self._tour_drone_deploy,
@@ -463,6 +468,7 @@ class AiCaptain:
             self._tour_salvage,
             self._tour_scoop,
             self._tour_burn_cells,
+            self._tour_fabricate,
         )
         attempts = 0
         while attempts < len(builders):
@@ -585,8 +591,9 @@ class AiCaptain:
         return "/api/engineering/action", {"action": "burn_cells", "quantity": 1}, "burn_cells"
 
     def _tour_repair(self):
-        ship = self.state.get("ship") or {}
-        if not self._is_docked() or int(ship.get("hull") or 0) >= int(ship.get("max_hull") or 0):
+        # Attempted at any dock: an undamaged hull gets a harmless refusal, which keeps the
+        # endpoint covered when the run happens to take no damage (ADR-353).
+        if not self._is_docked():
             return None
         return "/api/repair", {}, "repair"
 
@@ -827,7 +834,93 @@ class AiCaptain:
         item_id = manifest[0].get("id")
         if not item_id:
             return None
-        return "/api/depot/deposit", {"item_id": item_id, "quantity": 1}, "depot"
+        # Three units so the later withdraw and sell steps have stock to work with (ADR-353).
+        quantity = min(3, int(manifest[0].get("quantity") or 1))
+        return "/api/depot/deposit", {"item_id": item_id, "quantity": quantity}, "depot"
+
+    def _depot_stock(self):
+        """The current system's depot and its first item with stock."""
+        system_id = (self.state.get("current_system") or {}).get("id")
+        depot = next(
+            (d for d in (self.state.get("depots") or [])
+             if isinstance(d, dict) and d.get("system_id") == system_id),
+            None,
+        )
+        if depot is None:
+            return None, None
+        cargo = depot.get("cargo") or {}
+        item = next((key for key, value in cargo.items() if int(value or 0) > 0), None)
+        return depot, item
+
+    def _tour_depot_withdraw(self):
+        if not self._is_docked():
+            return None
+        _depot, item = self._depot_stock()
+        if not item:
+            return None
+        free = int((self.state.get("ship") or {}).get("cargo_free_volume") or 0)
+        if free < 2:
+            return None
+        return "/api/depot/withdraw", {"item_id": item, "quantity": 1}, "depot_withdraw"
+
+    def _tour_depot_sell(self):
+        if not self._is_docked():
+            return None
+        _depot, item = self._depot_stock()
+        if not item:
+            return None
+        return "/api/depot/sell", {"item_id": item, "quantity": 1}, "depot_sell"
+
+    def _tour_research_queue(self):
+        research = self.state.get("research") or {}
+        completed = set(research.get("completed") or [])
+        queued = set(research.get("queue") or [])
+        active = research.get("active_project_id")
+        for project in research.get("available") or []:
+            project_id = str(project.get("id") or "") if isinstance(project, dict) else ""
+            if project_id and project_id not in completed \
+                    and project_id not in queued and project_id != active:
+                return "/api/research/queue", {"project_id": project_id}, "research_queue"
+        return None
+
+    def _tour_research_cancel(self):
+        queue = (self.state.get("research") or {}).get("queue") or []
+        if not queue:
+            return None
+        project_id = str(queue[0])
+        return "/api/research/cancel", {"project_id": project_id}, "research_cancel"
+
+    def _tour_fabricate(self):
+        ship = self.state.get("ship") or {}
+        if int((ship.get("cargo") or {}).get("titanium") or 0) < 1:
+            return None
+        if int(ship.get("hull") or 0) < int(ship.get("max_hull") or 0):
+            return "/api/fabricate", {"munitions_type": "patch_kit"}, "fabricate"
+        if int(ship.get("fuel") or 0) < int(ship.get("max_fuel") or 0):
+            return "/api/fabricate", {"munitions_type": "fuel_cell"}, "fabricate"
+        return None
+
+    def _tour_crew_station(self):
+        crew = [member for member in self.state.get("crew") or []
+                if isinstance(member, dict) and member.get("status") == "active"
+                and int(member.get("injury_ticks") or 0) == 0
+                and not str(member.get("station") or "")]
+        if not crew:
+            return None
+        assigned = {str(crew_id) for outpost in self.state.get("outposts") or []
+                    if isinstance(outpost, dict)
+                    for crew_id in outpost.get("assigned_crew") or []}
+        captains = {str(ship.get("captain_id") or "")
+                    for ship in (self.state.get("fleet_manager") or {}).get("ships") or []
+                    if isinstance(ship, dict)}
+        for member in crew:
+            crew_id = str(member.get("id") or "")
+            if not crew_id or crew_id in assigned or crew_id in captains:
+                continue
+            station = self.STATION_BY_ROLE.get(str(member.get("role") or ""))
+            if station:
+                return "/api/crew/station", {"crew_id": crew_id, "station": station}, "crew_station"
+        return None
 
     def _tour_preview(self):
         for body in (self.state.get("current_system") or {}).get("bodies") or []:

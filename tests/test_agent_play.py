@@ -814,6 +814,86 @@ class ShipModInstallTourTest(unittest.TestCase):
         self.assertFalse(captain._tour_action_attempted("/api/shipmods/install", {"mod_id": "hangar"}))
 
 
+class ReachableMechanicsTourTest(unittest.TestCase):
+    """Depot, research, fabrication and crew stations stay on the guided tour (ADR-353)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "orbiting_body": {"station_dockable": True},
+            "current_system": {"id": "sol", "connections": []},
+            "ship": {"hull": 100, "max_hull": 100, "fuel": 60, "max_fuel": 60,
+                     "credits": 500, "cargo": {}, "cargo_free_volume": 40},
+            "depots": [{"system_id": "sol", "cargo": {}}],
+            "research": {"available": [], "completed": [], "queue": [],
+                         "active_project_id": None},
+            "crew": [],
+            "outposts": [],
+            "fleet_manager": {"ships": []},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_deposit_stock_allows_withdraw_and_sell(self):
+        depot = {"system_id": "sol", "cargo": {"titanium": 4}}
+        captain = self._captain(depots=[depot])
+        self.assertEqual(captain._tour_depot_withdraw()[2], "depot_withdraw")
+        self.assertEqual(captain._tour_depot_sell()[2], "depot_sell")
+
+    def test_withdraw_needs_room_and_stock(self):
+        captain = self._captain(depots=[{"system_id": "sol", "cargo": {"titanium": 2}}])
+        captain.state["ship"]["cargo_free_volume"] = 1
+        self.assertIsNone(captain._tour_depot_withdraw())
+        empty = self._captain(depots=[{"system_id": "sol", "cargo": {}}])
+        self.assertIsNone(empty._tour_depot_sell())
+
+    def test_deposit_moves_three_when_stock_allows(self):
+        captain = self._captain(inventory_manifest=[{"id": "titanium", "quantity": 5}])
+        self.assertEqual(captain._tour_depot()[1]["quantity"], 3)
+        captain.state["inventory_manifest"] = [{"id": "titanium", "quantity": 1}]
+        self.assertEqual(captain._tour_depot()[1]["quantity"], 1)
+
+    def test_research_queue_skips_active_queued_and_completed(self):
+        captain = self._captain(research={
+            "available": [{"id": "a"}, {"id": "b"}, {"id": "c"}],
+            "completed": ["a"], "queue": ["b"], "active_project_id": None,
+        })
+        self.assertEqual(captain._tour_research_queue()[1]["project_id"], "c")
+
+    def test_research_cancel_needs_a_queued_project(self):
+        self.assertIsNone(self._captain()._tour_research_cancel())
+        queued = self._captain(research={"available": [], "completed": [], "queue": ["x"],
+                                         "active_project_id": None})
+        self.assertEqual(queued._tour_research_cancel()[1]["project_id"], "x")
+
+    def test_fabrication_targets_hull_then_fuel(self):
+        damaged = self._captain(ship={"hull": 40})
+        damaged.state["ship"]["cargo"] = {"titanium": 2}
+        self.assertEqual(damaged._tour_fabricate()[1]["munitions_type"], "patch_kit")
+        low_fuel = self._captain(ship={"fuel": 10})
+        low_fuel.state["ship"]["cargo"] = {"titanium": 2}
+        self.assertEqual(low_fuel._tour_fabricate()[1]["munitions_type"], "fuel_cell")
+        full = self._captain()
+        full.state["ship"]["cargo"] = {"titanium": 2}
+        self.assertIsNone(full._tour_fabricate())
+
+    def test_crew_station_maps_the_role_and_skips_committed_specialists(self):
+        crew = [{"id": "c1", "role": "engineer", "status": "active",
+                 "injury_ticks": 0, "station": ""}]
+        captain = self._captain(crew=crew)
+        self.assertEqual(captain._tour_crew_station()[1]["station"], "engineering")
+        stationed = self._captain(crew=[dict(crew[0], station="engineering")])
+        self.assertIsNone(stationed._tour_crew_station())
+        on_escort = self._captain(crew=crew,
+                                  fleet_manager={"ships": [{"id": "e1", "captain_id": "c1"}]})
+        self.assertIsNone(on_escort._tour_crew_station())
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `236`
-- **Total Classes**: `559`
+- **Total Classes**: `560`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2781`
-- **Total Source Lines**: `64825`
+- **Total Class Methods**: `2796`
+- **Total Source Lines**: `64998`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`236` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `827` lines (`39197` bytes)
+**Size**: `907` lines (`43292` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -183,6 +183,15 @@
   - Method `.test_an_occupied_slot_is_left_alone()`
   - Method `.test_a_capacity_shedding_mod_is_not_chosen_for_a_full_hold()`
   - Method `.test_each_mod_id_gets_its_own_attempt_slot()`
+- `class ReachableMechanicsTourTest` - *Depot, research, fabrication and crew stations stay on the guided tour (ADR-353).*
+  - Method `._captain(**state)`
+  - Method `.test_deposit_stock_allows_withdraw_and_sell()`
+  - Method `.test_withdraw_needs_room_and_stock()`
+  - Method `.test_deposit_moves_three_when_stock_allows()`
+  - Method `.test_research_queue_skips_active_queued_and_completed()`
+  - Method `.test_research_cancel_needs_a_queued_project()`
+  - Method `.test_fabrication_targets_hull_then_fuel()`
+  - Method `.test_crew_station_maps_the_role_and_skips_committed_specialists()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4628,7 +4637,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1228` lines (`56650` bytes)
+**Size**: `1321` lines (`60874` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4676,6 +4685,13 @@
   - Method `._tour_mastery()`
   - Method `._tour_training()`
   - Method `._tour_depot()`
+  - Method `._depot_stock()` - *The current system's depot and its first item with stock.*
+  - Method `._tour_depot_withdraw()`
+  - Method `._tour_depot_sell()`
+  - Method `._tour_research_queue()`
+  - Method `._tour_research_cancel()`
+  - Method `._tour_fabricate()`
+  - Method `._tour_crew_station()`
   - Method `._tour_preview()`
   - Method `._tour_stance()`
   - Method `._tour_weapon_set()`

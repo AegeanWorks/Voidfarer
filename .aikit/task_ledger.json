@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-shipmods",
+    "task_id": "ai-captain-five-mechanics",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794803844.9708214,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794804724.32591,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794804014.7444234,
-    "completed_head": "b5ed5d3c95d26337658a809bbf552ac99e743ece",
-    "completed_tree": "07950e738408eb0d03c1bb147695207369056b3d"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-outpost-tier",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Outpost tier verifies end to end (build, upgrade 2, module, crew; repair/specialize correctly gated), 0 outpost refusals; suite 1833 OK, gate 0 gaps (ADR-346); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794794727.947674,
-      "timestamp_str": "2026-11-16 05:05:27",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-captain-outpost-tier",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-outpost-tier' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794794892.5128937,
-      "timestamp_str": "2026-11-16 05:08:12",
-      "agent": "kilo:goal",
-      "head": "b38d75f81231b0d6bc3da71b2037b79a5fb6432b",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-campaign-clock",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-five-mechanics",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Tour depot withdraw/sell, research queue/cancel, fabrication and crew stationing",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794804724.161998,
+      "timestamp_str": "2026-11-16 07:52:04",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Six reachable mechanics were never guided, and the one-unit deposit left withdraw and sell without stock",
+        "benefits": "Coverage rises to 60 attempted / 48 succeeded with the new families exercised live",
+        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory only",
+        "mitigation": "state-gated builders, repair attempted at any dock to avoid trajectory gaps, seven tests and the mechanics gate"
+      },
+      "plan_digest": "8d733d20c730588a49e88802c655ed23c6694d47adedf237b7e905532fd8fc75"
+    },
+    {
+      "task_id": "ai-captain-five-mechanics",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Gate 48/60 actions (was 44/54), 0 gaps/0 errors; suite 1872 OK (ADR-353); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794804724.32591,
+      "timestamp_str": "2026-11-16 07:52:04",
+      "agent": "kilo:goal"
     }
   ]
 }
