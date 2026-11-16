@@ -9,6 +9,7 @@ from voidfarer.economy import (
     get_galactic_trade_routes,
     tick_global_economy,
 )
+from voidfarer.inventory import calculate_cargo_volume
 from voidfarer.factions import get_faction_id_from_name
 from voidfarer.galaxy import COMMODITY_MAP
 
@@ -243,6 +244,26 @@ class TestTickNonPositiveIsNoop(unittest.TestCase):
         self.assertIs(same_neg, econ)
         self.assertEqual(news_neg, [])
         self.assertEqual(same_neg.last_updated_tick, before_tick)
+
+
+class CargoVolumeSnapshotTest(unittest.TestCase):
+    """The state snapshot carries real cargo volume so clients stop guessing (ADR-343)."""
+
+    def test_snapshot_ship_reports_used_and_free_volume(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(cargo={"titanium": 4}))
+        ship = engine.get_status_snapshot()["ship"]
+        used = calculate_cargo_volume({"titanium": 4})
+        self.assertGreater(used, 0)
+        self.assertEqual(ship["cargo_used_volume"], used)
+        self.assertEqual(ship["cargo_free_volume"], engine.state.ship.cargo_capacity - used)
+
+    def test_snapshot_free_volume_never_goes_negative(self):
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(cargo={"titanium": 999}, cargo_capacity=5))
+        self.assertEqual(engine.get_status_snapshot()["ship"]["cargo_free_volume"], 0)
 
 
 if __name__ == "__main__":

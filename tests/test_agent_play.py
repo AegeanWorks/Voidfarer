@@ -232,6 +232,43 @@ class PlayStepCapTest(unittest.TestCase):
         self.assertEqual(len(report["errors"]), 12)
 
 
+class TradeVolumeChoiceTest(unittest.TestCase):
+    """Cargo capacity is volume, so the captain must not buy into a full hold (ADR-343)."""
+
+    def _captain(self, ship, quotes=None):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "ship": ship,
+            "market_quotes": quotes if quotes is not None else {
+                "titanium": {"commodity_id": "titanium", "buy_price": 50}},
+        }
+        return captain
+
+    def test_a_volume_full_hold_sells_one_unit(self):
+        captain = self._captain({
+            "cargo": {"titanium": 4}, "cargo_capacity": 40, "cargo_free_volume": 0})
+        self.assertEqual(
+            captain._trade_choice(4),
+            ("/api/trade", {"commodity_id": "titanium", "quantity": 1, "is_buy": False}, "trade"),
+        )
+
+    def test_a_volume_full_empty_hold_does_not_attempt_a_buy(self):
+        captain = self._captain({
+            "cargo": {}, "cargo_capacity": 40, "cargo_free_volume": 0})
+        self.assertIsNone(captain._trade_choice(4))
+
+    def test_free_volume_buys_on_even_steps_only(self):
+        captain = self._captain({
+            "cargo": {}, "cargo_capacity": 40, "cargo_free_volume": 3})
+        self.assertTrue(captain._trade_choice(4)[1]["is_buy"])
+        self.assertIsNone(captain._trade_choice(5))
+
+    def test_missing_free_volume_falls_back_without_buying_into_a_full_hold(self):
+        captain = self._captain({"cargo": {"ore": 40}, "cargo_capacity": 40})
+        self.assertEqual(captain._trade_choice(4)[2], "trade")
+        self.assertFalse(captain._trade_choice(4)[1]["is_buy"])
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

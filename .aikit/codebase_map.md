@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `235`
-- **Total Classes**: `545`
+- **Total Classes**: `547`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2689`
-- **Total Source Lines**: `63761`
+- **Total Class Methods**: `2697`
+- **Total Source Lines**: `63841`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `245` lines (`11096` bytes)
+**Size**: `282` lines (`12705` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -105,6 +105,12 @@
   - Method `.test_a_request_inside_the_guard_runs_in_full_and_is_not_flagged()`
   - Method `.test_refusal_count_is_not_truncated_by_the_sample()`
   - Method `.test_error_count_is_not_truncated_by_the_sample()`
+- `class TradeVolumeChoiceTest` - *Cargo capacity is volume, so the captain must not buy into a full hold (ADR-343).*
+  - Method `._captain(ship, quotes)`
+  - Method `.test_a_volume_full_hold_sells_one_unit()`
+  - Method `.test_a_volume_full_empty_hold_does_not_attempt_a_buy()`
+  - Method `.test_free_volume_buys_on_even_steps_only()`
+  - Method `.test_missing_free_volume_falls_back_without_buying_into_a_full_hold()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -1436,7 +1442,7 @@
 ### [`tests/test_economy.py`](tests/test_economy.py)
 > *Unit tests for the dynamic galactic economy, stockpiles, events, and trade routes.*
 
-**Size**: `249` lines (`11544` bytes)
+**Size**: `270` lines (`12563` bytes)
 
 **Classes:**
 - `class TestInitialEconomy` - *Verify baseline economy generation across the galaxy.*
@@ -1464,6 +1470,9 @@
   - Method `.test_sell_from_depot_uses_dynamic_quote_and_updates_stockpiles()`
 - `class TestTickNonPositiveIsNoop`
   - Method `.test_tick_negative_and_zero_ticks_rejected()`
+- `class CargoVolumeSnapshotTest` - *The state snapshot carries real cargo volume so clients stop guessing (ADR-343).*
+  - Method `.test_snapshot_ship_reports_used_and_free_volume()`
+  - Method `.test_snapshot_free_volume_never_goes_negative()`
 
 ---
 
@@ -4529,7 +4538,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `885` lines (`40014` bytes)
+**Size**: `902` lines (`40716` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4541,6 +4550,7 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
+  - Method `._trade_choice(step)` - *Sell one unit when the hold is volume-full, otherwise buy one on even steps.*
   - Method `._next_tour_action()`
   - Method `._tour_action_attempted(path, body)`
   - Method `._tour_swap()` - *Exercise the free contract-offer swap once offers exist.*
@@ -4921,7 +4931,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11220` lines (`553130` bytes)
+**Size**: `11225` lines (`553424` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-play-honest-counts",
+    "task_id": "ai-captain-cargo-volume",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794788232.3997488,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794789681.3341079,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794788442.832449,
-    "completed_head": "800f63e43bcb9a9be1dc08a646f52a29eb8d5ad2",
-    "completed_tree": "5810b06cceb5601343cd61c358ffd645dad505f5"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "staged-tab-unlocks",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Staged unlocks and veteran setting verified in Edge at mastery 1/3 with toggle both ways (ADR-336); suite green; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794776900.6561532,
-      "timestamp_str": "2026-11-16 00:08:20",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "staged-tab-unlocks",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'staged-tab-unlocks' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794778067.5020468,
-      "timestamp_str": "2026-11-16 00:27:47",
-      "agent": "kilo:goal",
-      "head": "293abfe7f6cf8bb1d3200421abd6c94392373ca3",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "rail-unlock-notices",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-cargo-volume",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Size the AI captain's cargo decisions by volume and expose cargo volume in the snapshot",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794789681.1239755,
+      "timestamp_str": "2026-11-16 03:41:21",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The captain compared unit counts to a volume capacity, so it kept buying into a full hold and produced 173 wasted refusals in 600 steps",
+        "benefits": "The captain stops wasting steps and every client gets real used/free volume instead of guessing",
+        "risks": "contract: additive snapshot fields; dependency: none; concurrency: none; state: none",
+        "mitigation": "fallback keeps old payloads working; refusals measured before and after; four policy tests plus two snapshot tests"
+      },
+      "plan_digest": "ee0c44e63735420f8430c91f42284cfcdee845dbf3be050eb99946cdce8c13a7"
+    },
+    {
+      "task_id": "ai-captain-cargo-volume",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Refusals 202 -> 14 on the 600-step run; suite 1812 OK, mechanics 0 gaps (ADR-343); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794789681.3341079,
+      "timestamp_str": "2026-11-16 03:41:21",
+      "agent": "kilo:goal"
     }
   ]
 }

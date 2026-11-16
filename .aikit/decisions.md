@@ -3308,3 +3308,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: report() samples at most 12 refusals and 12 errors to keep the JSON small, but ai_play printed len(sample) as the count. A 600-step seed-2 run displayed 'refusals: 12' when the captain had actually been refused 183 times, so the text summary hid most of the friction.
 - **Decision**: report() adds refusal_count and error_count as totals while the sampled lists stay at 12; the CLI prints the totals, including an errors line when any occurred.
 - **Consequences**: The same 600-step run now reports 183 refusals truthfully. Two tests drive 20 refusals and 20 failures through a stub client and pin that the totals exceed the 12-item samples; suite Ran 1806 OK. The payload grows by two integers and existing JSON fields are unchanged.
+
+### ADR-343: Size the cargo hold by volume in the AI captain
+- **Date**: 2026-11-16
+- **Status**: Accepted
+- **Context**: The state snapshot exposes cargo_capacity in volume units and the hold as item counts. The captain compared the unit count to capacity, so a hold full of a dense commodity looked nearly empty by count and it kept posting 1-unit buys that the engine refused: 173 of 202 refusals in a 600-step run were 'Cargo hold capacity exceeded: cannot load 1 units.'
+- **Decision**: The snapshot ship gains cargo_used_volume and cargo_free_volume (clamped at zero) from calculate_cargo_volume. The captain's trade choice reads cargo_free_volume, sells one unit when less than one volume unit is free, and buys only when at least one is free; old payloads without the field fall back to the previous unit-count comparison. The choice moves into _trade_choice so it is testable without a server.
+- **Consequences**: The 600-step seed-2 run drops from 202 refusals to 14, all one-off (insufficient credits, anomaly checks, already-optimal services). Suite Ran 1812 OK; the 180-step mechanics gate still reports 0 gaps and its final credits/tick are unchanged. The snapshot grows by two integers; no save-schema change. Pinned by CargoVolumeSnapshotTest and TradeVolumeChoiceTest.

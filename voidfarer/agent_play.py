@@ -274,18 +274,9 @@ class AiCaptain:
         if body and not body.get("scan_completed"):
             return "/api/scan", {}, "scan"
 
-        quotes = state.get("market_quotes") or {}
-        if quotes:
-            cargo = ship.get("cargo") or {}
-            used = sum(int(v) for v in cargo.values())
-            capacity = int(ship.get("cargo_capacity") or 0)
-            if cargo and capacity and used >= capacity - 2:
-                item = next((k for k, v in cargo.items() if int(v) > 0), None)
-                if item:
-                    return "/api/trade", {"commodity_id": item, "quantity": 1, "is_buy": False}, "trade"
-            commodity = self._cheapest_quote(quotes)
-            if commodity and step % 2 == 0:
-                return "/api/trade", {"commodity_id": commodity, "quantity": 1, "is_buy": True}, "trade"
+        trade = self._trade_choice(step)
+        if trade is not None:
+            return trade
 
         if body and body.get("landable") and not ship.get("landed_body_id") and step % 3 == 0:
             return "/api/land", {"target": body["id"]}, "land"
@@ -306,6 +297,32 @@ class AiCaptain:
                 return "/api/travel", {"body_id": target_body["id"], "mode": "sublight"}, "travel"
 
         return "/api/time/step", {"ticks": 1}, "time"
+
+    def _trade_choice(self, step: int):
+        """Sell one unit when the hold is volume-full, otherwise buy one on even steps.
+
+        Cargo capacity is measured in VOLUME, not unit count. Comparing the unit count to
+        it kept the captain buying into a full hold and collecting hundreds of refusals
+        (ADR-343); the snapshot now carries cargo_free_volume for this decision.
+        """
+        ship = self.state.get("ship") or {}
+        quotes = self.state.get("market_quotes") or {}
+        if not quotes:
+            return None
+        cargo = ship.get("cargo") or {}
+        capacity = int(ship.get("cargo_capacity") or 0)
+        free_volume = ship.get("cargo_free_volume")
+        if free_volume is None:
+            free_volume = capacity - sum(int(v) for v in cargo.values())
+        free_volume = int(free_volume)
+        if cargo and free_volume < 1:
+            item = next((k for k, v in cargo.items() if int(v) > 0), None)
+            if item:
+                return "/api/trade", {"commodity_id": item, "quantity": 1, "is_buy": False}, "trade"
+        commodity = self._cheapest_quote(quotes)
+        if commodity and free_volume >= 1 and step % 2 == 0:
+            return "/api/trade", {"commodity_id": commodity, "quantity": 1, "is_buy": True}, "trade"
+        return None
 
     # A guided tour of the non-emergency mechanics, built from the live snapshot. Each
     # builder returns None when the state cannot support it, so the captain never posts

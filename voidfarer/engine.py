@@ -8483,8 +8483,13 @@ class SimulationEngine:
                         ),
                     }
             survey_scanned = sum(1 for b in cur_sys.bodies if b.scan_completed)
+            ship_snapshot = self.state.ship.to_dict()
+            used_volume = calculate_cargo_volume(self.state.ship.cargo)
+            ship_snapshot["cargo_used_volume"] = used_volume
+            ship_snapshot["cargo_free_volume"] = max(
+                0, self.state.ship.cargo_capacity - used_volume)
             snapshot = {
-                "ship": self.state.ship.to_dict(),
+                "ship": ship_snapshot,
                 "current_system": cur_sys.to_dict(),
                 "orbiting_body": orb_body.to_dict() if orb_body else None,
                 "outpost_options": (
