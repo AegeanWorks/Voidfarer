@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `235`
-- **Total Classes**: `547`
+- **Total Classes**: `548`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2697`
-- **Total Source Lines**: `63841`
+- **Total Class Methods**: `2704`
+- **Total Source Lines**: `63914`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `282` lines (`12705` bytes)
+**Size**: `328` lines (`14768` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -111,6 +111,12 @@
   - Method `.test_a_volume_full_empty_hold_does_not_attempt_a_buy()`
   - Method `.test_free_volume_buys_on_even_steps_only()`
   - Method `.test_missing_free_volume_falls_back_without_buying_into_a_full_hold()`
+- `class ContractClaimTourTest` - *Finished contracts are banked, and each contract is claimed at most once (ADR-344).*
+  - Method `._captain(contracts)`
+  - Method `.test_a_completed_contract_is_offered_for_claim()`
+  - Method `.test_no_completed_contract_means_no_claim()`
+  - Method `.test_each_completed_contract_is_claimable_once()`
+  - Method `.test_the_claim_signature_keys_on_the_contract_id()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4538,7 +4544,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `902` lines (`40716` bytes)
+**Size**: `929` lines (`41951` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4552,6 +4558,7 @@
   - Method `._choose(step)`
   - Method `._trade_choice(step)` - *Sell one unit when the hold is volume-full, otherwise buy one on even steps.*
   - Method `._next_tour_action()`
+  - Method `._tour_signature(path, body)`
   - Method `._tour_action_attempted(path, body)`
   - Method `._tour_swap()` - *Exercise the free contract-offer swap once offers exist.*
   - Method `._tour_power()`
@@ -4559,6 +4566,7 @@
   - Method `._tour_route()`
   - Method `._tour_messages()`
   - Method `._tour_contracts()`
+  - Method `._tour_contract_claim()` - *Bank a finished contract instead of leaving its rewards stranded (ADR-344).*
   - Method `._tour_refuel()`
   - Method `._tour_burn_cells()` - *Burn one hold Quantum Fuel Cell when the tank has room (the fuel-cell emergency refuel).*
   - Method `._tour_repair()`

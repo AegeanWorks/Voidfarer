@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-cargo-volume",
+    "task_id": "ai-captain-contract-claims",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794789681.3341079,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794791228.431236,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794789854.049461,
-    "completed_head": "f5f31b0bebd06c3f4d4582f0d6ba14dc9cd5a509",
-    "completed_tree": "ea7c4deca1231081c8afe07e70b1132855c9199d"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "rail-unlock-notices",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Rail notices verified in Edge (silent academy, one hint at graduation, one notice per unlock, no repeats) (ADR-337); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794780318.8131356,
-      "timestamp_str": "2026-11-16 01:05:18",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "rail-unlock-notices",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'rail-unlock-notices' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794780549.3307173,
-      "timestamp_str": "2026-11-16 01:09:09",
-      "agent": "kilo:goal",
-      "head": "f848937bd4c03db1d4ef4604f6007d6885e888ce",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "veteran-tab-persistence",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-contract-claims",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Claim completed contracts in the AI captain, keyed per contract id",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794791228.2481399,
+      "timestamp_str": "2026-11-16 04:07:08",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Completed contract rewards stayed unclaimed; credits fell to zero and blocked the escort, ship-mod and outpost tier for the rest of every long run",
+        "benefits": "The captain plays the reward loop, stays solvent, and reaches deeper mechanics; the mechanics gate earns 3.5x more",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "claims keyed on contract_id so each is banked once; four tests; 600-step and 180-step measurements before and after"
+      },
+      "plan_digest": "ef4d248b45368f72622e0f1bcf8336e16bd3998c054cdd09d5a53d09ba7c66f4"
+    },
+    {
+      "task_id": "ai-captain-contract-claims",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Claims banked (600-step credits 0 -> ~67k, gate 824 -> 2928 cr), gate 0 gaps/0 errors, suite 1816 OK (ADR-344); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794791228.431236,
+      "timestamp_str": "2026-11-16 04:07:08",
+      "agent": "kilo:goal"
     }
   ]
 }

@@ -269,6 +269,52 @@ class TradeVolumeChoiceTest(unittest.TestCase):
         self.assertFalse(captain._trade_choice(4)[1]["is_buy"])
 
 
+class ContractClaimTourTest(unittest.TestCase):
+    """Finished contracts are banked, and each contract is claimed at most once (ADR-344)."""
+
+    def _captain(self, contracts):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {"ship": {"active_contracts": contracts}}
+        return captain
+
+    def test_a_completed_contract_is_offered_for_claim(self):
+        captain = self._captain([
+            {"id": "c_open", "completed": False},
+            {"id": "c_done", "completed": True},
+        ])
+        self.assertEqual(
+            captain._tour_contract_claim(),
+            ("/api/contract/claim", {"contract_id": "c_done"}, "contract_claim"),
+        )
+
+    def test_no_completed_contract_means_no_claim(self):
+        self.assertIsNone(self._captain([{"id": "c_open", "completed": False}])._tour_contract_claim())
+
+    def test_each_completed_contract_is_claimable_once(self):
+        captain = self._captain([
+            {"id": "c_done_a", "completed": True},
+            {"id": "c_done_b", "completed": True},
+        ])
+        first = captain._tour_contract_claim()
+        self.assertEqual(first[1]["contract_id"], "c_done_a")
+        self.assertFalse(captain._tour_action_attempted(first[0], first[1]))
+        captain.attempted.add(first[0])
+        captain.attempted_signatures.add(captain._tour_signature(first[0], first[1]))
+        self.assertTrue(captain._tour_action_attempted(first[0], first[1]))
+        second = captain._tour_contract_claim()
+        self.assertEqual(second[1]["contract_id"], "c_done_b")
+        self.assertFalse(captain._tour_action_attempted(first[0], second[1]))
+
+    def test_the_claim_signature_keys_on_the_contract_id(self):
+        captain = self._captain([])
+        self.assertEqual(
+            captain._tour_signature("/api/contract/claim", {"contract_id": "c1"}),
+            ("/api/contract/claim", "c1"),
+        )
+        self.assertEqual(captain._tour_signature("/api/fleet/action", {"action": "autostaff"}),
+                         ("/api/fleet/action", "autostaff"))
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

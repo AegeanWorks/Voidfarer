@@ -185,7 +185,7 @@ class AiCaptain:
                 self.refusals.append(f"{family}: blocked by prompt")
                 continue
             self.attempted.add(path)
-            self.attempted_signatures.add((path, str((body or {}).get("action") or "")))
+            self.attempted_signatures.add(self._tour_signature(path, body or {}))
             if status != 200:
                 self.errors.append(f"POST {path} -> {status}: {payload.get('message', '')}")
                 if payload.get("state"):
@@ -334,6 +334,7 @@ class AiCaptain:
             self._tour_route,
             self._tour_messages,
             self._tour_contracts,
+            self._tour_contract_claim,
             self._tour_swap,
             self._tour_refuel,
             self._tour_repair,
@@ -393,12 +394,24 @@ class AiCaptain:
 
     # One route can carry several sub-actions (the fleet and crew aliases); the tour keys
     # those on the sub-action so a newly added one is not starved by its sibling.
-    SUBACTION_ROUTES = frozenset({"/api/fleet/action", "/api/crew/action"})
+    # One route can carry several sub-actions (the fleet and crew aliases) or act on one
+    # specific id (a contract claim); the tour keys those on that field so a sibling or a
+    # second completed contract is not starved by the first attempt (ADR-344).
+    SIGNATURE_ROUTES = {
+        "/api/fleet/action": "action",
+        "/api/crew/action": "action",
+        "/api/contract/claim": "contract_id",
+    }
+
+    def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
+        field = self.SIGNATURE_ROUTES.get(path)
+        if not field:
+            return (path, "")
+        return (path, str((body or {}).get(field) or ""))
 
     def _tour_action_attempted(self, path: str, body: dict[str, Any]) -> bool:
-        action = str((body or {}).get("action") or "")
-        if path in self.SUBACTION_ROUTES:
-            return (path, action) in self.attempted_signatures
+        if path in self.SIGNATURE_ROUTES:
+            return self._tour_signature(path, body) in self.attempted_signatures
         return path in self.attempted
 
     def _tour_swap(self):
@@ -441,6 +454,20 @@ class AiCaptain:
 
     def _tour_contracts(self):
         return "/api/contracts/refresh", {}, "contracts"
+
+    def _tour_contract_claim(self):
+        """Bank a finished contract instead of leaving its rewards stranded (ADR-344)."""
+        for contract in (self.state.get("ship") or {}).get("active_contracts") or []:
+            if not isinstance(contract, dict) or not contract.get("completed"):
+                continue
+            contract_id = str(contract.get("id") or "")
+            if not contract_id:
+                continue
+            body = {"contract_id": contract_id}
+            if self._tour_action_attempted("/api/contract/claim", body):
+                continue
+            return "/api/contract/claim", body, "contract_claim"
+        return None
 
     def _tour_refuel(self):
         ship = self.state.get("ship") or {}
