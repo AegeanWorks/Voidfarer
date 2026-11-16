@@ -326,6 +326,19 @@ class AiCaptain:
         if body and body.get("landable") and not ship.get("landed_body_id") and step % 3 == 0:
             return "/api/land", {"target": body["id"]}, "land"
 
+        # Once landed, work the first available surface operation straight away. Leaving it
+        # to the rotating tour let the endpoint be starved out of the 180-step gate when
+        # other steps were added (ADR-354).
+        if ship.get("landed_body_id"):
+            report = state.get("surface_report") or {}
+            if report.get("landed"):
+                for operation in report.get("operations") or []:
+                    if (isinstance(operation, dict) and operation.get("id")
+                            and operation.get("available", True)
+                            and not operation.get("used")):
+                        return ("/api/surface/op",
+                                {"operation_id": operation["id"]}, "surface")
+
         # A jump burns the real hop cost, not one unit; using the published estimates
         # stopped 47 attempts that could only be refused (ADR-348).
         if step % 20 == 5:
@@ -403,6 +416,9 @@ class AiCaptain:
     # nonsense just to claim coverage.
     def _next_tour_action(self) -> tuple[str, dict[str, Any], str] | None:
         builders = (
+            # The opening chapter is gated on being in Sol, and the fallback jump leaves at
+            # step 5 of every run, so the story step must be the first tour action (ADR-354).
+            self._tour_story_choice,
             self._tour_power,
             self._tour_reactor,
             self._tour_route,
@@ -410,6 +426,9 @@ class AiCaptain:
             self._tour_contracts,
             self._tour_research_queue,
             self._tour_research_cancel,
+            self._tour_message_send,
+            self._tour_shore_leave,
+            self._tour_away_recall,
             self._tour_contract_claim,
             self._tour_swap,
             self._tour_refuel,
@@ -559,6 +578,44 @@ class AiCaptain:
 
     def _tour_contracts(self):
         return "/api/contracts/refresh", {}, "contracts"
+
+    def _tour_story_choice(self):
+        """Resolve the active chapter's first unlocked choice; the tour never touched the arc."""
+        status = self.state.get("story_status") or {}
+        if status.get("completed") or not status.get("ready"):
+            return None
+        for choice in status.get("choices") or []:
+            if isinstance(choice, dict) and choice.get("id") and not choice.get("locked"):
+                return "/api/story/choice", {"choice_id": choice["id"]}, "story"
+        return None
+
+    def _tour_message_send(self):
+        """Send one quantum message to the first correspondent (ADR-354)."""
+        messages = [m for m in self.state.get("messages") or [] if isinstance(m, dict)]
+        recipient = str((messages[0].get("sender") if messages else "") or "")
+        if not recipient:
+            return None
+        return ("/api/messages/send",
+                {"recipient": recipient, "subject": "Survey report",
+                 "body": "Routine survey telemetry from the current campaign."}, "messages_send")
+
+    def _tour_shore_leave(self):
+        if not self._is_docked():
+            return None
+        active = [member for member in self.state.get("crew") or []
+                  if isinstance(member, dict) and member.get("status") == "active"]
+        if not active:
+            return None
+        if not any(float(member.get("morale") or 100.0) < 99.9 for member in active):
+            return None
+        return "/api/crew/shore", {}, "crew_shore"
+
+    def _tour_away_recall(self):
+        missions = [m for m in (self.state.get("ship") or {}).get("away_missions") or []
+                    if isinstance(m, dict) and m.get("id")]
+        if not missions:
+            return None
+        return "/api/away/recall", {"mission_id": missions[0]["id"]}, "away_recall"
 
     def _tour_contract_claim(self):
         """Bank a finished contract instead of leaving its rewards stranded (ADR-344)."""

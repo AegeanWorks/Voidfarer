@@ -20,6 +20,10 @@ class TestAiBurnCells(unittest.TestCase):
         with tempfile.TemporaryDirectory() as save_dir:
             engine = SimulationEngine(seed=42)
             engine.allow_decision_events = True
+            # Seed a spare cell and a partly empty tank: with docks in reach the captain
+            # otherwise refuels before it ever needs the emergency burn (ADR-354).
+            engine.state = engine._clone_state(
+                ship=engine._clone_ship(cargo={"fuel_cells": 2}, fuel=10))
             VoidFarerHandler.engine = engine
             VoidFarerHandler.storage = StorageManager(save_dir)
             VoidFarerHandler.static_dir = STATIC

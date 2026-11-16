@@ -894,6 +894,81 @@ class ReachableMechanicsTourTest(unittest.TestCase):
         self.assertIsNone(on_escort._tour_crew_station())
 
 
+class NarrativeAndCrewTourTest(unittest.TestCase):
+    """Story choices, messaging, shore leave and away recall are reachable (ADR-354)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "orbiting_body": {"station_dockable": True},
+            "ship": {"hull": 100, "max_hull": 100, "fuel": 60, "max_fuel": 60,
+                     "credits": 500, "cargo": {}, "cargo_free_volume": 40,
+                     "landed_body_id": None, "away_missions": []},
+            "crew": [], "messages": [], "story_status": {}, "surface_report": {},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_ready_chapter_choice_is_taken(self):
+        captain = self._captain(story_status={
+            "ready": True, "completed": False,
+            "choices": [{"id": "locked_one", "locked": True},
+                        {"id": "open_one", "locked": False}],
+        })
+        self.assertEqual(captain._tour_story_choice()[1]["choice_id"], "open_one")
+
+    def test_a_completed_or_unready_story_is_left_alone(self):
+        self.assertIsNone(self._captain(story_status={"ready": False, "completed": False,
+                                                      "choices": [{"id": "c", "locked": False}]})
+                          ._tour_story_choice())
+        self.assertIsNone(self._captain(story_status={"ready": True, "completed": True,
+                                                      "choices": [{"id": "c", "locked": False}]})
+                          ._tour_story_choice())
+
+    def test_a_message_is_sent_to_the_first_correspondent(self):
+        captain = self._captain(messages=[{"sender": "Admiral Vance"}])
+        self.assertEqual(captain._tour_message_send()[1]["recipient"], "Admiral Vance")
+        self.assertIsNone(self._captain()._tour_message_send())
+
+    def test_shore_leave_waits_for_morale_to_drop(self):
+        peak = [{"id": "c1", "status": "active", "morale": 100.0}]
+        tired = [{"id": "c1", "status": "active", "morale": 62.0}]
+        self.assertIsNone(self._captain(crew=peak)._tour_shore_leave())
+        self.assertEqual(self._captain(crew=tired)._tour_shore_leave()[2], "crew_shore")
+
+    def test_away_recall_needs_an_active_mission(self):
+        self.assertIsNone(self._captain()._tour_away_recall())
+        captain = self._captain(ship={"away_missions": [{"id": "m1"}]})
+        self.assertEqual(captain._tour_away_recall()[1]["mission_id"], "m1")
+
+    def test_surface_operation_follows_landing_directly(self):
+        captain = self._captain(
+            ship={"landed_body_id": "b1"},
+            orbiting_body={"id": "b1", "scan_completed": True},
+            surface_report={"landed": True, "operations": [
+                {"id": "survey", "available": True, "used": False},
+            ]},
+        )
+        action = captain._choose(7)
+        self.assertEqual(action[0], "/api/surface/op")
+        self.assertEqual(action[1]["operation_id"], "survey")
+
+    def test_a_used_surface_operation_is_not_repeated(self):
+        captain = self._captain(
+            ship={"landed_body_id": "b1"},
+            orbiting_body={"id": "b1", "scan_completed": True},
+            surface_report={"landed": True, "operations": [
+                {"id": "survey", "available": True, "used": True},
+            ]},
+        )
+        self.assertNotEqual(captain._choose(7)[0], "/api/surface/op")
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

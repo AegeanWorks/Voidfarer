@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-five-mechanics",
+    "task_id": "ai-captain-narrative-tour",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794804724.32591,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794806384.2989573,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794804906.815926,
-    "completed_head": "19a2dfc6d917a24401d15e524684493b7a96f57c",
-    "completed_tree": "86a3af2b88e51f4ca661441281134d8a81f8b515"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-campaign-clock",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Refusals 142 -> 110 (quantum-fuel ones gone), gate 0 gaps/0 errors, suite 1837 OK, seeded outpost E2E passes (ADR-347); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794795986.3228145,
-      "timestamp_str": "2026-11-16 05:26:26",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-captain-campaign-clock",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-campaign-clock' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794796146.3136454,
-      "timestamp_str": "2026-11-16 05:29:06",
-      "agent": "kilo:goal",
-      "head": "a0339565939872c9de59ace539152155db333c7c",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-honest-friction",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-narrative-tour",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Tour story choices, message send, shore leave and away recall; surface ops follow landing",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794806384.1058052,
+      "timestamp_str": "2026-11-16 08:19:44",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Four reachable mechanics were never guided, and adding steps starved surface ops from the gate",
+        "benefits": "The gate covers narrative, comms, crew welfare and away teams; the campaign now advances to Act II",
+        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory only",
+        "mitigation": "state-gated builders, story step first so Act I is in-system, direct surface op after landing, seeded fuel-cell test"
+      },
+      "plan_digest": "f774cadd96ac8e701fa26ce9088bf4b41de23f4a1a3814c38843f26f9e5b21a9"
+    },
+    {
+      "task_id": "ai-captain-narrative-tour",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Gate 56/65 actions (was 48/60), 0 gaps/0 errors; suite 1879 OK (ADR-354); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794806384.2989573,
+      "timestamp_str": "2026-11-16 08:19:44",
+      "agent": "kilo:goal"
     }
   ]
 }

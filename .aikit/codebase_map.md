@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `236`
-- **Total Classes**: `560`
+- **Total Classes**: `561`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2796`
-- **Total Source Lines**: `64998`
+- **Total Class Methods**: `2808`
+- **Total Source Lines**: `65134`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`236` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `907` lines (`43292` bytes)
+**Size**: `982` lines (`46921` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -192,6 +192,15 @@
   - Method `.test_research_cancel_needs_a_queued_project()`
   - Method `.test_fabrication_targets_hull_then_fuel()`
   - Method `.test_crew_station_maps_the_role_and_skips_committed_specialists()`
+- `class NarrativeAndCrewTourTest` - *Story choices, messaging, shore leave and away recall are reachable (ADR-354).*
+  - Method `._captain(**state)`
+  - Method `.test_a_ready_chapter_choice_is_taken()`
+  - Method `.test_a_completed_or_unready_story_is_left_alone()`
+  - Method `.test_a_message_is_sent_to_the_first_correspondent()`
+  - Method `.test_shore_leave_waits_for_morale_to_drop()`
+  - Method `.test_away_recall_needs_an_active_mission()`
+  - Method `.test_surface_operation_follows_landing_directly()`
+  - Method `.test_a_used_surface_operation_is_not_repeated()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -230,7 +239,7 @@
 ### [`tests/test_ai_burn_cells.py`](tests/test_ai_burn_cells.py)
 > *The headless AI captain exercises the fuel-cell burn, so the mechanics gate covers it.*
 
-**Size**: `41` lines (`1585` bytes)
+**Size**: `45` lines (`1880` bytes)
 
 **Classes:**
 - `class TestAiBurnCells`
@@ -4637,7 +4646,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1321` lines (`60874` bytes)
+**Size**: `1378` lines (`63777` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4661,6 +4670,10 @@
   - Method `._tour_route()`
   - Method `._tour_messages()`
   - Method `._tour_contracts()`
+  - Method `._tour_story_choice()` - *Resolve the active chapter's first unlocked choice; the tour never touched the arc.*
+  - Method `._tour_message_send()` - *Send one quantum message to the first correspondent (ADR-354).*
+  - Method `._tour_shore_leave()`
+  - Method `._tour_away_recall()`
   - Method `._tour_contract_claim()` - *Bank a finished contract instead of leaving its rewards stranded (ADR-344).*
   - Method `._tour_refuel()`
   - Method `._tour_burn_cells()` - *Burn one hold Quantum Fuel Cell when the tank has room (the fuel-cell emergency refuel).*
