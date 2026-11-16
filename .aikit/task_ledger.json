@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-shipmods",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794803844.9708214,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794804014.7444234,
+    "completed_head": "b5ed5d3c95d26337658a809bbf552ac99e743ece",
+    "completed_tree": "07950e738408eb0d03c1bb147695207369056b3d"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-outpost-tier",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Tour outpost management and make retry cooldowns survive separate play calls",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794794727.7790365,
-      "timestamp_str": "2026-11-16 05:05:27",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The outpost tier was founded and ignored, and the retry cooldown reset with each play call so late retries never fired",
-        "benefits": "The captain now upgrades, modules, crews, repairs and specializes outposts; gated retries actually happen across rounds",
-        "risks": "contract: none; dependency: none; concurrency: none; state: monotonic page counter only",
-        "mitigation": "per-step gates, build stays a single honest attempt, deterministic probe verifies the tier, seven tests plus a counter regression test"
-      },
-      "plan_digest": "73d16c1ce1c7f74bfe19402a4dbbefaba5159c6bd8d3c01e97703227eddc47eb"
-    },
     {
       "task_id": "ai-captain-outpost-tier",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794803844.9708214,
       "timestamp_str": "2026-11-16 07:37:24",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-shipmods",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-shipmods' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794804014.8426783,
+      "timestamp_str": "2026-11-16 07:40:14",
+      "agent": "kilo:goal",
+      "head": "b5ed5d3c95d26337658a809bbf552ac99e743ece",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
