@@ -998,6 +998,103 @@ class NarrativeAndCrewTourTest(unittest.TestCase):
         self.assertNotEqual(captain._choose(7)[0], "/api/surface/op")
 
 
+class CombatPolicyTest(unittest.TestCase):
+    """Combat is chosen by state, so survival actions and the tactical surface are used (ADR-362)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "ship": {
+                "hull": 100, "max_hull": 100, "shield": 60, "max_shield": 60, "fuel": 40,
+                "reactor": {"heat": 10.0, "max_heat": 100.0, "heat_pct": 10.0,
+                            "last_vent_tick": -999},
+                "power": {"engines": 25, "shields": 25, "sensors": 25, "weapons": 25},
+                "fleet_drones": [],
+            },
+            "active_combat": {
+                "id": "c1", "enemy_hull": 100, "enemy_max_hull": 100,
+                "enemy_shield": 0, "enemy_max_shield": 0, "enemy_damage": 15,
+                "enemy_intent": "fire", "enemy_engines_disabled": False,
+            },
+            "crew": [],
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def _action(self, **state):
+        return self._captain(**state)._choose(7)
+
+    def test_a_plain_fight_fires_lasers(self):
+        self.assertEqual(self._action()[1]["action"], "fire_lasers")
+
+    def test_a_critical_hull_flees_when_the_tank_allows(self):
+        self.assertEqual(self._action(ship={"hull": 20, "fuel": 30})[1]["action"], "flee")
+        short = self._action(ship={"hull": 20, "fuel": 5})
+        self.assertNotEqual(short[1]["action"], "flee")
+        self.assertEqual(short[1]["action"], "evasive_burn")
+
+    def test_a_damaged_hull_burns_once(self):
+        captain = self._captain(ship={"hull": 35, "fuel": 40})
+        self.assertEqual(captain._choose(7)[1]["action"], "evasive_burn")
+        self.assertNotEqual(captain._choose(7)[1]["action"], "evasive_burn")
+
+    def test_a_hot_reactor_vents_once(self):
+        captain = self._captain(ship={"reactor": {
+            "heat": 90.0, "max_heat": 100.0, "heat_pct": 90.0, "last_vent_tick": -999,
+        }})
+        self.assertEqual(captain._choose(7)[1]["action"], "vent_heat")
+        self.assertNotEqual(captain._choose(7)[1]["action"], "vent_heat")
+
+    def test_low_shields_absorb_the_barrage(self):
+        captain = self._captain(ship={"hull": 60, "shield": 10})
+        self.assertEqual(captain._choose(7)[1]["action"], "shield_absorb")
+        self.assertNotEqual(captain._choose(7)[1]["action"], "shield_absorb",
+                            "absorbing forever would never damage the enemy")
+
+    def test_enemy_engines_are_targeted_when_it_tries_to_evade(self):
+        captain = self._captain(active_combat={"enemy_intent": "evade"})
+        self.assertEqual(captain._choose(7)[1]["action"], "target_engines")
+        self.assertNotEqual(captain._choose(7)[1]["action"], "target_engines")
+
+    def test_high_enemy_damage_targets_weapons_once(self):
+        captain = self._captain(active_combat={"enemy_damage": 30})
+        self.assertEqual(captain._choose(7)[1]["action"], "target_weapons")
+        self.assertNotEqual(captain._choose(7)[1]["action"], "target_weapons")
+
+    def test_high_enemy_shields_are_ion_pulsed_once(self):
+        captain = self._captain(active_combat={"enemy_shield": 60, "enemy_max_shield": 60})
+        self.assertEqual(captain._choose(7)[1]["action"], "target_shields")
+        self.assertNotEqual(captain._choose(7)[1]["action"], "target_shields")
+
+    def test_a_crippled_enemy_is_boarded_with_a_healthy_marine(self):
+        marine = [{"id": "m1", "role": "marine", "status": "active", "injury_ticks": 0}]
+        captain = self._captain(active_combat={"enemy_hull": 20}, crew=marine)
+        self.assertEqual(captain._choose(7)[1]["action"], "board_enemy")
+        hurt = [{"id": "m1", "role": "marine", "status": "active", "injury_ticks": 3}]
+        self.assertNotEqual(self._action(active_combat={"enemy_hull": 20}, crew=hurt)[1]["action"],
+                            "board_enemy")
+
+    def test_a_tactical_drone_strikes(self):
+        captain = self._captain(ship={"fleet_drones": [{"drone_type": "combat_escort"}]})
+        self.assertEqual(captain._choose(7)[1]["action"], "drone_strike")
+
+    def test_a_hot_but_safe_reactor_uses_point_defense(self):
+        captain = self._captain(ship={"reactor": {
+            "heat": 70.0, "max_heat": 100.0, "heat_pct": 70.0, "last_vent_tick": -999,
+        }})
+        self.assertEqual(captain._choose(7)[1]["action"], "point_defense")
+        self.assertNotEqual(captain._choose(7)[1]["action"], "point_defense")
+
+    def test_a_threatened_hull_attempts_a_bridge_strike(self):
+        captain = self._captain(ship={"hull": 50})
+        self.assertEqual(captain._choose(7)[1]["action"], "target_bridge")
+
+
 class StoryTravelTourTest(unittest.TestCase):
     """Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360)."""
 

@@ -192,6 +192,9 @@ class AiCaptain:
         self.retry_at: dict[tuple[str, str], int] = {}
         self.refusal_attempts: dict[tuple[str, str], int] = {}
         self.repeat_last: dict[tuple[str, str], int] = {}
+        # One-shot combat tricks are remembered per encounter so a spent action is not
+        # chosen again while the snapshot is one call behind (ADR-362).
+        self.combat_used: dict[str, set[str]] = {}
         # Two emergency fuel burns per campaign, chosen by state rather than tour
         # position so adding steps cannot starve the mechanic (ADR-355).
         self.emergency_burns = 0
@@ -279,7 +282,7 @@ class AiCaptain:
         if customs:
             return "/api/customs/resolve", {"action": "jettison"}, "customs"
         if state.get("active_combat"):
-            return "/api/combat", {"action": "fire_lasers"}, "combat"
+            return self._combat_choice()
         if state.get("active_anomaly"):
             choices = (state.get("active_anomaly") or {}).get("choices") or []
             if choices:
@@ -391,6 +394,70 @@ class AiCaptain:
                 return "/api/travel", {"body_id": target_body["id"], "mode": "sublight"}, "travel"
 
         return "/api/time/step", {"ticks": 1}, "time"
+
+    def _combat_choice(self):
+        """Pick a combat action from the live state: survival first, then the tactical surface.
+
+        Firing lasers every turn kept only one of the thirteen combat actions reachable and
+        lost the ship repeatedly; each one-shot action is remembered per encounter so a
+        refused or spent trick is not retried in a loop (ADR-362).
+        """
+        combat = self.state.get("active_combat") or {}
+        ship = self.state.get("ship") or {}
+        hull = int(ship.get("hull") or 0)
+        max_hull = max(1, int(ship.get("max_hull") or 1))
+        shield = int(ship.get("shield") or 0)
+        max_shield = max(1, int(ship.get("max_shield") or 1))
+        fuel = int(ship.get("fuel") or 0)
+        reactor = self.state.get("reactor") or ship.get("reactor") or {}
+        heat_pct = float(reactor.get("heat_pct") or 0.0)
+        enemy_hull = int(combat.get("enemy_hull") or 0)
+        enemy_max_hull = max(1, int(combat.get("enemy_max_hull") or 1))
+        enemy_shield = int(combat.get("enemy_shield") or 0)
+        enemy_damage = int(combat.get("enemy_damage") or 0)
+        intent = str(combat.get("enemy_intent") or "")
+        used = self.combat_used.setdefault(str(combat.get("id") or "combat"), set())
+
+        def pick(action: str):
+            used.add(action)
+            return "/api/combat", {"action": action}, "combat"
+
+        if hull * 4 <= max_hull and fuel >= 8:
+            return pick("flee")
+        if hull * 5 <= max_hull * 2 and fuel >= 3 and "evasive_burn" not in used:
+            return pick("evasive_burn")
+        if heat_pct >= 85.0 and "vent_heat" not in used:
+            return pick("vent_heat")
+        if enemy_shield <= 0 and enemy_hull * 10 <= enemy_max_hull * 3 and "board_enemy" not in used:
+            marines = [
+                member for member in self.state.get("crew") or []
+                if isinstance(member, dict) and str(member.get("role")) == "marine"
+                and str(member.get("status")) == "active"
+                and int(member.get("injury_ticks") or 0) == 0
+            ]
+            if marines:
+                return pick("board_enemy")
+        if (shield * 3 <= max_shield and hull * 4 <= max_hull * 3
+                and enemy_damage >= 5 and "shield_absorb" not in used):
+            # Absorbing every turn can outlast the enemy indefinitely (it damages neither
+            # hull), so it is one defensive trick per fight, not a strategy (ADR-362).
+            return pick("shield_absorb")
+        drones = ship.get("fleet_drones") or []
+        if (any(isinstance(drone, dict) and drone.get("drone_type") in ("combat_escort", "scout")
+                for drone in drones) and "drone_strike" not in used):
+            return pick("drone_strike")
+        if intent == "evade" and not combat.get("enemy_engines_disabled") and "target_engines" not in used:
+            return pick("target_engines")
+        if enemy_damage >= 20 and "target_weapons" not in used:
+            return pick("target_weapons")
+        if enemy_shield > 0 and "target_shields" not in used:
+            return pick("target_shields")
+        if heat_pct >= 60.0 and "point_defense" not in used:
+            return pick("point_defense")
+        weapons = int((ship.get("power") or {}).get("weapons") or 0)
+        if hull * 5 <= max_hull * 3 and weapons >= 15 and "target_bridge" not in used:
+            return pick("target_bridge")
+        return "/api/combat", {"action": "fire_lasers"}, "combat"
 
     def _note_refusal(self, signature: tuple[str, str], message: str) -> None:
         """Schedule a fast retry, then a slow one, then drop a gate that never opens."""

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `565`
+- **Total Classes**: `566`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2836`
-- **Total Source Lines**: `65521`
+- **Total Class Methods**: `2851`
+- **Total Source Lines**: `65685`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1109` lines (`53346` bytes)
+**Size**: `1206` lines (`58221` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -203,6 +203,21 @@
   - Method `.test_away_recall_needs_an_active_mission()`
   - Method `.test_surface_operation_follows_landing_directly()`
   - Method `.test_a_used_surface_operation_is_not_repeated()`
+- `class CombatPolicyTest` - *Combat is chosen by state, so survival actions and the tactical surface are used (ADR-362).*
+  - Method `._captain(**state)`
+  - Method `._action(**state)`
+  - Method `.test_a_plain_fight_fires_lasers()`
+  - Method `.test_a_critical_hull_flees_when_the_tank_allows()`
+  - Method `.test_a_damaged_hull_burns_once()`
+  - Method `.test_a_hot_reactor_vents_once()`
+  - Method `.test_low_shields_absorb_the_barrage()`
+  - Method `.test_enemy_engines_are_targeted_when_it_tries_to_evade()`
+  - Method `.test_high_enemy_damage_targets_weapons_once()`
+  - Method `.test_high_enemy_shields_are_ion_pulsed_once()`
+  - Method `.test_a_crippled_enemy_is_boarded_with_a_healthy_marine()`
+  - Method `.test_a_tactical_drone_strikes()`
+  - Method `.test_a_hot_but_safe_reactor_uses_point_defense()`
+  - Method `.test_a_threatened_hull_attempts_a_bridge_strike()`
 - `class StoryTravelTourTest` - *Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360).*
   - Method `._captain(**state)`
   - Method `.test_a_ready_chapter_is_resolved_before_a_dock_trip()`
@@ -4682,7 +4697,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1499` lines (`69982` bytes)
+**Size**: `1566` lines (`73651` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4694,6 +4709,7 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
+  - Method `._combat_choice()` - *Pick a combat action from the live state: survival first, then the tactical surface.*
   - Method `._note_refusal(signature, message)` - *Schedule a fast retry, then a slow one, then drop a gate that never opens.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*
   - Method `._trade_choice(step)` - *Sell one unit when the hold is volume-full, otherwise buy one on even steps.*
