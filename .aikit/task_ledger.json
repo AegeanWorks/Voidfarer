@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "story-travel-hold",
-    "last_phase": "phase 5",
+    "task_id": "progression-gate-retry",
+    "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794839418.326613,
+    "updated_at": 1794848755.8227026,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,57 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794839588.5346613,
-    "completed_head": "cd301900f71a8e9ff581a650652d5364439b9def",
-    "completed_tree": "2197a3703445f8af4e598ea6958be73d8c8b3b9c"
+    "completed_at": 1794848841.8171823,
+    "completed_head": "996a4c4a6dbe09cba643133886748588461bd8e7",
+    "completed_tree": "95848cdd76c300b0e969d3f5ab7a0ea738b31d21"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-five-mechanics",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-five-mechanics' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794804906.8733323,
-      "timestamp_str": "2026-11-16 07:55:06",
-      "agent": "kilo:goal",
-      "head": "19a2dfc6d917a24401d15e524684493b7a96f57c",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "ai-captain-narrative-tour",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Tour story choices, message send, shore leave and away recall; surface ops follow landing",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794806384.1058052,
-      "timestamp_str": "2026-11-16 08:19:44",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Four reachable mechanics were never guided, and adding steps starved surface ops from the gate",
-        "benefits": "The gate covers narrative, comms, crew welfare and away teams; the campaign now advances to Act II",
-        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory only",
-        "mitigation": "state-gated builders, story step first so Act I is in-system, direct surface op after landing, seeded fuel-cell test"
-      },
-      "plan_digest": "f774cadd96ac8e701fa26ce9088bf4b41de23f4a1a3814c38843f26f9e5b21a9"
-    },
-    {
-      "task_id": "ai-captain-narrative-tour",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Gate 56/65 actions (was 48/60), 0 gaps/0 errors; suite 1879 OK (ADR-354); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794806384.2989573,
-      "timestamp_str": "2026-11-16 08:19:44",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "ai-captain-narrative-tour",
       "phase": "completed",
@@ -335,6 +289,64 @@
       "timestamp_str": "2026-11-16 17:33:08",
       "agent": "kilo:goal",
       "head": "cd301900f71a8e9ff581a650652d5364439b9def",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "progression-gate-retry",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Retry progression-gated refusals on a slow horizon so late-opening mechanics are exercised",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794847370.829425,
+      "timestamp_str": "2026-11-16 19:42:50",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The tour writes off a refused action after three 40-step attempts; a 2,000-step run ends at Pilot Mastery 6 with 21,775 cr but never founds an outpost or retries talent/skill spending because their level-1 refusal happened early and never re-fired",
+        "benefits": "Outposts, talent unlocks, training, escorts and mercenaries become genuinely exercised later in a campaign, not just refused once; AI coverage evidence becomes honest",
+        "risks": "contract: refusal retry policy gains a slow tier; dependency: none; concurrency: none; state: page-memory only",
+        "mitigation": "failing-first retry-policy tests, three-seed 2,000-step probes, unchanged 180-step gate counts, full suite and 5/5 gates"
+      },
+      "plan_digest": "70c953d42dcb1105f05be502b7f6ca738b039ec7f9e1a81ad308c80e629437d9",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "progression-gate-retry",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/4] Seeds 1/2/42 complete Act VI and found outposts with upgrade/module/repair; 0 gaps/0 errors; gate unchanged 57/67 (ADR-361); suite Ran 1897 OK; 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794848755.8227026,
+      "timestamp_str": "2026-11-16 20:05:55",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "progression-gate-retry",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'progression-gate-retry' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794848841.9150996,
+      "timestamp_str": "2026-11-16 20:07:21",
+      "agent": "kilo:goal",
+      "head": "996a4c4a6dbe09cba643133886748588461bd8e7",
       "delivery": {
         "roots": [
           "."
