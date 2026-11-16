@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-escort-tier",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794792631.2100868,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794792784.0556421,
+    "completed_head": "e661182a834897864fca12f7522d0b2c4863be19",
+    "completed_tree": "72635190ea5e6d0a4b214ca26112837ba698c4f6"
   },
   "checkpoints": [
-    {
-      "task_id": "audit-mastery-seed",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Add --mastery to the headless audit so the late terminal tabs stay measurable",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794783578.0606654,
-      "timestamp_str": "2026-11-16 01:59:38",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ADR-336 locks EMPIRE, CAPTAINS and DEPOT until Pilot Mastery 3; the post-tutorial audit could no longer open them",
-        "benefits": "Late-game rail states are auditable at every viewport, and the flag preserves progress fields instead of resetting them",
-        "risks": "contract: optional flag only; dependency: none; concurrency: none; state: none, the shipped save is untouched",
-        "mitigation": "dataclasses.replace keeps xp, talents and spec; screenshots get an mN- prefix; below level 3 the lock still applies; tests pin the seed and no-op paths"
-      },
-      "plan_digest": "976923d659c4b69b44890fb68934657648a113cab342f168f52df954c5b22c11"
-    },
     {
       "task_id": "audit-mastery-seed",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794792631.2100868,
       "timestamp_str": "2026-11-16 04:30:31",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-escort-tier",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-escort-tier' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794792784.1875956,
+      "timestamp_str": "2026-11-16 04:33:04",
+      "agent": "kilo:goal",
+      "head": "e661182a834897864fca12f7522d0b2c4863be19",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
