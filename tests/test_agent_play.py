@@ -192,6 +192,16 @@ class _StubClient:
         return 200, {"ok": True, "state": self.state}
 
 
+class _RefusingClient(_StubClient):
+    def post(self, path, body):
+        return 200, {"ok": False, "message": "nope", "state": self.state}
+
+
+class _FailingClient(_StubClient):
+    def post(self, path, body):
+        return 500, {"ok": False, "message": "boom", "state": self.state}
+
+
 class PlayStepCapTest(unittest.TestCase):
     """The CLI honours --steps and says when the runaway guard clamps it (ADR-341)."""
 
@@ -209,6 +219,17 @@ class PlayStepCapTest(unittest.TestCase):
         self.assertEqual(report["steps"], 3)
         self.assertEqual(report["steps_requested"], 3)
         self.assertFalse(report["steps_capped"])
+
+    def test_refusal_count_is_not_truncated_by_the_sample(self):
+        report = AiCaptain(_RefusingClient(), seed=42).play(steps=20)
+        self.assertEqual(report["refusal_count"], 20)
+        self.assertEqual(len(report["refusals"]), 12)
+        self.assertGreater(report["refusal_count"], len(report["refusals"]))
+
+    def test_error_count_is_not_truncated_by_the_sample(self):
+        report = AiCaptain(_FailingClient(), seed=42).play(steps=20)
+        self.assertEqual(report["error_count"], 20)
+        self.assertEqual(len(report["errors"]), 12)
 
 
 class AiPlayToolArgsTest(unittest.TestCase):

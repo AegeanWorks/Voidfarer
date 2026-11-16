@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `235`
-- **Total Classes**: `543`
+- **Total Classes**: `545`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2685`
-- **Total Source Lines**: `63736`
+- **Total Class Methods**: `2689`
+- **Total Source Lines**: `63761`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `224` lines (`10251` bytes)
+**Size**: `245` lines (`11096` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -96,9 +96,15 @@
   - Method `.__init__(state)`
   - Method `.get(path)`
   - Method `.post(path, body)`
+- `class _RefusingClient`
+  - Method `.post(path, body)`
+- `class _FailingClient`
+  - Method `.post(path, body)`
 - `class PlayStepCapTest` - *The CLI honours --steps and says when the runaway guard clamps it (ADR-341).*
   - Method `.test_a_request_beyond_the_guard_is_clamped_and_reported()`
   - Method `.test_a_request_inside_the_guard_runs_in_full_and_is_not_flagged()`
+  - Method `.test_refusal_count_is_not_truncated_by_the_sample()`
+  - Method `.test_error_count_is_not_truncated_by_the_sample()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4427,7 +4433,7 @@
 ### [`tools/ai_play.py`](tools/ai_play.py)
 > *Play VoidFarer headlessly through the public API and report mechanic coverage.*
 
-**Size**: `81` lines (`3209` bytes)
+**Size**: `83` lines (`3299` bytes)
 
 **Functions:**
 - `def main(argv)`
@@ -4523,7 +4529,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `883` lines (`39920` bytes)
+**Size**: `885` lines (`40014` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

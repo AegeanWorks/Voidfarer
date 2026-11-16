@@ -3301,3 +3301,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: MAX_STEPS was 200 inside play(), so ai_play --steps 600 silently ran 200 steps; the summary printed 200 with no mention of the request and the JSON carried no requested count, which made long soaks look like they had run far longer than they did.
 - **Decision**: MAX_STEPS becomes a 2000-step runaway guard, well above the 180-step gate. play() records steps_requested and reports steps_requested and steps_capped, and the text summary appends '(requested N; capped at 2000)' only when the guard actually clamps. Requests below the guard run in full.
 - **Consequences**: ai_play --steps 600 --seed 2 now runs 600 steps (tick 348, 0 coverage gaps, 0 errors). Two tests pin the clamped and full-run reports; the mechanics gate stays at 180 steps, so gate time is unchanged.
+
+### ADR-342: Report total refusal and error counts, not the sample size
+- **Date**: 2026-11-16
+- **Status**: Accepted
+- **Context**: report() samples at most 12 refusals and 12 errors to keep the JSON small, but ai_play printed len(sample) as the count. A 600-step seed-2 run displayed 'refusals: 12' when the captain had actually been refused 183 times, so the text summary hid most of the friction.
+- **Decision**: report() adds refusal_count and error_count as totals while the sampled lists stay at 12; the CLI prints the totals, including an errors line when any occurred.
+- **Consequences**: The same 600-step run now reports 183 refusals truthfully. Two tests drive 20 refusals and 20 failures through a stub client and pin that the totals exceed the 12-item samples; suite Ran 1806 OK. The payload grows by two integers and existing JSON fields are unchanged.

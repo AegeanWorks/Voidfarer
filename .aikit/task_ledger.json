@@ -1,53 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-play-step-cap",
+    "task_id": "ai-play-honest-counts",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794786948.8960884,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794788232.3997488,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "impact_assessment": {
-      "why": "A 600-step request silently ran 200 steps with no indication the request was ignored, so soak evidence overstated its length",
-      "benefits": "Explicit long runs execute, and any clamp is visible in both text and JSON",
-      "risks": "contract: JSON gains two fields; dependency: none; concurrency: none; state: none",
-      "mitigation": "guard stays far above the 180-step gate; tests pin clamped and full-run reports; the 600-step run is verified"
-    },
-    "completed_at": 1794787117.442167,
-    "completed_head": "60746d64078b24fc02cfbc8b770124a032f475dd",
-    "completed_tree": "081b40f47643d0372b74fa9f341c7310c211e6fb"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "story-disclosure-targets",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] STORY toggles at 26px, post-tutorial audit clean at 1366x768 and 1280x720 (ADR-335); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794772241.2207441,
-      "timestamp_str": "2026-11-15 22:50:41",
-      "agent": "kilo:goal",
-      "head": "4d9361ccb3ebc370f2567ded897fa1bb0b374086"
-    },
-    {
-      "task_id": "story-disclosure-targets",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'story-disclosure-targets' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794772406.6024463,
-      "timestamp_str": "2026-11-15 22:53:26",
-      "agent": "kilo:goal",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "staged-tab-unlocks",
       "phase": "in_progress",
@@ -323,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-play-honest-counts",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Report total refusal and error counts instead of the 12-item sample size",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794788232.216152,
+      "timestamp_str": "2026-11-16 03:17:12",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The CLI printed the sample length as the count, hiding 171 of 183 real refusals in a 600-step run",
+        "benefits": "Friction and failures are visible at their true scale while the payload stays small",
+        "risks": "contract: JSON gains two integer fields; dependency: none; concurrency: none; state: none",
+        "mitigation": "sampled lists unchanged; totals pinned by stub-client tests; real 600-step run re-checked"
+      },
+      "plan_digest": "7b991c64a58cce09380d34780f89d28111abf85e646b24b18f0d5a28118d6120"
+    },
+    {
+      "task_id": "ai-play-honest-counts",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Totals reported (183 refusals on the 600-step seed-2 run), two tests pin sample-vs-total (ADR-342); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794788232.3997488,
+      "timestamp_str": "2026-11-16 03:17:12",
+      "agent": "kilo:goal"
     }
   ]
 }

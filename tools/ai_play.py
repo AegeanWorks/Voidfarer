@@ -65,7 +65,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         for gap in report["coverage_gaps"]:
             print(f"  GAP: {gap}")
         if report["refusals"]:
-            print(f"  refusals: {len(report['refusals'])} (first: {report['refusals'][0]})")
+            print(f"  refusals: {report['refusal_count']} (first: {report['refusals'][0]})")
+        if report["error_count"]:
+            print(f"  errors: {report['error_count']}")
         for error in report["errors"]:
             print(f"  ERROR: {error}")
         final = report["final"]

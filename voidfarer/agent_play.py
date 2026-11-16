@@ -872,7 +872,9 @@ class AiCaptain:
             "succeeded_count": len(self.succeeded),
             "coverage_gaps": coverage_gaps(self.catalog_paths, self.attempted),
             "refusals": self.refusals[:12],
+            "refusal_count": len(self.refusals),
             "errors": self.errors[:12],
+            "error_count": len(self.errors),
             "final": {
                 "credits": ship.get("credits"),
                 "hull": ship.get("hull"),
