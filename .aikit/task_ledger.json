@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-five-mechanics",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794804724.32591,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794804906.815926,
+    "completed_head": "19a2dfc6d917a24401d15e524684493b7a96f57c",
+    "completed_tree": "86a3af2b88e51f4ca661441281134d8a81f8b515"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-campaign-clock",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Run the captain phase on the campaign clock and skip jumps with an empty tank",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794795986.1475859,
-      "timestamp_str": "2026-11-16 05:26:26",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Batched play calls took a different path than one long call, and the fallback jump kept firing with no quantum fuel",
-        "benefits": "Long soaks are composable and reproducible, and 33 impossible jump attempts disappear",
-        "risks": "contract: none; dependency: none; concurrency: none; state: monotonic counter only",
-        "mitigation": "single-call behaviour unchanged, gate re-run, seeded end-to-end outpost test replaces the stale organic proof"
-      },
-      "plan_digest": "0b62dc1ae06549afc30f88a977a33941e6b485b7df92911a64b6026c530b1397"
-    },
     {
       "task_id": "ai-captain-campaign-clock",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794804724.32591,
       "timestamp_str": "2026-11-16 07:52:04",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-five-mechanics",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-five-mechanics' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794804906.8733323,
+      "timestamp_str": "2026-11-16 07:55:06",
+      "agent": "kilo:goal",
+      "head": "19a2dfc6d917a24401d15e524684493b7a96f57c",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
