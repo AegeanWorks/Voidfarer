@@ -9,8 +9,8 @@
 - **Total Python Modules**: `237`
 - **Total Classes**: `568`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2856`
-- **Total Source Lines**: `65788`
+- **Total Class Methods**: `2857`
+- **Total Source Lines**: `65826`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -559,7 +559,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `800` lines (`37298` bytes)
+**Size**: `810` lines (`37846` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -655,6 +655,7 @@
 - `class TestCLIReplCommandMatrix` - *Every command the REPL's help advertises must actually run, and real surfaces must be listed.*
   - Method `._repl(lines)`
   - Method `.test_the_commands_the_help_lists_all_run()`
+  - Method `.test_comms_is_the_comms_surface_not_the_story()`
   - Method `.test_the_help_lists_every_player_surface()`
 - `class TestCLIReplGuardHatches` - *Every command the blocking-encounter guard lets through must actually run (ADR-364).*
   - Method `._pending_repl(lines)`
@@ -4870,7 +4871,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4906` lines (`242580` bytes)
+**Size**: `4934` lines (`244282` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*

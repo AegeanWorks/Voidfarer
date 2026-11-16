@@ -761,13 +761,23 @@ class TestCLIReplCommandMatrix(_IsolatedCliTestCase):
             self.assertIn(heading, out)
         self.assertIn("__nowhere__", out)
 
+    def test_comms_is_the_comms_surface_not_the_story(self):
+        out = self._repl(["comms", "story", "flight routes", "narrative status", "progress status"])
+        self.assertIn("=== COMMS ===", out)
+        self.assertIn("PRECURSOR CIPHER", out)
+        self.assertIn("=== ROUTES FROM", out)
+        self.assertIn("=== NARRATIVE ===", out)
+        self.assertIn("=== PROGRESSION ===", out)
+
     def test_the_help_lists_every_player_surface(self):
         out = self._repl(["help"])
         for surface in ("character", "research", "outpost", "diplomacy", "route",
                         "navigate", "weapons", "reactor", "refit", "codex", "log",
                         "events", "crew", "away", "surface", "pirate", "customs",
                         "decision", "settings", "quests", "ai", "messages", "depot",
-                        "land", "mercs", "allies", "encounter", "state-machines"):
+                        "land", "mercs", "allies", "encounter", "state-machines",
+                        "flight", "narrative", "comms", "engineering", "fitting",
+                        "logistics", "progress", "empire", "intel"):
             self.assertIn(surface, out)
 
 

@@ -3703,6 +3703,24 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             break
         elif cmd == "status":
             cmd_status(engine)
+        elif cmd == "flight":
+            cmd_flight(engine, storage, parts)
+        elif cmd == "narrative":
+            cmd_narrative(engine, storage, parts)
+        elif cmd == "comms":
+            cmd_comms(engine, storage, parts)
+        elif cmd == "engineering":
+            cmd_engineering(engine, storage, parts)
+        elif cmd == "fitting":
+            cmd_fitting(engine, storage, parts)
+        elif cmd == "logistics":
+            cmd_logistics(engine, storage, parts)
+        elif cmd == "progress":
+            cmd_progress(engine, storage, parts)
+        elif cmd == "empire":
+            cmd_empire(engine, storage, parts)
+        elif cmd == "intel":
+            cmd_intel(engine, storage, parts)
         elif cmd in ("chart",):
             cmd_chart(engine)
         elif cmd in ("map", "mapmods", "sector"):
@@ -3805,7 +3823,7 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_streak(engine)
         elif cmd in ("tutorial", "academy", "cadet"):
             cmd_tutorial(engine, storage, parts)
-        elif cmd in ("story", "campaign", "act", "lore", "comms"):
+        elif cmd in ("story", "campaign", "act", "lore"):
             cmd_story(engine, storage, parts)
         elif cmd == "ai":
             cmd_ai(engine, storage, parts)
@@ -3971,6 +3989,16 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
         elif cmd in ("help", "?"):
             print(f"{BOLD}Available subcommands:{RESET}")
             print("  status                         - Telemetry, fleet roster, and subsystem readouts")
+            print(f"{BOLD}Grouped surfaces (same names as the non-interactive CLI):{RESET}")
+            print("  flight <status|routes|plot|navigate> - Movement and course plotting")
+            print("  narrative <status|story|quests|contracts|events> - Story, quests and contracts")
+            print("  comms <status|captains|inbox|trees> - AI captains, quantum inbox and message trees")
+            print("  engineering <status|reactor|power|hull> - Power, reactor, repair and salvage")
+            print("  fitting <status|upgrades|modules|weapons|chassis> - Upgrades, weapons and hulls")
+            print("  logistics <status|market|cargo|depot|freight> - Market, cargo, depot and freight")
+            print("  progress <status|commander|skills|relics> - Commander, skills and relics")
+            print("  empire <status|research|outposts|diplomacy> - Research, outposts and diplomacy")
+            print("  intel <status|chart|factions|war|corps> - Chart, factions, wars and corps")
             print("  time [status|pause|speed|step] - Cosmic time, ticks, and temporal speed controls")
             print("  settings [decisions <cadence>] - Simulation options and decision cadence")
             print("  economy / econ                 - Galactic macroeconomic conditions and trade routes")
