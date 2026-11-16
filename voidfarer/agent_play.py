@@ -155,6 +155,9 @@ class AiCaptain:
     # Once the guided tour is exhausted the fallback trade would otherwise fire every
     # other step and bleed credits on the spread; twelve trades exercise the mechanic.
     MAX_FALLBACK_TRADES = 12
+    # Upkeep actions can be needed again and again; a one-shot success left the captain
+    # flying on fumes for 1,400 ticks after a single refuel (ADR-349).
+    REPEATABLE_MIN_INTERVAL = {"/api/refuel": 60}
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -177,6 +180,7 @@ class AiCaptain:
         self.tour_exhausted = False
         self.retry_at: dict[tuple[str, str], int] = {}
         self.refusal_attempts: dict[tuple[str, str], int] = {}
+        self.repeat_last: dict[tuple[str, str], int] = {}
         self.fallback_trades = 0
 
     def play(self, steps: int = 40) -> dict[str, Any]:
@@ -225,6 +229,7 @@ class AiCaptain:
             self.succeeded.add(path)
             self.retry_at.pop(signature, None)
             self.refusal_attempts.pop(signature, None)
+            self.repeat_last[signature] = self.total_steps
             if payload.get("state"):
                 self.state = payload["state"]
         return self.report()
@@ -232,6 +237,16 @@ class AiCaptain:
     def _choose(self, step: int) -> tuple[str | None, dict[str, Any], str]:
         state = self.state
         ship = state.get("ship") or {}
+        # A destroyed hull stops the clock (every time step advances 0 ticks), so a run that
+        # ignores it spins forever. Claim the insurance rebuild the death overlay offers,
+        # through the same engineering action the UI posts (ADR-349).
+        if int(ship.get("hull") or 0) <= 0:
+            return "/api/engineering/action", {"action": "insurance"}, "insurance"
+        # Time can pause long after the one-shot PAUSE/RESUME tour steps ran (alerts,
+        # decisions); a paused clock advances 0 ticks per step and freezes the campaign
+        # while every action silently succeeds (ADR-349). Resume is state-driven.
+        if (state.get("time") or {}).get("is_paused"):
+            return "/api/time/resume", {}, "time_resume"
         pending = state.get("pending_decision")
         if pending:
             choices = pending.get("choices") or []
@@ -476,6 +491,12 @@ class AiCaptain:
         retry_at = self.retry_at.get(signature)
         if retry_at is not None:
             return self.total_steps < retry_at
+        interval = self.REPEATABLE_MIN_INTERVAL.get(path)
+        if interval is not None:
+            last = self.repeat_last.get(signature)
+            if last is None:
+                return False
+            return self.total_steps - last < interval
         if path in self.SIGNATURE_ROUTES:
             return signature in self.attempted_signatures
         return path in self.attempted

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `235`
-- **Total Classes**: `553`
+- **Total Classes**: `556`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2751`
-- **Total Source Lines**: `64460`
+- **Total Class Methods**: `2759`
+- **Total Source Lines**: `64554`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `643` lines (`30557` bytes)
+**Size**: `716` lines (`33656` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -155,6 +155,17 @@
   - Method `.setUpClass()`
   - Method `.tearDownClass()`
   - Method `.test_the_captain_manages_the_seeded_outpost()`
+- `class RepeatableUpkeepTest` - *Refuelling is upkeep, not a once-per-run achievement (ADR-349).*
+  - Method `.test_refuel_repeats_only_after_its_cooldown()`
+  - Method `.test_it_still_needs_a_first_attempt()`
+  - Method `.test_ordinary_routes_keep_one_shot_behaviour()`
+- `class PausedClockTest` - *A paused campaign clock is resumed before anything else (ADR-349).*
+  - Method `._captain(paused)`
+  - Method `.test_a_paused_clock_is_resumed()`
+  - Method `.test_a_running_clock_is_left_alone()`
+- `class DestroyedHullTest` - *A destroyed hull stops the clock, so the captain claims insurance first (ADR-349).*
+  - Method `.test_insurance_is_claimed_before_anything_else()`
+  - Method `.test_a_living_hull_does_not_claim_insurance()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4582,7 +4593,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1152` lines (`52389` bytes)
+**Size**: `1173` lines (`53717` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

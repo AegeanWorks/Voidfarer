@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-honest-friction",
+    "task_id": "ai-captain-upkeep-recovery",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794797061.226729,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794799083.0310342,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794797231.38337,
-    "completed_head": "837c4952dc29d97690d4592981d25d2bcfc5a45f",
-    "completed_tree": "65dcce3f69c0599b076e97b24e72f45cb04a31a7"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-play-honest-counts",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Totals reported (183 refusals on the 600-step seed-2 run), two tests pin sample-vs-total (ADR-342); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794788232.3997488,
-      "timestamp_str": "2026-11-16 03:17:12",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-play-honest-counts",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-play-honest-counts' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794788442.8945851,
-      "timestamp_str": "2026-11-16 03:20:42",
-      "agent": "kilo:goal",
-      "head": "800f63e43bcb9a9be1dc08a646f52a29eb8d5ad2",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-cargo-volume",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-upkeep-recovery",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Repeatable refuel plus state-driven resume and insurance recovery",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794799082.8623059,
+      "timestamp_str": "2026-11-16 06:18:02",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "One-shot refuel left the tank dry, and a destroyed hull stops the clock, so long campaigns froze with no path forward",
+        "benefits": "Runs advance through death and pause states instead of spinning, and fuel upkeep works for the whole campaign",
+        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory cooldown only",
+        "mitigation": "cooldown per route, state-driven recovery before any other action, measured over 10 rounds, seven tests across three classes"
+      },
+      "plan_digest": "204e29da37041794bc96747f836762a3a13a167f4883d94e7f2c8932f99bac2e"
+    },
+    {
+      "task_id": "ai-captain-upkeep-recovery",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] 10-round probe advances to tick 1829 with fuel maintained, 0 errors/gaps; suite 1848 OK; gate 0 gaps (ADR-349); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794799083.0310342,
+      "timestamp_str": "2026-11-16 06:18:03",
+      "agent": "kilo:goal"
     }
   ]
 }

@@ -540,7 +540,8 @@ class CampaignPhaseTest(unittest.TestCase):
     def _captain(self, fuel=10):
         captain = AiCaptain(ApiClient(port=1), seed=42)
         captain.state = {
-            "ship": {"fuel": fuel, "cargo": {}, "cargo_capacity": 40, "cargo_free_volume": 40},
+            "ship": {"hull": 100, "fuel": fuel, "cargo": {}, "cargo_capacity": 40,
+                     "cargo_free_volume": 40},
             "current_system": {"id": "sol", "connections": ["altair"]},
             "market_quotes": {},
         }
@@ -628,6 +629,78 @@ class OutpostTierEndToEndTest(unittest.TestCase):
         self.assertTrue(outpost["specialization"])
         repaired = next(o for o in captain.state["outposts"] if o["id"] == "outpost_test_2")
         self.assertEqual(repaired["integrity"], 100.0)
+
+
+class RepeatableUpkeepTest(unittest.TestCase):
+    """Refuelling is upkeep, not a once-per-run achievement (ADR-349)."""
+
+    def test_refuel_repeats_only_after_its_cooldown(self):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        signature = ("/api/refuel", "")
+        captain.total_steps = 100
+        captain.repeat_last[signature] = 100
+        captain.total_steps = 120
+        self.assertTrue(captain._tour_action_attempted("/api/refuel", {}))
+        captain.total_steps = 160
+        self.assertFalse(captain._tour_action_attempted("/api/refuel", {}))
+
+    def test_it_still_needs_a_first_attempt(self):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        self.assertFalse(captain._tour_action_attempted("/api/refuel", {}))
+
+    def test_ordinary_routes_keep_one_shot_behaviour(self):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.total_steps = 500
+        captain.attempted.add("/api/scan")
+        self.assertTrue(captain._tour_action_attempted("/api/scan", {}))
+
+
+class PausedClockTest(unittest.TestCase):
+    """A paused campaign clock is resumed before anything else (ADR-349)."""
+
+    def _captain(self, paused):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "ship": {"hull": 100, "fuel": 10, "cargo": {}, "cargo_capacity": 40,
+                     "cargo_free_volume": 40},
+            "time": {"tick": 10, "is_paused": paused},
+            "current_system": {"id": "sol", "connections": []},
+            "market_quotes": {},
+        }
+        return captain
+
+    def test_a_paused_clock_is_resumed(self):
+        self.assertEqual(self._captain(True)._choose(0)[0], "/api/time/resume")
+
+    def test_a_running_clock_is_left_alone(self):
+        self.assertNotEqual(self._captain(False)._choose(0)[0], "/api/time/resume")
+
+
+class DestroyedHullTest(unittest.TestCase):
+    """A destroyed hull stops the clock, so the captain claims insurance first (ADR-349)."""
+
+    def test_insurance_is_claimed_before_anything_else(self):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "ship": {"hull": 0, "fuel": 10, "cargo": {}, "cargo_capacity": 40,
+                     "cargo_free_volume": 40},
+            "time": {"tick": 10, "is_paused": True},
+            "current_system": {"id": "sol", "connections": []},
+            "market_quotes": {},
+        }
+        self.assertEqual(captain._choose(0)[0], "/api/engineering/action")
+        self.assertEqual(captain._choose(0)[1], {"action": "insurance"})
+
+    def test_a_living_hull_does_not_claim_insurance(self):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "ship": {"hull": 40, "fuel": 10, "cargo": {}, "cargo_capacity": 40,
+                     "cargo_free_volume": 40},
+            "time": {"tick": 10, "is_paused": False},
+            "current_system": {"id": "sol", "connections": []},
+            "market_quotes": {},
+        }
+        self.assertNotEqual(captain._choose(0)[0], "/api/engineering/action")
 
 
 class AiPlayToolArgsTest(unittest.TestCase):
