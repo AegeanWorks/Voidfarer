@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-upkeep-recovery",
+    "task_id": "drone-haul-partial-collect",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794799083.0310342,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794801205.4233174,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794799266.5255609,
-    "completed_head": "ff7c2a029b84df1f8dd36a8757652c9b64a46880",
-    "completed_tree": "0eb472ab3ecf9527b64a28e566288e71b49189b1"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-cargo-volume",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Refusals 202 -> 14 on the 600-step run; suite 1812 OK, mechanics 0 gaps (ADR-343); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794789681.3341079,
-      "timestamp_str": "2026-11-16 03:41:21",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-captain-cargo-volume",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-cargo-volume' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794789854.1083994,
-      "timestamp_str": "2026-11-16 03:44:14",
-      "agent": "kilo:goal",
-      "head": "f5f31b0bebd06c3f4d4582f0d6ba14dc9cd5a509",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-contract-claims",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "drone-haul-partial-collect",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Bank oversized drone hauls in part, collect on cooldown, and never cap maintenance selling",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794801205.2032313,
+      "timestamp_str": "2026-11-16 06:53:25",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "A 1,256-unit haul behind a 40-volume hold could never be collected, so credits and mining contracts were stranded",
+        "benefits": "The economy loop pays out: 18 claims and 56k credits in six rounds instead of one claim and zero credits",
+        "risks": "contract: collect may now succeed partially where it used to refuse; dependency: none; concurrency: none; state: none",
+        "mitigation": "banked amount bounded by actual units and free volume, credits separated from cargo, existing full-hold pin updated to the split, new no-room refusal pinned"
+      },
+      "plan_digest": "7fd123a9069d58cde14684de9474b000355ff2d51cca7e4384cccb39f5df08f1"
+    },
+    {
+      "task_id": "drone-haul-partial-collect",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Claims 1 -> 18, credits 0 -> 56,014 in six rounds; suite 1858 OK, gate 0 gaps (ADR-350); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794801205.4233174,
+      "timestamp_str": "2026-11-16 06:53:25",
+      "agent": "kilo:goal"
     }
   ]
 }

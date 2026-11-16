@@ -703,6 +703,55 @@ class DestroyedHullTest(unittest.TestCase):
         self.assertNotEqual(captain._choose(0)[0], "/api/engineering/action")
 
 
+class DroneCollectTourTest(unittest.TestCase):
+    """Drone haul is banked when it exists, and selling to unjam the hold is never capped (ADR-350)."""
+
+    def _captain(self, drones, credits=0, cargo=None, free=None):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "ship": {"hull": 100, "credits": credits,
+                     "fleet_drones": drones,
+                     "cargo": cargo if cargo is not None else {},
+                     "cargo_capacity": 40,
+                     "cargo_free_volume": free if free is not None else 40},
+            "market_quotes": {"titanium": {"commodity_id": "titanium", "buy_price": 50}},
+        }
+        return captain
+
+    def _drone(self, cargo=0, credits=0):
+        return {"id": "d1", "drone_type": "mining", "cargo_accumulated": cargo,
+                "credits_accumulated": credits}
+
+    def test_yield_is_collected(self):
+        captain = self._captain([self._drone(cargo=3)])
+        self.assertEqual(captain._tour_drone_collect()[2], "drone_collect")
+
+    def test_no_yield_means_no_collect(self):
+        self.assertIsNone(self._captain([self._drone()])._tour_drone_collect())
+
+    def test_a_full_hold_blocks_indivisible_cargo_but_not_credits(self):
+        self.assertIsNone(self._captain([self._drone(cargo=3)], free=0)._tour_drone_collect())
+        self.assertIsNone(self._captain([self._drone(cargo=3)], free=1)._tour_drone_collect())
+        self.assertEqual(self._captain([self._drone(credits=80)], free=0)._tour_drone_collect()[2],
+                         "drone_collect")
+
+    def test_the_volume_constant_matches_the_catalog(self):
+        from voidfarer.inventory import get_item_info
+        self.assertEqual(AiCaptain.TITANIUM_VOLUME, get_item_info("titanium").volume)
+
+    def test_a_destroyed_hull_collects_nothing(self):
+        captain = self._captain([self._drone(cargo=3)])
+        captain.state["ship"]["hull"] = 0
+        self.assertIsNone(captain._tour_drone_collect())
+
+    def test_selling_out_of_a_full_hold_ignores_the_buy_cap(self):
+        captain = self._captain([], cargo={"titanium": 20}, free=0)
+        captain.fallback_trades = captain.MAX_FALLBACK_TRADES
+        action = captain._trade_choice(4)
+        self.assertEqual(action[2], "trade")
+        self.assertFalse(action[1]["is_buy"])
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

@@ -106,7 +106,9 @@ class EngineHardeningTest(unittest.TestCase):
         self.assertEqual(self.engine.state.ship.upgrades, before.upgrades)
         self.assertEqual(self.engine.state.ship.credits, before.credits)
 
-    def test_drone_harvest_rejects_when_cargo_hold_is_full(self):
+    def test_drone_harvest_banks_credits_but_not_cargo_when_hold_is_full(self):
+        # Credits need no volume, so a full hold transfers them and leaves the cargo
+        # waiting on the drone; refusing both stranded the payout forever (ADR-350).
         cargo = {"titanium": 20}
         self.assertEqual(calculate_cargo_volume(cargo), 40)
         drone = FleetDrone(
@@ -121,9 +123,11 @@ class EngineHardeningTest(unittest.TestCase):
         before = self.engine.state.ship
 
         ok, _, info = self.engine.collect_drone_yield("drone_mining_99")
-        self.assertFalse(ok)
+        self.assertTrue(ok)
         self.assertEqual(info["cargo"], 0)
+        self.assertEqual(info["credits"], 100)
         self.assertEqual(self.engine.state.ship.cargo, before.cargo)
+        self.assertEqual(self.engine.state.ship.credits, before.credits + 100)
         self.assertEqual(self.engine.state.ship.fleet_drones[0].cargo_accumulated, 5)
 
     def test_repeat_scan_of_surveyed_body_awards_no_bounty(self):

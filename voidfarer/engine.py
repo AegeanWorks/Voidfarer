@@ -6017,48 +6017,70 @@ class SimulationEngine:
             return True, f"Drone '{drone_id}' redeployed to {target_system_id}."
 
     def collect_drone_yield(self, drone_id: str | None = None) -> tuple[bool, str, dict[str, Any]]:
-        """Collect accumulated cargo and research credits from fleet drones."""
+        """Collect accumulated cargo and research credits from fleet drones.
+
+        The hold has finite volume, so a haul larger than the free space is collected in
+        part: what fits is banked and the remainder stays on the drones. Refusing the whole
+        haul trapped a 1,256-unit harvest behind a 40-volume hold forever (ADR-350).
+        """
         with self.lock:
-            total_cargo = 0
-            total_credits = 0
-            updated_drones = []
-
-            for d in self.state.ship.fleet_drones:
-                if drone_id is None or d.id == drone_id:
-                    total_cargo += d.cargo_accumulated
-                    total_credits += d.credits_accumulated
-                    updated_drones.append(
-                        replace(d, cargo_accumulated=0, credits_accumulated=0)
-                    )
-                else:
-                    updated_drones.append(d)
-
-            if total_cargo == 0 and total_credits == 0:
+            targets = [
+                d for d in self.state.ship.fleet_drones
+                if drone_id is None or d.id == drone_id
+            ]
+            raw_cargo = sum(d.cargo_accumulated for d in targets)
+            raw_credits = sum(d.credits_accumulated for d in targets)
+            if raw_cargo == 0 and raw_credits == 0:
                 return False, "No yield accumulated by fleet drones yet.", {"credits": 0, "cargo": 0}
 
             passives = calculate_passive_multipliers(self.state.ship)
-            total_cargo = int(total_cargo * passives.get("drone_yield", 1.0))
-            total_credits = int(total_credits * passives.get("drone_yield", 1.0))
+            total_cargo = int(raw_cargo * passives.get("drone_yield", 1.0))
+            total_credits = int(raw_credits * passives.get("drone_yield", 1.0))
 
             cargo = dict(self.state.ship.cargo)
-            incoming_volume = calculate_cargo_volume({"titanium": total_cargo})
             free_volume = self.state.ship.cargo_capacity - calculate_cargo_volume(cargo)
-            if incoming_volume > free_volume:
+            unit_volume = max(1, int(get_item_info("titanium").volume))
+            collected = min(total_cargo, raw_cargo, max(0, free_volume) // unit_volume)
+            if collected <= 0 and total_credits <= 0:
                 return False, (
-                    f"Cargo hold has {max(0, free_volume)} volume free but the harvest needs "
-                    f"{incoming_volume}. Jettison cargo or expand the hold first."
+                    f"Cargo hold has {max(0, free_volume)} volume free but one titanium unit "
+                    f"needs {unit_volume}. Jettison cargo or expand the hold first."
                 ), {"credits": 0, "cargo": 0}
-            cargo["titanium"] = cargo.get("titanium", 0) + total_cargo
+
+            remaining = collected
+            updated_drones = []
+            for d in self.state.ship.fleet_drones:
+                if d not in targets:
+                    updated_drones.append(d)
+                    continue
+                take = min(d.cargo_accumulated, remaining)
+                remaining -= take
+                updated_drones.append(replace(
+                    d,
+                    cargo_accumulated=d.cargo_accumulated - take,
+                    credits_accumulated=0,
+                ))
+
+            cargo["titanium"] = cargo.get("titanium", 0) + collected
             new_credits = self.state.ship.credits + total_credits
 
             stats = dict(self.state.stats)
             stats["credits_earned"] += total_credits
 
-            log_entry = f"Fleet harvest collected: +{total_credits} cr and +{total_cargo} titanium units (yield multiplier x{passives.get('drone_yield', 1.0):.2f})."
+            if collected < total_cargo:
+                log_entry = (
+                    f"Fleet harvest collected: +{total_credits} cr and +{collected} of "
+                    f"{total_cargo} titanium units; the rest waits on the drones until the hold frees."
+                )
+            else:
+                log_entry = (
+                    f"Fleet harvest collected: +{total_credits} cr and +{collected} titanium "
+                    f"units (yield multiplier x{passives.get('drone_yield', 1.0):.2f})."
+                )
             new_log = list(self.state.ship.flight_log[-19:]) + [log_entry]
 
             # Progress mining contracts and award fleet commander pilot XP
-            updated_contracts, contract_logs = self._progress_contracts("mining", total_cargo)
+            updated_contracts, contract_logs = self._progress_contracts("mining", collected)
             new_log.extend(contract_logs)
             new_mastery, xp_logs = self._award_pilot_xp(40, self.state.ship.mastery)
             new_log.extend(xp_logs)
@@ -6077,9 +6099,9 @@ class SimulationEngine:
                 stats=stats,
             )
 
-            return True, f"Transferred {total_credits} cr and {total_cargo} units from fleet.", {
+            return True, f"Transferred {total_credits} cr and {collected} units from fleet.", {
                 "credits": total_credits,
-                "cargo": total_cargo,
+                "cargo": collected,
             }
 
     def set_battle_stance(self, stance: str) -> tuple[bool, str]:

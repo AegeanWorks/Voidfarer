@@ -155,9 +155,12 @@ class AiCaptain:
     # Once the guided tour is exhausted the fallback trade would otherwise fire every
     # other step and bleed credits on the spread; twelve trades exercise the mechanic.
     MAX_FALLBACK_TRADES = 12
+    # Titanium is the drone haul and occupies 2 volume per unit; the captain needs
+    # that much free space to bank one unit (ADR-350). Pinned against the catalog.
+    TITANIUM_VOLUME = 2
     # Upkeep actions can be needed again and again; a one-shot success left the captain
     # flying on fumes for 1,400 ticks after a single refuel (ADR-349).
-    REPEATABLE_MIN_INTERVAL = {"/api/refuel": 60}
+    REPEATABLE_MIN_INTERVAL = {"/api/refuel": 60, "/api/drone/collect": 30}
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -373,7 +376,9 @@ class AiCaptain:
         """
         ship = self.state.get("ship") or {}
         quotes = self.state.get("market_quotes") or {}
-        if not quotes or self.fallback_trades >= self.MAX_FALLBACK_TRADES:
+        # The cap guards speculative buying; selling to keep the hold from jamming
+        # drone collection must always work (ADR-350).
+        if not quotes:
             return None
         cargo = ship.get("cargo") or {}
         capacity = int(ship.get("cargo_capacity") or 0)
@@ -381,13 +386,14 @@ class AiCaptain:
         if free_volume is None:
             free_volume = capacity - sum(int(v) for v in cargo.values())
         free_volume = int(free_volume)
-        if cargo and free_volume < 1:
+        if cargo and free_volume < self.TITANIUM_VOLUME:
             item = next((k for k, v in cargo.items() if int(v) > 0), None)
             if item:
                 self.fallback_trades += 1
                 return "/api/trade", {"commodity_id": item, "quantity": 1, "is_buy": False}, "trade"
         commodity = self._cheapest_quote(quotes)
-        if commodity and free_volume >= 1 and step % 2 == 0:
+        if (commodity and free_volume >= 1 and step % 2 == 0
+                and self.fallback_trades < self.MAX_FALLBACK_TRADES):
             self.fallback_trades += 1
             return "/api/trade", {"commodity_id": commodity, "quantity": 1, "is_buy": True}, "trade"
         return None
@@ -432,6 +438,7 @@ class AiCaptain:
             self._tour_ability,
             self._tour_drone_buy,
             self._tour_drone_deploy,
+            self._tour_drone_collect,
             self._tour_fleet_refit_damaged,
             self._tour_crew_autostaff,
             self._tour_mercenary,
@@ -923,6 +930,23 @@ class AiCaptain:
         ):
             return None
         return "/api/crew/action", {"action": "autostaff"}, "crew_autostaff"
+
+    def _tour_drone_collect(self):
+        """Bank drone haul: collecting pays credits and advances mining contracts."""
+        ship = self.state.get("ship") or {}
+        if int(ship.get("hull") or 0) <= 0:
+            return None
+        drones = [d for d in ship.get("fleet_drones") or [] if isinstance(d, dict)]
+        if not any(int(d.get("cargo_accumulated") or 0) > 0
+                   or int(d.get("credits_accumulated") or 0) > 0 for d in drones):
+            return None
+        free_volume = ship.get("cargo_free_volume")
+        credits_only = all(int(d.get("cargo_accumulated") or 0) <= 0 for d in drones)
+        if (free_volume is not None
+                and int(free_volume) < self.TITANIUM_VOLUME
+                and not credits_only):
+            return None
+        return "/api/drone/collect", {}, "drone_collect"
 
     def _tour_orbit(self):
         body = self.state.get("orbiting_body") or {}

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `235`
-- **Total Classes**: `556`
-- **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2759`
-- **Total Source Lines**: `64554`
+- **Total Python Modules**: `236`
+- **Total Classes**: `558`
+- **Total Top-Level Functions**: `537`
+- **Total Class Methods**: `2772`
+- **Total Source Lines**: `64712`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`235` module(s))
+- **Indexed**: python (`236` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `716` lines (`33656` bytes)
+**Size**: `765` lines (`35984` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -166,6 +166,15 @@
 - `class DestroyedHullTest` - *A destroyed hull stops the clock, so the captain claims insurance first (ADR-349).*
   - Method `.test_insurance_is_claimed_before_anything_else()`
   - Method `.test_a_living_hull_does_not_claim_insurance()`
+- `class DroneCollectTourTest` - *Drone haul is banked when it exists, and selling to unjam the hold is never capped (ADR-350).*
+  - Method `._captain(drones, credits, cargo, free)`
+  - Method `._drone(cargo, credits)`
+  - Method `.test_yield_is_collected()`
+  - Method `.test_no_yield_means_no_collect()`
+  - Method `.test_a_full_hold_blocks_indivisible_cargo_but_not_credits()`
+  - Method `.test_the_volume_constant_matches_the_catalog()`
+  - Method `.test_a_destroyed_hull_collects_nothing()`
+  - Method `.test_selling_out_of_a_full_hold_ignores_the_buy_cap()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -1494,6 +1503,23 @@
 
 ---
 
+### [`tests/test_drone_partial_collection.py`](tests/test_drone_partial_collection.py)
+> *Drone haul collection fills the hold in part instead of refusing an oversized harvest.*
+
+**Size**: `59` lines (`2449` bytes)
+
+**Classes:**
+- `class PartialDroneCollectionTest`
+  - Method `.test_an_oversized_haul_fills_the_free_volume_and_keeps_the_rest()`
+  - Method `.test_a_haul_that_fits_is_collected_whole()`
+  - Method `.test_a_full_hold_still_banks_credits()`
+  - Method `.test_no_room_and_no_credits_is_refused()`
+
+**Functions:**
+- `def _engine(cargo, capacity, accumulated, credits_accumulated, efficiency)`
+
+---
+
 ### [`tests/test_economy.py`](tests/test_economy.py)
 > *Unit tests for the dynamic galactic economy, stockpiles, events, and trade routes.*
 
@@ -1772,7 +1798,7 @@
 ### [`tests/test_engine_hardening.py`](tests/test_engine_hardening.py)
 > *Regression tests for audit-driven engine hardening.*
 
-**Size**: `178` lines (`7324` bytes)
+**Size**: `182` lines (`7633` bytes)
 
 **Classes:**
 - `class EngineHardeningTest`
@@ -1786,7 +1812,7 @@
   - Method `.test_scan_awards_random_max_hull_relic_immediately()`
   - Method `.test_scan_and_step_preserve_dominant_corp()`
   - Method `.test_replacing_an_occupied_upgrade_slot_is_rejected()`
-  - Method `.test_drone_harvest_rejects_when_cargo_hold_is_full()`
+  - Method `.test_drone_harvest_banks_credits_but_not_cargo_when_hold_is_full()`
   - Method `.test_repeat_scan_of_surveyed_body_awards_no_bounty()`
   - Method `.test_story_choice_updates_faction_standing()`
   - Method `.test_buy_drone_rejects_unknown_system()`
@@ -4593,7 +4619,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1173` lines (`53717` bytes)
+**Size**: `1197` lines (`54985` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4651,6 +4677,7 @@
   - Method `._tour_drone_deploy()`
   - Method `._tour_fleet_refit_damaged()` - *Refit the whole worn drone line at once when a dock and credits allow it.*
   - Method `._tour_crew_autostaff()` - *Seat the best officer at every bridge station when the current mix is not optimal.*
+  - Method `._tour_drone_collect()` - *Bank drone haul: collecting pays credits and advances mining contracts.*
   - Method `._tour_orbit()`
   - Method `._tour_salvage()`
   - Method `._tour_scoop()`
@@ -5002,7 +5029,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11233` lines (`553888` bytes)
+**Size**: `11255` lines (`554885` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
