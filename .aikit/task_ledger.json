@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "repl-guard-hatches",
+    "task_id": "repl-grouped-surfaces",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794860702.636448,
+    "updated_at": 1794862533.7140632,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,57 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794860773.845133,
-    "completed_head": "c69f370d2d8b2df354c5bd423c488a48576b09cc",
-    "completed_tree": "d80c0822354ef9909d117d71e4f34621779e99d4"
+    "completed_at": 1794862559.2799237,
+    "completed_head": "a2b22bcf6108380d95b77bd6c394648862f078ae",
+    "completed_tree": "2685c292fc9054245cb9f560454f14185a3673e7"
   },
   "checkpoints": [
-    {
-      "task_id": "cockpit-drone-yield-badge",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'cockpit-drone-yield-badge' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794812844.858425,
-      "timestamp_str": "2026-11-16 10:07:24",
-      "agent": "kilo:goal",
-      "head": "e32c3d4c0840124384be54995aa6ba430bcdd08d",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "navigation-interrupted-contract",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Report an interrupted multi-hop route as a failure",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794818711.9824173,
-      "timestamp_str": "2026-11-16 11:45:11",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "navigate_to returned success after an encounter cut the course short, so arrival could not be distinguished from a partial trip",
-        "benefits": "CLI, REST and agent callers can retry a cut-short course; de-duplication no longer records the destination as reached",
-        "risks": "contract: navigate_to bool changes from True to False on interruption; dependency: none; concurrency: none; state: none",
-        "mitigation": "failing-first test pinned the old bug, completed and unreachable routes pinned too, message names arrival vs interruption"
-      },
-      "plan_digest": "a55fd0c3b38ede68fe85119633a9f66a43684a99ab9d97996fe8ff01bdbc53a3"
-    },
-    {
-      "task_id": "navigation-interrupted-contract",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Failing-first fix passes; suite 1889 OK, gate 55/65 with 0 gaps (ADR-359); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794818712.1946058,
-      "timestamp_str": "2026-11-16 11:45:12",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "navigation-interrupted-contract",
       "phase": "completed",
@@ -383,6 +337,64 @@
       "timestamp_str": "2026-11-16 23:26:13",
       "agent": "kilo:goal",
       "head": "c69f370d2d8b2df354c5bd423c488a48576b09cc",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "repl-grouped-surfaces",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Stop comms from meaning story and expose every grouped CLI surface in the REPL",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794862181.0858219,
+      "timestamp_str": "2026-11-16 23:49:41",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The non-interactive CLI's comms group opens AI captains and the quantum inbox, but the REPL's comms alias opened the story campaign; the other eight grouped surfaces (flight, narrative, engineering, fitting, logistics, progress, empire, intel) worked outside the REPL but printed Unknown command inside it",
+        "benefits": "One vocabulary works in both front ends; the interactive cockpit can reach the grouped surfaces without leaving the session; the story keeps its own unambiguous aliases",
+        "risks": "contract: REPL comms output changes from story to comms; dependency: none; concurrency: none; state: none",
+        "mitigation": "failing-first REPL test pinning comms vs story and the grouped dispatches, real piped REPL run, full suite and 5/5 gates"
+      },
+      "plan_digest": "2d3212236dd4fb3eb01dd01a354841df38b2c9ef0c681d10cfb10033b326bead",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "repl-grouped-surfaces",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/4] comms and all nine grouped surfaces run in a real REPL; suite Ran 1913 OK; 5/5 gates (ADR-365); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794862533.7140632,
+      "timestamp_str": "2026-11-16 23:55:33",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "repl-grouped-surfaces",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'repl-grouped-surfaces' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794862559.3523521,
+      "timestamp_str": "2026-11-16 23:55:59",
+      "agent": "kilo:goal",
+      "head": "a2b22bcf6108380d95b77bd6c394648862f078ae",
       "delivery": {
         "roots": [
           "."
