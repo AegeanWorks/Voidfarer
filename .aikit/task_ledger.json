@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "drone-harvest-message",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794802295.8481092,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794802472.847174,
+    "completed_head": "de0b31158f84a014ce400f08cfffe7ebc4c4ad00",
+    "completed_tree": "9e02504870947b12e025c09b40d2c8128a3acb74"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-escort-tier",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Retry resource-gated refusals and tour the escort role, training, captain and repair",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794792631.0244036,
-      "timestamp_str": "2026-11-16 04:30:31",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "One early escort purchase refusal was permanent, and 1,800 fallback trades drained credits so the escort and outpost tier never became reachable",
-        "benefits": "The captain now plays the full progression: buys an escort, exercises its four commands, banks contracts and stays solvent",
-        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory retry map only",
-        "mitigation": "retries only for resource gates with a 40-step cooldown, coverage still recorded on first attempt; nine tests; measured before and after"
-      },
-      "plan_digest": "f78064afe61dd5c0657760eb0a59fa414543731c620ff44a0dff2cd81b6ec853"
-    },
     {
       "task_id": "ai-captain-escort-tier",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794802295.8481092,
       "timestamp_str": "2026-11-16 07:11:35",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "drone-harvest-message",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'drone-harvest-message' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794802472.905371,
+      "timestamp_str": "2026-11-16 07:14:32",
+      "agent": "kilo:goal",
+      "head": "de0b31158f84a014ce400f08cfffe7ebc4c4ad00",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
