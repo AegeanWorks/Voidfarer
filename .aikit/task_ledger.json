@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-honest-friction",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794797061.226729,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794797231.38337,
+    "completed_head": "837c4952dc29d97690d4592981d25d2bcfc5a45f",
+    "completed_tree": "65dcce3f69c0599b076e97b24e72f45cb04a31a7"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-play-honest-counts",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Report total refusal and error counts instead of the 12-item sample size",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794788232.216152,
-      "timestamp_str": "2026-11-16 03:17:12",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The CLI printed the sample length as the count, hiding 171 of 183 real refusals in a 600-step run",
-        "benefits": "Friction and failures are visible at their true scale while the payload stays small",
-        "risks": "contract: JSON gains two integer fields; dependency: none; concurrency: none; state: none",
-        "mitigation": "sampled lists unchanged; totals pinned by stub-client tests; real 600-step run re-checked"
-      },
-      "plan_digest": "7b991c64a58cce09380d34780f89d28111abf85e646b24b18f0d5a28118d6120"
-    },
     {
       "task_id": "ai-play-honest-counts",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794797061.226729,
       "timestamp_str": "2026-11-16 05:44:21",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-honest-friction",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-honest-friction' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794797231.4415524,
+      "timestamp_str": "2026-11-16 05:47:11",
+      "agent": "kilo:goal",
+      "head": "837c4952dc29d97690d4592981d25d2bcfc5a45f",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
