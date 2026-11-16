@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-contract-claims",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794791228.431236,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794791425.6461,
+    "completed_head": "75662933d6d3e0756de4a177deedc21c468f1fe5",
+    "completed_tree": "56f8fe4f591c675e436911fe20c6dda3d40cfc12"
   },
   "checkpoints": [
-    {
-      "task_id": "veteran-tab-persistence",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Keep the persisted veteran tab preference across reloads",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794781555.4024692,
-      "timestamp_str": "2026-11-16 01:25:55",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Constructor defaults overwrote the loaded unlockTabs value, so the saved preference never took effect",
-        "benefits": "The SETTINGS escape hatch works on every launch, matching what the checkbox stores",
-        "risks": "contract: none, save untouched; dependency: none; concurrency: none; state: localStorage only",
-        "mitigation": "single loader/single writer; a pin forbids the constructor reset; reload verified in Edge with 0 errors"
-      },
-      "plan_digest": "43f4d92c69fd83526c00778ab52d99fd3eef902c6ffad3241b5b4f14663269e9"
-    },
     {
       "task_id": "veteran-tab-persistence",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794791228.431236,
       "timestamp_str": "2026-11-16 04:07:08",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-contract-claims",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-contract-claims' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794791425.7053704,
+      "timestamp_str": "2026-11-16 04:10:25",
+      "agent": "kilo:goal",
+      "head": "75662933d6d3e0756de4a177deedc21c468f1fe5",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
