@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "repl-command-parity",
+    "task_id": "repl-guard-hatches",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794858139.6236415,
+    "updated_at": 1794860702.636448,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,57 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794858181.457644,
-    "completed_head": "dc397b6205939c56df040f79e6c445f5c0e0b98e",
-    "completed_tree": "beceabf54ad290beddf9a324862f16d47b0c1093"
+    "completed_at": 1794860773.845133,
+    "completed_head": "c69f370d2d8b2df354c5bd423c488a48576b09cc",
+    "completed_tree": "d80c0822354ef9909d117d71e4f34621779e99d4"
   },
   "checkpoints": [
-    {
-      "task_id": "cockpit-jettison-ore",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'cockpit-jettison-ore' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794810587.0042586,
-      "timestamp_str": "2026-11-16 09:29:47",
-      "agent": "kilo:goal",
-      "head": "ad23085d9b0728148e16ad36968de3afbe9252b1",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "cockpit-drone-yield-badge",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Show drone ore as WAITING when the hold cannot take it",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794812409.0496955,
-      "timestamp_str": "2026-11-16 10:00:09",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The badge advertised a full haul as ready while only credits could move",
-        "benefits": "Players see what is blocked and what still collects, with a pointer to jettison or market sale",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "derived from cargo_free_volume, two DOM-verified states, three pins"
-      },
-      "plan_digest": "8b11ec75c65d07df74965ad6d5ecb5aec6778a8a823934ae8524dc9929ceef49"
-    },
-    {
-      "task_id": "cockpit-drone-yield-badge",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] DOM-verified both states at 1366x768, 0 console errors; suite 1886 OK (ADR-357); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794812409.2722752,
-      "timestamp_str": "2026-11-16 10:00:09",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "cockpit-drone-yield-badge",
       "phase": "completed",
@@ -371,6 +325,64 @@
       "timestamp_str": "2026-11-16 22:43:01",
       "agent": "kilo:goal",
       "head": "dc397b6205939c56df040f79e6c445f5c0e0b98e",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "repl-guard-hatches",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Make every command in the REPL blocking-encounter allowlist actually run",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794859740.7060962,
+      "timestamp_str": "2026-11-16 23:09:00",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The guard allows encounter, state-machines and ? through during a decision, but the REPL dispatches none of them, so the advertised escape hatches print Unknown command exactly when the player is blocked",
+        "benefits": "A blocked player can inspect the encounter, inspect state machines and open help without guessing; the guard contract stops lying",
+        "risks": "contract: none (wires existing handlers); dependency: none; concurrency: none; state: none",
+        "mitigation": "failing-first scripted REPL test under a pending decision, full suite and 5/5 gates"
+      },
+      "plan_digest": "8e1c2e936dcf37646d549cf4b75085f9b6c79947453584777d667b37cd0c046b",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "repl-guard-hatches",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/4] encounter, state-machines and ? now run under a pending decision; suite Ran 1912 OK; 5/5 gates (ADR-364); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794860702.636448,
+      "timestamp_str": "2026-11-16 23:25:02",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "repl-guard-hatches",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'repl-guard-hatches' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794860773.9162254,
+      "timestamp_str": "2026-11-16 23:26:13",
+      "agent": "kilo:goal",
+      "head": "c69f370d2d8b2df354c5bd423c488a48576b09cc",
       "delivery": {
         "roots": [
           "."
