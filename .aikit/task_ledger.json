@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "repl-grouped-surfaces",
-    "last_phase": "phase 4",
+    "task_id": "voidfarer-oath-dive",
+    "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794862533.7140632,
+    "updated_at": 1794866679.8116598,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794862559.2799237,
-    "completed_head": "a2b22bcf6108380d95b77bd6c394648862f078ae",
-    "completed_tree": "2685c292fc9054245cb9f560454f14185a3673e7"
+    "completed_at": 1794866782.9289052,
+    "completed_head": "f3550ba5675e11286a7fbe3c11c1709f308c85e4",
+    "completed_tree": "be21228b681d5ac93b2e171d2bd5ffd3db9be29b"
   },
   "checkpoints": [
-    {
-      "task_id": "navigation-interrupted-contract",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'navigation-interrupted-contract' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794819012.4576054,
-      "timestamp_str": "2026-11-16 11:50:12",
-      "agent": "kilo:goal",
-      "head": "2d6c2e3ded261d073e323e80a23f260e1b6f2e47",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "story-travel-hold",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Pin story route publication and the stay-until-resolved hold; fix the Act IV orbit drift",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794836685.7961986,
-      "timestamp_str": "2026-11-16 16:44:45",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The story-directed travel prototype in the tree reaches Act IV but a dock trip or generic body move can leave the required black-hole orbit; the orbit signature is then de-duplicated forever, so the campaign stalls one step before the choice",
-        "benefits": "Act IV resolves and the campaign can advance past Cygnus; the snapshot publishes the whole real course so multi-hop travel cannot strand the tank",
-        "risks": "contract: snapshot story_status gains a route object when out of system; dependency: none; concurrency: none; state: page-memory only",
-        "mitigation": "failing-first unit tests for the hold, orbit re-fire and route estimate; 2,000-step probe; full suite and 5/5 gates before commit"
-      },
-      "plan_digest": "2d19d208fa2eb9b582f6f7395a3dfdb4676dcb6314bbeb567d4830731a707fa7",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "story-travel-hold",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] 2,000-step seed-2 campaign completes Act VI (6 choices, 2 travels, 1 orbit; 78/70, 0 gaps/0 errors); gate 57/67, 0 gaps; suite Ran 1895 OK (ADR-360); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794839417.7787707,
-      "timestamp_str": "2026-11-16 17:30:17",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "story-travel-hold",
       "phase": "phase 5",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-16 23:55:59",
       "agent": "kilo:goal",
       "head": "a2b22bcf6108380d95b77bd6c394648862f078ae",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "voidfarer-oath-dive",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Make void readiness honest and have the captain take the Act IV void dive",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794865185.79643,
+      "timestamp_str": "2026-11-17 00:39:45",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "At Act IV the story asks the captain to hold the Cygnus horizon and swear the Voidfarer's Oath, but the AI resolves the choice without ever using the Hollow Between; /api/void/dive and /api/void/emerge stay permanently in CONTEXT_ACTIONS. The status also reports dive_ready with zero shields although void_dive refuses for shield shear, so the cockpit advertises a dive that fails",
+        "benefits": "The two void endpoints are exercised at the story's own void beat; emergency emergence restores the horizon orbit so Act IV still resolves; readiness now matches the engine gate",
+        "risks": "contract: void_status may report dive_ready False with a new shield blocker; dependency: none; concurrency: none; state: per-campaign one-shot flags in the captain",
+        "mitigation": "failing-first unit tests for readiness honesty and the dive/emerge policy, Act IV probe evidence on three seeds, campaign completion and 180-step gate unchanged, full suite and 5/5 gates"
+      },
+      "plan_digest": "be58f6e7f2f80d091218aba57edbaf9fd4811ed09e300d66fa58c67d630a181e",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-oath-dive",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/4] Seeds 2/42 dive and emerge once at Act IV and still complete; seed 1 stays at 0 shields with honest readiness; 180-step gate unchanged 57/67, 0 gaps; suite Ran 1919 OK (ADR-366); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794866679.8116598,
+      "timestamp_str": "2026-11-17 01:04:39",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "voidfarer-oath-dive",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'voidfarer-oath-dive' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794866782.9942422,
+      "timestamp_str": "2026-11-17 01:06:22",
+      "agent": "kilo:goal",
+      "head": "f3550ba5675e11286a7fbe3c11c1709f308c85e4",
       "delivery": {
         "roots": [
           "."
