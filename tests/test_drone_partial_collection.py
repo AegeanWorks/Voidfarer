@@ -29,6 +29,8 @@ class PartialDroneCollectionTest(unittest.TestCase):
         ok, message, info = engine.collect_drone_yield()
         self.assertTrue(ok, message)
         self.assertEqual(info["cargo"], 5, "titanium volume is 2, so 10 volume fits 5 units")
+        self.assertEqual(info["remaining"], 95)
+        self.assertIn("95 units remain on the drones", message)
         ship = engine.state.ship
         self.assertEqual(ship.cargo["titanium"], 5)
         self.assertEqual(ship.fleet_drones[0].cargo_accumulated, 95)
@@ -53,6 +55,15 @@ class PartialDroneCollectionTest(unittest.TestCase):
         ok, message, _info = engine.collect_drone_yield()
         self.assertFalse(ok)
         self.assertIn("Jettison cargo or expand the hold", message)
+
+    def test_singular_amounts_read_naturally(self):
+        engine = _engine({"titanium": 19}, capacity=40, accumulated=2)
+        ok, message, info = engine.collect_drone_yield()
+        self.assertTrue(ok)
+        self.assertEqual(info["cargo"], 1)
+        self.assertEqual(info["remaining"], 1)
+        self.assertIn("1 unit from fleet", message)
+        self.assertIn("1 unit remains on the drones", message)
 
 
 if __name__ == "__main__":

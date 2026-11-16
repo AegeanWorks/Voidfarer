@@ -9,8 +9,8 @@
 - **Total Python Modules**: `236`
 - **Total Classes**: `558`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2772`
-- **Total Source Lines**: `64712`
+- **Total Class Methods**: `2773`
+- **Total Source Lines**: `64732`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`236` module(s))
@@ -1506,7 +1506,7 @@
 ### [`tests/test_drone_partial_collection.py`](tests/test_drone_partial_collection.py)
 > *Drone haul collection fills the hold in part instead of refusing an oversized harvest.*
 
-**Size**: `59` lines (`2449` bytes)
+**Size**: `70` lines (`2975` bytes)
 
 **Classes:**
 - `class PartialDroneCollectionTest`
@@ -1514,6 +1514,7 @@
   - Method `.test_a_haul_that_fits_is_collected_whole()`
   - Method `.test_a_full_hold_still_banks_credits()`
   - Method `.test_no_room_and_no_credits_is_refused()`
+  - Method `.test_singular_amounts_read_naturally()`
 
 **Functions:**
 - `def _engine(cargo, capacity, accumulated, credits_accumulated, efficiency)`
@@ -5029,7 +5030,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11255` lines (`554885` bytes)
+**Size**: `11264` lines (`555350` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

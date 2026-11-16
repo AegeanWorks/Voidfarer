@@ -6099,9 +6099,18 @@ class SimulationEngine:
                 stats=stats,
             )
 
-            return True, f"Transferred {total_credits} cr and {collected} units from fleet.", {
+            leftover = max(0, raw_cargo - collected)
+            collected_word = "unit" if collected == 1 else "units"
+            message = (f"Transferred {total_credits} cr and {collected} "
+                       f"{collected_word} from fleet.")
+            if leftover:
+                leftover_word = "unit remains" if leftover == 1 else "units remain"
+                message += (f" {leftover} {leftover_word} on the drones until the hold "
+                            "frees.")
+            return True, message, {
                 "credits": total_credits,
                 "cargo": collected,
+                "remaining": leftover,
             }
 
     def set_battle_stance(self, stance: str) -> tuple[bool, str]:

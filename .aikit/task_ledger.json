@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "drone-haul-partial-collect",
+    "task_id": "drone-harvest-message",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794801205.4233174,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794802295.8481092,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794801408.6929402,
-    "completed_head": "68dfe1d3b15ff66a72ff442b56b646b7547d0278",
-    "completed_tree": "5134870336d140429fdec1b2919861d3b7dbde69"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-contract-claims",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Claims banked (600-step credits 0 -> ~67k, gate 824 -> 2928 cr), gate 0 gaps/0 errors, suite 1816 OK (ADR-344); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794791228.431236,
-      "timestamp_str": "2026-11-16 04:07:08",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-captain-contract-claims",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-contract-claims' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794791425.7053704,
-      "timestamp_str": "2026-11-16 04:10:25",
-      "agent": "kilo:goal",
-      "head": "75662933d6d3e0756de4a177deedc21c468f1fe5",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-escort-tier",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "drone-harvest-message",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Name the remainder and pluralize counts in the drone collect response",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794802295.6722596,
+      "timestamp_str": "2026-11-16 07:11:35",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The message implied the whole haul arrived after partial collection, and '1 units' read badly",
+        "benefits": "Players see exactly what was banked and what waits; API callers get the remaining count",
+        "risks": "contract: response dict gains a remaining key, message changes; dependency: none; concurrency: none; state: none",
+        "mitigation": "real Edge click verifies the exact text and state deltas, singular/plural tests, full suite"
+      },
+      "plan_digest": "b7f6aa9b10593fd34d9b6b0024fce9010cd6c17faf7b115f0e4f2fa7e9c2a38c"
+    },
+    {
+      "task_id": "drone-harvest-message",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Edge shows '1 unit from fleet. 639 units remain...', 0 console errors; suite 1859 OK (ADR-351); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794802295.8481092,
+      "timestamp_str": "2026-11-16 07:11:35",
+      "agent": "kilo:goal"
     }
   ]
 }
