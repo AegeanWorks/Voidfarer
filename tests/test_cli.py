@@ -738,6 +738,39 @@ class TestCLIReplRelicsFuse(_IsolatedCliTestCase):
         self.assertIn("VITAL TELEMETRY", out)
 
 
+class TestCLIReplCommandMatrix(_IsolatedCliTestCase):
+    """Every command the REPL's help advertises must actually run, and real surfaces must be listed."""
+
+    def _repl(self, lines):
+        engine = SimulationEngine(seed=42)
+        storage = StorageManager(Path(self._tmp.name) / ".voidfarer")
+        storage.save(engine.state)
+        with patch("builtins.input", side_effect=list(lines) + ["exit"]):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+                self.assertEqual(cmd_repl(engine, storage), 0)
+        return mock_out.getvalue()
+
+    def test_the_commands_the_help_lists_all_run(self):
+        out = self._repl([
+            "quests", "ai list", "messages list", "depot status",
+            "mercs list", "allies list", "land __nowhere__",
+        ])
+        self.assertNotIn("Unknown command", out)
+        for heading in ("QUEST PANEL", "AI CAPTAINS", "QUANTUM INBOX",
+                        "Cargo Depot", "MERCENARY CONTRACTS", "ALLIANCES"):
+            self.assertIn(heading, out)
+        self.assertIn("__nowhere__", out)
+
+    def test_the_help_lists_every_player_surface(self):
+        out = self._repl(["help"])
+        for surface in ("character", "research", "outpost", "diplomacy", "route",
+                        "navigate", "weapons", "reactor", "refit", "codex", "log",
+                        "events", "crew", "away", "surface", "pirate", "customs",
+                        "decision", "settings", "quests", "ai", "messages", "depot",
+                        "land", "mercs", "allies"):
+            self.assertIn(surface, out)
+
+
 if __name__ == "__main__":
     unittest.main()
 

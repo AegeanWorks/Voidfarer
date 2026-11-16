@@ -3724,6 +3724,11 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_quantum(engine, storage, parts)
         elif cmd in ("surface", "landing"):
             cmd_surface(engine, storage, parts)
+        elif cmd == "land":
+            if len(parts) < 2:
+                print(f"{RED}Usage:{RESET} land <body_id>")
+            else:
+                cmd_land(engine, storage, parts[1])
         elif cmd in ("autotrade", "broker"):
             cmd_autotrade(engine, storage, parts)
         elif cmd in ("reconstruct", "rebuild", "relief"):
@@ -3763,6 +3768,10 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_market(engine)
         elif cmd == "fleet":
             cmd_fleet(engine, storage, parts)
+        elif cmd in ("mercs", "mercenaries"):
+            cmd_mercs(engine, storage, parts)
+        elif cmd in ("allies", "alliance"):
+            cmd_allies(engine, storage, parts)
         elif cmd in ("upgrades", "upgrade", "arsenal", "shop"):
             cmd_upgrades(engine, storage, parts)
         elif cmd in ("combat", "fight", "battle"):
@@ -3771,6 +3780,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_contracts(engine, storage, parts)
         elif cmd in ("claim",):
             cmd_contracts(engine, storage, ["contracts", "claim"] + parts[1:])
+        elif cmd in ("quests", "quest"):
+            cmd_quests(engine)
         elif cmd in ("mastery", "talents", "talent", "perks"):
             cmd_mastery(engine, storage, parts)
         elif cmd in ("unlock",):
@@ -3792,6 +3803,10 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_tutorial(engine, storage, parts)
         elif cmd in ("story", "campaign", "act", "lore", "comms"):
             cmd_story(engine, storage, parts)
+        elif cmd == "ai":
+            cmd_ai(engine, storage, parts)
+        elif cmd in ("messages", "message", "inbox"):
+            cmd_messages(engine, storage, parts)
         elif cmd in ("void", "hollow"):
             cmd_void(engine, storage, parts)
         elif cmd in ("serve", "web", "gui", "hud"):
@@ -3938,6 +3953,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_inventory(engine, storage, ["inventory", "use"] + parts[1:])
         elif cmd in ("jettison", "drop"):
             cmd_inventory(engine, storage, ["inventory", "jettison"] + parts[1:])
+        elif cmd == "depot":
+            cmd_depot(engine, storage, parts)
         elif cmd in ("shipyard", "drydock"):
             cmd_shipyard(engine, storage, parts)
         elif cmd in ("chassis",):
@@ -3951,44 +3968,67 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             print(f"{BOLD}Available subcommands:{RESET}")
             print("  status                         - Telemetry, fleet roster, and subsystem readouts")
             print("  time [status|pause|speed|step] - Cosmic time, ticks, and temporal speed controls")
+            print("  settings [decisions <cadence>] - Simulation options and decision cadence")
             print("  economy / econ                 - Galactic macroeconomic conditions and trade routes")
-            print("  inventory [buy|use|jettison]   - Hold manifest, station consumables & usable items")
-            print("  shipyard [chassis|sell]        - Orbital shipyard, chassis showroom, and drydocks")
             print("  chart / map                    - Hyperlane network & orbital bodies")
-            print("  factions                       - Galactic factions, sovereign standings & perks")
-            print("  war [list|support]             - Active wars, territory fronts & credit pledges")
-            print("  corps / corporations           - Megacorporations, specialties & trade bonuses")
+            print("  route <system_id>              - Plot a course with its fuel estimate")
+            print("  navigate <system_id>           - Fly a plotted multi-hop course")
             print("  jump <system_id>               - Hyperspace jump to adjacent star")
             print("  orbit <body_id>                - Enter orbit around planet or station")
+            print("  travel <body_id> [mode]        - Sublight or quantum in-system transit")
             print("  scan                           - Sensor sweep of orbiting body (relic discovery)")
-            print("  contracts [claim <id>]         - Active sector bounty contracts (Zeigarnik loop)")
-            print("  mastery [unlock <id>]          - Pilot rank, XP progression, and talent tree")
-            print("  tutorial [skip|reset]          - Cadet Flight Academy onboarding and guidance")
-            print("  story [choose <id>]            - The Precursor Cipher narrative campaign")
-            print("  void [status|lanes|dive|emerge] - The Hollow Between void lane traversal")
-            print("  relics                         - Ancient Precursor Relic vault & passive fleet buffs")
-            print("  streak                         - Expedition jump streak & multiplier status")
+            print("  land <body_id>                 - Land on a habitable body")
+            print("  surface [list|op|land]         - Landing-party surface operations")
+            print("  reconstruct <body_id> [--relief] - Rebuild a devastated inhabited world")
+            print("  inventory [buy|use|jettison]   - Hold manifest, station consumables & usable items")
             print("  market                         - Check commodity trade prices")
             print("  buy <comm> <qty|max>           - Buy commodities (max: all you can afford and hold)")
             print("  sell <comm> <qty|all>          - Sell commodities (all: the whole hold of it)")
-            print("  fleet [harvest|buy|deploy]     - Autonomous fleet assets and drone yields")
+            print("  shipyard [chassis|sell]        - Orbital shipyard, chassis showroom, and drydocks")
             print("  upgrades [buy <id>]            - Station hardware upgrades and module shop")
-            print("  combat <fire|drone|target|flee>- Tactical maneuvers during hostile intercepts")
+            print("  weapons                        - Weapon hardpoints and primary selection")
+            print("  reactor                        - Reactor modes, heat and core integrity")
+            print("  refit [install|remove]         - Structural ship mods, slots and capacity")
+            print("  fleet [harvest|buy|deploy]     - Autonomous fleet assets and drone yields")
+            print("  crew [recruit|train|station]   - Crew roster, drills and assignments")
+            print("  away [launch|recall]           - Away-team expeditions")
+            print("  mercs [list|hire|dismiss|refit] - Mercenary contracts and fleet refits")
+            print("  allies [list|form]             - Alliance roster and formation")
+            print("  contracts [claim <id>]         - Active sector bounty contracts (Zeigarnik loop)")
+            print("  claim <contract_id>            - Claim a completed contract reward")
+            print("  quests                         - Unified story and contract quest panel")
+            print("  story [choose <id>]            - The Precursor Cipher narrative campaign")
+            print("  messages [list|send|read]      - Intergalactic quantum messaging")
+            print("  ai [list|hail|buy|sell|hire|ally] - AI captain diplomacy and trade")
+            print("  tutorial [skip|reset]          - Cadet Flight Academy onboarding and guidance")
+            print("  mastery [unlock <id>]          - Pilot rank, XP progression, and talent tree")
+            print("  character / skills             - Commander profile, skills and progression")
+            print("  relics [fuse <rarity>]         - Ancient Precursor Relic vault & passive fleet buffs")
+            print("  codex [claim <id>]             - Codex milestones and reward claims")
+            print("  log                            - Recent captain's flight log")
+            print("  events [dismiss <id>]          - Cockpit popup events")
+            print("  streak                         - Expedition jump streak & multiplier status")
             print("  power <e> <s> <se> <w>         - Distribute 100% reactor power")
+            print("  combat <fire|drone|target|flee> - Tactical maneuvers during hostile intercepts")
+            print("  pirate [pay|fight|evade]       - Pirate toll resolution")
+            print("  customs [bribe|jettison|flee]  - Customs interdiction resolution")
+            print("  decision                       - Resolve a blocking decision popup")
             print("  anomaly <choice_id>            - Resolve active spatial encounter")
             print("  repair [amt]                   - Repair hull integrity at station")
             print("  refuel [amt]                   - Replenish quantum fuel at station")
-            print("  serve [--port 8080|stop]       - Launch/stop concurrent Web Cockpit HUD")
-            print("  quests                         - Unified story and contract quest panel")
-            print("  ai [list|hail|buy|sell|hire|ally] - AI captain diplomacy and trade")
-            print("  messages [list|send|read]      - Intergalactic quantum messaging")
+            print("  void [status|lanes|dive|emerge] - The Hollow Between void lane traversal")
+            print("  factions                       - Galactic factions, sovereign standings & perks")
+            print("  diplomacy                      - Faction leaders, treaties and standing")
+            print("  war [list|support]             - Active wars, territory fronts & credit pledges")
+            print("  corps / corporations           - Megacorporations, specialties & trade bonuses")
+            print("  outpost                        - Colonies, modules, specialists and repairs")
+            print("  research                       - Research projects and active technology")
+            print("  quantum                        - Quantum trade orders and freight")
             print("  depot [status|deposit|withdraw|sell] - System cargo depot operations")
-            print("  land <body_id>                 - Land on a habitable body")
-            print("  reconstruct <body_id> [--relief] - Rebuild a devastated inhabited world")
             print("  autotrade [status|on|off]      - Configure the docked trade broker")
-            print("  mercs [list|hire|dismiss|refit] - Mercenary contracts and fleet refits")
-            print("  allies [list|form]             - Alliance roster and formation")
             print("  saves [list|save|load|delete] [slot] - Manage multiple save slots")
+            print("  serve [--port 8080|stop]       - Launch/stop concurrent Web Cockpit HUD")
+            print("  help                           - Show this command matrix")
             print("  exit / quit                    - Close interactive link")
         else:
             print(f"{RED}Unknown command '{cmd}'. Type 'help' for command matrix.{RESET}")
