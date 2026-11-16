@@ -161,6 +161,8 @@ class AiCaptain:
         self.errors: list[str] = []
         self.steps_taken = 0
         self.steps_requested = 0
+        # Cooldowns must survive separate play() calls on the same campaign (ADR-345).
+        self.total_steps = 0
         self.travelled = 0
         self.visited_bodies: set[str] = set()
         self.attempted: set[str] = set()
@@ -187,6 +189,7 @@ class AiCaptain:
 
         for step in range(min(self.steps_requested, self.MAX_STEPS)):
             self.steps_taken = step + 1
+            self.total_steps += 1
             path, body, family = self._choose(step)
             if path is None:
                 break
@@ -208,7 +211,7 @@ class AiCaptain:
                 message = str(payload.get("message", "refused"))
                 self.refusals.append(f"{family}: {message}")
                 if self._refusal_may_pass(message):
-                    self.retry_at[signature] = self.steps_taken + self.REFUSAL_RETRY_STEPS
+                    self.retry_at[signature] = self.total_steps + self.REFUSAL_RETRY_STEPS
                 if payload.get("state"):
                     self.state = payload["state"]
                 continue
@@ -367,6 +370,11 @@ class AiCaptain:
             self._tour_weapon,
             self._tour_shipmod,
             self._tour_outpost,
+            self._tour_outpost_upgrade,
+            self._tour_outpost_module,
+            self._tour_outpost_crew,
+            self._tour_outpost_repair,
+            self._tour_outpost_specialize,
             self._tour_land,
             self._tour_surface,
             self._tour_away,
@@ -441,7 +449,7 @@ class AiCaptain:
         signature = self._tour_signature(path, body)
         retry_at = self.retry_at.get(signature)
         if retry_at is not None:
-            return self.steps_taken < retry_at
+            return self.total_steps < retry_at
         if path in self.SIGNATURE_ROUTES:
             return signature in self.attempted_signatures
         return path in self.attempted
@@ -580,6 +588,104 @@ class AiCaptain:
         if not body_id or not outpost_type:
             return None
         return "/api/outpost/build", {"body_id": body_id, "outpost_type": outpost_type}, "outpost"
+
+    # Outposts keep producing after they are founded; these steps exercise the management
+    # surface once a site exists. Costs mirror the engine so the captain never posts an
+    # action the treasury cannot pay for (ADR-346).
+    OUTPOST_UPGRADE_COST_PER_LEVEL = 450
+
+    def _outpost_rows(self):
+        return [o for o in self.state.get("outposts") or []
+                if isinstance(o, dict) and o.get("id")]
+
+    def _outpost_credits(self):
+        return int((self.state.get("ship") or {}).get("credits") or 0)
+
+    def _tour_outpost_upgrade(self):
+        credits = self._outpost_credits()
+        for outpost in self._outpost_rows():
+            level = int(outpost.get("level") or 0)
+            if level < 1 or level >= 5:
+                continue
+            if credits < self.OUTPOST_UPGRADE_COST_PER_LEVEL * level:
+                continue
+            return ("/api/outpost/upgrade",
+                    {"outpost_id": outpost["id"], "level": level}, "outpost_upgrade")
+        return None
+
+    def _tour_outpost_module(self):
+        credits = self._outpost_credits()
+        catalog = self.state.get("outpost_modules") or {}
+        if not isinstance(catalog, dict) or not catalog:
+            return None
+        for outpost in self._outpost_rows():
+            installed = outpost.get("modules") or {}
+            for module_id, module in sorted(catalog.items(),
+                                            key=lambda item: int((item[1] or {}).get("cost") or 0)):
+                if not isinstance(module, dict) or not module_id:
+                    continue
+                count = int(installed.get(module_id, 0))
+                if count >= 3:
+                    continue
+                cost = int(module.get("cost") or 0) * (count + 1)
+                if credits < cost:
+                    continue
+                return ("/api/outpost/module",
+                        {"outpost_id": outpost["id"], "module_id": module_id}, "outpost_module")
+        return None
+
+    def _tour_outpost_crew(self):
+        outposts = self._outpost_rows()
+        if not outposts:
+            return None
+        stationed = {str(crew_id) for outpost in outposts
+                     for crew_id in outpost.get("assigned_crew") or []}
+        captains = {str(ship.get("captain_id") or "")
+                    for ship in (self.state.get("fleet_manager") or {}).get("ships") or []
+                    if isinstance(ship, dict)}
+        free_crew = [
+            member for member in self.state.get("crew") or []
+            if isinstance(member, dict)
+            and member.get("status") == "active"
+            and int(member.get("injury_ticks") or 0) == 0
+            and not str(member.get("station") or "")
+            and str(member.get("id") or "") not in stationed
+            and str(member.get("id") or "") not in captains
+        ]
+        if not free_crew:
+            return None
+        for outpost in outposts:
+            capacity = int(outpost.get("crew_capacity") or 0)
+            if len(outpost.get("assigned_crew") or []) >= capacity:
+                continue
+            return ("/api/outpost/crew",
+                    {"outpost_id": outpost["id"], "crew_id": free_crew[0]["id"],
+                     "action": "assign"}, "outpost_crew")
+        return None
+
+    def _tour_outpost_repair(self):
+        credits = self._outpost_credits()
+        for outpost in self._outpost_rows():
+            if float(outpost.get("integrity") or 100.0) >= 100.0:
+                continue
+            if credits < int(outpost.get("repair_cost") or 0):
+                continue
+            return "/api/outpost/repair", {"outpost_id": outpost["id"]}, "outpost_repair"
+        return None
+
+    def _tour_outpost_specialize(self):
+        credits = self._outpost_credits()
+        for outpost in self._outpost_rows():
+            if int(outpost.get("level") or 0) < 3:
+                continue
+            cost = int(outpost.get("specialization_cost") or 0)
+            if credits < cost:
+                continue
+            current = str(outpost.get("specialization") or "")
+            choice = "industry" if current != "industry" else "research"
+            return ("/api/outpost/specialize",
+                    {"outpost_id": outpost["id"], "specialization": choice}, "outpost_specialize")
+        return None
 
     def _tour_land(self):
         """Reach a landable body so the surface-operation tour has real work to do."""

@@ -226,6 +226,15 @@ class PlayStepCapTest(unittest.TestCase):
         self.assertEqual(len(report["refusals"]), 12)
         self.assertGreater(report["refusal_count"], len(report["refusals"]))
 
+    def test_total_steps_accumulate_across_play_calls(self):
+        # The retry cooldown must survive a second play() call on the same campaign;
+        # measuring it with the per-call counter made late retries permanent (ADR-345).
+        captain = AiCaptain(_StubClient(), seed=42)
+        captain.play(steps=3)
+        self.assertEqual(captain.total_steps, 3)
+        captain.play(steps=3)
+        self.assertEqual(captain.total_steps, 6)
+
     def test_error_count_is_not_truncated_by_the_sample(self):
         report = AiCaptain(_FailingClient(), seed=42).play(steps=20)
         self.assertEqual(report["error_count"], 20)
@@ -340,9 +349,9 @@ class RefusalRetryTest(unittest.TestCase):
         captain.attempted.add("/api/fleet/escort/buy")
         captain.attempted_signatures.add(signature)
         captain.retry_at[signature] = 60
-        captain.steps_taken = 30
+        captain.total_steps = 30
         self.assertTrue(captain._tour_action_attempted(*signature[:1], {}))
-        captain.steps_taken = 60
+        captain.total_steps = 60
         self.assertFalse(captain._tour_action_attempted("/api/fleet/escort/buy", {}))
 
     def test_fallback_trades_are_capped(self):
@@ -413,6 +422,83 @@ class EscortTierTourTest(unittest.TestCase):
         self.assertTrue(self._captain(fleet_manager={"ships": [damaged]})._tour_escort_repair())
         self.assertIsNone(self._captain(docked=False, fleet_manager={"ships": [damaged]})._tour_escort_repair())
         self.assertIsNone(self._captain(fleet_manager={"ships": [self._ship()]})._tour_escort_repair())
+
+
+class OutpostTierTourTest(unittest.TestCase):
+    """A founded outpost exposes upgrade, module, crew, repair and specialize steps (ADR-346)."""
+
+    def _captain(self, *, credits=5000, outposts=None, crew=None, ships=None):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "ship": {"credits": credits},
+            "outposts": outposts or [],
+            "outpost_catalog": [{"id": "research", "cost": 2200}],
+            "outpost_options": ["research"],
+            "outpost_modules": {"laboratory": {"cost": 500}, "solar_array": {"cost": 300}},
+            "crew": crew or [],
+            "fleet_manager": {"ships": ships or []},
+            "orbiting_body": {"id": "mars_body_1"},
+        }
+        return captain
+
+    def _outpost(self, **fields):
+        outpost = {"id": "o1", "level": 1, "modules": {"laboratory": 1}, "assigned_crew": [],
+                   "crew_capacity": 3, "integrity": 100.0, "repair_cost": 100,
+                   "specialization": "", "specialization_cost": 600}
+        outpost.update(fields)
+        return outpost
+
+    def test_upgrade_cost_matches_the_engine_scale(self):
+        from voidfarer.models import Outpost
+        from voidfarer.outposts import upgrade_outpost
+        outpost = Outpost(id="o1", name="Test", system_id="sol", body_id="b1", level=2)
+        ok, _upgraded, cost, _msg = upgrade_outpost(outpost)
+        self.assertTrue(ok)
+        self.assertEqual(cost, AiCaptain.OUTPOST_UPGRADE_COST_PER_LEVEL * 2)
+
+    def test_build_is_attempted_at_a_buildable_site_even_when_broke(self):
+        # Affordability is a gameplay gate: the attempt must still happen once so the
+        # mechanics gate covers the endpoint; the retry policy re-tries it later (ADR-346).
+        poor = self._captain(credits=0)
+        self.assertEqual(poor._tour_outpost()[2], "outpost")
+
+    def test_upgrade_gates_on_level_and_credits(self):
+        captain = self._captain(outposts=[self._outpost(level=1)])
+        self.assertEqual(captain._tour_outpost_upgrade()[2], "outpost_upgrade")
+        self.assertIsNone(self._captain(credits=100, outposts=[self._outpost(level=1)])._tour_outpost_upgrade())
+        self.assertIsNone(self._captain(outposts=[self._outpost(level=5)])._tour_outpost_upgrade())
+
+    def test_module_picks_the_cheapest_stack_below_three(self):
+        captain = self._captain(outposts=[self._outpost(modules={"laboratory": 3})])
+        action = captain._tour_outpost_module()
+        self.assertEqual(action[1]["module_id"], "solar_array")
+        full = self._captain(outposts=[self._outpost(modules={"laboratory": 3, "solar_array": 3})])
+        self.assertIsNone(full._tour_outpost_module())
+
+    def test_crew_needs_an_active_free_specialist_and_capacity(self):
+        crew = [{"id": "c1", "status": "active", "injury_ticks": 0, "station": ""}]
+        captain = self._captain(crew=crew, outposts=[self._outpost()])
+        self.assertEqual(captain._tour_outpost_crew()[1]["crew_id"], "c1")
+        stationed = self._captain(crew=crew, outposts=[self._outpost(assigned_crew=["c1"])])
+        self.assertIsNone(stationed._tour_outpost_crew())
+        full = self._captain(crew=crew, outposts=[self._outpost(assigned_crew=["a", "b", "d"])])
+        self.assertIsNone(full._tour_outpost_crew())
+        captain_with_escort = self._captain(
+            crew=crew, outposts=[self._outpost()],
+            ships=[{"id": "e1", "captain_id": "c1"}])
+        self.assertIsNone(captain_with_escort._tour_outpost_crew())
+
+    def test_repair_needs_damage_and_credits(self):
+        damaged = self._outpost(integrity=40.0)
+        self.assertEqual(self._captain(outposts=[damaged])._tour_outpost_repair()[2], "outpost_repair")
+        self.assertIsNone(self._captain(outposts=[self._outpost()])._tour_outpost_repair())
+        self.assertIsNone(self._captain(credits=50, outposts=[damaged])._tour_outpost_repair())
+
+    def test_specialize_needs_level_three_and_credits(self):
+        level3 = self._outpost(level=3)
+        self.assertEqual(self._captain(outposts=[level3])._tour_outpost_specialize()[1]["specialization"], "industry")
+        self.assertIsNone(self._captain(outposts=[self._outpost(level=2)])._tour_outpost_specialize())
+        self.assertIsNone(self._captain(credits=100, outposts=[level3])._tour_outpost_specialize())
 
 
 class AiPlayToolArgsTest(unittest.TestCase):

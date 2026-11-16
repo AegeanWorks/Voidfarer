@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-escort-tier",
+    "task_id": "ai-captain-outpost-tier",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794792631.2100868,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794794727.947674,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794792784.0556421,
-    "completed_head": "e661182a834897864fca12f7522d0b2c4863be19",
-    "completed_tree": "72635190ea5e6d0a4b214ca26112837ba698c4f6"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "audit-mastery-seed",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Late tabs audited at mastery 3, 1366x768 and 1280x720, 0 findings (ADR-339); docs updated; 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794783578.2423403,
-      "timestamp_str": "2026-11-16 01:59:38",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "audit-mastery-seed",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'audit-mastery-seed' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794783811.1804545,
-      "timestamp_str": "2026-11-16 02:03:31",
-      "agent": "kilo:goal",
-      "head": "a1e262b7cafa4a943fdfbb242db793f08622be24",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "strict-quantity-residual",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-outpost-tier",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Tour outpost management and make retry cooldowns survive separate play calls",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794794727.7790365,
+      "timestamp_str": "2026-11-16 05:05:27",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The outpost tier was founded and ignored, and the retry cooldown reset with each play call so late retries never fired",
+        "benefits": "The captain now upgrades, modules, crews, repairs and specializes outposts; gated retries actually happen across rounds",
+        "risks": "contract: none; dependency: none; concurrency: none; state: monotonic page counter only",
+        "mitigation": "per-step gates, build stays a single honest attempt, deterministic probe verifies the tier, seven tests plus a counter regression test"
+      },
+      "plan_digest": "73d16c1ce1c7f74bfe19402a4dbbefaba5159c6bd8d3c01e97703227eddc47eb"
+    },
+    {
+      "task_id": "ai-captain-outpost-tier",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Outpost tier verifies end to end (build, upgrade 2, module, crew; repair/specialize correctly gated), 0 outpost refusals; suite 1833 OK, gate 0 gaps (ADR-346); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794794727.947674,
+      "timestamp_str": "2026-11-16 05:05:27",
+      "agent": "kilo:goal"
     }
   ]
 }

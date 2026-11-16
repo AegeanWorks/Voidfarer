@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `235`
-- **Total Classes**: `550`
+- **Total Classes**: `551`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2722`
-- **Total Source Lines**: `64105`
+- **Total Class Methods**: `2739`
+- **Total Source Lines**: `64297`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `428` lines (`19975` bytes)
+**Size**: `514` lines (`24753` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -104,6 +104,7 @@
   - Method `.test_a_request_beyond_the_guard_is_clamped_and_reported()`
   - Method `.test_a_request_inside_the_guard_runs_in_full_and_is_not_flagged()`
   - Method `.test_refusal_count_is_not_truncated_by_the_sample()`
+  - Method `.test_total_steps_accumulate_across_play_calls()`
   - Method `.test_error_count_is_not_truncated_by_the_sample()`
 - `class TradeVolumeChoiceTest` - *Cargo capacity is volume, so the captain must not buy into a full hold (ADR-343).*
   - Method `._captain(ship, quotes)`
@@ -131,6 +132,16 @@
   - Method `.test_training_needs_a_dock_credits_and_room_to_grow()`
   - Method `.test_a_captain_is_assigned_only_to_an_unstaffed_living_escort()`
   - Method `.test_repair_needs_a_dock_and_real_damage()`
+- `class OutpostTierTourTest` - *A founded outpost exposes upgrade, module, crew, repair and specialize steps (ADR-346).*
+  - Method `._captain(*, credits, outposts, crew, ships)`
+  - Method `._outpost(**fields)`
+  - Method `.test_upgrade_cost_matches_the_engine_scale()`
+  - Method `.test_build_is_attempted_at_a_buildable_site_even_when_broke()`
+  - Method `.test_upgrade_gates_on_level_and_credits()`
+  - Method `.test_module_picks_the_cheapest_stack_below_three()`
+  - Method `.test_crew_needs_an_active_free_specialist_and_capacity()`
+  - Method `.test_repair_needs_damage_and_credits()`
+  - Method `.test_specialize_needs_level_three_and_credits()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4558,7 +4569,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1020` lines (`46122` bytes)
+**Size**: `1126` lines (`50800` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4590,6 +4601,13 @@
   - Method `._tour_weapon()`
   - Method `._tour_shipmod()`
   - Method `._tour_outpost()`
+  - Method `._outpost_rows()`
+  - Method `._outpost_credits()`
+  - Method `._tour_outpost_upgrade()`
+  - Method `._tour_outpost_module()`
+  - Method `._tour_outpost_crew()`
+  - Method `._tour_outpost_repair()`
+  - Method `._tour_outpost_specialize()`
   - Method `._tour_land()` - *Reach a landable body so the surface-operation tour has real work to do.*
   - Method `._tour_surface()`
   - Method `._tour_away()`
