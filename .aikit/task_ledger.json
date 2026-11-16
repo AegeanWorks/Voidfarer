@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "cockpit-jettison-ore",
+    "task_id": "cockpit-drone-yield-badge",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794810284.3210053,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794812409.2722752,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794810586.9432018,
-    "completed_head": "ad23085d9b0728148e16ad36968de3afbe9252b1",
-    "completed_tree": "1ddf4f211e6a66f17a810f6c6f98f6961d146263"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "drone-haul-partial-collect",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Claims 1 -> 18, credits 0 -> 56,014 in six rounds; suite 1858 OK, gate 0 gaps (ADR-350); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794801205.4233174,
-      "timestamp_str": "2026-11-16 06:53:25",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "drone-haul-partial-collect",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'drone-haul-partial-collect' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794801408.7478063,
-      "timestamp_str": "2026-11-16 06:56:48",
-      "agent": "kilo:goal",
-      "head": "68dfe1d3b15ff66a72ff442b56b646b7547d0278",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "drone-harvest-message",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "cockpit-drone-yield-badge",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Show drone ore as WAITING when the hold cannot take it",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794812409.0496955,
+      "timestamp_str": "2026-11-16 10:00:09",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The badge advertised a full haul as ready while only credits could move",
+        "benefits": "Players see what is blocked and what still collects, with a pointer to jettison or market sale",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "derived from cargo_free_volume, two DOM-verified states, three pins"
+      },
+      "plan_digest": "8b11ec75c65d07df74965ad6d5ecb5aec6778a8a823934ae8524dc9929ceef49"
+    },
+    {
+      "task_id": "cockpit-drone-yield-badge",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] DOM-verified both states at 1366x768, 0 console errors; suite 1886 OK (ADR-357); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794812409.2722752,
+      "timestamp_str": "2026-11-16 10:00:09",
+      "agent": "kilo:goal"
     }
   ]
 }

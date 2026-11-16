@@ -3401,3 +3401,27 @@ class TestJettisonOreControl(unittest.TestCase):
         self.assertIn(".btn-fabricate.btn-jettison:hover,", self.css)
 
 
+class TestDroneYieldBadgeHonesty(unittest.TestCase):
+    """A full hold shows ore as waiting rather than ready (ADR-357)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_ore_waiting_is_derived_from_free_volume(self):
+        block = self.js.split("const oreHeld", 1)[1].split("card.innerHTML", 1)[0]
+        self.assertIn("cargo_free_volume", block)
+        self.assertIn("const oreWaiting = oreHeld > 0 && holdFree < 2;", block)
+
+    def test_both_states_are_written_and_explained(self):
+        self.assertIn("ORE WAITING //", self.js)
+        self.assertIn("CR READY", self.js)
+        self.assertIn("ORE WAITING", self.js)
+        self.assertIn("jettison titanium in SHIP", self.js)
+        self.assertIn('oreWaiting ? " is-waiting" : ""', self.js)
+
+    def test_the_waiting_badge_is_styled_distinctly(self):
+        self.assertIn(".drone-yield-badge.is-waiting {", self.css)
+
+

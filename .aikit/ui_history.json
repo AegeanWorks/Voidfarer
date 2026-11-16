@@ -3063,5 +3063,27 @@
     "final_snapshot_digest": "fbd6166cb653b48da306358692c37385f97a38a476820d1beb6886fad594a533",
     "final_snapshot_entries": 1374,
     "surface_digest": "18453555d547a767964641a686d61a2ad175fd2e8284fca4797ebb40e897ca55"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "4e40bdaf3e6ffe4bf81d39607923ba6345faed8b",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794811507.7987378,
+    "finished_at": 1794812042.88054,
+    "strikes": 0,
+    "reviewer": "kilo:goal per G-015 via DOM measurement (this model has no vision): ui-review/drone-yield-badge/measure.json shows '+640 ORE WAITING // +240 CR READY' with is-waiting and the jettison tooltip on a 40-volume hold, and '+640 ORE READY' once space is free; 0 console errors; screenshots captured for human review",
+    "allowed_removals": [],
+    "allowed_tests": [],
+    "final_snapshot_digest": "fbd6166cb653b48da306358692c37385f97a38a476820d1beb6886fad594a533",
+    "final_snapshot_entries": 1374,
+    "surface_digest": "060f3a592b5ae8bbcca6844641afe3abb4923047024460747028055deaa9e581"
   }
 ]

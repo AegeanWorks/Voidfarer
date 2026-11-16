@@ -5824,6 +5824,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
 
                 const integrity = Math.max(0, Math.min(100, Number(d.integrity ?? 100)));
                 const roleGlyph = /combat|attack|fighter/i.test(d.drone_type) ? "▲" : /scout|survey/i.test(d.drone_type) ? "◈" : "⬡";
+                // Ore needs two volume units per unit and credits need none, so a full hold
+                // leaves ore waiting while credits still bank (ADR-350, ADR-357).
+                const oreHeld = Number(d.cargo_accumulated || 0);
+                const holdFree = Number((this.state.ship || {}).cargo_free_volume ?? 0);
+                const oreWaiting = oreHeld > 0 && holdFree < 2;
+                const yieldLabel = oreWaiting
+                    ? `+${oreHeld} ORE WAITING // +${d.credits_accumulated} CR READY`
+                    : `+${oreHeld} ORE READY // +${d.credits_accumulated} CR READY`;
                 card.innerHTML = `
                     <div class="drone-meta">
                         <strong class="drone-name"><span style="color:var(--console-gold);margin-right:4px;">${roleGlyph}</span>${this.escapeHtml(d.name)}</strong>
@@ -5833,8 +5841,8 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                     <div class="drone-stats">
                         LVL ${d.level ?? 1} // EFF ${(d.efficiency ?? 1).toFixed(2)} // INTEGRITY ${integrity}% // SORTIES ${d.sorties ?? 0}${d.specialty ? " // " + this.escapeHtml(d.specialty.toUpperCase()) : ""}
                     </div>
-                    <div class="drone-yield-badge">
-                        +${d.cargo_accumulated} Ore / +${d.credits_accumulated} CR
+                    <div class="drone-yield-badge${oreWaiting ? " is-waiting" : ""}" title="${oreWaiting ? "The hold cannot take one titanium unit (2 volume). Credits still collect; jettison titanium in SHIP or sell cargo at a market." : "Harvest banks what fits; credits need no hold space."}">
+                        ${yieldLabel}
                     </div>
                     <div class="drone-actions" style="display:flex;gap:5px;margin-top:6px;">
                         <button class="btn-hud" data-refit="${this.escapeHtml(d.id)}">REFIT (300 CR)</button>

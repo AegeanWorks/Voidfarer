@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `236`
-- **Total Classes**: `562`
+- **Total Classes**: `563`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2814`
-- **Total Source Lines**: `65201`
+- **Total Class Methods**: `2818`
+- **Total Source Lines**: `65225`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`236` module(s))
@@ -646,7 +646,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3403` lines (`156160` bytes)
+**Size**: `3427` lines (`157162` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1184,6 +1184,11 @@
   - Method `.test_the_control_sits_with_field_fabrication()`
   - Method `.test_the_handler_posts_the_documented_jettison_route()`
   - Method `.test_the_destructive_action_reads_as_a_warning()`
+- `class TestDroneYieldBadgeHonesty` - *A full hold shows ore as waiting rather than ready (ADR-357).*
+  - Method `.setUpClass()`
+  - Method `.test_ore_waiting_is_derived_from_free_volume()`
+  - Method `.test_both_states_are_written_and_explained()`
+  - Method `.test_the_waiting_badge_is_styled_distinctly()`
 
 ---
 

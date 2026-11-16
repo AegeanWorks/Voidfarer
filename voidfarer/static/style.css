@@ -1527,6 +1527,13 @@ body.cockpit-theme {
     border: 1px solid rgba(143, 191, 159, 0.3);
 }
 
+/* Ore that cannot fit yet stays visible but reads as pending, not collectable (ADR-357). */
+.drone-yield-badge.is-waiting {
+    color: #e0a24a;
+    background: rgba(224, 162, 74, 0.1);
+    border-color: rgba(224, 162, 74, 0.45);
+}
+
 .commission-drone-box {
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border-subtle);
