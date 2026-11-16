@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `235`
-- **Total Classes**: `551`
+- **Total Classes**: `553`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2739`
-- **Total Source Lines**: `64297`
+- **Total Class Methods**: `2746`
+- **Total Source Lines**: `64390`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `514` lines (`24753` bytes)
+**Size**: `603` lines (`28524` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -142,6 +142,15 @@
   - Method `.test_crew_needs_an_active_free_specialist_and_capacity()`
   - Method `.test_repair_needs_damage_and_credits()`
   - Method `.test_specialize_needs_level_three_and_credits()`
+- `class CampaignPhaseTest` - *play() resumes the campaign clock and never jumps on an empty tank (ADR-347).*
+  - Method `._captain(fuel)`
+  - Method `.test_batched_play_calls_continue_the_global_phase()`
+  - Method `.test_a_jump_is_attempted_with_fuel()`
+  - Method `.test_an_empty_tank_does_not_attempt_a_jump()`
+- `class OutpostTierEndToEndTest` - *A seeded outpost really is upgraded, fitted, crewed and specialized via the API (ADR-347).*
+  - Method `.setUpClass()`
+  - Method `.tearDownClass()`
+  - Method `.test_the_captain_manages_the_seeded_outpost()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4569,7 +4578,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1126` lines (`50800` bytes)
+**Size**: `1130` lines (`51209` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

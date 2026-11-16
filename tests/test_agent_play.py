@@ -501,6 +501,95 @@ class OutpostTierTourTest(unittest.TestCase):
         self.assertIsNone(self._captain(credits=100, outposts=[level3])._tour_outpost_specialize())
 
 
+class CampaignPhaseTest(unittest.TestCase):
+    """play() resumes the campaign clock and never jumps on an empty tank (ADR-347)."""
+
+    def _captain(self, fuel=10):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "ship": {"fuel": fuel, "cargo": {}, "cargo_capacity": 40, "cargo_free_volume": 40},
+            "current_system": {"id": "sol", "connections": ["altair"]},
+            "market_quotes": {},
+        }
+        return captain
+
+    def test_batched_play_calls_continue_the_global_phase(self):
+        seen = []
+
+        class Recording(AiCaptain):
+            def _choose(inner_self, step):
+                seen.append(step)
+                return "/api/time/step", {"ticks": 1}, "time"
+
+        captain = Recording(_StubClient(), seed=42)
+        captain.state = self._captain().state
+        captain.play(steps=2)
+        captain.play(steps=2)
+        self.assertEqual(seen, [0, 1, 2, 3])
+
+    def test_a_jump_is_attempted_with_fuel(self):
+        action = self._captain(fuel=10)._choose(5)
+        self.assertEqual(action[0], "/api/jump")
+
+    def test_an_empty_tank_does_not_attempt_a_jump(self):
+        action = self._captain(fuel=0)._choose(5)
+        self.assertNotEqual(action[0], "/api/jump")
+
+
+class OutpostTierEndToEndTest(unittest.TestCase):
+    """A seeded outpost really is upgraded, fitted, crewed and specialized via the API (ADR-347)."""
+
+    @classmethod
+    def setUpClass(cls):
+        from voidfarer.models import Outpost
+        cls.temp_dir = tempfile.TemporaryDirectory()
+        cls.engine = SimulationEngine(seed=42)
+        cls.engine.allow_decision_events = True
+        cls.engine.state = cls.engine._clone_state(
+            ship=cls.engine._clone_ship(credits=9000),
+            outposts=(
+                Outpost(
+                    id="outpost_test_1", name="Test Anchor", system_id="sol",
+                    body_id="sol_body_1", outpost_type="mining", level=3,
+                    modules={"extractor": 1}, integrity=100.0,
+                ),
+                Outpost(
+                    id="outpost_test_2", name="Test Redoubt", system_id="sol",
+                    body_id="sol_body_2", outpost_type="shipyard", level=5,
+                    modules={"drydock": 1}, integrity=55.0,
+                ),
+            ),
+        )
+        VoidFarerHandler.engine = cls.engine
+        VoidFarerHandler.storage = StorageManager(cls.temp_dir.name)
+        VoidFarerHandler.static_dir = Path(__file__).parent.parent / "voidfarer" / "static"
+        cls.server = ThreadedHTTPServer(("127.0.0.1", 0), VoidFarerHandler)
+        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.thread.join(timeout=2.0)
+        cls.temp_dir.cleanup()
+
+    def test_the_captain_manages_the_seeded_outpost(self):
+        captain = AiCaptain(ApiClient(port=self.server.server_port), seed=42)
+        report = captain.play(steps=90)
+        self.assertEqual(report["errors"], [], report["errors"])
+        families = report["families"]
+        for expected in ("outpost_upgrade", "outpost_module", "outpost_repair",
+                         "outpost_specialize"):
+            self.assertIn(expected, families, families)
+        outpost = next(o for o in captain.state["outposts"] if o["id"] == "outpost_test_1")
+        self.assertGreaterEqual(outpost["level"], 4)
+        self.assertGreaterEqual(sum(outpost["modules"].values()), 2)
+        self.assertTrue(outpost["specialization"])
+        repaired = next(o for o in captain.state["outposts"] if o["id"] == "outpost_test_2")
+        self.assertEqual(repaired["integrity"], 100.0)
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-outpost-tier",
+    "task_id": "ai-captain-campaign-clock",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794794727.947674,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794795986.3228145,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794794892.4143083,
-    "completed_head": "b38d75f81231b0d6bc3da71b2037b79a5fb6432b",
-    "completed_tree": "3b661eb5f2dccd7ea5641bed8ccbd78ef0cb8da6"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "strict-quantity-residual",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Strict guards verified: 6/6 guard tests, full suite 1802 OK, README suite count fixed (ADR-340); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794785017.0740516,
-      "timestamp_str": "2026-11-16 02:23:37",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "strict-quantity-residual",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'strict-quantity-residual' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794785185.5171597,
-      "timestamp_str": "2026-11-16 02:26:25",
-      "agent": "kilo:goal",
-      "head": "67432d76fe431a8fe3698008a0ab6d201dbef5ee",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-play-step-cap",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-campaign-clock",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Run the captain phase on the campaign clock and skip jumps with an empty tank",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794795986.1475859,
+      "timestamp_str": "2026-11-16 05:26:26",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Batched play calls took a different path than one long call, and the fallback jump kept firing with no quantum fuel",
+        "benefits": "Long soaks are composable and reproducible, and 33 impossible jump attempts disappear",
+        "risks": "contract: none; dependency: none; concurrency: none; state: monotonic counter only",
+        "mitigation": "single-call behaviour unchanged, gate re-run, seeded end-to-end outpost test replaces the stale organic proof"
+      },
+      "plan_digest": "0b62dc1ae06549afc30f88a977a33941e6b485b7df92911a64b6026c530b1397"
+    },
+    {
+      "task_id": "ai-captain-campaign-clock",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Refusals 142 -> 110 (quantum-fuel ones gone), gate 0 gaps/0 errors, suite 1837 OK, seeded outpost E2E passes (ADR-347); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794795986.3228145,
+      "timestamp_str": "2026-11-16 05:26:26",
+      "agent": "kilo:goal"
     }
   ]
 }

@@ -190,7 +190,9 @@ class AiCaptain:
         for step in range(min(self.steps_requested, self.MAX_STEPS)):
             self.steps_taken = step + 1
             self.total_steps += 1
-            path, body, family = self._choose(step)
+            # Phase must run on the campaign clock, not the call-local one, so a run split
+            # into several play() calls follows the same path as one long call (ADR-347).
+            path, body, family = self._choose(self.total_steps - 1)
             if path is None:
                 break
             status, payload = self.client.post(path, body)
@@ -301,7 +303,9 @@ class AiCaptain:
         if body and body.get("landable") and not ship.get("landed_body_id") and step % 3 == 0:
             return "/api/land", {"target": body["id"]}, "land"
 
-        if step % 20 == 5:
+        # A jump burns quantum fuel; with an empty tank an attempt can only be refused
+        # (33 wasted refusals in a 2,000-step run), so wait for fuel or a refuel instead.
+        if step % 20 == 5 and int(ship.get("fuel") or 0) > 0:
             system = (state.get("current_system") or {}).get("connections") or []
             if system:
                 return "/api/jump", {"target": system[step % len(system)]}, "jump"
