@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-cargo-volume",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794789681.3341079,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794789854.049461,
+    "completed_head": "f5f31b0bebd06c3f4d4582f0d6ba14dc9cd5a509",
+    "completed_tree": "ea7c4deca1231081c8afe07e70b1132855c9199d"
   },
   "checkpoints": [
-    {
-      "task_id": "rail-unlock-notices",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] One-time flight-log notices for the growing terminal rail",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794780111.7448826,
-      "timestamp_str": "2026-11-16 01:01:51",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The staged rail hid three tabs with no explanation; hidden features look missing",
-        "benefits": "Players learn where advanced terminals live and why three are late, without a modal or repeat spam",
-        "risks": "contract: none; dependency: none; concurrency: none; state: two page-memory flags only",
-        "mitigation": "transition detection with explicit flags; repeat renders asserted stable in Edge; static pins"
-      },
-      "plan_digest": "e991dccaae5b84324bc75342654b6a542961d1b84067bc28b5602c8d13a17e8a"
-    },
     {
       "task_id": "rail-unlock-notices",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794789681.3341079,
       "timestamp_str": "2026-11-16 03:41:21",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-cargo-volume",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-cargo-volume' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794789854.1083994,
+      "timestamp_str": "2026-11-16 03:44:14",
+      "agent": "kilo:goal",
+      "head": "f5f31b0bebd06c3f4d4582f0d6ba14dc9cd5a509",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
