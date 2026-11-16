@@ -184,6 +184,10 @@ class AiCaptain:
         self.retry_at: dict[tuple[str, str], int] = {}
         self.refusal_attempts: dict[tuple[str, str], int] = {}
         self.repeat_last: dict[tuple[str, str], int] = {}
+        # Two emergency fuel burns per campaign, chosen by state rather than tour
+        # position so adding steps cannot starve the mechanic (ADR-355).
+        self.emergency_burns = 0
+        self.MAX_EMERGENCY_BURNS = 2
         self.fallback_trades = 0
 
     def play(self, steps: int = 40) -> dict[str, Any]:
@@ -339,6 +343,15 @@ class AiCaptain:
                         return ("/api/surface/op",
                                 {"operation_id": operation["id"]}, "surface")
 
+        # Burn a spare fuel cell when the tank runs low; this is state-driven so the
+        # rotating tour cannot starve it when other steps are added (ADR-355).
+        if (self.emergency_burns < self.MAX_EMERGENCY_BURNS
+                and int(ship.get("fuel") or 0) < max(1, int(ship.get("max_fuel") or 0) // 3)
+                and int((ship.get("cargo") or {}).get("fuel_cells") or 0) > 0):
+            self.emergency_burns += 1
+            return ("/api/engineering/action",
+                    {"action": "burn_cells", "quantity": 1}, "burn_cells")
+
         # A jump burns the real hop cost, not one unit; using the published estimates
         # stopped 47 attempts that could only be refused (ADR-348).
         if step % 20 == 5:
@@ -432,6 +445,7 @@ class AiCaptain:
             self._tour_contract_claim,
             self._tour_swap,
             self._tour_refuel,
+            self._tour_overhaul,
             self._tour_repair,
             self._tour_crew,
             self._tour_upgrade,
@@ -646,6 +660,19 @@ class AiCaptain:
         if cells < 1 or int(ship.get("fuel") or 0) >= int(ship.get("max_fuel") or 0):
             return None
         return "/api/engineering/action", {"action": "burn_cells", "quantity": 1}, "burn_cells"
+
+    def _tour_overhaul(self):
+        """Scrub hyperlane frame wear at a drydock; the wear only appears after many jumps."""
+        if not self._is_docked():
+            return None
+        ship = self.state.get("ship") or {}
+        if float(ship.get("wear") or 0.0) <= 0.0:
+            return None
+        quote = self.state.get("drydock") or {}
+        cost = int(quote.get("overhaul_cost") or 0)
+        if cost > int(ship.get("credits") or 0):
+            return None
+        return "/api/overhaul", {}, "overhaul"
 
     def _tour_repair(self):
         # Attempted at any dock: an undamaged hull gets a harmless refusal, which keeps the

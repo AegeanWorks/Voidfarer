@@ -9,8 +9,8 @@
 - **Total Python Modules**: `236`
 - **Total Classes**: `561`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2808`
-- **Total Source Lines**: `65134`
+- **Total Class Methods**: `2810`
+- **Total Source Lines**: `65174`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`236` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `982` lines (`46921` bytes)
+**Size**: `995` lines (`47593` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -192,6 +192,7 @@
   - Method `.test_research_cancel_needs_a_queued_project()`
   - Method `.test_fabrication_targets_hull_then_fuel()`
   - Method `.test_crew_station_maps_the_role_and_skips_committed_specialists()`
+  - Method `.test_overhaul_needs_wear_a_dock_and_credits()`
 - `class NarrativeAndCrewTourTest` - *Story choices, messaging, shore leave and away recall are reachable (ADR-354).*
   - Method `._captain(**state)`
   - Method `.test_a_ready_chapter_choice_is_taken()`
@@ -4646,7 +4647,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1378` lines (`63777` bytes)
+**Size**: `1405` lines (`65115` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4677,6 +4678,7 @@
   - Method `._tour_contract_claim()` - *Bank a finished contract instead of leaving its rewards stranded (ADR-344).*
   - Method `._tour_refuel()`
   - Method `._tour_burn_cells()` - *Burn one hold Quantum Fuel Cell when the tank has room (the fuel-cell emergency refuel).*
+  - Method `._tour_overhaul()` - *Scrub hyperlane frame wear at a drydock; the wear only appears after many jumps.*
   - Method `._tour_repair()`
   - Method `._tour_crew()`
   - Method `._tour_upgrade()`

@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-narrative-tour",
+    "task_id": "ai-captain-overhaul-burn",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794806384.2989573,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794808922.3251152,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794806639.528898,
-    "completed_head": "9438f659e8d524c27befc3d005f5f6876fec7b5f",
-    "completed_tree": "2e6554b7af7cac0c48188dfb767315e6a9cace19"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-honest-friction",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Refusals 110 -> 21, gate 0 gaps/0 errors, suite 1841 OK, ADR-348 references corrected (ADR-348); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794797061.226729,
-      "timestamp_str": "2026-11-16 05:44:21",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-captain-honest-friction",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-honest-friction' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794797231.4415524,
-      "timestamp_str": "2026-11-16 05:47:11",
-      "agent": "kilo:goal",
-      "head": "837c4952dc29d97690d4592981d25d2bcfc5a45f",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "ai-captain-upkeep-recovery",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-overhaul-burn",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Add a drydock overhaul step and make the emergency fuel burn state-driven",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794808922.1109939,
+      "timestamp_str": "2026-11-16 09:02:02",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Frame wear was never scrubbed, and the burn mechanic kept being displaced by tour additions",
+        "benefits": "Overhaul is covered once wear exists, and the burn can no longer be starved by ordering",
+        "risks": "contract: none; dependency: none; concurrency: none; state: two page-memory burn counters",
+        "mitigation": "wear and quote gates, a two-burn cap below one third tank, unit tests and a 600-step run"
+      },
+      "plan_digest": "30845f26b37e58cccae67da1cd6c2052b6e80ab7b5ed8100227792dd99aaa9e9"
+    },
+    {
+      "task_id": "ai-captain-overhaul-burn",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Overhaul fires in a 600-step run (76/69, 0 gaps); 180-step gate unchanged 56/65, 0 gaps; suite 1880 OK (ADR-355); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794808922.3251152,
+      "timestamp_str": "2026-11-16 09:02:02",
+      "agent": "kilo:goal"
     }
   ]
 }

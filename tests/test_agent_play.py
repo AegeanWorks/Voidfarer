@@ -893,6 +893,19 @@ class ReachableMechanicsTourTest(unittest.TestCase):
                                   fleet_manager={"ships": [{"id": "e1", "captain_id": "c1"}]})
         self.assertIsNone(on_escort._tour_crew_station())
 
+    def test_overhaul_needs_wear_a_dock_and_credits(self):
+        worn = {"wear": 8.0}
+        quote = {"overhaul_cost": 160}
+        captain = self._captain(ship=worn, drydock=quote)
+        self.assertEqual(captain._tour_overhaul()[2], "overhaul")
+        self.assertIsNone(self._captain(ship={"wear": 0.0}, drydock={"overhaul_cost": 0})
+                          ._tour_overhaul())
+        undocked = self._captain(ship=worn, drydock=quote)
+        undocked.state["orbiting_body"] = {}
+        self.assertIsNone(undocked._tour_overhaul())
+        poor = self._captain(ship={"wear": 8.0, "credits": 10}, drydock=quote)
+        self.assertIsNone(poor._tour_overhaul())
+
 
 class NarrativeAndCrewTourTest(unittest.TestCase):
     """Story choices, messaging, shore leave and away recall are reachable (ADR-354)."""
