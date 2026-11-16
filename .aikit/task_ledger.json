@@ -1,76 +1,25 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "navigation-interrupted-contract",
-    "last_phase": "in_progress",
+    "task_id": "story-travel-hold",
+    "last_phase": "phase 5",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794818712.1946058,
+    "updated_at": 1794839418.326613,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1794819012.3896084,
-    "completed_head": "2d6c2e3ded261d073e323e80a23f260e1b6f2e47",
-    "completed_tree": "ba679b9401502556d9b65e95cc35b5b6c2c5c303"
+    "workspaces": [
+      {
+        "name": "voidfarer",
+        "path": "projects/voidfarer"
+      }
+    ],
+    "completed_at": 1794839588.5346613,
+    "completed_head": "cd301900f71a8e9ff581a650652d5364439b9def",
+    "completed_tree": "2197a3703445f8af4e598ea6958be73d8c8b3b9c"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-shipmods",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Gate 44/54 actions (was 41/53), 0 gaps/errors; suite 1865 OK; install+remove both exercised (ADR-352); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794803844.9708214,
-      "timestamp_str": "2026-11-16 07:37:24",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "ai-captain-shipmods",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-shipmods' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794804014.8426783,
-      "timestamp_str": "2026-11-16 07:40:14",
-      "agent": "kilo:goal",
-      "head": "b5ed5d3c95d26337658a809bbf552ac99e743ece",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "ai-captain-five-mechanics",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Tour depot withdraw/sell, research queue/cancel, fabrication and crew stationing",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794804724.161998,
-      "timestamp_str": "2026-11-16 07:52:04",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Six reachable mechanics were never guided, and the one-unit deposit left withdraw and sell without stock",
-        "benefits": "Coverage rises to 60 attempted / 48 succeeded with the new families exercised live",
-        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory only",
-        "mitigation": "state-gated builders, repair attempted at any dock to avoid trajectory gaps, seven tests and the mechanics gate"
-      },
-      "plan_digest": "8d733d20c730588a49e88802c655ed23c6694d47adedf237b7e905532fd8fc75"
-    },
-    {
-      "task_id": "ai-captain-five-mechanics",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Gate 48/60 actions (was 44/54), 0 gaps/0 errors; suite 1872 OK (ADR-353); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794804724.32591,
-      "timestamp_str": "2026-11-16 07:52:04",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "ai-captain-five-mechanics",
       "phase": "completed",
@@ -311,6 +260,81 @@
       "timestamp_str": "2026-11-16 11:50:12",
       "agent": "kilo:goal",
       "head": "2d6c2e3ded261d073e323e80a23f260e1b6f2e47",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "story-travel-hold",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Pin story route publication and the stay-until-resolved hold; fix the Act IV orbit drift",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794836685.7961986,
+      "timestamp_str": "2026-11-16 16:44:45",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The story-directed travel prototype in the tree reaches Act IV but a dock trip or generic body move can leave the required black-hole orbit; the orbit signature is then de-duplicated forever, so the campaign stalls one step before the choice",
+        "benefits": "Act IV resolves and the campaign can advance past Cygnus; the snapshot publishes the whole real course so multi-hop travel cannot strand the tank",
+        "risks": "contract: snapshot story_status gains a route object when out of system; dependency: none; concurrency: none; state: page-memory only",
+        "mitigation": "failing-first unit tests for the hold, orbit re-fire and route estimate; 2,000-step probe; full suite and 5/5 gates before commit"
+      },
+      "plan_digest": "2d19d208fa2eb9b582f6f7395a3dfdb4676dcb6314bbeb567d4830731a707fa7",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "story-travel-hold",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/4] 2,000-step seed-2 campaign completes Act VI (6 choices, 2 travels, 1 orbit; 78/70, 0 gaps/0 errors); gate 57/67, 0 gaps; suite Ran 1895 OK (ADR-360); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794839417.7787707,
+      "timestamp_str": "2026-11-16 17:30:17",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "story-travel-hold",
+      "phase": "phase 5",
+      "phase_num": 5,
+      "description": "[1/4] Completing story-travel-hold",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794839418.326613,
+      "timestamp_str": "2026-11-16 17:30:18",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "story-travel-hold",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'story-travel-hold' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794839588.598756,
+      "timestamp_str": "2026-11-16 17:33:08",
+      "agent": "kilo:goal",
+      "head": "cd301900f71a8e9ff581a650652d5364439b9def",
       "delivery": {
         "roots": [
           "."
