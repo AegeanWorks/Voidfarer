@@ -1,47 +1,16 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ai-captain-contract-claims",
+    "task_id": "ai-captain-escort-tier",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1794791228.431236,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1794792631.2100868,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1794791425.6461,
-    "completed_head": "75662933d6d3e0756de4a177deedc21c468f1fe5",
-    "completed_tree": "56f8fe4f591c675e436911fe20c6dda3d40cfc12"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "veteran-tab-persistence",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Veteran tab preference survives reload (ADR-338); Edge 8 -> 11 -> reload 11, 0 errors; 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794781555.6022453,
-      "timestamp_str": "2026-11-16 01:25:55",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "veteran-tab-persistence",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'veteran-tab-persistence' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794781864.914103,
-      "timestamp_str": "2026-11-16 01:31:04",
-      "agent": "kilo:goal",
-      "head": "4a84daba72148ca4e52879d45de9a762f632dc89",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "audit-mastery-seed",
       "phase": "in_progress",
@@ -317,6 +286,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "ai-captain-escort-tier",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Retry resource-gated refusals and tour the escort role, training, captain and repair",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794792631.0244036,
+      "timestamp_str": "2026-11-16 04:30:31",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "One early escort purchase refusal was permanent, and 1,800 fallback trades drained credits so the escort and outpost tier never became reachable",
+        "benefits": "The captain now plays the full progression: buys an escort, exercises its four commands, banks contracts and stays solvent",
+        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory retry map only",
+        "mitigation": "retries only for resource gates with a 40-step cooldown, coverage still recorded on first attempt; nine tests; measured before and after"
+      },
+      "plan_digest": "f78064afe61dd5c0657760eb0a59fa414543731c620ff44a0dff2cd81b6ec853"
+    },
+    {
+      "task_id": "ai-captain-escort-tier",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Escort tier succeeds, trade 1802 -> 12, credits 5,137, tick 1,812; suite 1825 OK and gate 0 gaps (ADR-345); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794792631.2100868,
+      "timestamp_str": "2026-11-16 04:30:31",
+      "agent": "kilo:goal"
     }
   ]
 }

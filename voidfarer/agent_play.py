@@ -141,6 +141,16 @@ class AiCaptain:
     # A runaway guard, not a comfort limit: the CLI honours any request up to this bound
     # and reports when it has to clamp (ADR-341).
     MAX_STEPS = 2000
+    # Affordability gates can pass later (contracts pay out), so a refused action is
+    # retried after a cooldown instead of being written off for the whole run (ADR-345).
+    REFUSAL_RETRY_STEPS = 40
+    RETRYABLE_REFUSAL_WORDS = (
+        "insufficient credits", "cr required", "costs", "skill point",
+        "level", "not enough", "requires",
+    )
+    # Once the guided tour is exhausted the fallback trade would otherwise fire every
+    # other step and bleed credits on the spread; twelve trades exercise the mechanic.
+    MAX_FALLBACK_TRADES = 12
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -159,6 +169,8 @@ class AiCaptain:
         self.catalog_paths: list[str] = []
         self.tour_cursor = 0
         self.tour_exhausted = False
+        self.retry_at: dict[tuple[str, str], int] = {}
+        self.fallback_trades = 0
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -184,20 +196,25 @@ class AiCaptain:
                 self.state = payload["state"]
                 self.refusals.append(f"{family}: blocked by prompt")
                 continue
+            signature = self._tour_signature(path, body or {})
             self.attempted.add(path)
-            self.attempted_signatures.add(self._tour_signature(path, body or {}))
+            self.attempted_signatures.add(signature)
             if status != 200:
                 self.errors.append(f"POST {path} -> {status}: {payload.get('message', '')}")
                 if payload.get("state"):
                     self.state = payload["state"]
                 continue
             if not payload.get("ok"):
-                self.refusals.append(f"{family}: {payload.get('message', 'refused')}")
+                message = str(payload.get("message", "refused"))
+                self.refusals.append(f"{family}: {message}")
+                if self._refusal_may_pass(message):
+                    self.retry_at[signature] = self.steps_taken + self.REFUSAL_RETRY_STEPS
                 if payload.get("state"):
                     self.state = payload["state"]
                 continue
             self.families[family] = self.families.get(family, 0) + 1
             self.succeeded.add(path)
+            self.retry_at.pop(signature, None)
             if payload.get("state"):
                 self.state = payload["state"]
         return self.report()
@@ -298,6 +315,11 @@ class AiCaptain:
 
         return "/api/time/step", {"ticks": 1}, "time"
 
+    def _refusal_may_pass(self, message: str) -> bool:
+        """True when the refusal is a resource gate that later play can satisfy."""
+        text = str(message).lower()
+        return any(word in text for word in self.RETRYABLE_REFUSAL_WORDS)
+
     def _trade_choice(self, step: int):
         """Sell one unit when the hold is volume-full, otherwise buy one on even steps.
 
@@ -307,7 +329,7 @@ class AiCaptain:
         """
         ship = self.state.get("ship") or {}
         quotes = self.state.get("market_quotes") or {}
-        if not quotes:
+        if not quotes or self.fallback_trades >= self.MAX_FALLBACK_TRADES:
             return None
         cargo = ship.get("cargo") or {}
         capacity = int(ship.get("cargo_capacity") or 0)
@@ -318,9 +340,11 @@ class AiCaptain:
         if cargo and free_volume < 1:
             item = next((k for k, v in cargo.items() if int(v) > 0), None)
             if item:
+                self.fallback_trades += 1
                 return "/api/trade", {"commodity_id": item, "quantity": 1, "is_buy": False}, "trade"
         commodity = self._cheapest_quote(quotes)
         if commodity and free_volume >= 1 and step % 2 == 0:
+            self.fallback_trades += 1
             return "/api/trade", {"commodity_id": commodity, "quantity": 1, "is_buy": True}, "trade"
         return None
 
@@ -363,6 +387,10 @@ class AiCaptain:
             self._tour_crew_autostaff,
             self._tour_mercenary,
             self._tour_escort,
+            self._tour_escort_role,
+            self._tour_escort_train,
+            self._tour_escort_captain,
+            self._tour_escort_repair,
             self._tour_time_speed,
             self._tour_navigate,
             self._tour_war,
@@ -410,8 +438,12 @@ class AiCaptain:
         return (path, str((body or {}).get(field) or ""))
 
     def _tour_action_attempted(self, path: str, body: dict[str, Any]) -> bool:
+        signature = self._tour_signature(path, body)
+        retry_at = self.retry_at.get(signature)
+        if retry_at is not None:
+            return self.steps_taken < retry_at
         if path in self.SIGNATURE_ROUTES:
-            return self._tour_signature(path, body) in self.attempted_signatures
+            return signature in self.attempted_signatures
         return path in self.attempted
 
     def _tour_swap(self):
@@ -779,6 +811,65 @@ class AiCaptain:
             "escort_type": keys[0],
             "system_id": (self.state.get("current_system") or {}).get("id", ""),
         }, "fleet"
+
+    def _escort_rows(self):
+        rows = (self.state.get("fleet_manager") or {}).get("ships") or []
+        return [ship for ship in rows if isinstance(ship, dict) and ship.get("id")]
+
+    # Once an escort is bought, its squadron role, training, captain and repair are
+    # reachable; each builder gates on the state the engine needs (ADR-345).
+    def _tour_escort_role(self):
+        for ship in self._escort_rows():
+            if int(ship.get("hull") or 0) <= 0:
+                continue
+            current = str(ship.get("tactical_role") or "screen")
+            role = "strike" if current != "strike" else "screen"
+            return ("/api/fleet/escort/role",
+                    {"ship_id": ship["id"], "role": role}, "escort_role")
+        return None
+
+    def _tour_escort_train(self):
+        if not self._is_docked():
+            return None
+        credits = int((self.state.get("ship") or {}).get("credits") or 0)
+        for ship in self._escort_rows():
+            if int(ship.get("hull") or 0) <= 0:
+                continue
+            if int(ship.get("experience") or 0) >= int(ship.get("experience_max") or 0):
+                continue
+            if credits < int(ship.get("training_cost") or 0):
+                continue
+            return "/api/fleet/escort/train", {"ship_id": ship["id"]}, "escort_train"
+        return None
+
+    def _tour_escort_captain(self):
+        assigned = {str(ship.get("captain_id") or "") for ship in self._escort_rows()}
+        crew = [
+            member for member in self.state.get("crew") or []
+            if isinstance(member, dict)
+            and member.get("status") == "active"
+            and int(member.get("injury_ticks") or 0) == 0
+            and not str(member.get("station") or "")
+            and str(member.get("id") or "") not in assigned
+        ]
+        if not crew:
+            return None
+        for ship in self._escort_rows():
+            if int(ship.get("hull") or 0) <= 0 or str(ship.get("captain_id") or ""):
+                continue
+            return ("/api/fleet/escort/captain",
+                    {"ship_id": ship["id"], "crew_id": crew[0]["id"],
+                     "action": "assign"}, "escort_captain")
+        return None
+
+    def _tour_escort_repair(self):
+        if not self._is_docked():
+            return None
+        for ship in self._escort_rows():
+            hull = int(ship.get("hull") or 0)
+            if 0 < hull < int(ship.get("max_hull") or 0):
+                return "/api/fleet/escort/repair", {"ship_id": ship["id"]}, "escort_repair"
+        return None
 
     def _tour_time_speed(self):
         return "/api/time/speed", {"speed": 1.0}, "time_speed"

@@ -315,6 +315,106 @@ class ContractClaimTourTest(unittest.TestCase):
                          ("/api/fleet/action", "autostaff"))
 
 
+class RefusalRetryTest(unittest.TestCase):
+    """Affordability refusals are retried after a cooldown; hard refusals are not (ADR-345)."""
+
+    def _captain(self, state=None):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = state or {"ship": {}, "market_quotes": {}}
+        return captain
+
+    def test_a_credit_gate_may_pass_later(self):
+        captain = self._captain()
+        self.assertTrue(captain._refusal_may_pass("Insufficient credits: Aegis Escort Corvette costs 2200 cr."))
+        self.assertTrue(captain._refusal_may_pass("Outpost charters require Pilot Mastery level 2"))
+        self.assertTrue(captain._refusal_may_pass("No skill points available. Level up the commander first."))
+
+    def test_a_hard_refusal_is_not_retried(self):
+        captain = self._captain()
+        self.assertFalse(captain._refusal_may_pass("Reactor already operating in balanced mode."))
+        self.assertFalse(captain._refusal_may_pass("No derelict salvage is detected here."))
+
+    def test_a_retry_stays_suppressed_until_the_cooldown_passes(self):
+        captain = self._captain()
+        signature = ("/api/fleet/escort/buy", "")
+        captain.attempted.add("/api/fleet/escort/buy")
+        captain.attempted_signatures.add(signature)
+        captain.retry_at[signature] = 60
+        captain.steps_taken = 30
+        self.assertTrue(captain._tour_action_attempted(*signature[:1], {}))
+        captain.steps_taken = 60
+        self.assertFalse(captain._tour_action_attempted("/api/fleet/escort/buy", {}))
+
+    def test_fallback_trades_are_capped(self):
+        captain = self._captain({
+            "ship": {"cargo": {}, "cargo_capacity": 40, "cargo_free_volume": 5},
+            "market_quotes": {"titanium": {"commodity_id": "titanium", "buy_price": 50}},
+        })
+        taken = [captain._trade_choice(4) for _ in range(captain.MAX_FALLBACK_TRADES)]
+        self.assertTrue(all(action is not None for action in taken))
+        self.assertIsNone(captain._trade_choice(4))
+
+
+class EscortTierTourTest(unittest.TestCase):
+    """Once an escort is purchased, its role, training, captain and repair are tour steps."""
+
+    def _captain(self, *, docked=True, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "orbiting_body": {"station_dockable": True} if docked else {},
+            "ship": {"credits": 1000},
+            "fleet_manager": {"ships": []},
+            "crew": [],
+        }
+        base.update(state)
+        captain.state = base
+        return captain
+
+    def _ship(self, **fields):
+        ship = {"id": "e1", "hull": 90, "max_hull": 90, "experience": 10,
+                "experience_max": 300, "training_cost": 250,
+                "tactical_role": "screen", "captain_id": ""}
+        ship.update(fields)
+        return ship
+
+    def test_role_flips_between_screen_and_strike(self):
+        captain = self._captain(fleet_manager={"ships": [self._ship()]})
+        self.assertEqual(captain._tour_escort_role()[1]["role"], "strike")
+        captain.state["fleet_manager"]["ships"][0]["tactical_role"] = "strike"
+        self.assertEqual(captain._tour_escort_role()[1]["role"], "screen")
+
+    def test_a_destroyed_escort_blocks_every_escort_step(self):
+        captain = self._captain(fleet_manager={"ships": [self._ship(hull=0)]})
+        self.assertIsNone(captain._tour_escort_role())
+        self.assertIsNone(captain._tour_escort_train())
+        self.assertIsNone(captain._tour_escort_repair())
+        self.assertIsNone(captain._tour_escort_captain())
+
+    def test_training_needs_a_dock_credits_and_room_to_grow(self):
+        ship = self._ship()
+        self.assertTrue(self._captain(fleet_manager={"ships": [ship]})._tour_escort_train())
+        self.assertIsNone(self._captain(docked=False, fleet_manager={"ships": [ship]})._tour_escort_train())
+        self.assertIsNone(self._captain(fleet_manager={"ships": [ship]}, ship={"credits": 10})._tour_escort_train())
+        ace = self._ship(experience=300)
+        self.assertIsNone(self._captain(fleet_manager={"ships": [ace]})._tour_escort_train())
+
+    def test_a_captain_is_assigned_only_to_an_unstaffed_living_escort(self):
+        crew = [{"id": "c1", "status": "active", "injury_ticks": 0, "station": ""}]
+        captain = self._captain(fleet_manager={"ships": [self._ship()]}, crew=crew)
+        self.assertEqual(captain._tour_escort_captain()[1]["crew_id"], "c1")
+        staffed = self._captain(fleet_manager={"ships": [self._ship(captain_id="c1")]}, crew=crew)
+        self.assertIsNone(staffed._tour_escort_captain())
+        assigned_elsewhere = self._captain(
+            fleet_manager={"ships": [self._ship(captain_id="c1"), self._ship(id="e2")]}, crew=crew)
+        self.assertIsNone(assigned_elsewhere._tour_escort_captain())
+
+    def test_repair_needs_a_dock_and_real_damage(self):
+        damaged = self._ship(hull=40)
+        self.assertTrue(self._captain(fleet_manager={"ships": [damaged]})._tour_escort_repair())
+        self.assertIsNone(self._captain(docked=False, fleet_manager={"ships": [damaged]})._tour_escort_repair())
+        self.assertIsNone(self._captain(fleet_manager={"ships": [self._ship()]})._tour_escort_repair())
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

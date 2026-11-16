@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `235`
-- **Total Classes**: `548`
+- **Total Classes**: `550`
 - **Total Top-Level Functions**: `536`
-- **Total Class Methods**: `2704`
-- **Total Source Lines**: `63914`
+- **Total Class Methods**: `2722`
+- **Total Source Lines**: `64105`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`235` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `328` lines (`14768` bytes)
+**Size**: `428` lines (`19975` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -117,6 +117,20 @@
   - Method `.test_no_completed_contract_means_no_claim()`
   - Method `.test_each_completed_contract_is_claimable_once()`
   - Method `.test_the_claim_signature_keys_on_the_contract_id()`
+- `class RefusalRetryTest` - *Affordability refusals are retried after a cooldown; hard refusals are not (ADR-345).*
+  - Method `._captain(state)`
+  - Method `.test_a_credit_gate_may_pass_later()`
+  - Method `.test_a_hard_refusal_is_not_retried()`
+  - Method `.test_a_retry_stays_suppressed_until_the_cooldown_passes()`
+  - Method `.test_fallback_trades_are_capped()`
+- `class EscortTierTourTest` - *Once an escort is purchased, its role, training, captain and repair are tour steps.*
+  - Method `._captain(*, docked, **state)`
+  - Method `._ship(**fields)`
+  - Method `.test_role_flips_between_screen_and_strike()`
+  - Method `.test_a_destroyed_escort_blocks_every_escort_step()`
+  - Method `.test_training_needs_a_dock_credits_and_room_to_grow()`
+  - Method `.test_a_captain_is_assigned_only_to_an_unstaffed_living_escort()`
+  - Method `.test_repair_needs_a_dock_and_real_damage()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4544,7 +4558,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `929` lines (`41951` bytes)
+**Size**: `1020` lines (`46122` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4556,6 +4570,7 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
+  - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*
   - Method `._trade_choice(step)` - *Sell one unit when the hold is volume-full, otherwise buy one on even steps.*
   - Method `._next_tour_action()`
   - Method `._tour_signature(path, body)`
@@ -4598,6 +4613,11 @@
   - Method `._tour_scoop()`
   - Method `._tour_mercenary()`
   - Method `._tour_escort()`
+  - Method `._escort_rows()`
+  - Method `._tour_escort_role()`
+  - Method `._tour_escort_train()`
+  - Method `._tour_escort_captain()`
+  - Method `._tour_escort_repair()`
   - Method `._tour_time_speed()`
   - Method `._tour_navigate()`
   - Method `._tour_war()`
