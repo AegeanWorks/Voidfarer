@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "combat-action-policy",
+    "task_id": "repl-command-parity",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794853905.2605631,
+    "updated_at": 1794858139.6236415,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,57 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794853959.0651834,
-    "completed_head": "a1c09d923b8000ddb6b0f3e8c06c1363973a939d",
-    "completed_tree": "7b4d70c28ff820f18ecc1b864d0d1a20c464cf05"
+    "completed_at": 1794858181.457644,
+    "completed_head": "dc397b6205939c56df040f79e6c445f5c0e0b98e",
+    "completed_tree": "beceabf54ad290beddf9a324862f16d47b0c1093"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-overhaul-burn",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ai-captain-overhaul-burn' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794809126.818246,
-      "timestamp_str": "2026-11-16 09:05:26",
-      "agent": "kilo:goal",
-      "head": "08ec4de88332d6e776195481129511d8ea538de0",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "cockpit-jettison-ore",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Expose titanium jettison beside field fabrication in the SHIP tab",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794810284.12203,
-      "timestamp_str": "2026-11-16 09:24:44",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The engine tells players to jettison and CLI/REST support it, but the cockpit had no control",
-        "benefits": "A jammed hold can be cleared exactly where the advice appears, without leaving the cockpit",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "reuses the documented REST route, warning styling for the destructive action, real Edge click, three pins"
-      },
-      "plan_digest": "e1eeb4308cbd6e9f1c692ebaf35248755d83eb4082ab0addf2ca2940a583d65a"
-    },
-    {
-      "task_id": "cockpit-jettison-ore",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Edge: 3 -> 2 titanium with the documented message, 0 console errors; suite 1883 OK (ADR-356); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794810284.3210053,
-      "timestamp_str": "2026-11-16 09:24:44",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "cockpit-jettison-ore",
       "phase": "completed",
@@ -359,6 +313,64 @@
       "timestamp_str": "2026-11-16 21:32:39",
       "agent": "kilo:goal",
       "head": "a1c09d923b8000ddb6b0f3e8c06c1363973a939d",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "repl-command-parity",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Wire the seven advertised REPL commands and list every real surface in help",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794857583.2037904,
+      "timestamp_str": "2026-11-16 22:33:03",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The REPL help advertised quests, ai, messages, depot, land, mercs and allies, but all seven printed Unknown command; meanwhile many working surfaces (character, research, outpost, diplomacy, route, navigate, weapons, reactor, refit, codex, log, events, crew, away, surface, pirate, customs, decision, settings, quantum) were absent from help",
+        "benefits": "The interactive command matrix is truthful and complete; the CLI reaches parity with the argparse surface without leaving the REPL",
+        "risks": "contract: none (dispatch-only wiring of existing handlers); dependency: none; concurrency: none; state: none",
+        "mitigation": "failing-first REPL tests driving a scripted input session, real piped REPL run, full suite and 5/5 gates"
+      },
+      "plan_digest": "c1aee0b0c71e4fc19b3e5fdbeb6ca246c30076dc05c49a9c7c3f77af742a946c",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "repl-command-parity",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/4] All seven advertised commands run in a scripted and a real piped REPL; help lists every surface; suite Ran 1911 OK; 5/5 gates (ADR-363); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794858139.6236415,
+      "timestamp_str": "2026-11-16 22:42:19",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "repl-command-parity",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'repl-command-parity' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794858181.5320022,
+      "timestamp_str": "2026-11-16 22:43:01",
+      "agent": "kilo:goal",
+      "head": "dc397b6205939c56df040f79e6c445f5c0e0b98e",
       "delivery": {
         "roots": [
           "."
