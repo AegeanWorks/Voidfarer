@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "drone-haul-partial-collect",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794801205.4233174,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794801408.6929402,
+    "completed_head": "68dfe1d3b15ff66a72ff442b56b646b7547d0278",
+    "completed_tree": "5134870336d140429fdec1b2919861d3b7dbde69"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-contract-claims",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Claim completed contracts in the AI captain, keyed per contract id",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794791228.2481399,
-      "timestamp_str": "2026-11-16 04:07:08",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Completed contract rewards stayed unclaimed; credits fell to zero and blocked the escort, ship-mod and outpost tier for the rest of every long run",
-        "benefits": "The captain plays the reward loop, stays solvent, and reaches deeper mechanics; the mechanics gate earns 3.5x more",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "claims keyed on contract_id so each is banked once; four tests; 600-step and 180-step measurements before and after"
-      },
-      "plan_digest": "ef4d248b45368f72622e0f1bcf8336e16bd3998c054cdd09d5a53d09ba7c66f4"
-    },
     {
       "task_id": "ai-captain-contract-claims",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794801205.4233174,
       "timestamp_str": "2026-11-16 06:53:25",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "drone-haul-partial-collect",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'drone-haul-partial-collect' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794801408.7478063,
+      "timestamp_str": "2026-11-16 06:56:48",
+      "agent": "kilo:goal",
+      "head": "68dfe1d3b15ff66a72ff442b56b646b7547d0278",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
