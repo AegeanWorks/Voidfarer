@@ -604,6 +604,18 @@ class TestStoryBranchingMechanics(unittest.TestCase):
         self.assertTrue(any(c["id"] == "choice_vance_telemetry" for c in status["choices"]))
         self.assertTrue(all(not c["locked"] for c in status["choices"]))
 
+    def test_story_status_route_publishes_the_whole_real_course(self):
+        self.assertNotIn("route", self.engine.story_status_with_route())
+        ok, msg = self.engine.make_story_choice("choice_vance_telemetry")
+        self.assertTrue(ok, msg)
+        status = self.engine.story_status_with_route()
+        self.assertEqual(status["target_system_id"], "sirius")
+        plan = self.engine.plan_route("sirius")
+        self.assertEqual(status["route"]["path"], plan["path"])
+        self.assertEqual(status["route"]["jumps"], plan["jumps"])
+        self.assertEqual(status["route"]["fuel_estimate"], plan["fuel_estimate"])
+        self.assertGreaterEqual(status["route"]["jumps"], 1)
+
     def test_act_iv_requires_black_hole_orbit(self):
         self.engine.make_story_choice("choice_vance_telemetry")
         self._travel_to("sirius")

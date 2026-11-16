@@ -161,6 +161,8 @@ class AiCaptain:
     # Upkeep actions can be needed again and again; a one-shot success left the captain
     # flying on fumes for 1,400 ticks after a single refuel (ADR-349).
     REPEATABLE_MIN_INTERVAL = {"/api/refuel": 60, "/api/drone/collect": 30}
+    NAVIGATION_FUEL_RESERVE = 5
+    STORY_TRAVEL_RETRY_STEPS = 30
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -295,6 +297,12 @@ class AiCaptain:
             faction = self._current_faction_id()
             if faction:
                 return "/api/diplomacy", {"faction_id": faction, "action": "improve"}, "diplomacy"
+
+        # Resolve a chapter standing in its own target system before any dock trip or body
+        # travel can carry the ship away from the required place (ADR-360).
+        hold = self._story_hold_action()
+        if hold is not None:
+            return hold
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -432,6 +440,8 @@ class AiCaptain:
             # The opening chapter is gated on being in Sol, and the fallback jump leaves at
             # step 5 of every run, so the story step must be the first tour action (ADR-354).
             self._tour_story_choice,
+            self._tour_story_orbit,
+            self._tour_story_travel,
             self._tour_power,
             self._tour_reactor,
             self._tour_route,
@@ -525,6 +535,12 @@ class AiCaptain:
         "/api/fleet/action": "action",
         "/api/crew/action": "action",
         "/api/contract/claim": "contract_id",
+        # Six chapters share one choice route; keying on the path let Act I lock the
+        # whole campaign after its first resolution (ADR-360).
+        "/api/story/choice": "choice_id",
+        # Many bodies share one orbit route; keying on the path let the first generic
+        # orbit lock the chapter's required body (ADR-360).
+        "/api/orbit": "target",
         # One route installs twelve different mods; keying on the path meant a single
         # early refusal (or a removal) locked every later install (ADR-352).
         "/api/shipmods/install": "mod_id",
@@ -542,6 +558,12 @@ class AiCaptain:
         retry_at = self.retry_at.get(signature)
         if retry_at is not None:
             return self.total_steps < retry_at
+        story_target = str((self.state.get("story_status") or {}).get("target_system_id") or "")
+        if path == "/api/navigate" and story_target and story_target == str((body or {}).get("system_id") or ""):
+            # A story course can be interrupted; retry the target after the same cooldown
+            # without making the generic one-shot navigate step repeat (ADR-360).
+            last = self.repeat_last.get(signature)
+            return last is not None and self.total_steps - last < self.STORY_TRAVEL_RETRY_STEPS
         interval = self.REPEATABLE_MIN_INTERVAL.get(path)
         if interval is not None:
             last = self.repeat_last.get(signature)
@@ -602,6 +624,68 @@ class AiCaptain:
             if isinstance(choice, dict) and choice.get("id") and not choice.get("locked"):
                 return "/api/story/choice", {"choice_id": choice["id"]}, "story"
         return None
+
+    def _story_hold_action(self):
+        """Resolve the local chapter instead of letting a dock trip or body travel leave it.
+
+        The rotating tour runs only on even steps and the dock trip runs before it, so a
+        ready chapter could be walked out of; once the required body was orbited, the
+        de-duplicated orbit signature never fired again (ADR-360).
+        """
+        story = self.state.get("story_status") or {}
+        if story.get("completed") or not story.get("target_system_id"):
+            return None
+        current = str((self.state.get("current_system") or {}).get("id") or "")
+        if current != str(story.get("target_system_id")):
+            return None
+        unmet = [str(item) for item in story.get("unmet_requirements") or []]
+        if not unmet:
+            return self._tour_story_choice()
+        if all("orbit" in item.lower() for item in unmet):
+            return self._tour_story_orbit()
+        return None
+
+    def _tour_story_travel(self):
+        """Fly to the chapter target when the tank can cover the whole route plus a reserve.
+
+        The snapshot publishes the real course estimate, so this cannot strand itself on a
+        multi-hop trip the way the first prototype did (ADR-358, ADR-360).
+        """
+        status = self.state.get("story_status") or {}
+        if status.get("completed"):
+            return None
+        target = str(status.get("target_system_id") or "")
+        current = str((self.state.get("current_system") or {}).get("id") or "")
+        ship = self.state.get("ship") or {}
+        if not target or target == current:
+            return None
+        route = status.get("route") or {}
+        if not route.get("reachable") or not route.get("fuel_estimate"):
+            return None
+        if ship.get("travel") or self.state.get("active_combat") or self.state.get("active_anomaly"):
+            return None
+        needed = int(route["fuel_estimate"]) + self.NAVIGATION_FUEL_RESERVE
+        if int(ship.get("fuel") or 0) < needed:
+            return None
+        return "/api/navigate", {"system_id": target}, "story_travel"
+
+    def _tour_story_orbit(self):
+        """Orbit the body a chapter explicitly demands (Act IV's black hole, ADR-360)."""
+        status = self.state.get("story_status") or {}
+        chapter_id = str(status.get("chapter_id") or "")
+        chapter = (self.state.get("story_chapters_map") or {}).get(chapter_id) or {}
+        requirements = chapter.get("requirements") or {}
+        body_id = str(requirements.get("orbit_body_id") or "")
+        if not body_id:
+            return None
+        ship = self.state.get("ship") or {}
+        if str(ship.get("orbiting_body_id") or "") == body_id:
+            return None
+        system = self.state.get("current_system") or {}
+        if not any(isinstance(body, dict) and body.get("id") == body_id
+                   for body in system.get("bodies") or []):
+            return None
+        return "/api/orbit", {"target": body_id}, "story_orbit"
 
     def _tour_message_send(self):
         """Send one quantum message to the first correspondent (ADR-354)."""

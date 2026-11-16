@@ -8081,6 +8081,21 @@ class SimulationEngine:
                 "transmissions": len(story.transmission_log),
             }
 
+    def story_status_with_route(self) -> dict[str, Any]:
+        """Story status plus the real course and fuel estimate to its target system.
+
+        A story-directed client needs to know the whole trip's cost before committing, not
+        just the next hop; stamping it here keeps the snapshot the single source of truth
+        (ADR-360).
+        """
+        status = self.story_status()
+        target = str(status.get("target_system_id") or "")
+        current = str(self.state.ship.current_system_id or "")
+        if status.get("completed") or not target or target == current:
+            return status
+        status["route"] = self.plan_route(target)
+        return status
+
     def make_story_choice(self, choice_id: str) -> tuple[bool, str]:
         """Resolve a branching story dilemma in the active campaign chapter."""
         with self.lock:
@@ -8706,7 +8721,7 @@ class SimulationEngine:
                     "decisions_ready_in": self.decisions_ready_in(),
                     "decision_cadences": sorted(self.DECISION_CADENCE),
                 },
-                "story_status": self.story_status(),
+                "story_status": self.story_status_with_route(),
                 "state_machines": state_machine_situation(self.state),
                 "encounter": encounter_report(self.state),
                 "fitting": fitting_summary(self.state),

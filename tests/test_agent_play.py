@@ -982,6 +982,104 @@ class NarrativeAndCrewTourTest(unittest.TestCase):
         self.assertNotEqual(captain._choose(7)[0], "/api/surface/op")
 
 
+class StoryTravelTourTest(unittest.TestCase):
+    """Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360)."""
+
+    CHAPTER = "act4_hollow_between"
+    SYSTEM = "cygnus_x1"
+    BODY = "cygnus_x1_black_hole"
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "current_system": {
+                "id": self.SYSTEM,
+                "connections": ["sol"],
+                "bodies": [{"id": self.BODY}, {"id": "cygnus_x1_body_1", "station_dockable": True}],
+            },
+            "orbiting_body": {"id": "cygnus_x1_body_1", "station_dockable": True},
+            "ship": {"hull": 100, "max_hull": 100, "fuel": 40, "max_fuel": 60,
+                     "travel": None, "orbiting_body_id": "cygnus_x1_body_1"},
+            "story_status": {
+                "completed": False, "ready": False, "target_system_id": self.SYSTEM,
+                "chapter_id": self.CHAPTER, "unmet_requirements": [], "choices": [],
+            },
+            "story_chapters_map": {
+                self.CHAPTER: {"requirements": {"orbit_body_id": self.BODY}},
+            },
+            "jump_fuel_costs": {"sol": 4},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_ready_chapter_is_resolved_before_a_dock_trip(self):
+        captain = self._captain(
+            orbiting_body={"station_dockable": False},
+            story_status={"ready": True, "choices": [{"id": "choice_first_dive", "locked": False}]},
+        )
+        action = captain._choose(3)
+        self.assertEqual(action[0], "/api/story/choice")
+        self.assertEqual(action[1]["choice_id"], "choice_first_dive")
+
+    def test_an_orbit_chapter_re_orbits_a_body_it_left(self):
+        captain = self._captain(story_status={
+            "unmet_requirements": ["Establish orbit around Cygnus Void Gate Event Horizon"],
+        })
+        captain.attempted_signatures.add(("/api/orbit", self.BODY))
+        action = captain._choose(25)
+        self.assertEqual(action[0], "/api/orbit")
+        self.assertEqual(action[1]["target"], self.BODY)
+
+    def test_story_travel_needs_the_whole_route_plus_a_reserve(self):
+        status = {"target_system_id": "sirius", "route": {"reachable": True, "fuel_estimate": 20}}
+        current = {"id": self.SYSTEM}
+        short = self._captain(current_system=current, story_status=status, ship={"fuel": 24})
+        self.assertIsNone(short._tour_story_travel())
+        ready = self._captain(current_system=current, story_status=status, ship={"fuel": 25})
+        self.assertEqual(ready._tour_story_travel()[1]["system_id"], "sirius")
+        unreachable = self._captain(
+            current_system=current,
+            story_status={"target_system_id": "sirius", "route": {"reachable": False}},
+        )
+        self.assertIsNone(unreachable._tour_story_travel())
+
+    def test_story_travel_waits_for_combat_transit_and_anomalies(self):
+        status = {"target_system_id": "sirius", "route": {"reachable": True, "fuel_estimate": 10}}
+        current = {"id": self.SYSTEM}
+        for blocked in ({"active_combat": {"id": "c"}}, {"active_anomaly": {"id": "a"}},
+                        {"ship": {"travel": {"body_id": "b"}}}):
+            captain = self._captain(current_system=current, story_status=status, **blocked)
+            self.assertIsNone(captain._tour_story_travel())
+
+    def test_story_navigation_retries_but_generic_navigation_stays_one_shot(self):
+        captain = self._captain(
+            current_system={"id": "sol", "connections": ["sirius"]},
+            story_status={"target_system_id": "sirius"},
+        )
+        target = {"system_id": "sirius"}
+        captain.attempted.add("/api/navigate")
+        captain.repeat_last[("/api/navigate", "")] = 10
+        captain.total_steps = 20
+        self.assertTrue(captain._tour_action_attempted("/api/navigate", target))
+        captain.total_steps = 40
+        self.assertFalse(captain._tour_action_attempted("/api/navigate", target))
+        self.assertTrue(captain._tour_action_attempted("/api/navigate", {"system_id": "vega"}))
+
+    def test_shared_routes_key_de_duplication_on_the_sub_action(self):
+        captain = self._captain()
+        self.assertEqual(captain._tour_signature("/api/story/choice", {"choice_id": "c1"}),
+                         ("/api/story/choice", "c1"))
+        self.assertNotEqual(captain._tour_signature("/api/story/choice", {"choice_id": "c1"}),
+                            captain._tour_signature("/api/story/choice", {"choice_id": "c2"}))
+        self.assertEqual(captain._tour_signature("/api/orbit", {"target": self.BODY}),
+                         ("/api/orbit", self.BODY))
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main

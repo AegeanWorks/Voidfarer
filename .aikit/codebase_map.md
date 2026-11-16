@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `564`
+- **Total Classes**: `565`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2823`
-- **Total Source Lines**: `65286`
+- **Total Class Methods**: `2835`
+- **Total Source Lines**: `65495`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `995` lines (`47593` bytes)
+**Size**: `1093` lines (`52490` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -202,6 +202,14 @@
   - Method `.test_away_recall_needs_an_active_mission()`
   - Method `.test_surface_operation_follows_landing_directly()`
   - Method `.test_a_used_surface_operation_is_not_repeated()`
+- `class StoryTravelTourTest` - *Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360).*
+  - Method `._captain(**state)`
+  - Method `.test_a_ready_chapter_is_resolved_before_a_dock_trip()`
+  - Method `.test_an_orbit_chapter_re_orbits_a_body_it_left()`
+  - Method `.test_story_travel_needs_the_whole_route_plus_a_reserve()`
+  - Method `.test_story_travel_waits_for_combat_transit_and_anomalies()`
+  - Method `.test_story_navigation_retries_but_generic_navigation_stays_one_shot()`
+  - Method `.test_shared_routes_key_de_duplication_on_the_sub_action()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4022,7 +4030,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `871` lines (`37722` bytes)
+**Size**: `883` lines (`38413` bytes)
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -4055,6 +4063,7 @@
   - Method `.tearDown()`
   - Method `._travel_to(destination)`
   - Method `.test_story_status_reports_objectives_and_locks()`
+  - Method `.test_story_status_route_publishes_the_whole_real_course()`
   - Method `.test_act_iv_requires_black_hole_orbit()`
   - Method `.test_locked_choices_report_branch_resolvable_reasons()`
   - Method `.test_persistent_flags_drive_distinct_endings()`
@@ -4672,7 +4681,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1405` lines (`65115` bytes)
+**Size**: `1489` lines (`69426` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4697,6 +4706,9 @@
   - Method `._tour_messages()`
   - Method `._tour_contracts()`
   - Method `._tour_story_choice()` - *Resolve the active chapter's first unlocked choice; the tour never touched the arc.*
+  - Method `._story_hold_action()` - *Resolve the local chapter instead of letting a dock trip or body travel leave it.*
+  - Method `._tour_story_travel()` - *Fly to the chapter target when the tank can cover the whole route plus a reserve.*
+  - Method `._tour_story_orbit()` - *Orbit the body a chapter explicitly demands (Act IV's black hole, ADR-360).*
   - Method `._tour_message_send()` - *Send one quantum message to the first correspondent (ADR-354).*
   - Method `._tour_shore_leave()`
   - Method `._tour_away_recall()`
@@ -5095,7 +5107,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11272` lines (`555853` bytes)
+**Size**: `11287` lines (`556548` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5290,6 +5302,7 @@
   - Method `._system_display_name(system_id)` - *The galaxy-map name of a system, or a readable form of its id.*
   - Method `._story_unmet_requirements(requirements, *, chapter)` - *List human-readable unmet gating conditions for a chapter or choice.*
   - Method `.story_status()` - *Objective snapshot of the narrative campaign for CLI, REST, and cockpit parity.*
+  - Method `.story_status_with_route()` - *Story status plus the real course and fuel estimate to its target system.*
   - Method `.make_story_choice(choice_id)` - *Resolve a branching story dilemma in the active campaign chapter.*
   - Method `.skip_tutorial()` - *Skip Cadet Flight Academy and unlock unrestricted operational status.*
   - Method `.reset_tutorial()` - *Reset Cadet Flight Academy to step 1 for revision or retraining.*

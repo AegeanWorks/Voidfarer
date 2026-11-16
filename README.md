@@ -394,10 +394,12 @@ python tools/ai_play.py --steps 180 --json    # machine-readable report
 python tools/ui_browser.py --click-map --viewports desktop --out ui-review/clickmap
 ```
 
-The captain exercises the full mechanic surface through the same HTTP API. A 180-step run reaches 37
-mechanic families, succeeds on 38 endpoints, attempts 51 and reports **zero coverage
+The captain exercises the full mechanic surface through the same HTTP API. A 180-step run reaches 56
+mechanic families, succeeds on 57 endpoints, attempts 67 and reports **zero coverage
 gaps**: every POST route in `/api/agent/actions` is either exercised or listed in
-`CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither.
+`CONTEXT_ACTIONS` with a reason (lifecycle, prompt-driven or content the run cannot build). `tests/test_agent_play.py` fails if a new endpoint appears with neither. Story chapters are flown on the
+route published in the `/api/state` snapshot, and a chapter standing in its target system is
+resolved before any dock trip can carry the ship away.
 
 Click-map: dup/missing
 184 controls, 39 visible, 0 dup.
