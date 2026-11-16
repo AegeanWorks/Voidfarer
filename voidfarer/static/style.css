@@ -9687,6 +9687,20 @@ body.cockpit-theme .nav-panel > .panel-header {
     box-shadow: 0 0 6px rgba(201, 163, 90, 0.25);
 }
 
+/* Discarding cargo is destructive, so it reads as a warning rather than a synthesis action. */
+.btn-fabricate.btn-jettison {
+    border-color: rgba(214, 112, 92, 0.4);
+    color: var(--console-muted);
+}
+
+.btn-fabricate.btn-jettison:hover,
+.btn-fabricate.btn-jettison:focus-visible {
+    border-color: rgba(214, 112, 92, 0.9);
+    color: #f0a08e;
+    background: rgba(214, 112, 92, 0.16);
+    box-shadow: 0 0 6px rgba(214, 112, 92, 0.3);
+}
+
 /* Market Volatility Trend Badges */
 .market-trend-badge {
     display: inline-flex;

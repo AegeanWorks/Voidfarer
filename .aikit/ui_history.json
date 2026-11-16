@@ -3041,5 +3041,27 @@
     "final_snapshot_digest": "c9afd8ba12030efb303eadf211fadfad7d0e054af018e47c7942419182749d66",
     "final_snapshot_entries": 1370,
     "surface_digest": "e48c5b47c8d201f70e3a97af6c221e14781893dedbf16c15326f423d0f9988c6"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "afe9349edb464ccad5af8daf6bea60751fa9d828",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794809394.427086,
+    "finished_at": 1794809799.057626,
+    "strikes": 0,
+    "reviewer": "kilo:goal main multimodal agent per G-015; ui-review/jettison-ore laptop-jettison.png: SHIP tab FIELD FABRICATION shows JETTISON TITANIUM (1x Ti); clicking with 3 titanium logged 'Jettisoned 1x Titanium Alloy... freeing 2 cargo hold units' and left 2, 0 console errors",
+    "allowed_removals": [],
+    "final_snapshot_digest": "fbd6166cb653b48da306358692c37385f97a38a476820d1beb6886fad594a533",
+    "final_snapshot_entries": 1374,
+    "surface_digest": "18453555d547a767964641a686d61a2ad175fd2e8284fca4797ebb40e897ca55"
   }
 ]

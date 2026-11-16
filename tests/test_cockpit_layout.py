@@ -3374,3 +3374,30 @@ class TestBeginnerCockpitCompaction(unittest.TestCase):
         self.assertIn(".ship-interior-panel.is-collapsed { min-height: 0; max-height: none; }", self.css)
 
 
+class TestJettisonOreControl(unittest.TestCase):
+    """The cockpit offers the jettison the hold-full message recommends (ADR-356)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_the_control_sits_with_field_fabrication(self):
+        self.assertIn('id="btnJettisonOre"', self.html)
+        self.assertIn("JETTISON TITANIUM (1x Ti)", self.html)
+        self.assertIn('class="btn-fabricate btn-jettison"', self.html)
+
+    def test_the_handler_posts_the_documented_jettison_route(self):
+        block = self.js.split("    async handleJettisonOre() {", 1)[1].split("    async handleDistress() {", 1)[0]
+        self.assertIn('"/api/inventory/jettison"', block)
+        self.assertIn('item_id: "titanium", quantity: 1', block)
+        self.assertIn("this.state = json.state;", block)
+        self.assertIn("this.renderHUD();", block)
+        self.assertIn('document.getElementById("btnJettisonOre")', self.js)
+
+    def test_the_destructive_action_reads_as_a_warning(self):
+        self.assertIn(".btn-fabricate.btn-jettison {", self.css)
+        self.assertIn(".btn-fabricate.btn-jettison:hover,", self.css)
+
+

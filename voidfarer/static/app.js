@@ -729,6 +729,7 @@ class CockpitApp {
         this.btnFabricatePatch = document.getElementById("btnFabricatePatch");
         this.btnFabricateFuel = document.getElementById("btnFabricateFuel");
         this.btnBurnCells = document.getElementById("btnBurnCells");
+        this.btnJettisonOre = document.getElementById("btnJettisonOre");
         this.btnCombatAbsorb = document.getElementById("btnCombatAbsorb");
         this.btnCombatEvade = document.getElementById("btnCombatEvade");
         this.btnCombatFlee = document.getElementById("btnCombatFlee");
@@ -1603,6 +1604,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
         if (this.btnFabricateFuel) {
             this.btnFabricateFuel.addEventListener("click", () => this.handleFabricate("fuel_cell"));
+        }
+        if (this.btnJettisonOre) {
+            this.btnJettisonOre.addEventListener("click", () => this.handleJettisonOre());
         }
         this.btnCombatAbsorb.addEventListener("click", () => this.handleCombat("shield_absorb"));
         this.btnCombatEvade.addEventListener("click", () => this.handleCombat("evasive_burn"));
@@ -6178,6 +6182,30 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             this.renderHUD();
         } catch (e) {
             this.appendLog(`[ERROR] Field fabrication failed: ${e.message}`, "hazard");
+        }
+    }
+
+    async handleJettisonOre() {
+        // The hold message already tells players to jettison; CLI and REST had it, the
+        // cockpit did not (ADR-356). Discard one titanium unit to free hold volume.
+        this.sound?.init();
+        this.sound?.playBeep(320);
+        try {
+            const res = await apiFetch("/api/inventory/jettison", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ item_id: "titanium", quantity: 1 })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.appendLog(json.message, "system");
+            } else {
+                this.appendLog(`[HOLD] ${json.message}`, "hazard");
+            }
+            this.state = json.state;
+            this.renderHUD();
+        } catch (e) {
+            this.appendLog(`[ERROR] Jettison failed: ${e.message}`, "hazard");
         }
     }
 

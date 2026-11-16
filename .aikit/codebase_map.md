@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `236`
-- **Total Classes**: `561`
+- **Total Classes**: `562`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2810`
-- **Total Source Lines**: `65174`
+- **Total Class Methods**: `2814`
+- **Total Source Lines**: `65201`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`236` module(s))
@@ -646,7 +646,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3376` lines (`154876` bytes)
+**Size**: `3403` lines (`156160` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1179,6 +1179,11 @@
   - Method `.setUpClass()`
   - Method `.test_cadet_banner_has_guide_me_button_and_handler()`
   - Method `.test_market_fleet_ship_and_story_use_default_disclosures()`
+- `class TestJettisonOreControl` - *The cockpit offers the jettison the hold-full message recommends (ADR-356).*
+  - Method `.setUpClass()`
+  - Method `.test_the_control_sits_with_field_fabrication()`
+  - Method `.test_the_handler_posts_the_documented_jettison_route()`
+  - Method `.test_the_destructive_action_reads_as_a_warning()`
 
 ---
 
