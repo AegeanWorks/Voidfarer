@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-outpost-tier",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794794727.947674,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794794892.4143083,
+    "completed_head": "b38d75f81231b0d6bc3da71b2037b79a5fb6432b",
+    "completed_tree": "3b661eb5f2dccd7ea5641bed8ccbd78ef0cb8da6"
   },
   "checkpoints": [
-    {
-      "task_id": "strict-quantity-residual",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Strict positive-integer guards on deposit, withdraw, depot sale, quantum order and AI trade",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794785016.889839,
-      "timestamp_str": "2026-11-16 02:23:36",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ADR-162 left these coercing bool/float/string quantities by int() or max(1), so direct engine calls could mint or truncate cargo",
-        "benefits": "All quantity entry points now match the repair convention; nothing changes for REST/CLI callers that already parse ints",
-        "risks": "contract: stricter direct-engine API, no save change; dependency: none; concurrency: none; state: untouched on refusal",
-        "mitigation": "one shared helper, six failing-first tests including state snapshots, full suite and mechanics gates"
-      },
-      "plan_digest": "ca4bf9526732865ac841422abe807cfebc0e93873e53bed62d5fc5c29e23e50f"
-    },
     {
       "task_id": "strict-quantity-residual",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794794727.947674,
       "timestamp_str": "2026-11-16 05:05:27",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-outpost-tier",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-outpost-tier' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794794892.5128937,
+      "timestamp_str": "2026-11-16 05:08:12",
+      "agent": "kilo:goal",
+      "head": "b38d75f81231b0d6bc3da71b2037b79a5fb6432b",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
