@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-upkeep-recovery",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794799083.0310342,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794799266.5255609,
+    "completed_head": "ff7c2a029b84df1f8dd36a8757652c9b64a46880",
+    "completed_tree": "0eb472ab3ecf9527b64a28e566288e71b49189b1"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-cargo-volume",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Size the AI captain's cargo decisions by volume and expose cargo volume in the snapshot",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794789681.1239755,
-      "timestamp_str": "2026-11-16 03:41:21",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The captain compared unit counts to a volume capacity, so it kept buying into a full hold and produced 173 wasted refusals in 600 steps",
-        "benefits": "The captain stops wasting steps and every client gets real used/free volume instead of guessing",
-        "risks": "contract: additive snapshot fields; dependency: none; concurrency: none; state: none",
-        "mitigation": "fallback keeps old payloads working; refusals measured before and after; four policy tests plus two snapshot tests"
-      },
-      "plan_digest": "ee0c44e63735420f8430c91f42284cfcdee845dbf3be050eb99946cdce8c13a7"
-    },
     {
       "task_id": "ai-captain-cargo-volume",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794799083.0310342,
       "timestamp_str": "2026-11-16 06:18:03",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-upkeep-recovery",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-upkeep-recovery' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794799266.623964,
+      "timestamp_str": "2026-11-16 06:21:06",
+      "agent": "kilo:goal",
+      "head": "ff7c2a029b84df1f8dd36a8757652c9b64a46880",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
