@@ -3720,6 +3720,10 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             cmd_customs(engine, storage, parts)
         elif cmd in ("decision", "decide"):
             cmd_decision(engine, storage, parts)
+        elif cmd == "encounter":
+            cmd_encounter(engine, storage, parts)
+        elif cmd in ("state-machines", "statemachines", "machines"):
+            cmd_state_machines(engine)
         elif cmd in ("quantum", "freight"):
             cmd_quantum(engine, storage, parts)
         elif cmd in ("surface", "landing"):
@@ -3964,7 +3968,7 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
                 cmd_saves(engine, storage, ["saves", cmd] + parts[1:])
             else:
                 cmd_saves(engine, storage, parts)
-        elif cmd == "help":
+        elif cmd in ("help", "?"):
             print(f"{BOLD}Available subcommands:{RESET}")
             print("  status                         - Telemetry, fleet roster, and subsystem readouts")
             print("  time [status|pause|speed|step] - Cosmic time, ticks, and temporal speed controls")
@@ -4013,6 +4017,8 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             print("  pirate [pay|fight|evade]       - Pirate toll resolution")
             print("  customs [bribe|jettison|flee]  - Customs interdiction resolution")
             print("  decision                       - Resolve a blocking decision popup")
+            print("  encounter [status|<action>]    - Inspect or resolve the one blocking encounter")
+            print("  state-machines                 - Implicit state machines and their current states")
             print("  anomaly <choice_id>            - Resolve active spatial encounter")
             print("  repair [amt]                   - Repair hull integrity at station")
             print("  refuel [amt]                   - Replenish quantum fuel at station")

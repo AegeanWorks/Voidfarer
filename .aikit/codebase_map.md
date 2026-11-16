@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `567`
+- **Total Classes**: `568`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2854`
-- **Total Source Lines**: `65758`
+- **Total Class Methods**: `2856`
+- **Total Source Lines**: `65788`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -559,7 +559,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `776` lines (`36069` bytes)
+**Size**: `800` lines (`37298` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -656,6 +656,9 @@
   - Method `._repl(lines)`
   - Method `.test_the_commands_the_help_lists_all_run()`
   - Method `.test_the_help_lists_every_player_surface()`
+- `class TestCLIReplGuardHatches` - *Every command the blocking-encounter guard lets through must actually run (ADR-364).*
+  - Method `._pending_repl(lines)`
+  - Method `.test_the_blocked_guard_hatches_all_run()`
 
 ---
 
@@ -4867,7 +4870,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4900` lines (`242175` bytes)
+**Size**: `4906` lines (`242580` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*

@@ -767,8 +767,32 @@ class TestCLIReplCommandMatrix(_IsolatedCliTestCase):
                         "navigate", "weapons", "reactor", "refit", "codex", "log",
                         "events", "crew", "away", "surface", "pirate", "customs",
                         "decision", "settings", "quests", "ai", "messages", "depot",
-                        "land", "mercs", "allies"):
+                        "land", "mercs", "allies", "encounter", "state-machines"):
             self.assertIn(surface, out)
+
+
+class TestCLIReplGuardHatches(_IsolatedCliTestCase):
+    """Every command the blocking-encounter guard lets through must actually run (ADR-364)."""
+
+    def _pending_repl(self, lines):
+        from voidfarer.decisions import DECISION_DEFINITIONS, make_decision_event
+        definition = next(d for d in DECISION_DEFINITIONS if d.id == "colony_distress")
+        engine = SimulationEngine(seed=42)
+        engine.state = engine._clone_state(
+            pending_decision=make_decision_event(definition, 0, "tick"))
+        storage = StorageManager(Path(self._tmp.name) / ".voidfarer")
+        storage.save(engine.state)
+        with patch("builtins.input", side_effect=list(lines) + ["exit"]):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+                self.assertEqual(cmd_repl(engine, storage), 0)
+        return mock_out.getvalue()
+
+    def test_the_blocked_guard_hatches_all_run(self):
+        out = self._pending_repl(["encounter", "state-machines", "?"])
+        self.assertNotIn("Unknown command", out)
+        self.assertIn("DECISION", out.upper())
+        self.assertIn("IMPLICIT STATE MACHINES", out)
+        self.assertIn("Available subcommands", out)
 
 
 if __name__ == "__main__":
