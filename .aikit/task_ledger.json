@@ -3,32 +3,17 @@
   "active_task": {
     "task_id": "ai-captain-overhaul-burn",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1794808922.3251152,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1794809126.7017226,
+    "completed_head": "08ec4de88332d6e776195481129511d8ea538de0",
+    "completed_tree": "b746fb2f663d2db35fc7542d72498f01d1654c2e"
   },
   "checkpoints": [
-    {
-      "task_id": "ai-captain-upkeep-recovery",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Repeatable refuel plus state-driven resume and insurance recovery",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794799082.8623059,
-      "timestamp_str": "2026-11-16 06:18:02",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "One-shot refuel left the tank dry, and a destroyed hull stops the clock, so long campaigns froze with no path forward",
-        "benefits": "Runs advance through death and pause states instead of spinning, and fuel upkeep works for the whole campaign",
-        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory cooldown only",
-        "mitigation": "cooldown per route, state-driven recovery before any other action, measured over 10 rounds, seven tests across three classes"
-      },
-      "plan_digest": "204e29da37041794bc96747f836762a3a13a167f4883d94e7f2c8932f99bac2e"
-    },
     {
       "task_id": "ai-captain-upkeep-recovery",
       "phase": "in_progress",
@@ -315,6 +300,23 @@
       "timestamp": 1794808922.3251152,
       "timestamp_str": "2026-11-16 09:02:02",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "ai-captain-overhaul-burn",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ai-captain-overhaul-burn' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794809126.818246,
+      "timestamp_str": "2026-11-16 09:05:26",
+      "agent": "kilo:goal",
+      "head": "08ec4de88332d6e776195481129511d8ea538de0",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
