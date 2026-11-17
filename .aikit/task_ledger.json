@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "marine-boarding-crew",
+    "task_id": "crew-builder-consolidation",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794937375.0839486,
+    "updated_at": 1794939942.0397522,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794937392.535774,
-    "completed_head": "e3707d9497d9c22522766ed51e28b2edce4a654f",
-    "completed_tree": "110da4a33b189f9a3e3722370d569fd89aa1fc57"
+    "completed_at": 1794939976.2205522,
+    "completed_head": "8823c6f033a548c653be46b2221b6567b63e13aa",
+    "completed_tree": "2726b5be0ce5411300a9052f7f546646f3c87559"
   },
   "checkpoints": [
-    {
-      "task_id": "supply-locker-layout-test",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/3] Seven source pins for the supply locker pass; suite Ran 1932 OK; 5/5 gates (ADR-369); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794896890.9520938,
-      "timestamp_str": "2026-11-17 09:28:10",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "supply-locker-layout-test",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'supply-locker-layout-test' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794896933.6175604,
-      "timestamp_str": "2026-11-17 09:28:53",
-      "agent": "kilo:goal",
-      "head": "df29fbf79459fea18a7ed14f91ea337977982fda",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "combat-decoy-control",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Put a held ECM decoy on the combat card with an honest hold gate",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794898689.5867522,
-      "timestamp_str": "2026-11-17 09:58:09",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The supply locker can now sell and use the evasion decoy, and the engine allows use_item during combat, but the combat card offers only FIRE/ABSORB/EVADE/FLEE; when fuel is below 8 the flee button is disabled and the only escape is hidden behind the SHIP tab's supply disclosure",
-        "benefits": "The decoy is usable where the threat is, the low-fuel flee tooltip points at it, and the four consumables become a coherent loop: buy at a dock, use in context",
-        "risks": "contract: none (uses the existing /api/inventory/use route); dependency: none; concurrency: none; state: none (reads ship.cargo)",
-        "mitigation": "failing-first layout pins, bounded UI task with fast+snapshot proofs, real Edge click-through that clears combat and spends the decoy, ui_browser and ui_audit at combat, full suite and 5/5 gates"
-      },
-      "plan_digest": "7e28f2855ff6cf09acef93f18b84c35bbe1a45c4f4488f5d54442dd98cfedf4a",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "combat-decoy-control",
       "phase": "in_progress",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 20:43:12",
       "agent": "kilo:goal",
       "head": "e3707d9497d9c22522766ed51e28b2edce4a654f",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "crew-builder-consolidation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Fold the marine hire into the crew builder to recover the lost tour coverage",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794938468.1363125,
+      "timestamp_str": "2026-11-17 21:01:08",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-375 added a separate marine builder and shifted the 180-step tour, dropping three attempted endpoints and two families (58/59/69 to 56/57/66); the recruit route is already keyed by role_id, so one builder can hire both roles in sequence",
+        "benefits": "The marine stays reachable while the tour rhythm and gate coverage return; one fewer builder and no dead method",
+        "risks": "contract: none; dependency: none; concurrency: none; state: none",
+        "mitigation": "failing-first crew sequence tests, gate measurement, three-seed campaigns, full suite and 5/5 gates"
+      },
+      "plan_digest": "15ac9b6286b862f27aa89c900f8e6fce91fa971757280f311a28ca5a3acf0de3",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "crew-builder-consolidation",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/3] One crew builder hires pilot then marine; gate restored to 58 families/59 of 69, 0 gaps; seeds 1/2/42 carry pilot+marine and complete, seed 42 captures a prize; suite Ran 1961 OK (ADR-376); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794939942.0397522,
+      "timestamp_str": "2026-11-17 21:25:42",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "crew-builder-consolidation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'crew-builder-consolidation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794939976.32394,
+      "timestamp_str": "2026-11-17 21:26:16",
+      "agent": "kilo:goal",
+      "head": "8823c6f033a548c653be46b2221b6567b63e13aa",
       "delivery": {
         "roots": [
           "."
