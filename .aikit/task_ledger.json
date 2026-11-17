@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "cockpit-supply-locker",
+    "task_id": "supply-locker-layout-test",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794895253.6347136,
+    "updated_at": 1794896890.9520938,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794895274.5928671,
-    "completed_head": "acaa150bcefdee44b676e8f095c41bfe1ae2600b",
-    "completed_tree": "0abf6abef840fad692cc371e9ce80386f79ac9d2"
+    "completed_at": 1794896933.541883,
+    "completed_head": "df29fbf79459fea18a7ed14f91ea337977982fda",
+    "completed_tree": "774f12c6d7365e36018118daa43d6f764fb181a8"
   },
   "checkpoints": [
-    {
-      "task_id": "combat-action-policy",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] Seeds 1/2/42 complete Act VI with 7 combat actions observed and 0-2 insurance rebuilds; gate unchanged 57/67, 0 gaps; suite Ran 1909 OK (ADR-362); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794853905.2605631,
-      "timestamp_str": "2026-11-16 21:31:45",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "combat-action-policy",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'combat-action-policy' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794853959.129573,
-      "timestamp_str": "2026-11-16 21:32:39",
-      "agent": "kilo:goal",
-      "head": "a1c09d923b8000ddb6b0f3e8c06c1363973a939d",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "repl-command-parity",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Wire the seven advertised REPL commands and list every real surface in help",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794857583.2037904,
-      "timestamp_str": "2026-11-16 22:33:03",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The REPL help advertised quests, ai, messages, depot, land, mercs and allies, but all seven printed Unknown command; meanwhile many working surfaces (character, research, outpost, diplomacy, route, navigate, weapons, reactor, refit, codex, log, events, crew, away, surface, pirate, customs, decision, settings, quantum) were absent from help",
-        "benefits": "The interactive command matrix is truthful and complete; the CLI reaches parity with the argparse surface without leaving the REPL",
-        "risks": "contract: none (dispatch-only wiring of existing handlers); dependency: none; concurrency: none; state: none",
-        "mitigation": "failing-first REPL tests driving a scripted input session, real piped REPL run, full suite and 5/5 gates"
-      },
-      "plan_digest": "c1aee0b0c71e4fc19b3e5fdbeb6ca246c30076dc05c49a9c7c3f77af742a946c",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "repl-command-parity",
       "phase": "phase 4",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 09:01:14",
       "agent": "kilo:goal",
       "head": "acaa150bcefdee44b676e8f095c41bfe1ae2600b",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "supply-locker-layout-test",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Pin the cockpit supply locker contract in the static layout tests",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794896497.970347,
+      "timestamp_str": "2026-11-17 09:21:37",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The SUPPLY LOCKER shipped with real-Edge DOM evidence and a closed UI task, but no tests/test_cockpit_layout.py pin; unlike the jettison control (ADR-356) and drone badge (ADR-357), a later refactor could drop the disclosure, the render call or the inventory routes without a red test",
+        "benefits": "The markup position, disclosure wiring, catalog/manifest derivation, honest gate texts and both inventory routes become regression-checked; future UI edits cannot silently remove the terminal",
+        "risks": "contract: none (test-only); dependency: none; concurrency: none; state: none",
+        "mitigation": "source-pin tests mirroring the existing jettison and drone-badge patterns, plus the full suite and 5/5 gates"
+      },
+      "plan_digest": "65fbbfc211af2850d873d981ae64fd6028d971dd939fd9cbbe6e032ceb1aa01b",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "supply-locker-layout-test",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/3] Seven source pins for the supply locker pass; suite Ran 1932 OK; 5/5 gates (ADR-369); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794896890.9520938,
+      "timestamp_str": "2026-11-17 09:28:10",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "supply-locker-layout-test",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'supply-locker-layout-test' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794896933.6175604,
+      "timestamp_str": "2026-11-17 09:28:53",
+      "agent": "kilo:goal",
+      "head": "df29fbf79459fea18a7ed14f91ea337977982fda",
       "delivery": {
         "roots": [
           "."
