@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "supply-terminal-catalog",
+    "task_id": "cockpit-supply-locker",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794892423.9435925,
+    "updated_at": 1794895253.6347136,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794892471.4459982,
-    "completed_head": "6cf654f6516cdf29f27f8bfed9ce35bd4f1e718d",
-    "completed_tree": "c8b2973e613098df2a13423e68b4ca7c69831631"
+    "completed_at": 1794895274.5928671,
+    "completed_head": "acaa150bcefdee44b676e8f095c41bfe1ae2600b",
+    "completed_tree": "0abf6abef840fad692cc371e9ce80386f79ac9d2"
   },
   "checkpoints": [
-    {
-      "task_id": "progression-gate-retry",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] Seeds 1/2/42 complete Act VI and found outposts with upgrade/module/repair; 0 gaps/0 errors; gate unchanged 57/67 (ADR-361); suite Ran 1897 OK; 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794848755.8227026,
-      "timestamp_str": "2026-11-16 20:05:55",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "progression-gate-retry",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'progression-gate-retry' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794848841.9150996,
-      "timestamp_str": "2026-11-16 20:07:21",
-      "agent": "kilo:goal",
-      "head": "996a4c4a6dbe09cba643133886748588461bd8e7",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "combat-action-policy",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Choose combat actions by state instead of always firing lasers",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794849998.2554398,
-      "timestamp_str": "2026-11-16 20:26:38",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The captain fires lasers on every combat step; 2,000-step probes die repeatedly (up to 5 insurance claims on seed 42) and never exercise shield absorb, reactor venting, subsystem targeting, boarding, drone strike, evasive burn or flee",
-        "benefits": "Combat survives longer and the tactical surface is genuinely exercised by the shared headless core; the 180-step gate can show several combat actions",
-        "risks": "contract: none; dependency: none; concurrency: none; state: page-memory per-encounter action memory",
-        "mitigation": "failing-first unit tests per action and per gate, three-seed 2,000-step probes, unchanged 180-step gate gaps, full suite and 5/5 gates"
-      },
-      "plan_digest": "6f1e48712b2e207a059c0d1610382b604aa1920dd7523b9b3dee84ae55926d8e",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "combat-action-policy",
       "phase": "phase 4",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 08:14:31",
       "agent": "kilo:goal",
       "head": "6cf654f6516cdf29f27f8bfed9ce35bd4f1e718d",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "cockpit-supply-locker",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Add a cockpit SUPPLY LOCKER in the SHIP tab that buys and uses the station consumables",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794894978.528462,
+      "timestamp_str": "2026-11-17 08:56:18",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The engine, REST and CLI can buy and use station consumables and /api/state now carries catalog_items, but the cockpit had no way to buy or use any of the four items, so a player taking hull damage in deep space could not apply the repair paste without leaving the UI",
+        "benefits": "Cockpit parity with the terminal; the four consumables are discoverable with price, held count and effect; BUY and USE never lie about their gates",
+        "risks": "contract: none (new additive panel); dependency: none; concurrency: none; state: none (renders from snapshot)",
+        "mitigation": "bounded UI task with fast+snapshot proofs, real Edge DOM measurements at 1366x768 and 1280x720, ui_browser and ui_audit clean, full suite and 5/5 gates"
+      },
+      "plan_digest": "ded8d1d04a9105b470bf75d4de54fa0c0939db3a2e472764bb14776717ea477f",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "cockpit-supply-locker",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/4] Supply locker verified in real Edge: buy 2000->1750 cr and held x1, use after hull 40 restores 75/100 and held x0; 0 console errors; no overflow at 1366x768/1280x720; ui_browser and ui_audit clean; suite Ran 1925 OK; 5/5 gates; UI task closed (ADR-368); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794895253.6347136,
+      "timestamp_str": "2026-11-17 09:00:53",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "cockpit-supply-locker",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'cockpit-supply-locker' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794895274.6702,
+      "timestamp_str": "2026-11-17 09:01:14",
+      "agent": "kilo:goal",
+      "head": "acaa150bcefdee44b676e8f095c41bfe1ae2600b",
       "delivery": {
         "roots": [
           "."
