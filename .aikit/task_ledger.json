@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "combat-decoy-control",
+    "task_id": "captain-last-resort-decoy",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794900104.3471854,
+    "updated_at": 1794907620.165619,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794900189.1527796,
-    "completed_head": "1e354d920befcf439fd7070d3a78ac6c5d245c3f",
-    "completed_tree": "dbcd3096adbf64075e3ff0def4daab7ad6567ba8"
+    "completed_at": 1794907649.7148361,
+    "completed_head": "ea1e1d0244bf4887d470ed3f34a1d63a3fea90ca",
+    "completed_tree": "21befff46435834145119eacd5d4fbfde926202c"
   },
   "checkpoints": [
-    {
-      "task_id": "repl-guard-hatches",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] encounter, state-machines and ? now run under a pending decision; suite Ran 1912 OK; 5/5 gates (ADR-364); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794860702.636448,
-      "timestamp_str": "2026-11-16 23:25:02",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "repl-guard-hatches",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'repl-guard-hatches' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794860773.9162254,
-      "timestamp_str": "2026-11-16 23:26:13",
-      "agent": "kilo:goal",
-      "head": "c69f370d2d8b2df354c5bd423c488a48576b09cc",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "repl-grouped-surfaces",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Stop comms from meaning story and expose every grouped CLI surface in the REPL",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794862181.0858219,
-      "timestamp_str": "2026-11-16 23:49:41",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The non-interactive CLI's comms group opens AI captains and the quantum inbox, but the REPL's comms alias opened the story campaign; the other eight grouped surfaces (flight, narrative, engineering, fitting, logistics, progress, empire, intel) worked outside the REPL but printed Unknown command inside it",
-        "benefits": "One vocabulary works in both front ends; the interactive cockpit can reach the grouped surfaces without leaving the session; the story keeps its own unambiguous aliases",
-        "risks": "contract: REPL comms output changes from story to comms; dependency: none; concurrency: none; state: none",
-        "mitigation": "failing-first REPL test pinning comms vs story and the grouped dispatches, real piped REPL run, full suite and 5/5 gates"
-      },
-      "plan_digest": "2d3212236dd4fb3eb01dd01a354841df38b2c9ef0c681d10cfb10033b326bead",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "repl-grouped-surfaces",
       "phase": "phase 4",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 10:23:09",
       "agent": "kilo:goal",
       "head": "1e354d920befcf439fd7070d3a78ac6c5d245c3f",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "captain-last-resort-decoy",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Let the captain buy a decoy and use it when fuel cannot buy an escape",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794901231.7602096,
+      "timestamp_str": "2026-11-17 10:40:31",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-362's combat policy can only leave a fight with fuel: flee needs 8, evasive burn needs 3. With less than 3 fuel the captain fires until it dies even though ADR-370 made a held ECM decoy a guaranteed escape, and the supply run only ever buys a repair paste",
+        "benefits": "The full decoy loop (buy at a dock, deploy in a doomed fight) is exercised headlessly; fewer insurance rebuilds; the evade_combat effect is covered without manual UI play",
+        "risks": "contract: none; dependency: none; concurrency: none; state: one purchase and one use per encounter in page memory",
+        "mitigation": "failing-first unit tests for the purchase order and the last-resort branch, a scripted doomed-fight HTTP probe, three-seed campaigns, unchanged 180-step gate, full suite and 5/5 gates"
+      },
+      "plan_digest": "78a28ab375feadef9b7620abacf3770de272a15fd0542e82844621febfcb2ca9",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "captain-last-resort-decoy",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/4] Gate 56 families/57 of 70, 0 gaps/0 errors, supply 2, war 1, trade 1; seeds 1/2/42 complete Act VI with paste+decoy purchases and 0-1 insurance; scripted doomed fight clears via decoy; suite Ran 1948 OK (ADR-371); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794907620.165619,
+      "timestamp_str": "2026-11-17 12:27:00",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "captain-last-resort-decoy",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'captain-last-resort-decoy' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794907649.776277,
+      "timestamp_str": "2026-11-17 12:27:29",
+      "agent": "kilo:goal",
+      "head": "ea1e1d0244bf4887d470ed3f34a1d63a3fea90ca",
       "delivery": {
         "roots": [
           "."
