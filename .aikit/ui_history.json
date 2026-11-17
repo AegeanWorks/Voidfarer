@@ -3109,5 +3109,33 @@
     "final_snapshot_entries": 1382,
     "surface_digest": "bd157527849769bdfe5af6edb2fe036c220692a786b59091f80b3f88abd1716f",
     "baseline_digest": "060f3a592b5ae8bbcca6844641afe3abb4923047024460747028055deaa9e581"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "e9e0393212cab77bb8de570c0adb0c80f8c16db7",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794898757.4160428,
+    "finished_at": 1794899773.753749,
+    "strikes": 2,
+    "reviewer": "kilo:goal per G-015 via DOM measurement (this model has no vision): real Edge (Playwright msedge) on a fresh save with an active Corsair combat, fuel 5 and one decoy held. At 1366x768 SHOW MORE TACTICS shows '^ ECM DECOY (1)' enabled with title 'Deploy a tactical ECM decoy: breaks the hostile lock and escapes combat'; FLEE is disabled reading 'NEED 8 FUEL TO FLEE' with title '...fight on, deploy an ECM decoy, or burn a fuel cell from the Ship tab'. Clicking the decoy cleared combat (active_combat false, combat card display none), removed the decoy from cargo, and logged '[SYS] Deployed Tactical ECM Decoy Flare! Scrambled hostile sensor lock and escaped combat encounter.' At 1280x720 with no decoy the button is disabled reading 'NO ECM DECOY' with title 'Buy an ECM decoy at a station terminal (Ship -> Supply Locker)', and FLEE keeps the decoy hint. 0 console or page errors; the combat card never overflowed (clientWidth == scrollWidth 458 at both sizes); official tools/ui_browser.py combat scenario reports 0 errors/0 hscroll/0 tiny; tools/ui_audit.py --scenario combat reports 0 errors/clipped/offscreen/tiny/contrast/unlabeled/overlaps. Screenshots and measure.json are in ui-review/combat-decoy/. Layout pins for the new control were added after the bounded surface proof and are covered by the suite.",
+    "allowed_removals": [
+      {
+        "pattern": "tests/test_cockpit_layout.py",
+        "reason": "The new combat decoy control needs its static layout pins in the same change (ADR-370); the UI contract lists tests as protected"
+      }
+    ],
+    "allowed_tests": [],
+    "final_snapshot_digest": "e854b759835b06e71a792b6abf08f7f66f3849d7727639b1bf728943e456b68e",
+    "final_snapshot_entries": 1385,
+    "surface_digest": "5cde9f73b4873c495870a1b2f12c0a1d97c9e631d46badd205b82cf3d1908a03",
+    "baseline_digest": "bd157527849769bdfe5af6edb2fe036c220692a786b59091f80b3f88abd1716f"
   }
 ]

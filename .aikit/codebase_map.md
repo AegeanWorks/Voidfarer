@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `571`
+- **Total Classes**: `572`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2882`
-- **Total Source Lines**: `66190`
+- **Total Class Methods**: `2887`
+- **Total Source Lines**: `66224`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -692,7 +692,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3479` lines (`160039` bytes)
+**Size**: `3513` lines (`161857` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1244,6 +1244,12 @@
   - Method `.test_each_use_effect_has_an_honest_gate()`
   - Method `.test_the_buttons_post_the_inventory_routes()`
   - Method `.test_the_rows_are_styled()`
+- `class TestCombatDecoyControl` - *A held ECM decoy is usable from the combat card, not just the Ship tab (ADR-370).*
+  - Method `.setUpClass()`
+  - Method `.test_the_decoy_sits_with_the_secondary_combat_tactics()`
+  - Method `.test_the_control_is_wired_to_the_inventory_route()`
+  - Method `.test_the_button_state_reads_the_hold_and_explains_the_gate()`
+  - Method `.test_the_low_fuel_flee_names_the_decoy_alternative()`
 
 ---
 

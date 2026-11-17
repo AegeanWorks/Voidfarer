@@ -3477,3 +3477,37 @@ class TestSupplyLockerControl(unittest.TestCase):
         for selector in (".supply-list {", ".supply-row {", ".supply-price {",
                          ".supply-actions .btn-hud {"):
             self.assertIn(selector, self.css)
+
+class TestCombatDecoyControl(unittest.TestCase):
+    """A held ECM decoy is usable from the combat card, not just the Ship tab (ADR-370)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+
+    def test_the_decoy_sits_with_the_secondary_combat_tactics(self):
+        self.assertIn('id="btnCombatDecoy"', self.html)
+        self.assertLess(self.html.index("btnCombatGambit"), self.html.index("btnCombatDecoy"))
+        self.assertLess(self.html.index("btnCombatDecoy"), self.html.index("combatSubsystemsRow"))
+
+    def test_the_control_is_wired_to_the_inventory_route(self):
+        self.assertIn('this.btnCombatDecoy = document.getElementById("btnCombatDecoy");', self.js)
+        self.assertIn(
+            'this.btnCombatDecoy.addEventListener("click", () => this.handleCombatItem("decoy_countermeasure"));',
+            self.js,
+        )
+        block = self.js.split("    async handleCombatItem(itemId) {", 1)[1].split("    async handleCombat(", 1)[0]
+        self.assertIn('"/api/inventory/use"', block)
+        self.assertIn("item_id: itemId", block)
+
+    def test_the_button_state_reads_the_hold_and_explains_the_gate(self):
+        block = self.js.split("if (this.btnCombatDecoy) {", 1)[1].split("if (this.btnCombatFlee)", 1)[0]
+        self.assertIn("decoy_countermeasure", block)
+        self.assertIn("this.btnCombatDecoy.disabled", block)
+        self.assertIn("Buy an ECM decoy at a station terminal", block)
+        self.assertIn("this.btnCombatDecoy.textContent", block)
+
+    def test_the_low_fuel_flee_names_the_decoy_alternative(self):
+        block = self.js.split("if (this.btnCombatFlee) {", 1)[1].split("if (this.btnCombatGambit)", 1)[0]
+        self.assertIn("deploy an ECM decoy", block)

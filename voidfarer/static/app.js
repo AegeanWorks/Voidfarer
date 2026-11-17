@@ -719,6 +719,7 @@ class CockpitApp {
         this.btnCombatDrone = document.getElementById("btnCombatDrone");
         this.btnCombatBoard = document.getElementById("btnCombatBoard");
         this.btnCombatGambit = document.getElementById("btnCombatGambit");
+        this.btnCombatDecoy = document.getElementById("btnCombatDecoy");
         this.btnToggleCombatTactics = document.getElementById("btnToggleCombatTactics");
         this.combatTacticsDetails = document.getElementById("combatTacticsDetails");
         this.btnCombatPdc = document.getElementById("btnCombatPdc");
@@ -1516,6 +1517,9 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
         if (this.btnCombatGambit) {
             this.btnCombatGambit.addEventListener("click", () => this.postAction("/api/combat/gambit", {}));
+        }
+        if (this.btnCombatDecoy) {
+            this.btnCombatDecoy.addEventListener("click", () => this.handleCombatItem("decoy_countermeasure"));
         }
         if (this.btnCombatDrone) {
             this.btnCombatDrone.addEventListener("click", () => this.handleCombat("drone_strike"));
@@ -2789,6 +2793,14 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                             ? `Board only below ${crippledAt} hull`
                             : "Send the marine party across";
             }
+            if (this.btnCombatDecoy) {
+                const decoys = Number((ship.cargo || {}).decoy_countermeasure || 0);
+                this.btnCombatDecoy.disabled = decoys <= 0;
+                this.btnCombatDecoy.textContent = decoys > 0 ? `⌁ ECM DECOY (${decoys})` : "NO ECM DECOY";
+                this.btnCombatDecoy.title = decoys > 0
+                    ? "Deploy a tactical ECM decoy: breaks the hostile lock and escapes combat"
+                    : "Buy an ECM decoy at a station terminal (Ship -> Supply Locker)";
+            }
             if (this.btnCombatFlee) {
                 // The emergency micro-jump is the guaranteed way out; it burns 8 fuel (engine combat_action "flee").
                 const fuel = Number(ship.fuel || 0);
@@ -2796,7 +2808,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.btnCombatFlee.disabled = tooLow;
                 this.btnCombatFlee.textContent = tooLow ? "↯ NEED 8 FUEL TO FLEE" : "↯ FLEE SECTOR (-8 FUEL)";
                 this.btnCombatFlee.title = tooLow
-                    ? `The emergency jump burns 8 fuel and you have ${fuel}: fight on, or burn a fuel cell from the Ship tab`
+                    ? `The emergency jump burns 8 fuel and you have ${fuel}: fight on, deploy an ECM decoy, or burn a fuel cell from the Ship tab`
                     : "Guaranteed escape: an emergency micro-jump out of the sector";
             }
             if (this.btnCombatGambit) {
@@ -6178,6 +6190,11 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
     }
 
     // --- Actions ---
+
+    async handleCombatItem(itemId) {
+        this.sound.init();
+        await this.postAction("/api/inventory/use", { item_id: itemId }, "ship");
+    }
 
     async handleCombat(action) {
         this.sound.init();
