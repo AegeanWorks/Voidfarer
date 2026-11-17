@@ -589,10 +589,34 @@ def cmd_inventory(engine: SimulationEngine, storage: StorageManager, parts: list
             print(f"{item['id']:<24} {BOLD}{item['name']:<24}{RESET} {CYAN}{item['category']:<14}{RESET} {item['quantity']:>6} {item['total_volume']:>10} {usable_str:<8}")
             print(f"  {DIM}└─ {item['description']}{RESET}")
         print(f"{'-' * 90}")
-        print(f"Subcommands: {BOLD}inventory buy <item_id> [qty]{RESET} | {BOLD}inventory use <item_id>{RESET} | {BOLD}inventory jettison <item_id> <quantity>{RESET}")
+        print(f"Subcommands: {BOLD}inventory shop{RESET} | {BOLD}inventory buy <item_id> [qty]{RESET} | {BOLD}inventory use <item_id>{RESET} | {BOLD}inventory jettison <item_id> <quantity>{RESET}")
         return 0
 
     sub = parts[1].lower()
+    if sub in ("shop", "catalog", "store", "supplies"):
+        print(f"\n{BOLD}{CYAN}=== STATION SUPPLY TERMINAL ==={RESET}")
+        docked = bool(engine.docked_body and engine.docked_body.station_dockable)
+        for item in sorted(ITEM_CATALOG.values(), key=lambda entry: entry.base_price):
+            if item.category != "consumable" or not item.is_usable:
+                continue
+            qty = int((ship.cargo or {}).get(item.id, 0))
+            print(
+                f"  {CYAN}{item.id:<26}{RESET} {BOLD}{item.name:<26}{RESET} "
+                f"{YELLOW}{item.base_price:>5} cr{RESET}  VOL {item.volume}  "
+                f"HELD {GREEN if qty else DIM}x{qty}{RESET}"
+            )
+            effect = (
+                f"{item.effect_type} +{item.effect_amount}"
+                if item.effect_amount
+                else item.effect_type
+            )
+            print(f"    {DIM}{item.description} [{effect}]{RESET}")
+        if docked:
+            print(f"{DIM}Buy: inventory buy <item_id> [qty]{RESET}")
+        else:
+            print(f"{YELLOW}Dock at a station or colony terminal to buy.{RESET}")
+        return 0
+
     if sub == "buy":
         if len(parts) < 3:
             consumables = ", ".join(sorted(k for k, v in ITEM_CATALOG.items() if v.category == "consumable"))
@@ -638,7 +662,7 @@ def cmd_inventory(engine: SimulationEngine, storage: StorageManager, parts: list
             storage.save(engine.state)
         return 0 if ok else 1
 
-    print(f"{RED}Unknown inventory command '{sub}'. Options: list, buy <id> [qty], use <id>, jettison <id> [qty].{RESET}")
+    print(f"{RED}Unknown inventory command '{sub}'. Options: list, shop, buy <id> [qty], use <id>, jettison <id> [qty].{RESET}")
     return 1
 
 
@@ -4011,7 +4035,7 @@ def cmd_repl(engine: SimulationEngine, storage: StorageManager) -> int:
             print("  land <body_id>                 - Land on a habitable body")
             print("  surface [list|op|land]         - Landing-party surface operations")
             print("  reconstruct <body_id> [--relief] - Rebuild a devastated inhabited world")
-            print("  inventory [buy|use|jettison]   - Hold manifest, station consumables & usable items")
+            print("  inventory [shop|buy|use|jettison] - Hold manifest, station consumables & usable items")
             print("  market                         - Check commodity trade prices")
             print("  buy <comm> <qty|max>           - Buy commodities (max: all you can afford and hold)")
             print("  sell <comm> <qty|all>          - Sell commodities (all: the whole hold of it)")
@@ -4152,7 +4176,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     autotrade_p.add_argument("sell_above", nargs="?", type=int, help="Sell at or above this price")
     autotrade_p.add_argument("quantity", nargs="?", type=int, default=1, help="Units per automated trade")
     inv_p = subparsers.add_parser("inventory", help=argparse.SUPPRESS)
-    inv_p.add_argument("action", nargs="?", default="list", choices=["list", "buy", "use", "jettison"])
+    inv_p.add_argument("action", nargs="?", default="list", choices=["list", "shop", "buy", "use", "jettison"])
     inv_p.add_argument("arg1", nargs="?", help="Item ID")
     inv_p.add_argument("arg2", nargs="?", help="Quantity")
     shipyard_p = subparsers.add_parser("shipyard", help=argparse.SUPPRESS)

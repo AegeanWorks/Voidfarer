@@ -9,8 +9,8 @@
 - **Total Python Modules**: `237`
 - **Total Classes**: `575`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2916`
-- **Total Source Lines**: `66578`
+- **Total Class Methods**: `2918`
+- **Total Source Lines**: `66628`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -594,7 +594,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `810` lines (`37846` bytes)
+**Size**: `836` lines (`39131` bytes)
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -639,6 +639,8 @@
 - `class TestCLIStabilization` - *Regression tests for numeric guards and the station consumable terminal.*
   - Method `.setUp()`
   - Method `.test_inventory_jettison_non_numeric_quantity_is_handled()`
+  - Method `.test_inventory_shop_lists_consumables_with_prices()`
+  - Method `.test_inventory_shop_names_the_dock_gate_when_undocked()`
   - Method `.test_inventory_buy_usage_without_item_id()`
   - Method `.test_inventory_buy_consumable_at_station()`
   - Method `.test_repl_repair_and_refuel_reject_non_numeric_amounts()`
@@ -4936,7 +4938,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4933` lines (`244268` bytes)
+**Size**: `4957` lines (`245456` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*

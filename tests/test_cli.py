@@ -280,6 +280,32 @@ class TestCLIStabilization(_IsolatedCliTestCase):
         self.assertEqual(code, 1)
         self.assertIn("integer", mock_out.getvalue().lower())
 
+    def test_inventory_shop_lists_consumables_with_prices(self):
+        engine = SimulationEngine(seed=42)
+        engine.orbit("sol_body_1")
+        engine.state = engine._clone_state(ship=engine._clone_ship(credits=5000))
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = cmd_inventory(engine, self.storage, ["inventory", "shop"])
+        out = mock_out.getvalue()
+        self.assertEqual(code, 0)
+        for token in ("STATION SUPPLY TERMINAL", "nanite_repair_paste",
+                      "Nanite Repair Matrix", "250", "decoy_countermeasure",
+                      "350", "x0", "inventory buy"):
+            self.assertIn(token, out)
+
+    def test_inventory_shop_names_the_dock_gate_when_undocked(self):
+        engine = SimulationEngine(seed=42)
+        with engine.lock:
+            engine.state = engine._clone_state(
+                ship=engine._clone_ship(orbiting_body_id=None)
+            )
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
+            code = cmd_inventory(engine, self.storage, ["inventory", "shop"])
+        out = mock_out.getvalue()
+        self.assertEqual(code, 0)
+        self.assertIn("Dock at a station or colony terminal", out)
+        self.assertNotIn("Buy: inventory buy", out)
+
     def test_inventory_buy_usage_without_item_id(self):
         with patch("sys.stdout", new_callable=io.StringIO) as mock_out:
             code = main(["inventory", "buy"])

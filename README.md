@@ -298,6 +298,7 @@ python -m voidfarer.cli economy
 
 # Inspect the cargo manifest, buy station consumables, and use them in space
 python -m voidfarer.cli inventory
+python -m voidfarer.cli inventory shop
 python -m voidfarer.cli inventory buy nanite_repair_paste 2
 python -m voidfarer.cli inventory use nanite_repair_paste
 python -m voidfarer.cli inventory jettison titanium 1
@@ -308,7 +309,8 @@ python -m voidfarer.cli autotrade status
 python -m voidfarer.cli autotrade off
 ```
 The cockpit mirrors the same terminal in **SHIP → SUPPLY LOCKER**: buy at a docked station or
-colony, then use the held consumable anywhere in space. The ECM decoy also has its own DECOY
+colony, then use the held consumable anywhere in space. The `inventory shop` subcommand lists the
+same four items with their prices, effects and held counts. The ECM decoy also has its own DECOY
 button in the combat card's tactics, so a hostile lock can be broken when the 8-fuel flee is out
 of reach.
 Auto-trade buys below its threshold or sells above it once per 3 ticks while docked, respecting cargo, credits, stock and faction pricing. Quantum auto-freight ships surplus cargo on the best net route every 6 ticks above a chosen minimum. The Commerce tab exposes both policies below the market table behind `SHOW AUTO-TRADE` and `SHOW QUANTUM FREIGHT` disclosures, so the exchange stays the primary surface.
