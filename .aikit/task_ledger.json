@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "anomaly-check-readiness",
+    "task_id": "decoy-after-burn",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794913080.3455124,
+    "updated_at": 1794918035.0213747,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794913121.8428514,
-    "completed_head": "05802ba2373ce3427ed1a131d46081d83d5967a4",
-    "completed_tree": "0000ecfecb80d82a0e6f741f324e128e2cad1cbe"
+    "completed_at": 1794918047.6888986,
+    "completed_head": "995e457713272ea553e03f216289143ecedeedae",
+    "completed_tree": "167871ec7e87546e65eb6e22e8c021ca99a4b7d9"
   },
   "checkpoints": [
-    {
-      "task_id": "voidfarer-oath-dive",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/4] Seeds 2/42 dive and emerge once at Act IV and still complete; seed 1 stays at 0 shields with honest readiness; 180-step gate unchanged 57/67, 0 gaps; suite Ran 1919 OK (ADR-366); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794866679.8116598,
-      "timestamp_str": "2026-11-17 01:04:39",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "voidfarer-oath-dive",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'voidfarer-oath-dive' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794866782.9942422,
-      "timestamp_str": "2026-11-17 01:06:22",
-      "agent": "kilo:goal",
-      "head": "f3550ba5675e11286a7fbe3c11c1709f308c85e4",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "supply-terminal-catalog",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Expose the item catalog and let the captain buy and use station supplies",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794890631.8597462,
-      "timestamp_str": "2026-11-17 07:43:51",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The engine, CLI and REST all support buying and consuming station items, but no item catalog reaches /api/state or /api/catalogs, and the AI captain has never bought or used a consumable; three inventory routes are excused as unreachable with a reason that the API itself contradicts",
-        "benefits": "Clients can render a supplies terminal from one code-constant catalog; the captain exercises item purchase and use for real; inventory coverage becomes honest",
-        "risks": "contract: snapshot/catalogs gain catalog_items (additive); dependency: none; concurrency: none; state: captain buys one repair paste and uses it when hurt in space",
-        "mitigation": "failing-first catalog and policy tests, three-seed 2,000-step probes, 180-step gate, full suite and 5/5 gates"
-      },
-      "plan_digest": "94e672b1afe62a5a8ef8b1650cb91f77dbfd9f582583f47f7624ba86987d3614",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "supply-terminal-catalog",
       "phase": "in_progress",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 13:58:41",
       "agent": "kilo:goal",
       "head": "05802ba2373ce3427ed1a131d46081d83d5967a4",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "decoy-after-burn",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Deploy the held decoy when the evasive burn is spent or unaffordable",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794917649.9025059,
+      "timestamp_str": "2026-11-17 15:14:09",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-371 bought and armed the decoy, but the branch required under 3 fuel, so campaigns still died after failed evasive burns with fuel remaining and never deployed it (combat_item absent on all three seeds)",
+        "benefits": "The decoy loop now closes in real campaigns; a guaranteed escape is available after the one-shot burn fails; no extra purchases or balance change",
+        "risks": "contract: none; dependency: none; concurrency: none; state: one decoy per fight",
+        "mitigation": "failing-first policy test, three-seed campaigns, unchanged gate, full suite and 5/5 gates"
+      },
+      "plan_digest": "a5e31cd60ad0d3d86bd6275486607d42c675437662b467ff6bdf043c1517e08b",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "decoy-after-burn",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/3] combat_item 1 on seeds 1/2/42, campaigns complete with 0 gaps/0 errors and 16-17 refusals; gate unchanged 58/59 of 69; suite Ran 1956 OK (ADR-373); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794918035.0213747,
+      "timestamp_str": "2026-11-17 15:20:35",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "decoy-after-burn",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'decoy-after-burn' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794918047.7628598,
+      "timestamp_str": "2026-11-17 15:20:47",
+      "agent": "kilo:goal",
+      "head": "995e457713272ea553e03f216289143ecedeedae",
       "delivery": {
         "roots": [
           "."
