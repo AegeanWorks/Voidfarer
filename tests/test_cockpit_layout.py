@@ -3424,4 +3424,56 @@ class TestDroneYieldBadgeHonesty(unittest.TestCase):
     def test_the_waiting_badge_is_styled_distinctly(self):
         self.assertIn(".drone-yield-badge.is-waiting {", self.css)
 
+class TestSupplyLockerControl(unittest.TestCase):
+    """The SHIP tab's supply locker buys and uses station consumables (ADR-368/369)."""
 
+    @classmethod
+    def setUpClass(cls):
+        cls.html = INDEX_HTML.read_text(encoding="utf-8")
+        cls.js = APP_JS.read_text(encoding="utf-8")
+        cls.css = STYLE_CSS.read_text(encoding="utf-8")
+
+    def test_the_locker_sits_in_the_ship_tab_after_fabrication(self):
+        self.assertIn('id="btnToggleSupplies"', self.html)
+        self.assertIn('id="supplyDetails" hidden', self.html)
+        self.assertIn('id="supplyList"', self.html)
+        self.assertIn("SUPPLY LOCKER", self.html)
+        self.assertLess(self.html.index("btnJettisonOre"), self.html.index("btnToggleSupplies"))
+        self.assertLess(self.html.index("btnToggleSupplies"), self.html.index("tabContentEmpire"))
+
+    def test_the_disclosure_is_wired(self):
+        self.assertIn('this.btnToggleSupplies = document.getElementById("btnToggleSupplies");', self.js)
+        self.assertIn('[this.btnToggleSupplies, this.supplyDetails],', self.js)
+
+    def test_render_ship_renders_the_locker(self):
+        block = self.js.split("    renderShip() {", 1)[1].split("    renderShipInterior(", 1)[0]
+        self.assertIn("this.renderSupplies();", block)
+
+    def test_the_locker_is_built_from_the_catalog_and_manifest(self):
+        block = self.js.split("    renderSupplies() {", 1)[1].split("    async handleSupply(", 1)[0]
+        self.assertIn("this.state.catalog_items", block)
+        self.assertIn('item.category === "consumable"', block)
+        self.assertIn("this.state.inventory_manifest", block)
+        self.assertIn("(this.state.drydock || {}).docked", block)
+        self.assertIn('data-supply="buy"', block)
+        self.assertIn('data-supply="use"', block)
+
+    def test_each_use_effect_has_an_honest_gate(self):
+        block = self.js.split("    renderSupplies() {", 1)[1].split("    async handleSupply(", 1)[0]
+        for effect in ("repair_hull", "recharge_shield", "refuel", "evade_combat"):
+            self.assertIn(f'"{effect}"', block)
+        self.assertIn("Hull is already at maximum.", block)
+        self.assertIn("Shields are already full.", block)
+        self.assertIn("Fuel tanks are already full.", block)
+        self.assertIn("Only usable during hostile combat.", block)
+
+    def test_the_buttons_post_the_inventory_routes(self):
+        block = self.js.split("    async handleSupply(action, itemId) {", 1)[1].split("    renderMarketTable() {", 1)[0]
+        self.assertIn('"/api/inventory/buy"', block)
+        self.assertIn('"/api/inventory/use"', block)
+        self.assertIn("quantity: 1", block)
+
+    def test_the_rows_are_styled(self):
+        for selector in (".supply-list {", ".supply-row {", ".supply-price {",
+                         ".supply-actions .btn-hud {"):
+            self.assertIn(selector, self.css)

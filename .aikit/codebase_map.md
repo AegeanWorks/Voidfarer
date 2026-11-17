@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `570`
+- **Total Classes**: `571`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2874`
-- **Total Source Lines**: `66138`
+- **Total Class Methods**: `2882`
+- **Total Source Lines**: `66190`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -692,7 +692,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3427` lines (`157162` bytes)
+**Size**: `3479` lines (`160039` bytes)
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1235,6 +1235,15 @@
   - Method `.test_ore_waiting_is_derived_from_free_volume()`
   - Method `.test_both_states_are_written_and_explained()`
   - Method `.test_the_waiting_badge_is_styled_distinctly()`
+- `class TestSupplyLockerControl` - *The SHIP tab's supply locker buys and uses station consumables (ADR-368/369).*
+  - Method `.setUpClass()`
+  - Method `.test_the_locker_sits_in_the_ship_tab_after_fabrication()`
+  - Method `.test_the_disclosure_is_wired()`
+  - Method `.test_render_ship_renders_the_locker()`
+  - Method `.test_the_locker_is_built_from_the_catalog_and_manifest()`
+  - Method `.test_each_use_effect_has_an_honest_gate()`
+  - Method `.test_the_buttons_post_the_inventory_routes()`
+  - Method `.test_the_rows_are_styled()`
 
 ---
 
