@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `577`
+- **Total Classes**: `578`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2932`
-- **Total Source Lines**: `66811`
+- **Total Class Methods**: `2941`
+- **Total Source Lines**: `66918`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1678` lines (`79710` bytes)
+**Size**: `1749` lines (`82816` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -265,6 +265,15 @@
   - Method `.test_the_mail_followup_reads_before_it_sends()`
   - Method `.test_a_resolved_branch_is_not_chosen_again()`
   - Method `.test_each_tree_node_is_keyed_by_its_message_id()`
+- `class ShipyardChassisTourTest` - *The captain commissions a fitting hull once the treasury can afford one (ADR-379).*
+  - Method `._captain(**state)`
+  - Method `.test_a_fitting_affordable_hull_is_commissioned()`
+  - Method `.test_the_cheapest_fitting_hull_wins()`
+  - Method `.test_a_cheap_hull_that_cannot_fit_the_hold_is_skipped()`
+  - Method `.test_it_waits_for_the_campaign_to_complete()`
+  - Method `.test_it_needs_a_dock_credits_reserve_and_hold_space()`
+  - Method `.test_the_current_class_is_not_rebought()`
+  - Method `.test_the_commission_is_one_shot()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4779,7 +4788,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1834` lines (`86648` bytes)
+**Size**: `1870` lines (`88432` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4810,6 +4819,7 @@
   - Method `._tour_story_choice()` - *Resolve the active chapter's first unlocked choice; the tour never touched the arc.*
   - Method `._void_dive_action()` - *Take the story's own void beat once: dive at the required horizon.*
   - Method `._supply_action()` - *Use a held repair paste when the hull is hurt outside a blocking encounter (ADR-367).*
+  - Method `._chassis_action()` - *Commission the cheapest fitting hull once, after Act VI at a service dock (ADR-379).*
   - Method `._tour_supply()` - *Buy the station repair paste so the item terminal is exercised (ADR-367).*
   - Method `._tour_supply_decoy()` - *Buy the last-resort ECM decoy once, separately so the paste cannot starve it (ADR-371).*
   - Method `._supply_purchase(item_id, fallback_price)`

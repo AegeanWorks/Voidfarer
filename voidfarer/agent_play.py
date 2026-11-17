@@ -51,7 +51,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/war/support": "faction wars are declared after the 180-step gate; the 2,000-step campaign supports one",
     "/api/inventory/jettison": "the captain sells or stores cargo instead of dumping it",
     "/api/ship/module": "needs an owned ship module",
-    "/api/shipyard/chassis": "needs a shipyard and a new hull purchase",
+    "/api/shipyard/chassis": "the 180-step treasury cannot cover a hull; the 2,000-step campaign commissions one",
     "/api/shipyard/sell": "needs a spare hull in the shipyard",
     "/api/outpost/upgrade": "needs a founded outpost",
     "/api/outpost/module": "needs a founded outpost and module credits",
@@ -178,6 +178,8 @@ class AiCaptain:
     SUPPLY_DECOY_ID = "decoy_countermeasure"
     SUPPLY_FALLBACK_DECOY_PRICE = 350
     SUPPLY_VOLUME = 1
+    # Keep enough credits for repairs and fuel after a capital hull purchase (ADR-379).
+    CHASSIS_CREDIT_RESERVE = 1000
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -361,6 +363,12 @@ class AiCaptain:
             dock = self._dockable_body()
             if dock and dock.get("id") != ship.get("orbiting_body_id"):
                 return "/api/travel", {"body_id": dock["id"], "mode": "sublight"}, "dock"
+
+        # A capital hull is the shipyard's headline purchase; take it once the treasury
+        # can cover the hull, a repair reserve and the current hold (ADR-379).
+        chassis = self._chassis_action()
+        if chassis is not None:
+            return chassis
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -908,6 +916,34 @@ class AiCaptain:
         if self._tour_action_attempted("/api/inventory/use", body):
             return None
         return "/api/inventory/use", body, "supply_use"
+
+    def _chassis_action(self):
+        """Commission the cheapest fitting hull once, after Act VI at a service dock (ADR-379)."""
+        if "/api/shipyard/chassis" in self.attempted or not self._is_docked():
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        ship = self.state.get("ship") or {}
+        credits = int(ship.get("credits") or 0)
+        used = int(ship.get("cargo_used_volume") or 0)
+        current_class = str(ship.get("ship_class") or "")
+        candidates: list[tuple[int, str]] = []
+        for chassis in self.state.get("available_chassis") or []:
+            if not isinstance(chassis, dict) or not chassis.get("id"):
+                continue
+            cost = int(chassis.get("cost") or 0)
+            capacity = int(chassis.get("cargo_capacity") or 0)
+            if cost <= 0 or capacity < used:
+                continue
+            if credits < cost + self.CHASSIS_CREDIT_RESERVE:
+                continue
+            if current_class and str(chassis.get("ship_class") or "") == current_class:
+                continue
+            candidates.append((cost, str(chassis["id"])))
+        if not candidates:
+            return None
+        chassis_id = min(candidates)[1]
+        return "/api/shipyard/chassis", {"chassis_id": chassis_id}, "chassis"
 
     def _tour_supply(self):
         """Buy the station repair paste so the item terminal is exercised (ADR-367)."""

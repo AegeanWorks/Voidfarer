@@ -1568,6 +1568,77 @@ class MessageTreePolicyTest(unittest.TestCase):
             "a follow-up node must stay reachable after its parent")
 
 
+class ShipyardChassisTourTest(unittest.TestCase):
+    """The captain commissions a fitting hull once the treasury can afford one (ADR-379)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "orbiting_body": {"id": "b1", "station_dockable": True},
+            "story_status": {"completed": True},
+            "ship": {"credits": 6000, "cargo_used_volume": 10, "cargo": {}},
+            "available_chassis": [
+                {"id": "orion_hauler", "ship_class": "Bulk Merchant Hauler",
+                 "cost": 4500, "cargo_capacity": 120},
+                {"id": "archon_dreadnought", "ship_class": "Command Battlecruiser",
+                 "cost": 12000, "cargo_capacity": 80},
+            ],
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_fitting_affordable_hull_is_commissioned(self):
+        self.assertEqual(
+            self._captain()._chassis_action(),
+            ("/api/shipyard/chassis", {"chassis_id": "orion_hauler"}, "chassis"),
+        )
+
+    def test_the_cheapest_fitting_hull_wins(self):
+        captain = self._captain(
+            ship={"credits": 7000, "cargo_used_volume": 10},
+            available_chassis=[
+                {"id": "big", "cost": 5200, "cargo_capacity": 120},
+                {"id": "cheap", "cost": 4500, "cargo_capacity": 120},
+            ])
+        self.assertEqual(captain._chassis_action()[1]["chassis_id"], "cheap")
+
+    def test_a_cheap_hull_that_cannot_fit_the_hold_is_skipped(self):
+        captain = self._captain(
+            ship={"credits": 6500, "cargo_used_volume": 10},
+            available_chassis=[
+                {"id": "tiny", "cost": 4500, "cargo_capacity": 5},
+                {"id": "roomy", "cost": 5000, "cargo_capacity": 120},
+            ])
+        self.assertEqual(captain._chassis_action()[1]["chassis_id"], "roomy")
+
+    def test_it_waits_for_the_campaign_to_complete(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._chassis_action())
+
+    def test_it_needs_a_dock_credits_reserve_and_hold_space(self):
+        self.assertIsNone(self._captain(orbiting_body=None)._chassis_action())
+        self.assertIsNone(self._captain(
+            ship={"credits": 5000, "cargo_used_volume": 10})._chassis_action())
+        self.assertIsNone(self._captain(
+            ship={"credits": 6000, "cargo_used_volume": 121})._chassis_action())
+
+    def test_the_current_class_is_not_rebought(self):
+        captain = self._captain(
+            ship={"credits": 6000, "cargo_used_volume": 10,
+                  "ship_class": "Bulk Merchant Hauler"})
+        self.assertIsNone(captain._chassis_action())
+
+    def test_the_commission_is_one_shot(self):
+        captain = self._captain()
+        captain.attempted.add("/api/shipyard/chassis")
+        self.assertIsNone(captain._chassis_action())
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 
