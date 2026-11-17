@@ -407,7 +407,7 @@ resolved before any dock trip can carry the ship away. In the 2,000-step campaig
 void beat also dives into the Hollow Between at the Cygnus horizon and surfaces again, which
 exercises the void lanes without losing the chapter orbit. The captain also buys a repair paste
 and an ECM decoy at station terminals, uses the paste when the hull is hurt, and deploys the decoy
-as a guaranteed escape when the tank is too low for a flee or an evasive burn.
+as a guaranteed escape when the tank is too low for a flee or after an evasive burn is spent.
 
 Click-map: dup/missing
 184 controls, 39 visible, 0 dup.

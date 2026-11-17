@@ -511,9 +511,9 @@ class AiCaptain:
             return pick("flee")
         if hull * 5 <= max_hull * 2 and fuel >= 3 and "evasive_burn" not in used:
             return pick("evasive_burn")
-        if hull * 2 <= max_hull and fuel < 3 and "decoy" not in used:
-            # Flee needs 8 fuel and a burn needs 3; below that the only guaranteed way
-            # out is the station decoy bought at a dock (ADR-371).
+        if hull * 2 <= max_hull and "decoy" not in used:
+            # Once the burn is spent (or fuel cannot buy one at all), the station decoy is
+            # the only guaranteed way out of a losing fight (ADR-371, ADR-373).
             if int((ship.get("cargo") or {}).get(self.SUPPLY_DECOY_ID) or 0) > 0:
                 used.add("decoy")
                 return "/api/inventory/use", {"item_id": self.SUPPLY_DECOY_ID}, "combat_item"

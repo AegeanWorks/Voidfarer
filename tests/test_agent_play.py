@@ -1097,6 +1097,15 @@ class CombatPolicyTest(unittest.TestCase):
         self.assertNotEqual(captain._choose(7)[1].get("item_id"), "decoy_countermeasure",
                             "one decoy buys one escape, not a loop")
 
+    def test_the_decoy_finishes_an_escape_after_the_burn_is_spent(self):
+        captain = self._captain(ship={
+            "hull": 25, "fuel": 5, "cargo": {"decoy_countermeasure": 1},
+        })
+        captain.combat_used.setdefault("c1", set()).add("evasive_burn")
+        action = captain._choose(7)
+        self.assertEqual(action[0], "/api/inventory/use")
+        self.assertEqual(action[1], {"item_id": "decoy_countermeasure"})
+
     def test_the_decoy_waits_while_fuel_can_still_escape(self):
         fueled = self._captain(ship={
             "hull": 20, "fuel": 5, "cargo": {"decoy_countermeasure": 1},
