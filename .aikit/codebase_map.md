@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `572`
+- **Total Classes**: `573`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2887`
-- **Total Source Lines**: `66224`
+- **Total Class Methods**: `2903`
+- **Total Source Lines**: `66408`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1349` lines (`64692` bytes)
+**Size**: `1486` lines (`70942` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -112,6 +112,7 @@
   - Method `.test_a_volume_full_empty_hold_does_not_attempt_a_buy()`
   - Method `.test_free_volume_buys_on_even_steps_only()`
   - Method `.test_missing_free_volume_falls_back_without_buying_into_a_full_hold()`
+  - Method `.test_unquoted_cargo_is_not_offered_to_the_market()`
 - `class ContractClaimTourTest` - *Finished contracts are banked, and each contract is claimed at most once (ADR-344).*
   - Method `._captain(contracts)`
   - Method `.test_a_completed_contract_is_offered_for_claim()`
@@ -216,6 +217,8 @@
   - Method `.test_high_enemy_shields_are_ion_pulsed_once()`
   - Method `.test_a_crippled_enemy_is_boarded_with_a_healthy_marine()`
   - Method `.test_a_tactical_drone_strikes()`
+  - Method `.test_a_fuel_less_fight_uses_a_held_decoy()`
+  - Method `.test_the_decoy_waits_while_fuel_can_still_escape()`
   - Method `.test_a_hot_but_safe_reactor_uses_point_defense()`
   - Method `.test_a_threatened_hull_attempts_a_bridge_strike()`
 - `class StoryTravelTourTest` - *Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360).*
@@ -237,9 +240,20 @@
   - Method `._captain(**state)`
   - Method `.test_a_docked_captain_buys_one_repair_paste()`
   - Method `.test_the_purchase_uses_the_published_catalog_price()`
+  - Method `.test_the_decoy_is_bought_at_a_late_dock_after_the_tour()`
+  - Method `.test_a_refused_refill_waits_for_its_cooldown()`
+  - Method `.test_a_consumable_is_never_traded_as_a_commodity()`
+  - Method `.test_the_second_purchase_is_a_decoy()`
+  - Method `.test_each_supply_item_has_its_own_purchase_signature()`
+  - Method `.test_an_unaffordable_decoy_is_skipped()`
   - Method `.test_no_purchase_without_a_dock_credits_or_hold_space()`
   - Method `.test_a_hurt_captain_uses_the_held_paste()`
   - Method `.test_no_use_when_healthy_empty_or_in_combat()`
+- `class WarSupportStateTest` - *A live war is supported from state, not from a tour slot that can miss (ADR-371).*
+  - Method `._captain(wars, attempted)`
+  - Method `.test_an_active_war_is_supported_immediately()`
+  - Method `.test_a_supported_war_is_not_supported_twice()`
+  - Method `.test_a_finished_war_is_ignored()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -4736,7 +4750,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1693` lines (`79874` bytes)
+**Size**: `1740` lines (`82537` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4764,7 +4778,9 @@
   - Method `._tour_story_choice()` - *Resolve the active chapter's first unlocked choice; the tour never touched the arc.*
   - Method `._void_dive_action()` - *Take the story's own void beat once: dive at the required horizon.*
   - Method `._supply_action()` - *Use a held repair paste when the hull is hurt outside a blocking encounter (ADR-367).*
-  - Method `._tour_supply()` - *Buy one station repair paste so the item terminal is exercised (ADR-367).*
+  - Method `._tour_supply()` - *Buy the station repair paste so the item terminal is exercised (ADR-367).*
+  - Method `._tour_supply_decoy()` - *Buy the last-resort ECM decoy once, separately so the paste cannot starve it (ADR-371).*
+  - Method `._supply_purchase(item_id, fallback_price)`
   - Method `._story_hold_action()` - *Resolve the local chapter instead of letting a dock trip or body travel leave it.*
   - Method `._tour_story_travel()` - *Fly to the chapter target when the tank can cover the whole route plus a reserve.*
   - Method `._tour_story_orbit()` - *Orbit the body a chapter explicitly demands (Act IV's black hole, ADR-360).*
@@ -4801,6 +4817,7 @@
   - Method `._tour_depot_sell()`
   - Method `._tour_research_queue()`
   - Method `._tour_research_cancel()`
+  - Method `._tour_trade()` - *Take one market trade on the tour so the route survives station errands (ADR-371).*
   - Method `._tour_fabricate()`
   - Method `._tour_crew_station()`
   - Method `._tour_preview()`

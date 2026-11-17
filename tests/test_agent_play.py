@@ -273,9 +273,13 @@ class TradeVolumeChoiceTest(unittest.TestCase):
         self.assertIsNone(captain._trade_choice(5))
 
     def test_missing_free_volume_falls_back_without_buying_into_a_full_hold(self):
-        captain = self._captain({"cargo": {"ore": 40}, "cargo_capacity": 40})
+        captain = self._captain({"cargo": {"titanium": 40}, "cargo_capacity": 40})
         self.assertEqual(captain._trade_choice(4)[2], "trade")
         self.assertFalse(captain._trade_choice(4)[1]["is_buy"])
+
+    def test_unquoted_cargo_is_not_offered_to_the_market(self):
+        captain = self._captain({"cargo": {"ore": 40}, "cargo_capacity": 40})
+        self.assertIsNone(captain._trade_choice(4))
 
 
 class ContractClaimTourTest(unittest.TestCase):
@@ -1009,7 +1013,7 @@ class CombatPolicyTest(unittest.TestCase):
                 "reactor": {"heat": 10.0, "max_heat": 100.0, "heat_pct": 10.0,
                             "last_vent_tick": -999},
                 "power": {"engines": 25, "shields": 25, "sensors": 25, "weapons": 25},
-                "fleet_drones": [],
+                "fleet_drones": [], "cargo": {},
             },
             "active_combat": {
                 "id": "c1", "enemy_hull": 100, "enemy_max_hull": 100,
@@ -1082,6 +1086,28 @@ class CombatPolicyTest(unittest.TestCase):
     def test_a_tactical_drone_strikes(self):
         captain = self._captain(ship={"fleet_drones": [{"drone_type": "combat_escort"}]})
         self.assertEqual(captain._choose(7)[1]["action"], "drone_strike")
+
+    def test_a_fuel_less_fight_uses_a_held_decoy(self):
+        captain = self._captain(ship={
+            "hull": 25, "fuel": 2, "cargo": {"decoy_countermeasure": 1},
+        })
+        action = captain._choose(7)
+        self.assertEqual(action[0], "/api/inventory/use")
+        self.assertEqual(action[1], {"item_id": "decoy_countermeasure"})
+        self.assertNotEqual(captain._choose(7)[1].get("item_id"), "decoy_countermeasure",
+                            "one decoy buys one escape, not a loop")
+
+    def test_the_decoy_waits_while_fuel_can_still_escape(self):
+        fueled = self._captain(ship={
+            "hull": 20, "fuel": 5, "cargo": {"decoy_countermeasure": 1},
+        })
+        self.assertEqual(fueled._choose(7)[1]["action"], "evasive_burn")
+        healthy = self._captain(ship={
+            "hull": 60, "fuel": 2, "cargo": {"decoy_countermeasure": 1},
+        })
+        self.assertNotEqual(healthy._choose(7)[0], "/api/inventory/use")
+        empty = self._captain(ship={"hull": 25, "fuel": 2})
+        self.assertNotEqual(empty._choose(7)[0], "/api/inventory/use")
 
     def test_a_hot_but_safe_reactor_uses_point_defense(self):
         captain = self._captain(ship={"reactor": {
@@ -1305,15 +1331,84 @@ class SupplyTourTest(unittest.TestCase):
         expensive = [{"id": "nanite_repair_paste", "category": "consumable",
                       "is_usable": True, "base_price": 900, "volume": 1}]
         self.assertIsNone(self._captain(
-            ship={"credits": 500}, catalog_items=expensive)._tour_supply())
+            ship={"credits": 300}, catalog_items=expensive)._tour_supply())
         self.assertIsNotNone(self._captain(
             ship={"credits": 500})._tour_supply())
+
+    def test_the_decoy_is_bought_at_a_late_dock_after_the_tour(self):
+        captain = self._captain(
+            ship={"credits": 500, "cargo": {"nanite_repair_paste": 1}},
+        )
+        captain.tour_exhausted = True
+        action = captain._choose(3)
+        self.assertEqual(action[0], "/api/inventory/buy")
+        self.assertEqual(action[1]["item_id"], "decoy_countermeasure")
+
+    def test_a_refused_refill_waits_for_its_cooldown(self):
+        captain = self._captain(
+            ship={"credits": 500, "cargo": {"nanite_repair_paste": 1}},
+        )
+        captain.tour_exhausted = True
+        signature = ("/api/inventory/buy", "decoy_countermeasure")
+        captain.retry_at[signature] = captain.total_steps + captain.REFUSAL_RETRY_STEPS
+        self.assertNotEqual(captain._choose(3)[0], "/api/inventory/buy")
+        captain.total_steps = captain.retry_at[signature]
+        self.assertEqual(captain._choose(3)[0], "/api/inventory/buy")
+
+    def test_a_consumable_is_never_traded_as_a_commodity(self):
+        captain = self._captain(
+            ship={"cargo": {"decoy_countermeasure": 1}, "cargo_free_volume": 0,
+                  "cargo_capacity": 40},
+            market_quotes={"titanium": {"price": 10}},
+        )
+        self.assertIsNone(captain._trade_choice(5),
+                          "a held decoy has no market quote and must not be sold")
+        both = self._captain(
+            ship={"cargo": {"decoy_countermeasure": 1, "titanium": 2},
+                  "cargo_free_volume": 0, "cargo_capacity": 40},
+            market_quotes={"titanium": {"price": 10}},
+        )
+        action = both._trade_choice(5)
+        self.assertEqual(action[1]["commodity_id"], "titanium")
+
+    def test_the_second_purchase_is_a_decoy(self):
+        captain = self._captain(
+            ship={"credits": 500, "cargo": {"nanite_repair_paste": 1}},
+        )
+        action = captain._tour_supply_decoy()
+        self.assertEqual(action[0], "/api/inventory/buy")
+        self.assertEqual(action[1], {"item_id": "decoy_countermeasure", "quantity": 1})
+        self.assertIsNone(captain._tour_supply(), "the paste is still held")
+        held = self._captain(ship={
+            "credits": 500,
+            "cargo": {"nanite_repair_paste": 1, "decoy_countermeasure": 1},
+        })
+        self.assertIsNone(held._tour_supply_decoy())
+
+    def test_each_supply_item_has_its_own_purchase_signature(self):
+        captain = self._captain()
+        captain.attempted.add("/api/inventory/buy")
+        captain.attempted_signatures.add(("/api/inventory/buy", "nanite_repair_paste"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/inventory/buy", {"item_id": "nanite_repair_paste"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/inventory/buy", {"item_id": "decoy_countermeasure"}),
+            "a second item must stay buyable after the first")
+
+    def test_an_unaffordable_decoy_is_skipped(self):
+        captain = self._captain(
+            ship={"credits": 349, "cargo": {"nanite_repair_paste": 1}},
+        )
+        self.assertIsNone(captain._tour_supply_decoy())
+        affordable = self._captain(
+            ship={"credits": 350, "cargo": {"nanite_repair_paste": 1}},
+        )
+        self.assertEqual(affordable._tour_supply_decoy()[1]["item_id"], "decoy_countermeasure")
 
     def test_no_purchase_without_a_dock_credits_or_hold_space(self):
         self.assertIsNone(self._captain(orbiting_body=None)._tour_supply())
         self.assertIsNone(self._captain(ship={"credits": 100})._tour_supply())
         self.assertIsNone(self._captain(ship={"cargo_free_volume": 0})._tour_supply())
-        self.assertIsNone(self._captain(ship={"cargo": {"nanite_repair_paste": 1}})._tour_supply())
 
     def test_a_hurt_captain_uses_the_held_paste(self):
         captain = self._captain(
@@ -1334,6 +1429,48 @@ class SupplyTourTest(unittest.TestCase):
             active_combat={"id": "c1"},
         )
         self.assertNotEqual(captain._choose(3)[0], "/api/inventory/use")
+
+
+class WarSupportStateTest(unittest.TestCase):
+    """A live war is supported from state, not from a tour slot that can miss (ADR-371)."""
+
+    def _captain(self, wars, attempted=False):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "wars": wars,
+            "ship": {
+                "credits": 5000, "hull": 100, "max_hull": 100,
+                "fuel": 40, "max_fuel": 60,
+                "power": {"engines": 25, "shields": 25, "sensors": 25, "weapons": 25},
+                "reactor": {"heat": 10.0, "max_heat": 100.0, "heat_pct": 10.0,
+                            "last_vent_tick": -999},
+            },
+            "current_system": {"id": "sol"},
+        }
+        if attempted:
+            captain.attempted.add("/api/war/support")
+        return captain
+
+    def test_an_active_war_is_supported_immediately(self):
+        captain = self._captain([
+            {"id": "w1", "active": True, "defender_id": "coalition"},
+        ])
+        action = captain._choose(3)
+        self.assertEqual(action[0], "/api/war/support")
+        self.assertEqual(action[1]["faction_id"], "coalition")
+        self.assertEqual(action[1]["credits"], 100)
+
+    def test_a_supported_war_is_not_supported_twice(self):
+        captain = self._captain([
+            {"id": "w1", "active": True, "defender_id": "coalition"},
+        ], attempted=True)
+        self.assertNotEqual(captain._choose(3)[0], "/api/war/support")
+
+    def test_a_finished_war_is_ignored(self):
+        captain = self._captain([
+            {"id": "w1", "active": False, "defender_id": "coalition"},
+        ])
+        self.assertNotEqual(captain._choose(3)[0], "/api/war/support")
 
 
 class AiPlayToolArgsTest(unittest.TestCase):

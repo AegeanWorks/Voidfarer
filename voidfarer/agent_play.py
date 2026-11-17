@@ -170,10 +170,13 @@ class AiCaptain:
     # Act IV asks for the Cygnus horizon and the Voidfarer's Oath; surfacing after a
     # quarter of the crossing proves the lane without sailing past the chapter (ADR-366).
     VOID_EMERGE_PROGRESS = 0.25
-    # The station terminal's survival consumable; one is bought per campaign and used
-    # when the hull is hurt, so the item shop is exercised (ADR-367).
+    # The station terminal's survival consumables; one of each is bought per campaign so
+    # the item shop is exercised, and the decoy is the guaranteed last-resort escape
+    # when fuel cannot buy one (ADR-367, ADR-371).
     SUPPLY_ITEM_ID = "nanite_repair_paste"
     SUPPLY_FALLBACK_PRICE = 250
+    SUPPLY_DECOY_ID = "decoy_countermeasure"
+    SUPPLY_FALLBACK_DECOY_PRICE = 350
     SUPPLY_VOLUME = 1
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
@@ -338,11 +341,23 @@ class AiCaptain:
         if hold is not None:
             return hold
 
+        # A war is a live-state opportunity; the rotating tour can miss its window when
+        # station errands shift the clock, so support it as soon as it appears (ADR-371).
+        war = self._tour_war()
+        if war is not None and not self._tour_action_attempted(war[0], war[1]):
+            return war
+
         # The station terminal's consumable is bought once and used when hurt, so the
         # item terminal and its use are exercised (ADR-367).
         supply = self._supply_action()
         if supply is not None:
             return supply
+        # Once the guided tour is spent, a late dock still refills the second survival
+        # item; this is state-driven so the tour cannot lock the decoy out forever (ADR-371).
+        if self.tour_exhausted:
+            refill = self._tour_supply_decoy()
+            if refill is not None and not self._tour_action_attempted(refill[0], refill[1]):
+                return refill
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -457,6 +472,12 @@ class AiCaptain:
             return pick("flee")
         if hull * 5 <= max_hull * 2 and fuel >= 3 and "evasive_burn" not in used:
             return pick("evasive_burn")
+        if hull * 2 <= max_hull and fuel < 3 and "decoy" not in used:
+            # Flee needs 8 fuel and a burn needs 3; below that the only guaranteed way
+            # out is the station decoy bought at a dock (ADR-371).
+            if int((ship.get("cargo") or {}).get(self.SUPPLY_DECOY_ID) or 0) > 0:
+                used.add("decoy")
+                return "/api/inventory/use", {"item_id": self.SUPPLY_DECOY_ID}, "combat_item"
         if heat_pct >= 85.0 and "vent_heat" not in used:
             return pick("vent_heat")
         if enemy_shield <= 0 and enemy_hull * 10 <= enemy_max_hull * 3 and "board_enemy" not in used:
@@ -529,7 +550,9 @@ class AiCaptain:
             free_volume = capacity - sum(int(v) for v in cargo.values())
         free_volume = int(free_volume)
         if cargo and free_volume < self.TITANIUM_VOLUME:
-            item = next((k for k, v in cargo.items() if int(v) > 0), None)
+            # Only market commodities trade here; station consumables share the cargo
+            # hold but have no quote, and selling one retried forever (ADR-371).
+            item = next((k for k, v in cargo.items() if int(v) > 0 and k in quotes), None)
             if item:
                 self.fallback_trades += 1
                 return "/api/trade", {"commodity_id": item, "quantity": 1, "is_buy": False}, "trade"
@@ -545,9 +568,11 @@ class AiCaptain:
     # nonsense just to claim coverage.
     def _next_tour_action(self) -> tuple[str, dict[str, Any], str] | None:
         builders = (
-            # The station terminal's consumable is bought at the opening dock before the
-            # fallback jump can leave Sol (ADR-367).
+            # The station terminal's consumables are bought at the opening dock before the
+            # fallback jump can leave Sol; the decoy has its own builder so the paste
+            # cannot starve it after its second wrap (ADR-367, ADR-371).
             self._tour_supply,
+            self._tour_supply_decoy,
             # The opening chapter is gated on being in Sol, and the fallback jump leaves at
             # step 5 of every run, so the story step must be the first tour action (ADR-354).
             self._tour_story_choice,
@@ -555,9 +580,6 @@ class AiCaptain:
             self._tour_story_travel,
             self._tour_power,
             self._tour_reactor,
-            # A war is a live-state opportunity, not a menu errand: reach it early so an
-            # extra station step cannot starve it before the 180-step gate ends (ADR-367).
-            self._tour_war,
             self._tour_route,
             self._tour_messages,
             self._tour_contracts,
@@ -625,6 +647,9 @@ class AiCaptain:
             self._tour_scoop,
             self._tour_burn_cells,
             self._tour_fabricate,
+            # A market trade belongs on the tour so the fallback's even-step parity
+            # cannot starve the route when station errands shift the clock (ADR-371).
+            self._tour_trade,
         )
         attempts = 0
         while attempts < len(builders):
@@ -651,6 +676,10 @@ class AiCaptain:
         # Six chapters share one choice route; keying on the path let Act I lock the
         # whole campaign after its first resolution (ADR-360).
         "/api/story/choice": "choice_id",
+        # Both survival items share the buy and use routes; keying on the path let the
+        # repair paste lock the decoy out of the shop (ADR-371).
+        "/api/inventory/buy": "item_id",
+        "/api/inventory/use": "item_id",
         # Many bodies share one orbit route; keying on the path let the first generic
         # orbit lock the chapter's required body (ADR-360).
         "/api/orbit": "target",
@@ -810,24 +839,36 @@ class AiCaptain:
         return "/api/inventory/use", body, "supply_use"
 
     def _tour_supply(self):
-        """Buy one station repair paste so the item terminal is exercised (ADR-367)."""
+        """Buy the station repair paste so the item terminal is exercised (ADR-367)."""
         ship = self.state.get("ship") or {}
         if int((ship.get("cargo") or {}).get(self.SUPPLY_ITEM_ID) or 0) > 0:
             return None
+        return self._supply_purchase(self.SUPPLY_ITEM_ID, self.SUPPLY_FALLBACK_PRICE)
+
+    def _tour_supply_decoy(self):
+        """Buy the last-resort ECM decoy once, separately so the paste cannot starve it (ADR-371)."""
+        ship = self.state.get("ship") or {}
+        if int((ship.get("cargo") or {}).get(self.SUPPLY_DECOY_ID) or 0) > 0:
+            return None
+        return self._supply_purchase(self.SUPPLY_DECOY_ID, self.SUPPLY_FALLBACK_DECOY_PRICE)
+
+    def _supply_purchase(self, item_id: str, fallback_price: int):
+        ship = self.state.get("ship") or {}
         if not self._is_docked():
             return None
-        price = self.SUPPLY_FALLBACK_PRICE
-        for item in self.state.get("catalog_items") or []:
-            if isinstance(item, dict) and item.get("id") == self.SUPPLY_ITEM_ID:
-                price = int(item.get("base_price") or price)
-                break
-        if int(ship.get("credits") or 0) < price:
-            return None
+        catalog = {
+            str(item.get("id")): item
+            for item in self.state.get("catalog_items") or []
+            if isinstance(item, dict)
+        }
+        row = catalog.get(item_id) or {}
+        price = int(row.get("base_price") or fallback_price)
+        volume = int(row.get("volume") or self.SUPPLY_VOLUME)
         free = ship.get("cargo_free_volume")
         free = int(ship.get("cargo_capacity") or 0) if free is None else int(free)
-        if free < self.SUPPLY_VOLUME:
+        if int(ship.get("credits") or 0) < price or free < volume:
             return None
-        return "/api/inventory/buy", {"item_id": self.SUPPLY_ITEM_ID, "quantity": 1}, "supply"
+        return "/api/inventory/buy", {"item_id": item_id, "quantity": 1}, "supply"
 
     def _story_hold_action(self):
         """Resolve the local chapter instead of letting a dock trip or body travel leave it.
@@ -1261,6 +1302,12 @@ class AiCaptain:
             return None
         project_id = str(queue[0])
         return "/api/research/cancel", {"project_id": project_id}, "research_cancel"
+
+    def _tour_trade(self):
+        """Take one market trade on the tour so the route survives station errands (ADR-371)."""
+        if self._tour_action_attempted("/api/trade", {}):
+            return None
+        return self._trade_choice(0)
 
     def _tour_fabricate(self):
         ship = self.state.get("ship") or {}
