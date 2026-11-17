@@ -370,6 +370,7 @@ from voidfarer.upgrades import (
 STATIC_SNAPSHOT_KEYS = (
     "catalog_chassis",
     "catalog_drones",
+    "catalog_items",
     "catalog_relics",
     "catalog_talents",
     "catalog_upgrades",
@@ -394,6 +395,7 @@ def static_catalogs() -> dict[str, Any]:
     return {
         "catalog_chassis": [c.to_dict() for c in CATALOG_CHASSIS],
         "catalog_drones": CATALOG_DRONE_TEMPLATES,
+        "catalog_items": [item.to_dict() for item in ITEM_CATALOG.values()],
         "catalog_relics": [r.to_dict() for r in CATALOG_RELICS],
         "catalog_talents": PILOT_TALENTS,
         "catalog_upgrades": [u.to_dict() for u in CATALOG_UPGRADES],

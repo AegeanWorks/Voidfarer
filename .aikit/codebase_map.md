@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `569`
+- **Total Classes**: `570`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2865`
-- **Total Source Lines**: `66001`
+- **Total Class Methods**: `2874`
+- **Total Source Lines**: `66138`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1283` lines (`61692` bytes)
+**Size**: `1349` lines (`64692` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -233,6 +233,13 @@
   - Method `.test_no_dive_with_thin_shields_hull_or_tank()`
   - Method `.test_a_traversal_time_steps_then_emerges()`
   - Method `.test_the_chapter_resolves_after_emergence()`
+- `class SupplyTourTest` - *The captain buys a station consumable and uses it when hurt (ADR-367).*
+  - Method `._captain(**state)`
+  - Method `.test_a_docked_captain_buys_one_repair_paste()`
+  - Method `.test_the_purchase_uses_the_published_catalog_price()`
+  - Method `.test_no_purchase_without_a_dock_credits_or_hold_space()`
+  - Method `.test_a_hurt_captain_uses_the_held_paste()`
+  - Method `.test_no_use_when_healthy_empty_or_in_combat()`
 - `class AiPlayToolArgsTest`
   - Method `.test_rejects_non_positive_steps()`
 
@@ -3948,13 +3955,14 @@
 ### [`tests/test_snapshot_catalogs.py`](tests/test_snapshot_catalogs.py)
 > *Static catalogs: built once, served by /api/catalogs, and left out of polls that cache them.*
 
-**Size**: `92` lines (`3996` bytes)
+**Size**: `105` lines (`4662` bytes)
 
 **Classes:**
 - `class TestStaticCatalogs`
   - Method `.test_catalogs_cover_exactly_the_static_keys()`
   - Method `.test_catalogs_are_built_once()`
   - Method `.test_full_snapshot_still_carries_every_catalog()`
+  - Method `.test_item_catalog_exposes_the_consumable_shop()`
   - Method `.test_lite_snapshot_omits_catalogs_and_keeps_live_state()`
   - Method `.test_snapshot_mutation_does_not_poison_cache()`
 - `class TestCatalogEndpoints`
@@ -4713,7 +4721,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1637` lines (`77124` bytes)
+**Size**: `1693` lines (`79874` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4740,6 +4748,8 @@
   - Method `._tour_contracts()`
   - Method `._tour_story_choice()` - *Resolve the active chapter's first unlocked choice; the tour never touched the arc.*
   - Method `._void_dive_action()` - *Take the story's own void beat once: dive at the required horizon.*
+  - Method `._supply_action()` - *Use a held repair paste when the hull is hurt outside a blocking encounter (ADR-367).*
+  - Method `._tour_supply()` - *Buy one station repair paste so the item terminal is exercised (ADR-367).*
   - Method `._story_hold_action()` - *Resolve the local chapter instead of letting a dock trip or body travel leave it.*
   - Method `._tour_story_travel()` - *Fly to the chapter target when the tank can cover the whole route plus a reserve.*
   - Method `._tour_story_orbit()` - *Orbit the body a chapter explicitly demands (Act IV's black hole, ADR-360).*
@@ -5141,7 +5151,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11295` lines (`556995` bytes)
+**Size**: `11297` lines (`557093` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

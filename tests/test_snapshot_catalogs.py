@@ -24,6 +24,19 @@ class TestStaticCatalogs(unittest.TestCase):
         for key, value in static_catalogs().items():
             self.assertEqual(snapshot[key], value, key)
 
+    def test_item_catalog_exposes_the_consumable_shop(self):
+        rows = static_catalogs()["catalog_items"]
+        by_id = {row["id"]: row for row in rows}
+        for item_id in ("nanite_repair_paste", "shield_overcharge_cell",
+                        "plasma_fuel_canister", "decoy_countermeasure"):
+            item = by_id[item_id]
+            self.assertEqual(item["category"], "consumable")
+            self.assertTrue(item["is_usable"])
+            self.assertTrue(item["effect_type"])
+            self.assertGreater(item["effect_amount"], 0)
+            self.assertGreater(item["base_price"], 0)
+        self.assertFalse(by_id["titanium"]["is_usable"])
+
     def test_lite_snapshot_omits_catalogs_and_keeps_live_state(self):
         snapshot = SimulationEngine(seed=42).get_status_snapshot(include_static=False)
         self.assertFalse(set(STATIC_SNAPSHOT_KEYS) & set(snapshot))

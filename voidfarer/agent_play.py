@@ -49,9 +49,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/reconstruct": "needs a devastated inhabited world in orbit",
     "/api/void/dive": "needs the Act IV black-hole orbit, which only a 2,000-step campaign reaches",
     "/api/void/emerge": "needs an active void traversal after that dive",
-    "/api/inventory/buy": "no item shop catalog is exposed by the API",
-    "/api/inventory/use": "no consumable is in the hold",
-    "/api/inventory/jettison": "no item catalog is exposed by the API",
+    "/api/inventory/jettison": "the captain sells or stores cargo instead of dumping it",
     "/api/ship/module": "needs an owned ship module",
     "/api/shipyard/chassis": "needs a shipyard and a new hull purchase",
     "/api/shipyard/sell": "needs a spare hull in the shipyard",
@@ -172,6 +170,11 @@ class AiCaptain:
     # Act IV asks for the Cygnus horizon and the Voidfarer's Oath; surfacing after a
     # quarter of the crossing proves the lane without sailing past the chapter (ADR-366).
     VOID_EMERGE_PROGRESS = 0.25
+    # The station terminal's survival consumable; one is bought per campaign and used
+    # when the hull is hurt, so the item shop is exercised (ADR-367).
+    SUPPLY_ITEM_ID = "nanite_repair_paste"
+    SUPPLY_FALLBACK_PRICE = 250
+    SUPPLY_VOLUME = 1
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -334,6 +337,12 @@ class AiCaptain:
         hold = self._story_hold_action()
         if hold is not None:
             return hold
+
+        # The station terminal's consumable is bought once and used when hurt, so the
+        # item terminal and its use are exercised (ADR-367).
+        supply = self._supply_action()
+        if supply is not None:
+            return supply
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -536,6 +545,9 @@ class AiCaptain:
     # nonsense just to claim coverage.
     def _next_tour_action(self) -> tuple[str, dict[str, Any], str] | None:
         builders = (
+            # The station terminal's consumable is bought at the opening dock before the
+            # fallback jump can leave Sol (ADR-367).
+            self._tour_supply,
             # The opening chapter is gated on being in Sol, and the fallback jump leaves at
             # step 5 of every run, so the story step must be the first tour action (ADR-354).
             self._tour_story_choice,
@@ -543,6 +555,9 @@ class AiCaptain:
             self._tour_story_travel,
             self._tour_power,
             self._tour_reactor,
+            # A war is a live-state opportunity, not a menu errand: reach it early so an
+            # extra station step cannot starve it before the 180-step gate ends (ADR-367).
+            self._tour_war,
             self._tour_route,
             self._tour_messages,
             self._tour_contracts,
@@ -596,7 +611,6 @@ class AiCaptain:
             self._tour_escort_repair,
             self._tour_time_speed,
             self._tour_navigate,
-            self._tour_war,
             self._tour_dock,
             self._tour_point,
             self._tour_weapon_install,
@@ -772,6 +786,48 @@ class AiCaptain:
             return None
         self.void_attempted = True
         return "/api/void/dive", {"target_system_id": target_system}, "void"
+
+    def _supply_action(self):
+        """Use a held repair paste when the hull is hurt outside a blocking encounter (ADR-367).
+
+        Buying is a tour builder so it does not steal an early tour slot from the 180-step
+        gate; using is state-driven because damage appears wherever combat leaves it.
+        """
+        ship = self.state.get("ship") or {}
+        cargo = ship.get("cargo") or {}
+        held = int(cargo.get(self.SUPPLY_ITEM_ID) or 0)
+        hull = int(ship.get("hull") or 0)
+        max_hull = max(1, int(ship.get("max_hull") or 1))
+        if held <= 0 or hull >= max_hull:
+            return None
+        if (self.state.get("active_combat") or self.state.get("active_anomaly")
+                or self.state.get("active_pirate") or self.state.get("active_customs")
+                or self.state.get("pending_decision")):
+            return None
+        body = {"item_id": self.SUPPLY_ITEM_ID}
+        if self._tour_action_attempted("/api/inventory/use", body):
+            return None
+        return "/api/inventory/use", body, "supply_use"
+
+    def _tour_supply(self):
+        """Buy one station repair paste so the item terminal is exercised (ADR-367)."""
+        ship = self.state.get("ship") or {}
+        if int((ship.get("cargo") or {}).get(self.SUPPLY_ITEM_ID) or 0) > 0:
+            return None
+        if not self._is_docked():
+            return None
+        price = self.SUPPLY_FALLBACK_PRICE
+        for item in self.state.get("catalog_items") or []:
+            if isinstance(item, dict) and item.get("id") == self.SUPPLY_ITEM_ID:
+                price = int(item.get("base_price") or price)
+                break
+        if int(ship.get("credits") or 0) < price:
+            return None
+        free = ship.get("cargo_free_volume")
+        free = int(ship.get("cargo_capacity") or 0) if free is None else int(free)
+        if free < self.SUPPLY_VOLUME:
+            return None
+        return "/api/inventory/buy", {"item_id": self.SUPPLY_ITEM_ID, "quantity": 1}, "supply"
 
     def _story_hold_action(self):
         """Resolve the local chapter instead of letting a dock trip or body travel leave it.

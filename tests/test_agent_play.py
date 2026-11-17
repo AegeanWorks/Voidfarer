@@ -1270,6 +1270,72 @@ class VoidTraversalTourTest(unittest.TestCase):
         self.assertEqual(captain._choose(3)[0], "/api/story/choice")
 
 
+class SupplyTourTest(unittest.TestCase):
+    """The captain buys a station consumable and uses it when hurt (ADR-367)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "current_system": {"id": "sol"},
+            "orbiting_body": {"id": "sol_body_1", "station_dockable": True},
+            "ship": {
+                "hull": 100, "max_hull": 100, "credits": 2000,
+                "cargo": {}, "cargo_capacity": 40, "cargo_free_volume": 40,
+            },
+            "inventory_manifest": [],
+            "catalog_items": [
+                {"id": "nanite_repair_paste", "category": "consumable",
+                 "is_usable": True, "base_price": 250, "volume": 1},
+            ],
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_docked_captain_buys_one_repair_paste(self):
+        action = self._captain()._tour_supply()
+        self.assertEqual(action[0], "/api/inventory/buy")
+        self.assertEqual(action[1], {"item_id": "nanite_repair_paste", "quantity": 1})
+
+    def test_the_purchase_uses_the_published_catalog_price(self):
+        expensive = [{"id": "nanite_repair_paste", "category": "consumable",
+                      "is_usable": True, "base_price": 900, "volume": 1}]
+        self.assertIsNone(self._captain(
+            ship={"credits": 500}, catalog_items=expensive)._tour_supply())
+        self.assertIsNotNone(self._captain(
+            ship={"credits": 500})._tour_supply())
+
+    def test_no_purchase_without_a_dock_credits_or_hold_space(self):
+        self.assertIsNone(self._captain(orbiting_body=None)._tour_supply())
+        self.assertIsNone(self._captain(ship={"credits": 100})._tour_supply())
+        self.assertIsNone(self._captain(ship={"cargo_free_volume": 0})._tour_supply())
+        self.assertIsNone(self._captain(ship={"cargo": {"nanite_repair_paste": 1}})._tour_supply())
+
+    def test_a_hurt_captain_uses_the_held_paste(self):
+        captain = self._captain(
+            orbiting_body=None,
+            ship={"hull": 40, "cargo": {"nanite_repair_paste": 1}},
+        )
+        action = captain._supply_action()
+        self.assertEqual(action[0], "/api/inventory/use")
+        self.assertEqual(action[1], {"item_id": "nanite_repair_paste"})
+
+    def test_no_use_when_healthy_empty_or_in_combat(self):
+        self.assertIsNone(self._captain(
+            ship={"cargo": {"nanite_repair_paste": 1}})._supply_action())
+        self.assertIsNone(self._captain(
+            orbiting_body=None, ship={"hull": 40})._supply_action())
+        captain = self._captain(
+            ship={"hull": 40, "cargo": {"nanite_repair_paste": 1}},
+            active_combat={"id": "c1"},
+        )
+        self.assertNotEqual(captain._choose(3)[0], "/api/inventory/use")
+
+
 class AiPlayToolArgsTest(unittest.TestCase):
     def test_rejects_non_positive_steps(self):
         from tools.ai_play import main as ai_play_main
