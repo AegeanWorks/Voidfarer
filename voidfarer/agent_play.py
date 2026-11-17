@@ -49,6 +49,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/reconstruct": "needs a devastated inhabited world in orbit",
     "/api/void/dive": "needs the Act IV black-hole orbit, which only a 2,000-step campaign reaches",
     "/api/void/emerge": "needs an active void traversal after that dive",
+    "/api/war/support": "faction wars are declared after the 180-step gate; the 2,000-step campaign supports one",
     "/api/inventory/jettison": "the captain sells or stores cargo instead of dumping it",
     "/api/ship/module": "needs an owned ship module",
     "/api/shipyard/chassis": "needs a shipyard and a new hull purchase",
@@ -296,12 +297,9 @@ class AiCaptain:
         if state.get("active_combat"):
             return self._combat_choice()
         if state.get("active_anomaly"):
-            choices = (state.get("active_anomaly") or {}).get("choices") or []
-            if choices:
-                choice = choices[0]
-                choice_id = choice.get("choice_id") or choice.get("id") if isinstance(choice, dict) else str(choice)
-                if choice_id:
-                    return "/api/anomaly", {"choice_id": choice_id}, "anomaly"
+            anomaly = self._anomaly_action()
+            if anomaly is not None:
+                return anomaly
 
         if ship.get("travel"):
             return "/api/time/step", {"ticks": 1}, "time"
@@ -441,6 +439,47 @@ class AiCaptain:
 
         return "/api/time/step", {"ticks": 1}, "time"
 
+    def _anomaly_action(self):
+        """Take an anomaly choice whose power check passes, not always the first one.
+
+        The card marks each check READY or FAILS with the effective percentage; the first
+        choice is often the deepest check and cost 15 hull per failure in campaign probes
+        (ADR-372). Without that payload, fall back to the lowest threshold, where a
+        'none' check is always safe.
+        """
+        anomaly = self.state.get("active_anomaly") or {}
+        choices = [choice for choice in anomaly.get("choices") or [] if isinstance(choice, dict)]
+        if not choices:
+            return None
+        actions = ((self.state.get("encounter") or {}).get("encounter") or {}).get("actions") or []
+        ready = {
+            str(action.get("id"))
+            for action in actions
+            if isinstance(action, dict) and action.get("ready")
+        }
+        chosen = next(
+            (
+                choice for choice in choices
+                if str(choice.get("choice_id") or choice.get("id") or "") in ready
+            ),
+            None,
+        )
+        if chosen is None:
+            chosen = min(choices, key=self._anomaly_threshold)
+        choice_id = str(chosen.get("choice_id") or chosen.get("id") or "")
+        if not choice_id:
+            return None
+        return "/api/anomaly", {"choice_id": choice_id}, "anomaly"
+
+    @staticmethod
+    def _anomaly_threshold(choice: dict[str, Any]) -> int:
+        if str(choice.get("required_power") or "none") == "none":
+            return 0
+        try:
+            return int(choice.get("min_power_threshold") or 0)
+        except (TypeError, ValueError):
+            return 0
+
     def _combat_choice(self):
         """Pick a combat action from the live state: survival first, then the tactical surface.
 
@@ -573,6 +612,9 @@ class AiCaptain:
             # cannot starve it after its second wrap (ADR-367, ADR-371).
             self._tour_supply,
             self._tour_supply_decoy,
+            # A market trade must happen before the fallback's even-step parity can drift;
+            # the route is cheap and does not depend on a specific system (ADR-371).
+            self._tour_trade,
             # The opening chapter is gated on being in Sol, and the fallback jump leaves at
             # step 5 of every run, so the story step must be the first tour action (ADR-354).
             self._tour_story_choice,
@@ -647,9 +689,6 @@ class AiCaptain:
             self._tour_scoop,
             self._tour_burn_cells,
             self._tour_fabricate,
-            # A market trade belongs on the tour so the fallback's even-step parity
-            # cannot starve the route when station errands shift the clock (ADR-371).
-            self._tour_trade,
         )
         attempts = 0
         while attempts < len(builders):

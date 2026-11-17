@@ -21,6 +21,7 @@ from voidfarer.models import (
     DecisionChoice,
     DecisionEvent,
     PirateEncounter,
+    ShipPower,
     TravelState,
 )
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
@@ -75,6 +76,20 @@ def _anomaly() -> AnomalyEncounter:
                 min_power_threshold=0,
                 outcome_text="The rift yields salvage.",
             ),
+            AnomalyChoice(
+                choice_id="sensor_sweep",
+                text="Sweep the rift with sensors",
+                required_power="sensors",
+                min_power_threshold=20,
+                outcome_text="The rift yields telemetry.",
+            ),
+            AnomalyChoice(
+                choice_id="deep_sweep",
+                text="Drive a deep sensor spike",
+                required_power="sensors",
+                min_power_threshold=45,
+                outcome_text="The rift yields a relic.",
+            ),
         ),
     )
 
@@ -90,6 +105,39 @@ def _decision() -> DecisionEvent:
         choices=(DecisionChoice(id="help", label="Help"),),
         tick=12,
     )
+
+
+class TestAnomalyCheckReadiness(unittest.TestCase):
+    """Anomaly actions say whether their power check passes with the ship's real output."""
+
+    def _report(self, power=None):
+        engine = _engine()
+        engine.state = engine._clone_state(active_anomaly=_anomaly())
+        return active_encounter(engine.state, power=power)
+
+    def test_actions_report_ready_and_failing_checks(self):
+        actions = {a["id"]: a for a in self._report({"sensors": 25.0})["actions"]}
+        self.assertTrue(actions["harvest"]["ready"])
+        self.assertIn("SAFE HARVEST", actions["harvest"]["detail"])
+        self.assertTrue(actions["sensor_sweep"]["ready"])
+        self.assertIn("READY (25%)", actions["sensor_sweep"]["detail"])
+        self.assertFalse(actions["deep_sweep"]["ready"])
+        self.assertIn("FAILS (25%)", actions["deep_sweep"]["detail"])
+
+    def test_engine_effective_power_is_used_not_the_allocation(self):
+        engine = _engine()
+        engine.state = engine._clone_state(
+            active_anomaly=_anomaly(),
+            ship=engine._clone_ship(power=ShipPower(engines=25, shields=25, sensors=15, weapons=25)),
+        )
+        actions = {a["id"]: a for a in engine.encounter_report()["encounter"]["actions"]}
+        self.assertFalse(actions["sensor_sweep"]["ready"])
+        self.assertIn("FAILS (", actions["sensor_sweep"]["detail"])
+
+    def test_without_power_the_old_detail_remains(self):
+        actions = {a["id"]: a for a in self._report()["actions"]}
+        self.assertNotIn("ready", actions["sensor_sweep"])
+        self.assertEqual(actions["sensor_sweep"]["detail"], "CHECK: SENSORS >= 20%")
 
 
 class TestEncounterPayload(unittest.TestCase):
@@ -146,7 +194,8 @@ class TestEncounterPayload(unittest.TestCase):
         engine.state = engine._clone_state(active_anomaly=_anomaly())
         anomaly = active_encounter(engine.state)
         self.assertEqual(anomaly["kind"], "anomaly")
-        self.assertEqual([a["id"] for a in anomaly["actions"]], ["harvest"])
+        self.assertEqual([a["id"] for a in anomaly["actions"]],
+                         ["harvest", "sensor_sweep", "deep_sweep"])
         engine.state = engine._clone_state(
             active_anomaly=None, pending_decision=_decision()
         )

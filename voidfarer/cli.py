@@ -22,7 +22,6 @@ except (ValueError, OSError):  # hygiene: allow non-reconfigurable stdio streams
 from voidfarer import __version__
 from voidfarer.encounters import (
     ENCOUNTER_KINDS,
-    active_encounter,
     resolve as resolve_encounter,
 )
 from voidfarer.fitting import (
@@ -3447,7 +3446,7 @@ def cmd_encounter(engine: SimulationEngine, storage: StorageManager, parts: list
     """Inspect or resolve the single blocking encounter (decision/pirate/customs/anomaly)."""
     args = [part for part in parts[1:] if part]
     if not args or args[0].lower() in ("status", "show", "info"):
-        encounter = active_encounter(engine.state)
+        encounter = engine.encounter_report()["encounter"]
         if encounter is None:
             print(
                 f"\n{DIM}No blocking encounter. A decision, pirate toll, customs "

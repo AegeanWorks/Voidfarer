@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `573`
+- **Total Classes**: `575`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2903`
-- **Total Source Lines**: `66408`
+- **Total Class Methods**: `2915`
+- **Total Source Lines**: `66569`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1486` lines (`70942` bytes)
+**Size**: `1541` lines (`73394` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -249,6 +249,12 @@
   - Method `.test_no_purchase_without_a_dock_credits_or_hold_space()`
   - Method `.test_a_hurt_captain_uses_the_held_paste()`
   - Method `.test_no_use_when_healthy_empty_or_in_combat()`
+- `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
+  - Method `._captain(choices, encounter_actions)`
+  - Method `.test_a_ready_check_beats_the_first_failing_choice()`
+  - Method `.test_without_a_ready_check_the_lowest_threshold_wins()`
+  - Method `.test_without_the_payload_the_lowest_threshold_is_used()`
+  - Method `.test_no_choices_does_not_post_an_anomaly()`
 - `class WarSupportStateTest` - *A live war is supported from state, not from a tour slot that can miss (ADR-371).*
   - Method `._captain(wars, attempted)`
   - Method `.test_an_active_war_is_supported_immediately()`
@@ -1805,9 +1811,14 @@
 ### [`tests/test_encounters.py`](tests/test_encounters.py)
 > *Unified blocking-encounter payload, resolver, REST and CLI tests.*
 
-**Size**: `307` lines (`11661` bytes)
+**Size**: `356` lines (`13917` bytes)
 
 **Classes:**
+- `class TestAnomalyCheckReadiness` - *Anomaly actions say whether their power check passes with the ship's real output.*
+  - Method `._report(power)`
+  - Method `.test_actions_report_ready_and_failing_checks()`
+  - Method `.test_engine_effective_power_is_used_not_the_allocation()`
+  - Method `.test_without_power_the_old_detail_remains()`
 - `class TestEncounterPayload`
   - Method `.test_no_active_encounter()`
   - Method `.test_decision_has_priority()`
@@ -4750,7 +4761,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1740` lines (`82537` bytes)
+**Size**: `1779` lines (`84092` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4762,6 +4773,8 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
+  - Method `._anomaly_action()` - *Take an anomaly choice whose power check passes, not always the first one.*
+  - Method `._anomaly_threshold(choice)`
   - Method `._combat_choice()` - *Pick a combat action from the live state: survival first, then the tactical surface.*
   - Method `._note_refusal(signature, message)` - *Schedule a fast retry, then a slow one, then drop a gate that never opens.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*
@@ -4922,7 +4935,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4934` lines (`244282` bytes)
+**Size**: `4933` lines (`244268` bytes)
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -5151,16 +5164,16 @@
 ### [`voidfarer/encounters.py`](voidfarer/encounters.py)
 > *Unified view and resolver for VoidFarer's blocking encounters.*
 
-**Size**: `224` lines (`7685` bytes)
+**Size**: `235` lines (`8333` bytes)
 
 **Functions:**
 - `def _action(action_id, label, detail, *, cost, disabled, reason)`
 - `def _decision(state)`
 - `def _pirate(state)`
 - `def _customs(state)`
-- `def _anomaly(state)`
-- `def active_encounter(state)` - *Return the highest-priority blocking encounter, or None.*
-- `def encounter_report(state)` - *Compact payload for /api/state, the cockpit and agents.*
+- `def _anomaly(state, power)`
+- `def active_encounter(state, power)` - *Return the highest-priority blocking encounter, or None.*
+- `def encounter_report(state, power)` - *Compact payload for /api/state, the cockpit and agents.*
 - `def resolve(engine, kind, action)` - *Resolve the active encounter through its existing engine resolver.*
 
 ---
@@ -5183,7 +5196,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11297` lines (`557093` bytes)
+**Size**: `11305` lines (`557432` bytes)
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5203,6 +5216,7 @@
   - Method `._drift_world_technology(systems, faction_tech, previous_tick, new_tick)` - *Upgrade settled worlds toward their owner's tech at most once per drift window.*
   - Method `._map_effects(system)` - *Aggregate the active map modifiers of a system (defaults to the current one).*
   - Method `._effective_power(subsystem, ship)` - *Allocated subsystem power after reactor mode, heat, and integrity derating.*
+  - Method `.encounter_report()` - *Encounter payload with each anomaly check judged against real output.*
   - Method `._recompute_caps(ship, equipped, ship_mods)` - *Recompute maximum hull, shield, cargo, and fuel from chassis, modules, and mods.*
   - Method `._grant_cargo(cargo, commodity_id, quantity)` - *Add as many units as the hold allows, returning (granted, overflow).*
   - Method `._replace_system_body(body_id, **changes)` - *Return a systems map with one body of the current system replaced.*

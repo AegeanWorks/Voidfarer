@@ -136,8 +136,26 @@ def _customs(state: GameState) -> dict[str, Any]:
     }
 
 
-def _anomaly(state: GameState) -> dict[str, Any]:
+def _anomaly(state: GameState, power: dict[str, float] | None = None) -> dict[str, Any]:
     anomaly = state.active_anomaly
+    actions: list[dict[str, Any]] = []
+    for choice in anomaly.choices:
+        if choice.required_power == "none":
+            action = _action(choice.choice_id, choice.text, "SAFE HARVEST")
+            action["ready"] = True
+        else:
+            detail = f"CHECK: {choice.required_power.upper()} >= {choice.min_power_threshold}%"
+            current = None if power is None else power.get(choice.required_power)
+            if current is not None:
+                ready = float(current) >= choice.min_power_threshold
+                verdict = "READY" if ready else "FAILS"
+                detail = f"{detail} // {verdict} ({float(current):.0f}%)"
+            else:
+                ready = None
+            action = _action(choice.choice_id, choice.text, detail)
+            if ready is not None:
+                action["ready"] = ready
+        actions.append(action)
     return {
         "kind": "anomaly",
         "id": anomaly.id,
@@ -145,23 +163,14 @@ def _anomaly(state: GameState) -> dict[str, Any]:
         "tag": f"PROXIMITY HAZARD // {str(anomaly.severity).upper()}",
         "description": anomaly.description,
         "detail": "",
-        "actions": [
-            _action(
-                choice.choice_id,
-                choice.text,
-                (
-                    f"CHECK: {choice.required_power.upper()} >= {choice.min_power_threshold}%"
-                    if choice.required_power != "none"
-                    else "SAFE HARVEST"
-                ),
-            )
-            for choice in anomaly.choices
-        ],
+        "actions": actions,
         "data": anomaly.to_dict(),
     }
 
 
-def active_encounter(state: GameState) -> dict[str, Any] | None:
+def active_encounter(
+    state: GameState, power: dict[str, float] | None = None
+) -> dict[str, Any] | None:
     """Return the highest-priority blocking encounter, or None.
 
     Priority matches the state-machine contract: decision, pirate, customs,
@@ -175,13 +184,15 @@ def active_encounter(state: GameState) -> dict[str, Any] | None:
     if state.active_customs is not None:
         return _customs(state)
     if state.active_anomaly is not None:
-        return _anomaly(state)
+        return _anomaly(state, power)
     return None
 
 
-def encounter_report(state: GameState) -> dict[str, Any]:
+def encounter_report(
+    state: GameState, power: dict[str, float] | None = None
+) -> dict[str, Any]:
     """Compact payload for /api/state, the cockpit and agents."""
-    encounter = active_encounter(state)
+    encounter = active_encounter(state, power)
     return {
         "active": encounter is not None,
         "kind": encounter["kind"] if encounter else None,

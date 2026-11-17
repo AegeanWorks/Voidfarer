@@ -1431,6 +1431,61 @@ class SupplyTourTest(unittest.TestCase):
         self.assertNotEqual(captain._choose(3)[0], "/api/inventory/use")
 
 
+class AnomalyPolicyTest(unittest.TestCase):
+    """The captain picks an anomaly check that passes (ADR-372)."""
+
+    def _captain(self, choices, encounter_actions=None):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        state = {
+            "ship": {"hull": 100, "max_hull": 100, "fuel": 40, "max_fuel": 60},
+            "active_anomaly": {"id": "a1", "title": "Rift", "choices": choices},
+        }
+        if encounter_actions is not None:
+            state["encounter"] = {
+                "encounter": {"kind": "anomaly", "actions": encounter_actions}
+            }
+        captain.state = state
+        return captain
+
+    def test_a_ready_check_beats_the_first_failing_choice(self):
+        captain = self._captain(
+            [
+                {"choice_id": "deep", "required_power": "sensors", "min_power_threshold": 45},
+                {"choice_id": "sweep", "required_power": "sensors", "min_power_threshold": 20},
+            ],
+            encounter_actions=[
+                {"id": "deep", "ready": False},
+                {"id": "sweep", "ready": True},
+            ],
+        )
+        self.assertEqual(captain._choose(7)[1]["choice_id"], "sweep")
+        self.assertEqual(captain._choose(7)[2], "anomaly")
+
+    def test_without_a_ready_check_the_lowest_threshold_wins(self):
+        captain = self._captain(
+            [
+                {"choice_id": "deep", "required_power": "sensors", "min_power_threshold": 45},
+                {"choice_id": "safe", "required_power": "none", "min_power_threshold": 0},
+                {"choice_id": "sweep", "required_power": "engines", "min_power_threshold": 20},
+            ],
+            encounter_actions=[{"id": "deep", "ready": False},
+                               {"id": "safe", "ready": False},
+                               {"id": "sweep", "ready": False}],
+        )
+        self.assertEqual(captain._choose(7)[1]["choice_id"], "safe")
+
+    def test_without_the_payload_the_lowest_threshold_is_used(self):
+        captain = self._captain([
+            {"choice_id": "deep", "required_power": "sensors", "min_power_threshold": 45},
+            {"choice_id": "sweep", "required_power": "engines", "min_power_threshold": 20},
+        ])
+        self.assertEqual(captain._choose(7)[1]["choice_id"], "sweep")
+
+    def test_no_choices_does_not_post_an_anomaly(self):
+        captain = self._captain([])
+        self.assertNotEqual(captain._choose(7)[0], "/api/anomaly")
+
+
 class WarSupportStateTest(unittest.TestCase):
     """A live war is supported from state, not from a tour slot that can miss (ADR-371)."""
 

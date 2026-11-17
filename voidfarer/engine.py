@@ -923,6 +923,14 @@ class SimulationEngine:
         output_bonus = float(self._combined_equipment(target).get("reactor_output", 0.0))
         return allocation * reactor_output_efficiency(target.reactor, output_bonus)
 
+    def encounter_report(self) -> dict[str, Any]:
+        """Encounter payload with each anomaly check judged against real output."""
+        power = {
+            subsystem: self._effective_power(subsystem)
+            for subsystem in ("engines", "shields", "sensors", "weapons")
+        }
+        return encounter_report(self.state, power)
+
     def _recompute_caps(
         self,
         ship: ShipState,
@@ -8733,7 +8741,7 @@ class SimulationEngine:
                 },
                 "story_status": self.story_status_with_route(),
                 "state_machines": state_machine_situation(self.state),
-                "encounter": encounter_report(self.state),
+                "encounter": self.encounter_report(),
                 "fitting": fitting_summary(self.state),
                 "fleet": fleet_summary(self.state),
                 "logistics": logistics_summary(self.state),
