@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "captain-last-resort-decoy",
+    "task_id": "anomaly-check-readiness",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794907620.165619,
+    "updated_at": 1794913080.3455124,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794907649.7148361,
-    "completed_head": "ea1e1d0244bf4887d470ed3f34a1d63a3fea90ca",
-    "completed_tree": "21befff46435834145119eacd5d4fbfde926202c"
+    "completed_at": 1794913121.8428514,
+    "completed_head": "05802ba2373ce3427ed1a131d46081d83d5967a4",
+    "completed_tree": "0000ecfecb80d82a0e6f741f324e128e2cad1cbe"
   },
   "checkpoints": [
-    {
-      "task_id": "repl-grouped-surfaces",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] comms and all nine grouped surfaces run in a real REPL; suite Ran 1913 OK; 5/5 gates (ADR-365); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794862533.7140632,
-      "timestamp_str": "2026-11-16 23:55:33",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "repl-grouped-surfaces",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'repl-grouped-surfaces' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794862559.3523521,
-      "timestamp_str": "2026-11-16 23:55:59",
-      "agent": "kilo:goal",
-      "head": "a2b22bcf6108380d95b77bd6c394648862f078ae",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "voidfarer-oath-dive",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Make void readiness honest and have the captain take the Act IV void dive",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794865185.79643,
-      "timestamp_str": "2026-11-17 00:39:45",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "At Act IV the story asks the captain to hold the Cygnus horizon and swear the Voidfarer's Oath, but the AI resolves the choice without ever using the Hollow Between; /api/void/dive and /api/void/emerge stay permanently in CONTEXT_ACTIONS. The status also reports dive_ready with zero shields although void_dive refuses for shield shear, so the cockpit advertises a dive that fails",
-        "benefits": "The two void endpoints are exercised at the story's own void beat; emergency emergence restores the horizon orbit so Act IV still resolves; readiness now matches the engine gate",
-        "risks": "contract: void_status may report dive_ready False with a new shield blocker; dependency: none; concurrency: none; state: per-campaign one-shot flags in the captain",
-        "mitigation": "failing-first unit tests for readiness honesty and the dive/emerge policy, Act IV probe evidence on three seeds, campaign completion and 180-step gate unchanged, full suite and 5/5 gates"
-      },
-      "plan_digest": "be58f6e7f2f80d091218aba57edbaf9fd4811ed09e300d66fa58c67d630a181e",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "voidfarer-oath-dive",
       "phase": "in_progress",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 12:27:29",
       "agent": "kilo:goal",
       "head": "ea1e1d0244bf4887d470ed3f34a1d63a3fea90ca",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "anomaly-check-readiness",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Show which anomaly power checks pass and make the captain pick a passing one",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794908773.6663072,
+      "timestamp_str": "2026-11-17 12:46:13",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Anomaly choices render only 'CHECK: SENSORS >= 45%' with no current effective power, so a player cannot tell a safe pick from a 15-hull failure; the AI captain always takes choices[0], which in campaign probes failed repeatedly (SENSORS 25% < 55%, SHIELDS 25% < 35%) and drove insurance rebuilds",
+        "benefits": "Encounter actions carry READY/FAILS with the effective percentage computed from the same engine formula; the cockpit shows it without markup changes; the captain resolves anomalies without needless hull loss and exercises non-first choices",
+        "risks": "contract: encounter anomaly actions gain ready + longer detail (additive); dependency: none; concurrency: none; state: none",
+        "mitigation": "failing-first payload and policy tests, Edge measurement of the rendered card at two viewports, three-seed campaigns, unchanged 180-step gate, full suite and 5/5 gates"
+      },
+      "plan_digest": "5f47c2e8608b3ba4e04091777ea728010d4c3228e2619bac749aa191e4f5c712",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "anomaly-check-readiness",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/4] Edge shows READY (25%)/FAILS (25%)/SAFE HARVEST with no overflow; gate 58 families/59 of 69, 0 gaps/0 errors; seeds 1/2/42 complete with anomaly 12/15/16, war 1, refusals 16-17; suite Ran 1955 OK (ADR-372); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794913080.3455124,
+      "timestamp_str": "2026-11-17 13:58:00",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "anomaly-check-readiness",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'anomaly-check-readiness' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794913121.9080756,
+      "timestamp_str": "2026-11-17 13:58:41",
+      "agent": "kilo:goal",
+      "head": "05802ba2373ce3427ed1a131d46081d83d5967a4",
       "delivery": {
         "roots": [
           "."
