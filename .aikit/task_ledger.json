@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "voidfarer-oath-dive",
+    "task_id": "supply-terminal-catalog",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794866679.8116598,
+    "updated_at": 1794892423.9435925,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794866782.9289052,
-    "completed_head": "f3550ba5675e11286a7fbe3c11c1709f308c85e4",
-    "completed_tree": "be21228b681d5ac93b2e171d2bd5ffd3db9be29b"
+    "completed_at": 1794892471.4459982,
+    "completed_head": "6cf654f6516cdf29f27f8bfed9ce35bd4f1e718d",
+    "completed_tree": "c8b2973e613098df2a13423e68b4ca7c69831631"
   },
   "checkpoints": [
-    {
-      "task_id": "story-travel-hold",
-      "phase": "phase 5",
-      "phase_num": 5,
-      "description": "[1/4] Completing story-travel-hold",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794839418.326613,
-      "timestamp_str": "2026-11-16 17:30:18",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "story-travel-hold",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'story-travel-hold' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794839588.598756,
-      "timestamp_str": "2026-11-16 17:33:08",
-      "agent": "kilo:goal",
-      "head": "cd301900f71a8e9ff581a650652d5364439b9def",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "progression-gate-retry",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Retry progression-gated refusals on a slow horizon so late-opening mechanics are exercised",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794847370.829425,
-      "timestamp_str": "2026-11-16 19:42:50",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The tour writes off a refused action after three 40-step attempts; a 2,000-step run ends at Pilot Mastery 6 with 21,775 cr but never founds an outpost or retries talent/skill spending because their level-1 refusal happened early and never re-fired",
-        "benefits": "Outposts, talent unlocks, training, escorts and mercenaries become genuinely exercised later in a campaign, not just refused once; AI coverage evidence becomes honest",
-        "risks": "contract: refusal retry policy gains a slow tier; dependency: none; concurrency: none; state: page-memory only",
-        "mitigation": "failing-first retry-policy tests, three-seed 2,000-step probes, unchanged 180-step gate counts, full suite and 5/5 gates"
-      },
-      "plan_digest": "70c953d42dcb1105f05be502b7f6ca738b039ec7f9e1a81ad308c80e629437d9",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "progression-gate-retry",
       "phase": "phase 4",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 01:06:22",
       "agent": "kilo:goal",
       "head": "f3550ba5675e11286a7fbe3c11c1709f308c85e4",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "supply-terminal-catalog",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Expose the item catalog and let the captain buy and use station supplies",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794890631.8597462,
+      "timestamp_str": "2026-11-17 07:43:51",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The engine, CLI and REST all support buying and consuming station items, but no item catalog reaches /api/state or /api/catalogs, and the AI captain has never bought or used a consumable; three inventory routes are excused as unreachable with a reason that the API itself contradicts",
+        "benefits": "Clients can render a supplies terminal from one code-constant catalog; the captain exercises item purchase and use for real; inventory coverage becomes honest",
+        "risks": "contract: snapshot/catalogs gain catalog_items (additive); dependency: none; concurrency: none; state: captain buys one repair paste and uses it when hurt in space",
+        "mitigation": "failing-first catalog and policy tests, three-seed 2,000-step probes, 180-step gate, full suite and 5/5 gates"
+      },
+      "plan_digest": "94e672b1afe62a5a8ef8b1650cb91f77dbfd9f582583f47f7624ba86987d3614",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "supply-terminal-catalog",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/4] Gate 55 families/56 of 68 endpoints, 0 gaps, 0 errors; seeds 1/2/42 complete Act VI with supply and supply_use once each; suite Ran 1925 OK (ADR-367); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794892423.9435925,
+      "timestamp_str": "2026-11-17 08:13:43",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "supply-terminal-catalog",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'supply-terminal-catalog' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794892471.57535,
+      "timestamp_str": "2026-11-17 08:14:31",
+      "agent": "kilo:goal",
+      "head": "6cf654f6516cdf29f27f8bfed9ce35bd4f1e718d",
       "delivery": {
         "roots": [
           "."
