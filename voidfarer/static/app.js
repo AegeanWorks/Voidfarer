@@ -1022,6 +1022,9 @@ class CockpitApp {
         this.shipRoomDetails = document.getElementById("shipRoomDetails");
         this.btnToggleShipRooms = document.getElementById("btnToggleShipRooms");
         this.btnToggleShipCatalog = document.getElementById("btnToggleShipCatalog");
+        this.btnToggleSupplies = document.getElementById("btnToggleSupplies");
+        this.supplyDetails = document.getElementById("supplyDetails");
+        this.supplyList = document.getElementById("supplyList");
         this.shipRoomGrid = document.getElementById("shipRoomGrid");
         this.shipInteriorStatus = document.getElementById("shipInteriorStatus");
         this.researchSummary = document.getElementById("researchSummary");
@@ -1590,6 +1593,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             [this.btnToggleFabrication, this.fabricationDetails],
             [this.btnToggleVoid, this.voidBody],
             [this.btnToggleTransmissions, this.transmissionsDetails],
+            [this.btnToggleSupplies, this.supplyDetails],
         ];
         sectionDisclosures.forEach(([button, target]) => {
             if (button && target) {
@@ -3682,6 +3686,95 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         }
     }
 
+    // Station consumables: the catalog is code-constant and already carried by /api/state;
+    // buying needs a docked terminal, using works anywhere except while a prompt blocks.
+    renderSupplies() {
+        if (!this.supplyList || !this.state) return;
+        const items = (this.state.catalog_items || []).filter(
+            item => item.category === "consumable" && item.is_usable
+        );
+        const manifest = new Map((this.state.inventory_manifest || []).map(
+            row => [row.id, Number(row.quantity || 0)]
+        ));
+        const ship = this.state.ship || {};
+        const credits = Number(ship.credits || 0);
+        const usedVolume = (this.state.inventory_manifest || []).reduce(
+            (sum, row) => sum + Number(row.total_volume || 0), 0
+        );
+        const freeVolume = Math.max(0, Number(ship.cargo_capacity || 0) - usedVolume);
+        const docked = Boolean((this.state.drydock || {}).docked);
+        const combat = Boolean(this.state.active_combat);
+
+        const useState = (item, held) => {
+            if (held <= 0) return [false, "None in the hold; buy one at a station terminal."];
+            if (item.effect_type === "repair_hull") {
+                return [ship.hull < ship.max_hull,
+                    ship.hull < ship.max_hull ? "Restore hull integrity." : "Hull is already at maximum."];
+            }
+            if (item.effect_type === "recharge_shield") {
+                return [ship.shield < ship.max_shield,
+                    ship.shield < ship.max_shield ? "Boost deflector shields." : "Shields are already full."];
+            }
+            if (item.effect_type === "refuel") {
+                return [ship.fuel < ship.max_fuel,
+                    ship.fuel < ship.max_fuel ? "Load quantum fuel." : "Fuel tanks are already full."];
+            }
+            if (item.effect_type === "evade_combat") {
+                return [combat,
+                    combat ? "Break the current hostile lock." : "Only usable during hostile combat."];
+            }
+            return [false, "This item has no direct use."];
+        };
+
+        const rows = items.map(item => {
+            const held = manifest.get(item.id) || 0;
+            const price = Number(item.base_price || 0);
+            const volume = Number(item.volume || 1);
+            const canBuy = docked && credits >= price && freeVolume >= volume;
+            const buyTitle = !docked
+                ? "Dock at a station or colony terminal to buy supplies."
+                : (credits < price
+                    ? `Need ${price} credits; you have ${credits}.`
+                    : (freeVolume < volume
+                        ? `Need ${volume} free hold volume; ${freeVolume} available.`
+                        : `Buy ${item.name} for ${price} credits.`));
+            const [canUse, useTitle] = useState(item, held);
+            return `
+                <div class="supply-row">
+                    <div class="supply-info">
+                        <strong>${this.escapeHtml(item.name)}</strong>
+                        <small title="${this.escapeHtml(item.description || "")}">${this.escapeHtml(item.description || "")}</small>
+                    </div>
+                    <div class="supply-meta">
+                        <span class="supply-price">${price} CR</span>
+                        <span class="supply-held" title="Held in cargo">x${held}</span>
+                    </div>
+                    <div class="supply-actions">
+                        <button class="btn-hud" data-supply="buy" data-supply-id="${this.escapeHtml(item.id)}" ${canBuy ? "" : "disabled"} title="${this.escapeHtml(buyTitle)}">BUY</button>
+                        <button class="btn-hud btn-green" data-supply="use" data-supply-id="${this.escapeHtml(item.id)}" ${canUse ? "" : "disabled"} title="${this.escapeHtml(useTitle)}">USE</button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        this.supplyList.innerHTML = rows
+            || `<p class="panel-intro-text">No consumables are catalogued.</p>`;
+        this.supplyList.querySelectorAll("[data-supply]").forEach(button => {
+            button.addEventListener("click", () => {
+                this.handleSupply(button.getAttribute("data-supply"), button.getAttribute("data-supply-id"));
+            });
+        });
+    }
+
+    async handleSupply(action, itemId) {
+        if (!action || !itemId) return;
+        if (action === "buy") {
+            await this.postAction("/api/inventory/buy", { item_id: itemId, quantity: 1 }, "ship");
+        } else {
+            await this.postAction("/api/inventory/use", { item_id: itemId }, "ship");
+        }
+    }
+
     renderMarketTable() {
         if (!this.state) return;
         this.syncMarketLotBar();
@@ -4689,6 +4782,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 ${docked ? "" : `<p class="panel-intro-text" style="color: var(--neon-amber);">Orbit a station or colony drydock to install or remove structural modifications.</p>`}
             `;
         }
+        this.renderSupplies();
     }
 
     renderShipInterior(silhouette, shipClass) {

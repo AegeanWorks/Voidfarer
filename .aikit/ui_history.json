@@ -3085,5 +3085,29 @@
     "final_snapshot_digest": "fbd6166cb653b48da306358692c37385f97a38a476820d1beb6886fad594a533",
     "final_snapshot_entries": 1374,
     "surface_digest": "060f3a592b5ae8bbcca6844641afe3abb4923047024460747028055deaa9e581"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "2052301c4639eff33ac5cde5521e5614224d9ae6",
+    "contract_hash": "b5be116ddd36029f5416312baddd0a66ecf8b1f411b18e661a21e50713ef59e8",
+    "started_at": 1794894151.8668487,
+    "finished_at": 1794894964.32637,
+    "strikes": 0,
+    "reviewer": "kilo:goal per G-015 via DOM measurement (this model has no vision): real Edge (Playwright msedge) on a fresh save, SHIP tab. SUPPLY LOCKER exposes 4 rows: 'Nanite Repair Matrix / 250 CR / x0', 'Shield Flux Battery / 200 CR', 'Compressed Fuel Canister / 150 CR', 'Tactical ECM Decoy Flare / 350 CR'; BUY enabled with 'Buy ... for N credits.', USE disabled with 'None in the hold; buy one at a station terminal.' Clicking BUY logged 'Purchased 1x Nanite Repair Matrix for 250 cr.', credits 2000->1750, held x1. With hull 40/100 the USE tooltip read 'Restore hull integrity.'; clicking it logged 'Applied Nanite Repair Matrix: restored +35 Hull integrity (75/100).', held x0, USE disabled again. 0 console/page errors; listScrollWidth == clientWidth at 1366x768 and 1280x720; official tools/ui_browser.py laptop-ship/short-ship 0 errors/0 hscroll/0 tiny; tools/ui_audit.py 0 errors/clipped/offscreen/tiny/contrast. Screenshots and measure.json in ui-review/supply-locker/; screenshots captured for human review.",
+    "allowed_removals": [],
+    "allowed_tests": [],
+    "final_snapshot_digest": "39d9cb50b45de214007b8eacf62ea8258db79aa48d3d216448a0b651ad3617ae",
+    "final_snapshot_entries": 1382,
+    "surface_digest": "bd157527849769bdfe5af6edb2fe036c220692a786b59091f80b3f88abd1716f",
+    "baseline_digest": "060f3a592b5ae8bbcca6844641afe3abb4923047024460747028055deaa9e581"
   }
 ]

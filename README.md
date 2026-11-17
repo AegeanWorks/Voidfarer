@@ -307,6 +307,8 @@ python -m voidfarer.cli autotrade on fuel_cells 55 85 1
 python -m voidfarer.cli autotrade status
 python -m voidfarer.cli autotrade off
 ```
+The cockpit mirrors the same terminal in **SHIP → SUPPLY LOCKER**: buy at a docked station or
+colony, then use the held consumable anywhere in space (the ECM decoy only during combat).
 Auto-trade buys below its threshold or sells above it once per 3 ticks while docked, respecting cargo, credits, stock and faction pricing. Quantum auto-freight ships surplus cargo on the best net route every 6 ticks above a chosen minimum. The Commerce tab exposes both policies below the market table behind `SHOW AUTO-TRADE` and `SHOW QUANTUM FREIGHT` disclosures, so the exchange stays the primary surface.
 
 ### 12. Cadet Flight Academy (Situated Scaffolding)
