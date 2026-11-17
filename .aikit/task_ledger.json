@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "supply-locker-layout-test",
+    "task_id": "combat-decoy-control",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794896890.9520938,
+    "updated_at": 1794900104.3471854,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,69 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794896933.541883,
-    "completed_head": "df29fbf79459fea18a7ed14f91ea337977982fda",
-    "completed_tree": "774f12c6d7365e36018118daa43d6f764fb181a8"
+    "completed_at": 1794900189.1527796,
+    "completed_head": "1e354d920befcf439fd7070d3a78ac6c5d245c3f",
+    "completed_tree": "dbcd3096adbf64075e3ff0def4daab7ad6567ba8"
   },
   "checkpoints": [
-    {
-      "task_id": "repl-command-parity",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] All seven advertised commands run in a scripted and a real piped REPL; help lists every surface; suite Ran 1911 OK; 5/5 gates (ADR-363); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794858139.6236415,
-      "timestamp_str": "2026-11-16 22:42:19",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "repl-command-parity",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'repl-command-parity' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794858181.5320022,
-      "timestamp_str": "2026-11-16 22:43:01",
-      "agent": "kilo:goal",
-      "head": "dc397b6205939c56df040f79e6c445f5c0e0b98e",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "repl-guard-hatches",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Make every command in the REPL blocking-encounter allowlist actually run",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794859740.7060962,
-      "timestamp_str": "2026-11-16 23:09:00",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The guard allows encounter, state-machines and ? through during a decision, but the REPL dispatches none of them, so the advertised escape hatches print Unknown command exactly when the player is blocked",
-        "benefits": "A blocked player can inspect the encounter, inspect state machines and open help without guessing; the guard contract stops lying",
-        "risks": "contract: none (wires existing handlers); dependency: none; concurrency: none; state: none",
-        "mitigation": "failing-first scripted REPL test under a pending decision, full suite and 5/5 gates"
-      },
-      "plan_digest": "8e1c2e936dcf37646d549cf4b75085f9b6c79947453584777d667b37cd0c046b",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "repl-guard-hatches",
       "phase": "phase 4",
@@ -395,6 +337,64 @@
       "timestamp_str": "2026-11-17 09:28:53",
       "agent": "kilo:goal",
       "head": "df29fbf79459fea18a7ed14f91ea337977982fda",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "combat-decoy-control",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/4] Put a held ECM decoy on the combat card with an honest hold gate",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794898689.5867522,
+      "timestamp_str": "2026-11-17 09:58:09",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "The supply locker can now sell and use the evasion decoy, and the engine allows use_item during combat, but the combat card offers only FIRE/ABSORB/EVADE/FLEE; when fuel is below 8 the flee button is disabled and the only escape is hidden behind the SHIP tab's supply disclosure",
+        "benefits": "The decoy is usable where the threat is, the low-fuel flee tooltip points at it, and the four consumables become a coherent loop: buy at a dock, use in context",
+        "risks": "contract: none (uses the existing /api/inventory/use route); dependency: none; concurrency: none; state: none (reads ship.cargo)",
+        "mitigation": "failing-first layout pins, bounded UI task with fast+snapshot proofs, real Edge click-through that clears combat and spends the decoy, ui_browser and ui_audit at combat, full suite and 5/5 gates"
+      },
+      "plan_digest": "7e28f2855ff6cf09acef93f18b84c35bbe1a45c4f4488f5d54442dd98cfedf4a",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "combat-decoy-control",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/4] Decoy clears a live combat in real Edge and spends the item; disabled NO ECM DECOY with a buy hint when empty; low-fuel flee names the decoy; 0 errors/overflow; suite Ran 1936 OK; 5/5 gates; UI task closed (ADR-370); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794900104.3471854,
+      "timestamp_str": "2026-11-17 10:21:44",
+      "agent": "kilo:goal",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "combat-decoy-control",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'combat-decoy-control' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794900189.2267125,
+      "timestamp_str": "2026-11-17 10:23:09",
+      "agent": "kilo:goal",
+      "head": "1e354d920befcf439fd7070d3a78ac6c5d245c3f",
       "delivery": {
         "roots": [
           "."
