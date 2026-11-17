@@ -729,6 +729,9 @@ class AiCaptain:
         # early refusal (or a removal) locked every later install (ADR-352).
         "/api/shipmods/install": "mod_id",
         "/api/shipmods/remove": "slot",
+        # Each outpost level is a different upgrade; keying on the path stopped the
+        # climb at level 2 and made level-3 specialization unreachable (ADR-377).
+        "/api/outpost/upgrade": "level",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:

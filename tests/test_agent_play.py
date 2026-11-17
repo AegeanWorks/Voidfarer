@@ -521,6 +521,16 @@ class OutpostTierTourTest(unittest.TestCase):
         self.assertIsNone(self._captain(credits=100, outposts=[self._outpost(level=1)])._tour_outpost_upgrade())
         self.assertIsNone(self._captain(outposts=[self._outpost(level=5)])._tour_outpost_upgrade())
 
+    def test_each_upgrade_level_is_its_own_action(self):
+        captain = self._captain(outposts=[self._outpost(level=1)])
+        captain.attempted.add("/api/outpost/upgrade")
+        captain.attempted_signatures.add(("/api/outpost/upgrade", "1"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/outpost/upgrade", {"outpost_id": "o1", "level": 1}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/outpost/upgrade", {"outpost_id": "o1", "level": 2}),
+            "a level-2 upgrade must stay available after level 1")
+
     def test_module_picks_the_cheapest_stack_below_three(self):
         captain = self._captain(outposts=[self._outpost(modules={"laboratory": 3})])
         action = captain._tour_outpost_module()

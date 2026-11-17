@@ -9,8 +9,8 @@
 - **Total Python Modules**: `237`
 - **Total Classes**: `576`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2922`
-- **Total Source Lines**: `66697`
+- **Total Class Methods**: `2923`
+- **Total Source Lines**: `66710`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1596` lines (`75862` bytes)
+**Size**: `1606` lines (`76435` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -143,6 +143,7 @@
   - Method `.test_upgrade_cost_matches_the_engine_scale()`
   - Method `.test_build_is_attempted_at_a_buildable_site_even_when_broke()`
   - Method `.test_upgrade_gates_on_level_and_credits()`
+  - Method `.test_each_upgrade_level_is_its_own_action()`
   - Method `.test_module_picks_the_cheapest_stack_below_three()`
   - Method `.test_crew_needs_an_active_free_specialist_and_capacity()`
   - Method `.test_repair_needs_damage_and_credits()`
@@ -4769,7 +4770,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1802` lines (`84986` bytes)
+**Size**: `1805` lines (`85193` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
