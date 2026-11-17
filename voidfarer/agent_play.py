@@ -20,8 +20,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/step": "orbit-only micro-step (delta_time); use /api/time/step for full ticks",
     "/api/tutorial/reset": "meta: replays onboarding",
     "/api/tutorial/skip": "meta: skips onboarding",
-    "/api/messages/choose": "needs an interactive message-tree node",
-    "/api/messages/send": "needs a valid recipient",
+    "/api/messages/send": "needs an inbox with no unread mail or live branch",
     "/api/ally/form": "needs high standing and a prepared captain",
     "/api/anomaly": "prompt-driven: an anomaly must be resolved",
     "/api/combat": "prompt-driven: a hostile intercept must occur",
@@ -732,6 +731,9 @@ class AiCaptain:
         # Each outpost level is a different upgrade; keying on the path stopped the
         # climb at level 2 and made level-3 specialization unreachable (ADR-377).
         "/api/outpost/upgrade": "level",
+        # A tree branch spawns a follow-up node with its own choices; keying on the
+        # path would let the root lock every follow-up out of the tour (ADR-378).
+        "/api/messages/choose": "message_id",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -794,9 +796,33 @@ class AiCaptain:
         return "/api/route", {"system_id": connections[0]}, "route"
 
     def _tour_messages(self):
-        for message in self.state.get("messages") or []:
-            if isinstance(message, dict) and not message.get("read") and message.get("id"):
+        """Resolve one live branch, then fall back to plain mail (ADR-378)."""
+        messages = [m for m in self.state.get("messages") or []
+                    if isinstance(m, dict) and m.get("id")]
+        for message in messages:
+            if message.get("resolved_choice"):
+                continue
+            for choice in message.get("choices") or []:
+                if isinstance(choice, dict) and choice.get("id"):
+                    return ("/api/messages/choose",
+                            {"message_id": message["id"], "choice_id": choice["id"]},
+                            "messages_choose")
+        for message in messages:
+            if not message.get("read"):
                 return "/api/messages/read", {"message_id": message["id"]}, "messages"
+        return None
+
+    def _unread_message_action(self):
+        """Read plain inbox mail so a live branch cannot hide the read route."""
+        for message in self.state.get("messages") or []:
+            if not isinstance(message, dict) or not message.get("id"):
+                continue
+            if message.get("read") or message.get("resolved_choice"):
+                continue
+            if any(isinstance(choice, dict) and choice.get("id")
+                   for choice in message.get("choices") or []):
+                continue
+            return "/api/messages/read", {"message_id": message["id"]}, "messages"
         return None
 
     def _tour_contracts(self):
@@ -978,7 +1004,10 @@ class AiCaptain:
         return "/api/orbit", {"target": body_id}, "story_orbit"
 
     def _tour_message_send(self):
-        """Send one quantum message to the first correspondent (ADR-354)."""
+        """Read pending inbox mail first, then send to the first correspondent (ADR-354, ADR-378)."""
+        mail = self._unread_message_action()
+        if mail is not None:
+            return mail
         messages = [m for m in self.state.get("messages") or [] if isinstance(m, dict)]
         recipient = str((messages[0].get("sender") if messages else "") or "")
         if not recipient:

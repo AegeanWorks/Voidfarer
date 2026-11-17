@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `576`
+- **Total Classes**: `577`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2923`
-- **Total Source Lines**: `66710`
+- **Total Class Methods**: `2932`
+- **Total Source Lines**: `66811`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1606` lines (`76435` bytes)
+**Size**: `1678` lines (`79710` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -256,6 +256,15 @@
   - Method `.test_one_builder_hires_the_pilot_then_the_marine()`
   - Method `.test_no_crew_hire_when_both_are_aboard_undocked_or_poor()`
   - Method `.test_the_recruit_route_is_keyed_by_role()`
+- `class MessageTreePolicyTest` - *The captain resolves a live message-tree branch instead of only reading it (ADR-378).*
+  - Method `._captain(messages)`
+  - Method `.test_the_first_pending_branch_is_chosen()`
+  - Method `.test_a_read_but_unresolved_branch_is_still_chosen()`
+  - Method `.test_plain_mail_is_read_by_state_without_starving_the_branch()`
+  - Method `.test_a_plain_message_is_still_marked_read()`
+  - Method `.test_the_mail_followup_reads_before_it_sends()`
+  - Method `.test_a_resolved_branch_is_not_chosen_again()`
+  - Method `.test_each_tree_node_is_keyed_by_its_message_id()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4770,7 +4779,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1805` lines (`85193` bytes)
+**Size**: `1834` lines (`86648` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4795,7 +4804,8 @@
   - Method `._tour_power()`
   - Method `._tour_reactor()`
   - Method `._tour_route()`
-  - Method `._tour_messages()`
+  - Method `._tour_messages()` - *Resolve one live branch, then fall back to plain mail (ADR-378).*
+  - Method `._unread_message_action()` - *Read plain inbox mail so a live branch cannot hide the read route.*
   - Method `._tour_contracts()`
   - Method `._tour_story_choice()` - *Resolve the active chapter's first unlocked choice; the tour never touched the arc.*
   - Method `._void_dive_action()` - *Take the story's own void beat once: dive at the required horizon.*
@@ -4806,7 +4816,7 @@
   - Method `._story_hold_action()` - *Resolve the local chapter instead of letting a dock trip or body travel leave it.*
   - Method `._tour_story_travel()` - *Fly to the chapter target when the tank can cover the whole route plus a reserve.*
   - Method `._tour_story_orbit()` - *Orbit the body a chapter explicitly demands (Act IV's black hole, ADR-360).*
-  - Method `._tour_message_send()` - *Send one quantum message to the first correspondent (ADR-354).*
+  - Method `._tour_message_send()` - *Read pending inbox mail first, then send to the first correspondent (ADR-354, ADR-378).*
   - Method `._tour_shore_leave()`
   - Method `._tour_away_recall()`
   - Method `._tour_contract_claim()` - *Bank a finished contract instead of leaving its rewards stranded (ADR-344).*

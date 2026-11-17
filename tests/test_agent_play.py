@@ -1496,6 +1496,78 @@ class MarineCrewTest(unittest.TestCase):
             "the marine must stay hireable after the pilot")
 
 
+class MessageTreePolicyTest(unittest.TestCase):
+    """The captain resolves a live message-tree branch instead of only reading it (ADR-378)."""
+
+    def _captain(self, messages):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {"messages": messages}
+        return captain
+
+    def test_the_first_pending_branch_is_chosen(self):
+        captain = self._captain([
+            {"id": "tree_precursor_signal_0", "read": False, "resolved_choice": None,
+             "choices": [{"id": "decode"}, {"id": "sell"}]},
+        ])
+        self.assertEqual(
+            captain._tour_messages(),
+            ("/api/messages/choose",
+             {"message_id": "tree_precursor_signal_0", "choice_id": "decode"},
+             "messages_choose"),
+        )
+
+    def test_a_read_but_unresolved_branch_is_still_chosen(self):
+        captain = self._captain([
+            {"id": "tree_refugee_fleet_74", "read": True, "resolved_choice": None,
+             "choices": [{"id": "accept_crew"}]},
+        ])
+        self.assertEqual(captain._tour_messages()[0], "/api/messages/choose")
+
+    def test_plain_mail_is_read_by_state_without_starving_the_branch(self):
+        captain = self._captain([
+            {"id": "msg_depot", "read": False, "choices": []},
+            {"id": "tree_one", "read": False, "resolved_choice": None,
+             "choices": [{"id": "decode"}]},
+        ])
+        self.assertEqual(captain._unread_message_action()[1]["message_id"], "msg_depot")
+        self.assertEqual(captain._tour_messages()[1]["message_id"], "tree_one")
+        captain.state["messages"][0]["read"] = True
+        self.assertIsNone(captain._unread_message_action())
+
+    def test_a_plain_message_is_still_marked_read(self):
+        captain = self._captain([{"id": "msg_depot", "read": False, "choices": []}])
+        self.assertEqual(
+            captain._tour_messages(),
+            ("/api/messages/read", {"message_id": "msg_depot"}, "messages"),
+        )
+
+    def test_the_mail_followup_reads_before_it_sends(self):
+        captain = self._captain([
+            {"id": "msg_welcome", "sender": "Admiral Vance", "read": True, "choices": []},
+            {"id": "msg_depot", "read": False, "choices": []},
+        ])
+        self.assertEqual(captain._tour_message_send()[0], "/api/messages/read")
+        captain.state["messages"][1]["read"] = True
+        self.assertEqual(captain._tour_message_send()[0], "/api/messages/send")
+
+    def test_a_resolved_branch_is_not_chosen_again(self):
+        captain = self._captain([
+            {"id": "tree_one", "read": True, "resolved_choice": "decode",
+             "choices": [{"id": "decode"}]},
+        ])
+        self.assertIsNone(captain._tour_messages())
+
+    def test_each_tree_node_is_keyed_by_its_message_id(self):
+        captain = self._captain([])
+        captain.attempted.add("/api/messages/choose")
+        captain.attempted_signatures.add(("/api/messages/choose", "tree_one"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/messages/choose", {"message_id": "tree_one"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/messages/choose", {"message_id": "tree_one_decoded"}),
+            "a follow-up node must stay reachable after its parent")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 
