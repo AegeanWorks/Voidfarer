@@ -1440,6 +1440,48 @@ class SupplyTourTest(unittest.TestCase):
         self.assertNotEqual(captain._choose(3)[0], "/api/inventory/use")
 
 
+class MarineCrewTest(unittest.TestCase):
+    """The captain hires a marine so boarding is reachable (ADR-375)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "current_system": {"id": "sol"},
+            "orbiting_body": {"id": "sol_body_1", "station_dockable": True},
+            "ship": {"credits": 5000, "cargo": {}},
+            "crew": [],
+            "crew_roles": [
+                {"id": "pilot", "cost": 900},
+                {"id": "marine", "cost": 1000},
+            ],
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_docked_captain_hires_one_marine(self):
+        action = self._captain()._tour_marine()
+        self.assertEqual(action[0], "/api/crew/recruit")
+        self.assertEqual(action[1], {"role_id": "marine"})
+
+    def test_no_marine_hire_when_one_is_aboard_undocked_or_poor(self):
+        marine = [{"role": "marine", "status": "active"}]
+        self.assertIsNone(self._captain(crew=marine)._tour_marine())
+        self.assertIsNone(self._captain(orbiting_body=None)._tour_marine())
+        self.assertIsNone(self._captain(ship={"credits": 500})._tour_marine())
+
+    def test_the_recruit_route_is_keyed_by_role(self):
+        captain = self._captain()
+        captain.attempted.add("/api/crew/recruit")
+        captain.attempted_signatures.add(("/api/crew/recruit", "pilot"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/crew/recruit", {"role_id": "pilot"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/crew/recruit", {"role_id": "marine"}),
+            "the marine must stay hireable after the pilot")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

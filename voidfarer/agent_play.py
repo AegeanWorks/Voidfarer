@@ -636,6 +636,7 @@ class AiCaptain:
             self._tour_overhaul,
             self._tour_repair,
             self._tour_crew,
+            self._tour_marine,
             self._tour_upgrade,
             self._tour_weapon,
             self._tour_shipmod,
@@ -719,6 +720,9 @@ class AiCaptain:
         # repair paste lock the decoy out of the shop (ADR-371).
         "/api/inventory/buy": "item_id",
         "/api/inventory/use": "item_id",
+        # A pilot and a marine share the recruit route; keying on the path kept the
+        # marine out and boarded nothing (ADR-375).
+        "/api/crew/recruit": "role_id",
         # Many bodies share one orbit route; keying on the path let the first generic
         # orbit lock the chapter's required body (ADR-360).
         "/api/orbit": "target",
@@ -1057,6 +1061,28 @@ class AiCaptain:
         if int((self.state.get("ship") or {}).get("credits") or 0) < int(role.get("cost") or 0):
             return None
         return "/api/crew/recruit", {"role_id": role.get("id", "")}, "crew"
+
+    def _tour_marine(self):
+        """Hire a marine once so boarding and capture are reachable (ADR-375)."""
+        crew = self.state.get("crew") or []
+        if any(
+            isinstance(member, dict)
+            and str(member.get("role")) == "marine"
+            and str(member.get("status")) != "dead"
+            for member in crew
+        ):
+            return None
+        roles = self.state.get("crew_roles") or []
+        marine = next(
+            (role for role in roles
+             if isinstance(role, dict) and str(role.get("id")) == "marine"),
+            None,
+        )
+        if marine is None or not self._is_docked():
+            return None
+        if int((self.state.get("ship") or {}).get("credits") or 0) < int(marine.get("cost") or 0):
+            return None
+        return "/api/crew/recruit", {"role_id": "marine"}, "crew"
 
     def _tour_upgrade(self):
         catalog = self.state.get("catalog_upgrades") or []
