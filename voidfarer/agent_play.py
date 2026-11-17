@@ -636,7 +636,6 @@ class AiCaptain:
             self._tour_overhaul,
             self._tour_repair,
             self._tour_crew,
-            self._tour_marine,
             self._tour_upgrade,
             self._tour_weapon,
             self._tour_shipmod,
@@ -1054,35 +1053,33 @@ class AiCaptain:
         return "/api/repair", {}, "repair"
 
     def _tour_crew(self):
+        """Hire the pilot, then the marine, from one builder (ADR-375, ADR-376).
+
+        The recruit route is keyed by role_id, so one builder can fill both roles across
+        visits; a separate marine builder cost a tour slot and dropped late coverage.
+        """
         roles = self.state.get("crew_roles") or []
         if not roles or not self._is_docked():
             return None
-        role = roles[0] if isinstance(roles[0], dict) else {"id": str(roles[0]), "cost": 0}
-        if int((self.state.get("ship") or {}).get("credits") or 0) < int(role.get("cost") or 0):
-            return None
-        return "/api/crew/recruit", {"role_id": role.get("id", "")}, "crew"
-
-    def _tour_marine(self):
-        """Hire a marine once so boarding and capture are reachable (ADR-375)."""
-        crew = self.state.get("crew") or []
-        if any(
-            isinstance(member, dict)
-            and str(member.get("role")) == "marine"
-            and str(member.get("status")) != "dead"
-            for member in crew
-        ):
-            return None
-        roles = self.state.get("crew_roles") or []
-        marine = next(
-            (role for role in roles
-             if isinstance(role, dict) and str(role.get("id")) == "marine"),
-            None,
-        )
-        if marine is None or not self._is_docked():
-            return None
-        if int((self.state.get("ship") or {}).get("credits") or 0) < int(marine.get("cost") or 0):
-            return None
-        return "/api/crew/recruit", {"role_id": "marine"}, "crew"
+        by_id = {
+            str(role.get("id")): role
+            for role in roles
+            if isinstance(role, dict)
+        }
+        present = {
+            str(member.get("role"))
+            for member in self.state.get("crew") or []
+            if isinstance(member, dict) and str(member.get("status")) != "dead"
+        }
+        credits = int((self.state.get("ship") or {}).get("credits") or 0)
+        for role_id in ("pilot", "marine"):
+            role = by_id.get(role_id)
+            if role is None or role_id in present:
+                continue
+            if credits < int(role.get("cost") or 0):
+                continue
+            return "/api/crew/recruit", {"role_id": role_id}, "crew"
+        return None
 
     def _tour_upgrade(self):
         catalog = self.state.get("catalog_upgrades") or []

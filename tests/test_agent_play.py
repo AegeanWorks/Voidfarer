@@ -1460,16 +1460,20 @@ class MarineCrewTest(unittest.TestCase):
         captain.state = base
         return captain
 
-    def test_a_docked_captain_hires_one_marine(self):
-        action = self._captain()._tour_marine()
-        self.assertEqual(action[0], "/api/crew/recruit")
-        self.assertEqual(action[1], {"role_id": "marine"})
+    def test_one_builder_hires_the_pilot_then_the_marine(self):
+        captain = self._captain()
+        self.assertEqual(captain._tour_crew()[1], {"role_id": "pilot"})
+        captain.state["crew"] = [{"role": "pilot", "status": "active"}]
+        self.assertEqual(captain._tour_crew()[1], {"role_id": "marine"})
+        captain.state["crew"].append({"role": "marine", "status": "active"})
+        self.assertIsNone(captain._tour_crew())
 
-    def test_no_marine_hire_when_one_is_aboard_undocked_or_poor(self):
-        marine = [{"role": "marine", "status": "active"}]
-        self.assertIsNone(self._captain(crew=marine)._tour_marine())
-        self.assertIsNone(self._captain(orbiting_body=None)._tour_marine())
-        self.assertIsNone(self._captain(ship={"credits": 500})._tour_marine())
+    def test_no_crew_hire_when_both_are_aboard_undocked_or_poor(self):
+        both = [{"role": "pilot", "status": "active"},
+                {"role": "marine", "status": "active"}]
+        self.assertIsNone(self._captain(crew=both)._tour_crew())
+        self.assertIsNone(self._captain(orbiting_body=None)._tour_crew())
+        self.assertIsNone(self._captain(ship={"credits": 500})._tour_crew())
 
     def test_the_recruit_route_is_keyed_by_role(self):
         captain = self._captain()

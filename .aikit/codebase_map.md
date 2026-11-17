@@ -9,8 +9,8 @@
 - **Total Python Modules**: `237`
 - **Total Classes**: `576`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2923`
-- **Total Source Lines**: `66696`
+- **Total Class Methods**: `2922`
+- **Total Source Lines**: `66697`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1592` lines (`75595` bytes)
+**Size**: `1596` lines (`75862` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -252,8 +252,8 @@
   - Method `.test_no_use_when_healthy_empty_or_in_combat()`
 - `class MarineCrewTest` - *The captain hires a marine so boarding is reachable (ADR-375).*
   - Method `._captain(**state)`
-  - Method `.test_a_docked_captain_hires_one_marine()`
-  - Method `.test_no_marine_hire_when_one_is_aboard_undocked_or_poor()`
+  - Method `.test_one_builder_hires_the_pilot_then_the_marine()`
+  - Method `.test_no_crew_hire_when_both_are_aboard_undocked_or_poor()`
   - Method `.test_the_recruit_route_is_keyed_by_role()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
@@ -4769,7 +4769,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1805` lines (`85161` bytes)
+**Size**: `1802` lines (`84986` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4813,8 +4813,7 @@
   - Method `._tour_burn_cells()` - *Burn one hold Quantum Fuel Cell when the tank has room (the fuel-cell emergency refuel).*
   - Method `._tour_overhaul()` - *Scrub hyperlane frame wear at a drydock; the wear only appears after many jumps.*
   - Method `._tour_repair()`
-  - Method `._tour_crew()`
-  - Method `._tour_marine()` - *Hire a marine once so boarding and capture are reachable (ADR-375).*
+  - Method `._tour_crew()` - *Hire the pilot, then the marine, from one builder (ADR-375, ADR-376).*
   - Method `._tour_upgrade()`
   - Method `._tour_weapon()`
   - Method `._tour_shipmod()`
