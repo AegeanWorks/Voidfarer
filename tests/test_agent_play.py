@@ -1954,6 +1954,59 @@ class AwayRecallPolicyTest(unittest.TestCase):
         self.assertEqual(captain._away_recall_action()[1]["mission_id"], "away_3")
 
 
+class AllyFormationPolicyTest(unittest.TestCase):
+    """The captain hails a captain to trust 50 and forms the alliance (ADR-385)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "ai_captains": [
+                {"id": "vance", "name": "Admiral Vance", "trust": 10, "ally": False},
+                {"id": "rook", "name": "Captain Rook", "trust": 44, "ally": False},
+                {"id": "old_ally", "name": "Captain Grey", "trust": 80, "ally": True},
+            ],
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_most_trusted_non_ally_is_hailed_until_fifty(self):
+        self.assertEqual(
+            self._captain()._ally_action(),
+            ("/api/ai/interact", {"captain_id": "rook", "action": "hail"}, "ai"),
+        )
+
+    def test_trust_fifty_forms_the_alliance(self):
+        captain = self._captain(ai_captains=[
+            {"id": "rook", "trust": 50, "ally": False},
+        ])
+        self.assertEqual(
+            captain._ally_action(),
+            ("/api/ally/form", {"captain_id": "rook"}, "ally"),
+        )
+
+    def test_an_already_allied_captain_is_skipped(self):
+        captain = self._captain(ai_captains=[
+            {"id": "old_ally", "trust": 90, "ally": True},
+        ])
+        self.assertIsNone(captain._ally_action())
+
+    def test_no_hailing_before_act_vi(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._ally_action())
+
+    def test_each_captain_is_keyed_by_its_id(self):
+        captain = self._captain(ai_captains=[])
+        captain.attempted_signatures.add(("/api/ally/form", "rook"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/ally/form", {"captain_id": "rook"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/ally/form", {"captain_id": "vance"}),
+            "a second captain must stay reachable after the first alliance")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `582`
+- **Total Classes**: `583`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2973`
-- **Total Source Lines**: `67444`
+- **Total Class Methods**: `2980`
+- **Total Source Lines**: `67528`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2064` lines (`96866` bytes)
+**Size**: `2117` lines (`98969` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -305,6 +305,13 @@
   - Method `.test_no_recall_without_an_active_mission()`
   - Method `.test_recall_is_one_shot_per_mission()`
   - Method `.test_each_mission_is_keyed_by_its_id()`
+- `class AllyFormationPolicyTest` - *The captain hails a captain to trust 50 and forms the alliance (ADR-385).*
+  - Method `._captain(**state)`
+  - Method `.test_the_most_trusted_non_ally_is_hailed_until_fifty()`
+  - Method `.test_trust_fifty_forms_the_alliance()`
+  - Method `.test_an_already_allied_captain_is_skipped()`
+  - Method `.test_no_hailing_before_act_vi()`
+  - Method `.test_each_captain_is_keyed_by_its_id()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4819,7 +4826,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2081` lines (`98806` bytes)
+**Size**: `2112` lines (`100253` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4855,6 +4862,7 @@
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
   - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._ally_action()` - *Hail the most trusted non-ally to 50 trust, then ally (ADR-385).*
   - Method `._patrol_action()` - *Recall a detached escort, then patrol one onto a connected lane (ADR-382).*
   - Method `._tour_supply()` - *Buy the station repair paste so the item terminal is exercised (ADR-367).*
   - Method `._tour_supply_decoy()` - *Buy the last-resort ECM decoy once, separately so the paste cannot starve it (ADR-371).*

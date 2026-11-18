@@ -187,6 +187,8 @@ class AiCaptain:
     AUTOMATION_BUY_MARGIN = 1.10
     # Auto-freight is stood down after its order lands or this many steps pass (ADR-381).
     QUANTUM_AUTOMATION_WINDOW = 10
+    # The engine's alliance gate; hailing adds two trust per action (ADR-385).
+    ALLY_TRUST = 50
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -406,6 +408,12 @@ class AiCaptain:
         patrol = self._patrol_action()
         if patrol is not None:
             return patrol
+
+        # A captain starts at 10-40 trust; the post-campaign hail chain reaches the
+        # engine's 50-trust alliance gate and then forms the alliance (ADR-385).
+        ally = self._ally_action()
+        if ally is not None:
+            return ally
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -794,6 +802,9 @@ class AiCaptain:
         # Each expedition type may launch once, so a late type can prove the recall
         # after the first team has already completed its survey (ADR-384).
         "/api/away/launch": "mission_type",
+        # Trust and alliance are per captain, so every captain stays reachable for
+        # the post-campaign hail chain (ADR-385).
+        "/api/ally/form": "captain_id",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1110,6 +1121,26 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _ally_action(self):
+        """Hail the most trusted non-ally to 50 trust, then ally (ADR-385)."""
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        candidates = [
+            captain for captain in self.state.get("ai_captains") or []
+            if isinstance(captain, dict) and captain.get("id") and not captain.get("ally")
+        ]
+        if not candidates:
+            return None
+        candidates.sort(key=lambda captain: -int(captain.get("trust") or 0))
+        lead = candidates[0]
+        if int(lead.get("trust") or 0) >= self.ALLY_TRUST:
+            body = {"captain_id": str(lead["id"])}
+            if self._tour_action_attempted("/api/ally/form", body):
+                return None
+            return "/api/ally/form", body, "ally"
+        return ("/api/ai/interact",
+                {"captain_id": str(lead["id"]), "action": "hail"}, "ai")
 
     def _patrol_action(self):
         """Recall a detached escort, then patrol one onto a connected lane (ADR-382).
