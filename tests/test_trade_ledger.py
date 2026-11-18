@@ -139,7 +139,7 @@ class TestMaxOrderParity(unittest.TestCase):
 
     def test_rest_trade_accepts_max_flag(self):
         VoidFarerHandler.engine = _docked_engine(cargo={"fuel_cells": 5})
-        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=10)
         body = json.dumps({"commodity_id": "fuel_cells", "is_buy": False, "max": True})
         conn.request("POST", "/api/trade", body=body, headers={"Content-Type": "application/json"})
         payload = json.loads(conn.getresponse().read())

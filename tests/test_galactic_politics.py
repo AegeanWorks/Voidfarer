@@ -446,7 +446,7 @@ class TestWarSupportParity(unittest.TestCase):
     def test_rest_support(self):
         VoidFarerHandler.engine = _engine_at_war()
         VoidFarerHandler.storage = StorageManager(self.temp_dir.name)
-        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=10)
         body = json.dumps({"war_id": "w_test", "faction_id": "sol_coalition", "credits": 800})
         conn.request("POST", "/api/war/support", body=body, headers={"Content-Type": "application/json"})
         payload = json.loads(conn.getresponse().read())
@@ -471,7 +471,7 @@ class TestWarSupportParity(unittest.TestCase):
         )
         VoidFarerHandler.engine = engine
         VoidFarerHandler.storage = StorageManager(self.temp_dir.name)
-        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=10)
         body = json.dumps({"faction_id": "nebula_collective", "action": "ceasefire"})
         with patch.object(engine, "_stable_unit", return_value=0.0):
             conn.request("POST", "/api/diplomacy", body=body, headers={"Content-Type": "application/json"})

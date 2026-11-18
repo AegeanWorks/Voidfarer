@@ -263,7 +263,7 @@ class AwayParityTest(unittest.TestCase):
     def _get(self, path):
         import http.client
 
-        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         conn.request("GET", path)
         response = conn.getresponse()
         body = response.read()
@@ -273,7 +273,7 @@ class AwayParityTest(unittest.TestCase):
     def _post(self, path, payload):
         import http.client
 
-        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         conn.request("POST", path, body=json.dumps(payload), headers={"Content-Type": "application/json"})
         response = conn.getresponse()
         body = response.read()

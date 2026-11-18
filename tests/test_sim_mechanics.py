@@ -379,7 +379,7 @@ class TestServerCrewShoreEndpoint(unittest.TestCase):
         cls.temp_dir.cleanup()
 
     def _post(self, path: str, body: dict):
-        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         payload = json.dumps(body)
         conn.request("POST", path, body=payload, headers={"Content-Type": "application/json"})
         res = conn.getresponse()

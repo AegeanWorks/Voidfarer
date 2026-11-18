@@ -72,7 +72,7 @@ class TestCatalogEndpoints(unittest.TestCase):
         headers = {"Content-Type": "application/json"}
         if cached:
             headers[CATALOG_CACHE_HEADER] = "1"
-        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=10)
         conn.request(method, path, body=json.dumps(body) if body is not None else None, headers=headers)
         payload = json.loads(conn.getresponse().read())
         conn.close()

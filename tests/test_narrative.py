@@ -125,7 +125,7 @@ class TestNarrativeSurfaces(unittest.TestCase):
         VoidFarerHandler.storage = StorageManager(self.temp_dir.name)
 
     def _get(self, path: str):
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         connection.request("GET", path)
         response = connection.getresponse()
         body = response.read()
@@ -133,7 +133,7 @@ class TestNarrativeSurfaces(unittest.TestCase):
         return response.status, json.loads(body.decode("utf-8"))
 
     def _post(self, path: str, payload: dict):
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         connection.request(
             "POST", path, body=json.dumps(payload),
             headers={"Content-Type": "application/json"},

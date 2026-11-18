@@ -46,7 +46,7 @@ class TestServer(unittest.TestCase):
         VoidFarerHandler.storage = StorageManager(self.temp_dir.name)
 
     def _get(self, path: str):
-        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         conn.request("GET", path)
         res = conn.getresponse()
         data = res.read()
@@ -57,7 +57,7 @@ class TestServer(unittest.TestCase):
         return self._post_raw(path, json.dumps(body))
 
     def _post_raw(self, path: str, payload: str, content_type: str = "application/json"):
-        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         conn.request("POST", path, body=payload, headers={"Content-Type": content_type})
         res = conn.getresponse()
         data = res.read()

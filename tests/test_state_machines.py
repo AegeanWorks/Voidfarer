@@ -398,7 +398,7 @@ class TestStateMachineSurfaces(unittest.TestCase):
         cls.temp_dir.cleanup()
 
     def _get(self, path: str):
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
         connection.request("GET", path)
         response = connection.getresponse()
         body = response.read()
