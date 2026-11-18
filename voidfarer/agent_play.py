@@ -62,7 +62,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/drone/collect": "needs a deployed drone",
     "/api/depot/sell": "needs stock sitting in a depot",
     "/api/trade/automation": "the broker is armed after Act VI; the 180-step gate ends before the campaign does",
-    "/api/trade/quantum/automation": "needs a docked market and surplus cargo",
+    "/api/trade/quantum/automation": "auto-freight is armed after Act VI; the 180-step gate ends before the campaign does",
     "/api/research/queue": "needs a valid, incomplete research project",
     "/api/research/cancel": "needs a project already in the research queue",
     "/api/depot/withdraw": "needs stock sitting in a depot",
@@ -82,7 +82,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/crew/station": "needs an active crew specialist",
     "/api/crew/dismiss": "would erase the only crew roster in the run",
     "/api/story/choice": "needs an active story choice",
-    "/api/trade/quantum/place": "needs a quantum-trade unlock",
+    "/api/trade/quantum/place": "the lane opens after Act VI; the 180-step gate ends before the campaign does",
     "/api/combat/gambit": "needs an active fight and a local escort captain",
     "/api/outpost/link": "needs two outposts in one system",
     "/api/megastructure/restore": "needs orbit and a restorable megastructure",
@@ -184,6 +184,8 @@ class AiCaptain:
     # The broker's buy ceiling sits above the quoted price so a quiet market move
     # cannot cancel the one armed window (ADR-380).
     AUTOMATION_BUY_MARGIN = 1.10
+    # Auto-freight is stood down after its order lands or this many steps pass (ADR-381).
+    QUANTUM_AUTOMATION_WINDOW = 10
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -220,6 +222,8 @@ class AiCaptain:
         self.fallback_trades = 0
         # One tick per armed broker window, so the automation cannot tick forever (ADR-380).
         self.automation_waited = False
+        # The step auto-freight was armed on; its window is bounded by steps (ADR-381).
+        self.quantum_armed_at = 0
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -381,6 +385,12 @@ class AiCaptain:
         automation = self._automation_action()
         if automation is not None:
             return automation
+
+        # Quantum freight follows the same post-campaign pattern on the engine's own
+        # route report: one order, one armed auto-freight window (ADR-381).
+        quantum = self._quantum_freight_action()
+        if quantum is not None:
+            return quantum
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -757,6 +767,10 @@ class AiCaptain:
         # Arming and standing the broker down are two distinct actions; keying on the
         # path would leave the disable direction unreachable after the arm (ADR-380).
         "/api/trade/automation": "enabled",
+        # One quantum order per commodity and the same arm/disable split as the broker
+        # keep both freight directions reachable (ADR-381).
+        "/api/trade/quantum/place": "commodity_id",
+        "/api/trade/quantum/automation": "enabled",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1018,6 +1032,61 @@ class AiCaptain:
                 price = item.get(field)
                 return float(price) if isinstance(price, (int, float)) else 0.0
         return 0.0
+
+    def _quantum_report(self) -> dict[str, Any] | None:
+        """Read the docked quantum-freight report so routes come from the engine."""
+        status, payload = self.client.get("/api/trade/quantum")
+        if status != 200 or not payload.get("ok"):
+            return None
+        return payload.get("quantum") or payload.get("report") or {}
+
+    def _quantum_freight_action(self):
+        """Place one quantum order, then arm and stand down auto-freight (ADR-381).
+
+        The engine's route report already prices every held commodity against every
+        reachable terminal, so the captain never guesses a fee or a destination.
+        """
+        auto = self.state.get("quantum_automation") or {}
+        if auto.get("enabled"):
+            window_passed = self.total_steps - self.quantum_armed_at >= self.QUANTUM_AUTOMATION_WINDOW
+            if int(auto.get("orders") or 0) > 0 or window_passed:
+                body = {"enabled": False}
+                if self._tour_action_attempted("/api/trade/quantum/automation", body):
+                    return None
+                return "/api/trade/quantum/automation", body, "quantum_automation"
+            return None
+        if not self._is_docked():
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        report = self._quantum_report()
+        if not report or not report.get("docked"):
+            return None
+        ship = self.state.get("ship") or {}
+        credits = int(ship.get("credits") or 0)
+        routes = [
+            route for route in report.get("routes") or []
+            if isinstance(route, dict) and int(route.get("net") or 0) > 0
+            and int(route.get("fee") or 0) <= credits
+            and str(route.get("commodity_id") or "")
+            and str(route.get("destination_system_id") or "")
+        ]
+        routes.sort(key=lambda route: -int(route.get("net") or 0))
+        if not routes:
+            return None
+        route = routes[0]
+        body = {
+            "commodity_id": str(route["commodity_id"]),
+            "quantity": 1,
+            "destination_system_id": str(route["destination_system_id"]),
+        }
+        if not self._tour_action_attempted("/api/trade/quantum/place", body):
+            return "/api/trade/quantum/place", body, "quantum_place"
+        arm = {"enabled": True, "min_net": 0}
+        if self._tour_action_attempted("/api/trade/quantum/automation", arm):
+            return None
+        self.quantum_armed_at = self.total_steps
+        return "/api/trade/quantum/automation", arm, "quantum_automation"
 
     def _tour_supply(self):
         """Buy the station repair paste so the item terminal is exercised (ADR-367)."""

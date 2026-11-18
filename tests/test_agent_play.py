@@ -1717,6 +1717,113 @@ class TradeAutomationPolicyTest(unittest.TestCase):
             "standing the broker down must stay reachable after arming it")
 
 
+class QuantumFreightTourTest(unittest.TestCase):
+    """The captain ships cargo down the quantum lane and arms auto-freight (ADR-381)."""
+
+    class StubClient:
+        def __init__(self, report):
+            self.report = report
+
+        def get(self, path):
+            if path == "/api/trade/quantum":
+                return 200, {"ok": True, "quantum": self.report}
+            return 404, {}
+
+    def _captain(self, report, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.client = self.StubClient(report)
+        base = {
+            "story_status": {"completed": True},
+            "orbiting_body": {"id": "b1", "station_dockable": True},
+            "ship": {"credits": 5000, "cargo": {"titanium": 20}},
+            "quantum_automation": {"enabled": False, "min_net": 100, "orders": 0},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    @staticmethod
+    def _report(routes):
+        return {"docked": True, "routes": routes, "max_orders": 4}
+
+    def test_the_best_positive_route_is_placed(self):
+        report = self._report([
+            {"commodity_id": "titanium", "quantity": 20,
+             "destination_system_id": "vega", "fee": 50, "net": 300},
+            {"commodity_id": "titanium", "quantity": 20,
+             "destination_system_id": "sol", "fee": 10, "net": 900},
+        ])
+        action = self._captain(report)._quantum_freight_action()
+        self.assertEqual(action[0], "/api/trade/quantum/place")
+        self.assertEqual(action[1], {"commodity_id": "titanium", "quantity": 1,
+                                     "destination_system_id": "sol"})
+        self.assertEqual(action[2], "quantum_place")
+
+    def test_no_lane_without_a_dock_story_or_positive_route(self):
+        report = self._report([
+            {"commodity_id": "titanium", "quantity": 20,
+             "destination_system_id": "vega", "fee": 500, "net": -20},
+        ])
+        self.assertIsNone(self._captain(report)._quantum_freight_action())
+        good = self._report([
+            {"commodity_id": "titanium", "quantity": 20,
+             "destination_system_id": "vega", "fee": 10, "net": 500},
+        ])
+        self.assertIsNone(self._captain(good, orbiting_body=None)._quantum_freight_action())
+        self.assertIsNone(self._captain(
+            good, story_status={"completed": False})._quantum_freight_action())
+
+    def test_a_refused_or_unaffordable_fee_is_skipped(self):
+        report = self._report([
+            {"commodity_id": "titanium", "quantity": 20,
+             "destination_system_id": "vega", "fee": 900, "net": 500},
+        ])
+        self.assertIsNone(self._captain(
+            report, ship={"credits": 500, "cargo": {"titanium": 20}})._quantum_freight_action())
+
+    def test_the_automation_is_armed_after_the_manual_order(self):
+        report = self._report([
+            {"commodity_id": "titanium", "quantity": 20,
+             "destination_system_id": "vega", "fee": 10, "net": 500},
+        ])
+        captain = self._captain(report)
+        captain.attempted_signatures.add(("/api/trade/quantum/place", "titanium"))
+        action = captain._quantum_freight_action()
+        self.assertEqual(action[0], "/api/trade/quantum/automation")
+        self.assertEqual(action[1], {"enabled": True, "min_net": 0})
+        self.assertEqual(action[2], "quantum_automation")
+
+    def test_the_automation_is_stood_down_after_an_order_or_its_window(self):
+        report = self._report([])
+        traded = self._captain(report, quantum_automation={
+            "enabled": True, "min_net": 0, "orders": 1})
+        self.assertEqual(
+            traded._quantum_freight_action(),
+            ("/api/trade/quantum/automation", {"enabled": False}, "quantum_automation"),
+        )
+        idle = self._captain(report, quantum_automation={
+            "enabled": True, "min_net": 0, "orders": 0})
+        idle.quantum_armed_at = 1
+        idle.total_steps = 99
+        self.assertEqual(idle._quantum_freight_action()[1], {"enabled": False})
+
+    def test_both_quantum_routes_are_keyed(self):
+        captain = self._captain(self._report([]))
+        captain.attempted_signatures.add(("/api/trade/quantum/place", "titanium"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/trade/quantum/place", {"commodity_id": "titanium"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/trade/quantum/place", {"commodity_id": "medicines"}))
+        captain.attempted_signatures.add(("/api/trade/quantum/automation", "True"))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/trade/quantum/automation", {"enabled": False}),
+            "standing auto-freight down must stay reachable after arming it")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `579`
+- **Total Classes**: `580`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2950`
-- **Total Source Lines**: `67070`
+- **Total Class Methods**: `2960`
+- **Total Source Lines**: `67246`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1827` lines (`86426` bytes)
+**Size**: `1934` lines (`91381` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -282,6 +282,15 @@
   - Method `.test_an_armed_broker_gets_one_tick_and_then_stands_down()`
   - Method `.test_a_full_hold_waits_for_the_sell_fallback()`
   - Method `.test_both_switch_directions_are_separate_signatures()`
+- `class QuantumFreightTourTest` - *The captain ships cargo down the quantum lane and arms auto-freight (ADR-381).*
+  - Method `._captain(report, **state)`
+  - Method `._report(routes)`
+  - Method `.test_the_best_positive_route_is_placed()`
+  - Method `.test_no_lane_without_a_dock_story_or_positive_route()`
+  - Method `.test_a_refused_or_unaffordable_fee_is_skipped()`
+  - Method `.test_the_automation_is_armed_after_the_manual_order()`
+  - Method `.test_the_automation_is_stood_down_after_an_order_or_its_window()`
+  - Method `.test_both_quantum_routes_are_keyed()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4796,7 +4805,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1944` lines (`91923` bytes)
+**Size**: `2013` lines (`95395` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4830,6 +4839,8 @@
   - Method `._chassis_action()` - *Commission the cheapest fitting hull once, after Act VI at a service dock (ADR-379).*
   - Method `._automation_action()` - *Arm the docked broker on the cheapest quote, then stand it down (ADR-380).*
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
+  - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
+  - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
   - Method `._tour_supply()` - *Buy the station repair paste so the item terminal is exercised (ADR-367).*
   - Method `._tour_supply_decoy()` - *Buy the last-resort ECM decoy once, separately so the paste cannot starve it (ADR-371).*
   - Method `._supply_purchase(item_id, fallback_price)`
