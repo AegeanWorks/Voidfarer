@@ -1,199 +1,19 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "quantum-freight-lane",
-    "last_phase": "phase 4",
+    "task_id": "test-timeout-hardening",
+    "last_phase": "resumed",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794983348.833684,
+    "updated_at": 1794993010.0779157,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
-    "workspaces": [
-      {
-        "name": "voidfarer",
-        "path": "projects/voidfarer"
-      }
-    ],
-    "completed_at": 1794983394.2815075,
-    "completed_head": "d0d1e9956fd30ec08adad98db36b47f133257432",
-    "completed_tree": "938bec5d717a199b5a7b66028414121af0a03aa6"
+    "completed_at": 1794993040.6638763,
+    "completed_head": "b0c69391448087e0bb17382bf5ea4894c79f3735",
+    "completed_tree": "6d5f5466baeed3ac22ff8ba3c523c4b2e64f7cc1"
   },
   "checkpoints": [
-    {
-      "task_id": "marine-boarding-crew",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/4] Gate 56 families/57 of 66 with crew 2 (pilot+marine) and 0 gaps; seeds 1/2/42 carry a marine with seed 1 capturing a prize; scripted fight logs PRIZE CAPTURED; suite Ran 1961 OK (ADR-375); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794937375.0839486,
-      "timestamp_str": "2026-11-17 20:42:55",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "marine-boarding-crew",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'marine-boarding-crew' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794937392.6171594,
-      "timestamp_str": "2026-11-17 20:43:12",
-      "agent": "kilo:goal",
-      "head": "e3707d9497d9c22522766ed51e28b2edce4a654f",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "crew-builder-consolidation",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Fold the marine hire into the crew builder to recover the lost tour coverage",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794938468.1363125,
-      "timestamp_str": "2026-11-17 21:01:08",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ADR-375 added a separate marine builder and shifted the 180-step tour, dropping three attempted endpoints and two families (58/59/69 to 56/57/66); the recruit route is already keyed by role_id, so one builder can hire both roles in sequence",
-        "benefits": "The marine stays reachable while the tour rhythm and gate coverage return; one fewer builder and no dead method",
-        "risks": "contract: none; dependency: none; concurrency: none; state: none",
-        "mitigation": "failing-first crew sequence tests, gate measurement, three-seed campaigns, full suite and 5/5 gates"
-      },
-      "plan_digest": "15ac9b6286b862f27aa89c900f8e6fce91fa971757280f311a28ca5a3acf0de3",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "crew-builder-consolidation",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/3] One crew builder hires pilot then marine; gate restored to 58 families/59 of 69, 0 gaps; seeds 1/2/42 carry pilot+marine and complete, seed 42 captures a prize; suite Ran 1961 OK (ADR-376); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794939942.0397522,
-      "timestamp_str": "2026-11-17 21:25:42",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "crew-builder-consolidation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'crew-builder-consolidation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794939976.32394,
-      "timestamp_str": "2026-11-17 21:26:16",
-      "agent": "kilo:goal",
-      "head": "8823c6f033a548c653be46b2221b6567b63e13aa",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "outpost-leveling",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Let the outpost tour climb levels so specialization is reachable",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794940530.1632843,
-      "timestamp_str": "2026-11-17 21:35:30",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The upgrade route is de-duplicated by path, so one upgrade at level 1 locks every later level; campaigns stop at level 2 and /api/outpost/specialize (level 3) stays in CONTEXT_ACTIONS even though the outpost is founded and the builder exists",
-        "benefits": "Outposts reach level 3+ and specialize in 2,000-step campaigns; the upgrade route is keyed by current level so each step is a distinct action; coverage of the outpost tier becomes real",
-        "risks": "contract: /api/outpost/upgrade signature changes from path to level (additive); dependency: none; concurrency: none; state: bounded by the five-level cap",
-        "mitigation": "failing-first signature tests, campaign evidence for level and specialization, unchanged gate, full suite and 5/5 gates"
-      },
-      "plan_digest": "9e5a28504778cf2c407ef0922607e1683083e1cfeb12dc363deba973a8b7107a",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "outpost-leveling",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/3] Level-keyed upgrades raise outposts to level 5 with specialization on seeds 1/2/42; campaigns complete 0 gaps/0 errors; gate unchanged 58/59 of 69; suite Ran 1962 OK (ADR-377); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794942569.8504932,
-      "timestamp_str": "2026-11-17 22:09:29",
-      "agent": "kilo:goal",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "outpost-leveling",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'outpost-leveling' completed successfully.",
-      "status": "completed",
-      "timestamp": 1794942584.3876228,
-      "timestamp_str": "2026-11-17 22:09:44",
-      "agent": "kilo:goal",
-      "head": "f233b3cc225e82ab043575a84349a275b247d392",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "message-tree-branches",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Resolve branching message-tree nodes so the narrative choice surface is reachable",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794948461.4159436,
-      "timestamp_str": "2026-11-17 23:47:41",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The captain reads inbox messages but never chooses a branch, so all three message trees (precursor signal, refugee flotilla, quantum compact) and /api/messages/choose stay outside the proof surface; a seed-1 campaign ends with two unresolved tree nodes whose choices are live payload, while CONTEXT_ACTIONS still claims the route needs an interactive node the campaign never provides",
-        "benefits": "The first unresolved branch is chosen from the live choices payload, follow-up nodes are distinct actions keyed by message_id, permanent outcomes (research, standing, crew, reactor bonuses) reach the campaign, and the 180-step gate exercises the route",
-        "risks": "contract: /api/messages/choose leaves CONTEXT_ACTIONS and joins SIGNATURE_ROUTES keyed by message_id (additive); dependency: none; concurrency: none; state: one branch per node, all persist through the existing engine path",
-        "mitigation": "failing-first policy tests for choice/read/resolved/signature, a 180-step gate run, 2,000-step campaigns on seeds 1/2/42, full suite and 5/5 gates"
-      },
-      "plan_digest": "4f5cc32d50fd1c9ecfd0827f5e5033a645a481bea676378b7edc2f10fcaf0b39",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "message-tree-branches",
       "phase": "phase 4",
@@ -399,6 +219,155 @@
       "timestamp_str": "2026-11-18 09:29:54",
       "agent": "kilo:goal",
       "head": "d0d1e9956fd30ec08adad98db36b47f133257432",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "fleet-patrol-rotation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Rotate an escort onto a connected patrol lane and recall it",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794983595.885594,
+      "timestamp_str": "2026-11-18 09:33:15",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "/api/fleet/escort/assign stays context although the engine only validates the system id and the campaign owns escorts that sometimes end the run detached in another system; the fleet manager, CLI and cockpit all expose patrol assignment, so the AI proof surface is the only one missing",
+        "benefits": "After Act VI the captain sends a local escort to the first connected system and recalls any detached escort back, so both directions of the assignment route are exercised and the fleet ends the campaign local",
+        "risks": "contract: /api/fleet/escort/assign stays context for the short gate with a narrowed reason and joins SIGNATURE_ROUTES keyed by system_id (additive); dependency: none; concurrency: none; state: assigned_system_id only, persisted by the engine",
+        "mitigation": "failing-first policy tests for patrol, recall, gates and signatures, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and 5/5 gates"
+      },
+      "plan_digest": "b81c2ee154eb08624bdf5e3de0395c573836f7d9615d512e74d008faa71bf107",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "test-timeout-hardening",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Raise the suite's HTTP probe timeout so shared-host disk stalls stop flaking the gate",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794989059.8443084,
+      "timestamp_str": "2026-11-18 11:04:19",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "Three consecutive full-suite gate runs failed on different tests with TimeoutError after two seconds (test_engineering GET, test_server scan/step/trade-pact, test_void_traversal emerge, agent campaign time/step), while the same tests pass alone and the same commit passed 1993 OK twice; every failure is a local HTTPConnection with timeout=2 against a server that fsyncs the full state on each POST, so a disk stall from another agent's work turns a healthy request into a gate failure",
+        "benefits": "The suite keeps every assertion but tolerates a stalled shared disk for up to ten seconds, so the gate reports code regressions instead of host contention",
+        "risks": "contract: test-only connection timeouts, no production or assertion change; dependency: none; concurrency: none; state: none",
+        "mitigation": "scripted replacement limited to HTTPConnection lines, compileall, full suite, 5/5 gates"
+      },
+      "plan_digest": "b3fa462b6c4c57f59c502a4acccfef4c00ea2bbf930042151df623d55256aeb0",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "fleet-patrol-rotation",
+      "phase": "superseded",
+      "phase_num": 2,
+      "description": "Superseded by 'test-timeout-hardening' without --complete or --reset",
+      "status": "superseded",
+      "timestamp": 1794989059.8443084,
+      "timestamp_str": "2026-11-18 11:04:19",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "test-timeout-hardening",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/2] 42 HTTPConnection probes raised 2s to 10s in 23 test files with no assertion or production change; full suite Ran 1993 OK twice and the strict 5/5 gates passed on the same tree that flaked three times before (ADR-383); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794989993.7171817,
+      "timestamp_str": "2026-11-18 11:19:53",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "test-timeout-hardening",
+      "phase": "suspended",
+      "phase_num": 4,
+      "description": "Task 'test-timeout-hardening' suspended: patrol delivery in progress; timeout work committed at 401babb",
+      "status": "suspended",
+      "timestamp": 1794990469.6496534,
+      "timestamp_str": "2026-11-18 11:27:49",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "fleet-patrol-rotation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/3] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors and the assign reason narrowed to the post-Act-VI window; 2,000-step seeds 1/2/42 all attempt and succeed on /api/fleet/escort/assign with Act VI complete (86/83/88, 84/82/88, 83/81/88) and seed 1 recalls its detached escort local (ADR-382); suite Ran 1993 OK; 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794990483.6969626,
+      "timestamp_str": "2026-11-18 11:28:03",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "fleet-patrol-rotation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'fleet-patrol-rotation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794990642.7574906,
+      "timestamp_str": "2026-11-18 11:30:42",
+      "agent": "kilo:goal",
+      "head": "b0c69391448087e0bb17382bf5ea4894c79f3735",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "test-timeout-hardening",
+      "phase": "resumed",
+      "phase_num": 4,
+      "description": "Resumed 'test-timeout-hardening' after a pause",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1794993010.0779157,
+      "timestamp_str": "2026-11-18 12:10:10",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "test-timeout-hardening",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'test-timeout-hardening' completed successfully.",
+      "status": "completed",
+      "timestamp": 1794993041.089335,
+      "timestamp_str": "2026-11-18 12:10:41",
+      "agent": "kilo:goal",
+      "head": "b0c69391448087e0bb17382bf5ea4894c79f3735",
       "delivery": {
         "roots": [
           "."
