@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "shipyard-sell",
+    "task_id": "crew-dismiss",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1794999843.2366838,
+    "updated_at": 1795004494.7338686,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
@@ -15,63 +15,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1794999865.729882,
-    "completed_head": "521b0ed530bc2c588076c8d39729879002386e16",
-    "completed_tree": "a87acfb5cb46b4f0e8febf0a0ca4aa75646a6362"
+    "completed_at": 1795004660.3474872,
+    "completed_head": "567d3651a8409db30a0d0b30048288b7c4e6dcf5",
+    "completed_tree": "a24a71558aef2d82edff0a70fea9cafb0582b72b"
   },
   "checkpoints": [
-    {
-      "task_id": "test-timeout-hardening",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Raise the suite's HTTP probe timeout so shared-host disk stalls stop flaking the gate",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794989059.8443084,
-      "timestamp_str": "2026-11-18 11:04:19",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "Three consecutive full-suite gate runs failed on different tests with TimeoutError after two seconds (test_engineering GET, test_server scan/step/trade-pact, test_void_traversal emerge, agent campaign time/step), while the same tests pass alone and the same commit passed 1993 OK twice; every failure is a local HTTPConnection with timeout=2 against a server that fsyncs the full state on each POST, so a disk stall from another agent's work turns a healthy request into a gate failure",
-        "benefits": "The suite keeps every assertion but tolerates a stalled shared disk for up to ten seconds, so the gate reports code regressions instead of host contention",
-        "risks": "contract: test-only connection timeouts, no production or assertion change; dependency: none; concurrency: none; state: none",
-        "mitigation": "scripted replacement limited to HTTPConnection lines, compileall, full suite, 5/5 gates"
-      },
-      "plan_digest": "b3fa462b6c4c57f59c502a4acccfef4c00ea2bbf930042151df623d55256aeb0",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "fleet-patrol-rotation",
-      "phase": "superseded",
-      "phase_num": 2,
-      "description": "Superseded by 'test-timeout-hardening' without --complete or --reset",
-      "status": "superseded",
-      "timestamp": 1794989059.8443084,
-      "timestamp_str": "2026-11-18 11:04:19",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "test-timeout-hardening",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/2] 42 HTTPConnection probes raised 2s to 10s in 23 test files with no assertion or production change; full suite Ran 1993 OK twice and the strict 5/5 gates passed on the same tree that flaked three times before (ADR-383); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1794989993.7171817,
-      "timestamp_str": "2026-11-18 11:19:53",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "test-timeout-hardening",
       "phase": "suspended",
@@ -374,6 +322,65 @@
       "timestamp_str": "2026-11-18 14:04:25",
       "agent": "kilo:goal",
       "head": "521b0ed530bc2c588076c8d39729879002386e16",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "crew-dismiss",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/3] Trim duplicate crew after the campaign so the dismiss route is exercised",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795000568.328692,
+      "timestamp_str": "2026-11-18 14:16:08",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "/api/crew/dismiss stays context claiming it would erase the only roster, but the message-tree policy now recruits one engineer per refugee flotilla and campaigns end with 10-16 engineers, most unassigned; dismissing the redundant tail is safe housekeeping, saves payroll, and proves the crew lifecycle direction",
+        "benefits": "A post-campaign roster trim keeps the two best crew of every role-specialty pair, never touches an outpost station or escort commander, and exercises /api/crew/dismiss repeatedly until the roster is clean",
+        "risks": "contract: /api/crew/dismiss joins SIGNATURE_ROUTES keyed by crew_id and keeps a narrowed context reason for the short gate (additive); dependency: none; concurrency: none; state: only the redundant crew records are removed through the existing engine path",
+        "mitigation": "failing-first tests for the keep-two rule, assigned and stationed crew, the pre-campaign and small-roster gates and the signature, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and 5/5 gates"
+      },
+      "plan_digest": "a7b81433858b424613e26d9cd4410eefab96af7d7e06eeb59fe2d4a540d6be15",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "crew-dismiss",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/3] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors and the dismiss reason narrowed to short-gate timing; 2,000-step seeds 1/2/42 dismiss redundant engineers, keep outpost/escort/away assignments and finish Act VI (seed 1 90 families/93 attempted/0 errors; seed 2 87/92/2 unrelated timeouts; seed 42 86/91/0); suite Ran 2018 OK (ADR-388); 5/5 gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795004494.7338686,
+      "timestamp_str": "2026-11-18 15:21:34",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "crew-dismiss",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'crew-dismiss' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795004660.4145901,
+      "timestamp_str": "2026-11-18 15:24:20",
+      "agent": "kilo:goal",
+      "head": "567d3651a8409db30a0d0b30048288b7c4e6dcf5",
       "delivery": {
         "roots": [
           "."
