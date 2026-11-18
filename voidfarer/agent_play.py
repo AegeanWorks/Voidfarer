@@ -30,7 +30,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/fabricate": "needs titanium alloy in cargo hold",
     "/api/weather": "telemetry endpoint for solar space weather",
     "/api/overhaul": "needs an orbital dock and hyperlane frame wear",
-    "/api/relics/fuse": "needs three relics of one rarity",
+    "/api/relics/fuse": "the 180-step gate collects fewer than three relics; the 2,000-step campaign fuses one set",
     "/api/decision/resolve": "prompt-driven: a blocking decision must be pending",
     "/api/encounter/resolve": "alias: routes to the prompt-driven decision/pirate/customs/anomaly resolvers",
     "/api/fitting/install": "alias: routes to the existing upgrade/module/weapon/chassis installers",
@@ -406,6 +406,12 @@ class AiCaptain:
         structure = self._megastructure_action()
         if structure is not None:
             return structure
+
+        # Relic fusion is the post-campaign progress capstone: one set for one higher
+        # rarity, once, before the station errand (ADR-392).
+        fusion = self._relic_fuse_action()
+        if fusion is not None:
+            return fusion
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -1168,6 +1174,27 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _relic_fuse_action(self):
+        """Fuse the lowest complete relic set once after the campaign (ADR-392).
+
+        The campaign collects dozens of common relics; one fusion proves the ladder
+        without consuming the whole collection.
+        """
+        if "/api/relics/fuse" in self.attempted:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        counts: dict[str, int] = {}
+        for relic in (self.state.get("ship") or {}).get("relics") or []:
+            if isinstance(relic, dict):
+                rarity = str(relic.get("rarity") or "").lower()
+                if rarity:
+                    counts[rarity] = counts.get(rarity, 0) + 1
+        for rarity in ("common", "rare", "epic"):
+            if counts.get(rarity, 0) >= 3:
+                return "/api/relics/fuse", {"rarity": rarity}, "relic_fuse"
+        return None
 
     def _megastructure_action(self):
         """Restore the first affordable restorable structure after the campaign (ADR-391).

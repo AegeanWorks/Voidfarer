@@ -2375,6 +2375,56 @@ class MegastructureRestorePolicyTest(unittest.TestCase):
         self.assertIsNone(captain._megastructure_action())
 
 
+class RelicFusionPolicyTest(unittest.TestCase):
+    """The captain fuses the lowest complete relic set after the campaign (ADR-392)."""
+
+    def _captain(self, relics, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "ship": {"relics": relics},
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    @staticmethod
+    def _relics(rarity, count):
+        return [{"id": f"{rarity}_{index}", "rarity": rarity}
+                for index in range(count)]
+
+    def test_three_commons_are_fused(self):
+        captain = self._captain(self._relics("common", 3))
+        self.assertEqual(
+            captain._relic_fuse_action(),
+            ("/api/relics/fuse", {"rarity": "common"}, "relic_fuse"),
+        )
+
+    def test_the_lowest_complete_rarity_wins(self):
+        captain = self._captain(
+            self._relics("common", 2) + self._relics("rare", 4)
+            + self._relics("epic", 3))
+        self.assertEqual(captain._relic_fuse_action()[1], {"rarity": "rare"})
+
+    def test_legendary_relics_never_fuse(self):
+        captain = self._captain(
+            self._relics("legendary", 5) + self._relics("common", 2))
+        self.assertIsNone(captain._relic_fuse_action())
+
+    def test_no_fusion_before_the_campaign_or_without_a_set(self):
+        self.assertIsNone(self._captain(
+            self._relics("common", 6),
+            story_status={"completed": False})._relic_fuse_action())
+        self.assertIsNone(self._captain(
+            self._relics("common", 2) + self._relics("rare", 2))._relic_fuse_action())
+
+    def test_the_fusion_is_one_shot(self):
+        captain = self._captain(self._relics("common", 9))
+        captain.attempted.add("/api/relics/fuse")
+        self.assertIsNone(captain._relic_fuse_action())
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `588`
+- **Total Classes**: `589`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3020`
-- **Total Source Lines**: `68163`
+- **Total Class Methods**: `3028`
+- **Total Source Lines**: `68240`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2485` lines (`114488` bytes)
+**Size**: `2535` lines (`116400` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -351,6 +351,14 @@
   - Method `.test_an_unaffordable_restore_waits()`
   - Method `.test_it_needs_the_campaign_and_a_candidate()`
   - Method `.test_the_restore_is_one_shot()`
+- `class RelicFusionPolicyTest` - *The captain fuses the lowest complete relic set after the campaign (ADR-392).*
+  - Method `._captain(relics, **state)`
+  - Method `._relics(rarity, count)`
+  - Method `.test_three_commons_are_fused()`
+  - Method `.test_the_lowest_complete_rarity_wins()`
+  - Method `.test_legendary_relics_never_fuse()`
+  - Method `.test_no_fusion_before_the_campaign_or_without_a_set()`
+  - Method `.test_the_fusion_is_one_shot()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4865,7 +4873,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2379` lines (`113215` bytes)
+**Size**: `2406` lines (`114442` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4901,6 +4909,7 @@
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
   - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
   - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
