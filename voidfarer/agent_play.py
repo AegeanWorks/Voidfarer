@@ -27,7 +27,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/combat": "prompt-driven: a hostile intercept must occur",
     "/api/pirate/resolve": "prompt-driven: a pirate toll must intercept",
     "/api/customs/resolve": "prompt-driven: an active customs interdiction must intercept",
-    "/api/fabricate": "needs titanium alloy in cargo hold",
+    "/api/fabricate": "the 180-step trip reaches the builder with a full hull and tank; the 2,000-step campaign fabricates when hurt",
     "/api/weather": "telemetry endpoint for solar space weather",
     "/api/overhaul": "the 180-step gate ends before Act VI; the 2,000-step campaign overhauls once",
     "/api/relics/fuse": "the 180-step gate collects fewer than three relics; the 2,000-step campaign fuses one set",
@@ -418,6 +418,12 @@ class AiCaptain:
         overhaul = self._overhaul_action()
         if overhaul is not None:
             return overhaul
+
+        # Titanium in the hold becomes a field repair once the campaign is over and the
+        # hull or tank is actually hurt (ADR-394).
+        fabricate = self._fabricate_action()
+        if fabricate is not None:
+            return fabricate
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -1180,6 +1186,29 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _fabricate_action(self):
+        """Field-fabricate one patch kit or fuel cell after the campaign (ADR-394).
+
+        The tour already tries this builder, but a long run often reaches it with a full
+        hull and tank; the post-story gap is exactly when the titanium is worth spending.
+        """
+        if "/api/fabricate" in self.succeeded:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        ship = self.state.get("ship") or {}
+        if int((ship.get("cargo") or {}).get("titanium") or 0) < 1:
+            return None
+        if int(ship.get("hull") or 0) < int(ship.get("max_hull") or 0):
+            body = {"munitions_type": "patch_kit"}
+        elif int(ship.get("fuel") or 0) < int(ship.get("max_fuel") or 0):
+            body = {"munitions_type": "fuel_cell"}
+        else:
+            return None
+        if self._tour_action_attempted("/api/fabricate", body):
+            return None
+        return "/api/fabricate", body, "fabricate"
 
     def _overhaul_action(self):
         """Scrub hyperlane frame wear once after the campaign at a drydock (ADR-393).

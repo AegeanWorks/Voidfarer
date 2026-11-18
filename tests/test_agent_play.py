@@ -2468,6 +2468,57 @@ class OverhaulServicePolicyTest(unittest.TestCase):
         self.assertIsNone(captain._overhaul_action())
 
 
+class FabricateFieldRepairPolicyTest(unittest.TestCase):
+    """The captain fabricates field repairs from titanium after the campaign (ADR-394)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "ship": {"hull": 50, "max_hull": 100, "fuel": 30, "max_fuel": 80,
+                     "cargo": {"titanium": 3}},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_hurt_hull_gets_a_patch_kit(self):
+        self.assertEqual(
+            self._captain()._fabricate_action(),
+            ("/api/fabricate", {"munitions_type": "patch_kit"}, "fabricate"),
+        )
+
+    def test_a_low_tank_gets_a_fuel_cell_when_the_hull_is_whole(self):
+        captain = self._captain(ship={
+            "hull": 100, "max_hull": 100, "fuel": 10, "max_fuel": 80,
+            "cargo": {"titanium": 3}})
+        self.assertEqual(
+            captain._fabricate_action(),
+            ("/api/fabricate", {"munitions_type": "fuel_cell"}, "fabricate"),
+        )
+
+    def test_a_full_ship_or_empty_hold_fabricates_nothing(self):
+        self.assertIsNone(self._captain(ship={
+            "hull": 100, "max_hull": 100, "fuel": 80, "max_fuel": 80,
+            "cargo": {"titanium": 3}})._fabricate_action())
+        self.assertIsNone(self._captain(ship={
+            "hull": 50, "max_hull": 100, "fuel": 30, "max_fuel": 80,
+            "cargo": {}})._fabricate_action())
+
+    def test_it_waits_for_the_campaign(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._fabricate_action())
+
+    def test_one_success_per_campaign_is_enough(self):
+        captain = self._captain()
+        captain.succeeded.add("/api/fabricate")
+        self.assertIsNone(captain._fabricate_action())
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 
