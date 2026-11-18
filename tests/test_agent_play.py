@@ -985,9 +985,10 @@ class NarrativeAndCrewTourTest(unittest.TestCase):
         self.assertEqual(self._captain(crew=tired)._tour_shore_leave()[2], "crew_shore")
 
     def test_away_recall_needs_an_active_mission(self):
-        self.assertIsNone(self._captain()._tour_away_recall())
-        captain = self._captain(ship={"away_missions": [{"id": "m1"}]})
-        self.assertEqual(captain._tour_away_recall()[1]["mission_id"], "m1")
+        self.assertIsNone(self._captain()._away_recall_action())
+        captain = self._captain(ship={"away_missions": [{"id": "m1"}, {"id": "m2"}]})
+        captain.away_protected_mission = "m1"
+        self.assertEqual(captain._away_recall_action()[1]["mission_id"], "m2")
 
     def test_surface_operation_follows_landing_directly(self):
         captain = self._captain(
@@ -1884,6 +1885,73 @@ class FleetPatrolTourTest(unittest.TestCase):
         self.assertFalse(captain._tour_action_attempted(
             "/api/fleet/escort/assign", {"ship_id": "escort_1", "system_id": "sol"}),
             "the recall direction must stay reachable after the patrol")
+
+
+class AwayRecallPolicyTest(unittest.TestCase):
+    """An active expedition is recalled before a transit tick can resolve it (ADR-384)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {"ship": {"hull": 100, "away_missions": []}}
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_first_expedition_is_protected_so_it_can_finish(self):
+        captain = self._captain(ship={
+            "hull": 100,
+            "away_missions": [{"id": "away_1", "mission_type": "geological_survey"}],
+        })
+        self.assertIsNone(captain._away_recall_action())
+        self.assertEqual(captain.away_protected_mission, "away_1")
+
+    def test_a_later_expedition_is_recalled_before_transit(self):
+        captain = self._captain(ship={
+            "hull": 100,
+            "travel": {"target": "b2"},
+            "away_missions": [
+                {"id": "away_1", "mission_type": "geological_survey"},
+                {"id": "away_2", "mission_type": "salvage_sweep"},
+            ],
+        })
+        captain.away_protected_mission = "away_1"
+        self.assertEqual(
+            captain._choose(7),
+            ("/api/away/recall", {"mission_id": "away_2"}, "away_recall"),
+        )
+
+    def test_no_recall_without_an_active_mission(self):
+        self.assertIsNone(self._captain()._away_recall_action())
+
+    def test_recall_is_one_shot_per_mission(self):
+        captain = self._captain(ship={
+            "hull": 100,
+            "away_missions": [
+                {"id": "away_1", "mission_type": "geological_survey"},
+                {"id": "away_2", "mission_type": "salvage_sweep"},
+            ],
+        })
+        captain.away_protected_mission = "away_1"
+        captain.attempted.add("/api/away/recall")
+        captain.attempted_signatures.add(("/api/away/recall", "away_2"))
+        self.assertIsNone(captain._away_recall_action())
+
+    def test_each_mission_is_keyed_by_its_id(self):
+        captain = self._captain(ship={
+            "hull": 100,
+            "away_missions": [
+                {"id": "away_1", "mission_type": "geological_survey"},
+                {"id": "away_2", "mission_type": "salvage_sweep"},
+                {"id": "away_3", "mission_type": "xenobiology"},
+            ],
+        })
+        captain.away_protected_mission = "away_1"
+        captain.attempted_signatures.add(("/api/away/recall", "away_2"))
+        self.assertEqual(captain._away_recall_action()[1]["mission_id"], "away_3")
 
 
 class AnomalyPolicyTest(unittest.TestCase):

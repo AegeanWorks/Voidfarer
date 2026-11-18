@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `581`
+- **Total Classes**: `582`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2967`
-- **Total Source Lines**: `67348`
+- **Total Class Methods**: `2973`
+- **Total Source Lines**: `67444`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1996` lines (`94089` bytes)
+**Size**: `2064` lines (`96866` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -298,6 +298,13 @@
   - Method `.test_a_destroyed_or_absent_escort_is_ignored()`
   - Method `.test_no_patrol_before_act_vi()`
   - Method `.test_patrol_and_recall_are_separate_signatures()`
+- `class AwayRecallPolicyTest` - *An active expedition is recalled before a transit tick can resolve it (ADR-384).*
+  - Method `._captain(**state)`
+  - Method `.test_the_first_expedition_is_protected_so_it_can_finish()`
+  - Method `.test_a_later_expedition_is_recalled_before_transit()`
+  - Method `.test_no_recall_without_an_active_mission()`
+  - Method `.test_recall_is_one_shot_per_mission()`
+  - Method `.test_each_mission_is_keyed_by_its_id()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4812,7 +4819,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2053` lines (`97439` bytes)
+**Size**: `2081` lines (`98806` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4857,7 +4864,7 @@
   - Method `._tour_story_orbit()` - *Orbit the body a chapter explicitly demands (Act IV's black hole, ADR-360).*
   - Method `._tour_message_send()` - *Read pending inbox mail first, then send to the first correspondent (ADR-354, ADR-378).*
   - Method `._tour_shore_leave()`
-  - Method `._tour_away_recall()`
+  - Method `._away_recall_action()` - *Let the first team finish, then abort a later expedition (ADR-384).*
   - Method `._tour_contract_claim()` - *Bank a finished contract instead of leaving its rewards stranded (ADR-344).*
   - Method `._tour_refuel()`
   - Method `._tour_burn_cells()` - *Burn one hold Quantum Fuel Cell when the tank has room (the fuel-cell emergency refuel).*

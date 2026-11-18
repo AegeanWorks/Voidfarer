@@ -61,6 +61,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/outpost/repair": "needs a damaged outpost and credits",
     "/api/drone/collect": "needs a deployed drone",
     "/api/depot/sell": "needs stock sitting in a depot",
+    "/api/away/recall": "the 180-step gate finishes the first expedition; the 2,000-step campaign recalls a later team",
     "/api/trade/automation": "the broker is armed after Act VI; the 180-step gate ends before the campaign does",
     "/api/trade/quantum/automation": "auto-freight is armed after Act VI; the 180-step gate ends before the campaign does",
     "/api/research/queue": "needs a valid, incomplete research project",
@@ -77,7 +78,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/fleet/escort/sell": "needs a docked station and an owned escort",
     "/api/contract/claim": "needs a completed contract",
     "/api/contract/swap": "needs a pending contract offer from a claim",
-    "/api/away/recall": "needs an active away mission",
+
     "/api/crew/shore": "needs crew ashore at a colony",
     "/api/crew/station": "needs an active crew specialist",
     "/api/crew/dismiss": "would erase the only crew roster in the run",
@@ -224,6 +225,8 @@ class AiCaptain:
         self.automation_waited = False
         # The step auto-freight was armed on; its window is bounded by steps (ADR-381).
         self.quantum_armed_at = 0
+        # The first expedition is left to finish; later ones prove the recall (ADR-384).
+        self.away_protected_mission = ""
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -311,6 +314,12 @@ class AiCaptain:
             anomaly = self._anomaly_action()
             if anomaly is not None:
                 return anomaly
+
+        # The rotating tour reaches its recall builder only after a 6-10 tick expedition
+        # has resolved, so abort an active team before any transit tick (ADR-384).
+        recall = self._away_recall_action()
+        if recall is not None:
+            return recall
 
         if ship.get("travel"):
             return "/api/time/step", {"ticks": 1}, "time"
@@ -664,7 +673,6 @@ class AiCaptain:
             self._tour_research_cancel,
             self._tour_message_send,
             self._tour_shore_leave,
-            self._tour_away_recall,
             self._tour_contract_claim,
             self._tour_swap,
             self._tour_refuel,
@@ -780,6 +788,12 @@ class AiCaptain:
         # Patrol and recall target different systems, so the system id is the action
         # identity and the recall stays reachable after the patrol (ADR-382).
         "/api/fleet/escort/assign": "system_id",
+        # Every expedition is recalled by its own id, so one abort cannot lock the
+        # second mission out of the policy (ADR-384).
+        "/api/away/recall": "mission_id",
+        # Each expedition type may launch once, so a late type can prove the recall
+        # after the first team has already completed its survey (ADR-384).
+        "/api/away/launch": "mission_type",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1246,12 +1260,26 @@ class AiCaptain:
             return None
         return "/api/crew/shore", {}, "crew_shore"
 
-    def _tour_away_recall(self):
-        missions = [m for m in (self.state.get("ship") or {}).get("away_missions") or []
-                    if isinstance(m, dict) and m.get("id")]
+    def _away_recall_action(self):
+        """Let the first team finish, then abort a later expedition (ADR-384)."""
+        missions = [
+            mission for mission in (self.state.get("ship") or {}).get("away_missions") or []
+            if isinstance(mission, dict) and mission.get("id")
+        ]
         if not missions:
             return None
-        return "/api/away/recall", {"mission_id": missions[0]["id"]}, "away_recall"
+        if not self.away_protected_mission:
+            self.away_protected_mission = str(missions[0]["id"])
+            return None
+        for mission in missions:
+            mission_id = str(mission["id"])
+            if mission_id == self.away_protected_mission:
+                continue
+            body = {"mission_id": mission_id}
+            if self._tour_action_attempted("/api/away/recall", body):
+                continue
+            return "/api/away/recall", body, "away_recall"
+        return None
 
     def _tour_contract_claim(self):
         """Bank a finished contract instead of leaving its rewards stranded (ADR-344)."""
