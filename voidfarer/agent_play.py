@@ -67,7 +67,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/research/cancel": "needs a project already in the research queue",
     "/api/depot/withdraw": "needs stock sitting in a depot",
     "/api/fleet/dismiss": "needs an owned escort",
-    "/api/fleet/escort/assign": "needs an owned escort",
+    "/api/fleet/escort/assign": "the patrol rotation runs after Act VI; the 180-step gate ends before the campaign does",
     "/api/fleet/escort/dismiss": "needs an owned escort",
     "/api/fleet/escort/repair": "needs a damaged escort",
     "/api/fleet/escort/train": "needs a docked escort, credits and spare experience",
@@ -391,6 +391,12 @@ class AiCaptain:
         quantum = self._quantum_freight_action()
         if quantum is not None:
             return quantum
+
+        # Escorts rotate through connected patrol lanes after the campaign so a
+        # detached wing is recalled and the fleet ends local (ADR-382).
+        patrol = self._patrol_action()
+        if patrol is not None:
+            return patrol
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -771,6 +777,9 @@ class AiCaptain:
         # keep both freight directions reachable (ADR-381).
         "/api/trade/quantum/place": "commodity_id",
         "/api/trade/quantum/automation": "enabled",
+        # Patrol and recall target different systems, so the system id is the action
+        # identity and the recall stays reachable after the patrol (ADR-382).
+        "/api/fleet/escort/assign": "system_id",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1087,6 +1096,37 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _patrol_action(self):
+        """Recall a detached escort, then patrol one onto a connected lane (ADR-382).
+
+        Assignment only changes the escort's station, so the rotation is reversible
+        and the fleet ends the campaign local.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        system = self.state.get("current_system") or {}
+        system_id = str(system.get("id") or "")
+        escorts = [
+            ship for ship in self._escort_rows()
+            if int(ship.get("hull") or 0) > 0 and ship.get("id")
+        ]
+        for ship in escorts:
+            assigned = str(ship.get("assigned_system_id") or "")
+            if system_id and assigned and assigned != system_id:
+                body = {"ship_id": str(ship["id"]), "system_id": system_id}
+                if not self._tour_action_attempted("/api/fleet/escort/assign", body):
+                    return "/api/fleet/escort/assign", body, "escort_assign"
+        connections = [str(item) for item in system.get("connections") or [] if item]
+        if not connections:
+            return None
+        for ship in escorts:
+            if str(ship.get("assigned_system_id") or "") != system_id:
+                continue
+            body = {"ship_id": str(ship["id"]), "system_id": connections[0]}
+            if not self._tour_action_attempted("/api/fleet/escort/assign", body):
+                return "/api/fleet/escort/assign", body, "escort_assign"
+        return None
 
     def _tour_supply(self):
         """Buy the station repair paste so the item terminal is exercised (ADR-367)."""

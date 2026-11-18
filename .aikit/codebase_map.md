@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `580`
+- **Total Classes**: `581`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2960`
-- **Total Source Lines**: `67246`
+- **Total Class Methods**: `2967`
+- **Total Source Lines**: `67348`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1934` lines (`91381` bytes)
+**Size**: `1996` lines (`94089` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -291,6 +291,13 @@
   - Method `.test_the_automation_is_armed_after_the_manual_order()`
   - Method `.test_the_automation_is_stood_down_after_an_order_or_its_window()`
   - Method `.test_both_quantum_routes_are_keyed()`
+- `class FleetPatrolTourTest` - *The captain patrols an escort on a connected lane and recalls it (ADR-382).*
+  - Method `._captain(**state)`
+  - Method `.test_a_local_escort_patrols_the_first_connection()`
+  - Method `.test_a_detached_escort_is_recalled_first()`
+  - Method `.test_a_destroyed_or_absent_escort_is_ignored()`
+  - Method `.test_no_patrol_before_act_vi()`
+  - Method `.test_patrol_and_recall_are_separate_signatures()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -424,7 +431,7 @@
 ### [`tests/test_away_missions.py`](tests/test_away_missions.py)
 > *Away-team expeditions: catalog, deterministic outcomes, injuries, XP, parity and saves.*
 
-**Size**: `307` lines (`12972` bytes)
+**Size**: `307` lines (`12974` bytes)
 
 **Classes:**
 - `class AwayCatalogTest`
@@ -1425,7 +1432,7 @@
 ### [`tests/test_comms.py`](tests/test_comms.py)
 > *Unified comms report/action, REST and CLI tests.*
 
-**Size**: `168` lines (`6166` bytes)
+**Size**: `168` lines (`6168` bytes)
 
 **Classes:**
 - `class TestCommsReport`
@@ -1494,7 +1501,7 @@
 ### [`tests/test_crew_command.py`](tests/test_crew_command.py)
 > *Unified crew/away report and action tests.*
 
-**Size**: `176` lines (`6616` bytes)
+**Size**: `176` lines (`6618` bytes)
 
 **Classes:**
 - `class TestCrewReport`
@@ -1738,7 +1745,7 @@
 ### [`tests/test_empire.py`](tests/test_empire.py)
 > *Unified empire report/action, REST and CLI tests.*
 
-**Size**: `191` lines (`7634` bytes)
+**Size**: `191` lines (`7636` bytes)
 
 **Classes:**
 - `class TestEmpireReport`
@@ -1855,7 +1862,7 @@
 ### [`tests/test_encounters.py`](tests/test_encounters.py)
 > *Unified blocking-encounter payload, resolver, REST and CLI tests.*
 
-**Size**: `356` lines (`13917` bytes)
+**Size**: `356` lines (`13919` bytes)
 
 **Classes:**
 - `class TestAnomalyCheckReadiness` - *Anomaly actions say whether their power check passes with the ship's real output.*
@@ -1992,7 +1999,7 @@
 ### [`tests/test_engineering.py`](tests/test_engineering.py)
 > *Unified engineering report/action, REST and CLI tests.*
 
-**Size**: `175` lines (`6397` bytes)
+**Size**: `175` lines (`6399` bytes)
 
 **Classes:**
 - `class TestEngineeringReport`
@@ -2144,7 +2151,7 @@
 ### [`tests/test_fitting.py`](tests/test_fitting.py)
 > *Unified ship-fitting report, install/remove, REST and CLI tests.*
 
-**Size**: `209` lines (`8740` bytes)
+**Size**: `209` lines (`8742` bytes)
 
 **Classes:**
 - `class TestFittingReport`
@@ -2205,7 +2212,7 @@
 ### [`tests/test_fleet_command.py`](tests/test_fleet_command.py)
 > *Unified fleet report/action, REST and CLI tests.*
 
-**Size**: `208` lines (`8856` bytes)
+**Size**: `208` lines (`8858` bytes)
 
 **Classes:**
 - `class TestFleetReport`
@@ -2345,7 +2352,7 @@
 ### [`tests/test_flight.py`](tests/test_flight.py)
 > *Unified flight report/action, REST and CLI tests.*
 
-**Size**: `164` lines (`6023` bytes)
+**Size**: `164` lines (`6025` bytes)
 
 **Classes:**
 - `class TestFlightReport`
@@ -2593,7 +2600,7 @@
 ### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
 > *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
 
-**Size**: `503` lines (`24407` bytes)
+**Size**: `503` lines (`24409` bytes)
 
 **Classes:**
 - `class FixedRng` - *Noise-free rng: uniform returns a fixed value, choice takes the first item.*
@@ -2742,7 +2749,7 @@
 ### [`tests/test_intel.py`](tests/test_intel.py)
 > *Unified intel report/action, REST and CLI tests.*
 
-**Size**: `169` lines (`6170` bytes)
+**Size**: `169` lines (`6172` bytes)
 
 **Classes:**
 - `class TestIntelReport`
@@ -2860,7 +2867,7 @@
 ### [`tests/test_logistics.py`](tests/test_logistics.py)
 > *Unified logistics report/action, REST and CLI tests.*
 
-**Size**: `210` lines (`8381` bytes)
+**Size**: `210` lines (`8383` bytes)
 
 **Classes:**
 - `class TestLogisticsReport`
@@ -3069,7 +3076,7 @@
 ### [`tests/test_narrative.py`](tests/test_narrative.py)
 > *Unified narrative report/action, REST and CLI tests.*
 
-**Size**: `174` lines (`6323` bytes)
+**Size**: `174` lines (`6325` bytes)
 
 **Classes:**
 - `class TestNarrativeReport`
@@ -3415,7 +3422,7 @@
 ### [`tests/test_progress.py`](tests/test_progress.py)
 > *Unified progression report/action, REST and CLI tests.*
 
-**Size**: `157` lines (`6079` bytes)
+**Size**: `157` lines (`6081` bytes)
 
 **Classes:**
 - `class TestProgressReport`
@@ -3814,7 +3821,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `967` lines (`41429` bytes)
+**Size**: `967` lines (`41431` bytes)
 
 **Classes:**
 - `class TestServer`
@@ -3942,7 +3949,7 @@
 ### [`tests/test_sim_mechanics.py`](tests/test_sim_mechanics.py)
 > *Unit and integration tests for the living crew, volume-aware market, and cash-flow mechanics.*
 
-**Size**: `402` lines (`16733` bytes)
+**Size**: `402` lines (`16734` bytes)
 
 **Classes:**
 - `class TestCrewMoraleCore`
@@ -4039,7 +4046,7 @@
 ### [`tests/test_snapshot_catalogs.py`](tests/test_snapshot_catalogs.py)
 > *Static catalogs: built once, served by /api/catalogs, and left out of polls that cache them.*
 
-**Size**: `105` lines (`4662` bytes)
+**Size**: `105` lines (`4663` bytes)
 
 **Classes:**
 - `class TestStaticCatalogs`
@@ -4064,7 +4071,7 @@
 ### [`tests/test_state_machines.py`](tests/test_state_machines.py)
 > *Canonical state-machine registry, inspector, gate and surface tests.*
 
-**Size**: `440` lines (`17478` bytes)
+**Size**: `440` lines (`17479` bytes)
 
 **Classes:**
 - `class TestRegistryContract`
@@ -4153,7 +4160,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `883` lines (`38413` bytes)
+**Size**: `883` lines (`38415` bytes)
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -4219,7 +4226,7 @@
 ### [`tests/test_surface_ops.py`](tests/test_surface_ops.py)
 > *Unified surface report/action, REST and CLI tests.*
 
-**Size**: `177` lines (`6745` bytes)
+**Size**: `177` lines (`6747` bytes)
 
 **Classes:**
 - `class TestSurfaceReport`
@@ -4287,7 +4294,7 @@
 ### [`tests/test_time_and_ticks.py`](tests/test_time_and_ticks.py)
 > *Comprehensive automated test suite for Time, Ticks, and Temporal Controls in VoidFarer.*
 
-**Size**: `325` lines (`13134` bytes)
+**Size**: `325` lines (`13136` bytes)
 
 **Classes:**
 - `class TestTimeStateModel` - *Verify TimeState dataclass serialization, defaults, and legacy migration.*
@@ -4342,7 +4349,7 @@
 ### [`tests/test_trade_ledger.py`](tests/test_trade_ledger.py)
 > *Trade ledger: per-commodity cost basis, realised profit and max-quantity orders.*
 
-**Size**: `160` lines (`7106` bytes)
+**Size**: `160` lines (`7107` bytes)
 
 **Classes:**
 - `class TestTradeCostBasis`
@@ -4577,7 +4584,7 @@
 ### [`tests/test_void_traversal.py`](tests/test_void_traversal.py)
 > *Unit and integration tests for the Hollow Between void traversal mechanics.*
 
-**Size**: `474` lines (`19682` bytes)
+**Size**: `474` lines (`19684` bytes)
 
 **Classes:**
 - `class TestVoidLanes`
@@ -4805,7 +4812,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2013` lines (`95395` bytes)
+**Size**: `2053` lines (`97439` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4841,6 +4848,7 @@
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
   - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._patrol_action()` - *Recall a detached escort, then patrol one onto a connected lane (ADR-382).*
   - Method `._tour_supply()` - *Buy the station repair paste so the item terminal is exercised (ADR-367).*
   - Method `._tour_supply_decoy()` - *Buy the last-resort ECM decoy once, separately so the paste cannot starve it (ADR-371).*
   - Method `._supply_purchase(item_id, fallback_price)`

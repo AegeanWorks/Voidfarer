@@ -1824,6 +1824,68 @@ class QuantumFreightTourTest(unittest.TestCase):
             "standing auto-freight down must stay reachable after arming it")
 
 
+class FleetPatrolTourTest(unittest.TestCase):
+    """The captain patrols an escort on a connected lane and recalls it (ADR-382)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "current_system": {"id": "sol", "connections": ["vega", "orion"]},
+            "fleet_manager": {"ships": [
+                {"id": "escort_1", "hull": 90, "max_hull": 120,
+                 "assigned_system_id": "sol", "status": "escorting"},
+            ]},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_local_escort_patrols_the_first_connection(self):
+        self.assertEqual(
+            self._captain()._patrol_action(),
+            ("/api/fleet/escort/assign",
+             {"ship_id": "escort_1", "system_id": "vega"}, "escort_assign"),
+        )
+
+    def test_a_detached_escort_is_recalled_first(self):
+        captain = self._captain(fleet_manager={"ships": [
+            {"id": "escort_1", "hull": 90, "max_hull": 120,
+             "assigned_system_id": "kepler", "status": "escorting"},
+        ]})
+        self.assertEqual(
+            captain._patrol_action(),
+            ("/api/fleet/escort/assign",
+             {"ship_id": "escort_1", "system_id": "sol"}, "escort_assign"),
+        )
+
+    def test_a_destroyed_or_absent_escort_is_ignored(self):
+        destroyed = self._captain(fleet_manager={"ships": [
+            {"id": "hulk", "hull": 0, "max_hull": 120, "assigned_system_id": "sol"},
+        ]})
+        self.assertIsNone(destroyed._patrol_action())
+        self.assertIsNone(self._captain(fleet_manager={"ships": []})._patrol_action())
+        self.assertIsNone(self._captain(
+            current_system={"id": "sol", "connections": []})._patrol_action())
+
+    def test_no_patrol_before_act_vi(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._patrol_action())
+
+    def test_patrol_and_recall_are_separate_signatures(self):
+        captain = self._captain()
+        captain.attempted_signatures.add(("/api/fleet/escort/assign", "vega"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/fleet/escort/assign", {"ship_id": "escort_1", "system_id": "vega"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/fleet/escort/assign", {"ship_id": "escort_1", "system_id": "sol"}),
+            "the recall direction must stay reachable after the patrol")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 
