@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `585`
+- **Total Classes**: `586`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2994`
-- **Total Source Lines**: `67700`
+- **Total Class Methods**: `3002`
+- **Total Source Lines**: `67823`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2224` lines (`103433` bytes)
+**Size**: `2295` lines (`106368` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -326,6 +326,14 @@
   - Method `.test_it_needs_a_dock_and_the_campaign_to_be_finished()`
   - Method `.test_the_trade_in_is_one_shot_per_slot()`
   - Method `.test_each_slot_is_keyed_by_its_name()`
+- `class CrewDismissPolicyTest` - *The captain trims redundant unassigned crew after the campaign (ADR-388).*
+  - Method `._captain(crew, **state)`
+  - Method `._member(crew_id, skill, station, role, specialty)`
+  - Method `.test_the_weakest_duplicate_is_dismissed_first()`
+  - Method `.test_two_of_each_role_are_kept()`
+  - Method `.test_stationed_and_assigned_crew_are_never_dismissed()`
+  - Method `.test_it_needs_the_campaign_finished()`
+  - Method `.test_each_crew_member_is_keyed_by_id()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4840,7 +4848,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2177` lines (`103211` bytes)
+**Size**: `2229` lines (`105901` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4876,6 +4884,7 @@
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
   - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*
   - Method `._shipyard_sell_action()` - *Trade in one safe equipped upgrade at a dock after the campaign (ADR-387).*
   - Method `._send_action()` - *Send one quantum report to a real correspondent after the campaign (ADR-386).*
   - Method `._ally_action()` - *Hail the most trusted non-ally to 50 trust, then ally (ADR-385).*

@@ -2114,6 +2114,77 @@ class ShipyardSellPolicyTest(unittest.TestCase):
             "a second slot must stay reachable after the first trade-in")
 
 
+class CrewDismissPolicyTest(unittest.TestCase):
+    """The captain trims redundant unassigned crew after the campaign (ADR-388)."""
+
+    def _captain(self, crew, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "crew": crew,
+            "outposts": [],
+            "fleet_manager": {"ships": []},
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    @staticmethod
+    def _member(crew_id, skill, station="", role="engineer", specialty="engineering"):
+        return {"id": crew_id, "role": role, "specialty": specialty,
+                "skill": skill, "station": station, "status": "active"}
+
+    def test_the_weakest_duplicate_is_dismissed_first(self):
+        captain = self._captain([
+            self._member("e1", 5),
+            self._member("e2", 4),
+            self._member("e3", 2),
+            self._member("e4", 1),
+        ])
+        self.assertEqual(
+            captain._crew_dismiss_action(),
+            ("/api/crew/dismiss", {"crew_id": "e4"}, "crew_dismiss"),
+        )
+
+    def test_two_of_each_role_are_kept(self):
+        captain = self._captain([
+            self._member("e1", 5), self._member("e2", 4),
+            self._member("p1", 5, role="pilot", specialty="evasion"),
+            self._member("p2", 4, role="pilot", specialty="evasion"),
+        ])
+        self.assertIsNone(captain._crew_dismiss_action())
+
+    def test_stationed_and_assigned_crew_are_never_dismissed(self):
+        captain = self._captain(
+            crew=[
+                self._member("e1", 5), self._member("e2", 4),
+                self._member("e3", 1), self._member("e4", 1),
+                self._member("e5", 1, station="engineering"),
+                self._member("e6", 1),
+            ],
+            outposts=[{"assigned_crew": ["e3"]}],
+            fleet_manager={"ships": [{"captain_id": "e4"}]},
+            ship={"away_missions": [{"id": "away_1", "crew_ids": ["e6"]}]},
+        )
+        self.assertIsNone(captain._crew_dismiss_action())
+
+    def test_it_needs_the_campaign_finished(self):
+        self.assertIsNone(self._captain(
+            [self._member("e1", 5), self._member("e2", 4), self._member("e3", 1)],
+            story_status={"completed": False})._crew_dismiss_action())
+
+    def test_each_crew_member_is_keyed_by_id(self):
+        captain = self._captain([self._member("e1", 5), self._member("e2", 4),
+                                 self._member("e3", 1)])
+        captain.attempted_signatures.add(("/api/crew/dismiss", "e3"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/crew/dismiss", {"crew_id": "e3"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/crew/dismiss", {"crew_id": "e2"}),
+            "a second trim must stay reachable after the first dismissal")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

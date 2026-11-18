@@ -81,7 +81,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
 
     "/api/crew/shore": "needs crew ashore at a colony",
     "/api/crew/station": "needs an active crew specialist",
-    "/api/crew/dismiss": "would erase the only crew roster in the run",
+    "/api/crew/dismiss": "the 180-step gate keeps its starting roster; the 2,000-step campaign trims duplicate recruits",
     "/api/story/choice": "needs an active story choice",
     "/api/trade/quantum/place": "the lane opens after Act VI; the 180-step gate ends before the campaign does",
     "/api/combat/gambit": "needs an active fight and a local escort captain",
@@ -422,6 +422,10 @@ class AiCaptain:
         sell = self._shipyard_sell_action()
         if sell is not None:
             return sell
+
+        dismissal = self._crew_dismiss_action()
+        if dismissal is not None:
+            return dismissal
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -816,6 +820,8 @@ class AiCaptain:
         # Each equipped slot is a separate trade-in, so one sale cannot lock the others
         # out of the post-campaign policy (ADR-387).
         "/api/shipyard/sell": "slot",
+        # The roster trim dismisses one redundant member at a time (ADR-388).
+        "/api/crew/dismiss": "crew_id",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1132,6 +1138,52 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _crew_dismiss_action(self):
+        """Trim redundant unassigned crew after the campaign, weakest first (ADR-388).
+
+        The message-tree policy recruits one engineer per refugee flotilla, so the
+        post-campaign roster is mostly duplicates. Keep the two best of each
+        role-specialty pair; never touch a bridge station, an outpost or a commander.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        crew = [member for member in self.state.get("crew") or []
+                if isinstance(member, dict) and member.get("id")]
+        if len(crew) <= 2:
+            return None
+        assigned: set[str] = set()
+        for outpost in self.state.get("outposts") or []:
+            if isinstance(outpost, dict):
+                assigned.update(str(cid) for cid in outpost.get("assigned_crew") or [])
+        for ship in (self.state.get("fleet_manager") or {}).get("ships") or []:
+            if isinstance(ship, dict) and ship.get("captain_id"):
+                assigned.add(str(ship["captain_id"]))
+        for mission in (self.state.get("ship") or {}).get("away_missions") or []:
+            if isinstance(mission, dict):
+                assigned.update(str(cid) for cid in mission.get("crew_ids") or [])
+        groups: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for member in crew:
+            key = (str(member.get("role") or ""), str(member.get("specialty") or ""))
+            groups.setdefault(key, []).append(member)
+        candidates: list[dict[str, Any]] = []
+        for members in groups.values():
+            members.sort(key=lambda member: (-int(member.get("skill") or 0),
+                                             str(member.get("id"))))
+            for member in members[2:]:
+                if str(member["id"]) in assigned:
+                    continue
+                if str(member.get("station") or "").strip():
+                    continue
+                candidates.append(member)
+        candidates.sort(key=lambda member: (int(member.get("skill") or 0),
+                                            str(member.get("id"))))
+        for member in candidates:
+            body = {"crew_id": str(member["id"])}
+            if self._tour_action_attempted("/api/crew/dismiss", body):
+                continue
+            return "/api/crew/dismiss", body, "crew_dismiss"
+        return None
 
     def _shipyard_sell_action(self):
         """Trade in one safe equipped upgrade at a dock after the campaign (ADR-387).
