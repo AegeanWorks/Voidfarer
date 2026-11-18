@@ -8,6 +8,7 @@ from pathlib import Path
 from voidfarer.agent_api import build_action_catalog
 from voidfarer.agent_play import AiCaptain, ApiClient, coverage_gaps
 from voidfarer.engine import SimulationEngine
+from voidfarer.megastructures import MEGASTRUCTURE_RESTORATION
 from voidfarer.outposts import OUTPOST_TYPES
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
@@ -138,6 +139,8 @@ class AiCaptainTourCoverageTest(unittest.TestCase):
                          SimulationEngine.OUTPOST_CHARTER_MASTERY_LEVEL)
         self.assertEqual(AiCaptain.OUTPOST_COSTS,
                          {outpost.id: outpost.cost for outpost in OUTPOST_TYPES})
+        self.assertEqual(AiCaptain.MEGASTRUCTURE_TYPES,
+                         frozenset(MEGASTRUCTURE_RESTORATION))
 
     def test_autostaff_tour_fires_only_when_the_seating_is_not_optimal(self):
         crew = [{"id": "c1", "role": "pilot", "status": "active", "skill": 4, "xp": 0, "station": ""}]
@@ -2280,6 +2283,96 @@ class OutpostSupplyLinkPolicyTest(unittest.TestCase):
              "supply_hub_id": ""},
         ])
         self.assertEqual(captain._outpost_link_action()[0], "/api/outpost/build")
+
+
+class MegastructureRestorePolicyTest(unittest.TestCase):
+    """The captain restores an ancient structure after the campaign (ADR-391)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "current_system": {
+                "id": "sol", "name": "Sol System",
+                "bodies": [
+                    {"id": "sol_body_7", "body_type": "research_outpost"},
+                    {"id": "sol_ring_world", "body_type": "ring_world"},
+                    {"id": "sol_dyson_sphere", "body_type": "dyson_sphere"},
+                ],
+            },
+            "orbiting_body": {"id": "sol_body_7", "body_type": "research_outpost"},
+            "megastructure": {"restorable": False, "body_id": "sol_body_7",
+                              "body_name": "Sol VII", "complete": False,
+                              "cost": 0, "orbiting": True},
+            "ship": {"credits": 30000},
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_restorable_orbited_structure_is_restored(self):
+        captain = self._captain(
+            orbiting_body={"id": "sol_ring_world", "body_type": "ring_world"},
+            megastructure={
+                "restorable": True, "body_id": "sol_ring_world",
+                "body_name": "Sol Ring", "complete": False, "cost": 10000,
+                "orbiting": True,
+            })
+        self.assertEqual(
+            captain._megastructure_action(),
+            ("/api/megastructure/restore", {"body_id": "sol_ring_world"},
+             "megastructure"),
+        )
+
+    def test_a_completed_structure_is_skipped_for_the_next_candidate(self):
+        captain = self._captain(
+            orbiting_body={"id": "sol_ring_world", "body_type": "ring_world"},
+            megastructure={
+                "restorable": True, "body_id": "sol_ring_world",
+                "body_name": "Sol Ring", "complete": True, "cost": 10000,
+                "orbiting": True,
+            })
+        self.assertEqual(
+            captain._megastructure_action(),
+            ("/api/orbit", {"target": "sol_dyson_sphere"}, "orbit"),
+        )
+
+    def test_a_plain_body_orbits_the_first_restorable_type(self):
+        self.assertEqual(
+            self._captain()._megastructure_action(),
+            ("/api/orbit", {"target": "sol_ring_world"}, "orbit"),
+        )
+
+    def test_an_unaffordable_restore_waits(self):
+        captain = self._captain(
+            ship={"credits": 500},
+            orbiting_body={"id": "sol_ring_world", "body_type": "ring_world"},
+            megastructure={
+                "restorable": True, "body_id": "sol_ring_world",
+                "body_name": "Sol Ring", "complete": False, "cost": 10000,
+                "orbiting": True,
+            },
+        )
+        self.assertIsNone(captain._megastructure_action())
+
+    def test_it_needs_the_campaign_and_a_candidate(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._megastructure_action())
+        self.assertIsNone(self._captain(
+            current_system={"id": "a", "bodies": [
+                {"id": "a1", "body_type": "terrestrial"}]},
+            orbiting_body={"id": "a1", "body_type": "terrestrial"},
+        )._megastructure_action())
+
+    def test_the_restore_is_one_shot(self):
+        captain = self._captain(megastructure={
+            "restorable": True, "body_id": "sol_ring_world",
+            "body_name": "Sol Ring", "complete": False, "cost": 10000,
+            "orbiting": True,
+        })
+        captain.attempted.add("/api/megastructure/restore")
+        self.assertIsNone(captain._megastructure_action())
 
 
 class AnomalyPolicyTest(unittest.TestCase):

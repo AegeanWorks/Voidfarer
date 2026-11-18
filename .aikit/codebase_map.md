@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `587`
+- **Total Classes**: `588`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3012`
-- **Total Source Lines**: `68018`
+- **Total Class Methods**: `3020`
+- **Total Source Lines**: `68163`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2392` lines (`110520` bytes)
+**Size**: `2485` lines (`114488` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -343,6 +343,14 @@
   - Method `.test_the_link_is_one_shot()`
   - Method `.test_it_needs_the_campaign_credits_and_mastery()`
   - Method `.test_another_systems_outpost_does_not_count()`
+- `class MegastructureRestorePolicyTest` - *The captain restores an ancient structure after the campaign (ADR-391).*
+  - Method `._captain(**state)`
+  - Method `.test_a_restorable_orbited_structure_is_restored()`
+  - Method `.test_a_completed_structure_is_skipped_for_the_next_candidate()`
+  - Method `.test_a_plain_body_orbits_the_first_restorable_type()`
+  - Method `.test_an_unaffordable_restore_waits()`
+  - Method `.test_it_needs_the_campaign_and_a_candidate()`
+  - Method `.test_the_restore_is_one_shot()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4857,7 +4865,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2327` lines (`110614` bytes)
+**Size**: `2379` lines (`113215` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4893,6 +4901,7 @@
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
   - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
   - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*

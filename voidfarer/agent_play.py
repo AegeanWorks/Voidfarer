@@ -86,7 +86,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/trade/quantum/place": "the lane opens after Act VI; the 180-step gate ends before the campaign does",
     "/api/combat/gambit": "needs an active fight and a local escort captain",
     "/api/outpost/link": "the 180-step gate founds one outpost; the 2,000-step campaign builds a same-system pair",
-    "/api/megastructure/restore": "needs orbit and a restorable megastructure",
+    "/api/megastructure/restore": "the 180-step gate never orbits a restorable body; the 2,000-step campaign restores one",
 }
 
 
@@ -196,6 +196,11 @@ class AiCaptain:
         "mining": 1800, "research": 2200, "solar": 1400,
         "shipyard": 3200, "colony": 2600,
     }
+    # Mirrors megastructures.MEGASTRUCTURE_RESTORATION; the drift test keeps them equal
+    # (ADR-391).
+    MEGASTRUCTURE_TYPES = frozenset({
+        "dyson_sphere", "ring_world", "quantum_relay", "solar_collector", "wormhole",
+    })
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -238,6 +243,8 @@ class AiCaptain:
         self.away_protected_mission = ""
         # Bodies already orbited while looking for a second outpost site (ADR-390).
         self.outpost_probed: set[str] = set()
+        # Bodies already orbited while looking for a restorable structure (ADR-391).
+        self.megastructure_probed: set[str] = set()
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -393,6 +400,12 @@ class AiCaptain:
         outpost = self._outpost_link_action()
         if outpost is not None:
             return outpost
+
+        # Ancient structures are the other same-system construction surface; one restore
+        # per campaign after the outpost pair (ADR-391).
+        structure = self._megastructure_action()
+        if structure is not None:
+            return structure
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -837,6 +850,8 @@ class AiCaptain:
         "/api/shipyard/sell": "slot",
         # The roster trim dismisses one redundant member at a time (ADR-388).
         "/api/crew/dismiss": "crew_id",
+        # One restoration per body, so a second structure stays reachable (ADR-391).
+        "/api/megastructure/restore": "body_id",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1153,6 +1168,43 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _megastructure_action(self):
+        """Restore the first affordable restorable structure after the campaign (ADR-391).
+
+        The snapshot reports cost, orbit and completion only for the current body, so the
+        captain probes the restorable body types and lets the report confirm each one.
+        """
+        if "/api/megastructure/restore" in self.attempted:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        ship = self.state.get("ship") or {}
+        credits = int(ship.get("credits") or 0)
+        report = self.state.get("megastructure") or {}
+        if report.get("restorable") and not report.get("complete"):
+            body_id = str(report.get("body_id") or "")
+            if body_id and report.get("orbiting") and credits >= int(report.get("cost") or 0):
+                return ("/api/megastructure/restore", {"body_id": body_id},
+                        "megastructure")
+            if report.get("orbiting"):
+                return None
+        system = self.state.get("current_system") or {}
+        orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        if report.get("restorable") and orbiting:
+            self.megastructure_probed.add(orbiting)
+        for body in system.get("bodies") or []:
+            if not isinstance(body, dict):
+                continue
+            body_id = str(body.get("id") or "")
+            if not body_id or body_id == orbiting:
+                continue
+            if str(body.get("body_type") or "") not in self.MEGASTRUCTURE_TYPES:
+                continue
+            if body_id in self.megastructure_probed:
+                continue
+            return "/api/orbit", {"target": body_id}, "orbit"
+        return None
 
     def _outpost_link_action(self):
         """Build two same-system outposts, then link their supply (ADR-390).
