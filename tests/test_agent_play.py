@@ -2046,6 +2046,74 @@ class MessagesSendPolicyTest(unittest.TestCase):
         self.assertIsNone(captain._send_action())
 
 
+class ShipyardSellPolicyTest(unittest.TestCase):
+    """The captain trades in a safe equipped upgrade after the campaign (ADR-387)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "orbiting_body": {"id": "b1", "station_dockable": True},
+            "ship": {
+                "credits": 5000, "fuel": 60, "max_fuel": 80,
+                "equipped_upgrades": {"engines": "warp_booster_mk1"},
+            },
+            "catalog_upgrades": [
+                {"id": "warp_booster_mk1", "slot": "engines",
+                 "stat_bonus": {"fuel_efficiency": 0.20}},
+                {"id": "cargo_bay_mk1", "slot": "utility",
+                 "stat_bonus": {"cargo_capacity": 20.0}},
+            ],
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_safe_equipped_upgrade_is_traded_in(self):
+        self.assertEqual(
+            self._captain()._shipyard_sell_action(),
+            ("/api/shipyard/sell", {"slot": "engines"}, "shipyard_sell"),
+        )
+
+    def test_cargo_and_fuel_capacity_upgrades_are_kept(self):
+        captain = self._captain(ship={
+            "credits": 5000, "fuel": 60, "max_fuel": 80,
+            "equipped_upgrades": {"utility": "cargo_bay_mk1"},
+        })
+        self.assertIsNone(captain._shipyard_sell_action())
+
+    def test_a_low_tank_waits_for_the_refuel(self):
+        captain = self._captain(ship={
+            "credits": 5000, "fuel": 10, "max_fuel": 80,
+            "equipped_upgrades": {"engines": "warp_booster_mk1"},
+        })
+        self.assertIsNone(captain._shipyard_sell_action())
+
+    def test_it_needs_a_dock_and_the_campaign_to_be_finished(self):
+        self.assertIsNone(self._captain(orbiting_body=None)._shipyard_sell_action())
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._shipyard_sell_action())
+
+    def test_the_trade_in_is_one_shot_per_slot(self):
+        captain = self._captain()
+        captain.attempted.add("/api/shipyard/sell")
+        captain.attempted_signatures.add(("/api/shipyard/sell", "engines"))
+        self.assertIsNone(captain._shipyard_sell_action())
+
+    def test_each_slot_is_keyed_by_its_name(self):
+        captain = self._captain()
+        captain.attempted_signatures.add(("/api/shipyard/sell", "engines"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/shipyard/sell", {"slot": "engines"}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/shipyard/sell", {"slot": "shields"}),
+            "a second slot must stay reachable after the first trade-in")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

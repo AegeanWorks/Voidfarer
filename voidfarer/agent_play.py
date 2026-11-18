@@ -53,7 +53,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/inventory/jettison": "the captain sells or stores cargo instead of dumping it",
     "/api/ship/module": "needs an owned ship module",
     "/api/shipyard/chassis": "the 180-step treasury cannot cover a hull; the 2,000-step campaign commissions one",
-    "/api/shipyard/sell": "needs a spare hull in the shipyard",
+    "/api/shipyard/sell": "the 180-step gate ends before Act VI; the 2,000-step campaign trades in an equipped slot",
     "/api/outpost/upgrade": "needs a founded outpost",
     "/api/outpost/module": "needs a founded outpost and module credits",
     "/api/outpost/crew": "needs a founded outpost and available crew",
@@ -418,6 +418,10 @@ class AiCaptain:
         send = self._send_action()
         if send is not None:
             return send
+
+        sell = self._shipyard_sell_action()
+        if sell is not None:
+            return sell
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -809,6 +813,9 @@ class AiCaptain:
         # Trust and alliance are per captain, so every captain stays reachable for
         # the post-campaign hail chain (ADR-385).
         "/api/ally/form": "captain_id",
+        # Each equipped slot is a separate trade-in, so one sale cannot lock the others
+        # out of the post-campaign policy (ADR-387).
+        "/api/shipyard/sell": "slot",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1125,6 +1132,38 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _shipyard_sell_action(self):
+        """Trade in one safe equipped upgrade at a dock after the campaign (ADR-387).
+
+        Cargo and fuel-capacity modules are kept because removing them can overflow the
+        hold or clamp the tank; a low tank waits for the refuel builder first.
+        """
+        if "/api/shipyard/sell" in self.attempted or not self._is_docked():
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        ship = self.state.get("ship") or {}
+        if int(ship.get("fuel") or 0) * 2 < int(ship.get("max_fuel") or 1):
+            return None
+        equipped = ship.get("equipped_upgrades") or {}
+        if not isinstance(equipped, dict):
+            return None
+        catalog = {
+            str(upgrade.get("id")): upgrade
+            for upgrade in self.state.get("catalog_upgrades") or []
+            if isinstance(upgrade, dict) and upgrade.get("id")
+        }
+        for slot in sorted(equipped):
+            upgrade = catalog.get(str(equipped.get(slot))) or {}
+            bonus = upgrade.get("stat_bonus") or {}
+            if "cargo_capacity" in bonus or "max_fuel" in bonus:
+                continue
+            body = {"slot": str(slot)}
+            if self._tour_action_attempted("/api/shipyard/sell", body):
+                continue
+            return "/api/shipyard/sell", body, "shipyard_sell"
+        return None
 
     def _send_action(self):
         """Send one quantum report to a real correspondent after the campaign (ADR-386)."""
