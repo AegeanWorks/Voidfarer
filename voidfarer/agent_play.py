@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import urllib.error
 import urllib.request
 from typing import Any
@@ -60,7 +61,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/outpost/repair": "needs a damaged outpost and credits",
     "/api/drone/collect": "needs a deployed drone",
     "/api/depot/sell": "needs stock sitting in a depot",
-    "/api/trade/automation": "needs a docked market and configured thresholds",
+    "/api/trade/automation": "the broker is armed after Act VI; the 180-step gate ends before the campaign does",
     "/api/trade/quantum/automation": "needs a docked market and surplus cargo",
     "/api/research/queue": "needs a valid, incomplete research project",
     "/api/research/cancel": "needs a project already in the research queue",
@@ -180,6 +181,9 @@ class AiCaptain:
     SUPPLY_VOLUME = 1
     # Keep enough credits for repairs and fuel after a capital hull purchase (ADR-379).
     CHASSIS_CREDIT_RESERVE = 1000
+    # The broker's buy ceiling sits above the quoted price so a quiet market move
+    # cannot cancel the one armed window (ADR-380).
+    AUTOMATION_BUY_MARGIN = 1.10
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -214,6 +218,8 @@ class AiCaptain:
         self.emergency_burns = 0
         self.MAX_EMERGENCY_BURNS = 2
         self.fallback_trades = 0
+        # One tick per armed broker window, so the automation cannot tick forever (ADR-380).
+        self.automation_waited = False
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -369,6 +375,12 @@ class AiCaptain:
         chassis = self._chassis_action()
         if chassis is not None:
             return chassis
+
+        # The docked broker is armed on a live quote after the campaign, proves one
+        # automated trade, and is stood down before its loop can fill the hold (ADR-380).
+        automation = self._automation_action()
+        if automation is not None:
+            return automation
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -742,6 +754,9 @@ class AiCaptain:
         # A tree branch spawns a follow-up node with its own choices; keying on the
         # path would let the root lock every follow-up out of the tour (ADR-378).
         "/api/messages/choose": "message_id",
+        # Arming and standing the broker down are two distinct actions; keying on the
+        # path would leave the disable direction unreachable after the arm (ADR-380).
+        "/api/trade/automation": "enabled",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -944,6 +959,65 @@ class AiCaptain:
             return None
         chassis_id = min(candidates)[1]
         return "/api/shipyard/chassis", {"chassis_id": chassis_id}, "chassis"
+
+    def _automation_action(self):
+        """Arm the docked broker on the cheapest quote, then stand it down (ADR-380).
+
+        One armed window proves the automation: the captain lets a single engine tick
+        pass so the broker executes at the dock, then disables it so the three-tick
+        rearm loop cannot crowd the hold.
+        """
+        auto = self.state.get("trade_automation") or {}
+        if auto.get("enabled"):
+            if int(auto.get("trades") or 0) > 0 or self.automation_waited:
+                body = {"enabled": False}
+                if self._tour_action_attempted("/api/trade/automation", body):
+                    return None
+                return "/api/trade/automation", body, "automation"
+            ship = self.state.get("ship") or {}
+            free = ship.get("cargo_free_volume")
+            free = int(ship.get("cargo_capacity") or 0) if free is None else int(free)
+            if self._is_docked() and free >= 1:
+                self.automation_waited = True
+                return "/api/time/step", {"ticks": 1}, "time"
+            return None
+        if not self._is_docked():
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        quotes = self.state.get("market_quotes") or {}
+        commodity_id = self._cheapest_quote(quotes)
+        if not commodity_id:
+            return None
+        buy_price = self._quote_price(quotes, commodity_id, "buy_price")
+        if buy_price <= 0:
+            return None
+        ship = self.state.get("ship") or {}
+        if int(ship.get("credits") or 0) < buy_price:
+            return None
+        body = {
+            "commodity_id": commodity_id,
+            "buy_below": int(math.ceil(buy_price * self.AUTOMATION_BUY_MARGIN)),
+            "sell_above": 0,
+            "quantity": 1,
+            "enabled": True,
+        }
+        if self._tour_action_attempted("/api/trade/automation", body):
+            return None
+        return "/api/trade/automation", body, "automation"
+
+    @staticmethod
+    def _quote_price(quotes: Any, commodity_id: str, field: str) -> float:
+        """Read one price from the quote list or its id-keyed form."""
+        items = quotes if isinstance(quotes, list) else list((quotes or {}).values())
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            item_id = str(item.get("commodity_id") or item.get("id") or "")
+            if item_id == commodity_id:
+                price = item.get(field)
+                return float(price) if isinstance(price, (int, float)) else 0.0
+        return 0.0
 
     def _tour_supply(self):
         """Buy the station repair paste so the item terminal is exercised (ADR-367)."""

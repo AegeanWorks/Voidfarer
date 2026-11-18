@@ -1639,6 +1639,84 @@ class ShipyardChassisTourTest(unittest.TestCase):
         self.assertIsNone(captain._chassis_action())
 
 
+class TradeAutomationPolicyTest(unittest.TestCase):
+    """The captain arms the docked broker, lets it trade, then stands it down (ADR-380)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "orbiting_body": {"id": "b1", "station_dockable": True},
+            "market_quotes": {
+                "titanium": {"commodity_id": "titanium", "buy_price": 10.0,
+                             "sell_price": 8.0},
+                "water": {"commodity_id": "water", "buy_price": 4.0, "sell_price": 3.0},
+            },
+            "ship": {"credits": 5000, "cargo": {}, "cargo_free_volume": 40},
+            "trade_automation": {"enabled": False, "commodity_id": "", "trades": 0},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_cheapest_quote_is_armed_at_a_post_story_dock(self):
+        action = self._captain()._automation_action()
+        self.assertEqual(action[0], "/api/trade/automation")
+        self.assertEqual(action[2], "automation")
+        self.assertEqual(action[1]["commodity_id"], "water")
+        self.assertEqual(action[1]["quantity"], 1)
+        self.assertTrue(action[1]["enabled"])
+        self.assertGreaterEqual(action[1]["buy_below"], 4.0)
+
+    def test_no_arming_before_act_vi_without_a_dock_quote_or_credits(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._automation_action())
+        self.assertIsNone(self._captain(orbiting_body=None)._automation_action())
+        self.assertIsNone(self._captain(market_quotes=None)._automation_action())
+        self.assertIsNone(self._captain(
+            ship={"credits": 1, "cargo": {}, "cargo_free_volume": 40})._automation_action())
+
+    def test_a_traded_broker_is_stood_down(self):
+        captain = self._captain(trade_automation={
+            "enabled": True, "commodity_id": "water", "trades": 1})
+        self.assertEqual(
+            captain._automation_action(),
+            ("/api/trade/automation", {"enabled": False}, "automation"),
+        )
+
+    def test_an_armed_broker_gets_one_tick_and_then_stands_down(self):
+        captain = self._captain(trade_automation={
+            "enabled": True, "commodity_id": "water", "trades": 0})
+        self.assertEqual(
+            captain._automation_action(),
+            ("/api/time/step", {"ticks": 1}, "time"),
+        )
+        self.assertTrue(captain.automation_waited)
+        self.assertEqual(
+            captain._automation_action(),
+            ("/api/trade/automation", {"enabled": False}, "automation"),
+        )
+
+    def test_a_full_hold_waits_for_the_sell_fallback(self):
+        captain = self._captain(
+            ship={"cargo_free_volume": 0},
+            trade_automation={"enabled": True, "commodity_id": "water", "trades": 0})
+        self.assertIsNone(captain._automation_action())
+
+    def test_both_switch_directions_are_separate_signatures(self):
+        captain = self._captain()
+        captain.attempted_signatures.add(("/api/trade/automation", "True"))
+        self.assertTrue(captain._tour_action_attempted(
+            "/api/trade/automation", {"enabled": True}))
+        self.assertFalse(captain._tour_action_attempted(
+            "/api/trade/automation", {"enabled": False}),
+            "standing the broker down must stay reachable after arming it")
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `578`
+- **Total Classes**: `579`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `2941`
-- **Total Source Lines**: `66918`
+- **Total Class Methods**: `2950`
+- **Total Source Lines**: `67070`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `1749` lines (`82816` bytes)
+**Size**: `1827` lines (`86426` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -274,6 +274,14 @@
   - Method `.test_it_needs_a_dock_credits_reserve_and_hold_space()`
   - Method `.test_the_current_class_is_not_rebought()`
   - Method `.test_the_commission_is_one_shot()`
+- `class TradeAutomationPolicyTest` - *The captain arms the docked broker, lets it trade, then stands it down (ADR-380).*
+  - Method `._captain(**state)`
+  - Method `.test_the_cheapest_quote_is_armed_at_a_post_story_dock()`
+  - Method `.test_no_arming_before_act_vi_without_a_dock_quote_or_credits()`
+  - Method `.test_a_traded_broker_is_stood_down()`
+  - Method `.test_an_armed_broker_gets_one_tick_and_then_stands_down()`
+  - Method `.test_a_full_hold_waits_for_the_sell_fallback()`
+  - Method `.test_both_switch_directions_are_separate_signatures()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4788,7 +4796,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `1870` lines (`88432` bytes)
+**Size**: `1944` lines (`91923` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4820,6 +4828,8 @@
   - Method `._void_dive_action()` - *Take the story's own void beat once: dive at the required horizon.*
   - Method `._supply_action()` - *Use a held repair paste when the hull is hurt outside a blocking encounter (ADR-367).*
   - Method `._chassis_action()` - *Commission the cheapest fitting hull once, after Act VI at a service dock (ADR-379).*
+  - Method `._automation_action()` - *Arm the docked broker on the cheapest quote, then stand it down (ADR-380).*
+  - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._tour_supply()` - *Buy the station repair paste so the item terminal is exercised (ADR-367).*
   - Method `._tour_supply_decoy()` - *Buy the last-resort ECM decoy once, separately so the paste cannot starve it (ADR-371).*
   - Method `._supply_purchase(item_id, fallback_price)`
