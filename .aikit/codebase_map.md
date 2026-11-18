@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `586`
+- **Total Classes**: `587`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3002`
-- **Total Source Lines**: `67823`
+- **Total Class Methods**: `3012`
+- **Total Source Lines**: `68018`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2295` lines (`106368` bytes)
+**Size**: `2392` lines (`110520` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -334,6 +334,15 @@
   - Method `.test_stationed_and_assigned_crew_are_never_dismissed()`
   - Method `.test_it_needs_the_campaign_finished()`
   - Method `.test_each_crew_member_is_keyed_by_id()`
+- `class OutpostSupplyLinkPolicyTest` - *The captain founds a second outpost and links its supply (ADR-390).*
+  - Method `._captain(**state)`
+  - Method `.test_the_current_eligible_body_is_built_first()`
+  - Method `.test_an_ineligible_body_is_orbited_next()`
+  - Method `.test_the_second_body_is_orbited_after_the_first_build()`
+  - Method `.test_two_unlinked_outposts_are_linked()`
+  - Method `.test_the_link_is_one_shot()`
+  - Method `.test_it_needs_the_campaign_credits_and_mastery()`
+  - Method `.test_another_systems_outpost_does_not_count()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4848,7 +4857,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2229` lines (`106053` bytes)
+**Size**: `2327` lines (`110614` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4884,6 +4893,8 @@
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
   - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
+  - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*
   - Method `._shipyard_sell_action()` - *Trade in one safe equipped upgrade at a dock after the campaign (ADR-387).*
   - Method `._send_action()` - *Send one quantum report to a real correspondent after the campaign (ADR-386).*

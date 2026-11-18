@@ -85,7 +85,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/story/choice": "needs an active story choice",
     "/api/trade/quantum/place": "the lane opens after Act VI; the 180-step gate ends before the campaign does",
     "/api/combat/gambit": "needs an active fight and a local escort captain",
-    "/api/outpost/link": "needs two outposts in one system",
+    "/api/outpost/link": "the 180-step gate founds one outpost; the 2,000-step campaign builds a same-system pair",
     "/api/megastructure/restore": "needs orbit and a restorable megastructure",
 }
 
@@ -189,6 +189,13 @@ class AiCaptain:
     QUANTUM_AUTOMATION_WINDOW = 10
     # The engine's alliance gate; hailing adds two trust per action (ADR-385).
     ALLY_TRUST = 50
+    # Mirrors SimulationEngine.OUTPOST_CHARTER_MASTERY_LEVEL (ADR-390).
+    OUTPOST_CHARTER_LEVEL = 2
+    # Mirrors outposts.OUTPOST_TYPES costs; the drift test keeps them equal (ADR-390).
+    OUTPOST_COSTS = {
+        "mining": 1800, "research": 2200, "solar": 1400,
+        "shipyard": 3200, "colony": 2600,
+    }
 
     def __init__(self, client: ApiClient, seed: int = 42) -> None:
         self.client = client
@@ -229,6 +236,8 @@ class AiCaptain:
         self.quantum_armed_at = 0
         # The first expedition is left to finish; later ones prove the recall (ADR-384).
         self.away_protected_mission = ""
+        # Bodies already orbited while looking for a second outpost site (ADR-390).
+        self.outpost_probed: set[str] = set()
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -378,6 +387,12 @@ class AiCaptain:
             refill = self._tour_supply_decoy()
             if refill is not None and not self._tour_action_attempted(refill[0], refill[1]):
                 return refill
+
+        # A same-system outpost pair is the only way to exercise the supply link; the
+        # post-campaign captain builds both and routes the newer through the older.
+        outpost = self._outpost_link_action()
+        if outpost is not None:
+            return outpost
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -1138,6 +1153,89 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _outpost_link_action(self):
+        """Build two same-system outposts, then link their supply (ADR-390).
+
+        The supply link is the only route that needs a pair in one system, and the
+        post-campaign treasury covers both. Only dockable bodies are orbited so the
+        station errand does not fight the construction trip.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        # One pair per campaign: the first link attempt ends the construction flow so a
+        # later jump cannot seed a fresh pair in every system (ADR-390).
+        if "/api/outpost/link" in self.attempted:
+            return None
+        system = self.state.get("current_system") or {}
+        system_id = str(system.get("id") or "")
+        local = [
+            outpost for outpost in self.state.get("outposts") or []
+            if isinstance(outpost, dict)
+            and str(outpost.get("system_id") or "") == system_id
+        ]
+        if len(local) >= 2:
+            return self._outpost_link_pair(local)
+        ship = self.state.get("ship") or {}
+        level = int((ship.get("mastery") or {}).get("level") or 0)
+        if level < self.OUTPOST_CHARTER_LEVEL:
+            return None
+        body = self.state.get("orbiting_body") or {}
+        body_id = str(body.get("id") or "")
+        occupied = bool(self.state.get("outpost_body_occupied")) or any(
+            str(outpost.get("body_id") or "") == body_id for outpost in local)
+        options = [
+            str(option) for option in self.state.get("outpost_options") or []
+            if str(option) in self.OUTPOST_COSTS
+        ]
+        credits = int(ship.get("credits") or 0)
+        if body_id and not occupied:
+            if options:
+                outpost_type = min(options, key=lambda option: self.OUTPOST_COSTS[option])
+                if credits >= self.OUTPOST_COSTS[outpost_type]:
+                    return ("/api/outpost/build",
+                            {"body_id": body_id, "outpost_type": outpost_type},
+                            "outpost_build")
+                return None
+            self.outpost_probed.add(body_id)
+        for candidate in system.get("bodies") or []:
+            if not isinstance(candidate, dict):
+                continue
+            candidate_id = str(candidate.get("id") or "")
+            if not candidate_id or candidate_id == body_id:
+                continue
+            if candidate_id in self.outpost_probed:
+                continue
+            if not candidate.get("station_dockable"):
+                continue
+            if any(str(outpost.get("body_id") or "") == candidate_id for outpost in local):
+                continue
+            return "/api/orbit", {"target": candidate_id}, "orbit"
+        return None
+
+    def _outpost_link_pair(self, local):
+        """Route the newest unlinked outpost through the oldest unlinked hub."""
+        if "/api/outpost/link" in self.attempted:
+            return None
+        linked_ids = {str(outpost.get("supply_hub_id") or "") for outpost in local}
+        sources = [
+            outpost for outpost in reversed(local)
+            if not outpost.get("supply_hub_id")
+            and str(outpost.get("id") or "") not in linked_ids
+        ]
+        hubs = [
+            outpost for outpost in local
+            if not outpost.get("supply_hub_id")
+            and str(outpost.get("id") or "") not in linked_ids
+        ]
+        for source in sources:
+            for hub in hubs:
+                if source.get("id") == hub.get("id"):
+                    continue
+                return ("/api/outpost/link",
+                        {"outpost_id": str(source["id"]), "hub_id": str(hub["id"])},
+                        "outpost_link")
+        return None
 
     def _crew_dismiss_action(self):
         """Trim redundant unassigned crew after the campaign, weakest first (ADR-388).

@@ -8,6 +8,7 @@ from pathlib import Path
 from voidfarer.agent_api import build_action_catalog
 from voidfarer.agent_play import AiCaptain, ApiClient, coverage_gaps
 from voidfarer.engine import SimulationEngine
+from voidfarer.outposts import OUTPOST_TYPES
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
 from voidfarer.storage import StorageManager
 
@@ -133,6 +134,10 @@ class AiCaptainTourCoverageTest(unittest.TestCase):
     def test_station_map_and_wear_mark_match_the_engine(self):
         self.assertEqual(AiCaptain.STATION_BY_ROLE, SimulationEngine.STATION_BY_ROLE)
         self.assertEqual(AiCaptain.REFIT_WORN_INTEGRITY, SimulationEngine.REFIT_WORN_INTEGRITY)
+        self.assertEqual(AiCaptain.OUTPOST_CHARTER_LEVEL,
+                         SimulationEngine.OUTPOST_CHARTER_MASTERY_LEVEL)
+        self.assertEqual(AiCaptain.OUTPOST_COSTS,
+                         {outpost.id: outpost.cost for outpost in OUTPOST_TYPES})
 
     def test_autostaff_tour_fires_only_when_the_seating_is_not_optimal(self):
         crew = [{"id": "c1", "role": "pilot", "status": "active", "skill": 4, "xp": 0, "station": ""}]
@@ -2183,6 +2188,98 @@ class CrewDismissPolicyTest(unittest.TestCase):
         self.assertFalse(captain._tour_action_attempted(
             "/api/crew/dismiss", {"crew_id": "e2"}),
             "a second trim must stay reachable after the first dismissal")
+
+
+class OutpostSupplyLinkPolicyTest(unittest.TestCase):
+    """The captain founds a second outpost and links its supply (ADR-390)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "current_system": {
+                "id": "ashen", "name": "Ashen Choir",
+                "bodies": [
+                    {"id": "ashen_body_5", "body_type": "research_outpost",
+                     "station_dockable": True},
+                    {"id": "ashen_body_1", "body_type": "desert_world",
+                     "station_dockable": True},
+                    {"id": "ashen_body_2", "body_type": "ice_world",
+                     "station_dockable": True},
+                ],
+            },
+            "orbiting_body": {"id": "ashen_body_5", "body_type": "research_outpost",
+                              "station_dockable": True},
+            "outpost_options": ["research", "shipyard"],
+            "outpost_body_occupied": False,
+            "ship": {"credits": 20000, "mastery": {"level": 5}},
+            "outposts": [],
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_current_eligible_body_is_built_first(self):
+        self.assertEqual(
+            self._captain()._outpost_link_action(),
+            ("/api/outpost/build",
+             {"body_id": "ashen_body_5", "outpost_type": "research"}, "outpost_build"),
+        )
+
+    def test_an_ineligible_body_is_orbited_next(self):
+        self.assertEqual(
+            self._captain(outpost_options=[])._outpost_link_action(),
+            ("/api/orbit", {"target": "ashen_body_1"}, "orbit"),
+        )
+
+    def test_the_second_body_is_orbited_after_the_first_build(self):
+        captain = self._captain(
+            outpost_body_occupied=True,
+            outposts=[{"id": "o1", "system_id": "ashen", "body_id": "ashen_body_5",
+                       "supply_hub_id": ""}],
+        )
+        self.assertEqual(
+            captain._outpost_link_action(),
+            ("/api/orbit", {"target": "ashen_body_1"}, "orbit"),
+        )
+
+    def test_two_unlinked_outposts_are_linked(self):
+        captain = self._captain(outposts=[
+            {"id": "o1", "system_id": "ashen", "body_id": "ashen_body_5",
+             "supply_hub_id": ""},
+            {"id": "o2", "system_id": "ashen", "body_id": "ashen_body_1",
+             "supply_hub_id": ""},
+        ])
+        self.assertEqual(
+            captain._outpost_link_action(),
+            ("/api/outpost/link", {"outpost_id": "o2", "hub_id": "o1"}, "outpost_link"),
+        )
+
+    def test_the_link_is_one_shot(self):
+        captain = self._captain(outposts=[
+            {"id": "o1", "system_id": "ashen", "body_id": "ashen_body_5",
+             "supply_hub_id": ""},
+            {"id": "o2", "system_id": "ashen", "body_id": "ashen_body_1",
+             "supply_hub_id": ""},
+        ])
+        captain.attempted.add("/api/outpost/link")
+        self.assertIsNone(captain._outpost_link_action())
+
+    def test_it_needs_the_campaign_credits_and_mastery(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._outpost_link_action())
+        self.assertIsNone(self._captain(
+            ship={"credits": 1000, "mastery": {"level": 5}})._outpost_link_action())
+        self.assertIsNone(self._captain(
+            ship={"credits": 20000, "mastery": {"level": 1}})._outpost_link_action())
+
+    def test_another_systems_outpost_does_not_count(self):
+        captain = self._captain(outposts=[
+            {"id": "old", "system_id": "sol", "body_id": "sol_body_7",
+             "supply_hub_id": ""},
+        ])
+        self.assertEqual(captain._outpost_link_action()[0], "/api/outpost/build")
 
 
 class AnomalyPolicyTest(unittest.TestCase):
