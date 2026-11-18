@@ -21,7 +21,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/step": "orbit-only micro-step (delta_time); use /api/time/step for full ticks",
     "/api/tutorial/reset": "meta: replays onboarding",
     "/api/tutorial/skip": "meta: skips onboarding",
-    "/api/messages/send": "needs an inbox with no unread mail or live branch",
+    "/api/messages/send": "the 180-step mail visit reads and resolves mail; the 2,000-step campaign sends after Act VI",
     "/api/ally/form": "needs high standing and a prepared captain",
     "/api/anomaly": "prompt-driven: an anomaly must be resolved",
     "/api/combat": "prompt-driven: a hostile intercept must occur",
@@ -414,6 +414,10 @@ class AiCaptain:
         ally = self._ally_action()
         if ally is not None:
             return ally
+
+        send = self._send_action()
+        if send is not None:
+            return send
 
         # The guided tour owns every even step, so a long run is guaranteed to reach the
         # station and menu mechanics instead of scanning the same rock forever.
@@ -1121,6 +1125,28 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _send_action(self):
+        """Send one quantum report to a real correspondent after the campaign (ADR-386)."""
+        if "/api/messages/send" in self.attempted:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        recipient = ""
+        for message in self.state.get("messages") or []:
+            if isinstance(message, dict) and str(message.get("sender") or "").strip():
+                recipient = str(message["sender"]).strip()
+                break
+        if not recipient:
+            for captain in self.state.get("ai_captains") or []:
+                if isinstance(captain, dict) and str(captain.get("name") or "").strip():
+                    recipient = str(captain["name"]).strip()
+                    break
+        if not recipient:
+            return None
+        return ("/api/messages/send",
+                {"recipient": recipient, "subject": "Survey report",
+                 "body": "Routine survey telemetry from the current campaign."}, "messages_send")
 
     def _ally_action(self):
         """Hail the most trusted non-ally to 50 trust, then ally (ADR-385)."""

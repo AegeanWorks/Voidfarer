@@ -2007,6 +2007,45 @@ class AllyFormationPolicyTest(unittest.TestCase):
             "a second captain must stay reachable after the first alliance")
 
 
+class MessagesSendPolicyTest(unittest.TestCase):
+    """The captain sends one quantum report after the campaign (ADR-386)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "messages": [{"id": "m1", "sender": "Admiral Vance", "subject": "Welcome"}],
+            "ai_captains": [{"id": "rook", "name": "Captain Rook"}],
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_first_correspondent_receives_a_report(self):
+        action = self._captain()._send_action()
+        self.assertEqual(action[0], "/api/messages/send")
+        self.assertEqual(action[1]["recipient"], "Admiral Vance")
+        self.assertEqual(action[2], "messages_send")
+
+    def test_a_captain_name_is_the_fallback_recipient(self):
+        action = self._captain(messages=[
+            {"id": "m1", "sender": "", "subject": "System notice"},
+        ])._send_action()
+        self.assertEqual(action[1]["recipient"], "Captain Rook")
+
+    def test_no_recipient_or_pre_story_run_sends_nothing(self):
+        self.assertIsNone(self._captain(
+            messages=[], ai_captains=[])._send_action())
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._send_action())
+
+    def test_the_report_is_sent_once(self):
+        captain = self._captain()
+        captain.attempted.add("/api/messages/send")
+        self.assertIsNone(captain._send_action())
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 
