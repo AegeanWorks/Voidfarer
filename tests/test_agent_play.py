@@ -2425,6 +2425,49 @@ class RelicFusionPolicyTest(unittest.TestCase):
         self.assertIsNone(captain._relic_fuse_action())
 
 
+class OverhaulServicePolicyTest(unittest.TestCase):
+    """The captain scrubs frame wear at a drydock after the campaign (ADR-393)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "orbiting_body": {"id": "b1", "station_dockable": True},
+            "drydock": {"docked": True, "wear": 73.0, "overhaul_cost": 328},
+            "ship": {"credits": 5000, "wear": 73.0},
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_worn_docked_frame_is_overhauled(self):
+        self.assertEqual(
+            self._captain()._overhaul_action(),
+            ("/api/overhaul", {}, "overhaul"),
+        )
+
+    def test_a_pristine_frame_needs_no_service(self):
+        self.assertIsNone(self._captain(
+            ship={"credits": 5000, "wear": 0.0},
+            drydock={"docked": True, "wear": 0.0, "overhaul_cost": 0},
+        )._overhaul_action())
+
+    def test_it_needs_a_dock_and_the_service_fee(self):
+        self.assertIsNone(self._captain(orbiting_body=None)._overhaul_action())
+        self.assertIsNone(self._captain(
+            ship={"credits": 100, "wear": 73.0})._overhaul_action())
+
+    def test_it_waits_for_the_campaign_to_complete(self):
+        self.assertIsNone(self._captain(
+            story_status={"completed": False})._overhaul_action())
+
+    def test_the_overhaul_is_one_shot(self):
+        captain = self._captain()
+        captain.attempted.add("/api/overhaul")
+        self.assertIsNone(captain._overhaul_action())
+
+
 class AnomalyPolicyTest(unittest.TestCase):
     """The captain picks an anomaly check that passes (ADR-372)."""
 

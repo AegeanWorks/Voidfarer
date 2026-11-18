@@ -29,7 +29,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/customs/resolve": "prompt-driven: an active customs interdiction must intercept",
     "/api/fabricate": "needs titanium alloy in cargo hold",
     "/api/weather": "telemetry endpoint for solar space weather",
-    "/api/overhaul": "needs an orbital dock and hyperlane frame wear",
+    "/api/overhaul": "the 180-step gate ends before Act VI; the 2,000-step campaign overhauls once",
     "/api/relics/fuse": "the 180-step gate collects fewer than three relics; the 2,000-step campaign fuses one set",
     "/api/decision/resolve": "prompt-driven: a blocking decision must be pending",
     "/api/encounter/resolve": "alias: routes to the prompt-driven decision/pirate/customs/anomaly resolvers",
@@ -412,6 +412,12 @@ class AiCaptain:
         fusion = self._relic_fuse_action()
         if fusion is not None:
             return fusion
+
+        # A worn frame is pure downside, so scrub it once at the first post-story dock
+        # rather than waiting for the rotating tour (ADR-393).
+        overhaul = self._overhaul_action()
+        if overhaul is not None:
+            return overhaul
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -1174,6 +1180,25 @@ class AiCaptain:
             return None
         self.quantum_armed_at = self.total_steps
         return "/api/trade/quantum/automation", arm, "quantum_automation"
+
+    def _overhaul_action(self):
+        """Scrub hyperlane frame wear once after the campaign at a drydock (ADR-393).
+
+        The rotating tour owns an overhaul builder, but the long campaigns never reach it
+        once the post-story actions queue ahead, so wear accumulates to the cap.
+        """
+        if "/api/overhaul" in self.attempted or not self._is_docked():
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        ship = self.state.get("ship") or {}
+        wear = float(ship.get("wear") or 0.0)
+        cost = int((self.state.get("drydock") or {}).get("overhaul_cost") or 0)
+        if wear <= 0.0 or cost <= 0:
+            return None
+        if int(ship.get("credits") or 0) < cost:
+            return None
+        return "/api/overhaul", {}, "overhaul"
 
     def _relic_fuse_action(self):
         """Fuse the lowest complete relic set once after the campaign (ADR-392).

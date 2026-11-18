@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `589`
+- **Total Classes**: `590`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3028`
-- **Total Source Lines**: `68240`
+- **Total Class Methods**: `3035`
+- **Total Source Lines**: `68308`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2535` lines (`116400` bytes)
+**Size**: `2578` lines (`118052` bytes)
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -359,6 +359,13 @@
   - Method `.test_legendary_relics_never_fuse()`
   - Method `.test_no_fusion_before_the_campaign_or_without_a_set()`
   - Method `.test_the_fusion_is_one_shot()`
+- `class OverhaulServicePolicyTest` - *The captain scrubs frame wear at a drydock after the campaign (ADR-393).*
+  - Method `._captain(**state)`
+  - Method `.test_a_worn_docked_frame_is_overhauled()`
+  - Method `.test_a_pristine_frame_needs_no_service()`
+  - Method `.test_it_needs_a_dock_and_the_service_fee()`
+  - Method `.test_it_waits_for_the_campaign_to_complete()`
+  - Method `.test_the_overhaul_is_one_shot()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4873,7 +4880,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2406` lines (`114442` bytes)
+**Size**: `2431` lines (`115572` bytes)
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4909,6 +4916,7 @@
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
   - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._overhaul_action()` - *Scrub hyperlane frame wear once after the campaign at a drydock (ADR-393).*
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
