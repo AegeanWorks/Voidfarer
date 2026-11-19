@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "crew-id-uniqueness",
+    "task_id": "reactor-heat-chain",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795090658.6000607,
+    "updated_at": 1795097018.6513176,
     "owner": "kilo:goal",
-    "lease_until": 1795097858.6000607,
+    "lease_until": 1795104218.6513176,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795090675.1982934,
-    "completed_head": "ea1850e18e05569a7fb1f34d59632c7b64b4398c",
-    "completed_tree": "1eff95ca218a08d58f1f880b966f84358abe86c6"
+    "completed_at": 1795097084.2320473,
+    "completed_head": "b4994ca36eb07fb0015ffa8e5a89c4c5b458f7a5",
+    "completed_tree": "3b0bdeefbe2fd77c51caa900d13466d213ce6abc"
   },
   "checkpoints": [
-    {
-      "task_id": "salvage-scoop-prospecting",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'salvage-scoop-prospecting' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795070857.8853652,
-      "timestamp_str": "2026-11-19 09:47:37",
-      "agent": "kilo:goal",
-      "head": "351c8fd8e748f21a97de53652cfa480735b0353d",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "combat-gambit-recall",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Recall the armed escort and spend its captain's gambit in a fight",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795073681.0586684,
-      "timestamp_str": "2026-11-19 10:34:41",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/combat/gambit stays context claiming it needs an active fight and a local escort captain, but a 2,000-step seed-1 campaign has both a crewed escort and one pirate intercept; they never line up because the patrol rotation stations the escort on a connected lane while the fight breaks out in the current system, so the once-per-battle gambit has no AI proof",
-        "benefits": "A fight with an armed escort anywhere in the fleet recalls that escort into the current system and spends the role-appropriate gambit once, so the combat command is exercised for real",
-        "risks": "contract: /api/combat/gambit keeps a narrowed CONTEXT_ACTIONS reason and gains no signature entry because it is one-shot per campaign; dependency: none; concurrency: none; state: one escort reassignment and one spent gambit through the existing engine paths",
-        "mitigation": "failing-first tests for the ready local gambit, recall-first path, one-recall cap, spent-battle and one-shot guards, unarmed-escort skip and role gates, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and project gates"
-      },
-      "plan_digest": "b3b702f2488f967ab0609e47c1f1c79689ed4d803ae504ebdec21cb0a9cc6ec8"
-    },
-    {
-      "task_id": "combat-gambit-recall",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors; 2,000-step seed 1 recalls the armed corvette into the fight and spends the engineer gambit (hull 39 to 60), 97 families/94 succeeded/97 attempted with 0 errors; seeds 2/42 keep 0 errors but their escorts never receive a captain so the gambit stays unproven there; suite Ran 2075 OK (ADR-397); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795073734.117481,
-      "timestamp_str": "2026-11-19 10:35:34",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "combat-gambit-recall",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-19 15:17:55",
       "agent": "kilo:goal",
       "head": "ea1850e18e05569a7fb1f34d59632c7b64b4398c",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "reactor-heat-chain",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Vent a live reactor heat spike and service the integrity it costs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795096957.924885,
+      "timestamp_str": "2026-11-19 17:02:37",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "/api/reactor/vent and /api/reactor/repair were the last never-proven catalog endpoints: the engine refuses them unless the core is hot or hurt, and the rotating tour meets transient spikes too late; a state-driven tour attempt was reverted because declining shifts the cursor and cost seed 1 the customs/void families",
+        "benefits": "The post-story captain vents while heat is actually present and services the purge damage at the next dock, closing the coverage frontier without moving the tour schedule or the 180-step benchmark",
+        "risks": "contract: no route or signature change, two additive post-story actions; dependency: none; concurrency: none; state: repeated purges cost 1 integrity each and each service is paid from the post-story treasury",
+        "mitigation": "failing-first tests for the hot/cool vent gate, coolant recharge, pre-campaign gate, docked service, damage and heat triggers, credits floor and orderings, 180-step gate, three campaigns plus a full invariant sweep"
+      },
+      "plan_digest": "db63f74f38aa6d7241a4986cffc9cfbbc9eadb6de06cd87948de793864eba9d5"
+    },
+    {
+      "task_id": "reactor-heat-chain",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] 180 gate byte-identical 58 families/59 succeeded of 69 with 10 refusals/0 gaps/0 errors; campaigns 0 errors and higher coverage: seed 1 104/101/101 with vent 7 + repair 7, seed 2 101/98/99 with 8+8 (customs now proven), seed 42 102/99/100 with 12+12; coverage frontier closed (every catalog endpoint proven or documented) (ADR-404); suite Ran 2121 OK; 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795097018.6513176,
+      "timestamp_str": "2026-11-19 17:03:38",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "reactor-heat-chain",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'reactor-heat-chain' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795097084.2958536,
+      "timestamp_str": "2026-11-19 17:04:44",
+      "agent": "kilo:goal",
+      "head": "b4994ca36eb07fb0015ffa8e5a89c4c5b458f7a5",
       "delivery": {
         "roots": [
           "."
