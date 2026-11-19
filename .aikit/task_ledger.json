@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "autosave-follows-active-slot",
+    "task_id": "chaos-fuzz-harness",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795120431.5815454,
+    "updated_at": 1795123538.0465941,
     "owner": "kilo:goal",
-    "lease_until": 1795127631.5815454,
+    "lease_until": 1795130738.0465941,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795120601.9615421,
-    "completed_head": "ab56c6d9e42d705688ed27b3837bf8c548db5767",
-    "completed_tree": "2dcbe9a078d6485f9076ef2791a834e01886e597"
+    "completed_at": 1795123625.9637938,
+    "completed_head": "923bb8f75a785856ce7cabf2f631126021dfaea9",
+    "completed_tree": "3b9529a2255451178c2013d2841295f2ad683005"
   },
   "checkpoints": [
-    {
-      "task_id": "deterministic-resume",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[3/3] Resume parity exact on seeds 42@150, 1@400, 7@300, 2@300 (split point and final both 0 diffs, 0 errors); 180 gate unchanged 58 families/59 succeeded of 69 with 10 refusals/0 gaps/0 errors; campaigns keep coverage seed 1 104/101/101 and seed 42 102/99/100 with 0 errors; suite Ran 2133 OK (ADR-405, ADR-406, ADR-407); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795109484.511144,
-      "timestamp_str": "2026-11-19 20:31:24",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "deterministic-resume",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'deterministic-resume' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795109653.1143665,
-      "timestamp_str": "2026-11-19 20:34:13",
-      "agent": "kilo:goal",
-      "head": "d584f3708f73d5e70bacea14b73c493e52cd3490",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "save-load-boundary-proof",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Pin the save/load boundary end to end",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795111624.9793086,
-      "timestamp_str": "2026-11-19 21:07:04",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "deterministic resume was proven at the engine level only; the browser routes (/api/save, /api/reset, /api/load) had no test that the RNG stream, evolved trade links and clock survive a real round trip, and the deep invariant sweep had never been run on five seeds",
-        "benefits": "the user-facing save/load path proves the same guarantee, and the deep invariant sweep (ids, bounds, cargo signs, population, devastation, contracts) is documented clean across five seeds including a full 2,000-step campaign",
-        "risks": "contract: none, test-only change; dependency: none; concurrency: none; state: none",
-        "mitigation": "one integration test through the real HTTP server plus probe self-tests that prove the checker catches synthetic violations"
-      },
-      "plan_digest": "3ce7d5cf40954944883ceba57efaddb8d5442a00dd0f7fa2b3f4e3732217e6f2"
-    },
     {
       "task_id": "save-load-boundary-proof",
       "phase": "in_progress",
@@ -312,6 +266,52 @@
       "timestamp_str": "2026-11-19 23:36:42",
       "agent": "kilo:goal",
       "head": "ab56c6d9e42d705688ed27b3837bf8c548db5767",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "chaos-fuzz-harness",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Ship a chaos fuzz harness and prove the engine survives random play",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795123537.0374446,
+      "timestamp_str": "2026-11-20 00:25:37",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "all recent verification followed the AI captain's deliberate route; random legal action sequences (blocking encounters, odd trades, dismissals) had never been exercised, so unhandled state combinations were untested",
+        "benefits": "a reusable tool turns random play into a repeatable invariant check with reproducible seed/step reporting and Why/Fix exit guidance",
+        "risks": "contract: none, a new developer tool plus fast unit tests; dependency: stdlib only; concurrency: none; state: none",
+        "mitigation": "five fast tests pin the checker against a synthetic bad state covering all twelve rule classes, plus the clean case, dedup, priority and a small seeded run"
+      },
+      "plan_digest": "ebaac0cffc173a2d95b001f35e4ae54a1602d21414ba32a0752b16fcda36fff1"
+    },
+    {
+      "task_id": "chaos-fuzz-harness",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] tools/chaos_fuzz.py ran 10,000 random actions across seeds 3/7/11/23/42 in 12s with 0 crashes and 0 invariant breaches; five unit tests pass; suite Ran 2154 OK with README tree at 183 suites; 6/6 project gates (mechanics gate passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-414); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795123538.0465941,
+      "timestamp_str": "2026-11-20 00:25:38",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "chaos-fuzz-harness",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'chaos-fuzz-harness' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795123626.7073987,
+      "timestamp_str": "2026-11-20 00:27:06",
+      "agent": "kilo:goal",
+      "head": "923bb8f75a785856ce7cabf2f631126021dfaea9",
       "delivery": {
         "roots": [
           "."
