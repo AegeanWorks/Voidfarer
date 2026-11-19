@@ -1280,6 +1280,48 @@ class CombatGambitPolicyTest(unittest.TestCase):
         self.assertEqual(captain._choose(7), ("/api/combat/gambit", {}, "combat_gambit"))
 
 
+class ReactorDoctrineTest(unittest.TestCase):
+    """The post-campaign core switches doctrine once instead of reposting its mode (ADR-398)."""
+
+    def _captain(self, modes, current="balanced", completed=True):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "story_status": {"completed": completed},
+            "reactor": {"mode": current, "modes": modes},
+        }
+        return captain
+
+    def test_a_balanced_core_is_moved_to_economy(self):
+        captain = self._captain({"balanced": {}, "economy": {}, "overdrive": {}})
+        self.assertEqual(captain._reactor_mode_action(),
+                         ("/api/reactor/mode", {"mode": "economy"}, "reactor"))
+
+    def test_an_economy_core_moves_to_balanced(self):
+        captain = self._captain({"balanced": {}, "economy": {}, "overdrive": {}},
+                                current="economy")
+        self.assertEqual(captain._reactor_mode_action()[1], {"mode": "balanced"})
+
+    def test_a_legacy_list_catalog_still_switches(self):
+        captain = self._captain([{"id": "balanced"}, {"id": "silent"}])
+        self.assertEqual(captain._reactor_mode_action()[1], {"mode": "silent"})
+
+    def test_a_single_mode_catalog_stays_quiet(self):
+        self.assertIsNone(self._captain({"balanced": {}})._reactor_mode_action())
+
+    def test_a_missing_catalog_stays_quiet(self):
+        self.assertIsNone(self._captain(None)._reactor_mode_action())
+
+    def test_the_short_gate_keeps_its_balanced_core(self):
+        self.assertIsNone(
+            self._captain({"balanced": {}, "economy": {}}, completed=False)
+            ._reactor_mode_action())
+
+    def test_the_doctrine_changes_once(self):
+        captain = self._captain({"balanced": {}, "economy": {}})
+        self.assertEqual(captain._reactor_mode_action()[0], "/api/reactor/mode")
+        self.assertIsNone(captain._reactor_mode_action())
+
+
 class StoryTravelTourTest(unittest.TestCase):
     """Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360)."""
 

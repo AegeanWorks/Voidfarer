@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `594`
+- **Total Classes**: `595`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3078`
-- **Total Source Lines**: `68894`
+- **Total Class Methods**: `3087`
+- **Total Source Lines**: `68978`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2940` lines
+**Size**: `2982` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -235,6 +235,15 @@
   - Method `.test_a_pilot_gambit_is_ready_at_the_start_of_a_flight()`
   - Method `.test_a_scientist_needs_enemy_shields()`
   - Method `.test_the_choice_uses_the_gambit_before_routine_fire()`
+- `class ReactorDoctrineTest` - *The post-campaign core switches doctrine once instead of reposting its mode (ADR-398).*
+  - Method `._captain(modes, current, completed)`
+  - Method `.test_a_balanced_core_is_moved_to_economy()`
+  - Method `.test_an_economy_core_moves_to_balanced()`
+  - Method `.test_a_legacy_list_catalog_still_switches()`
+  - Method `.test_a_single_mode_catalog_stays_quiet()`
+  - Method `.test_a_missing_catalog_stays_quiet()`
+  - Method `.test_the_short_gate_keeps_its_balanced_core()`
+  - Method `.test_the_doctrine_changes_once()`
 - `class StoryTravelTourTest` - *Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360).*
   - Method `._captain(**state)`
   - Method `.test_a_ready_chapter_is_resolved_before_a_dock_trip()`
@@ -4922,7 +4931,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2655` lines
+**Size**: `2697` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4947,6 +4956,7 @@
   - Method `._tour_swap()` - *Exercise the free contract-offer swap once offers exist.*
   - Method `._tour_power()`
   - Method `._tour_reactor()`
+  - Method `._reactor_mode_action()` - *Switch the post-campaign core to economy so the doctrine change is proven (ADR-398).*
   - Method `._tour_route()`
   - Method `._tour_messages()` - *Resolve one live branch, then fall back to plain mail (ADR-378).*
   - Method `._unread_message_action()` - *Read plain inbox mail so a live branch cannot hide the read route.*

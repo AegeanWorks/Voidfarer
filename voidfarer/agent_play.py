@@ -205,6 +205,9 @@ class AiCaptain:
     # A body hosts a derelict about 40% of the time, so three probes are enough to
     # find one while a derelict-free system cannot eat the post-story errands.
     SALVAGE_PROBE_LIMIT = 3
+    # Economy is the mildest reactor doctrine, so the tour tries it first and only
+    # falls back to the rest of the catalog when the core already runs it (ADR-398).
+    REACTOR_MODE_ORDER = ("economy", "balanced", "silent", "overdrive")
     # Mirrors outposts.OUTPOST_TYPES costs; the drift test keeps them equal (ADR-390).
     OUTPOST_COSTS = {
         "mining": 1800, "research": 2200, "solar": 1400,
@@ -267,6 +270,8 @@ class AiCaptain:
         # One gambit recall per campaign; a refused recall must not repeat each fight
         # (ADR-397).
         self.gambit_recalled = False
+        # The post-campaign reactor doctrine change is attempted once (ADR-398).
+        self.reactor_switched = False
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -467,6 +472,12 @@ class AiCaptain:
         fabricate = self._fabricate_action()
         if fabricate is not None:
             return fabricate
+
+        # The reactor doctrine is a whole-ship trade-off, so it changes once after the
+        # campaign instead of rerouting the short gate (ADR-398).
+        reactor = self._reactor_mode_action()
+        if reactor is not None:
+            return reactor
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -1024,6 +1035,37 @@ class AiCaptain:
         else:
             mode = (modes[0] or {}).get("id", "balanced")
         return "/api/reactor/mode", {"mode": mode}, "reactor"
+
+    def _reactor_mode_action(self):
+        """Switch the post-campaign core to economy so the doctrine change is proven (ADR-398).
+
+        The rotating tour reposts the current mode (a guaranteed refusal), and switching
+        doctrine inside the 180-step gate reroutes the whole trip, so the change waits
+        until the story is over and is attempted once.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if "/api/reactor/mode" in self.succeeded:
+            return None
+        if self.reactor_switched:
+            return None
+        reactor = self.state.get("reactor") or {}
+        modes = reactor.get("modes")
+        if not modes:
+            return None
+        if isinstance(modes, dict):
+            ids = [str(mode_id) for mode_id in modes]
+        else:
+            ids = [
+                str(mode) if isinstance(mode, str) else str((mode or {}).get("id") or "")
+                for mode in modes
+            ]
+        current = str(reactor.get("mode") or "balanced")
+        for mode_id in self.REACTOR_MODE_ORDER:
+            if mode_id in ids and mode_id != current:
+                self.reactor_switched = True
+                return "/api/reactor/mode", {"mode": mode_id}, "reactor"
+        return None
 
     def _tour_route(self):
         connections = (self.state.get("current_system") or {}).get("connections") or []
