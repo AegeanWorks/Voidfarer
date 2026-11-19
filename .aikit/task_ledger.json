@@ -1,49 +1,17 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "combat-save-parity",
+    "task_id": "readme-docs-sync",
     "last_phase": "in_progress",
-    "active_phase": 5,
-    "status": "completed",
-    "updated_at": 1795115875.5322073,
+    "active_phase": 4,
+    "status": "in_progress",
+    "updated_at": 1795117607.843955,
     "owner": "kilo:goal",
-    "lease_until": 1795123075.5322073,
+    "lease_until": 1795124807.843955,
     "started_by": "kilo:goal",
-    "continuations": [],
-    "completed_at": 1795115944.7795587,
-    "completed_head": "899256ca844abf94d576e22b494c970edc6449d3",
-    "completed_tree": "bb7fbd948934c8ff8aa466690fbca2b56fcaa716"
+    "continuations": []
   },
   "checkpoints": [
-    {
-      "task_id": "reactor-heat-chain",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Vent a live reactor heat spike and service the integrity it costs",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795096957.924885,
-      "timestamp_str": "2026-11-19 17:02:37",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/reactor/vent and /api/reactor/repair were the last never-proven catalog endpoints: the engine refuses them unless the core is hot or hurt, and the rotating tour meets transient spikes too late; a state-driven tour attempt was reverted because declining shifts the cursor and cost seed 1 the customs/void families",
-        "benefits": "The post-story captain vents while heat is actually present and services the purge damage at the next dock, closing the coverage frontier without moving the tour schedule or the 180-step benchmark",
-        "risks": "contract: no route or signature change, two additive post-story actions; dependency: none; concurrency: none; state: repeated purges cost 1 integrity each and each service is paid from the post-story treasury",
-        "mitigation": "failing-first tests for the hot/cool vent gate, coolant recharge, pre-campaign gate, docked service, damage and heat triggers, credits floor and orderings, 180-step gate, three campaigns plus a full invariant sweep"
-      },
-      "plan_digest": "db63f74f38aa6d7241a4986cffc9cfbbc9eadb6de06cd87948de793864eba9d5"
-    },
-    {
-      "task_id": "reactor-heat-chain",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] 180 gate byte-identical 58 families/59 succeeded of 69 with 10 refusals/0 gaps/0 errors; campaigns 0 errors and higher coverage: seed 1 104/101/101 with vent 7 + repair 7, seed 2 101/98/99 with 8+8 (customs now proven), seed 42 102/99/100 with 12+12; coverage frontier closed (every catalog endpoint proven or documented) (ADR-404); suite Ran 2121 OK; 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795097018.6513176,
-      "timestamp_str": "2026-11-19 17:03:38",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "reactor-heat-chain",
       "phase": "completed",
@@ -324,6 +292,35 @@
         ],
         "forced": false
       }
+    },
+    {
+      "task_id": "readme-docs-sync",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Document the post-story captain and deterministic saves",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795117385.8653388,
+      "timestamp_str": "2026-11-19 22:43:05",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-395..411 changed shipped captain and save behavior while README section 14c still described only story-phase actions; user-visible changes must update the live document",
+        "benefits": "players can read what the headless captain does after Act VI and that reloads resume exactly",
+        "risks": "contract: docs only, no behavior change; dependency: none; concurrency: none; state: none",
+        "mitigation": "README stays inside its 37,500-character budget and the suite re-runs in the project gate"
+      },
+      "plan_digest": "db4bb3b87c902b6c428a5daf0aae1270fdeb4eef5d5edd36da70ef67d1c19cb4"
+    },
+    {
+      "task_id": "readme-docs-sync",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Section 14c now documents the post-story errands and the deterministic save guarantees with the tests that pin them; README 36,975 chars (under 37,500); 6/6 project gates incl. full suite and the 180-step mechanics gate (ADR-412); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795117607.843955,
+      "timestamp_str": "2026-11-19 22:46:47",
+      "agent": "kilo:goal"
     }
   ]
 }
