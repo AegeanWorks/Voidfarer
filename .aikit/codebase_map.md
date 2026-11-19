@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `592`
+- **Total Classes**: `593`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3050`
-- **Total Source Lines**: `68498`
+- **Total Class Methods**: `3066`
+- **Total Source Lines**: `68705`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2700` lines
+**Size**: `2812` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -381,6 +381,21 @@
   - Method `.test_uninhabited_or_whole_worlds_are_ignored()`
   - Method `.test_it_needs_the_reconstruction_fee()`
   - Method `.test_the_rebuild_is_one_shot()`
+- `class SalvageScoopProspectingTest` - *The captain prospects a derelict and scoops fuel after the campaign (ADR-396).*
+  - Method `._captain(**state)`
+  - Method `.test_the_mirrored_body_type_sets_match_the_engine()`
+  - Method `.test_a_derelict_candidate_is_probed_after_the_campaign()`
+  - Method `.test_excluded_and_dockable_bodies_are_never_probed()`
+  - Method `.test_a_probed_derelict_moves_to_the_next_candidate()`
+  - Method `.test_the_probe_is_capped()`
+  - Method `.test_a_claimed_derelict_is_not_probed_again()`
+  - Method `.test_a_low_tank_orbits_a_scoopable_body()`
+  - Method `.test_a_healthy_tank_does_not_scoop()`
+  - Method `.test_an_available_scoop_here_is_claimed_directly()`
+  - Method `.test_a_derelict_under_the_ship_is_claimed()`
+  - Method `.test_the_last_probe_is_still_claimed_at_the_limit()`
+  - Method `.test_the_scoop_is_one_shot_once_it_succeeds()`
+  - Method `.test_nothing_prospects_before_the_campaign()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -4895,7 +4910,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2499` lines
+**Size**: `2594` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4936,6 +4951,8 @@
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
+  - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
+  - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
   - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*

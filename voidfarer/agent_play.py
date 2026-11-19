@@ -193,6 +193,18 @@ class AiCaptain:
     OUTPOST_CHARTER_LEVEL = 2
     # Mirrors SimulationEngine.RECONSTRUCTION_CREDIT_COST (ADR-395).
     RECONSTRUCTION_COST = 600
+    # Mirrors exploration.SCOOP_PROFILES keys; the drift test pins them (ADR-396).
+    SCOOP_BODY_TYPES = frozenset({
+        "star", "gas_giant", "ringed_giant", "ice_world", "ice_giant",
+    })
+    # Mirrors exploration.DERELICT_EXCLUDED_TYPES (ADR-396).
+    DERELICT_EXCLUDED_TYPES = frozenset({
+        "star", "orbital_station", "research_outpost", "black_hole",
+        "wormhole", "quantum_relay", "solar_collector",
+    })
+    # A body hosts a derelict about 40% of the time, so three probes are enough to
+    # find one while a derelict-free system cannot eat the post-story errands.
+    SALVAGE_PROBE_LIMIT = 3
     # Mirrors outposts.OUTPOST_TYPES costs; the drift test keeps them equal (ADR-390).
     OUTPOST_COSTS = {
         "mining": 1800, "research": 2200, "solar": 1400,
@@ -247,6 +259,11 @@ class AiCaptain:
         self.outpost_probed: set[str] = set()
         # Bodies already orbited while looking for a restorable structure (ADR-391).
         self.megastructure_probed: set[str] = set()
+        # Post-story prospecting remembers dry rocks and scoopable taps so neither
+        # search orbits the same body twice (ADR-396).
+        self.salvage_probed: set[str] = set()
+        self.salvage_probes = 0
+        self.scoop_probed: set[str] = set()
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -402,6 +419,18 @@ class AiCaptain:
         reconstruct = self._reconstruct_action()
         if reconstruct is not None:
             return reconstruct
+
+        # A half-empty tank is a real errand: orbit a scoopable body instead of
+        # waiting for a station that may be a jump away (ADR-396).
+        scoop = self._scoop_action()
+        if scoop is not None:
+            return scoop
+
+        # The wars left derelicts across the galaxy; probe a plausible body so the
+        # salvage mechanic succeeds instead of refusing at a station (ADR-396).
+        salvage = self._salvage_action()
+        if salvage is not None:
+            return salvage
 
         # A same-system outpost pair is the only way to exercise the supply link; the
         # post-campaign captain builds both and routes the newer through the older.
@@ -1325,6 +1354,72 @@ class AiCaptain:
             return None
         return ("/api/reconstruct", {"body_id": body_id, "mode": "credits"},
                 "reconstruct")
+
+    def _scoop_action(self):
+        """Orbit a scoopable body when the post-story tank is running low (ADR-396).
+
+        The general flight flow already claims a scoop under the ship; this policy
+        only moves the captain to a star, gas giant or ice body that offers one.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if "/api/scoop" in self.succeeded:
+            return None
+        ship = self.state.get("ship") or {}
+        fuel = int(ship.get("fuel") or 0)
+        max_fuel = max(1, int(ship.get("max_fuel") or 0))
+        if fuel * 2 >= max_fuel:
+            return None
+        # Claim a scoop under the ship here: the salvage and construction errands
+        # would otherwise orbit away before the general flight flow runs (ADR-396).
+        if (self.state.get("scoop") or {}).get("available"):
+            return "/api/scoop", {}, "scoop"
+        current = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        system = self.state.get("current_system") or {}
+        for body in system.get("bodies") or []:
+            if not isinstance(body, dict):
+                continue
+            body_id = str(body.get("id") or "")
+            if (not body_id or body_id == current
+                    or body_id in self.scoop_probed
+                    or str(body.get("body_type") or "") not in self.SCOOP_BODY_TYPES):
+                continue
+            self.scoop_probed.add(body_id)
+            return "/api/orbit", {"target": body_id}, "orbit"
+        return None
+
+    def _salvage_action(self):
+        """Probe a plausible derelict body after the campaign (ADR-396).
+
+        Derelicts are deterministic per body but invisible until the captain orbits
+        one, so the probe is capped instead of scanning the whole system.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if "/api/salvage" in self.succeeded:
+            return None
+        # Claim the derelict under the ship before another errand orbits away; this
+        # also covers the body that reached the probe limit (ADR-396).
+        if self.state.get("salvage_site"):
+            return "/api/salvage", {}, "salvage"
+        if self.salvage_probes >= self.SALVAGE_PROBE_LIMIT:
+            return None
+        current = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        system = self.state.get("current_system") or {}
+        for body in system.get("bodies") or []:
+            if not isinstance(body, dict):
+                continue
+            body_id = str(body.get("id") or "")
+            if (not body_id or body_id == current
+                    or body_id in self.salvage_probed
+                    or body.get("station_dockable")
+                    or body.get("salvage_claimed")
+                    or str(body.get("body_type") or "") in self.DERELICT_EXCLUDED_TYPES):
+                continue
+            self.salvage_probed.add(body_id)
+            self.salvage_probes += 1
+            return "/api/orbit", {"target": body_id}, "orbit"
+        return None
 
     def _outpost_link_action(self):
         """Build two same-system outposts, then link their supply (ADR-390).

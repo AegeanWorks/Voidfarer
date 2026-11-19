@@ -8,6 +8,7 @@ from pathlib import Path
 from voidfarer.agent_api import build_action_catalog
 from voidfarer.agent_play import AiCaptain, ApiClient, coverage_gaps
 from voidfarer.engine import SimulationEngine
+from voidfarer.exploration import DERELICT_EXCLUDED_TYPES, SCOOP_PROFILES
 from voidfarer.megastructures import MEGASTRUCTURE_RESTORATION
 from voidfarer.outposts import OUTPOST_TYPES
 from voidfarer.server import ThreadedHTTPServer, VoidFarerHandler
@@ -2588,6 +2589,117 @@ class ReconstructWarRecoveryTest(unittest.TestCase):
             orbiting_body={"id": "ashen_body_6", "body_type": "savanna"})
         captain.attempted.add("/api/reconstruct")
         self.assertIsNone(captain._reconstruct_action())
+
+
+class SalvageScoopProspectingTest(unittest.TestCase):
+    """The captain prospects a derelict and scoops fuel after the campaign (ADR-396)."""
+
+    BODIES = [
+        {"id": "kepler_station", "body_type": "orbital_station",
+         "station_dockable": True},
+        {"id": "kepler_ice", "body_type": "ice_world"},
+        {"id": "kepler_star", "body_type": "star"},
+        {"id": "kepler_rock", "body_type": "barren"},
+    ]
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": True},
+            "current_system": {"id": "kepler", "bodies": list(self.BODIES)},
+            "orbiting_body": {"id": "kepler_station", "body_type": "orbital_station",
+                              "station_dockable": True},
+            "ship": {"credits": 5000, "fuel": 60, "max_fuel": 80,
+                     "landed_body_id": ""},
+            "scoop": None,
+            "salvage_site": None,
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_mirrored_body_type_sets_match_the_engine(self):
+        self.assertEqual(AiCaptain.SCOOP_BODY_TYPES, frozenset(SCOOP_PROFILES))
+        self.assertEqual(AiCaptain.DERELICT_EXCLUDED_TYPES,
+                         DERELICT_EXCLUDED_TYPES)
+
+    def test_a_derelict_candidate_is_probed_after_the_campaign(self):
+        self.assertEqual(
+            self._captain()._salvage_action(),
+            ("/api/orbit", {"target": "kepler_ice"}, "orbit"),
+        )
+
+    def test_excluded_and_dockable_bodies_are_never_probed(self):
+        captain = self._captain(current_system={
+            "id": "kepler", "bodies": [
+                {"id": "kepler_station", "body_type": "orbital_station",
+                 "station_dockable": True},
+                {"id": "kepler_star", "body_type": "star"},
+                {"id": "kepler_relay", "body_type": "quantum_relay"},
+            ]})
+        self.assertIsNone(captain._salvage_action())
+
+    def test_a_probed_derelict_moves_to_the_next_candidate(self):
+        captain = self._captain()
+        captain.salvage_probed.add("kepler_ice")
+        self.assertEqual(captain._salvage_action()[1], {"target": "kepler_rock"})
+
+    def test_the_probe_is_capped(self):
+        captain = self._captain()
+        captain.salvage_probes = AiCaptain.SALVAGE_PROBE_LIMIT
+        self.assertIsNone(captain._salvage_action())
+
+    def test_a_claimed_derelict_is_not_probed_again(self):
+        captain = self._captain()
+        captain.succeeded.add("/api/salvage")
+        self.assertIsNone(captain._salvage_action())
+
+    def test_a_low_tank_orbits_a_scoopable_body(self):
+        captain = self._captain(
+            ship={"credits": 5000, "fuel": 20, "max_fuel": 80,
+                  "landed_body_id": ""})
+        self.assertEqual(
+            captain._scoop_action(),
+            ("/api/orbit", {"target": "kepler_ice"}, "orbit"),
+        )
+
+    def test_a_healthy_tank_does_not_scoop(self):
+        self.assertIsNone(self._captain()._scoop_action())
+
+    def test_an_available_scoop_here_is_claimed_directly(self):
+        captain = self._captain(
+            orbiting_body={"id": "kepler_ice", "body_type": "ice_world"},
+            scoop={"available": True},
+            ship={"credits": 5000, "fuel": 20, "max_fuel": 80,
+                  "landed_body_id": ""})
+        self.assertEqual(captain._scoop_action(), ("/api/scoop", {}, "scoop"))
+
+    def test_a_derelict_under_the_ship_is_claimed(self):
+        captain = self._captain(
+            orbiting_body={"id": "kepler_ice", "body_type": "ice_world"},
+            salvage_site={"body_id": "kepler_ice", "name": "Freighter Wreck"})
+        self.assertEqual(captain._salvage_action(),
+                         ("/api/salvage", {}, "salvage"))
+
+    def test_the_last_probe_is_still_claimed_at_the_limit(self):
+        captain = self._captain(
+            orbiting_body={"id": "kepler_ice", "body_type": "ice_world"},
+            salvage_site={"body_id": "kepler_ice", "name": "Freighter Wreck"})
+        captain.salvage_probes = AiCaptain.SALVAGE_PROBE_LIMIT
+        self.assertEqual(captain._salvage_action()[0], "/api/salvage")
+
+    def test_the_scoop_is_one_shot_once_it_succeeds(self):
+        captain = self._captain(
+            ship={"credits": 5000, "fuel": 20, "max_fuel": 80,
+                  "landed_body_id": ""})
+        captain.succeeded.add("/api/scoop")
+        self.assertIsNone(captain._scoop_action())
+
+    def test_nothing_prospects_before_the_campaign(self):
+        captain = self._captain(story_status={"completed": False})
+        self.assertIsNone(captain._salvage_action())
+        self.assertIsNone(captain._scoop_action())
 
 
 class AnomalyPolicyTest(unittest.TestCase):
