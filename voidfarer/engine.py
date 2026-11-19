@@ -7678,6 +7678,7 @@ class SimulationEngine:
             return {
                 "units": sum(contraband.values()),
                 "chance": round(worst[0], 3) if worst else 0.0,
+                "system_id": worst[1].id if worst else "",
                 "system_name": worst[1].name if worst else "",
                 "hint": "Route 35%+ power to sensors (ECM) and 40%+ to engines to cut the odds; low-security sectors have no customs.",
             }

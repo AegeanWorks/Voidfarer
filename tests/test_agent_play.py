@@ -1382,6 +1382,153 @@ class PrizeSalePolicyTest(unittest.TestCase):
         self.assertIsNone(captain._prize_sale_action())
 
 
+class SmuggleCordonPolicyTest(unittest.TestCase):
+    """The post-story captain runs one real contraband cordon (ADR-400)."""
+
+    def _captain(self, cargo=None, docked=True, completed=True, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": completed},
+            "current_system": {
+                "id": "sol",
+                "security": 1.0,
+                "connections": ["alpha_centauri", "procyon"],
+                "bodies": [
+                    {"id": "sol_station", "station_dockable": True},
+                    {"id": "sol_rock", "station_dockable": False},
+                ],
+            },
+            "orbiting_body": ({"id": "sol_station", "station_dockable": True}
+                              if docked else {"id": "sol_rock"}),
+            "ship": {"credits": 50000, "fuel": 60, "max_fuel": 80,
+                     "hull": 100, "max_hull": 100,
+                     "cargo": cargo or {}, "cargo_free_volume": 30},
+            "market_quotes": [
+                {"commodity_id": "xenoliths", "category": "contraband",
+                 "buy_price": 1111, "max_buy": 1},
+                {"commodity_id": "medicines", "category": "medicine",
+                 "buy_price": 209, "max_buy": 8},
+            ],
+            "customs_risk": None,
+            "jump_fuel_costs": {"alpha_centauri": 7, "procyon": 7},
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_cheapest_contraband_lot_is_bought_at_a_dock(self):
+        self.assertEqual(
+            self._captain()._smuggle_action(),
+            ("/api/trade",
+             {"commodity_id": "xenoliths", "quantity": 1, "is_buy": True},
+             "trade"),
+        )
+
+    def test_an_undocked_captain_does_not_buy(self):
+        self.assertIsNone(self._captain(docked=False)._smuggle_action())
+
+    def test_nothing_is_bought_before_the_campaign(self):
+        self.assertIsNone(self._captain(completed=False)._smuggle_action())
+
+    def test_a_held_lot_jumps_at_the_quoted_cordon(self):
+        captain = self._captain(
+            cargo={"xenoliths": 1},
+            customs_risk={"units": 1, "chance": 0.5,
+                          "system_id": "procyon", "system_name": "Procyon"})
+        captain.smuggling_item = "xenoliths"
+        self.assertEqual(captain._smuggle_action(),
+                         ("/api/jump", {"target": "procyon"}, "jump"))
+
+    def test_a_short_tank_refuels_before_the_cordon_run(self):
+        captain = self._captain(
+            cargo={"xenoliths": 1},
+            ship={"credits": 50000, "fuel": 3, "max_fuel": 80,
+                  "cargo": {"xenoliths": 1}, "cargo_free_volume": 30},
+            customs_risk={"units": 1, "chance": 0.5,
+                          "system_id": "procyon", "system_name": "Procyon"})
+        captain.smuggling_item = "xenoliths"
+        self.assertEqual(captain._smuggle_action(),
+                         ("/api/refuel", {"amount": 10}, "refuel"))
+
+    def test_a_cordon_with_no_adjacent_quotes_repositions_out(self):
+        captain = self._captain(
+            cargo={"xenoliths": 1},
+            customs_risk={"units": 1, "chance": 0.0,
+                          "system_id": "", "system_name": ""})
+        captain.smuggling_item = "xenoliths"
+        self.assertEqual(captain._smuggle_action(),
+                         ("/api/jump", {"target": "alpha_centauri"}, "jump"))
+
+    def test_the_run_is_capped(self):
+        captain = self._captain(
+            cargo={"xenoliths": 1},
+            customs_risk={"units": 1, "chance": 0.5,
+                          "system_id": "procyon", "system_name": "Procyon"})
+        captain.smuggling_item = "xenoliths"
+        captain.smuggling_jumps = AiCaptain.SMUGGLE_JUMP_LIMIT
+        self.assertIsNone(captain._smuggle_action())
+
+    def test_a_resolved_interdiction_ends_the_run(self):
+        captain = self._captain(cargo={"xenoliths": 1})
+        captain.smuggling_item = "xenoliths"
+        captain.succeeded.add("/api/customs/resolve")
+        self.assertIsNone(captain._smuggle_action())
+
+    def test_a_lost_lot_ends_the_run(self):
+        captain = self._captain(cargo={})
+        captain.smuggling_item = "xenoliths"
+        self.assertIsNone(captain._smuggle_action())
+
+    def test_the_lookout_picks_the_risk_cordon_before_a_generic_jump(self):
+        captain = self._captain(
+            cargo={"xenoliths": 1},
+            customs_risk={"units": 1, "chance": 0.5,
+                          "system_id": "procyon", "system_name": "Procyon"})
+        captain.smuggling_item = "xenoliths"
+        captain.succeeded.add("/api/salvage")
+        self.assertEqual(captain._choose(25)[0], "/api/jump")
+
+
+class FallbackJumpRotationTest(unittest.TestCase):
+    """The off-objective jump rotates across lanes instead of ping-ponging (ADR-401)."""
+
+    def _captain(self, connections, costs, fuel=60, completed=True):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "story_status": {"completed": completed},
+            "current_system": {"connections": connections},
+            "jump_fuel_costs": costs,
+            "ship": {"fuel": fuel, "max_fuel": 80},
+        }
+        return captain
+
+    def test_three_cadence_jumps_use_three_lanes(self):
+        captain = self._captain(["a", "b", "c"], {"a": 7, "b": 7, "c": 7})
+        targets = [captain._fallback_jump(step)[1]["target"]
+                   for step in (5, 25, 45)]
+        self.assertEqual(sorted(targets), ["a", "b", "c"])
+
+    def test_the_first_jump_keeps_its_historic_slot(self):
+        captain = self._captain(["a", "b"], {"a": 7, "b": 7})
+        self.assertEqual(captain._fallback_jump(5)[1], {"target": "b"})
+
+    def test_the_short_gate_keeps_the_frozen_slot(self):
+        captain = self._captain(["a", "b"], {"a": 7, "b": 7}, completed=False)
+        targets = [captain._fallback_jump(step)[1]["target"]
+                   for step in (5, 25, 45)]
+        self.assertEqual(targets, ["b", "b", "b"])
+
+    def test_unaffordable_lanes_are_skipped(self):
+        captain = self._captain(["a", "b"], {"a": 7, "b": 3}, fuel=5)
+        self.assertEqual(captain._fallback_jump(5)[1], {"target": "b"})
+
+    def test_off_cadence_steps_do_not_jump(self):
+        captain = self._captain(["a", "b"], {"a": 7, "b": 7})
+        self.assertIsNone(captain._fallback_jump(6))
+        self.assertIsNone(captain._fallback_jump(7))
+
+
 class StoryTravelTourTest(unittest.TestCase):
     """Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360)."""
 

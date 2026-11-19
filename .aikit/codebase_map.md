@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `596`
+- **Total Classes**: `598`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3094`
-- **Total Source Lines**: `69067`
+- **Total Class Methods**: `3113`
+- **Total Source Lines**: `69318`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `3042` lines
+**Size**: `3189` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -251,6 +251,25 @@
   - Method `.test_the_bought_escort_is_never_sold()`
   - Method `.test_the_sale_happens_once()`
   - Method `.test_nothing_sells_before_the_campaign()`
+- `class SmuggleCordonPolicyTest` - *The post-story captain runs one real contraband cordon (ADR-400).*
+  - Method `._captain(cargo, docked, completed, **state)`
+  - Method `.test_the_cheapest_contraband_lot_is_bought_at_a_dock()`
+  - Method `.test_an_undocked_captain_does_not_buy()`
+  - Method `.test_nothing_is_bought_before_the_campaign()`
+  - Method `.test_a_held_lot_jumps_at_the_quoted_cordon()`
+  - Method `.test_a_short_tank_refuels_before_the_cordon_run()`
+  - Method `.test_a_cordon_with_no_adjacent_quotes_repositions_out()`
+  - Method `.test_the_run_is_capped()`
+  - Method `.test_a_resolved_interdiction_ends_the_run()`
+  - Method `.test_a_lost_lot_ends_the_run()`
+  - Method `.test_the_lookout_picks_the_risk_cordon_before_a_generic_jump()`
+- `class FallbackJumpRotationTest` - *The off-objective jump rotates across lanes instead of ping-ponging (ADR-401).*
+  - Method `._captain(connections, costs, fuel, completed)`
+  - Method `.test_three_cadence_jumps_use_three_lanes()`
+  - Method `.test_the_first_jump_keeps_its_historic_slot()`
+  - Method `.test_the_short_gate_keeps_the_frozen_slot()`
+  - Method `.test_unaffordable_lanes_are_skipped()`
+  - Method `.test_off_cadence_steps_do_not_jump()`
 - `class StoryTravelTourTest` - *Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360).*
   - Method `._captain(**state)`
   - Method `.test_a_ready_chapter_is_resolved_before_a_dock_trip()`
@@ -1676,7 +1695,7 @@
 ### [`tests/test_customs_risk_status.py`](tests/test_customs_risk_status.py)
 > *The status snapshot warns about customs risk while contraband is in the hold.*
 
-**Size**: `39` lines
+**Size**: `42` lines
 
 **Classes:**
 - `class CustomsRiskStatusTest`
@@ -4938,7 +4957,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2726` lines
+**Size**: `2826` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4950,9 +4969,11 @@
   - Method `.__init__(client, seed)`
   - Method `.play(steps)`
   - Method `._choose(step)`
+  - Method `._fallback_jump(step)` - *Rotate the post-story fallback jump across the affordable lanes (ADR-401).*
   - Method `._anomaly_action()` - *Take an anomaly choice whose power check passes, not always the first one.*
   - Method `._anomaly_threshold(choice)`
   - Method `._combat_choice()` - *Pick a combat action from the live state: survival first, then the tactical surface.*
+  - Method `._smuggle_action()` - *Buy one contraband lot and run it at the quoted high-security cordon (ADR-400).*
   - Method `._gambit_action()` - *Recall an armed escort and spend its captain's once-per-battle gambit (ADR-397).*
   - Method `._note_refusal(signature, message)` - *Schedule a fast retry, then a slow one, then drop a gate that never opens.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*
@@ -5396,7 +5417,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11305` lines
+**Size**: `11306` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

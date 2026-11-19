@@ -19,12 +19,15 @@ class CustomsRiskStatusTest(unittest.TestCase):
 
     def test_contraband_quotes_the_worst_adjacent_high_security_cordon(self):
         contraband = next(c for c in COMMODITY_MAP if is_contraband(c))
-        risk = _engine({contraband: 4}).get_status_snapshot()["customs_risk"]
+        engine = _engine({contraband: 4})
+        risk = engine.get_status_snapshot()["customs_risk"]
         self.assertEqual(risk["units"], 4)
         self.assertGreater(risk["chance"], 0.0)
         self.assertLessEqual(risk["chance"], 1.0)
         self.assertTrue(risk["system_name"])
         self.assertIn("sensor", risk["hint"].lower())
+        self.assertIn(risk["system_id"], engine.current_system.connections)
+        self.assertEqual(engine.state.systems[risk["system_id"]].name, risk["system_name"])
 
     def test_routing_power_to_the_sensors_lowers_the_quote(self):
         contraband = next(c for c in COMMODITY_MAP if is_contraband(c))

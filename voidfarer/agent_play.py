@@ -208,6 +208,10 @@ class AiCaptain:
     # Economy is the mildest reactor doctrine, so the tour tries it first and only
     # falls back to the rest of the catalog when the core already runs it (ADR-398).
     REACTOR_MODE_ORDER = ("economy", "balanced", "silent", "overdrive")
+    # A low-security cordon only rolls about one arrival in eight, so sixteen jumps
+    # (eight arrivals) gives the ferry enough chances to prove the mechanic while the
+    # fuel guard and the dock refuel keep it safe (ADR-400).
+    SMUGGLE_JUMP_LIMIT = 16
     # Mirrors outposts.OUTPOST_TYPES costs; the drift test keeps them equal (ADR-390).
     OUTPOST_COSTS = {
         "mining": 1800, "research": 2200, "solar": 1400,
@@ -272,6 +276,12 @@ class AiCaptain:
         self.gambit_recalled = False
         # The post-campaign reactor doctrine change is attempted once (ADR-398).
         self.reactor_switched = False
+        # One smuggling run per campaign: the contraband lot bought and the jumps
+        # spent carrying it toward a cordon (ADR-400).
+        self.smuggling_item = ""
+        self.smuggling_jumps = 0
+        # Fallback-jump rotation; one keeps the historic first slot (ADR-401).
+        self.fallback_jumps = 1
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -479,6 +489,14 @@ class AiCaptain:
         if reactor is not None:
             return reactor
 
+        # A post-story smuggling run buys one contraband lot and carries it at the
+        # quoted cordon until the scan fires, then dumps it under pressure (ADR-400).
+        # It runs after the construction errands so those opportunities are not lost
+        # to the ferry's jumps and tick shifts.
+        smuggle = self._smuggle_action()
+        if smuggle is not None:
+            return smuggle
+
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
             dock = self._dockable_body()
@@ -585,17 +603,9 @@ class AiCaptain:
 
         # A jump burns the real hop cost, not one unit; using the published estimates
         # stopped 47 attempts that could only be refused (ADR-348).
-        if step % 20 == 5:
-            system = (state.get("current_system") or {}).get("connections") or []
-            costs = state.get("jump_fuel_costs") or {}
-            fuel = int(ship.get("fuel") or 0)
-            # Without a published estimate the old floor still applies: some fuel.
-            affordable = [
-                sid for sid in system
-                if ((fuel >= int(costs[sid])) if sid in costs else fuel > 0)
-            ]
-            if affordable:
-                return "/api/jump", {"target": affordable[step % len(affordable)]}, "jump"
+        jump = self._fallback_jump(step)
+        if jump is not None:
+            return jump
 
         # Touristing between bodies is the last resort, not the default: otherwise the
         # captain spends the whole run in transit and never exercises a station mechanic.
@@ -608,6 +618,40 @@ class AiCaptain:
                 return "/api/travel", {"body_id": target_body["id"], "mode": "sublight"}, "travel"
 
         return "/api/time/step", {"ticks": 1}, "time"
+
+    def _fallback_jump(self, step: int):
+        """Rotate the post-story fallback jump across the affordable lanes (ADR-401).
+
+        ``step % len(affordable)`` froze on one slot because the cadence advances the
+        step by 20 and every jump therefore landed on the same remainder, so the captain
+        ping-ponged between two systems and never reached the restorable worlds beyond
+        them. The pre-story path keeps that frozen slot because the 180-step gate was
+        measured on it; the rotation counter starts at one so the first post-story jump
+        also keeps its historic slot.
+        """
+        if step % 20 != 5:
+            return None
+        state = self.state
+        ship = state.get("ship") or {}
+        connections = (state.get("current_system") or {}).get("connections") or []
+        costs = state.get("jump_fuel_costs") or {}
+        fuel = int(ship.get("fuel") or 0)
+        # Without a published estimate the old floor still applies: some fuel.
+        affordable = [
+            system_id for system_id in connections
+            if ((fuel >= int(costs[system_id])) if system_id in costs else fuel > 0)
+        ]
+        if not affordable:
+            return None
+        # Before the campaign ends, the frozen step remainder is the benchmark route
+        # the 180-step gate was measured on (58 families); rotation starts with the
+        # post-story exploration where the ping-pong actually starves mechanics.
+        if (state.get("story_status") or {}).get("completed"):
+            target = affordable[self.fallback_jumps % len(affordable)]
+            self.fallback_jumps += 1
+        else:
+            target = affordable[step % len(affordable)]
+        return "/api/jump", {"target": target}, "jump"
 
     def _anomaly_action(self):
         """Take an anomaly choice whose power check passes, not always the first one.
@@ -719,6 +763,62 @@ class AiCaptain:
         if hull * 5 <= max_hull * 3 and weapons >= 15 and "target_bridge" not in used:
             return pick("target_bridge")
         return "/api/combat", {"action": "fire_lasers"}, "combat"
+
+    def _smuggle_action(self):
+        """Buy one contraband lot and run it at the quoted high-security cordon (ADR-400).
+
+        The customs scan only rolls on arrival in a high-security system, so the run
+        buys at a dock, jumps at the cordon the snapshot quotes, and when that system's
+        own neighbours have no cordon it hops out once so the quoted system becomes
+        adjacent again. The encounter itself is resolved by the blocking-prompt flow.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if "/api/customs/resolve" in self.succeeded:
+            return None
+        if self.smuggling_jumps >= self.SMUGGLE_JUMP_LIMIT:
+            return None
+        ship = self.state.get("ship") or {}
+        cargo = ship.get("cargo") or {}
+        if not self.smuggling_item:
+            if not self._is_docked():
+                return None
+            quotes = [
+                quote for quote in self.state.get("market_quotes") or []
+                if isinstance(quote, dict)
+                and str(quote.get("category") or "") == "contraband"
+            ]
+            if not quotes:
+                return None
+            row = min(quotes, key=lambda quote: int(quote.get("buy_price") or 0))
+            item = str(row.get("commodity_id") or "")
+            if not item or int(row.get("max_buy") or 0) < 1:
+                return None
+            if int(ship.get("credits") or 0) < int(row.get("buy_price") or 0):
+                return None
+            self.smuggling_item = item
+            return "/api/trade", {"commodity_id": item, "quantity": 1, "is_buy": True}, "trade"
+        if int(cargo.get(self.smuggling_item) or 0) <= 0:
+            return None
+        system = self.state.get("current_system") or {}
+        connections = [str(item) for item in system.get("connections") or [] if item]
+        if not connections:
+            return None
+        risk = self.state.get("customs_risk") or {}
+        target = str(risk.get("system_id") or "")
+        if target not in connections:
+            # Standing inside the cordon: the quoted system is not adjacent to itself,
+            # so hop out once and let the next step quote it as the neighbour again.
+            target = connections[0]
+        costs = self.state.get("jump_fuel_costs") or {}
+        cost = int(costs.get(target) or 0)
+        fuel = int(ship.get("fuel") or 0)
+        if cost and fuel < cost + self.NAVIGATION_FUEL_RESERVE:
+            if self._is_docked() and int(ship.get("credits") or 0) >= 100:
+                return "/api/refuel", {"amount": 10}, "refuel"
+            return None
+        self.smuggling_jumps += 1
+        return "/api/jump", {"target": target}, "jump"
 
     def _gambit_action(self):
         """Recall an armed escort and spend its captain's once-per-battle gambit (ADR-397).
