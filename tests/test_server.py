@@ -349,6 +349,16 @@ class TestServer(unittest.TestCase):
         self.assertEqual(self.engine.state.trade_links, saved_links)
         self.assertEqual(self.engine.state.time.tick, saved_tick)
 
+    def test_an_autosave_follows_the_loaded_slot(self):
+        self.assertEqual(self._post("/api/new-game", {"seed": 11, "slot": "alpha"})[0], 200)
+        self.assertEqual(self._post("/api/tutorial/skip", {})[0], 200)
+        alpha_before = self.storage.load(slot="alpha").time.tick
+
+        self.assertEqual(self._post("/api/time/step", {"ticks": 3})[0], 200)
+
+        self.assertEqual(self.storage.load(slot="alpha").time.tick, alpha_before + 3)
+        self.assertEqual(self.storage.active_slot, "alpha")
+
     def test_get_api_shipyard_excludes_current_chassis(self):
         status, data = self._get("/api/shipyard")
         self.assertEqual(status, 200)

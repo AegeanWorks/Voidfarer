@@ -28,6 +28,9 @@ class StorageManager:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.save_file = self.data_dir / "voidfarer_save.json"
         self._write_lock = threading.Lock()
+        # The slot the player is currently in: an unslotted save (autosave, ticker,
+        # checkpoint-free flows) follows it instead of always clobbering "default" (ADR-413).
+        self.active_slot = "default"
 
     def _write_atomic(self, target_path: Path, data: dict[str, Any]) -> Path:
         """Write JSON payload atomically using a unique temporary file, fsync, and shadow backup."""
@@ -95,43 +98,62 @@ class StorageManager:
             return "default", self.save_file
         return normalized, self.data_dir / f"voidfarer_save_{normalized}.json"
 
-    def save(self, state: GameState, slot: str | None = None) -> Path:
-        """Atomically persist universe and ship state into the requested save slot."""
-        _, target_path = self._slot_path(slot)
+    def save(
+        self, state: GameState, slot: str | None = None, *, activate: bool = True
+    ) -> Path:
+        """Atomically persist state into the requested or active save slot.
+
+        An unslotted save follows ``active_slot`` so loading a named campaign and then
+        autosaving never overwrites a different branch. The checkpoint writer opts out
+        with ``activate=False`` so the safety net cannot become the active slot (ADR-413).
+        """
+        normalized = resolve_slot_name(slot) if slot is not None else self.active_slot
+        _, target_path = self._slot_path(normalized)
+        if activate:
+            self.active_slot = normalized
         return self._write_atomic(target_path, state.to_dict())
 
     def checkpoint_writer(self) -> Callable[[GameState], None]:
         """A hook that rolls the 'checkpoint' slot, for an engine to call before a risky move."""
-        return lambda state: self.save(state, CHECKPOINT_SLOT)
+        return lambda state: self.save(state, CHECKPOINT_SLOT, activate=False)
 
     def load(self, slot: str | None = None) -> GameState | None:
-        """Load game state from disk for the given slot, quarantining corrupt primary data and trying the backup."""
-        _, primary = self._slot_path(slot)
+        """Load state for the requested or active slot, quarantining corrupt primary data and trying the backup."""
+        normalized = resolve_slot_name(slot) if slot is not None else self.active_slot
+        _, primary = self._slot_path(normalized)
         data = self._read_json_file(primary)
         if data is None:
             if primary.exists():
                 self._quarantine(primary)
         else:
             try:
-                return GameState.from_dict(data)
+                state = GameState.from_dict(data)
             except (KeyError, TypeError, ValueError, AttributeError):
                 self._quarantine(primary)
+            else:
+                self.active_slot = normalized
+                return state
 
         backup_data = self._read_json_file(primary.with_suffix(".bak"))
         if backup_data is None:
             return None
         try:
-            return GameState.from_dict(backup_data)
+            state = GameState.from_dict(backup_data)
         except (KeyError, TypeError, ValueError, AttributeError):
             return None
+        self.active_slot = normalized
+        return state
 
     def clear(self, slot: str | None = None) -> bool:
-        """Remove save file and shadow backup for the given slot."""
-        _, target_path = self._slot_path(slot)
+        """Remove save file and shadow backup for the given or active slot."""
+        normalized = resolve_slot_name(slot) if slot is not None else self.active_slot
+        _, target_path = self._slot_path(normalized)
         backup_path = target_path.with_suffix(".bak")
         existed = target_path.exists() or backup_path.exists()
         target_path.unlink(missing_ok=True)
         backup_path.unlink(missing_ok=True)
+        if normalized == self.active_slot:
+            self.active_slot = "default"
         return existed
 
     def delete_save(self, slot: str | None = None) -> bool:

@@ -148,7 +148,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (181 suites)
+└── tests/                <- unit & integration test suite (182 suites)
 ```
 
 ---
@@ -424,7 +424,9 @@ If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says w
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a
 loaded campaign continues the same rolls rather than replaying them; trade-link volumes,
-mid-fight encounters and the pre-jump `checkpoint` slot all restore exactly. `tests/test_rng_checkpoint.py`,
+mid-fight encounters and the pre-jump `checkpoint` slot all restore exactly. An autosave
+follows the slot you loaded, so keeping an early branch in `alpha` never overwrites the
+campaign in `default`. `tests/test_rng_checkpoint.py`,
 `tests/test_load_preserves_live_state.py`, `tests/test_save_slots_determinism.py`,
 `tests/test_checkpoint_resume.py` and `tests/test_combat_save_parity.py` pin these guarantees.
 

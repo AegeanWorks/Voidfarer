@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `243`
-- **Total Classes**: `608`
-- **Total Top-Level Functions**: `547`
-- **Total Class Methods**: `3161`
-- **Total Source Lines**: `70090`
+- **Total Python Modules**: `244`
+- **Total Classes**: `609`
+- **Total Top-Level Functions**: `548`
+- **Total Class Methods**: `3168`
+- **Total Source Lines**: `70216`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`243` module(s))
+- **Indexed**: python (`244` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -26,6 +26,25 @@
 > *VoidFarer test suite package.*
 
 **Size**: `1` lines
+
+---
+
+### [`tests/test_active_slot.py`](tests/test_active_slot.py)
+> *Unslotted saves follow the active slot instead of clobbering default (ADR-413).*
+
+**Size**: `94` lines
+
+**Classes:**
+- `class ActiveSlotTest`
+  - Method `.test_an_autosave_after_loading_a_slot_keeps_that_slot_current()`
+  - Method `.test_an_autosave_after_loading_the_default_slot_updates_default()`
+  - Method `.test_an_explicit_save_switches_the_active_slot()`
+  - Method `.test_a_plain_load_uses_the_active_slot()`
+  - Method `.test_deleting_the_active_slot_falls_back_to_default()`
+  - Method `.test_a_checkpoint_save_does_not_steal_the_active_slot()`
+
+**Functions:**
+- `def _engine(seed, credits)`
 
 ---
 
@@ -4091,7 +4110,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `989` lines
+**Size**: `999` lines
 
 **Classes:**
 - `class TestServer`
@@ -4127,6 +4146,7 @@
   - Method `.test_scan_response_exposes_relic_and_near_miss()`
   - Method `.test_reset_is_deterministic_for_a_seed()`
   - Method `.test_a_save_load_cycle_restores_the_live_state_and_rng()`
+  - Method `.test_an_autosave_follows_the_loaded_slot()`
   - Method `.test_get_api_shipyard_excludes_current_chassis()`
   - Method `.test_post_inventory_buy_rejects_non_numeric_quantity()`
   - Method `.test_frontier_endpoints()`
@@ -6585,7 +6605,7 @@
 ### [`voidfarer/storage.py`](voidfarer/storage.py)
 > *Crash-resilient storage engine and atomic persistence for VoidFarer.*
 
-**Size**: `212` lines
+**Size**: `234` lines
 
 **Classes:**
 - `class StorageManager` - *Manages power-loss safe atomic persistence and shadow backups.*
@@ -6594,10 +6614,10 @@
   - Method `._read_json_file(target_path)`
   - Method `._quarantine(target_path)`
   - Method `._slot_path(slot)`
-  - Method `.save(state, slot)` - *Atomically persist universe and ship state into the requested save slot.*
+  - Method `.save(state, slot, *, activate)` - *Atomically persist state into the requested or active save slot.*
   - Method `.checkpoint_writer()` - *A hook that rolls the 'checkpoint' slot, for an engine to call before a risky move.*
-  - Method `.load(slot)` - *Load game state from disk for the given slot, quarantining corrupt primary data and trying the backup.*
-  - Method `.clear(slot)` - *Remove save file and shadow backup for the given slot.*
+  - Method `.load(slot)` - *Load state for the requested or active slot, quarantining corrupt primary data and trying the backup.*
+  - Method `.clear(slot)` - *Remove save file and shadow backup for the given or active slot.*
   - Method `.delete_save(slot)` - *Delete a save slot and its shadow backup.*
   - Method `.list_saves()` - *List all available save slots with summary metadata.*
 
