@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "checkpoint-replay-proof",
+    "task_id": "combat-save-parity",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795114923.242235,
+    "updated_at": 1795115875.5322073,
     "owner": "kilo:goal",
-    "lease_until": 1795122123.242235,
+    "lease_until": 1795123075.5322073,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795115066.5518901,
-    "completed_head": "acb475f84c236efe4fb8474550525a4c2590c2ee",
-    "completed_tree": "6ee2a5af772e951e368c063c8a7aa4383a76235e"
+    "completed_at": 1795115944.7795587,
+    "completed_head": "899256ca844abf94d576e22b494c970edc6449d3",
+    "completed_tree": "bb7fbd948934c8ff8aa466690fbca2b56fcaa716"
   },
   "checkpoints": [
-    {
-      "task_id": "crew-id-uniqueness",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Crew recruitment never reuses an id after a dismissal",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795090552.516919,
-      "timestamp_str": "2026-11-19 15:15:52",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "The 2,000-step seed-11 campaign ended with crew_engineer_6 duplicated and crew_engineer_5 missing: the recruit suffix comes from the roster length, so dismiss-then-recruit mints an id that is still present, making every id lookup (dismiss, station, shore leave, escort captain) ambiguous",
-        "benefits": "Recruits always receive a free suffix, so the roster stays addressable for the whole campaign",
-        "risks": "contract: recruit_crew_member keeps its signature and a new helper owns the uniqueness; dependency: none; concurrency: none; state: no save-schema change",
-        "mitigation": "failing-first tests for the reused-suffix skip, the natural free index, the missing-role guard and the recruit-after-dismiss sequence, 180-step gate, four campaigns, full suite and project gates"
-      },
-      "plan_digest": "f4f09cb70e66ea0359f73f6d290315f88c7f6c19afc6406dd8a1f837b5ce0b02"
-    },
-    {
-      "task_id": "crew-id-uniqueness",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors/10 refusals; campaigns 0 errors and unchanged coverage: seed 1 102/98/100, seed 2 99/95/98, seed 42 100/97/100; suite Ran 2111 (README tree updated to 176 suites) and passes (ADR-403); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795090658.6000607,
-      "timestamp_str": "2026-11-19 15:17:38",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "crew-id-uniqueness",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'crew-id-uniqueness' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795090675.2634745,
-      "timestamp_str": "2026-11-19 15:17:55",
-      "agent": "kilo:goal",
-      "head": "ea1850e18e05569a7fb1f34d59632c7b64b4398c",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "reactor-heat-chain",
       "phase": "in_progress",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-19 22:04:26",
       "agent": "kilo:goal",
       "head": "acb475f84c236efe4fb8474550525a4c2590c2ee",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "combat-save-parity",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] A fight saved mid-battle resumes the exact exchange",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795115875.1839015,
+      "timestamp_str": "2026-11-19 22:17:55",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "an active combat is the most stateful save moment (enemy hull, intent, cooldowns, spent gambit, evasion bonus) and nothing pinned that a reloaded fight rolls the same exchange instead of a re-roll",
+        "benefits": "mid-fight saves are proven exact over the real storage path",
+        "risks": "contract: none, test-only; dependency: none; concurrency: none; state: none",
+        "mitigation": "three tests covering a single exchange, three further rounds and the gambit-used fields"
+      },
+      "plan_digest": "5b99e6440fa73b374bb866bc9a72fc9da847aef535f1b114602cfddc9c2a8b36"
+    },
+    {
+      "task_id": "combat-save-parity",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Three combat parity tests pass; suite Ran 2142 OK with README tree at 181 suites; 6/6 project gates (mechanics 180-step passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-411); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795115875.5322073,
+      "timestamp_str": "2026-11-19 22:17:55",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "combat-save-parity",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'combat-save-parity' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795115944.8777604,
+      "timestamp_str": "2026-11-19 22:19:04",
+      "agent": "kilo:goal",
+      "head": "899256ca844abf94d576e22b494c970edc6449d3",
       "delivery": {
         "roots": [
           "."
