@@ -721,6 +721,11 @@ class SimulationEngine:
             updates["trade_links"] = trade_links
         if updates:
             self.state = self._clone_state(**updates)
+        # Repair a legacy save whose core heat sits above the fit's live capacity;
+        # modern saves already obey this because every equipment change clamps (ADR-417).
+        clamped = self._clamp_reactor_heat(self.state.ship)
+        if clamped is not self.state.ship:
+            self.state = self._clone_state(ship=clamped)
 
     def _clone_ship(self, **kwargs: Any) -> ShipState:
         """Create a new ShipState preserving all unspecified telemetry and inventory attributes."""
@@ -867,6 +872,20 @@ class SimulationEngine:
         for stat in ("evasion", "reactor_cooling", "combat_damage", "trade_margin", "hull_repair_per_tick", "research_per_tick", "boarding_defense"):
             bonuses[stat] = float(bonuses.get(stat, 0.0)) + float(crew.get(stat, 0.0))
         return bonuses
+
+    def _clamp_reactor_heat(self, ship: ShipState) -> ShipState:
+        """Keep core heat inside the capacity the current fit provides (ADR-417).
+
+        ``reactor.max_heat`` is only the base hull figure; the live capacity adds the
+        fitted thermal mods and upgrades. Removing a thermal mod must cool a core that
+        now sits above the smaller capacity, and no live state may exceed that capacity
+        because a save clamps against it.
+        """
+        capacity = reactor_heat_capacity(ship.reactor, self._combined_equipment(ship))
+        heat = min(max(0.0, float(ship.reactor.heat)), capacity)
+        if heat == ship.reactor.heat:
+            return ship
+        return replace(ship, reactor=replace(ship.reactor, heat=heat))
 
     def _crew_bonuses(self, ship: ShipState | None = None) -> dict[str, float]:
         target = ship if ship is not None else self.state.ship
@@ -2896,7 +2915,7 @@ class SimulationEngine:
                 ship_mods=installed,
                 flight_log=tuple(new_log),
             )
-            self.state = self._clone_state(ship=new_ship)
+            self.state = self._clone_state(ship=self._clamp_reactor_heat(new_ship))
             return True, log_entry
 
     def remove_ship_mod(self, slot: str, expected_mod_id: str | None = None) -> tuple[bool, str]:
@@ -2935,7 +2954,7 @@ class SimulationEngine:
                 ship_mods=installed,
                 flight_log=tuple(new_log),
             )
-            self.state = self._clone_state(ship=new_ship)
+            self.state = self._clone_state(ship=self._clamp_reactor_heat(new_ship))
             return True, log_entry
 
     def get_ship_mod_report(self) -> dict[str, Any]:
@@ -5769,7 +5788,7 @@ class SimulationEngine:
                 flight_log=tuple(new_log),
             )
 
-            self.state = self._clone_state(ship=new_ship)
+            self.state = self._clone_state(ship=self._clamp_reactor_heat(new_ship))
             return True, f"Successfully installed {upgrade.name} in {upgrade.slot} slot."
 
     def sell_upgrade(self, slot: str) -> tuple[bool, str]:
@@ -5814,7 +5833,7 @@ class SimulationEngine:
                 equipped_upgrades=equipped,
                 flight_log=tuple(new_log),
             )
-            self.state = self._clone_state(ship=new_ship)
+            self.state = self._clone_state(ship=self._clamp_reactor_heat(new_ship))
             return True, msg
 
     def buy_ship_chassis(self, chassis_id: str) -> tuple[bool, str]:

@@ -1292,14 +1292,16 @@ class ReactorState:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "heat": round(self.heat, 2),
+            # Persist the exact values; only the derived display percentages round
+            # (ADR-417). Rounding here rewrote heat by up to 0.005 on every save.
+            "heat": self.heat,
             "max_heat": self.max_heat,
-            "integrity": round(self.integrity, 2),
+            "integrity": self.integrity,
             "max_integrity": self.max_integrity,
             "mode": self.mode,
             "last_vent_tick": self.last_vent_tick,
             "surge_ticks": self.surge_ticks,
-            "surge_bonus": round(self.surge_bonus, 3),
+            "surge_bonus": self.surge_bonus,
             "heat_pct": round(min(100.0, max(0.0, self.heat / self.max_heat * 100.0)), 1) if self.max_heat else 0.0,
             "integrity_pct": round(min(100.0, max(0.0, self.integrity / self.max_integrity * 100.0)), 1) if self.max_integrity else 0.0,
         }
@@ -1309,7 +1311,10 @@ class ReactorState:
         max_heat = max(1.0, float(data.get("max_heat", 100.0)))
         max_integrity = max(1.0, float(data.get("max_integrity", 100.0)))
         return cls(
-            heat=max(0.0, min(max_heat, float(data.get("heat", 0.0)))),
+            # ``max_heat`` is the base hull figure; the live capacity adds the fitted
+            # thermal mods, so clamping heat to it here silently cooled the core on
+            # every load (ADR-417). Only negative values are repaired.
+            heat=max(0.0, float(data.get("heat", 0.0))),
             max_heat=max_heat,
             integrity=max(0.0, min(max_integrity, float(data.get("integrity", max_integrity)))),
             max_integrity=max_integrity,

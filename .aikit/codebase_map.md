@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `246`
-- **Total Classes**: `613`
-- **Total Top-Level Functions**: `556`
-- **Total Class Methods**: `3184`
-- **Total Source Lines**: `70684`
+- **Total Python Modules**: `247`
+- **Total Classes**: `614`
+- **Total Top-Level Functions**: `560`
+- **Total Class Methods**: `3191`
+- **Total Source Lines**: `70924`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`246` module(s))
+- **Indexed**: python (`247` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -825,11 +825,12 @@
 ### [`tests/test_chaos_fuzz.py`](tests/test_chaos_fuzz.py)
 > *The chaos fuzz tool must catch every rule class it claims to check (ADR-414).*
 
-**Size**: `133` lines
+**Size**: `149` lines
 
 **Classes:**
 - `class ChaosInvariantTest`
   - Method `.test_the_checker_catches_every_rule_class()`
+  - Method `.test_the_checker_catches_negative_heat()`
   - Method `.test_a_clean_engine_reports_nothing()`
   - Method `.test_the_same_breach_is_recorded_once()`
 - `class ChaosRunTest`
@@ -3830,6 +3831,26 @@
 
 ---
 
+### [`tests/test_reactor_capacity_save.py`](tests/test_reactor_capacity_save.py)
+> *Reactor heat follows the live capacity, not a stale base cap (ADR-417).*
+
+**Size**: `81` lines
+
+**Classes:**
+- `class ThermalCapacityTest`
+  - Method `.test_a_thermal_mod_raises_the_capacity()`
+  - Method `.test_heat_above_the_base_cap_survives_a_save()`
+  - Method `.test_removing_a_thermal_mod_clamps_the_core()`
+  - Method `.test_negative_heat_is_still_repaired_on_load()`
+  - Method `.test_integrity_is_still_clamped_to_its_own_max()`
+
+**Functions:**
+- `def _engine()`
+- `def _heat(engine)`
+- `def _capacity(engine)`
+
+---
+
 ### [`tests/test_reactor_map_shipmods.py`](tests/test_reactor_map_shipmods.py)
 > *Regression tests for reactor simulation, sector map modifiers, and ship modifications.*
 
@@ -5045,7 +5066,7 @@
 ### [`tools/chaos_fuzz.py`](tools/chaos_fuzz.py)
 > *Chaos-fuzz the engine with random valid actions and check state invariants.*
 
-**Size**: `281` lines
+**Size**: `400` lines
 
 **Classes:**
 - `class Findings` - *Collect crashes and invariant breaches once per distinct signature.*
@@ -5058,6 +5079,7 @@
 - `def check_invariants(engine, findings, action)` - *Every campaign state must stay inside its declared bounds.*
 - `def dock_somewhere(engine)`
 - `def choose_action(engine, rng)` - *Pick one random action that is legal in the current blocking state.*
+- `def choose_structural(engine, rng)` - *Pick one structural action (fleet, outposts, mods, research) (ADR-416).*
 - `def round_trip(engine, temp_dir, findings, action)` - *Save, reload and verify the universe is unchanged; return the resumed engine.*
 - `def run_seed(seed, actions, findings, save_every)`
 - `def main(argv)`
@@ -5617,7 +5639,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11338` lines
+**Size**: `11357` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5632,6 +5654,7 @@
   - Method `._research_bonuses()`
   - Method `._skill(skill)`
   - Method `._combined_equipment(ship)`
+  - Method `._clamp_reactor_heat(ship)` - *Keep core heat inside the capacity the current fit provides (ADR-417).*
   - Method `._crew_bonuses(ship)`
   - Method `._faction_stability()` - *System owner name -> its faction's civil stability (default 50 for unclaimed).*
   - Method `._faction_technology()` - *System owner name -> its faction's current technology level.*
@@ -6217,7 +6240,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2500` lines
+**Size**: `2505` lines
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*

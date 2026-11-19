@@ -17,6 +17,10 @@ if str(PROJECT_DIR) not in sys.path:
 
 from voidfarer.crew import CREW_ROLES  # noqa: E402
 from voidfarer.engine import SimulationEngine  # noqa: E402
+from voidfarer.outposts import OUTPOST_SPECIALIZATIONS, OUTPOST_TYPES  # noqa: E402
+from voidfarer.reactor import reactor_heat_capacity  # noqa: E402
+from voidfarer.research import RESEARCH_PROJECTS  # noqa: E402
+from voidfarer.shipmods import CATALOG_SHIP_MODS  # noqa: E402
 from voidfarer.storage import StorageManager  # noqa: E402
 
 WALL_CLOCK = {"completed_at", "created_at", "started_at", "saved_at", "timestamp", "recorded_at"}
@@ -75,6 +79,19 @@ def check_invariants(engine: SimulationEngine, findings: Findings, action: str) 
         findings.violation("fuel_bounds", f"{ship.fuel}/{ship.max_fuel}", action)
     if any(quantity < 0 for quantity in ship.cargo.values()):
         findings.violation("negative_cargo", str(dict(ship.cargo)), action)
+    reactor = ship.reactor
+    if reactor.heat < 0:
+        findings.violation("negative_heat", str(reactor.heat), action)
+    # ``max_heat`` is the base figure; the live capacity adds the fitted thermal mods.
+    capacity = reactor_heat_capacity(reactor, engine._combined_equipment(ship))
+    if reactor.heat > capacity + 0.001:
+        findings.violation("heat_over_capacity", f"{reactor.heat}/{capacity}", action)
+    if reactor.integrity < 0 or reactor.integrity > reactor.max_integrity:
+        findings.violation(
+            "core_integrity_bounds",
+            f"{reactor.integrity}/{reactor.max_integrity}",
+            action,
+        )
     crew_ids = [member.id for member in ship.crew]
     if len(crew_ids) != len(set(crew_ids)):
         findings.violation("duplicate_crew", ",".join(crew_ids), action)
@@ -175,6 +192,108 @@ def choose_action(
         return "station", lambda: engine.assign_crew_station(
             member.id, rng.choice(["", "helm", "engineering", "sensors"])
         )
+    return choose_structural(engine, rng)
+
+
+def choose_structural(
+    engine: SimulationEngine, rng: random.Random
+) -> tuple[str, Callable[[], Any]]:
+    """Pick one structural action (fleet, outposts, mods, research) (ADR-416).
+
+    These are the stateful systems whose serialization and validation paths deserve
+    random pressure; when the prerequisites are missing the engine's own refusal is
+    the assertion, so no action is skipped.
+    """
+    state = engine.state
+    ship = state.ship
+    system = engine.current_system
+    roll = rng.random()
+
+    if roll < 0.08:
+        total = 100
+        engines = rng.randrange(0, total + 1)
+        shields = rng.randrange(0, total - engines + 1)
+        sensors = rng.randrange(0, total - engines - shields + 1)
+        weapons = total - engines - shields - sensors
+        return "power", lambda: engine.route_power(engines, shields, sensors, weapons)
+    if roll < 0.16:
+        return "reactor", lambda: engine.set_reactor_mode(
+            rng.choice(["balanced", "economy", "overdrive", "silent"])
+        )
+    if roll < 0.20:
+        return "vent", lambda: engine.vent_reactor_coolant()
+    if roll < 0.24:
+        return "core_repair", lambda: engine.repair_reactor()
+    if roll < 0.32:
+        mod = rng.choice(CATALOG_SHIP_MODS)
+        return "shipmod", lambda: engine.install_ship_mod(mod.id)
+    if roll < 0.36 and ship.ship_mods:
+        slot = rng.choice(list(ship.ship_mods))
+        return "shipmod_remove", lambda: engine.remove_ship_mod(slot)
+    if roll < 0.42 and ship.upgrades:
+        upgrade_id = rng.choice(list(ship.upgrades))
+        return "upgrade", lambda: engine.buy_upgrade(upgrade_id)
+    if roll < 0.46 and ship.equipped_upgrades:
+        slot = rng.choice(list(ship.equipped_upgrades))
+        return "upgrade_sell", lambda: engine.sell_upgrade(slot)
+    if roll < 0.54:
+        body = rng.choice([candidate for candidate in system.bodies if candidate.landable] or system.bodies)
+        outpost = next((o for o in state.outposts if o.body_id == body.id), None)
+        if outpost is None:
+            outpost_type = rng.choice([kind.id for kind in OUTPOST_TYPES])
+            return "outpost_build", lambda: engine.build_outpost(body.id, outpost_type)
+        if rng.random() < 0.4:
+            return "outpost_upgrade", lambda: engine.upgrade_outpost(outpost.id)
+        if rng.random() < 0.5:
+            return "outpost_repair", lambda: engine.repair_outpost(outpost.id)
+        if rng.random() < 0.6 and ship.crew:
+            member = rng.choice(ship.crew)
+            return "outpost_crew", lambda: engine.assign_outpost_crew(outpost.id, member.id)
+        specialization = rng.choice(sorted(OUTPOST_SPECIALIZATIONS))
+        return "outpost_specialize", lambda: engine.specialize_outpost(outpost.id, specialization)
+    if roll < 0.58:
+        body = rng.choice([candidate for candidate in system.bodies if candidate.landable] or system.bodies)
+        return "megastructure", lambda: engine.restore_megastructure(body.id)
+    if roll < 0.62:
+        return "relic", lambda: engine.fuse_relics(
+            rng.choice(["common", "uncommon", "rare", "epic"])
+        )
+    if roll < 0.70:
+        drone_type = rng.choice(["mining", "scout", "combat_escort"])
+        return "drone_buy", lambda: engine.buy_drone(drone_type, system.id)
+    if roll < 0.74 and ship.fleet_drones:
+        drone = rng.choice(ship.fleet_drones)
+        return "drone_deploy", lambda: engine.deploy_drone(drone.id, system.id)
+    if roll < 0.78:
+        return "drone_collect", lambda: engine.collect_drone_yield()
+    if roll < 0.82 and ship.fleet_drones:
+        drone = rng.choice(ship.fleet_drones)
+        return "drone_dismiss", lambda: engine.dismiss_fleet_unit(drone.id)
+    if roll < 0.86:
+        escort_type = rng.choice(["corvette", "frigate", "cruiser", "carrier"])
+        return "escort_buy", lambda: engine.buy_escort(escort_type, system.id)
+    if roll < 0.90 and ship.fleet_ships:
+        escort = rng.choice(ship.fleet_ships)
+        if rng.random() < 0.4:
+            return "escort_assign", lambda: engine.assign_escort(escort.id, system.id)
+        if rng.random() < 0.5:
+            return "escort_role", lambda: engine.set_fleet_role(
+                escort.id, rng.choice(["screen", "strike", "support"])
+            )
+        if rng.random() < 0.6 and ship.crew:
+            member = rng.choice(ship.crew)
+            return "escort_captain", lambda: engine.assign_fleet_captain(escort.id, member.id)
+        return "escort_train", lambda: engine.train_fleet_ship(escort.id)
+    if roll < 0.94:
+        return "research", lambda: engine.queue_research(
+            rng.choice([project.id for project in RESEARCH_PROJECTS])
+        )
+    if roll < 0.97 and ship.active_contracts:
+        contract = rng.choice(ship.active_contracts)
+        return "contract_claim", lambda: engine.claim_contract(contract.id)
+    if roll < 0.99 and ship.cargo:
+        commodity = rng.choice(list(ship.cargo))
+        return "deposit", lambda: engine.deposit_cargo(commodity, 1)
     return "tick", lambda: engine.tick(rng.choice([1, 2, 3]))
 
 

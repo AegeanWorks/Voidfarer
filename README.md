@@ -149,7 +149,7 @@ voidfarer/
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   ├── ai_play.py        <- headless AI campaign with mechanic coverage
 │   └── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
-└── tests/                <- unit & integration test suite (183 suites)
+└── tests/                <- unit & integration test suite (184 suites)
 ```
 
 ---
@@ -395,10 +395,11 @@ action catalog scraped from the server's own route table, `window.voidfarerClick
 enumerates every cockpit control with a stable `data-testid`, and the bundled captain
 plays a full campaign through the same HTTP API the UI uses. `tools/chaos_fuzz.py`
 does the opposite: it fires random legal actions (jumps, orbits, trades, salvos,
-encounter resolutions, crew changes) and checks every state against its declared
-bounds. With `--save-every` it also saves and reloads mid-stream: 40,000 random
-actions across twenty seeds with 400 round trips produced zero crashes, zero
-breaches and zero save drift.
+encounter resolutions, crew changes, power routing, reactor modes, outposts, escorts,
+ship mods and research) and checks every state against its declared bounds. With
+`--save-every` it also saves and reloads mid-stream: 40,000 random actions across
+twenty seeds with 400 round trips produced zero crashes, zero breaches and zero
+save drift.
 
 ```bash
 python tools/ai_play.py --steps 180           # human-readable mechanic coverage

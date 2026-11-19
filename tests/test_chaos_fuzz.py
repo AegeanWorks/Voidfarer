@@ -24,6 +24,7 @@ def _bad_engine() -> SimulationEngine:
         fuel=ship.max_fuel + 1,
         cargo={**ship.cargo, "water": -2},
         crew=tuple(crew),
+        reactor=replace(ship.reactor, heat=500.0, integrity=250.0),
     )
     systems = dict(engine.state.systems)
     first_id, first_system = next(iter(systems.items()))
@@ -62,12 +63,27 @@ class ChaosInvariantTest(unittest.TestCase):
             "negative_cargo",
             "duplicate_crew",
             "negative_tick",
+            "heat_over_capacity",
+            "core_integrity_bounds",
             "negative_population",
             "population_over_capacity",
             "devastation_range",
             "outpost_level",
             "negative_depot",
         })
+
+    def test_the_checker_catches_negative_heat(self):
+        engine = SimulationEngine(seed=3)
+        engine.state = replace(
+            engine.state,
+            ship=replace(
+                engine.state.ship,
+                reactor=replace(engine.state.ship.reactor, heat=-1.0),
+            ),
+        )
+        findings = Findings()
+        check_invariants(engine, findings, "synthetic")
+        self.assertIn("negative_heat", {row["kind"] for row in findings.violations})
 
     def test_a_clean_engine_reports_nothing(self):
         findings = Findings()
