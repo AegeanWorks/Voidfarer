@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "chaos-fuzz-harness",
+    "task_id": "empty-loadout-stays-empty",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795123538.0465941,
+    "updated_at": 1795125751.4952114,
     "owner": "kilo:goal",
-    "lease_until": 1795130738.0465941,
+    "lease_until": 1795132951.4952114,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795123625.9637938,
-    "completed_head": "923bb8f75a785856ce7cabf2f631126021dfaea9",
-    "completed_tree": "3b9529a2255451178c2013d2841295f2ad683005"
+    "completed_at": 1795125843.9174469,
+    "completed_head": "03c0dcf016f671704dd319422f29780d23f71596",
+    "completed_tree": "047b3af65a5022fff0b109dedefe29454ef87e3c"
   },
   "checkpoints": [
-    {
-      "task_id": "save-load-boundary-proof",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] New server test passes inside the 55-test suite; deep sweep 0 violations on seeds 3/11/5/6 and 42 at 2,000 steps, probe self-test catches every rule class; 1,000-step midpoint resume of a 2,000-step campaign matches field for field; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2134 OK (ADR-408); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795111625.2825623,
-      "timestamp_str": "2026-11-19 21:07:05",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "save-load-boundary-proof",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'save-load-boundary-proof' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795111713.5457597,
-      "timestamp_str": "2026-11-19 21:08:33",
-      "agent": "kilo:goal",
-      "head": "4814bf8bb003613d939a94b4eeff72460854244f",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "save-slot-isolation",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Save slots each keep their own stream and never touch each other",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795112640.6636987,
-      "timestamp_str": "2026-11-19 21:24:00",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ADR-405 put the RNG checkpoint in every save, so independent slots had to be pinned: players keep branches in different slots and storage shares a data directory",
-        "benefits": "each slot provably restores its own stream, tick and credits, and loading one slot leaves the other byte-identical",
-        "risks": "contract: none, test-only; dependency: none; concurrency: none; state: none",
-        "mitigation": "three tests over the real StorageManager covering per-slot resume, listing and cross-slot immutability"
-      },
-      "plan_digest": "8cc7eadb9c5db9176c4c8b2bb52062e16243ef5dcd8c4560ce85e99d141ca9e2"
-    },
     {
       "task_id": "save-slot-isolation",
       "phase": "in_progress",
@@ -312,6 +266,52 @@
       "timestamp_str": "2026-11-20 00:27:06",
       "agent": "kilo:goal",
       "head": "923bb8f75a785856ce7cabf2f631126021dfaea9",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "empty-loadout-stays-empty",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Loading keeps an emptied crew, weapon rack or inbox empty",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795125750.4287412,
+      "timestamp_str": "2026-11-20 01:02:30",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the chaos harness's save/load interleaving found that a ship which dismissed every officer came back from a reload with the starter engineer and pilot restored: _bootstrap_frontier treated empty collections as legacy and backfilled them",
+        "benefits": "deliberate player choices survive a reload, and the fuzz now field-compares 400 arbitrary save/load round trips",
+        "risks": "contract: legacy backfill is gated on the pre-RNG-checkpoint marker; dependency: none; concurrency: none; state: none",
+        "mitigation": "failing-first tests for empty crew/weapons/inbox plus legacy crew and tree-root backfill, and the extended --save-every fuzz across twenty seeds"
+      },
+      "plan_digest": "d22d46c805081c5b3630349d9e7d6c2d860a875791cc855524ae9be65ae9ebd6"
+    },
+    {
+      "task_id": "empty-loadout-stays-empty",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Five resurrection tests pass; extended fuzz ran 40,000 actions across 20 seeds with 400 save/load round trips: 0 crashes, 0 breaches, 0 drift (110s); suite Ran 2161 OK; README tree still 183 suites, 36,124 chars; 6/6 project gates (mechanics gate passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-415); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795125751.4952114,
+      "timestamp_str": "2026-11-20 01:02:31",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "empty-loadout-stays-empty",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'empty-loadout-stays-empty' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795125844.87912,
+      "timestamp_str": "2026-11-20 01:04:04",
+      "agent": "kilo:goal",
+      "head": "03c0dcf016f671704dd319422f29780d23f71596",
       "delivery": {
         "roots": [
           "."
