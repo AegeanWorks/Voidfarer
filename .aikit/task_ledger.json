@@ -1,65 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "save-load-boundary-proof",
+    "task_id": "save-slot-isolation",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795111625.2825623,
+    "updated_at": 1795112641.5070548,
     "owner": "kilo:goal",
-    "lease_until": 1795118825.2825623,
+    "lease_until": 1795119841.5070548,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795111713.4505203,
-    "completed_head": "4814bf8bb003613d939a94b4eeff72460854244f",
-    "completed_tree": "2de47d3cacc1b0a66842921f5d4dd81efcad8272"
+    "completed_at": 1795112788.4609237,
+    "completed_head": "03d5d0600209e8350b1d970069104f702f6d7f3e",
+    "completed_tree": "1b03ca5207f2000d9f8ed7ca305bab12b7d45d2f"
   },
   "checkpoints": [
-    {
-      "task_id": "customs-cordon-run",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[2/2] Rotate the post-story fallback jump across the affordable lanes",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795081783.9515703,
-      "timestamp_str": "2026-11-19 12:49:43",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "affordable[step % len(affordable)] froze on one slot because the twenty-step cadence repeats the remainder, so the captain ping-ponged between two systems and the megastructure policy never probed a restorable world on seed 2",
-        "benefits": "Post-story exploration visits every affordable lane, recovering late-game mechanics that the shuttle silently starved, while the pre-story route that the 180 gate was measured on stays frozen",
-        "risks": "contract: none, the jump route and body are unchanged; dependency: none; concurrency: none; state: a rotation counter only",
-        "mitigation": "five agent tests for rotation, preserved first slot, pre-story freeze, affordability and cadence plus the 180-step gate and three campaign seeds"
-      }
-    },
-    {
-      "task_id": "customs-cordon-run",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors/10 refusals; campaigns 0 errors on seeds 1/2/42/7: seed 1 101/97/99 refusals 21 customs+mega+reactor+salvage+scoop+reconstruct+gambit, seed 2 97/93/96 refusals 19 mega+combat_item+pirate (the 12% cordon misses across 16 jumps), seed 42 99/96/99 refusals 19 customs+mega+fleet_sell, seed 7 101/97/99 refusals 19 mega+reactor+fleet_sell; suite Ran 2102 OK (ADR-400, ADR-401); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795081807.4763873,
-      "timestamp_str": "2026-11-19 12:50:07",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "customs-cordon-run",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'customs-cordon-run' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795081869.5094025,
-      "timestamp_str": "2026-11-19 12:51:09",
-      "agent": "kilo:goal",
-      "head": "59fd80102083f8bed6be133d0d2f0efc50cbf316",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "wreck-decommission",
       "phase": "in_progress",
@@ -317,6 +272,52 @@
       "timestamp_str": "2026-11-19 21:08:33",
       "agent": "kilo:goal",
       "head": "4814bf8bb003613d939a94b4eeff72460854244f",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "save-slot-isolation",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Save slots each keep their own stream and never touch each other",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795112640.6636987,
+      "timestamp_str": "2026-11-19 21:24:00",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-405 put the RNG checkpoint in every save, so independent slots had to be pinned: players keep branches in different slots and storage shares a data directory",
+        "benefits": "each slot provably restores its own stream, tick and credits, and loading one slot leaves the other byte-identical",
+        "risks": "contract: none, test-only; dependency: none; concurrency: none; state: none",
+        "mitigation": "three tests over the real StorageManager covering per-slot resume, listing and cross-slot immutability"
+      },
+      "plan_digest": "8cc7eadb9c5db9176c4c8b2bb52062e16243ef5dcd8c4560ce85e99d141ca9e2"
+    },
+    {
+      "task_id": "save-slot-isolation",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Three slot tests pass; suite Ran 2137 OK with README tree at 179 suites; 180 gate unchanged (mechanics gate passed; 58/59/69, 0 gaps/0 errors/10 refusals from the last measurement); 6/6 project gates; checklists: passed (ADR-409)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795112641.5070548,
+      "timestamp_str": "2026-11-19 21:24:01",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "save-slot-isolation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'save-slot-isolation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795112789.2609646,
+      "timestamp_str": "2026-11-19 21:26:29",
+      "agent": "kilo:goal",
+      "head": "03d5d0600209e8350b1d970069104f702f6d7f3e",
       "delivery": {
         "roots": [
           "."
