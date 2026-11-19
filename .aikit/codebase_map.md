@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `242`
-- **Total Classes**: `607`
-- **Total Top-Level Functions**: `545`
-- **Total Class Methods**: `3158`
-- **Total Source Lines**: `70006`
+- **Total Python Modules**: `243`
+- **Total Classes**: `608`
+- **Total Top-Level Functions**: `547`
+- **Total Class Methods**: `3161`
+- **Total Source Lines**: `70090`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`242` module(s))
+- **Indexed**: python (`243` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1529,6 +1529,23 @@
   - Method `.test_the_card_is_declared_an_alert_dialog()`
   - Method `.test_a_new_fight_focuses_the_first_enabled_action_once()`
   - Method `.test_the_end_of_combat_restores_the_previous_focus()`
+
+---
+
+### [`tests/test_combat_save_parity.py`](tests/test_combat_save_parity.py)
+> *A fight saved mid-battle resumes the exact same exchange (ADR-411).*
+
+**Size**: `84` lines
+
+**Classes:**
+- `class CombatSaveParityTest`
+  - Method `.test_a_saved_fight_resumes_the_exact_exchange()`
+  - Method `.test_two_rounds_stay_in_step_after_a_reload()`
+  - Method `.test_the_spent_gambit_and_evasion_bonus_survive_the_save()`
+
+**Functions:**
+- `def _strip_clock(value, key)`
+- `def _combat_engine(seed)`
 
 ---
 

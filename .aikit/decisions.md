@@ -3784,3 +3784,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: The engine rolls the checkpoint slot before a jump into a system below CHECKPOINT_SECURITY (ADR-301), and ADR-405 made saves carry the live RNG stream. Nothing pinned the two together: a player who dies to the encounter and reloads the checkpoint must face the same risky jump, not a re-roll with a reset stream.
 - **Decision**: Add two tests over the real StorageManager checkpoint writer: a low-security jump writes the slot, reloading it and jumping again reproduces the live post-jump state field for field (wall-clock fields excluded), and a high-security jump writes no checkpoint.
 - **Consequences**: The pre-jump safety net is now proven to be replayable. Suite passes at 2139 tests with the README tree updated to 180 suites.
+
+### ADR-411: A fight saved mid-battle resumes the exact exchange
+- **Date**: 2026-11-19
+- **Status**: Accepted
+- **Context**: ADR-405 to ADR-410 pinned resumption for campaigns, trade links, legacy bodies, slots and the pre-jump checkpoint, but an active combat is the most stateful moment a player can save in: enemy hull and shields, accumulated damage, intent, cooldowns, the spent captain's gambit and the evasion bonus must all survive, and the reloaded fight must roll the same exchange instead of a re-roll.
+- **Decision**: Add three tests over the real StorageManager: save with an active `CombatEncounter`, reload and fire, and assert the returned messages and the full wall-clock-stripped state match the live engine; run three further rounds (fire, brace, fire) on both and compare again; and verify `captain_gambit_used` with a non-default `captain_evasion_bonus` survives the save.
+- **Consequences**: Mid-fight saves are proven exact; no production change was needed, which confirms the combat model was already fully serialized. Suite passes at 2142 tests with the README tree updated to 181 suites.
