@@ -1529,6 +1529,55 @@ class FallbackJumpRotationTest(unittest.TestCase):
         self.assertIsNone(captain._fallback_jump(7))
 
 
+class WreckDismissalPolicyTest(unittest.TestCase):
+    """A destroyed escort is decommissioned so its officer is released (ADR-402)."""
+
+    def _captain(self, ships, completed=True):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "story_status": {"completed": completed},
+            "fleet_manager": {"ships": ships},
+        }
+        return captain
+
+    def test_a_destroyed_escort_is_decommissioned(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 0,
+             "captain_id": "crew_engineer_4"},
+        ])
+        self.assertEqual(
+            captain._wreck_dismiss_action(),
+            ("/api/fleet/escort/dismiss", {"ship_id": "escort_corvette_1"},
+             "fleet_dismiss"),
+        )
+
+    def test_a_live_escort_is_kept(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 90,
+             "captain_id": "crew_engineer_4"},
+        ])
+        self.assertIsNone(captain._wreck_dismiss_action())
+
+    def test_a_destroyed_prize_is_left_to_the_sale(self):
+        captain = self._captain([
+            {"id": "prize_134_1", "role": "prize", "hull": 0},
+        ])
+        self.assertIsNone(captain._wreck_dismiss_action())
+
+    def test_the_decommission_happens_once(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 0},
+        ])
+        captain.succeeded.add("/api/fleet/escort/dismiss")
+        self.assertIsNone(captain._wreck_dismiss_action())
+
+    def test_nothing_is_dismissed_before_the_campaign(self):
+        captain = self._captain(
+            [{"id": "escort_corvette_1", "role": "escort", "hull": 0}],
+            completed=False)
+        self.assertIsNone(captain._wreck_dismiss_action())
+
+
 class StoryTravelTourTest(unittest.TestCase):
     """Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360)."""
 

@@ -69,7 +69,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/depot/withdraw": "needs stock sitting in a depot",
     "/api/fleet/dismiss": "the captain keeps its drone line; dismissal is permanent",
     "/api/fleet/escort/assign": "the patrol rotation runs after Act VI; the 180-step gate ends before the campaign does",
-    "/api/fleet/escort/dismiss": "permanently decommissions an owned escort",
+    "/api/fleet/escort/dismiss": "a live hull is never decommissioned; the campaign only scraps a destroyed escort",
     "/api/fleet/escort/repair": "needs a damaged escort",
     "/api/fleet/escort/train": "needs a docked escort, credits and spare experience",
     "/api/fleet/escort/role": "needs an owned escort outside combat",
@@ -546,6 +546,12 @@ class AiCaptain:
         prize_sale = self._prize_sale_action()
         if prize_sale is not None:
             return prize_sale
+
+        # A wrecked bought escort cannot be repaired or refunded; decommission it so
+        # its officer is not held in a dead hull (ADR-402).
+        wreck = self._wreck_dismiss_action()
+        if wreck is not None:
+            return wreck
 
         dismissal = self._crew_dismiss_action()
         if dismissal is not None:
@@ -1813,6 +1819,26 @@ class AiCaptain:
                 return "/api/travel", {"body_id": dock["id"], "mode": "sublight"}, "dock"
             return None
         return "/api/fleet/escort/sell", {"ship_id": str(prizes[0]["id"])}, "fleet_sell"
+
+    def _wreck_dismiss_action(self):
+        """Decommission a destroyed escort so its officer is released (ADR-402).
+
+        A hull at zero cannot be repaired (the repair tour requires hull above zero)
+        and cannot fight, but its assigned captain keeps the seat forever. Prizes are
+        left to the drydock sale; only a dead bought escort is decommissioned in place.
+        """
+        if "/api/fleet/escort/dismiss" in self.succeeded:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        wrecks = [
+            ship for ship in self._escort_rows()
+            if str(ship.get("role") or "") != "prize"
+            and int(ship.get("hull") or 0) <= 0
+        ]
+        if not wrecks:
+            return None
+        return "/api/fleet/escort/dismiss", {"ship_id": str(wrecks[0]["id"])}, "fleet_dismiss"
 
     def _send_action(self):
         """Send one quantum report to a real correspondent after the campaign (ADR-386)."""

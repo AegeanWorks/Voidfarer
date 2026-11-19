@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `598`
+- **Total Classes**: `599`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3113`
-- **Total Source Lines**: `69318`
+- **Total Class Methods**: `3120`
+- **Total Source Lines**: `69393`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `3189` lines
+**Size**: `3238` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -270,6 +270,13 @@
   - Method `.test_the_short_gate_keeps_the_frozen_slot()`
   - Method `.test_unaffordable_lanes_are_skipped()`
   - Method `.test_off_cadence_steps_do_not_jump()`
+- `class WreckDismissalPolicyTest` - *A destroyed escort is decommissioned so its officer is released (ADR-402).*
+  - Method `._captain(ships, completed)`
+  - Method `.test_a_destroyed_escort_is_decommissioned()`
+  - Method `.test_a_live_escort_is_kept()`
+  - Method `.test_a_destroyed_prize_is_left_to_the_sale()`
+  - Method `.test_the_decommission_happens_once()`
+  - Method `.test_nothing_is_dismissed_before_the_campaign()`
 - `class StoryTravelTourTest` - *Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360).*
   - Method `._captain(**state)`
   - Method `.test_a_ready_chapter_is_resolved_before_a_dock_trip()`
@@ -4957,7 +4964,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2826` lines
+**Size**: `2852` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5009,6 +5016,7 @@
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*
   - Method `._shipyard_sell_action()` - *Trade in one safe equipped upgrade at a dock after the campaign (ADR-387).*
   - Method `._prize_sale_action()` - *Sell one captured prize at a drydock after the campaign (ADR-399).*
+  - Method `._wreck_dismiss_action()` - *Decommission a destroyed escort so its officer is released (ADR-402).*
   - Method `._send_action()` - *Send one quantum report to a real correspondent after the campaign (ADR-386).*
   - Method `._ally_action()` - *Hail the most trusted non-ally to 50 trust, then ally (ADR-385).*
   - Method `._patrol_action()` - *Recall a detached escort, then patrol one onto a connected lane (ADR-382).*
