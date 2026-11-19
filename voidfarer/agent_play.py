@@ -208,6 +208,12 @@ class AiCaptain:
     # Economy is the mildest reactor doctrine, so the tour tries it first and only
     # falls back to the rest of the catalog when the core already runs it (ADR-398).
     REACTOR_MODE_ORDER = ("economy", "balanced", "silent", "overdrive")
+    # Mirrors reactor.vent_reactor: a purge needs more than 5 heat and a 5-tick
+    # coolant recharge, so a heat spike must be vented while it is still live (ADR-404).
+    REACTOR_VENT_MIN_HEAT = 5.0
+    REACTOR_VENT_COOLDOWN = 5
+    # Mirrors engine.repair_reactor's floor: servicing costs at least 120 cr (ADR-404).
+    REACTOR_SERVICE_COST = 120
     # A low-security cordon only rolls about one arrival in eight, so sixteen jumps
     # (eight arrivals) gives the ferry enough chances to prove the mechanic while the
     # fuel guard and the dock refuel keep it safe (ADR-400).
@@ -488,6 +494,15 @@ class AiCaptain:
         reactor = self._reactor_mode_action()
         if reactor is not None:
             return reactor
+
+        # A transient heat spike must be vented while it is live, then the purge's
+        # integrity cost is serviced at the next dock (ADR-404).
+        vent = self._reactor_vent_action()
+        if vent is not None:
+            return vent
+        service = self._reactor_repair_action()
+        if service is not None:
+            return service
 
         # A post-story smuggling run buys one contraband lot and carries it at the
         # quoted cordon until the scan fires, then dumps it under pressure (ADR-400).
@@ -1178,6 +1193,47 @@ class AiCaptain:
                 self.reactor_switched = True
                 return "/api/reactor/mode", {"mode": mode_id}, "reactor"
         return None
+
+    def _reactor_vent_action(self):
+        """Vent a live heat spike after the campaign while it is still hot (ADR-404).
+
+        The rotating tour visits the purge slot on its own cadence, so a spike that
+        lasts a few ticks is usually gone by then; a state-driven purge fires while
+        the heat is actually present and proves the emergency coolant.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        reactor = self.state.get("reactor") or {}
+        if float(reactor.get("heat") or 0.0) <= self.REACTOR_VENT_MIN_HEAT:
+            return None
+        last_vent = int(reactor.get("last_vent_tick", -1))
+        if last_vent >= 0:
+            tick = int((self.state.get("time") or {}).get("tick") or 0)
+            if tick - last_vent < self.REACTOR_VENT_COOLDOWN:
+                return None
+        return "/api/reactor/vent", {}, "reactor_vent"
+
+    def _reactor_repair_action(self):
+        """Service the core at a post-story dock once it is hurt or overheated (ADR-404).
+
+        A purge always costs a point of integrity, so the repair that follows it is
+        real maintenance rather than a no-op post.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if not self._is_docked():
+            return None
+        reactor = self.state.get("reactor") or {}
+        missing = max(
+            0.0,
+            float(reactor.get("max_integrity") or 0.0)
+            - float(reactor.get("integrity") or 0.0),
+        )
+        if missing <= 0.5 and float(reactor.get("heat") or 0.0) <= self.REACTOR_VENT_MIN_HEAT:
+            return None
+        if int((self.state.get("ship") or {}).get("credits") or 0) < self.REACTOR_SERVICE_COST:
+            return None
+        return "/api/reactor/repair", {}, "reactor_repair"
 
     def _tour_route(self):
         connections = (self.state.get("current_system") or {}).get("connections") or []

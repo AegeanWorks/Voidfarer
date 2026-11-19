@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `238`
-- **Total Classes**: `601`
+- **Total Classes**: `602`
 - **Total Top-Level Functions**: `538`
-- **Total Class Methods**: `3125`
-- **Total Source Lines**: `69462`
+- **Total Class Methods**: `3138`
+- **Total Source Lines**: `69579`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`238` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `3238` lines
+**Size**: `3299` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -244,6 +244,18 @@
   - Method `.test_a_missing_catalog_stays_quiet()`
   - Method `.test_the_short_gate_keeps_its_balanced_core()`
   - Method `.test_the_doctrine_changes_once()`
+- `class ReactorHeatChainTest` - *A post-story heat spike is vented and the purge damage repaired (ADR-404).*
+  - Method `._captain(heat, integrity, tick, last_vent, docked, credits, completed)`
+  - Method `.test_a_hot_core_is_vented_after_the_campaign()`
+  - Method `.test_a_cool_core_is_never_vented()`
+  - Method `.test_a_recharging_coolant_waits()`
+  - Method `.test_the_short_gate_never_vents()`
+  - Method `.test_purge_damage_is_repaired_at_a_dock()`
+  - Method `.test_a_hot_core_is_serviced_at_a_dock()`
+  - Method `.test_an_intact_cool_core_is_not_serviced()`
+  - Method `.test_the_service_needs_a_dock_and_credits()`
+  - Method `.test_the_vent_fires_before_the_tour()`
+  - Method `.test_the_repair_fires_after_the_purge()`
 - `class PrizeSalePolicyTest` - *A captured prize is sold at a drydock, never the bought escort (ADR-399).*
   - Method `._captain(ships, docked, completed, **state)`
   - Method `.test_a_docked_prize_is_sold()`
@@ -4980,7 +4992,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2852` lines
+**Size**: `2908` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5008,6 +5020,8 @@
   - Method `._tour_power()`
   - Method `._tour_reactor()`
   - Method `._reactor_mode_action()` - *Switch the post-campaign core to economy so the doctrine change is proven (ADR-398).*
+  - Method `._reactor_vent_action()` - *Vent a live heat spike after the campaign while it is still hot (ADR-404).*
+  - Method `._reactor_repair_action()` - *Service the core at a post-story dock once it is hurt or overheated (ADR-404).*
   - Method `._tour_route()`
   - Method `._tour_messages()` - *Resolve one live branch, then fall back to plain mail (ADR-378).*
   - Method `._unread_message_action()` - *Read plain inbox mail so a live branch cannot hide the read route.*

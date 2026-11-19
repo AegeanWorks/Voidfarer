@@ -1322,6 +1322,67 @@ class ReactorDoctrineTest(unittest.TestCase):
         self.assertIsNone(captain._reactor_mode_action())
 
 
+class ReactorHeatChainTest(unittest.TestCase):
+    """A post-story heat spike is vented and the purge damage repaired (ADR-404)."""
+
+    def _captain(self, heat=16.0, integrity=100.0, tick=400, last_vent=-999,
+                 docked=True, credits=5000, completed=True):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        captain.state = {
+            "story_status": {"completed": completed},
+            "reactor": {
+                "heat": heat, "max_heat": 100.0, "heat_pct": heat,
+                "integrity": integrity, "max_integrity": 100.0,
+                "last_vent_tick": last_vent, "mode": "economy",
+            },
+            "time": {"tick": tick},
+            "orbiting_body": ({"id": "sol_station", "station_dockable": True}
+                              if docked else {"id": "sol_rock"}),
+            "ship": {"credits": credits, "fuel": 60, "max_fuel": 80,
+                     "hull": 90, "max_hull": 100},
+        }
+        return captain
+
+    def test_a_hot_core_is_vented_after_the_campaign(self):
+        self.assertEqual(self._captain()._reactor_vent_action(),
+                         ("/api/reactor/vent", {}, "reactor_vent"))
+
+    def test_a_cool_core_is_never_vented(self):
+        self.assertIsNone(self._captain(heat=4.0)._reactor_vent_action())
+
+    def test_a_recharging_coolant_waits(self):
+        self.assertIsNone(
+            self._captain(tick=400, last_vent=397)._reactor_vent_action())
+
+    def test_the_short_gate_never_vents(self):
+        self.assertIsNone(
+            self._captain(completed=False)._reactor_vent_action())
+
+    def test_purge_damage_is_repaired_at_a_dock(self):
+        self.assertEqual(self._captain(integrity=99.0)._reactor_repair_action(),
+                         ("/api/reactor/repair", {}, "reactor_repair"))
+
+    def test_a_hot_core_is_serviced_at_a_dock(self):
+        self.assertEqual(self._captain(heat=16.0)._reactor_repair_action()[0],
+                         "/api/reactor/repair")
+
+    def test_an_intact_cool_core_is_not_serviced(self):
+        self.assertIsNone(self._captain(heat=2.0)._reactor_repair_action())
+
+    def test_the_service_needs_a_dock_and_credits(self):
+        self.assertIsNone(
+            self._captain(integrity=90.0, docked=False)._reactor_repair_action())
+        self.assertIsNone(
+            self._captain(integrity=90.0, credits=50)._reactor_repair_action())
+
+    def test_the_vent_fires_before_the_tour(self):
+        self.assertEqual(self._captain()._choose(2)[0], "/api/reactor/vent")
+
+    def test_the_repair_fires_after_the_purge(self):
+        self.assertEqual(self._captain(heat=2.0, integrity=99.0)._choose(2)[0],
+                         "/api/reactor/repair")
+
+
 class PrizeSalePolicyTest(unittest.TestCase):
     """A captured prize is sold at a drydock, never the bought escort (ADR-399)."""
 
