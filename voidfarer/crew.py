@@ -95,6 +95,27 @@ def recruit_crew_member(role_id: str, seed: int, current_count: int) -> CrewMemb
     )
 
 
+def recruit_unique_crew_member(
+    role_id: str, seed: int, crew: Sequence["CrewMember"]
+) -> "CrewMember | None":
+    """Recruit with an id no existing member already holds (ADR-403).
+
+    The plain helper derives the suffix from the roster length, so dismissing a member
+    and recruiting again can mint an id that is still in the roster; crew lookups by id
+    then hit the wrong officer and the duplicate can never be addressed on its own.
+    """
+    used = {member.id for member in crew}
+    index = len(crew)
+    for _ in range(len(crew) + 1):
+        member = recruit_crew_member(role_id, seed, index)
+        if member is None:
+            return None
+        if member.id not in used:
+            return member
+        index += 1
+    return None
+
+
 def calculate_crew_bonuses(crew: Sequence[CrewMember]) -> dict[str, float]:
     bonuses: dict[str, float] = {
         "fuel_efficiency": 1.0,

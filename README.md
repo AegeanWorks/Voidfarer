@@ -148,7 +148,7 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (175 suites)
+└── tests/                <- unit & integration test suite (176 suites)
 ```
 
 ---

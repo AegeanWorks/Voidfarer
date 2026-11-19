@@ -40,7 +40,7 @@ from voidfarer.crew import (
     crew_upkeep,
     crew_xp_to_next,
     get_crew_role,
-    recruit_crew_member,
+    recruit_unique_crew_member,
     recover_crew_injuries,
     shore_leave_restore,
     tick_crew,
@@ -4326,7 +4326,9 @@ class SimulationEngine:
                 return False, "Crew berths are full (maximum 8 active crew)."
             if self.state.ship.credits < role.cost:
                 return False, f"Insufficient credits: {role.name} signing bonus is {role.cost} cr."
-            member = recruit_crew_member(role_id, self.state.galaxy_seed, len(self.state.ship.crew))
+            member = recruit_unique_crew_member(
+                role_id, self.state.galaxy_seed, self.state.ship.crew
+            )
             if not member:
                 return False, "Recruitment database unavailable."
             new_ship = self._clone_ship(
@@ -4819,7 +4821,9 @@ class SimulationEngine:
                 primary = str(unlock_weapon)
             crew_role = outcome.get("crew_role")
             if crew_role:
-                member = recruit_crew_member(str(crew_role), self.state.galaxy_seed, len(crew))
+                member = recruit_unique_crew_member(
+                    str(crew_role), self.state.galaxy_seed, crew
+                )
                 if member:
                     crew = crew + (member,)
             cargo_item = outcome.get("cargo")

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `237`
-- **Total Classes**: `599`
-- **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3120`
-- **Total Source Lines**: `69393`
+- **Total Python Modules**: `238`
+- **Total Classes**: `601`
+- **Total Top-Level Functions**: `538`
+- **Total Class Methods**: `3125`
+- **Total Source Lines**: `69462`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`237` module(s))
+- **Indexed**: python (`238` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1677,6 +1677,22 @@
 
 **Functions:**
 - `def _base()`
+
+---
+
+### [`tests/test_crew_ids.py`](tests/test_crew_ids.py)
+> *Crew ids stay unique when the roster shrinks and refills (ADR-403).*
+
+**Size**: `44` lines
+
+**Classes:**
+- `class UniqueCrewIdTest`
+  - Method `.test_the_helper_skips_a_reused_suffix()`
+  - Method `.test_the_helper_keeps_the_natural_index_when_it_is_free()`
+  - Method `.test_the_helper_reports_a_missing_role()`
+- `class RecruitAfterDismissTest`
+  - Method `.setUp()`
+  - Method `.test_a_recruit_after_a_dismissal_never_reuses_an_id()`
 
 ---
 
@@ -5279,7 +5295,7 @@
 ### [`voidfarer/crew.py`](voidfarer/crew.py)
 > *Crew roles, recruiting, portraits, and crew-derived ship bonuses.*
 
-**Size**: `310` lines
+**Size**: `331` lines
 
 **Classes:**
 - `class CrewRole`
@@ -5289,6 +5305,7 @@
 - `def award_service_medals(member)` - *Award persistent medals once the service counters cross their thresholds.*
 - `def get_crew_role(role_id)`
 - `def recruit_crew_member(role_id, seed, current_count)`
+- `def recruit_unique_crew_member(role_id, seed, crew)` - *Recruit with an id no existing member already holds (ADR-403).*
 - `def calculate_crew_bonuses(crew)`
 - `def crew_upkeep(crew)` - *Monthly wage bill of the active crew.*
 - `def wages_due(crew, days_before, days_after)` - *Whole credits of monthly wages accrued between two calendar points (cumulative, so*
@@ -5425,7 +5442,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11306` lines
+**Size**: `11310` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
