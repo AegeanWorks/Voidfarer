@@ -1,77 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "empty-loadout-stays-empty",
+    "task_id": "structural-fuzz-thermal-save",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795125751.4952114,
+    "updated_at": 1795130079.6646006,
     "owner": "kilo:goal",
-    "lease_until": 1795132951.4952114,
+    "lease_until": 1795137279.6646006,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795125843.9174469,
-    "completed_head": "03c0dcf016f671704dd319422f29780d23f71596",
-    "completed_tree": "047b3af65a5022fff0b109dedefe29454ef87e3c"
+    "completed_at": 1795130101.3561351,
+    "completed_head": "9c34db5d6ce4d30a375448233536f9c850a9938d",
+    "completed_tree": "f09d6bc981544609562b43c8fb1d97e284862ffc"
   },
   "checkpoints": [
-    {
-      "task_id": "save-slot-isolation",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Three slot tests pass; suite Ran 2137 OK with README tree at 179 suites; 180 gate unchanged (mechanics gate passed; 58/59/69, 0 gaps/0 errors/10 refusals from the last measurement); 6/6 project gates; checklists: passed (ADR-409)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795112641.5070548,
-      "timestamp_str": "2026-11-19 21:24:01",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "save-slot-isolation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'save-slot-isolation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795112789.2609646,
-      "timestamp_str": "2026-11-19 21:26:29",
-      "agent": "kilo:goal",
-      "head": "03d5d0600209e8350b1d970069104f702f6d7f3e",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "checkpoint-replay-proof",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] A pre-jump checkpoint replays the same risky jump",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795114922.886388,
-      "timestamp_str": "2026-11-19 22:02:02",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ADR-301 rolls a checkpoint before low-security jumps and ADR-405 made saves carry the live RNG stream, but nothing pinned that reloading the checkpoint faces the same encounter instead of a re-roll",
-        "benefits": "the pre-jump safety net is proven replayable end to end over the real checkpoint writer",
-        "risks": "contract: none, test-only; dependency: none; concurrency: none; state: none",
-        "mitigation": "two tests: a low-security jump writes the slot and replaying it reproduces the live state field for field (clock excluded), and a high-security jump writes nothing"
-      },
-      "plan_digest": "46a833daa73a7f9e35932850a6c17769e0dbb9ed166357140fa7a92c3b870ed9"
-    },
-    {
-      "task_id": "checkpoint-replay-proof",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Both checkpoint tests pass; suite Ran 2139 OK with README tree at 180 suites; 6/6 project gates (mechanics gate 180-step passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-410); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795114923.242235,
-      "timestamp_str": "2026-11-19 22:02:03",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "checkpoint-replay-proof",
       "phase": "completed",
@@ -312,6 +255,69 @@
       "timestamp_str": "2026-11-20 01:04:04",
       "agent": "kilo:goal",
       "head": "03c0dcf016f671704dd319422f29780d23f71596",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "structural-fuzz-thermal-save",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Press the structural systems with the chaos fuzz",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795130039.7665453,
+      "timestamp_str": "2026-11-20 02:13:59",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the harness only sampled flight, trade, encounters and crew, leaving power routing, reactor modes, outposts, escorts, ship mods, upgrades, research, contracts and depots untouched by random play",
+        "benefits": "every stateful ship-building system now sees random input and its refusals, and reactor bounds join the invariant checks",
+        "risks": "contract: tool-only, no production route changes; dependency: none; concurrency: none; state: none",
+        "mitigation": "prerequisites are left to the engine's refusals, and refusal/success counts partition the actions"
+      },
+      "plan_digest": "8ce357a2041e4cce480e0372a5d1abd09b2478f2c3f8a61d76de231561aceb2f"
+    },
+    {
+      "task_id": "structural-fuzz-thermal-save",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[2/2] Core heat follows the fitted capacity and survives a save exactly",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795130040.0214827,
+      "timestamp_str": "2026-11-20 02:14:00",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the save interleaving found heat rounded on save (0.005 drift) and clamped to the base max_heat on load, silently cooling a core that legitimately sat above the base cap, while removing a thermal mod left the core above its new capacity",
+        "benefits": "thermal capacity is respected everywhere, saves are lossless, and a reload no longer rewrites the reactor",
+        "risks": "contract: ReactorState serialization now keeps exact floats and load-time clamping is removed; dependency: none; concurrency: none; state: live states obey the fitted capacity because every equipment change clamps",
+        "mitigation": "failing-first tests for capacity change, 120-heat save round trip, clamp after removal, negative-heat repair and integrity clamp, plus the 20-seed save-interleaved fuzz"
+      }
+    },
+    {
+      "task_id": "structural-fuzz-thermal-save",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] 20-seed structural fuzz (40,000 actions, 400 save/reload round trips) clean: 0 crashes, 0 breaches, 0 drift; 5 reactor tests and 8 chaos tests pass; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; campaigns seed 1 104/101/101 and seed 42 102/99/100 with 0 errors (ADR-416, ADR-417); suite Ran 2167 OK with README tree at 184 suites; 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795130079.6646006,
+      "timestamp_str": "2026-11-20 02:14:39",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "structural-fuzz-thermal-save",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'structural-fuzz-thermal-save' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795130101.5725796,
+      "timestamp_str": "2026-11-20 02:15:01",
+      "agent": "kilo:goal",
+      "head": "9c34db5d6ce4d30a375448233536f9c850a9938d",
       "delivery": {
         "roots": [
           "."
