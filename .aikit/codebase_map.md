@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `240`
-- **Total Classes**: `605`
-- **Total Top-Level Functions**: `542`
-- **Total Class Methods**: `3153`
-- **Total Source Lines**: `69856`
+- **Total Python Modules**: `241`
+- **Total Classes**: `606`
+- **Total Top-Level Functions**: `543`
+- **Total Class Methods**: `3156`
+- **Total Source Lines**: `69936`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`240` module(s))
+- **Indexed**: python (`241` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3974,6 +3974,22 @@
 **Classes:**
 - `class RulerTicksReserveSpaceTests`
   - Method `.test_each_tick_label_registers_its_box_before_names_are_placed()`
+
+---
+
+### [`tests/test_save_slots_determinism.py`](tests/test_save_slots_determinism.py)
+> *Independent save slots each keep their own deterministic stream (ADR-409).*
+
+**Size**: `80` lines
+
+**Classes:**
+- `class SaveSlotDeterminismTest`
+  - Method `.test_each_slot_resumes_its_own_stream_and_state()`
+  - Method `.test_each_slot_listing_reports_its_own_save()`
+  - Method `.test_loading_a_slot_does_not_touch_the_other_file()`
+
+**Functions:**
+- `def _drive(engine, actions, offset)` - *A deterministic hop-and-scan tour that advances ticks and draws randomness.*
 
 ---
 
