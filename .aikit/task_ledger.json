@@ -1,101 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "reactor-heat-chain",
+    "task_id": "deterministic-resume",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795097018.6513176,
+    "updated_at": 1795109484.511144,
     "owner": "kilo:goal",
-    "lease_until": 1795104218.6513176,
+    "lease_until": 1795116684.511144,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795097084.2320473,
-    "completed_head": "b4994ca36eb07fb0015ffa8e5a89c4c5b458f7a5",
-    "completed_tree": "3b0bdeefbe2fd77c51caa900d13466d213ce6abc"
+    "completed_at": 1795109652.8695624,
+    "completed_head": "d584f3708f73d5e70bacea14b73c493e52cd3490",
+    "completed_tree": "60fdd58b2f68468068ab032fd89c83de5a730fd0"
   },
   "checkpoints": [
-    {
-      "task_id": "combat-gambit-recall",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'combat-gambit-recall' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795073752.1848776,
-      "timestamp_str": "2026-11-19 10:35:52",
-      "agent": "kilo:goal",
-      "head": "6b0e4ee2ec1eee7053773dc8cb572507712e70d4",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "reactor-doctrine",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Switch the reactor doctrine once after the campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795074787.1940866,
-      "timestamp_str": "2026-11-19 10:53:07",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/reactor/mode is attempted in every campaign but always refused because the rotating tour reposts the current balanced mode; the four-mode doctrine has no successful AI proof, and switching during the 180-step gate reroutes the trip (57 families/62 attempted/8 gaps)",
-        "benefits": "A post-Act-VI captain moves the core to economy once, proving the doctrine change and its heat/output trade-off without disturbing the short gate",
-        "risks": "contract: the tour keeps its legacy behavior and a new one-shot post-story action owns the change; dependency: none; concurrency: none; state: reactor mode switched to economy through the existing engine path",
-        "mitigation": "failing-first tests for the economy-first choice, balanced fallback, legacy list catalog, single-mode and missing-catalog skips, pre-campaign gate and one-shot rule, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and project gates"
-      },
-      "plan_digest": "66ef0d34d7aa055ade7ee9514394583dfcff0d377004bc29af486308bd37cc4a"
-    },
-    {
-      "task_id": "reactor-doctrine",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] 180 gate restored to the exact baseline 58 families/59 succeeded of 69 with 0 gaps/0 errors and the mode attempt still refused; 2,000-step seeds 1/2/42 switch to economy once and record the reactor family with 0 errors (99/96/98, 97/94/97, 98/95/98 families/succeeded/attempted; refusals 21/19/19); suite Ran 2082 OK (ADR-398); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795074798.6749504,
-      "timestamp_str": "2026-11-19 10:53:18",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "reactor-doctrine",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'reactor-doctrine' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795074828.146037,
-      "timestamp_str": "2026-11-19 10:53:48",
-      "agent": "kilo:goal",
-      "head": "5d018e01ead5d038df399588dee098faca079986",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "prize-sale",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Sell a captured prize at the drydock after the campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795076270.4371345,
-      "timestamp_str": "2026-11-19 11:17:50",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/fleet/escort/sell stays context because selling the only escort would erase the fleet asset, but the boarding chain does capture prizes (seed 42 ends with a destroyed Marauder prize worth 224 cr) and the codex frames boarding then selling at a station; the sale route has no AI proof even though a redundant prize is safe to sell",
-        "benefits": "A captain holding a captured prize docks and sells it once, proving the fleet sale and its ships_sold stat without disarming the bought escort",
-        "risks": "contract: /api/fleet/escort/sell keeps a narrowed CONTEXT_ACTIONS reason and no signature change because the sale is one-shot per campaign; dependency: none; concurrency: none; state: one prize removed and its sale value credited through the existing engine path",
-        "mitigation": "failing-first tests for the docked sale, station trip, escort-keeping rule, one-shot guard and pre-campaign gate, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and project gates"
-      },
-      "plan_digest": "f8b6b84a41bc602b680a3e73a39a7f66be534fbf7e3cf3354f74ce5952cacd9e"
-    },
     {
       "task_id": "prize-sale",
       "phase": "in_progress",
@@ -318,6 +237,86 @@
       "timestamp_str": "2026-11-19 17:04:44",
       "agent": "kilo:goal",
       "head": "b4994ca36eb07fb0015ffa8e5a89c4c5b458f7a5",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "deterministic-resume",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/3] A save carries the live RNG stream",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795109447.1136255,
+      "timestamp_str": "2026-11-19 20:30:47",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "a resume comparison showed dozens of divergences because every load reseeded random.Random(galaxy_seed), replaying the first rolls instead of continuing the stream",
+        "benefits": "a resumed campaign continues exactly like the uninterrupted one",
+        "risks": "contract: GameState gains one optional field and the snapshot never exposes it; dependency: none; concurrency: none; state: the 625-int Mersenne state is stored in the save",
+        "mitigation": "failing-first tests for capture, round trip, resumed stream, legacy absence and malformed values plus resume parity probes"
+      },
+      "plan_digest": "90aff5c4f8f2dfaad25424e5a77c24b01016bdd3ec22e5af698b8be441d74179"
+    },
+    {
+      "task_id": "deterministic-resume",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[2/3] Loading does not recompute live trade links",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795109447.5896266,
+      "timestamp_str": "2026-11-19 20:30:47",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "_bootstrap_frontier recomputed the route table on every load and replaced live volumes the tick had evolved, drifting the resumed economy by a few units",
+        "benefits": "the route table stays exactly as saved",
+        "risks": "contract: none; dependency: none; concurrency: none; state: legacy saves without a table still get one",
+        "mitigation": "four failing-first tests pinning preserved volumes, legacy backfill, exact round trip and empty-table replacement"
+      }
+    },
+    {
+      "task_id": "deterministic-resume",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[3/3] Only a real pre-demographics world is backfilled on load",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795109448.1991737,
+      "timestamp_str": "2026-11-19 20:30:48",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "legacy_body meant capacity<=0, but fresh gas giants and lava worlds legitimately have zero capacity; after a war left one unclaimed the next load re-seeded it and stamped the system owner's flag on it",
+        "benefits": "territory bookkeeping no longer changes just by loading a save",
+        "risks": "contract: none; dependency: none; concurrency: none; state: legacy saves keep migrating because they lack tech_level too",
+        "mitigation": "two failing-first tests plus the existing population-economy legacy migration test"
+      }
+    },
+    {
+      "task_id": "deterministic-resume",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[3/3] Resume parity exact on seeds 42@150, 1@400, 7@300, 2@300 (split point and final both 0 diffs, 0 errors); 180 gate unchanged 58 families/59 succeeded of 69 with 10 refusals/0 gaps/0 errors; campaigns keep coverage seed 1 104/101/101 and seed 42 102/99/100 with 0 errors; suite Ran 2133 OK (ADR-405, ADR-406, ADR-407); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795109484.511144,
+      "timestamp_str": "2026-11-19 20:31:24",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "deterministic-resume",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'deterministic-resume' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795109653.1143665,
+      "timestamp_str": "2026-11-19 20:34:13",
+      "agent": "kilo:goal",
+      "head": "d584f3708f73d5e70bacea14b73c493e52cd3490",
       "delivery": {
         "roots": [
           "."
