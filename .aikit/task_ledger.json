@@ -1,96 +1,19 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "prize-sale",
+    "task_id": "customs-cordon-run",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795076287.632387,
+    "updated_at": 1795081807.4763873,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795076345.9951587,
-    "completed_head": "328ad79de5101ead48e0584e86c49e69e14f873c",
-    "completed_tree": "1b0c9000259ed6fca448a5ba414eb7aed68cfcac"
+    "completed_at": 1795081869.4447856,
+    "completed_head": "59fd80102083f8bed6be133d0d2f0efc50cbf316",
+    "completed_tree": "7c4a21f7c55346fbfd087abab1e10b308830a33b"
   },
   "checkpoints": [
-    {
-      "task_id": "overhaul-service",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/3] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors and the overhaul reason narrowed to post-Act-VI timing; 2,000-step seeds 1/2/42 overhaul the worn frame, finish Act VI with 0 errors (94/91/96, 91/89/95, 90/88/94); suite Ran 2041 OK (ADR-393); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795021194.2955687,
-      "timestamp_str": "2026-11-18 19:59:54",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "overhaul-service",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'overhaul-service' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795021291.9388661,
-      "timestamp_str": "2026-11-18 20:01:31",
-      "agent": "kilo:goal",
-      "head": "38732c7ca761aa9b33e94c072c4b196250467519",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "fabricate-field-repair",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Let the post-campaign captain field-fabricate from titanium",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795021894.6073024,
-      "timestamp_str": "2026-11-18 20:11:34",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/fabricate stays context claiming the hold never carries titanium, yet a 2,000-step seed-1 campaign ends with 60 titanium, hull 51/415 and fuel 4/80 and the route was only attempted once while both tanks were full; the field-repair mechanic is otherwise a headline engineering action with no successful AI proof",
-        "benefits": "After Act VI the captain fabricates a patch kit when the hull is hurt or a fuel cell when the tank is low, consuming the titanium it already carries and proving the field-repair route without touching the short gate",
-        "risks": "contract: /api/fabricate keeps a narrowed CONTEXT_ACTIONS reason for the short gate, no signature change because one success per campaign is enough (additive); dependency: none; concurrency: none; state: one titanium unit consumed and 25 hull or fuel restored through the existing engine path",
-        "mitigation": "failing-first tests for the hull-first choice, fuel fallback, no-titanium and full-both gates, the pre-campaign gate and the one-success rule, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and 5/5 gates"
-      },
-      "plan_digest": "dc4d49b516428ed739a703f761940688350746746fca9fd53c5815593b3a2384",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "fabricate-field-repair",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/3] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors and the fabricate reason narrowed to short-gate timing; 2,000-step seeds 1/2/42 fabricate from carried titanium when hurt, complete Act VI with 0 errors (94/91/96, 91/89/95, 90/88/94); suite Ran 2046 OK (ADR-394); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795023150.3037045,
-      "timestamp_str": "2026-11-18 20:32:30",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "fabricate-field-repair",
       "phase": "completed",
@@ -343,6 +266,69 @@
       "timestamp_str": "2026-11-19 11:19:06",
       "agent": "kilo:goal",
       "head": "328ad79de5101ead48e0584e86c49e69e14f873c",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "customs-cordon-run",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Run a contraband lot at the quoted customs cordon",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795081783.7249587,
+      "timestamp_str": "2026-11-19 12:49:43",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "/api/customs/resolve stayed context as prompt-driven: a scan only rolls on arrival in a security-0.65+ system with contraband held, and ordinary play almost never paired those; the snapshot quoted the cordon's name and chance but not its id, so a deliberate run could not aim at it",
+        "benefits": "After the campaign the captain buys one contraband lot, ferries the quoted cordon until the scan fires and dumps the lot under pressure, proving the smuggling loop and its evasion stat without touching the short gate",
+        "risks": "contract: customs_risk_status gains one additive system_id field and no route signature changes; dependency: none; concurrency: none; state: one contraband lot bought, ferried and jettisoned through the existing engine paths",
+        "mitigation": "failing-first engine assertion for the id plus ten agent tests for the purchase, cordon jump, refuel guard, reposition hop, jump cap and one-shot/lost-lot guards, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42 plus seed 7, full suite and project gates"
+      },
+      "plan_digest": "48dfaea82523d5d7556948bd378514b4ee89afbdd419b3d47edcf66601b03465"
+    },
+    {
+      "task_id": "customs-cordon-run",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[2/2] Rotate the post-story fallback jump across the affordable lanes",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795081783.9515703,
+      "timestamp_str": "2026-11-19 12:49:43",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "affordable[step % len(affordable)] froze on one slot because the twenty-step cadence repeats the remainder, so the captain ping-ponged between two systems and the megastructure policy never probed a restorable world on seed 2",
+        "benefits": "Post-story exploration visits every affordable lane, recovering late-game mechanics that the shuttle silently starved, while the pre-story route that the 180 gate was measured on stays frozen",
+        "risks": "contract: none, the jump route and body are unchanged; dependency: none; concurrency: none; state: a rotation counter only",
+        "mitigation": "five agent tests for rotation, preserved first slot, pre-story freeze, affordability and cadence plus the 180-step gate and three campaign seeds"
+      }
+    },
+    {
+      "task_id": "customs-cordon-run",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors/10 refusals; campaigns 0 errors on seeds 1/2/42/7: seed 1 101/97/99 refusals 21 customs+mega+reactor+salvage+scoop+reconstruct+gambit, seed 2 97/93/96 refusals 19 mega+combat_item+pirate (the 12% cordon misses across 16 jumps), seed 42 99/96/99 refusals 19 customs+mega+fleet_sell, seed 7 101/97/99 refusals 19 mega+reactor+fleet_sell; suite Ran 2102 OK (ADR-400, ADR-401); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795081807.4763873,
+      "timestamp_str": "2026-11-19 12:50:07",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "customs-cordon-run",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'customs-cordon-run' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795081869.5094025,
+      "timestamp_str": "2026-11-19 12:51:09",
+      "agent": "kilo:goal",
+      "head": "59fd80102083f8bed6be133d0d2f0efc50cbf316",
       "delivery": {
         "roots": [
           "."
