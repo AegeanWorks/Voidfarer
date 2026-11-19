@@ -1,78 +1,19 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "combat-gambit-recall",
+    "task_id": "reactor-doctrine",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795073734.117481,
+    "updated_at": 1795074798.6749504,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795073752.0214953,
-    "completed_head": "6b0e4ee2ec1eee7053773dc8cb572507712e70d4",
-    "completed_tree": "a98a2bcdd8e3b72f9c69bbbd3503c51cd3a5af5c"
+    "completed_at": 1795074828.066856,
+    "completed_head": "5d018e01ead5d038df399588dee098faca079986",
+    "completed_tree": "de915622def8f0244a741e6e0f5ef6e5c8692e01"
   },
   "checkpoints": [
-    {
-      "task_id": "megastructure-restore",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors and the restore reason narrowed to short-gate timing; 2,000-step seeds 1/2/42 restore the cyclops solar collector, record megastructures_restored 1, complete Act VI with 0 errors (93/90/95, 90/88/94, 90/87/93); suite Ran 2031 OK (ADR-391); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795015607.9343536,
-      "timestamp_str": "2026-11-18 18:26:47",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "megastructure-restore",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'megastructure-restore' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795015672.9031227,
-      "timestamp_str": "2026-11-18 18:27:52",
-      "agent": "kilo:goal",
-      "head": "aad43a8c4ef52c070ac53cecf3fe8589d98f5a47",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "relic-fusion",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/3] Fuse a relic set after the campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795016843.6698074,
-      "timestamp_str": "2026-11-18 18:47:23",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/relics/fuse stays context claiming it needs three relics of one rarity, but a 2,000-step seed-1 campaign ends with 37 common, 12 rare and 2 epic relics, so the gate is satisfied many times over and the fusion ladder has no AI proof",
-        "benefits": "The post-campaign captain fuses the lowest rarity that holds three relics, so the first fusion is a safe one-step upgrade, the route is exercised, and the context reason narrows to short-gate timing",
-        "risks": "contract: /api/relics/fuse joins CONTEXT_ACTIONS as a narrowed short-gate note only, no signature change because the fusion is one-shot by path (additive); dependency: none; concurrency: none; state: three relics removed and one higher-rarity relic added through the existing engine path",
-        "mitigation": "failing-first tests for the rarity choice, legendary and short-count skips, the Act-VI gate and the one-shot rule, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and 5/5 gates"
-      },
-      "plan_digest": "df07e8af03b03ce36aaf90b982108c0466b166077e69156d68bce2ac292bd181",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "relic-fusion",
       "phase": "phase 4",
@@ -369,6 +310,52 @@
       "timestamp_str": "2026-11-19 10:35:52",
       "agent": "kilo:goal",
       "head": "6b0e4ee2ec1eee7053773dc8cb572507712e70d4",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "reactor-doctrine",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Switch the reactor doctrine once after the campaign",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795074787.1940866,
+      "timestamp_str": "2026-11-19 10:53:07",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "/api/reactor/mode is attempted in every campaign but always refused because the rotating tour reposts the current balanced mode; the four-mode doctrine has no successful AI proof, and switching during the 180-step gate reroutes the trip (57 families/62 attempted/8 gaps)",
+        "benefits": "A post-Act-VI captain moves the core to economy once, proving the doctrine change and its heat/output trade-off without disturbing the short gate",
+        "risks": "contract: the tour keeps its legacy behavior and a new one-shot post-story action owns the change; dependency: none; concurrency: none; state: reactor mode switched to economy through the existing engine path",
+        "mitigation": "failing-first tests for the economy-first choice, balanced fallback, legacy list catalog, single-mode and missing-catalog skips, pre-campaign gate and one-shot rule, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and project gates"
+      },
+      "plan_digest": "66ef0d34d7aa055ade7ee9514394583dfcff0d377004bc29af486308bd37cc4a"
+    },
+    {
+      "task_id": "reactor-doctrine",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] 180 gate restored to the exact baseline 58 families/59 succeeded of 69 with 0 gaps/0 errors and the mode attempt still refused; 2,000-step seeds 1/2/42 switch to economy once and record the reactor family with 0 errors (99/96/98, 97/94/97, 98/95/98 families/succeeded/attempted; refusals 21/19/19); suite Ran 2082 OK (ADR-398); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795074798.6749504,
+      "timestamp_str": "2026-11-19 10:53:18",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "reactor-doctrine",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'reactor-doctrine' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795074828.146037,
+      "timestamp_str": "2026-11-19 10:53:48",
+      "agent": "kilo:goal",
+      "head": "5d018e01ead5d038df399588dee098faca079986",
       "delivery": {
         "roots": [
           "."
