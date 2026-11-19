@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `238`
-- **Total Classes**: `602`
-- **Total Top-Level Functions**: `538`
-- **Total Class Methods**: `3138`
-- **Total Source Lines**: `69579`
+- **Total Python Modules**: `240`
+- **Total Classes**: `605`
+- **Total Top-Level Functions**: `542`
+- **Total Class Methods**: `3152`
+- **Total Source Lines**: `69834`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`238` module(s))
+- **Indexed**: python (`240` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3012,6 +3012,27 @@
 
 ---
 
+### [`tests/test_load_preserves_live_state.py`](tests/test_load_preserves_live_state.py)
+> *Loading a save must not rewrite live universe state (ADR-406).*
+
+**Size**: `108` lines
+
+**Classes:**
+- `class LegacyWorldMigrationTest` - *Only a genuinely pre-demographics world is backfilled on load (ADR-407).*
+  - Method `._system_with(body_kwargs, faction)`
+  - Method `.test_a_conquered_gas_giant_keeps_its_unclaimed_flag_on_load()`
+  - Method `.test_a_real_legacy_world_is_still_seeded()`
+- `class LoadPreservesLiveStateTest`
+  - Method `.test_loading_keeps_the_live_trade_link_volumes()`
+  - Method `.test_a_legacy_save_without_trade_links_still_gets_them()`
+  - Method `.test_a_rebuilt_engine_matches_the_saved_state()`
+  - Method `.test_the_computed_links_still_replace_an_empty_route_table()`
+
+**Functions:**
+- `def _drive(engine, actions)` - *A deterministic hop-and-scan tour that lets the tick advance trade links.*
+
+---
+
 ### [`tests/test_logbook.py`](tests/test_logbook.py)
 > *Flight-log windowing: galactic news must outlive routine AI-trade chatter.*
 
@@ -3922,6 +3943,26 @@
   - Method `.test_malformed_json_is_a_protocol_error()`
   - Method `.test_blocked_actions_are_not_counted_as_attempted()`
   - Method `.test_missing_catalog_is_an_error_not_silent_coverage()`
+
+---
+
+### [`tests/test_rng_checkpoint.py`](tests/test_rng_checkpoint.py)
+> *A save resumes the same random stream instead of replaying earlier rolls (ADR-405).*
+
+**Size**: `97` lines
+
+**Classes:**
+- `class RngCheckpointTest`
+  - Method `.test_a_mutation_captures_the_live_rng_stream()`
+  - Method `.test_the_save_round_trips_the_stream()`
+  - Method `.test_a_loaded_engine_resumes_the_stream()`
+  - Method `.test_a_legacy_save_without_the_field_seeds_a_fresh_stream()`
+  - Method `.test_a_malformed_stream_falls_back_to_the_seed()`
+  - Method `.test_a_saved_campaign_continues_like_the_uninterrupted_one()`
+
+**Functions:**
+- `def _strip_clock(value, key)`
+- `def _drive(engine, actions)` - *A deterministic hop-and-scan tour that draws from the RNG.*
 
 ---
 
@@ -5456,7 +5497,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11310` lines
+**Size**: `11333` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5467,6 +5508,7 @@
   - Method `._clone_ship(**kwargs)` - *Create a new ShipState preserving all unspecified telemetry and inventory attributes.*
   - Method `._merge_fleet_ships(updated_local)` - *Apply local battle updates without dropping escorts on patrol elsewhere.*
   - Method `._clone_state(**kwargs)` - *Create a new GameState preserving time, stats, economy, and all unspecified universe fields.*
+  - Method `._rng_checkpoint()` - *Snapshot the live RNG stream for the save that follows this mutation (ADR-405).*
   - Method `._research_bonuses()`
   - Method `._skill(skill)`
   - Method `._combined_equipment(ship)`
@@ -5488,7 +5530,7 @@
   - Method `._validate_commander_profile(profile)` - *Reject commander profiles whose starting skills exceed the creation budget.*
   - Method `._apply_commander_profile(profile)` - *Apply the commander name, age, background and starting skills chosen at creation.*
   - Method `._apply_archetype_loadout(archetype)` - *Give a quick-start archetype its starting loadout; the vanguard keeps the default ship.*
-  - Method `.load_state(state)` - *Replace the live universe with a loaded save and reseed its RNG stream.*
+  - Method `.load_state(state)` - *Replace the live universe with a loaded save and resume its RNG stream.*
   - Method `._create_initial_state(seed)` - *Construct a fresh universe state rooted at Sol System.*
   - Property `.current_system`
   - Property `.orbiting_body`
@@ -6055,7 +6097,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2473` lines
+**Size**: `2500` lines
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -6241,6 +6283,9 @@
 - `class GameState` - *Master simulation universe state container.*
   - Method `.to_dict()`
   - Method `.from_dict(data)`
+
+**Functions:**
+- `def _parse_rng_state(raw)` - *Rebuild a ``random.Random.getstate()`` tuple from stored JSON (ADR-405).*
 
 ---
 

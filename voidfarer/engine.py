@@ -515,8 +515,15 @@ class SimulationEngine:
 
     def __init__(self, seed: int = 42, state: GameState | None = None) -> None:
         self.lock = threading.RLock()
-        self.seed = seed
-        self.rng = random.Random(seed)
+        # A supplied state owns the seed; a legacy save without an RNG checkpoint
+        # must at least reseed from its own galaxy, not the constructor default (ADR-405).
+        self.seed = int(state.galaxy_seed) if state is not None else seed
+        self.rng = random.Random(self.seed)
+        if state is not None and state.rng_state:
+            try:
+                self.rng.setstate(state.rng_state)
+            except (TypeError, ValueError):
+                self.rng = random.Random(self.seed)
         self.allow_decision_events = False
         # Called with the pre-move state before a risky jump or void dive; a front end sets it to roll
         # a 'checkpoint' save slot. None means a bare engine writes nothing (ADR-301).
@@ -592,10 +599,12 @@ class SimulationEngine:
             body_changed = False
             for idx, body in enumerate(sys_obj.bodies):
                 updated_body = body
-                # A body with no capacity field predates the demographics model; only
-                # those legacy worlds are seeded. A world emptied by war keeps its
-                # population at zero instead of being silently repopulated on load.
-                legacy_body = body.population_capacity <= 0
+                # A pre-demographics body has no population capacity and no generated
+                # tech (both default to 0 and 1). A fresh gas giant or lava world
+                # legitimately has zero capacity but carries its planet's tech, so
+                # capacity alone must not mark it legacy or every load re-colonises a
+                # world a war left unclaimed (ADR-407).
+                legacy_body = body.population_capacity <= 0 and body.tech_level <= 1
                 if body.body_type not in ("star", "black_hole", "wormhole") and ("(" not in body.atmosphere or (body.habitability == 0.0 and body.body_type not in ("gas_giant", "ringed_giant", "ice_giant", "methane_storm", "lava_world"))):
                     rad_seed = 4000.0 + ((idx + len(sys_id)) % 9) * 6500.0
                     grav_seed = 0.65 + ((idx * 3 + len(sys_id)) % 7) * 0.22
@@ -700,7 +709,10 @@ class SimulationEngine:
                 self.state.eliminated_factions,
                 trade_links,
             )
-        if trade_links != self.state.trade_links:
+        if not self.state.trade_links and trade_links:
+            # Only a legacy save needs its route table derived; a live table carries
+            # volumes the tick has evolved, and recomputing it here rewrites them by a
+            # few units on every load so a resumed run drifts from the original (ADR-406).
             updates["trade_links"] = trade_links
         if updates:
             self.state = self._clone_state(**updates)
@@ -815,10 +827,16 @@ class SimulationEngine:
             local_dock_purchases=kwargs.get("local_dock_purchases", cur.local_dock_purchases),
             completed_quests=kwargs.get("completed_quests", cur.completed_quests),
             trade_automation=kwargs.get("trade_automation", cur.trade_automation),
-            quantum_automation=kwargs.get(
-                "quantum_automation", cur.quantum_automation
-            ),
+            quantum_automation=kwargs.get("quantum_automation", cur.quantum_automation),
+            # Every mutation funnels through here, so the checkpoint stays current
+            # enough that a save resumes the same random stream (ADR-405).
+            rng_state=self._rng_checkpoint(),
         )
+
+    def _rng_checkpoint(self) -> tuple | None:
+        """Snapshot the live RNG stream for the save that follows this mutation (ADR-405)."""
+        rng = getattr(self, "rng", None)
+        return rng.getstate() if rng is not None else None
 
     def _research_bonuses(self) -> dict[str, float]:
         return calculate_research_bonuses(self.state.research.completed)
@@ -1227,10 +1245,15 @@ class SimulationEngine:
         self.skip_tutorial()
 
     def load_state(self, state: GameState) -> tuple[bool, str]:
-        """Replace the live universe with a loaded save and reseed its RNG stream."""
+        """Replace the live universe with a loaded save and resume its RNG stream."""
         with self.lock:
             self.seed = int(state.galaxy_seed)
             self.rng = random.Random(self.seed)
+            if state.rng_state:
+                try:
+                    self.rng.setstate(state.rng_state)
+                except (TypeError, ValueError):
+                    self.rng = random.Random(self.seed)
             state = replace(state, character=reconcile_abilities(state.character)[0])
             self.state = state
             st = state.ship.story

@@ -2342,6 +2342,9 @@ class GameState:
     completed_quests: tuple[CompletedQuest, ...] = ()
     trade_automation: TradeAutomation = field(default_factory=TradeAutomation)
     quantum_automation: QuantumAutomation = field(default_factory=QuantumAutomation)
+    # Python's Random state captured at clone time so a resumed save keeps drawing
+    # the same stream instead of replaying every earlier roll (ADR-405).
+    rng_state: tuple | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -2379,6 +2382,11 @@ class GameState:
             "trade_automation": self.trade_automation.to_dict(),
             "quantum_automation": self.quantum_automation.to_dict(),
             "completed_quests": [q.to_dict() for q in self.completed_quests],
+            "rng_state": (
+                [self.rng_state[0], list(self.rng_state[1]), self.rng_state[2]]
+                if self.rng_state
+                else None
+            ),
         }
 
     @classmethod
@@ -2470,4 +2478,23 @@ class GameState:
             quantum_automation=QuantumAutomation.from_dict(
                 data.get("quantum_automation", {})
             ),
+            rng_state=_parse_rng_state(data.get("rng_state")),
         )
+
+
+def _parse_rng_state(raw: Any) -> tuple | None:
+    """Rebuild a ``random.Random.getstate()`` tuple from stored JSON (ADR-405).
+
+    The state is a (version, 625-int internal state, gauss-next) triple; JSON turns
+    the inner tuple into a list, so it is converted back. A malformed or absent
+    value degrades to None, which seeds a fresh stream exactly as before.
+    """
+    if not isinstance(raw, (list, tuple)) or len(raw) != 3:
+        return None
+    version, internal, gauss = raw
+    if not isinstance(internal, (list, tuple)) or len(internal) != 625:
+        return None
+    try:
+        return (int(version), tuple(int(value) for value in internal), gauss)
+    except (TypeError, ValueError):
+        return None
