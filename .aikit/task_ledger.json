@@ -1,84 +1,19 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "reconstruct-war-recovery",
+    "task_id": "salvage-scoop-prospecting",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795067303.8505101,
+    "updated_at": 1795070769.7432563,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
-    "workspaces": [
-      {
-        "name": "voidfarer",
-        "path": "projects/voidfarer"
-      }
-    ],
-    "completed_at": 1795067372.030734,
-    "completed_head": "74840997231b90ff2779ce2e79102403e596cac6",
-    "completed_tree": "05d5cd7f725071e092059fdb0ba7b9fac3ed99a2"
+    "completed_at": 1795070857.6675875,
+    "completed_head": "351c8fd8e748f21a97de53652cfa480735b0353d",
+    "completed_tree": "57e5c962dafea8d584d3d9da61b742ce186f50c2"
   },
   "checkpoints": [
-    {
-      "task_id": "context-reasons-audit",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/2] Five stale CONTEXT_ACTIONS reasons corrected to the real drone/alias/destructive mechanics; 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors; suite Ran 2018 OK (ADR-389); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795006473.4593732,
-      "timestamp_str": "2026-11-18 15:54:33",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "context-reasons-audit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'context-reasons-audit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795006703.9495177,
-      "timestamp_str": "2026-11-18 15:58:23",
-      "agent": "kilo:goal",
-      "head": "2599ec1daafaca97c5d12805028de1ae22753303",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "outpost-supply-link",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Found a second outpost in the current system and link its supply",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795009042.184958,
-      "timestamp_str": "2026-11-18 16:37:22",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/outpost/link stays context although every system has several outpost-eligible bodies and post-story campaigns hold 26k-70k credits with mastery above the charter level; the captain only ever founds the single tour outpost, so the supply-link mechanic and its same-system routing rule have no AI proof",
-        "benefits": "The post-campaign captain founds up to two outposts in the current system (orbit, build, orbit, build) and routes the newer one through the older, exercising both build and link and leaving a real same-system supply chain",
-        "risks": "contract: /api/outpost/link stays context for the short gate with a narrowed reason; the build path stays path-keyed for the tour and the new flow uses local tried-sets, so no signature change (additive); dependency: none; concurrency: none; state: two outposts and one supply_hub_id through the existing engine path",
-        "mitigation": "failing-first tests for the current-body build, next-body orbit, second build, link pair, one-shot link, credit and mastery gates, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and 5/5 gates"
-      },
-      "plan_digest": "ce2bd5ab5ff9fa3be2f21b9c4118ca4230ac3036d7d737a74e3943ec917a3551",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "outpost-supply-link",
       "phase": "phase 4",
@@ -401,6 +336,52 @@
       "timestamp_str": "2026-11-19 08:49:32",
       "agent": "kilo:goal",
       "head": "74840997231b90ff2779ce2e79102403e596cac6",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "salvage-scoop-prospecting",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/3] Prospect a derelict and scoop fuel after the campaign",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795069141.6857722,
+      "timestamp_str": "2026-11-19 09:19:01",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "/api/salvage and /api/scoop are attempted in campaigns but never succeed because the captain tries both at whatever body it happens to orbit (usually a station science body) where there is no derelict and no accessible volatiles; the derelict and scoop mechanics have no successful AI proof and post-story ships end seeds on fumes (seed 1 fuel 6/80)",
+        "benefits": "After Act VI the captain probes one plausible derelict body and orbits a scoopable body when the tank is low, so salvage and fuel scooping succeed for real cargo, credits and fuel instead of refused attempts",
+        "risks": "contract: no route or signature change, two state-driven post-story actions only and the 180 gate is untouched by the completed-story gate; dependency: none; concurrency: none; state: one claimed derelict and a refuelled tank through the existing engine paths",
+        "mitigation": "failing-first tests for candidate filtering, the probe limit, the low-fuel gate, the scoopable-body choice and the post-story gate, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and project gates"
+      },
+      "plan_digest": "01475f8f00f4f2d78f61bcf02ccb3c099b8213a301379d164fd360ba1e9090e5"
+    },
+    {
+      "task_id": "salvage-scoop-prospecting",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/3] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors; 2,000-step seeds 1/2/42 now attempt and succeed on /api/salvage and /api/scoop (97/94/97, 95/92/96, 97/94/98 families/succeeded/attempted; refusals 21/19/19; 0 errors; final fuel 6/27/11); suite Ran 2065 OK (ADR-396); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795070769.7432563,
+      "timestamp_str": "2026-11-19 09:46:09",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "salvage-scoop-prospecting",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'salvage-scoop-prospecting' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795070857.8853652,
+      "timestamp_str": "2026-11-19 09:47:37",
+      "agent": "kilo:goal",
+      "head": "351c8fd8e748f21a97de53652cfa480735b0353d",
       "delivery": {
         "roots": [
           "."
