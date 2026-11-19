@@ -46,7 +46,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/comms/action": "alias: routes the existing captain hail/trade/hire and message actions",
     "/api/surface/action": "alias: routes the existing land/surface-operation/reconstruct actions",
     "/api/flight/action": "alias: routes the existing plot/navigate/jump/orbit/travel actions",
-    "/api/reconstruct": "needs a devastated inhabited world in orbit",
+    "/api/reconstruct": "the 180-step gate predates the war declarations; the campaign rebuilds one world",
     "/api/void/dive": "needs the Act IV black-hole orbit, which only a 2,000-step campaign reaches",
     "/api/void/emerge": "needs an active void traversal after that dive",
     "/api/war/support": "faction wars are declared after the 180-step gate; the 2,000-step campaign supports one",
@@ -191,6 +191,8 @@ class AiCaptain:
     ALLY_TRUST = 50
     # Mirrors SimulationEngine.OUTPOST_CHARTER_MASTERY_LEVEL (ADR-390).
     OUTPOST_CHARTER_LEVEL = 2
+    # Mirrors SimulationEngine.RECONSTRUCTION_CREDIT_COST (ADR-395).
+    RECONSTRUCTION_COST = 600
     # Mirrors outposts.OUTPOST_TYPES costs; the drift test keeps them equal (ADR-390).
     OUTPOST_COSTS = {
         "mining": 1800, "research": 2200, "solar": 1400,
@@ -394,6 +396,12 @@ class AiCaptain:
             refill = self._tour_supply_decoy()
             if refill is not None and not self._tour_action_attempted(refill[0], refill[1]):
                 return refill
+
+        # A devastated inhabited world is the war-recovery surface; rebuild the worst
+        # one in the current system before the construction errands (ADR-395).
+        reconstruct = self._reconstruct_action()
+        if reconstruct is not None:
+            return reconstruct
 
         # A same-system outpost pair is the only way to exercise the supply link; the
         # post-campaign captain builds both and routes the newer through the older.
@@ -870,6 +878,8 @@ class AiCaptain:
         "/api/crew/dismiss": "crew_id",
         # One restoration per body, so a second structure stays reachable (ADR-391).
         "/api/megastructure/restore": "body_id",
+        # A rebuilt world is keyed by its body id (ADR-395).
+        "/api/reconstruct": "body_id",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -1286,6 +1296,35 @@ class AiCaptain:
                 continue
             return "/api/orbit", {"target": body_id}, "orbit"
         return None
+
+    def _reconstruct_action(self):
+        """Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).
+
+        Wars leave devastated colonies across the galaxy; the credit mode is cheap and
+        the standing gain is real, so the captain takes the first one it can reach.
+        """
+        if "/api/reconstruct" in self.attempted:
+            return None
+        system = self.state.get("current_system") or {}
+        targets = [
+            body for body in system.get("bodies") or []
+            if isinstance(body, dict) and body.get("id")
+            and int(body.get("population") or 0) > 0
+            and float(body.get("devastation") or 0.0) > 0.0
+        ]
+        if not targets:
+            return None
+        target = max(targets, key=lambda body: float(body.get("devastation") or 0.0))
+        body_id = str(target["id"])
+        ship = self.state.get("ship") or {}
+        orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        landed = str(ship.get("landed_body_id") or "")
+        if body_id not in (orbiting, landed):
+            return "/api/orbit", {"target": body_id}, "orbit"
+        if int(ship.get("credits") or 0) < self.RECONSTRUCTION_COST:
+            return None
+        return ("/api/reconstruct", {"body_id": body_id, "mode": "credits"},
+                "reconstruct")
 
     def _outpost_link_action(self):
         """Build two same-system outposts, then link their supply (ADR-390).

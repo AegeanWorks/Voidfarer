@@ -141,6 +141,8 @@ class AiCaptainTourCoverageTest(unittest.TestCase):
                          {outpost.id: outpost.cost for outpost in OUTPOST_TYPES})
         self.assertEqual(AiCaptain.MEGASTRUCTURE_TYPES,
                          frozenset(MEGASTRUCTURE_RESTORATION))
+        self.assertEqual(AiCaptain.RECONSTRUCTION_COST,
+                         SimulationEngine.RECONSTRUCTION_CREDIT_COST)
 
     def test_autostaff_tour_fires_only_when_the_seating_is_not_optimal(self):
         crew = [{"id": "c1", "role": "pilot", "status": "active", "skill": 4, "xp": 0, "station": ""}]
@@ -2517,6 +2519,75 @@ class FabricateFieldRepairPolicyTest(unittest.TestCase):
         captain = self._captain()
         captain.succeeded.add("/api/fabricate")
         self.assertIsNone(captain._fabricate_action())
+
+
+class ReconstructWarRecoveryTest(unittest.TestCase):
+    """The captain rebuilds a devastated inhabited world in the current system (ADR-395)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "current_system": {
+                "id": "ashen", "name": "Ashen Choir",
+                "bodies": [
+                    {"id": "ashen_body_5", "body_type": "research_outpost",
+                     "population": 644268, "devastation": 0.2},
+                    {"id": "ashen_body_6", "body_type": "savanna",
+                     "population": 617803935, "devastation": 0.3},
+                    {"id": "ashen_rock", "body_type": "barren",
+                     "population": 0, "devastation": 0.8},
+                ],
+            },
+            "orbiting_body": {"id": "ashen_body_1", "body_type": "ice_world"},
+            "ship": {"credits": 5000, "landed_body_id": ""},
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_the_worst_devastated_world_is_orbited(self):
+        self.assertEqual(
+            self._captain()._reconstruct_action(),
+            ("/api/orbit", {"target": "ashen_body_6"}, "orbit"),
+        )
+
+    def test_an_orbited_world_is_rebuilt_with_credits(self):
+        captain = self._captain(
+            orbiting_body={"id": "ashen_body_6", "body_type": "savanna"})
+        self.assertEqual(
+            captain._reconstruct_action(),
+            ("/api/reconstruct",
+             {"body_id": "ashen_body_6", "mode": "credits"}, "reconstruct"),
+        )
+
+    def test_a_landed_world_is_rebuilt_in_place(self):
+        captain = self._captain(
+            orbiting_body={"id": "ashen_body_6", "body_type": "savanna"},
+            ship={"credits": 5000, "landed_body_id": "ashen_body_6"})
+        self.assertEqual(captain._reconstruct_action()[0], "/api/reconstruct")
+
+    def test_uninhabited_or_whole_worlds_are_ignored(self):
+        captain = self._captain(current_system={
+            "id": "ashen", "bodies": [
+                {"id": "ashen_rock", "body_type": "barren",
+                 "population": 0, "devastation": 0.9},
+                {"id": "ashen_whole", "body_type": "savanna",
+                 "population": 1000, "devastation": 0.0},
+            ]})
+        self.assertIsNone(captain._reconstruct_action())
+
+    def test_it_needs_the_reconstruction_fee(self):
+        captain = self._captain(
+            orbiting_body={"id": "ashen_body_6", "body_type": "savanna"},
+            ship={"credits": 100, "landed_body_id": ""})
+        self.assertIsNone(captain._reconstruct_action())
+
+    def test_the_rebuild_is_one_shot(self):
+        captain = self._captain(
+            orbiting_body={"id": "ashen_body_6", "body_type": "savanna"})
+        captain.attempted.add("/api/reconstruct")
+        self.assertIsNone(captain._reconstruct_action())
 
 
 class AnomalyPolicyTest(unittest.TestCase):

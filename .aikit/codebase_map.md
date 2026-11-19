@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `591`
+- **Total Classes**: `592`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3042`
-- **Total Source Lines**: `68388`
+- **Total Class Methods**: `3050`
+- **Total Source Lines**: `68498`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -25,14 +25,14 @@
 ### [`tests/__init__.py`](tests/__init__.py)
 > *VoidFarer test suite package.*
 
-**Size**: `1` lines (`36` bytes)
+**Size**: `1` lines
 
 ---
 
 ### [`tests/test_adaptive_ui_salvage.py`](tests/test_adaptive_ui_salvage.py)
 > *Regression tests for the Windows high-DPI cockpit, derelict salvage,*
 
-**Size**: `213` lines (`9398` bytes)
+**Size**: `213` lines
 
 **Classes:**
 - `class TestAdaptiveCockpitAssets`
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2629` lines (`120098` bytes)
+**Size**: `2700` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -373,6 +373,14 @@
   - Method `.test_a_full_ship_or_empty_hold_fabricates_nothing()`
   - Method `.test_it_waits_for_the_campaign()`
   - Method `.test_one_success_per_campaign_is_enough()`
+- `class ReconstructWarRecoveryTest` - *The captain rebuilds a devastated inhabited world in the current system (ADR-395).*
+  - Method `._captain(**state)`
+  - Method `.test_the_worst_devastated_world_is_orbited()`
+  - Method `.test_an_orbited_world_is_rebuilt_with_credits()`
+  - Method `.test_a_landed_world_is_rebuilt_in_place()`
+  - Method `.test_uninhabited_or_whole_worlds_are_ignored()`
+  - Method `.test_it_needs_the_reconstruction_fee()`
+  - Method `.test_the_rebuild_is_one_shot()`
 - `class AnomalyPolicyTest` - *The captain picks an anomaly check that passes (ADR-372).*
   - Method `._captain(choices, encounter_actions)`
   - Method `.test_a_ready_check_beats_the_first_failing_choice()`
@@ -392,7 +400,7 @@
 ### [`tests/test_ai_and_calendar.py`](tests/test_ai_and_calendar.py)
 > *Regression tests for adaptive enemy AI, expanded systems, and calendar dates.*
 
-**Size**: `214` lines (`8132` bytes)
+**Size**: `214` lines
 
 **Classes:**
 - `class TestAdaptiveEnemyAI`
@@ -422,7 +430,7 @@
 ### [`tests/test_ai_burn_cells.py`](tests/test_ai_burn_cells.py)
 > *The headless AI captain exercises the fuel-cell burn, so the mechanics gate covers it.*
 
-**Size**: `45` lines (`1880` bytes)
+**Size**: `45` lines
 
 **Classes:**
 - `class TestAiBurnCells`
@@ -433,7 +441,7 @@
 ### [`tests/test_alliances.py`](tests/test_alliances.py)
 > *Faction alliances: formation rules, allied patrols and the command-card wiring.*
 
-**Size**: `40` lines (`1510` bytes)
+**Size**: `40` lines
 
 **Classes:**
 - `class FactionAllianceTest`
@@ -446,7 +454,7 @@
 ### [`tests/test_archetypes.py`](tests/test_archetypes.py)
 > *Quick-start archetypes: one choice gives a coherent skill spread and starting loadout.*
 
-**Size**: `76` lines (`3383` bytes)
+**Size**: `76` lines
 
 **Classes:**
 - `class ArchetypeCatalogTest`
@@ -467,7 +475,7 @@
 ### [`tests/test_arrive_now.py`](tests/test_arrive_now.py)
 > *ARRIVE NOW steps a sublight transit to its arrival tick and stops at the first interruption.*
 
-**Size**: `56` lines (`2123` bytes)
+**Size**: `56` lines
 
 **Classes:**
 - `class ArriveNowTest`
@@ -484,7 +492,7 @@
 ### [`tests/test_auto_staff.py`](tests/test_auto_staff.py)
 > *AUTO-STAFF seats the best matching officer at every bridge station in one action.*
 
-**Size**: `94` lines (`3849` bytes)
+**Size**: `94` lines
 
 **Classes:**
 - `class AutoStaffTest`
@@ -506,7 +514,7 @@
 ### [`tests/test_away_missions.py`](tests/test_away_missions.py)
 > *Away-team expeditions: catalog, deterministic outcomes, injuries, XP, parity and saves.*
 
-**Size**: `307` lines (`12974` bytes)
+**Size**: `307` lines
 
 **Classes:**
 - `class AwayCatalogTest`
@@ -545,7 +553,7 @@
 ### [`tests/test_background_aliases.py`](tests/test_background_aliases.py)
 > *Every origin name the creation screen has ever offered grants its origin training.*
 
-**Size**: `39` lines (`1642` bytes)
+**Size**: `39` lines
 
 **Classes:**
 - `class TestBackgroundAliases`
@@ -559,7 +567,7 @@
 ### [`tests/test_balance_tuning_stage3.py`](tests/test_balance_tuning_stage3.py)
 > *Stage 3 balance tuning proofs (M3-M6): DATA tables the game reads.*
 
-**Size**: `63` lines (`2080` bytes)
+**Size**: `63` lines
 
 **Classes:**
 - `class BalanceTuningStage3Test`
@@ -575,7 +583,7 @@
 ### [`tests/test_batch_launchers.py`](tests/test_batch_launchers.py)
 > *Regression tests for the Windows batch launchers (``play.bat``, ``voidfarer.bat``).*
 
-**Size**: `70` lines (`2719` bytes)
+**Size**: `70` lines
 
 **Classes:**
 - `class TestReadmeColdStartAccuracy` - *Hand-maintained README counts must match the repository layout.*
@@ -592,7 +600,7 @@
 ### [`tests/test_body_target_hotkeys.py`](tests/test_body_target_hotkeys.py)
 > *Keyboard targeting: comma and period cycle the selected radar body, and the reference lists them.*
 
-**Size**: `34` lines (`1414` bytes)
+**Size**: `34` lines
 
 **Classes:**
 - `class TestBodyTargetHotkeys`
@@ -606,7 +614,7 @@
 ### [`tests/test_cadet_protection.py`](tests/test_cadet_protection.py)
 > *Cadet protection: secure systems stay calm while the academy is active.*
 
-**Size**: `34` lines (`1108` bytes)
+**Size**: `34` lines
 
 **Classes:**
 - `class CadetProtectionTest`
@@ -621,7 +629,7 @@
 ### [`tests/test_canvas_font_floor.py`](tests/test_canvas_font_floor.py)
 > *Canvas text meets the same 12px readability floor the DOM audit enforces.*
 
-**Size**: `34` lines (`1331` bytes)
+**Size**: `34` lines
 
 **Classes:**
 - `class TestCanvasFontFloor`
@@ -637,7 +645,7 @@
 ### [`tests/test_captain_gambit.py`](tests/test_captain_gambit.py)
 > *Captain's Gambit: once-per-battle role actions scaled by captain skill.*
 
-**Size**: `146` lines (`5477` bytes)
+**Size**: `146` lines
 
 **Classes:**
 - `class CaptainGambitTest`
@@ -659,7 +667,7 @@
 ### [`tests/test_captain_progression.py`](tests/test_captain_progression.py)
 > *Escort captain progression: stored skill, scaling bonuses and battle XP.*
 
-**Size**: `120` lines (`4720` bytes)
+**Size**: `120` lines
 
 **Classes:**
 - `class CaptainSkillMathTest`
@@ -678,7 +686,7 @@
 ### [`tests/test_captains_log_codex.py`](tests/test_captains_log_codex.py)
 > *Regression tests for the captain's log, discovery codex, statistics, and rewards.*
 
-**Size**: `253` lines (`10653` bytes)
+**Size**: `253` lines
 
 **Classes:**
 - `class TestWarBondCodex`
@@ -717,7 +725,7 @@
 ### [`tests/test_cli.py`](tests/test_cli.py)
 > *Unit tests for command-line arguments and subcommands.*
 
-**Size**: `836` lines (`39131` bytes)
+**Size**: `836` lines
 
 **Classes:**
 - `class _IsolatedCliTestCase` - *Base for CLI tests: redirect default storage away from the player's live save.*
@@ -826,7 +834,7 @@
 ### [`tests/test_clipped_text_titles.py`](tests/test_clipped_text_titles.py)
 > *Text that a clamp or ellipsis can shorten (at 120% HUD scale) is always reachable through a title.*
 
-**Size**: `22` lines (`851` bytes)
+**Size**: `22` lines
 
 **Classes:**
 - `class TestClippedTextTitles`
@@ -838,7 +846,7 @@
 ### [`tests/test_cockpit_layout.py`](tests/test_cockpit_layout.py)
 > *Layout regression tests for the holographic web cockpit (index.html / style.css / app.js).*
 
-**Size**: `3513` lines (`161857` bytes)
+**Size**: `3513` lines
 
 **Classes:**
 - `class _DomNode` - *Minimal element tree node built from html.parser events.*
@@ -1402,7 +1410,7 @@
 ### [`tests/test_codex_progression.py`](tests/test_codex_progression.py)
 > *Codex milestones for pacts, captains, outposts and auto-freight.*
 
-**Size**: `94` lines (`3460` bytes)
+**Size**: `94` lines
 
 **Classes:**
 - `class CodexProgressionTest`
@@ -1417,7 +1425,7 @@
 ### [`tests/test_combat_focus.py`](tests/test_combat_focus.py)
 > *The combat card is an alert dialog that takes keyboard focus on a new fight and returns it afterwards.*
 
-**Size**: `36` lines (`1532` bytes)
+**Size**: `36` lines
 
 **Classes:**
 - `class TestCombatFocus`
@@ -1430,7 +1438,7 @@
 ### [`tests/test_combat_tactics.py`](tests/test_combat_tactics.py)
 > *Comprehensive unit tests for Tactical Subsystem Targeting, Combat Heat, and Field Munition Fabrication.*
 
-**Size**: `283` lines (`11844` bytes)
+**Size**: `283` lines
 
 **Classes:**
 - `class WeatherTestEngine`
@@ -1455,7 +1463,7 @@
 ### [`tests/test_combat_void_depth.py`](tests/test_combat_void_depth.py)
 > *Regression tests for progression-scaled combat and Hollow resonance risk/reward.*
 
-**Size**: `393` lines (`17139` bytes)
+**Size**: `393` lines
 
 **Classes:**
 - `class TestProgressionThreatScaling`
@@ -1496,7 +1504,7 @@
 ### [`tests/test_commerce_net_price_ui.py`](tests/test_commerce_net_price_ui.py)
 > *The Commerce table shows, and judges profit by, the net sell price (ADR-282).*
 
-**Size**: `25` lines (`968` bytes)
+**Size**: `25` lines
 
 **Classes:**
 - `class CommerceNetPriceUiTests`
@@ -1507,7 +1515,7 @@
 ### [`tests/test_comms.py`](tests/test_comms.py)
 > *Unified comms report/action, REST and CLI tests.*
 
-**Size**: `168` lines (`6168` bytes)
+**Size**: `168` lines
 
 **Classes:**
 - `class TestCommsReport`
@@ -1537,7 +1545,7 @@
 ### [`tests/test_contract_cards_keep_size.py`](tests/test_contract_cards_keep_size.py)
 > *Contract cards keep their content height inside the scrolling list (ADR-280).*
 
-**Size**: `26` lines (`877` bytes)
+**Size**: `26` lines
 
 **Classes:**
 - `class ContractCardsKeepSizeTests`
@@ -1548,7 +1556,7 @@
 ### [`tests/test_creation_first_launch.py`](tests/test_creation_first_launch.py)
 > *Character creation works on a first launch, before any game state has loaded (ADR-286).*
 
-**Size**: `24` lines (`1064` bytes)
+**Size**: `24` lines
 
 **Classes:**
 - `class CreationFirstLaunchTests`
@@ -1559,7 +1567,7 @@
 ### [`tests/test_creation_origins_ui.py`](tests/test_creation_origins_ui.py)
 > *The Character Creation origin dropdown offers exactly the engine's origins and shows what each grants.*
 
-**Size**: `44` lines (`1899` bytes)
+**Size**: `44` lines
 
 **Classes:**
 - `class TestCreationOrigins`
@@ -1576,7 +1584,7 @@
 ### [`tests/test_crew_command.py`](tests/test_crew_command.py)
 > *Unified crew/away report and action tests.*
 
-**Size**: `176` lines (`6618` bytes)
+**Size**: `176` lines
 
 **Classes:**
 - `class TestCrewReport`
@@ -1606,7 +1614,7 @@
 ### [`tests/test_crew_medals.py`](tests/test_crew_medals.py)
 > *Crew service medals: thresholds, morale, battle credit and persistence.*
 
-**Size**: `143` lines (`5365` bytes)
+**Size**: `143` lines
 
 **Classes:**
 - `class CrewMedalThresholdTest`
@@ -1625,7 +1633,7 @@
 ### [`tests/test_customs_risk_status.py`](tests/test_customs_risk_status.py)
 > *The status snapshot warns about customs risk while contraband is in the hold.*
 
-**Size**: `39` lines (`1571` bytes)
+**Size**: `39` lines
 
 **Classes:**
 - `class CustomsRiskStatusTest`
@@ -1641,7 +1649,7 @@
 ### [`tests/test_decision_focus.py`](tests/test_decision_focus.py)
 > *The decision popup takes keyboard focus on a new decision, keeps it across rebuilds and returns it.*
 
-**Size**: `36` lines (`1446` bytes)
+**Size**: `36` lines
 
 **Classes:**
 - `class TestDecisionFocus`
@@ -1657,7 +1665,7 @@
 ### [`tests/test_dialog_semantics.py`](tests/test_dialog_semantics.py)
 > *Overlays are real dialogs: labelled, modal, and they take and return keyboard focus.*
 
-**Size**: `44` lines (`1781` bytes)
+**Size**: `44` lines
 
 **Classes:**
 - `class TestDialogSemantics`
@@ -1670,7 +1678,7 @@
 ### [`tests/test_disabled_buttons_dim.py`](tests/test_disabled_buttons_dim.py)
 > *Disabled HUD buttons look disabled (ADR-279).*
 
-**Size**: `30` lines (`1051` bytes)
+**Size**: `30` lines
 
 **Classes:**
 - `class DisabledButtonsDimTests`
@@ -1681,7 +1689,7 @@
 ### [`tests/test_disabled_reasons.py`](tests/test_disabled_reasons.py)
 > *Disabled perk and upgrade buttons explain themselves instead of failing silently.*
 
-**Size**: `37` lines (`1628` bytes)
+**Size**: `37` lines
 
 **Classes:**
 - `class TestDisabledReasons`
@@ -1695,7 +1703,7 @@
 ### [`tests/test_dismiss_hotkey.py`](tests/test_dismiss_hotkey.py)
 > *X dismisses the visible event notifications through their own DISMISS buttons.*
 
-**Size**: `32` lines (`1192` bytes)
+**Size**: `32` lines
 
 **Classes:**
 - `class TestDismissHotkey`
@@ -1709,7 +1717,7 @@
 ### [`tests/test_distress_call.py`](tests/test_distress_call.py)
 > *Distress call: a truly stranded ship can summon a rescue tender, at a price, through every surface.*
 
-**Size**: `157` lines (`6897` bytes)
+**Size**: `157` lines
 
 **Classes:**
 - `class TestDistressCall`
@@ -1737,7 +1745,7 @@
 ### [`tests/test_distress_cockpit.py`](tests/test_distress_cockpit.py)
 > *Cockpit: the low-fuel gauge offers the rescue when no cell or titanium remains.*
 
-**Size**: `26` lines (`1015` bytes)
+**Size**: `26` lines
 
 **Classes:**
 - `class TestCockpit`
@@ -1750,7 +1758,7 @@
 ### [`tests/test_drone_partial_collection.py`](tests/test_drone_partial_collection.py)
 > *Drone haul collection fills the hold in part instead of refusing an oversized harvest.*
 
-**Size**: `70` lines (`2975` bytes)
+**Size**: `70` lines
 
 **Classes:**
 - `class PartialDroneCollectionTest`
@@ -1768,7 +1776,7 @@
 ### [`tests/test_economy.py`](tests/test_economy.py)
 > *Unit tests for the dynamic galactic economy, stockpiles, events, and trade routes.*
 
-**Size**: `270` lines (`12563` bytes)
+**Size**: `270` lines
 
 **Classes:**
 - `class TestInitialEconomy` - *Verify baseline economy generation across the galaxy.*
@@ -1805,7 +1813,7 @@
 ### [`tests/test_economy_rebalance.py`](tests/test_economy_rebalance.py)
 > *Unit tests for economic volatility events, faction trade margins, and drydock wear overhaul.*
 
-**Size**: `113` lines (`4938` bytes)
+**Size**: `113` lines
 
 **Classes:**
 - `class TestEconomyRebalance`
@@ -1820,7 +1828,7 @@
 ### [`tests/test_empire.py`](tests/test_empire.py)
 > *Unified empire report/action, REST and CLI tests.*
 
-**Size**: `191` lines (`7636` bytes)
+**Size**: `191` lines
 
 **Classes:**
 - `class TestEmpireReport`
@@ -1850,7 +1858,7 @@
 ### [`tests/test_empire_character_fleet.py`](tests/test_empire_character_fleet.py)
 > *Regression tests for character, research, outposts, factions, fleet, and travel additions.*
 
-**Size**: `543` lines (`25798` bytes)
+**Size**: `543` lines
 
 **Classes:**
 - `class CharacterResearchOutpostTest`
@@ -1911,7 +1919,7 @@
 ### [`tests/test_encounter_focus.py`](tests/test_encounter_focus.py)
 > *A blocking encounter card is an alert dialog that takes keyboard focus when it appears and returns it when it resolves.*
 
-**Size**: `44` lines (`1972` bytes)
+**Size**: `44` lines
 
 **Classes:**
 - `class TestEncounterFocus`
@@ -1926,7 +1934,7 @@
 ### [`tests/test_encounter_readability.py`](tests/test_encounter_readability.py)
 > *Encounter cards: action descriptions meet the cockpit's 12px readability floor.*
 
-**Size**: `24` lines (`799` bytes)
+**Size**: `24` lines
 
 **Classes:**
 - `class TestEncounterReadability`
@@ -1937,7 +1945,7 @@
 ### [`tests/test_encounters.py`](tests/test_encounters.py)
 > *Unified blocking-encounter payload, resolver, REST and CLI tests.*
 
-**Size**: `356` lines (`13919` bytes)
+**Size**: `356` lines
 
 **Classes:**
 - `class TestAnomalyCheckReadiness` - *Anomaly actions say whether their power check passes with the ship's real output.*
@@ -1980,7 +1988,7 @@
 ### [`tests/test_engagement_odds.py`](tests/test_engagement_odds.py)
 > *Stage 3 engagement odds: one tunable table, stated == coded.*
 
-**Size**: `249` lines (`10657` bytes)
+**Size**: `249` lines
 
 **Classes:**
 - `class TestStreakMultiplier`
@@ -2011,7 +2019,7 @@
 ### [`tests/test_engine.py`](tests/test_engine.py)
 > *Unit tests for simulation engine state transitions, flight, upgrades, fleet, and combat.*
 
-**Size**: `513` lines (`21959` bytes)
+**Size**: `513` lines
 
 **Classes:**
 - `class TestEngine`
@@ -2048,7 +2056,7 @@
 ### [`tests/test_engine_hardening.py`](tests/test_engine_hardening.py)
 > *Regression tests for audit-driven engine hardening.*
 
-**Size**: `182` lines (`7633` bytes)
+**Size**: `182` lines
 
 **Classes:**
 - `class EngineHardeningTest`
@@ -2074,7 +2082,7 @@
 ### [`tests/test_engineering.py`](tests/test_engineering.py)
 > *Unified engineering report/action, REST and CLI tests.*
 
-**Size**: `175` lines (`6399` bytes)
+**Size**: `175` lines
 
 **Classes:**
 - `class TestEngineeringReport`
@@ -2106,7 +2114,7 @@
 ### [`tests/test_equipment_bonuses.py`](tests/test_equipment_bonuses.py)
 > *Regression tests for hardware module stat bonuses and chassis specialty perks.*
 
-**Size**: `175` lines (`7676` bytes)
+**Size**: `175` lines
 
 **Classes:**
 - `class TestEquipmentBonusAggregation` - *Verify the pure aggregation rules without touching engine state.*
@@ -2136,7 +2144,7 @@
 ### [`tests/test_escape_character_creation.py`](tests/test_escape_character_creation.py)
 > *Escape closes Character Creation instead of stacking the main menu on top of it.*
 
-**Size**: `24` lines (`920` bytes)
+**Size**: `24` lines
 
 **Classes:**
 - `class TestEscapeCharacterCreation`
@@ -2148,7 +2156,7 @@
 ### [`tests/test_exploration_depth.py`](tests/test_exploration_depth.py)
 > *Regression tests for exploration depth: survey completion, scan discipline, salvage contracts, and scoop reserves.*
 
-**Size**: `207` lines (`8634` bytes)
+**Size**: `207` lines
 
 **Classes:**
 - `class TestScanDiscipline`
@@ -2176,7 +2184,7 @@
 ### [`tests/test_faction_trade_tech.py`](tests/test_faction_trade_tech.py)
 > *Faction trade links and technology drift across the simulation.*
 
-**Size**: `169` lines (`6330` bytes)
+**Size**: `169` lines
 
 **Classes:**
 - `class TestTradeLinks`
@@ -2204,7 +2212,7 @@
 ### [`tests/test_factions_and_enemies.py`](tests/test_factions_and_enemies.py)
 > *Unit tests for Factions, Corporations, and Enhanced Combat Enemies.*
 
-**Size**: `271` lines (`10864` bytes)
+**Size**: `271` lines
 
 **Classes:**
 - `class TestFactionsAndCorporations` - *Test faction registries, corporations, standing calculations, and market modifiers.*
@@ -2226,7 +2234,7 @@
 ### [`tests/test_fitting.py`](tests/test_fitting.py)
 > *Unified ship-fitting report, install/remove, REST and CLI tests.*
 
-**Size**: `209` lines (`8742` bytes)
+**Size**: `209` lines
 
 **Classes:**
 - `class TestFittingReport`
@@ -2257,7 +2265,7 @@
 ### [`tests/test_flee_needs_fuel_ui.py`](tests/test_flee_needs_fuel_ui.py)
 > *The Flee button says when there is too little fuel to use it (ADR-283).*
 
-**Size**: `27` lines (`1151` bytes)
+**Size**: `27` lines
 
 **Classes:**
 - `class FleeNeedsFuelUiTests`
@@ -2268,7 +2276,7 @@
 ### [`tests/test_fleet_captains.py`](tests/test_fleet_captains.py)
 > *Escort captains: assignment rules, role bonuses and persistence.*
 
-**Size**: `108` lines (`4536` bytes)
+**Size**: `108` lines
 
 **Classes:**
 - `class FleetCaptainMathTest`
@@ -2287,7 +2295,7 @@
 ### [`tests/test_fleet_command.py`](tests/test_fleet_command.py)
 > *Unified fleet report/action, REST and CLI tests.*
 
-**Size**: `208` lines (`8858` bytes)
+**Size**: `208` lines
 
 **Classes:**
 - `class TestFleetReport`
@@ -2318,7 +2326,7 @@
 ### [`tests/test_fleet_patrol.py`](tests/test_fleet_patrol.py)
 > *Fleet assignment: only local escorts fight, while remote patrols cut piracy.*
 
-**Size**: `173` lines (`6795` bytes)
+**Size**: `173` lines
 
 **Classes:**
 - `class FleetAssignmentTest`
@@ -2340,7 +2348,7 @@
 ### [`tests/test_fleet_prize.py`](tests/test_fleet_prize.py)
 > *Prize-ship sale, fleet value reporting and the shipbreaker milestone.*
 
-**Size**: `59` lines (`2269` bytes)
+**Size**: `59` lines
 
 **Classes:**
 - `class FleetPrizeSaleTest`
@@ -2355,7 +2363,7 @@
 ### [`tests/test_fleet_roles.py`](tests/test_fleet_roles.py)
 > *Fleet squadron roles: screen/strike/support combat tradeoffs.*
 
-**Size**: `104` lines (`4366` bytes)
+**Size**: `104` lines
 
 **Classes:**
 - `class FleetRoleMathTest`
@@ -2374,7 +2382,7 @@
 ### [`tests/test_fleet_service_record.py`](tests/test_fleet_service_record.py)
 > *Fleet service records: battles, kills, patrol bounties and training counts.*
 
-**Size**: `115` lines (`4408` bytes)
+**Size**: `115` lines
 
 **Classes:**
 - `class FleetServiceRecordTest`
@@ -2389,7 +2397,7 @@
 ### [`tests/test_fleet_upkeep.py`](tests/test_fleet_upkeep.py)
 > *Fleet upkeep: monthly escort payroll, cash flow and shortfall readiness.*
 
-**Size**: `80` lines (`3393` bytes)
+**Size**: `80` lines
 
 **Classes:**
 - `class FleetUpkeepMathTest`
@@ -2407,7 +2415,7 @@
 ### [`tests/test_fleet_veterancy.py`](tests/test_fleet_veterancy.py)
 > *Fleet veterancy: rank thresholds, combat scaling and drydock training.*
 
-**Size**: `132` lines (`5366` bytes)
+**Size**: `132` lines
 
 **Classes:**
 - `class FleetRankTest`
@@ -2427,7 +2435,7 @@
 ### [`tests/test_flight.py`](tests/test_flight.py)
 > *Unified flight report/action, REST and CLI tests.*
 
-**Size**: `164` lines (`6025` bytes)
+**Size**: `164` lines
 
 **Classes:**
 - `class TestFlightReport`
@@ -2458,7 +2466,7 @@
 ### [`tests/test_forced_colors.py`](tests/test_forced_colors.py)
 > *Windows High Contrast (forced colors): meter fills must stay visible, not vanish with their backgrounds.*
 
-**Size**: `40` lines (`1595` bytes)
+**Size**: `40` lines
 
 **Classes:**
 - `class TestForcedColors`
@@ -2474,7 +2482,7 @@
 ### [`tests/test_freight_profit.py`](tests/test_freight_profit.py)
 > *Quantum freight routes report real profit against what the cargo cost (ADR-290).*
 
-**Size**: `40` lines (`1566` bytes)
+**Size**: `40` lines
 
 **Classes:**
 - `class FreightProfitTests`
@@ -2489,7 +2497,7 @@
 ### [`tests/test_freight_profit_ui.py`](tests/test_freight_profit_ui.py)
 > *The freight row shows and colours by real profit (ADR-290).*
 
-**Size**: `24` lines (`962` bytes)
+**Size**: `24` lines
 
 **Classes:**
 - `class FreightProfitUiTests`
@@ -2500,7 +2508,7 @@
 ### [`tests/test_freight_row_narrow.py`](tests/test_freight_row_narrow.py)
 > *At laptop widths the freight row gives the net line its own full-width row (ADR-290).*
 
-**Size**: `23` lines (`905` bytes)
+**Size**: `23` lines
 
 **Classes:**
 - `class FreightRowNarrowTests`
@@ -2511,7 +2519,7 @@
 ### [`tests/test_frontier_depth.py`](tests/test_frontier_depth.py)
 > *Frontier depth: pirates, decisions, quantum freight, surface ops, populations, and UI affordances.*
 
-**Size**: `673` lines (`33509` bytes)
+**Size**: `673` lines
 
 **Classes:**
 - `class FrontierContentTest`
@@ -2575,7 +2583,7 @@
 ### [`tests/test_frontier_shipyard.py`](tests/test_frontier_shipyard.py)
 > *Frontier shipyards service hulls, escorts and weapons without a station dock.*
 
-**Size**: `131` lines (`5370` bytes)
+**Size**: `131` lines
 
 **Classes:**
 - `class FrontierShipyardTest`
@@ -2594,7 +2602,7 @@
 ### [`tests/test_frontier_systems.py`](tests/test_frontier_systems.py)
 > *Coverage for frontier systems: AI captains, depots, messages, landing, and fleets.*
 
-**Size**: `301` lines (`12950` bytes)
+**Size**: `301` lines
 
 **Classes:**
 - `class CaptainHailVoicesTest`
@@ -2640,7 +2648,7 @@
 ### [`tests/test_fuel_cell_burn.py`](tests/test_fuel_cell_burn.py)
 > *Emergency fuel-cell burn: hold fuel cells refill the tank through every surface.*
 
-**Size**: `130` lines (`5582` bytes)
+**Size**: `130` lines
 
 **Classes:**
 - `class TestBurnFuelCells`
@@ -2664,7 +2672,7 @@
 ### [`tests/test_fuel_cell_burn_cockpit.py`](tests/test_fuel_cell_burn_cockpit.py)
 > *Cockpit SHIP tab: the fuel-cell burn button sits beside field fabrication.*
 
-**Size**: `21` lines (`721` bytes)
+**Size**: `21` lines
 
 **Classes:**
 - `class TestCockpitButton`
@@ -2675,7 +2683,7 @@
 ### [`tests/test_galactic_politics.py`](tests/test_galactic_politics.py)
 > *Galactic politics: power-driven wars over hyperlane fronts, peace treaties and player war support.*
 
-**Size**: `503` lines (`24409` bytes)
+**Size**: `503` lines
 
 **Classes:**
 - `class FixedRng` - *Noise-free rng: uniform returns a fixed value, choice takes the first item.*
@@ -2742,7 +2750,7 @@
 ### [`tests/test_galaxy.py`](tests/test_galaxy.py)
 > *Unit tests for procedural galaxy generation, hyperlane mesh, and market quotes.*
 
-**Size**: `88` lines (`3742` bytes)
+**Size**: `88` lines
 
 **Classes:**
 - `class TestGalaxy`
@@ -2758,7 +2766,7 @@
 ### [`tests/test_galaxy_seed_snapshot.py`](tests/test_galaxy_seed_snapshot.py)
 > *The status snapshot exposes the galaxy seed so a galaxy can be replayed or shared.*
 
-**Size**: `27` lines (`1033` bytes)
+**Size**: `27` lines
 
 **Classes:**
 - `class GalaxySeedSnapshotTest`
@@ -2770,7 +2778,7 @@
 ### [`tests/test_half_sim_tick.py`](tests/test_half_sim_tick.py)
 > *Half-simulation tick proofs: economy, factions, and crew drift with zero player input.*
 
-**Size**: `124` lines (`4646` bytes)
+**Size**: `124` lines
 
 **Classes:**
 - `class TestHalfSimEconomyDrift`
@@ -2795,7 +2803,7 @@
 ### [`tests/test_input_names.py`](tests/test_input_names.py)
 > *Every form input has an accessible name, not just a nearby visual label.*
 
-**Size**: `40` lines (`1503` bytes)
+**Size**: `40` lines
 
 **Classes:**
 - `class TestInputNames`
@@ -2807,7 +2815,7 @@
 ### [`tests/test_insurance_rebuild.py`](tests/test_insurance_rebuild.py)
 > *Coalition insurance: a destroyed hull can be rebuilt at a safe station for a deductible.*
 
-**Size**: `60` lines (`2399` bytes)
+**Size**: `60` lines
 
 **Classes:**
 - `class InsuranceRebuildTest`
@@ -2824,7 +2832,7 @@
 ### [`tests/test_intel.py`](tests/test_intel.py)
 > *Unified intel report/action, REST and CLI tests.*
 
-**Size**: `169` lines (`6172` bytes)
+**Size**: `169` lines
 
 **Classes:**
 - `class TestIntelReport`
@@ -2854,7 +2862,7 @@
 ### [`tests/test_inventory.py`](tests/test_inventory.py)
 > *Unit tests for the item catalog, cargo manifest, and consumable usage.*
 
-**Size**: `109` lines (`4115` bytes)
+**Size**: `109` lines
 
 **Classes:**
 - `class TestItemCatalog` - *Verify catalog integrity, consumable metadata, and fallbacks.*
@@ -2879,7 +2887,7 @@
 ### [`tests/test_jump_cost_estimate.py`](tests/test_jump_cost_estimate.py)
 > *The route planner's fuel estimate equals what a jump really spends, so cockpit, CLI and rescue logic can trust it.*
 
-**Size**: `64` lines (`2880` bytes)
+**Size**: `64` lines
 
 **Classes:**
 - `class TestJumpCostEstimate`
@@ -2896,7 +2904,7 @@
 ### [`tests/test_jump_fuel_cost.py`](tests/test_jump_fuel_cost.py)
 > *System target card: the jump button states its fuel cost and refuses a jump the tank cannot cover.*
 
-**Size**: `32` lines (`1275` bytes)
+**Size**: `32` lines
 
 **Classes:**
 - `class TestJumpFuelCost`
@@ -2910,7 +2918,7 @@
 ### [`tests/test_logbook.py`](tests/test_logbook.py)
 > *Flight-log windowing: galactic news must outlive routine AI-trade chatter.*
 
-**Size**: `150` lines (`6506` bytes)
+**Size**: `150` lines
 
 **Classes:**
 - `class SummarizeTradesTest`
@@ -2942,7 +2950,7 @@
 ### [`tests/test_logistics.py`](tests/test_logistics.py)
 > *Unified logistics report/action, REST and CLI tests.*
 
-**Size**: `210` lines (`8383` bytes)
+**Size**: `210` lines
 
 **Classes:**
 - `class TestLogisticsReport`
@@ -2973,7 +2981,7 @@
 ### [`tests/test_low_fuel_gauge.py`](tests/test_low_fuel_gauge.py)
 > *Top-bar fuel gauge: a low-fuel state that offers the hold fuel-cell burn where the problem shows.*
 
-**Size**: `40` lines (`1824` bytes)
+**Size**: `40` lines
 
 **Classes:**
 - `class TestLowFuelGauge`
@@ -2987,7 +2995,7 @@
 ### [`tests/test_low_hull_gauge.py`](tests/test_low_hull_gauge.py)
 > *Top-bar hull gauge: a critical-hull state that offers the titanium patch kit where the problem shows.*
 
-**Size**: `40` lines (`1855` bytes)
+**Size**: `40` lines
 
 **Classes:**
 - `class TestLowHullGauge`
@@ -3001,7 +3009,7 @@
 ### [`tests/test_market_empty_state.py`](tests/test_market_empty_state.py)
 > *With no exchange the Commerce tab hides its dead controls, shows the explanation up top and names the stations.*
 
-**Size**: `47` lines (`2304` bytes)
+**Size**: `47` lines
 
 **Classes:**
 - `class TestMarketEmptyState`
@@ -3016,7 +3024,7 @@
 ### [`tests/test_market_price_gaps.py`](tests/test_market_price_gaps.py)
 > *Neighbouring markets never pay absurd arbitrage, and trading still pays (ADR-289).*
 
-**Size**: `43` lines (`1788` bytes)
+**Size**: `43` lines
 
 **Classes:**
 - `class MarketPriceGapTests`
@@ -3030,7 +3038,7 @@
 ### [`tests/test_megastructure_restoration.py`](tests/test_megastructure_restoration.py)
 > *Megastructure restoration: orbit/cost gates, bonuses and persistence.*
 
-**Size**: `125` lines (`4782` bytes)
+**Size**: `125` lines
 
 **Classes:**
 - `class MegastructureRestorationTest`
@@ -3047,7 +3055,7 @@
 ### [`tests/test_menu_backdrop.py`](tests/test_menu_backdrop.py)
 > *Main menu backdrop: orbital rings fill the empty side only where there is room.*
 
-**Size**: `29` lines (`1245` bytes)
+**Size**: `29` lines
 
 **Classes:**
 - `class TestMenuBackdrop`
@@ -3060,7 +3068,7 @@
 ### [`tests/test_menu_status_error.py`](tests/test_menu_status_error.py)
 > *A failed menu action does not read as a success (ADR-285).*
 
-**Size**: `27` lines (`1228` bytes)
+**Size**: `27` lines
 
 **Classes:**
 - `class MenuStatusErrorTests`
@@ -3071,7 +3079,7 @@
 ### [`tests/test_messaging_crew_quantum.py`](tests/test_messaging_crew_quantum.py)
 > *Regression tests for message trees, crew, portraits, weapons, quantum tech, and megastructures.*
 
-**Size**: `301` lines (`13722` bytes)
+**Size**: `301` lines
 
 **Classes:**
 - `class MessageTreeTest`
@@ -3114,7 +3122,7 @@
 ### [`tests/test_models.py`](tests/test_models.py)
 > *Unit tests for domain state models and frozen DTO serialization.*
 
-**Size**: `358` lines (`12372` bytes)
+**Size**: `358` lines
 
 **Classes:**
 - `class TestModels`
@@ -3137,7 +3145,7 @@
 ### [`tests/test_monthly_economy.py`](tests/test_monthly_economy.py)
 > *Monthly economy: crew wages are a monthly rate accrued on the calendar, not a per-tick charge.*
 
-**Size**: `43` lines (`1833` bytes)
+**Size**: `43` lines
 
 **Classes:**
 - `class TestMonthlyWages`
@@ -3151,7 +3159,7 @@
 ### [`tests/test_narrative.py`](tests/test_narrative.py)
 > *Unified narrative report/action, REST and CLI tests.*
 
-**Size**: `174` lines (`6325` bytes)
+**Size**: `174` lines
 
 **Classes:**
 - `class TestNarrativeReport`
@@ -3182,7 +3190,7 @@
 ### [`tests/test_narrow_clipping.py`](tests/test_narrow_clipping.py)
 > *At 1280px the REFIT module descriptions and war pledge buttons wrap instead of being cut off.*
 
-**Size**: `38` lines (`1430` bytes)
+**Size**: `38` lines
 
 **Classes:**
 - `class TestNarrowClipping`
@@ -3199,7 +3207,7 @@
 ### [`tests/test_navigation_contract.py`](tests/test_navigation_contract.py)
 > *navigate_to must not claim success when an encounter cuts the route short (ADR-359).*
 
-**Size**: `53` lines (`1945` bytes)
+**Size**: `53` lines
 
 **Classes:**
 - `class NavigateContractTest`
@@ -3214,7 +3222,7 @@
 ### [`tests/test_navigation_traffic.py`](tests/test_navigation_traffic.py)
 > *Open-space transit vectors and the NPC traffic that shares the map.*
 
-**Size**: `132` lines (`6182` bytes)
+**Size**: `132` lines
 
 **Classes:**
 - `class EmptySpaceTransitTest`
@@ -3235,7 +3243,7 @@
 ### [`tests/test_non_aggression_pacts.py`](tests/test_non_aggression_pacts.py)
 > *Non-aggression pacts: standing gate, expiry and war exclusion.*
 
-**Size**: `156` lines (`6289` bytes)
+**Size**: `156` lines
 
 **Classes:**
 - `class NonAggressionPactTest`
@@ -3254,7 +3262,7 @@
 ### [`tests/test_origin_tag_cap.py`](tests/test_origin_tag_cap.py)
 > *The creation origin tag shows the gain the rank-10 cap leaves (ADR-288).*
 
-**Size**: `30` lines (`1223` bytes)
+**Size**: `30` lines
 
 **Classes:**
 - `class OriginTagCapTests`
@@ -3266,7 +3274,7 @@
 ### [`tests/test_outpost_card_text.py`](tests/test_outpost_card_text.py)
 > *Outpost build cards use readable names, say where goods are delivered, and explain a credit shortfall.*
 
-**Size**: `31` lines (`1078` bytes)
+**Size**: `31` lines
 
 **Classes:**
 - `class TestOutpostCardText`
@@ -3282,7 +3290,7 @@
 ### [`tests/test_outpost_crew.py`](tests/test_outpost_crew.py)
 > *Outpost crew: specialist bonuses, assignment rules and persistence.*
 
-**Size**: `134` lines (`5470` bytes)
+**Size**: `134` lines
 
 **Classes:**
 - `class OutpostCrewMathTest`
@@ -3303,7 +3311,7 @@
 ### [`tests/test_outpost_defense.py`](tests/test_outpost_defense.py)
 > *Outpost integrity: defense, capture damage, production loss and repair.*
 
-**Size**: `104` lines (`4202` bytes)
+**Size**: `104` lines
 
 **Classes:**
 - `class OutpostDefenseMathTest`
@@ -3325,7 +3333,7 @@
 ### [`tests/test_outpost_modules.py`](tests/test_outpost_modules.py)
 > *Outpost modules: spend credits to stack production modules on an installation.*
 
-**Size**: `67` lines (`2732` bytes)
+**Size**: `67` lines
 
 **Classes:**
 - `class OutpostModuleTest`
@@ -3340,7 +3348,7 @@
 ### [`tests/test_outpost_specialization.py`](tests/test_outpost_specialization.py)
 > *Outpost specialization: level-3 production focus and logistics crew slot.*
 
-**Size**: `104` lines (`4164` bytes)
+**Size**: `104` lines
 
 **Classes:**
 - `class OutpostSpecializationMathTest`
@@ -3362,7 +3370,7 @@
 ### [`tests/test_outpost_supply_links.py`](tests/test_outpost_supply_links.py)
 > *Outpost supply links: same-system hubs, rules, bonuses and persistence.*
 
-**Size**: `123` lines (`5114` bytes)
+**Size**: `123` lines
 
 **Classes:**
 - `class OutpostSupplyTest`
@@ -3382,7 +3390,7 @@
 ### [`tests/test_payroll_runway.py`](tests/test_payroll_runway.py)
 > *CREW cash-flow strip: a payroll runway warns before wages go unpaid.*
 
-**Size**: `34` lines (`1297` bytes)
+**Size**: `34` lines
 
 **Classes:**
 - `class TestPayrollRunway`
@@ -3396,7 +3404,7 @@
 ### [`tests/test_perks_relics_rep.py`](tests/test_perks_relics_rep.py)
 > *Regression tests for faction perks, enemy reputation rewards, and multi-stat relics.*
 
-**Size**: `249` lines (`10807` bytes)
+**Size**: `249` lines
 
 **Classes:**
 - `class RelicSetBonusTest`
@@ -3437,7 +3445,7 @@
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
-**Size**: `385` lines (`17049` bytes)
+**Size**: `385` lines
 
 **Classes:**
 - `class FixedZeroRng` - *Random source that always fires the attrition roll and returns zero noise.*
@@ -3479,7 +3487,7 @@
 ### [`tests/test_prejump_checkpoint.py`](tests/test_prejump_checkpoint.py)
 > *A rolling 'checkpoint' save slot is written before a risky jump or a void dive.*
 
-**Size**: `59` lines (`2351` bytes)
+**Size**: `59` lines
 
 **Classes:**
 - `class PreJumpCheckpointTest`
@@ -3497,7 +3505,7 @@
 ### [`tests/test_progress.py`](tests/test_progress.py)
 > *Unified progression report/action, REST and CLI tests.*
 
-**Size**: `157` lines (`6081` bytes)
+**Size**: `157` lines
 
 **Classes:**
 - `class TestProgressReport`
@@ -3526,7 +3534,7 @@
 ### [`tests/test_quantity_guards_residual.py`](tests/test_quantity_guards_residual.py)
 > *Strict positive-integer guards on the residual economy entry points (ADR-162 residual).*
 
-**Size**: `59` lines (`2715` bytes)
+**Size**: `59` lines
 
 **Classes:**
 - `class StrictQuantityResidualTest`
@@ -3544,7 +3552,7 @@
 ### [`tests/test_quantum_automation.py`](tests/test_quantum_automation.py)
 > *Quantum auto-freight: policy, route selection, cooldown and persistence.*
 
-**Size**: `94` lines (`3877` bytes)
+**Size**: `94` lines
 
 **Classes:**
 - `class QuantumAutomationTest`
@@ -3560,7 +3568,7 @@
 ### [`tests/test_radar_hover.py`](tests/test_radar_hover.py)
 > *System radar: the hovered body gets a ring and a forced name, even with labels switched off.*
 
-**Size**: `26` lines (`1075` bytes)
+**Size**: `26` lines
 
 **Classes:**
 - `class TestRadarHover`
@@ -3573,7 +3581,7 @@
 ### [`tests/test_radar_label_contrast.py`](tests/test_radar_label_contrast.py)
 > *Radar reference labels (AU ticks, compass, range scale) use a tint that clears 3:1 on the nebula backdrop.*
 
-**Size**: `48` lines (`1849` bytes)
+**Size**: `48` lines
 
 **Classes:**
 - `class TestRadarLabelContrast`
@@ -3591,7 +3599,7 @@
 ### [`tests/test_radar_label_fallback.py`](tests/test_radar_label_fallback.py)
 > *Crowded radar: a body keeps a name by trying a shorter wording and more positions.*
 
-**Size**: `30` lines (`1179` bytes)
+**Size**: `30` lines
 
 **Classes:**
 - `class TestRadarLabelFallback`
@@ -3605,7 +3613,7 @@
 ### [`tests/test_radar_labels_avoid_target_card.py`](tests/test_radar_labels_avoid_target_card.py)
 > *Orbit-view labels route around the open target card (ADR-281).*
 
-**Size**: `27` lines (`1076` bytes)
+**Size**: `27` lines
 
 **Classes:**
 - `class RadarLabelsAvoidTargetCardTests`
@@ -3616,7 +3624,7 @@
 ### [`tests/test_rail_labels_fit.py`](tests/test_rail_labels_fit.py)
 > *Every sidebar tab label must fit beside its notification badge (ADR-276).*
 
-**Size**: `24` lines (`878` bytes)
+**Size**: `24` lines
 
 **Classes:**
 - `class RailLabelsFitTests`
@@ -3627,7 +3635,7 @@
 ### [`tests/test_reactor_map_shipmods.py`](tests/test_reactor_map_shipmods.py)
 > *Regression tests for reactor simulation, sector map modifiers, and ship modifications.*
 
-**Size**: `330` lines (`14315` bytes)
+**Size**: `330` lines
 
 **Classes:**
 - `class ReactorSimulationTest`
@@ -3674,7 +3682,7 @@
 ### [`tests/test_reduced_motion.py`](tests/test_reduced_motion.py)
 > *Particle FX honor the OS reduce-motion preference: continuous decoration stops, event feedback stays.*
 
-**Size**: `33` lines (`1254` bytes)
+**Size**: `33` lines
 
 **Classes:**
 - `class TestReducedMotion`
@@ -3690,7 +3698,7 @@
 ### [`tests/test_refit_damaged_drones.py`](tests/test_refit_damaged_drones.py)
 > *REFIT DAMAGED refits every worn drone, worst first, as far as credits stretch.*
 
-**Size**: `81` lines (`3135` bytes)
+**Size**: `81` lines
 
 **Classes:**
 - `class RefitDamagedDronesTest`
@@ -3710,7 +3718,7 @@
 ### [`tests/test_refit_filters.py`](tests/test_refit_filters.py)
 > *REFIT upgrade list: slot filter chips keep the long catalogue navigable.*
 
-**Size**: `42` lines (`1669` bytes)
+**Size**: `42` lines
 
 **Classes:**
 - `class TestRefitSlotFilters`
@@ -3725,7 +3733,7 @@
 ### [`tests/test_refit_replaces.py`](tests/test_refit_replaces.py)
 > *REFIT upgrade cards say which installed upgrade a purchase would replace.*
 
-**Size**: `27` lines (`980` bytes)
+**Size**: `27` lines
 
 **Classes:**
 - `class TestRefitReplaces`
@@ -3738,7 +3746,7 @@
 ### [`tests/test_repair_all_outposts.py`](tests/test_repair_all_outposts.py)
 > *REPAIR ALL OUTPOSTS restores every damaged outpost, worst first, as far as credits stretch.*
 
-**Size**: `63` lines (`2597` bytes)
+**Size**: `63` lines
 
 **Classes:**
 - `class RepairAllOutpostsTest`
@@ -3756,7 +3764,7 @@
 ### [`tests/test_research_pacts.py`](tests/test_research_pacts.py)
 > *Research pacts: standing gate, war suspension and passive research bonus.*
 
-**Size**: `86` lines (`3637` bytes)
+**Size**: `86` lines
 
 **Classes:**
 - `class ResearchPactTest`
@@ -3774,7 +3782,7 @@
 ### [`tests/test_research_queue.py`](tests/test_research_queue.py)
 > *Research queue: validation, ordering, auto-start and persistence.*
 
-**Size**: `110` lines (`4501` bytes)
+**Size**: `110` lines
 
 **Classes:**
 - `class ResearchQueueEngineTest`
@@ -3792,7 +3800,7 @@
 ### [`tests/test_review_fixes.py`](tests/test_review_fixes.py)
 > *Regressions pinned by the post-implementation review pass.*
 
-**Size**: `328` lines (`14118` bytes)
+**Size**: `328` lines
 
 **Classes:**
 - `class FlightSafetyTest`
@@ -3823,7 +3831,7 @@
 ### [`tests/test_ruler_ticks_reserve_space.py`](tests/test_ruler_ticks_reserve_space.py)
 > *Orbit-view names route around the AU ruler marks (ADR-287).*
 
-**Size**: `23` lines (`953` bytes)
+**Size**: `23` lines
 
 **Classes:**
 - `class RulerTicksReserveSpaceTests`
@@ -3834,7 +3842,7 @@
 ### [`tests/test_scoop_auto_open.py`](tests/test_scoop_auto_open.py)
 > *With a low tank and a scoop available, the target card opens its more-actions panel once so the scoop is visible.*
 
-**Size**: `35` lines (`1359` bytes)
+**Size**: `35` lines
 
 **Classes:**
 - `class TestScoopAutoOpen`
@@ -3851,7 +3859,7 @@
 ### [`tests/test_scoop_button.py`](tests/test_scoop_button.py)
 > *The scoop button states its remaining taps, expected yield and reactor heat.*
 
-**Size**: `27` lines (`1039` bytes)
+**Size**: `27` lines
 
 **Classes:**
 - `class TestScoopButton`
@@ -3864,7 +3872,7 @@
 ### [`tests/test_sell_all_profitable.py`](tests/test_sell_all_profitable.py)
 > *SELL ALL PROFITABLE sells every held commodity that beats its cost basis and keeps the rest.*
 
-**Size**: `52` lines (`2053` bytes)
+**Size**: `52` lines
 
 **Classes:**
 - `class SellAllProfitableTest`
@@ -3881,7 +3889,7 @@
 ### [`tests/test_sell_price_net.py`](tests/test_sell_price_net.py)
 > *The Commerce quote reports what a sale actually pays (ADR-282).*
 
-**Size**: `53` lines (`1933` bytes)
+**Size**: `53` lines
 
 **Classes:**
 - `class SellPriceNetTests`
@@ -3896,7 +3904,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `967` lines (`41431` bytes)
+**Size**: `967` lines
 
 **Classes:**
 - `class TestServer`
@@ -3966,7 +3974,7 @@
 ### [`tests/test_settings_above_menu.py`](tests/test_settings_above_menu.py)
 > *Settings opens above the main menu that launches it (ADR-284).*
 
-**Size**: `34` lines (`1122` bytes)
+**Size**: `34` lines
 
 **Classes:**
 - `class SettingsAboveMenuTests`
@@ -3980,7 +3988,7 @@
 ### [`tests/test_settings_controls.py`](tests/test_settings_controls.py)
 > *Settings overlay controls: real checkmarks and themed sliders instead of browser defaults.*
 
-**Size**: `36` lines (`1454` bytes)
+**Size**: `36` lines
 
 **Classes:**
 - `class TestSettingsControls`
@@ -3996,7 +4004,7 @@
 ### [`tests/test_ship_schematic_clear.py`](tests/test_ship_schematic_clear.py)
 > *The ship schematic's caption stays clear of the module chips (ADR-278).*
 
-**Size**: `28` lines (`1011` bytes)
+**Size**: `28` lines
 
 **Classes:**
 - `class ShipSchematicClearTests`
@@ -4007,7 +4015,7 @@
 ### [`tests/test_ship_wear.py`](tests/test_ship_wear.py)
 > *Tests for ship wear and drydock repair mechanics.*
 
-**Size**: `67` lines (`2507` bytes)
+**Size**: `67` lines
 
 **Classes:**
 - `class TestShipWear`
@@ -4024,7 +4032,7 @@
 ### [`tests/test_sim_mechanics.py`](tests/test_sim_mechanics.py)
 > *Unit and integration tests for the living crew, volume-aware market, and cash-flow mechanics.*
 
-**Size**: `402` lines (`16734` bytes)
+**Size**: `402` lines
 
 **Classes:**
 - `class TestCrewMoraleCore`
@@ -4080,7 +4088,7 @@
 ### [`tests/test_skill_allocation_ui.py`](tests/test_skill_allocation_ui.py)
 > *Character Creation step 2: the +/- buttons are wired, re-enable every row, are named, and show the origin bonus.*
 
-**Size**: `55` lines (`2419` bytes)
+**Size**: `55` lines
 
 **Classes:**
 - `class TestSkillAllocationUi`
@@ -4100,7 +4108,7 @@
 ### [`tests/test_smuggling_security.py`](tests/test_smuggling_security.py)
 > *Unit tests for contraband smuggling, security scans, and customs interdiction.*
 
-**Size**: `185` lines (`8268` bytes)
+**Size**: `185` lines
 
 **Classes:**
 - `class TestSmugglingSecurity`
@@ -4121,7 +4129,7 @@
 ### [`tests/test_snapshot_catalogs.py`](tests/test_snapshot_catalogs.py)
 > *Static catalogs: built once, served by /api/catalogs, and left out of polls that cache them.*
 
-**Size**: `105` lines (`4663` bytes)
+**Size**: `105` lines
 
 **Classes:**
 - `class TestStaticCatalogs`
@@ -4146,7 +4154,7 @@
 ### [`tests/test_state_machines.py`](tests/test_state_machines.py)
 > *Canonical state-machine registry, inspector, gate and surface tests.*
 
-**Size**: `440` lines (`17479` bytes)
+**Size**: `440` lines
 
 **Classes:**
 - `class TestRegistryContract`
@@ -4194,7 +4202,7 @@
 ### [`tests/test_stellar_depth_ui.py`](tests/test_stellar_depth_ui.py)
 > *Unit tests for Stellar Depth, Officer Station Assignments, and Distress Beacons.*
 
-**Size**: `253` lines (`11418` bytes)
+**Size**: `253` lines
 
 **Classes:**
 - `class StellarDepthAndOfficerTest`
@@ -4215,7 +4223,7 @@
 ### [`tests/test_storage.py`](tests/test_storage.py)
 > *Unit tests for atomic persistence, crash safety, and shadow backup recovery.*
 
-**Size**: `162` lines (`6904` bytes)
+**Size**: `162` lines
 
 **Classes:**
 - `class TestStorage`
@@ -4235,7 +4243,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `883` lines (`38415` bytes)
+**Size**: `883` lines
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -4290,7 +4298,7 @@
 ### [`tests/test_story_objective_names.py`](tests/test_story_objective_names.py)
 > *Story objectives name systems the way the galaxy map does (ADR-277).*
 
-**Size**: `23` lines (`706` bytes)
+**Size**: `23` lines
 
 **Classes:**
 - `class StoryObjectiveNamesTests`
@@ -4301,7 +4309,7 @@
 ### [`tests/test_surface_ops.py`](tests/test_surface_ops.py)
 > *Unified surface report/action, REST and CLI tests.*
 
-**Size**: `177` lines (`6747` bytes)
+**Size**: `177` lines
 
 **Classes:**
 - `class TestSurfaceReport`
@@ -4330,7 +4338,7 @@
 ### [`tests/test_system_target_hotkeys.py`](tests/test_system_target_hotkeys.py)
 > *On the galaxy map, comma and period cycle the star systems linked to the current one.*
 
-**Size**: `32` lines (`1445` bytes)
+**Size**: `32` lines
 
 **Classes:**
 - `class TestSystemTargetHotkeys`
@@ -4343,7 +4351,7 @@
 ### [`tests/test_tab_rail_state.py`](tests/test_tab_rail_state.py)
 > *The terminal tab rail exposes its active tab to assistive technology, not only through a CSS class.*
 
-**Size**: `24` lines (`1001` bytes)
+**Size**: `24` lines
 
 **Classes:**
 - `class TestTabRailState`
@@ -4355,7 +4363,7 @@
 ### [`tests/test_target_action_hotkeys.py`](tests/test_target_action_hotkeys.py)
 > *J and O press the target card's own jump and transit buttons, so every guard still applies.*
 
-**Size**: `36` lines (`1439` bytes)
+**Size**: `36` lines
 
 **Classes:**
 - `class TestTargetActionHotkeys`
@@ -4369,7 +4377,7 @@
 ### [`tests/test_time_and_ticks.py`](tests/test_time_and_ticks.py)
 > *Comprehensive automated test suite for Time, Ticks, and Temporal Controls in VoidFarer.*
 
-**Size**: `325` lines (`13136` bytes)
+**Size**: `325` lines
 
 **Classes:**
 - `class TestTimeStateModel` - *Verify TimeState dataclass serialization, defaults, and legacy migration.*
@@ -4406,7 +4414,7 @@
 ### [`tests/test_trade_automation.py`](tests/test_trade_automation.py)
 > *Docked trade automation: configure thresholds, buy low, sell high, persist.*
 
-**Size**: `107` lines (`4550` bytes)
+**Size**: `107` lines
 
 **Classes:**
 - `class TradeAutomationTest`
@@ -4424,7 +4432,7 @@
 ### [`tests/test_trade_ledger.py`](tests/test_trade_ledger.py)
 > *Trade ledger: per-commodity cost basis, realised profit and max-quantity orders.*
 
-**Size**: `160` lines (`7107` bytes)
+**Size**: `160` lines
 
 **Classes:**
 - `class TestTradeCostBasis`
@@ -4456,7 +4464,7 @@
 ### [`tests/test_trade_pacts.py`](tests/test_trade_pacts.py)
 > *Faction trade pacts: standing gate, war suspension and market benefit.*
 
-**Size**: `104` lines (`4123` bytes)
+**Size**: `104` lines
 
 **Classes:**
 - `class TradePactTest`
@@ -4475,7 +4483,7 @@
 ### [`tests/test_trade_quantity_guards.py`](tests/test_trade_quantity_guards.py)
 > *Regression: trade/buy/jettison reject non-int quantities like repair_hull does.*
 
-**Size**: `47` lines (`1811` bytes)
+**Size**: `47` lines
 
 **Classes:**
 - `class TradeQuantityGuardsTest`
@@ -4490,7 +4498,7 @@
 ### [`tests/test_trade_tip.py`](tests/test_trade_tip.py)
 > *The status snapshot names the best buy-here, sell-next-door tip while docked.*
 
-**Size**: `34` lines (`1346` bytes)
+**Size**: `34` lines
 
 **Classes:**
 - `class TradeTipTest`
@@ -4503,7 +4511,7 @@
 ### [`tests/test_transit_civ_events.py`](tests/test_transit_civ_events.py)
 > *Tests for in-system transit (TravelState), planetary civilization metadata, and cockpit GameEvents.*
 
-**Size**: `369` lines (`16845` bytes)
+**Size**: `369` lines
 
 **Classes:**
 - `class TestTransitCivEvents` - *Verify TravelState, planetary faction/population/government, and GameEvent lifecycles.*
@@ -4528,7 +4536,7 @@
 ### [`tests/test_tutorial_arrival_relic.py`](tests/test_tutorial_arrival_relic.py)
 > *A relic won by the orbit step on a transit arrival is kept and applied.*
 
-**Size**: `36` lines (`1426` bytes)
+**Size**: `36` lines
 
 **Classes:**
 - `class TutorialArrivalRelicTest`
@@ -4539,7 +4547,7 @@
 ### [`tests/test_tutorial_trade_hint.py`](tests/test_tutorial_trade_hint.py)
 > *The trade milestone tells the player they need a station, so a player parked at a wilderness body is not stranded.*
 
-**Size**: `31` lines (`1132` bytes)
+**Size**: `31` lines
 
 **Classes:**
 - `class TestTutorialTradeHint`
@@ -4553,7 +4561,7 @@
 ### [`tests/test_ui_audit.py`](tests/test_ui_audit.py)
 > *The headless cockpit audit has deterministic viewport, parsing and wrapper helpers.*
 
-**Size**: `128` lines (`5716` bytes)
+**Size**: `128` lines
 
 **Classes:**
 - `class _RecordingEngine`
@@ -4584,7 +4592,7 @@
 ### [`tests/test_ui_browser_customs.py`](tests/test_ui_browser_customs.py)
 > *The browser review tool drives customs through the engine, not a stale client-side key.*
 
-**Size**: `30` lines (`1120` bytes)
+**Size**: `30` lines
 
 **Classes:**
 - `class TestCustomsScenario`
@@ -4596,7 +4604,7 @@
 ### [`tests/test_ui_inventory.py`](tests/test_ui_inventory.py)
 > *The cockpit inventory proof covers controls, handlers, routes, hotkeys and theme tokens.*
 
-**Size**: `35` lines (`1400` bytes)
+**Size**: `35` lines
 
 **Classes:**
 - `class InventoryTest`
@@ -4609,7 +4617,7 @@
 ### [`tests/test_ui_promises_match_engine.py`](tests/test_ui_promises_match_engine.py)
 > *The numbers the cockpit advertises equal what the engine does: preview, quote, threshold, price and yield.*
 
-**Size**: `131` lines (`6546` bytes)
+**Size**: `131` lines
 
 **Classes:**
 - `class TestTransitPreviewIsExact`
@@ -4633,7 +4641,7 @@
 ### [`tests/test_vector_target_header.py`](tests/test_vector_target_header.py)
 > *Open-space target card: the header carries the transit distance only (bearing lives in the stat chips).*
 
-**Size**: `22` lines (`870` bytes)
+**Size**: `22` lines
 
 **Classes:**
 - `class TestVectorTargetHeader`
@@ -4645,7 +4653,7 @@
 ### [`tests/test_vital_card_keyboard.py`](tests/test_vital_card_keyboard.py)
 > *Actionable vital cards (burn cell, patch hull) are real keyboard controls, not mouse-only divs.*
 
-**Size**: `33` lines (`1425` bytes)
+**Size**: `33` lines
 
 **Classes:**
 - `class TestVitalCardKeyboard`
@@ -4659,7 +4667,7 @@
 ### [`tests/test_void_traversal.py`](tests/test_void_traversal.py)
 > *Unit and integration tests for the Hollow Between void traversal mechanics.*
 
-**Size**: `474` lines (`19684` bytes)
+**Size**: `474` lines
 
 **Classes:**
 - `class TestVoidLanes`
@@ -4708,7 +4716,7 @@
 ### [`tests/test_war_bonds.py`](tests/test_war_bonds.py)
 > *War bonds: pledges pay out on victory, partially on stalemate, never twice.*
 
-**Size**: `108` lines (`4001` bytes)
+**Size**: `108` lines
 
 **Classes:**
 - `class WarBondResolutionTest`
@@ -4732,7 +4740,7 @@
 ### [`tests/test_war_news_persistence.py`](tests/test_war_news_persistence.py)
 > *War news must survive a real save/load cycle, like every other game state.*
 
-**Size**: `58` lines (`2369` bytes)
+**Size**: `58` lines
 
 **Classes:**
 - `class WarNewsPersistenceTest`
@@ -4744,7 +4752,7 @@
 ### [`tests/test_wave8_fixbatch.py`](tests/test_wave8_fixbatch.py)
 > *Wave 8 fix-batch: failing-first regressions for swarm-verified defects.*
 
-**Size**: `106` lines (`3638` bytes)
+**Size**: `106` lines
 
 **Classes:**
 - `class _IsolatedCli`
@@ -4763,7 +4771,7 @@
 ### [`tests/test_world_relief.py`](tests/test_world_relief.py)
 > *Post-war reconstruction, relief cargo and the market premium for bombed worlds.*
 
-**Size**: `155` lines (`6737` bytes)
+**Size**: `155` lines
 
 **Classes:**
 - `class WorldReliefEngineTest`
@@ -4784,14 +4792,14 @@
 ### [`tools/__init__.py`](tools/__init__.py)
 > *Developer proofs for VoidFarer.*
 
-**Size**: `1` lines (`38` bytes)
+**Size**: `1` lines
 
 ---
 
 ### [`tools/ai_play.py`](tools/ai_play.py)
 > *Play VoidFarer headlessly through the public API and report mechanic coverage.*
 
-**Size**: `83` lines (`3299` bytes)
+**Size**: `83` lines
 
 **Functions:**
 - `def main(argv)`
@@ -4801,7 +4809,7 @@
 ### [`tools/ui_audit.py`](tools/ui_audit.py)
 > *Capture VoidFarer cockpit screenshots and a measurable UI audit with headless Edge or Chrome.*
 
-**Size**: `958` lines (`38611` bytes)
+**Size**: `958` lines
 
 **Functions:**
 - `def find_browser()` - *Locate an installed Edge or Chrome executable without a third-party dependency.*
@@ -4823,7 +4831,7 @@
 ### [`tools/ui_browser.py`](tools/ui_browser.py)
 > *Drive the real VoidFarer cockpit in Edge through Playwright.*
 
-**Size**: `605` lines (`27088` bytes)
+**Size**: `605` lines
 
 **Functions:**
 - `def _open_cockpit(page, scenario, tab, timeout, weapon)` - *Wait for the cockpit and move it into the requested review state.*
@@ -4843,7 +4851,7 @@
 ### [`tools/ui_inventory.py`](tools/ui_inventory.py)
 > *Print VoidFarer's cockpit inventory, one entry per line.*
 
-**Size**: `184` lines (`7734` bytes)
+**Size**: `184` lines
 
 **Classes:**
 - `class SurfaceParser` - *Collects identified elements, roles, live regions and hotkey chips of one page.*
@@ -4867,14 +4875,14 @@
 ### [`voidfarer/__init__.py`](voidfarer/__init__.py)
 > *VoidFarer: Autonomous deep-space fleet, procedural galaxy, and holographic cockpit simulation engine.*
 
-**Size**: `4` lines (`159` bytes)
+**Size**: `4` lines
 
 ---
 
 ### [`voidfarer/agent_api.py`](voidfarer/agent_api.py)
 > *Discoverable action catalog so an AI can play every mechanic through the public API.*
 
-**Size**: `86` lines (`3231` bytes)
+**Size**: `86` lines
 
 **Functions:**
 - `def _sections(source)` - *Split the handler source into the GET and POST halves.*
@@ -4887,7 +4895,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2460` lines (`116933` bytes)
+**Size**: `2499` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4927,6 +4935,7 @@
   - Method `._overhaul_action()` - *Scrub hyperlane frame wear once after the campaign at a drydock (ADR-393).*
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
+  - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
   - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*
@@ -5025,7 +5034,7 @@
 ### [`voidfarer/archetypes.py`](voidfarer/archetypes.py)
 > *Quick-start commander archetypes: a skill spread, an origin and a small starting loadout.*
 
-**Size**: `44` lines (`1874` bytes)
+**Size**: `44` lines
 
 **Functions:**
 - `def archetype_catalog()` - *The archetypes as a list for the creation screen, in display order.*
@@ -5035,7 +5044,7 @@
 ### [`voidfarer/away.py`](voidfarer/away.py)
 > *Away-team expeditions: body missions, deterministic outcomes, and crew risk.*
 
-**Size**: `306` lines (`10283` bytes)
+**Size**: `306` lines
 
 **Classes:**
 - `class AwayMissionType` - *One expedition profile that can be launched from orbit.*
@@ -5058,7 +5067,7 @@
 ### [`voidfarer/character.py`](voidfarer/character.py)
 > *Commander character progression, skills, and activatable abilities.*
 
-**Size**: `216` lines (`8828` bytes)
+**Size**: `216` lines
 
 **Functions:**
 - `def match_background(background)` - *Canonical background id for an id, display name or legacy alias (case-insensitive); None for custom strings.*
@@ -5078,7 +5087,7 @@
 ### [`voidfarer/cli.py`](voidfarer/cli.py)
 > *Command-line interface and interactive terminal REPL for VoidFarer.*
 
-**Size**: `4957` lines (`245456` bytes)
+**Size**: `4957` lines
 
 **Functions:**
 - `def _get_engine(storage_dir)` - *Initialize or restore simulation engine from disk.*
@@ -5159,7 +5168,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `761` lines (`26824` bytes)
+**Size**: `761` lines
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -5179,7 +5188,7 @@
 ### [`voidfarer/comms.py`](voidfarer/comms.py)
 > *One report and action surface for AI captains, quantum messages and trees.*
 
-**Size**: `92` lines (`3158` bytes)
+**Size**: `92` lines
 
 **Functions:**
 - `def comms_summary(state)` - *Compact payload for /api/state.*
@@ -5193,7 +5202,7 @@
 ### [`voidfarer/crew.py`](voidfarer/crew.py)
 > *Crew roles, recruiting, portraits, and crew-derived ship bonuses.*
 
-**Size**: `310` lines (`11703` bytes)
+**Size**: `310` lines
 
 **Classes:**
 - `class CrewRole`
@@ -5219,7 +5228,7 @@
 ### [`voidfarer/crew_command.py`](voidfarer/crew_command.py)
 > *One report and action surface for crew, stations, shore leave and away teams.*
 
-**Size**: `89` lines (`3227` bytes)
+**Size**: `89` lines
 
 **Functions:**
 - `def crew_summary(state)` - *Compact payload for /api/state.*
@@ -5232,7 +5241,7 @@
 ### [`voidfarer/decisions.py`](voidfarer/decisions.py)
 > *Conditional real-time decision events that pause the simulation until resolved.*
 
-**Size**: `379` lines (`26244` bytes)
+**Size**: `379` lines
 
 **Classes:**
 - `class DecisionDefinition`
@@ -5260,7 +5269,7 @@
 ### [`voidfarer/demographics.py`](voidfarer/demographics.py)
 > *Population capacity, technology limits, and logistic growth for VoidFarer worlds.*
 
-**Size**: `245` lines (`8464` bytes)
+**Size**: `245` lines
 
 **Functions:**
 - `def clamp_tech_level(tech_level)` - *Return a whole tech level in the supported 1..10 band.*
@@ -5277,7 +5286,7 @@
 ### [`voidfarer/economy.py`](voidfarer/economy.py)
 > *Dynamic Global Economy, supply/demand simulation, economic events, and galactic trade network.*
 
-**Size**: `504` lines (`19839` bytes)
+**Size**: `504` lines
 
 **Functions:**
 - `def generate_initial_economy(systems, rng)` - *Construct baseline economy state with localized stockpiles and initial macroeconomic conditions.*
@@ -5292,7 +5301,7 @@
 ### [`voidfarer/empire.py`](voidfarer/empire.py)
 > *One report and action surface for research, outposts, megastructures and diplomacy.*
 
-**Size**: `164` lines (`6355` bytes)
+**Size**: `164` lines
 
 **Functions:**
 - `def _leader_rows(state)`
@@ -5307,7 +5316,7 @@
 ### [`voidfarer/encounters.py`](voidfarer/encounters.py)
 > *Unified view and resolver for VoidFarer's blocking encounters.*
 
-**Size**: `235` lines (`8333` bytes)
+**Size**: `235` lines
 
 **Functions:**
 - `def _action(action_id, label, detail, *, cost, disabled, reason)`
@@ -5324,7 +5333,7 @@
 ### [`voidfarer/enemies.py`](voidfarer/enemies.py)
 > *Hostile Enemy Archetypes, Tactical Combat AI, and Procedural Intercept Generation.*
 
-**Size**: `287` lines (`11370` bytes)
+**Size**: `287` lines
 
 **Classes:**
 - `class EnemyArchetype` - *Blueprint for procedural hostile intercepts across galactic territories.*
@@ -5339,7 +5348,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11305` lines (`557432` bytes)
+**Size**: `11305` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5602,7 +5611,7 @@
 ### [`voidfarer/engineering.py`](voidfarer/engineering.py)
 > *One report and action surface for power, reactor, repair, salvage and fabrication.*
 
-**Size**: `135` lines (`4852` bytes)
+**Size**: `135` lines
 
 **Functions:**
 - `def engineering_summary(state)` - *Compact payload for /api/state.*
@@ -5616,7 +5625,7 @@
 ### [`voidfarer/exploration.py`](voidfarer/exploration.py)
 > *Derelict salvage sites, fuel scooping profiles, and crew training drills.*
 
-**Size**: `167` lines (`5983` bytes)
+**Size**: `167` lines
 
 **Classes:**
 - `class DerelictSite` - *A deterministic, once-per-body salvage site with a risk/reward profile.*
@@ -5636,7 +5645,7 @@
 ### [`voidfarer/faction_economy.py`](voidfarer/faction_economy.py)
 > *Basic per-faction economy: tax base, industry, upkeep, treasury and war burden.*
 
-**Size**: `206` lines (`7614` bytes)
+**Size**: `206` lines
 
 **Functions:**
 - `def _owned_systems(faction_name, systems)`
@@ -5650,7 +5659,7 @@
 ### [`voidfarer/faction_state.py`](voidfarer/faction_state.py)
 > *Dynamic faction leaders, behaviors, war resolution, and elimination.*
 
-**Size**: `624` lines (`27258` bytes)
+**Size**: `624` lines
 
 **Functions:**
 - `def leader_voice(leader, occasion)` - *Deterministic voiced line for a leader and occasion; stable per save seed.*
@@ -5676,7 +5685,7 @@
 ### [`voidfarer/faction_trade.py`](voidfarer/faction_trade.py)
 > *Faction-to-faction trade: hyperlane-adjacent, peaceful pairs exchange goods.*
 
-**Size**: `148` lines (`5197` bytes)
+**Size**: `148` lines
 
 **Functions:**
 - `def _faction_name(faction_id)`
@@ -5693,7 +5702,7 @@
 ### [`voidfarer/factions.py`](voidfarer/factions.py)
 > *Galactic Factions, Megacorporations, Standings, and Geopolitical Mechanics.*
 
-**Size**: `333` lines (`13628` bytes)
+**Size**: `333` lines
 
 **Classes:**
 - `class Faction` - *Sovereign faction or interstellar coalition.*
@@ -5717,7 +5726,7 @@
 ### [`voidfarer/fitting.py`](voidfarer/fitting.py)
 > *One fitting surface for every ship hardware catalog.*
 
-**Size**: `244` lines (`7918` bytes)
+**Size**: `244` lines
 
 **Functions:**
 - `def _service_dock(state)`
@@ -5735,7 +5744,7 @@
 ### [`voidfarer/fleet.py`](voidfarer/fleet.py)
 > *Escort warship catalog and fleet-manager behavior.*
 
-**Size**: `365` lines (`12695` bytes)
+**Size**: `365` lines
 
 **Functions:**
 - `def captain_skill_multiplier(skill)` - *Role bonuses grow 5% per skill rank above 1; skill 0 is legacy-neutral.*
@@ -5761,7 +5770,7 @@
 ### [`voidfarer/fleet_command.py`](voidfarer/fleet_command.py)
 > *One report and action surface for every fleet asset.*
 
-**Size**: `182` lines (`6862` bytes)
+**Size**: `182` lines
 
 **Functions:**
 - `def _drone_rows(state)`
@@ -5778,7 +5787,7 @@
 ### [`voidfarer/flight.py`](voidfarer/flight.py)
 > *One report and action surface for route plotting, navigation and local flight.*
 
-**Size**: `123` lines (`4543` bytes)
+**Size**: `123` lines
 
 **Functions:**
 - `def flight_summary(state)` - *Compact payload for /api/state.*
@@ -5791,7 +5800,7 @@
 ### [`voidfarer/frontier.py`](voidfarer/frontier.py)
 > *Frontier systems: autonomous captains, depots, mercenaries, and quantum messages.*
 
-**Size**: `230` lines (`9515` bytes)
+**Size**: `230` lines
 
 **Functions:**
 - `def captain_hail(captain)` - *Deterministic hail greeting for a captain; stable per captain id.*
@@ -5806,7 +5815,7 @@
 ### [`voidfarer/galaxy.py`](voidfarer/galaxy.py)
 > *Procedural galaxy generator, celestial orbital mechanics, and market economy.*
 
-**Size**: `1389` lines (`62615` bytes)
+**Size**: `1389` lines
 
 **Classes:**
 - `class GalaxyGenerator` - *Generates deterministic star systems, celestial bodies, and hyperlane corridors.*
@@ -5830,7 +5839,7 @@
 ### [`voidfarer/intel.py`](voidfarer/intel.py)
 > *One report and action surface for chart, economy, factions, wars and corps.*
 
-**Size**: `180` lines (`6035` bytes)
+**Size**: `180` lines
 
 **Functions:**
 - `def intel_summary(state)` - *Compact payload for /api/state.*
@@ -5848,7 +5857,7 @@
 ### [`voidfarer/inventory.py`](voidfarer/inventory.py)
 > *Inventory items, consumables, and cargo management.*
 
-**Size**: `180` lines (`5784` bytes)
+**Size**: `180` lines
 
 **Classes:**
 - `class InventoryItem` - *Itemized inventory item manifest (trade commodity or usable space consumable).*
@@ -5864,7 +5873,7 @@
 ### [`voidfarer/logbook.py`](voidfarer/logbook.py)
 > *Flight-log windowing: notable galactic news must outlive routine chatter.*
 
-**Size**: `97` lines (`3311` bytes)
+**Size**: `97` lines
 
 **Functions:**
 - `def is_notable(line)` - *True when a log line carries galactic news rather than ambient chatter.*
@@ -5876,7 +5885,7 @@
 ### [`voidfarer/logistics.py`](voidfarer/logistics.py)
 > *One report and action surface for trade, freight, depots and inventory.*
 
-**Size**: `150` lines (`5812` bytes)
+**Size**: `150` lines
 
 **Functions:**
 - `def _depot_row(state)`
@@ -5891,7 +5900,7 @@
 ### [`voidfarer/mapmods.py`](voidfarer/mapmods.py)
 > *Sector map modifiers: persistent environmental conditions that reshape simulation.*
 
-**Size**: `208` lines (`7603` bytes)
+**Size**: `208` lines
 
 **Functions:**
 - `def get_map_modifier(modifier_id)`
@@ -5906,7 +5915,7 @@
 ### [`voidfarer/megastructures.py`](voidfarer/megastructures.py)
 > *Ancient megastructure restoration catalog and production bonuses.*
 
-**Size**: `79` lines (`2241` bytes)
+**Size**: `79` lines
 
 **Functions:**
 - `def get_restoration(body_type)`
@@ -5918,7 +5927,7 @@
 ### [`voidfarer/messaging.py`](voidfarer/messaging.py)
 > *Branching quantum message trees and their consequences.*
 
-**Size**: `332` lines (`13460` bytes)
+**Size**: `332` lines
 
 **Classes:**
 - `class MessageNode`
@@ -5938,7 +5947,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2473` lines (`92744` bytes)
+**Size**: `2473` lines
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -6130,7 +6139,7 @@
 ### [`voidfarer/narrative.py`](voidfarer/narrative.py)
 > *One report and action surface for story, tutorial, quests, contracts and events.*
 
-**Size**: `123` lines (`4540` bytes)
+**Size**: `123` lines
 
 **Functions:**
 - `def _rows(items)`
@@ -6144,7 +6153,7 @@
 ### [`voidfarer/navigation.py`](voidfarer/navigation.py)
 > *Navigation routing, jump planning, and black-hole hazard helpers.*
 
-**Size**: `189` lines (`6569` bytes)
+**Size**: `189` lines
 
 **Functions:**
 - `def shortest_route(systems, start_id, target_id)`
@@ -6162,7 +6171,7 @@
 ### [`voidfarer/outposts.py`](voidfarer/outposts.py)
 > *Outpost construction and production catalogs.*
 
-**Size**: `319` lines (`11432` bytes)
+**Size**: `319` lines
 
 **Classes:**
 - `class OutpostType`
@@ -6188,7 +6197,7 @@
 ### [`voidfarer/pirates.py`](voidfarer/pirates.py)
 > *Pirate bands, toll encounters, and deterministic raid generation.*
 
-**Size**: `112` lines (`3636` bytes)
+**Size**: `112` lines
 
 **Classes:**
 - `class PirateRisk`
@@ -6202,7 +6211,7 @@
 ### [`voidfarer/progress.py`](voidfarer/progress.py)
 > *One report and action surface for commander, pilot and collection progress.*
 
-**Size**: `92` lines (`3407` bytes)
+**Size**: `92` lines
 
 **Functions:**
 - `def progress_summary(state)` - *Compact payload for /api/state.*
@@ -6215,7 +6224,7 @@
 ### [`voidfarer/reactor.py`](voidfarer/reactor.py)
 > *Reactor core simulation: operating modes, thermal load, cooling, and derating.*
 
-**Size**: `159` lines (`6429` bytes)
+**Size**: `159` lines
 
 **Functions:**
 - `def get_reactor_mode(mode)`
@@ -6231,7 +6240,7 @@
 ### [`voidfarer/research.py`](voidfarer/research.py)
 > *Research projects and technology bonuses.*
 
-**Size**: `182` lines (`5868` bytes)
+**Size**: `182` lines
 
 **Classes:**
 - `class ResearchProject`
@@ -6247,7 +6256,7 @@
 ### [`voidfarer/retention.py`](voidfarer/retention.py)
 > *Psychological retention mechanics, Precursor relics, dynamic contracts, and pilot mastery.*
 
-**Size**: `583` lines (`21372` bytes)
+**Size**: `583` lines
 
 **Functions:**
 - `def streak_multiplier(streak)` - *Expedition streak yield multiplier (loss-aversion loop, Kahneman/Tversky).*
@@ -6266,7 +6275,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1776` lines (`76024` bytes)
+**Size**: `1776` lines
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -6299,7 +6308,7 @@
 ### [`voidfarer/shipmods.py`](voidfarer/shipmods.py)
 > *Structural ship modifications: permanent refits with explicit trade-offs.*
 
-**Size**: `208` lines (`7179` bytes)
+**Size**: `208` lines
 
 **Classes:**
 - `class ShipMod` - *A permanent structural refit available at orbital drydocks.*
@@ -6318,7 +6327,7 @@
 ### [`voidfarer/smuggling.py`](voidfarer/smuggling.py)
 > *Contraband smuggling mechanics, customs scanner risks, and security interdiction.*
 
-**Size**: `156` lines (`5302` bytes)
+**Size**: `156` lines
 
 **Functions:**
 - `def is_contraband(commodity_id)` - *Return True if the commodity is classed as illicit contraband.*
@@ -6331,7 +6340,7 @@
 ### [`voidfarer/state_machines.py`](voidfarer/state_machines.py)
 > *Canonical contract for VoidFarer's implicit state machines.*
 
-**Size**: `1111` lines (`44024` bytes)
+**Size**: `1111` lines
 
 **Classes:**
 - `class Transition` - *One named edge in a state machine.*
@@ -6373,7 +6382,7 @@
 ### [`voidfarer/storage.py`](voidfarer/storage.py)
 > *Crash-resilient storage engine and atomic persistence for VoidFarer.*
 
-**Size**: `212` lines (`8446` bytes)
+**Size**: `212` lines
 
 **Classes:**
 - `class StorageManager` - *Manages power-loss safe atomic persistence and shadow backups.*
@@ -6398,7 +6407,7 @@
 ### [`voidfarer/story.py`](voidfarer/story.py)
 > *Interactive Cadet Flight Academy tutorial and branching narrative campaign systems.*
 
-**Size**: `541` lines (`24798` bytes)
+**Size**: `541` lines
 
 **Functions:**
 - `def generate_initial_tutorial()` - *Construct a fresh Cadet Flight Academy tutorial state.*
@@ -6412,7 +6421,7 @@
 ### [`voidfarer/surface.py`](voidfarer/surface.py)
 > *Surface operations: choose what your landing party does after touchdown.*
 
-**Size**: `265` lines (`8789` bytes)
+**Size**: `265` lines
 
 **Classes:**
 - `class SurfaceOperation`
@@ -6430,7 +6439,7 @@
 ### [`voidfarer/surface_ops.py`](voidfarer/surface_ops.py)
 > *One report and action surface for landing, surface operations and reconstruction.*
 
-**Size**: `102` lines (`4112` bytes)
+**Size**: `102` lines
 
 **Functions:**
 - `def _current_body(state)`
@@ -6444,7 +6453,7 @@
 ### [`voidfarer/upgrades.py`](voidfarer/upgrades.py)
 > *Hardware upgrade catalog, fleet drone definitions, shipyard chassis, and equipment registry.*
 
-**Size**: `433` lines (`15077` bytes)
+**Size**: `433` lines
 
 **Classes:**
 - `class ShipChassis` - *Pre-configured spacecraft hull chassis available for purchase at orbital shipyards.*
@@ -6465,7 +6474,7 @@
 ### [`voidfarer/weapons.py`](voidfarer/weapons.py)
 > *Weapon catalog and combat modifiers.*
 
-**Size**: `56` lines (`2337` bytes)
+**Size**: `56` lines
 
 **Classes:**
 - `class WeaponSpec`
