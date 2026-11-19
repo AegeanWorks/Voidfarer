@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "save-slot-isolation",
+    "task_id": "checkpoint-replay-proof",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795112641.5070548,
+    "updated_at": 1795114923.242235,
     "owner": "kilo:goal",
-    "lease_until": 1795119841.5070548,
+    "lease_until": 1795122123.242235,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795112788.4609237,
-    "completed_head": "03d5d0600209e8350b1d970069104f702f6d7f3e",
-    "completed_tree": "1b03ca5207f2000d9f8ed7ca305bab12b7d45d2f"
+    "completed_at": 1795115066.5518901,
+    "completed_head": "acb475f84c236efe4fb8474550525a4c2590c2ee",
+    "completed_tree": "6ee2a5af772e951e368c063c8a7aa4383a76235e"
   },
   "checkpoints": [
-    {
-      "task_id": "wreck-decommission",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Decommission a destroyed escort after the campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795084294.7897973,
-      "timestamp_str": "2026-11-19 13:31:34",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/fleet/escort/dismiss stayed context because live-hull decommissioning is permanent, but every benchmark campaign ends with the bought corvette at hull zero: the repair tour requires hull above zero, so the wreck can never be repaired, never fights, and still holds its assigned engineer forever",
-        "benefits": "A wrecked bought escort is decommissioned in place, releasing its officer, while live hulls and prizes stay untouched and the drydock sale keeps handling captured prizes",
-        "risks": "contract: /api/fleet/escort/dismiss keeps a narrowed CONTEXT_ACTIONS reason and no signature change; dependency: none; concurrency: none; state: one dead hull removed through the existing engine path",
-        "mitigation": "failing-first tests for the wrecked-escort dismissal, live-hull keep, destroyed-prize exclusion, one-shot guard and pre-campaign gate, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and project gates"
-      },
-      "plan_digest": "c84e3e31eb1257cb25fa133396d8a3bce226359af64712e962d28bcb53f42180"
-    },
-    {
-      "task_id": "wreck-decommission",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors/10 refusals; all three benchmark campaigns decommission the wreck with 0 errors: seed 1 102/98/100 refusals 21 customs+mega+gambit, seed 2 99/95/98 refusals 19 mega+prize sale, seed 42 100/97/100 refusals 19 customs+mega+sale+gambit; suite Ran 2107 OK (ADR-402); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795084295.0670311,
-      "timestamp_str": "2026-11-19 13:31:35",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "wreck-decommission",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'wreck-decommission' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795084555.9072506,
-      "timestamp_str": "2026-11-19 13:35:55",
-      "agent": "kilo:goal",
-      "head": "960c492a47e8e0dbed2ec1a473a8a0f01e74049c",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "crew-id-uniqueness",
       "phase": "in_progress",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-19 21:26:29",
       "agent": "kilo:goal",
       "head": "03d5d0600209e8350b1d970069104f702f6d7f3e",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "checkpoint-replay-proof",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] A pre-jump checkpoint replays the same risky jump",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795114922.886388,
+      "timestamp_str": "2026-11-19 22:02:02",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-301 rolls a checkpoint before low-security jumps and ADR-405 made saves carry the live RNG stream, but nothing pinned that reloading the checkpoint faces the same encounter instead of a re-roll",
+        "benefits": "the pre-jump safety net is proven replayable end to end over the real checkpoint writer",
+        "risks": "contract: none, test-only; dependency: none; concurrency: none; state: none",
+        "mitigation": "two tests: a low-security jump writes the slot and replaying it reproduces the live state field for field (clock excluded), and a high-security jump writes nothing"
+      },
+      "plan_digest": "46a833daa73a7f9e35932850a6c17769e0dbb9ed166357140fa7a92c3b870ed9"
+    },
+    {
+      "task_id": "checkpoint-replay-proof",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Both checkpoint tests pass; suite Ran 2139 OK with README tree at 180 suites; 6/6 project gates (mechanics gate 180-step passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-410); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795114923.242235,
+      "timestamp_str": "2026-11-19 22:02:03",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "checkpoint-replay-proof",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'checkpoint-replay-proof' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795115066.7841136,
+      "timestamp_str": "2026-11-19 22:04:26",
+      "agent": "kilo:goal",
+      "head": "acb475f84c236efe4fb8474550525a4c2590c2ee",
       "delivery": {
         "roots": [
           "."
