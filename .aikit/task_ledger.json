@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "deterministic-resume",
+    "task_id": "save-load-boundary-proof",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795109484.511144,
+    "updated_at": 1795111625.2825623,
     "owner": "kilo:goal",
-    "lease_until": 1795116684.511144,
+    "lease_until": 1795118825.2825623,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795109652.8695624,
-    "completed_head": "d584f3708f73d5e70bacea14b73c493e52cd3490",
-    "completed_tree": "60fdd58b2f68468068ab032fd89c83de5a730fd0"
+    "completed_at": 1795111713.4505203,
+    "completed_head": "4814bf8bb003613d939a94b4eeff72460854244f",
+    "completed_tree": "2de47d3cacc1b0a66842921f5d4dd81efcad8272"
   },
   "checkpoints": [
-    {
-      "task_id": "prize-sale",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/2] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors and no prize on the board; seed 42 sells its captured Marauder prize and records the fleet_sell family with 0 errors (99 families/96 succeeded/99 attempted, refusals 19); seeds 1/2 hold no prize and keep 0 errors (99/96/98 and 97/94/97); suite Ran 2087 OK (ADR-399); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795076287.632387,
-      "timestamp_str": "2026-11-19 11:18:07",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "prize-sale",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'prize-sale' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795076346.068456,
-      "timestamp_str": "2026-11-19 11:19:06",
-      "agent": "kilo:goal",
-      "head": "328ad79de5101ead48e0584e86c49e69e14f873c",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "customs-cordon-run",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Run a contraband lot at the quoted customs cordon",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795081783.7249587,
-      "timestamp_str": "2026-11-19 12:49:43",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/customs/resolve stayed context as prompt-driven: a scan only rolls on arrival in a security-0.65+ system with contraband held, and ordinary play almost never paired those; the snapshot quoted the cordon's name and chance but not its id, so a deliberate run could not aim at it",
-        "benefits": "After the campaign the captain buys one contraband lot, ferries the quoted cordon until the scan fires and dumps the lot under pressure, proving the smuggling loop and its evasion stat without touching the short gate",
-        "risks": "contract: customs_risk_status gains one additive system_id field and no route signature changes; dependency: none; concurrency: none; state: one contraband lot bought, ferried and jettisoned through the existing engine paths",
-        "mitigation": "failing-first engine assertion for the id plus ten agent tests for the purchase, cordon jump, refuel guard, reposition hop, jump cap and one-shot/lost-lot guards, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42 plus seed 7, full suite and project gates"
-      },
-      "plan_digest": "48dfaea82523d5d7556948bd378514b4ee89afbdd419b3d47edcf66601b03465"
-    },
     {
       "task_id": "customs-cordon-run",
       "phase": "in_progress",
@@ -317,6 +271,52 @@
       "timestamp_str": "2026-11-19 20:34:13",
       "agent": "kilo:goal",
       "head": "d584f3708f73d5e70bacea14b73c493e52cd3490",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "save-load-boundary-proof",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Pin the save/load boundary end to end",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795111624.9793086,
+      "timestamp_str": "2026-11-19 21:07:04",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "deterministic resume was proven at the engine level only; the browser routes (/api/save, /api/reset, /api/load) had no test that the RNG stream, evolved trade links and clock survive a real round trip, and the deep invariant sweep had never been run on five seeds",
+        "benefits": "the user-facing save/load path proves the same guarantee, and the deep invariant sweep (ids, bounds, cargo signs, population, devastation, contracts) is documented clean across five seeds including a full 2,000-step campaign",
+        "risks": "contract: none, test-only change; dependency: none; concurrency: none; state: none",
+        "mitigation": "one integration test through the real HTTP server plus probe self-tests that prove the checker catches synthetic violations"
+      },
+      "plan_digest": "3ce7d5cf40954944883ceba57efaddb8d5442a00dd0f7fa2b3f4e3732217e6f2"
+    },
+    {
+      "task_id": "save-load-boundary-proof",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] New server test passes inside the 55-test suite; deep sweep 0 violations on seeds 3/11/5/6 and 42 at 2,000 steps, probe self-test catches every rule class; 1,000-step midpoint resume of a 2,000-step campaign matches field for field; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2134 OK (ADR-408); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795111625.2825623,
+      "timestamp_str": "2026-11-19 21:07:05",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "save-load-boundary-proof",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'save-load-boundary-proof' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795111713.5457597,
+      "timestamp_str": "2026-11-19 21:08:33",
+      "agent": "kilo:goal",
+      "head": "4814bf8bb003613d939a94b4eeff72460854244f",
       "delivery": {
         "roots": [
           "."
