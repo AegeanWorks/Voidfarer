@@ -75,7 +75,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/fleet/escort/role": "needs an owned escort outside combat",
     "/api/fleet/escort/captain": "needs an owned escort and an available crew member",
     "/api/fleet/refit": "the captain refits worn drones through the fleet action alias",
-    "/api/fleet/escort/sell": "selling the only escort would erase the fleet asset",
+    "/api/fleet/escort/sell": "the 180-step gate owns one bought escort; the campaign sells a captured prize instead",
     "/api/contract/claim": "needs a completed contract",
     "/api/contract/swap": "needs a pending contract offer from a claim",
 
@@ -522,6 +522,12 @@ class AiCaptain:
         sell = self._shipyard_sell_action()
         if sell is not None:
             return sell
+
+        # A captured prize is scrap value at a drydock, and selling one proves the
+        # fleet sale without disarming the bought escort (ADR-399).
+        prize_sale = self._prize_sale_action()
+        if prize_sale is not None:
+            return prize_sale
 
         dismissal = self._crew_dismiss_action()
         if dismissal is not None:
@@ -1684,6 +1690,29 @@ class AiCaptain:
                 continue
             return "/api/shipyard/sell", body, "shipyard_sell"
         return None
+
+    def _prize_sale_action(self):
+        """Sell one captured prize at a drydock after the campaign (ADR-399).
+
+        A prize is captured by boarding, so it is the one fleet hull the captain can
+        lose without disarming itself; the bought escort is never touched.
+        """
+        if "/api/fleet/escort/sell" in self.succeeded:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        prizes = [
+            ship for ship in self._escort_rows()
+            if str(ship.get("role") or "") == "prize"
+        ]
+        if not prizes:
+            return None
+        if not self._is_docked():
+            dock = self._dockable_body()
+            if dock and dock.get("id"):
+                return "/api/travel", {"body_id": dock["id"], "mode": "sublight"}, "dock"
+            return None
+        return "/api/fleet/escort/sell", {"ship_id": str(prizes[0]["id"])}, "fleet_sell"
 
     def _send_action(self):
         """Send one quantum report to a real correspondent after the campaign (ADR-386)."""

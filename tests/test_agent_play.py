@@ -1322,6 +1322,66 @@ class ReactorDoctrineTest(unittest.TestCase):
         self.assertIsNone(captain._reactor_mode_action())
 
 
+class PrizeSalePolicyTest(unittest.TestCase):
+    """A captured prize is sold at a drydock, never the bought escort (ADR-399)."""
+
+    def _captain(self, ships, docked=True, completed=True, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "story_status": {"completed": completed},
+            "current_system": {
+                "id": "ashen",
+                "bodies": [
+                    {"id": "ashen_station", "station_dockable": True},
+                    {"id": "ashen_rock", "station_dockable": False},
+                ],
+            },
+            "orbiting_body": ({"id": "ashen_station", "station_dockable": True}
+                              if docked else {"id": "ashen_rock"}),
+            "fleet_manager": {"ships": ships},
+        }
+        for key, value in state.items():
+            base[key] = value
+        captain.state = base
+        return captain
+
+    def test_a_docked_prize_is_sold(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 40},
+            {"id": "prize_134_1", "role": "prize", "hull": 0},
+        ])
+        self.assertEqual(
+            captain._prize_sale_action(),
+            ("/api/fleet/escort/sell", {"ship_id": "prize_134_1"}, "fleet_sell"),
+        )
+
+    def test_an_undocked_captain_reaches_a_station_first(self):
+        captain = self._captain(
+            [{"id": "prize_134_1", "role": "prize", "hull": 0}], docked=False)
+        self.assertEqual(
+            captain._prize_sale_action(),
+            ("/api/travel", {"body_id": "ashen_station", "mode": "sublight"}, "dock"),
+        )
+
+    def test_the_bought_escort_is_never_sold(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 90},
+        ])
+        self.assertIsNone(captain._prize_sale_action())
+
+    def test_the_sale_happens_once(self):
+        captain = self._captain([
+            {"id": "prize_134_1", "role": "prize", "hull": 0},
+        ])
+        captain.succeeded.add("/api/fleet/escort/sell")
+        self.assertIsNone(captain._prize_sale_action())
+
+    def test_nothing_sells_before_the_campaign(self):
+        captain = self._captain(
+            [{"id": "prize_134_1", "role": "prize", "hull": 0}], completed=False)
+        self.assertIsNone(captain._prize_sale_action())
+
+
 class StoryTravelTourTest(unittest.TestCase):
     """Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360)."""
 
