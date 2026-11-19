@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `237`
-- **Total Classes**: `593`
+- **Total Classes**: `594`
 - **Total Top-Level Functions**: `537`
-- **Total Class Methods**: `3066`
-- **Total Source Lines**: `68705`
+- **Total Class Methods**: `3078`
+- **Total Source Lines**: `68894`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`237` module(s))
@@ -68,7 +68,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `2812` lines
+**Size**: `2940` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -223,6 +223,18 @@
   - Method `.test_the_decoy_waits_while_fuel_can_still_escape()`
   - Method `.test_a_hot_but_safe_reactor_uses_point_defense()`
   - Method `.test_a_threatened_hull_attempts_a_bridge_strike()`
+- `class CombatGambitPolicyTest` - *The captain recalls an armed escort and spends its once-per-battle gambit (ADR-397).*
+  - Method `._captain(**state)`
+  - Method `.test_an_armed_local_escort_spends_a_ready_gambit()`
+  - Method `.test_a_remote_armed_escort_is_recalled_first()`
+  - Method `.test_a_failed_recall_is_not_retried()`
+  - Method `.test_a_spent_battle_gambit_is_not_repeated()`
+  - Method `.test_the_campaign_spends_the_gambit_once()`
+  - Method `.test_an_unarmed_escort_has_no_gambit()`
+  - Method `.test_an_engineer_waits_for_hull_damage()`
+  - Method `.test_a_pilot_gambit_is_ready_at_the_start_of_a_flight()`
+  - Method `.test_a_scientist_needs_enemy_shields()`
+  - Method `.test_the_choice_uses_the_gambit_before_routine_fire()`
 - `class StoryTravelTourTest` - *Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360).*
   - Method `._captain(**state)`
   - Method `.test_a_ready_chapter_is_resolved_before_a_dock_trip()`
@@ -4910,7 +4922,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2594` lines
+**Size**: `2655` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -4925,6 +4937,7 @@
   - Method `._anomaly_action()` - *Take an anomaly choice whose power check passes, not always the first one.*
   - Method `._anomaly_threshold(choice)`
   - Method `._combat_choice()` - *Pick a combat action from the live state: survival first, then the tactical surface.*
+  - Method `._gambit_action()` - *Recall an armed escort and spend its captain's once-per-battle gambit (ADR-397).*
   - Method `._note_refusal(signature, message)` - *Schedule a fast retry, then a slow one, then drop a gate that never opens.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*
   - Method `._trade_choice(step)` - *Sell one unit when the hold is volume-full, otherwise buy one on even steps.*

@@ -1152,6 +1152,134 @@ class CombatPolicyTest(unittest.TestCase):
         self.assertEqual(captain._choose(7)[1]["action"], "target_bridge")
 
 
+class CombatGambitPolicyTest(unittest.TestCase):
+    """The captain recalls an armed escort and spends its once-per-battle gambit (ADR-397)."""
+
+    def _captain(self, **state):
+        captain = AiCaptain(ApiClient(port=1), seed=42)
+        base = {
+            "ship": {
+                "hull": 100, "max_hull": 100, "shield": 60, "max_shield": 60,
+                "fuel": 40,
+                "reactor": {"heat": 10.0, "max_heat": 100.0, "heat_pct": 10.0,
+                            "last_vent_tick": -999},
+                "power": {"engines": 25, "shields": 25, "sensors": 25, "weapons": 25},
+                "fleet_drones": [], "cargo": {},
+            },
+            "active_combat": {
+                "id": "c1", "enemy_hull": 100, "enemy_max_hull": 100,
+                "enemy_shield": 40, "enemy_max_shield": 40, "enemy_damage": 15,
+                "enemy_intent": "fire", "enemy_engines_disabled": False,
+                "captain_gambit_used": False, "captain_evasion_bonus": 0.0,
+            },
+            "current_system": {"id": "ashen"},
+            "crew": [
+                {"id": "crew_engineer_4", "role": "engineer", "status": "active",
+                 "injury_ticks": 0},
+            ],
+            "fleet_manager": {"ships": [
+                {"id": "escort_1", "hull": 90, "max_hull": 90, "shield": 60,
+                 "max_shield": 60, "assigned_system_id": "ashen",
+                 "captain_id": "crew_engineer_4"},
+            ]},
+        }
+        for key, value in state.items():
+            if isinstance(base.get(key), dict) and isinstance(value, dict):
+                base[key].update(value)
+            else:
+                base[key] = value
+        captain.state = base
+        return captain
+
+    def test_an_armed_local_escort_spends_a_ready_gambit(self):
+        captain = self._captain(ship={"hull": 60})
+        self.assertEqual(captain._gambit_action(),
+                         ("/api/combat/gambit", {}, "combat_gambit"))
+
+    def test_a_remote_armed_escort_is_recalled_first(self):
+        captain = self._captain(
+            fleet_manager={"ships": [
+                {"id": "escort_1", "hull": 90, "max_hull": 90, "shield": 60,
+                 "max_shield": 60, "assigned_system_id": "cyclops",
+                 "captain_id": "crew_engineer_4"},
+            ]})
+        self.assertEqual(
+            captain._gambit_action(),
+            ("/api/fleet/escort/assign",
+             {"ship_id": "escort_1", "system_id": "ashen"}, "escort_assign"),
+        )
+
+    def test_a_failed_recall_is_not_retried(self):
+        captain = self._captain(
+            fleet_manager={"ships": [
+                {"id": "escort_1", "hull": 90, "max_hull": 90, "shield": 60,
+                 "max_shield": 60, "assigned_system_id": "cyclops",
+                 "captain_id": "crew_engineer_4"},
+            ]})
+        self.assertEqual(captain._gambit_action()[0], "/api/fleet/escort/assign")
+        self.assertIsNone(captain._gambit_action())
+
+    def test_a_spent_battle_gambit_is_not_repeated(self):
+        captain = self._captain(active_combat={"captain_gambit_used": True})
+        self.assertIsNone(captain._gambit_action())
+
+    def test_the_campaign_spends_the_gambit_once(self):
+        captain = self._captain()
+        captain.attempted.add("/api/combat/gambit")
+        self.assertIsNone(captain._gambit_action())
+
+    def test_an_unarmed_escort_has_no_gambit(self):
+        captain = self._captain(
+            fleet_manager={"ships": [
+                {"id": "escort_1", "hull": 90, "max_hull": 90, "shield": 60,
+                 "max_shield": 60, "assigned_system_id": "ashen", "captain_id": ""},
+            ]},
+            crew=[])
+        self.assertIsNone(captain._gambit_action())
+
+    def test_an_engineer_waits_for_hull_damage(self):
+        self.assertIsNone(self._captain()._gambit_action())
+
+    def test_a_pilot_gambit_is_ready_at_the_start_of_a_flight(self):
+        captain = self._captain(
+            crew=[{"id": "crew_pilot_1", "role": "pilot", "status": "active",
+                   "injury_ticks": 0}],
+            fleet_manager={"ships": [
+                {"id": "escort_1", "hull": 90, "max_hull": 90, "shield": 60,
+                 "max_shield": 60, "assigned_system_id": "ashen",
+                 "captain_id": "crew_pilot_1"},
+            ]})
+        self.assertEqual(captain._gambit_action()[0], "/api/combat/gambit")
+        capped = self._captain(
+            active_combat={"captain_evasion_bonus": 0.35},
+            crew=[{"id": "crew_pilot_1", "role": "pilot", "status": "active",
+                   "injury_ticks": 0}],
+            fleet_manager={"ships": [
+                {"id": "escort_1", "hull": 90, "max_hull": 90, "shield": 60,
+                 "max_shield": 60, "assigned_system_id": "ashen",
+                 "captain_id": "crew_pilot_1"},
+            ]})
+        self.assertIsNone(capped._gambit_action())
+
+    def test_a_scientist_needs_enemy_shields(self):
+        def build(enemy_shield):
+            return self._captain(
+                active_combat={"enemy_shield": enemy_shield},
+                crew=[{"id": "crew_scientist_1", "role": "scientist",
+                       "status": "active", "injury_ticks": 0}],
+                fleet_manager={"ships": [
+                    {"id": "escort_1", "hull": 90, "max_hull": 90, "shield": 60,
+                     "max_shield": 60, "assigned_system_id": "ashen",
+                     "captain_id": "crew_scientist_1"},
+                ]})
+        self.assertEqual(build(40)._gambit_action()[0], "/api/combat/gambit")
+        self.assertIsNone(build(0)._gambit_action())
+
+    def test_the_choice_uses_the_gambit_before_routine_fire(self):
+        captain = self._captain(ship={"hull": 60})
+        self.assertEqual(captain._choose(7), ("/api/combat/gambit", {}, "combat_gambit"))
+
+
 class StoryTravelTourTest(unittest.TestCase):
     """Story-directed travel and orbit survive the stay-until-resolved hold (ADR-360)."""
 

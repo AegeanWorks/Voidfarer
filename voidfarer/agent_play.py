@@ -84,7 +84,7 @@ CONTEXT_ACTIONS: dict[str, str] = {
     "/api/crew/dismiss": "the 180-step gate keeps its starting roster; the 2,000-step campaign trims duplicate recruits",
     "/api/story/choice": "needs an active story choice",
     "/api/trade/quantum/place": "the lane opens after Act VI; the 180-step gate ends before the campaign does",
-    "/api/combat/gambit": "needs an active fight and a local escort captain",
+    "/api/combat/gambit": "the 180-step gate ends before an escort captain is assigned; the campaign recalls its armed wing and spends the gambit in one fight",
     "/api/outpost/link": "the 180-step gate founds one outpost; the 2,000-step campaign builds a same-system pair",
     "/api/megastructure/restore": "the 180-step gate never orbits a restorable body; the 2,000-step campaign restores one",
 }
@@ -264,6 +264,9 @@ class AiCaptain:
         self.salvage_probed: set[str] = set()
         self.salvage_probes = 0
         self.scoop_probed: set[str] = set()
+        # One gambit recall per campaign; a refused recall must not repeat each fight
+        # (ADR-397).
+        self.gambit_recalled = False
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -346,6 +349,9 @@ class AiCaptain:
         if customs:
             return "/api/customs/resolve", {"action": "jettison"}, "customs"
         if state.get("active_combat"):
+            gambit = self._gambit_action()
+            if gambit is not None:
+                return gambit
             return self._combat_choice()
         if state.get("active_anomaly"):
             anomaly = self._anomaly_action()
@@ -696,6 +702,61 @@ class AiCaptain:
         if hull * 5 <= max_hull * 3 and weapons >= 15 and "target_bridge" not in used:
             return pick("target_bridge")
         return "/api/combat", {"action": "fire_lasers"}, "combat"
+
+    def _gambit_action(self):
+        """Recall an armed escort and spend its captain's once-per-battle gambit (ADR-397).
+
+        The gambit's effect depends on the escort captain's role, so the policy only
+        posts the command when that role's engine gate is already open. Assignment
+        between systems does not spend a combat turn, so the recall is safe mid-fight.
+        """
+        if "/api/combat/gambit" in self.attempted:
+            return None
+        combat = self.state.get("active_combat") or {}
+        if combat.get("captain_gambit_used"):
+            return None
+        system_id = str((self.state.get("current_system") or {}).get("id") or "")
+        if not system_id:
+            return None
+        crew = {
+            str(member.get("id")): member
+            for member in self.state.get("crew") or []
+            if isinstance(member, dict)
+        }
+        armed = [
+            ship for ship in self._escort_rows()
+            if int(ship.get("hull") or 0) > 0 and str(ship.get("captain_id") or "")
+        ]
+        if not armed:
+            return None
+        local = [
+            ship for ship in armed
+            if str(ship.get("assigned_system_id") or "") == system_id
+        ]
+        if not local:
+            if self.gambit_recalled:
+                return None
+            self.gambit_recalled = True
+            body = {"ship_id": str(armed[0]["id"]), "system_id": system_id}
+            return "/api/fleet/escort/assign", body, "escort_assign"
+        ship = self.state.get("ship") or {}
+        hull = int(ship.get("hull") or 0)
+        max_hull = max(1, int(ship.get("max_hull") or 1))
+        role = str((crew.get(str(local[0]["captain_id"])) or {}).get("role") or "")
+        ready = {
+            "engineer": hull < max_hull,
+            "medic": any(int(escort.get("hull") or 0) < int(escort.get("max_hull") or 0)
+                         for escort in local),
+            "quartermaster": any(
+                int(escort.get("shield") or 0) < int(escort.get("max_shield") or 0)
+                for escort in local),
+            "pilot": float(combat.get("captain_evasion_bonus") or 0.0) < 0.35,
+            "scientist": int(combat.get("enemy_shield") or 0) > 0,
+            "marine": int(combat.get("enemy_damage") or 0) > 1,
+        }
+        if not ready.get(role):
+            return None
+        return "/api/combat/gambit", {}, "combat_gambit"
 
     def _note_refusal(self, signature: tuple[str, str], message: str) -> None:
         """Schedule a fast retry, then a slow one, then drop a gate that never opens."""
