@@ -3777,3 +3777,10 @@ epair_hull at a station reduces wear by 0.2 per HP repaired.
 - **Context**: ADR-405 put the RNG checkpoint in every save, so the natural follow-up question is whether independent slots stayed independent: a player may keep an early branch in one slot and a later run in another, and the storage layer shares a data directory. Nothing pinned that loading one slot cannot disturb another.
 - **Decision**: Add three tests over the real StorageManager: save slot alpha, play further, save slot beta, then assert each slot restores its own stream, tick and credits; the slot listing reports both; and loading alpha leaves beta's serialized state byte-identical. No production change was needed, which itself is the finding.
 - **Consequences**: Slot isolation and per-slot determinism are now guaranteed by test. Suite passes at 2137 tests with the README tree updated to 179 suites.
+
+### ADR-410: A pre-jump checkpoint replays the same risky jump
+- **Date**: 2026-11-19
+- **Status**: Accepted
+- **Context**: The engine rolls the checkpoint slot before a jump into a system below CHECKPOINT_SECURITY (ADR-301), and ADR-405 made saves carry the live RNG stream. Nothing pinned the two together: a player who dies to the encounter and reloads the checkpoint must face the same risky jump, not a re-roll with a reset stream.
+- **Decision**: Add two tests over the real StorageManager checkpoint writer: a low-security jump writes the slot, reloading it and jumping again reproduces the live post-jump state field for field (wall-clock fields excluded), and a high-security jump writes no checkpoint.
+- **Consequences**: The pre-jump safety net is now proven to be replayable. Suite passes at 2139 tests with the README tree updated to 180 suites.

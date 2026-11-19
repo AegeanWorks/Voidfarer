@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `241`
-- **Total Classes**: `606`
-- **Total Top-Level Functions**: `543`
-- **Total Class Methods**: `3156`
-- **Total Source Lines**: `69936`
+- **Total Python Modules**: `242`
+- **Total Classes**: `607`
+- **Total Top-Level Functions**: `545`
+- **Total Class Methods**: `3158`
+- **Total Source Lines**: `70006`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`241` module(s))
+- **Indexed**: python (`242` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -800,6 +800,22 @@
   - Method `.test_index_declares_the_captains_log_tab()`
   - Method `.test_javascript_renders_and_claims_codex_entries()`
   - Method `.test_styles_cover_codex_cards()`
+
+---
+
+### [`tests/test_checkpoint_resume.py`](tests/test_checkpoint_resume.py)
+> *A pre-jump checkpoint replays the same risky jump (ADR-410).*
+
+**Size**: `70` lines
+
+**Classes:**
+- `class CheckpointResumeTest`
+  - Method `.test_the_checkpoint_slot_replays_the_same_risky_jump()`
+  - Method `.test_a_secure_jump_writes_no_checkpoint()`
+
+**Functions:**
+- `def _strip_clock(value, key)`
+- `def _lower_security(engine, target_id)`
 
 ---
 
