@@ -1,72 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "readme-docs-sync",
+    "task_id": "autosave-follows-active-slot",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795117607.843955,
+    "updated_at": 1795120431.5815454,
     "owner": "kilo:goal",
-    "lease_until": 1795124807.843955,
+    "lease_until": 1795127631.5815454,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795117716.0290158,
-    "completed_head": "f9c1d34ab52e539c2d341349fd0e8d12c368ee15",
-    "completed_tree": "4435410639346b7c2d7ca7cd6989df709d8340da"
+    "completed_at": 1795120601.9615421,
+    "completed_head": "ab56c6d9e42d705688ed27b3837bf8c548db5767",
+    "completed_tree": "2dcbe9a078d6485f9076ef2791a834e01886e597"
   },
   "checkpoints": [
-    {
-      "task_id": "deterministic-resume",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/3] A save carries the live RNG stream",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795109447.1136255,
-      "timestamp_str": "2026-11-19 20:30:47",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "a resume comparison showed dozens of divergences because every load reseeded random.Random(galaxy_seed), replaying the first rolls instead of continuing the stream",
-        "benefits": "a resumed campaign continues exactly like the uninterrupted one",
-        "risks": "contract: GameState gains one optional field and the snapshot never exposes it; dependency: none; concurrency: none; state: the 625-int Mersenne state is stored in the save",
-        "mitigation": "failing-first tests for capture, round trip, resumed stream, legacy absence and malformed values plus resume parity probes"
-      },
-      "plan_digest": "90aff5c4f8f2dfaad25424e5a77c24b01016bdd3ec22e5af698b8be441d74179"
-    },
-    {
-      "task_id": "deterministic-resume",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[2/3] Loading does not recompute live trade links",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795109447.5896266,
-      "timestamp_str": "2026-11-19 20:30:47",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "_bootstrap_frontier recomputed the route table on every load and replaced live volumes the tick had evolved, drifting the resumed economy by a few units",
-        "benefits": "the route table stays exactly as saved",
-        "risks": "contract: none; dependency: none; concurrency: none; state: legacy saves without a table still get one",
-        "mitigation": "four failing-first tests pinning preserved volumes, legacy backfill, exact round trip and empty-table replacement"
-      }
-    },
-    {
-      "task_id": "deterministic-resume",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[3/3] Only a real pre-demographics world is backfilled on load",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795109448.1991737,
-      "timestamp_str": "2026-11-19 20:30:48",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "legacy_body meant capacity<=0, but fresh gas giants and lava worlds legitimately have zero capacity; after a war left one unclaimed the next load re-seeded it and stamped the system owner's flag on it",
-        "benefits": "territory bookkeeping no longer changes just by loading a save",
-        "risks": "contract: none; dependency: none; concurrency: none; state: legacy saves keep migrating because they lack tech_level too",
-        "mitigation": "two failing-first tests plus the existing population-economy legacy migration test"
-      }
-    },
     {
       "task_id": "deterministic-resume",
       "phase": "in_progress",
@@ -318,6 +266,52 @@
       "timestamp_str": "2026-11-19 22:48:36",
       "agent": "kilo:goal",
       "head": "f9c1d34ab52e539c2d341349fd0e8d12c368ee15",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "autosave-follows-active-slot",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] An autosave follows the loaded slot",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795120430.7832386,
+      "timestamp_str": "2026-11-19 23:33:50",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "StorageManager had no active-slot notion, so the ticker and per-step autosaves always wrote the default file; loading alpha and playing silently overwrote the default branch (reproduced: default 111 became 222)",
+        "benefits": "named campaigns autosave into themselves and a second branch is never clobbered; the pre-jump checkpoint slot stays a safety net",
+        "risks": "contract: StorageManager.save gains an activate keyword with a default that preserves explicit-slot saves; dependency: none; concurrency: the existing write lock already serializes saves; state: active_slot lives in memory only and starts at default",
+        "mitigation": "failing-first storage tests for all six transitions plus a server-level new-game/time-step test, full suite and project gates"
+      },
+      "plan_digest": "e16fb383649a0687327e21cdfd5625d89f3fb7fc08012aca3344721ea108b1b1"
+    },
+    {
+      "task_id": "autosave-follows-active-slot",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Six storage tests and the server autosave-slot test pass; suite Ran 2149 OK with README tree at 182 suites; 6/6 project gates incl. the 180-step mechanics gate (last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-413); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795120431.5815454,
+      "timestamp_str": "2026-11-19 23:33:51",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "autosave-follows-active-slot",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'autosave-follows-active-slot' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795120602.3626847,
+      "timestamp_str": "2026-11-19 23:36:42",
+      "agent": "kilo:goal",
+      "head": "ab56c6d9e42d705688ed27b3837bf8c548db5767",
       "delivery": {
         "roots": [
           "."
