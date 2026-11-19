@@ -1,78 +1,19 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "salvage-scoop-prospecting",
+    "task_id": "combat-gambit-recall",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795070769.7432563,
+    "updated_at": 1795073734.117481,
     "owner": "kilo:goal",
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795070857.6675875,
-    "completed_head": "351c8fd8e748f21a97de53652cfa480735b0353d",
-    "completed_tree": "57e5c962dafea8d584d3d9da61b742ce186f50c2"
+    "completed_at": 1795073752.0214953,
+    "completed_head": "6b0e4ee2ec1eee7053773dc8cb572507712e70d4",
+    "completed_tree": "a98a2bcdd8e3b72f9c69bbbd3503c51cd3a5af5c"
   },
   "checkpoints": [
-    {
-      "task_id": "outpost-supply-link",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/4] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors and the link reason narrowed to short-gate timing; 2,000-step seeds 1/2/42 build a post-story pair in rift_station, link the newer through the older, keep the tour outpost and finish Act VI with 0 errors (92/89/94, 89/87/93, 89/86/92); suite Ran 2025 OK (ADR-390); 5/5 gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795012434.3133051,
-      "timestamp_str": "2026-11-18 17:33:54",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "outpost-supply-link",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'outpost-supply-link' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795012626.7334504,
-      "timestamp_str": "2026-11-18 17:37:06",
-      "agent": "kilo:goal",
-      "head": "751f643416756624eccda3ccec3ed752c43e0c59",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "megastructure-restore",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/4] Restore one ancient megastructure after the campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795013287.368036,
-      "timestamp_str": "2026-11-18 17:48:07",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "/api/megastructure/restore stays context although the snapshot exposes a restorable report with body, cost and orbit state, and post-campaign campaigns hold 26k-75k credits; the captain never orbits a restorable body type, so the Dyson/Ring/Relay restoration and its economy bonus have no AI proof",
-        "benefits": "After Act VI the captain probes restorable body types, restores the first affordable and incomplete structure, and records the megastructures_restored stat, exercising a headline economy mechanic",
-        "risks": "contract: /api/megastructure/restore joins SIGNATURE_ROUTES keyed by body_id and keeps a narrowed context reason for the short gate (additive); dependency: none; concurrency: none; state: one restored body and the stats counter through the existing engine path",
-        "mitigation": "failing-first tests for the report gate, candidate orbit, complete skip, credit gate, one-shot and the mirrored type set, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and 5/5 gates"
-      },
-      "plan_digest": "6ed58530e579c98bde661c6d3ef7e303962a7540678e42dc427cac9352266eb7",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "megastructure-restore",
       "phase": "phase 4",
@@ -382,6 +323,52 @@
       "timestamp_str": "2026-11-19 09:47:37",
       "agent": "kilo:goal",
       "head": "351c8fd8e748f21a97de53652cfa480735b0353d",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "combat-gambit-recall",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Recall the armed escort and spend its captain's gambit in a fight",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795073681.0586684,
+      "timestamp_str": "2026-11-19 10:34:41",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "/api/combat/gambit stays context claiming it needs an active fight and a local escort captain, but a 2,000-step seed-1 campaign has both a crewed escort and one pirate intercept; they never line up because the patrol rotation stations the escort on a connected lane while the fight breaks out in the current system, so the once-per-battle gambit has no AI proof",
+        "benefits": "A fight with an armed escort anywhere in the fleet recalls that escort into the current system and spends the role-appropriate gambit once, so the combat command is exercised for real",
+        "risks": "contract: /api/combat/gambit keeps a narrowed CONTEXT_ACTIONS reason and gains no signature entry because it is one-shot per campaign; dependency: none; concurrency: none; state: one escort reassignment and one spent gambit through the existing engine paths",
+        "mitigation": "failing-first tests for the ready local gambit, recall-first path, one-recall cap, spent-battle and one-shot guards, unarmed-escort skip and role gates, 180-step gate measurement, 2,000-step campaigns on seeds 1/2/42, full suite and project gates"
+      },
+      "plan_digest": "b3b702f2488f967ab0609e47c1f1c79689ed4d803ae504ebdec21cb0a9cc6ec8"
+    },
+    {
+      "task_id": "combat-gambit-recall",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/2] 180 gate unchanged 58 families/59 succeeded of 69 with 0 gaps/0 errors; 2,000-step seed 1 recalls the armed corvette into the fight and spends the engineer gambit (hull 39 to 60), 97 families/94 succeeded/97 attempted with 0 errors; seeds 2/42 keep 0 errors but their escorts never receive a captain so the gambit stays unproven there; suite Ran 2075 OK (ADR-397); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795073734.117481,
+      "timestamp_str": "2026-11-19 10:35:34",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "combat-gambit-recall",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'combat-gambit-recall' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795073752.1848776,
+      "timestamp_str": "2026-11-19 10:35:52",
+      "agent": "kilo:goal",
+      "head": "6b0e4ee2ec1eee7053773dc8cb572507712e70d4",
       "delivery": {
         "roots": [
           "."
