@@ -327,6 +327,28 @@ class TestServer(unittest.TestCase):
         self.assertEqual(first_state["stats"], second_state["stats"])
         self.assertEqual(first_state["ship"]["credits"], second_state["ship"]["credits"])
 
+    def test_a_save_load_cycle_restores_the_live_state_and_rng(self):
+        self.assertEqual(self._post("/api/reset", {"seed": 11})[0], 200)
+        self.assertEqual(self._post("/api/tutorial/skip", {})[0], 200)
+        self.assertEqual(self._post("/api/time/step", {"ticks": 5})[0], 200)
+        connections = self.engine.current_system.connections
+        self.assertEqual(self._post("/api/jump", {"target": connections[0]})[0], 200)
+        self.assertEqual(self._post("/api/time/step", {"ticks": 5})[0], 200)
+
+        saved_stream = self.engine.rng.getstate()
+        saved_links = self.engine.state.trade_links
+        saved_tick = self.engine.state.time.tick
+
+        self.assertEqual(self._post("/api/save", {})[0], 200)
+        self.assertEqual(self._post("/api/reset", {"seed": 99})[0], 200)
+        status, data = self._post("/api/load", {})
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["ok"])
+        self.assertEqual(self.engine.rng.getstate(), saved_stream)
+        self.assertEqual(self.engine.state.trade_links, saved_links)
+        self.assertEqual(self.engine.state.time.tick, saved_tick)
+
     def test_get_api_shipyard_excludes_current_chassis(self):
         status, data = self._get("/api/shipyard")
         self.assertEqual(status, 200)

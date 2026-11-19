@@ -9,8 +9,8 @@
 - **Total Python Modules**: `240`
 - **Total Classes**: `605`
 - **Total Top-Level Functions**: `542`
-- **Total Class Methods**: `3152`
-- **Total Source Lines**: `69834`
+- **Total Class Methods**: `3153`
+- **Total Source Lines**: `69856`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`240` module(s))
@@ -4042,7 +4042,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `967` lines
+**Size**: `989` lines
 
 **Classes:**
 - `class TestServer`
@@ -4077,6 +4077,7 @@
   - Method `.test_block_gates_have_no_dead_time_literal()`
   - Method `.test_scan_response_exposes_relic_and_near_miss()`
   - Method `.test_reset_is_deterministic_for_a_seed()`
+  - Method `.test_a_save_load_cycle_restores_the_live_state_and_rng()`
   - Method `.test_get_api_shipyard_excludes_current_chassis()`
   - Method `.test_post_inventory_buy_rejects_non_numeric_quantity()`
   - Method `.test_frontier_endpoints()`
