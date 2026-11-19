@@ -412,6 +412,22 @@ and an ECM decoy at station terminals, uses the paste when the hull is hurt, and
 as a guaranteed escape when the tank is too low for a flee or after an evasive burn is spent.
 It also hires a marine, so a crippled, shieldless enemy can be boarded and taken as a prize.
 
+After Act VI the same captain keeps playing: it rebuilds a devastated world (credits or
+fabricated materials), probes up to three bodies for a derelict and orbits a scoopable
+body when the tank is low, develops and links outposts, restores a megastructure and fuses
+a relic set. It decommissions a destroyed escort so the officer is released, sells a
+captured prize at a drydock, recalls an armed escort into a fight to spend its captain's
+gambit, and switches the reactor to economy once the story is over. A smuggling run buys
+one contraband lot, ferries the high-security cordon the snapshot quotes and dumps it when
+the scan lands; a live heat spike is vented and the purge damage serviced at the next dock.
+If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
+
+Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a
+loaded campaign continues the same rolls rather than replaying them; trade-link volumes,
+mid-fight encounters and the pre-jump `checkpoint` slot all restore exactly. `tests/test_rng_checkpoint.py`,
+`tests/test_load_preserves_live_state.py`, `tests/test_save_slots_determinism.py`,
+`tests/test_checkpoint_resume.py` and `tests/test_combat_save_parity.py` pin these guarantees.
+
 Click-map: dup/missing
 184 controls, 39 visible, 0 dup.
 PLAYER strip. SHIP/COMMERCE
