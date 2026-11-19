@@ -6,6 +6,7 @@ import argparse
 import json
 import random
 import sys
+import tempfile
 import traceback
 from pathlib import Path
 from typing import Any, Callable, Optional, Sequence
@@ -16,6 +17,19 @@ if str(PROJECT_DIR) not in sys.path:
 
 from voidfarer.crew import CREW_ROLES  # noqa: E402
 from voidfarer.engine import SimulationEngine  # noqa: E402
+from voidfarer.storage import StorageManager  # noqa: E402
+
+WALL_CLOCK = {"completed_at", "created_at", "started_at", "saved_at", "timestamp", "recorded_at"}
+
+
+def _strip_clock(value: Any, key: Optional[str] = None) -> Any:
+    if key in WALL_CLOCK:
+        return "<clock>"
+    if isinstance(value, dict):
+        return {name: _strip_clock(item, name) for name, item in value.items()}
+    if isinstance(value, list):
+        return [_strip_clock(item) for item in value]
+    return value
 
 
 class Findings:
@@ -25,6 +39,7 @@ class Findings:
         self.actions = 0
         self.successes = 0
         self.refusals = 0
+        self.reloads = 0
         self.crashes: list[dict[str, Any]] = []
         self.violations: list[dict[str, Any]] = []
         self._seen: set[tuple[str, str]] = set()
@@ -163,26 +178,53 @@ def choose_action(
     return "tick", lambda: engine.tick(rng.choice([1, 2, 3]))
 
 
-def run_seed(seed: int, actions: int, findings: Findings) -> None:
+def round_trip(engine: SimulationEngine, temp_dir: str, findings: Findings, action: str) -> SimulationEngine:
+    """Save, reload and verify the universe is unchanged; return the resumed engine."""
+    storage = StorageManager(temp_dir)
+    before = _strip_clock(engine.state.to_dict())
+    storage.save(engine.state)
+    loaded = storage.load()
+    resumed = SimulationEngine(state=loaded)
+    after = _strip_clock(resumed.state.to_dict())
+    findings.reloads += 1
+    if before != after:
+        differing = [key for key in sorted(set(before) | set(after)) if before.get(key) != after.get(key)]
+        findings.violation(
+            "save_state_drift",
+            f"{action}: {', '.join(differing[:4]) or 'nested'}",
+            action,
+        )
+        return engine
+    return resumed
+
+
+def run_seed(seed: int, actions: int, findings: Findings, save_every: int = 0) -> None:
     rng = random.Random(seed * 7919 + 3)
     engine = SimulationEngine(seed=seed)
     engine.allow_decision_events = True
-    for step in range(actions):
-        name, action = choose_action(engine, rng)
-        findings.actions += 1
-        try:
-            result = action()
-        except Exception as exc:  # noqa: BLE001 - the fuzz must capture everything
-            findings.crash(name, seed, step, exc)
-            if len(findings.crashes) >= 5:
-                return
-            continue
-        ok = bool(result[0]) if isinstance(result, tuple) else True
-        if ok:
-            findings.successes += 1
-        else:
-            findings.refusals += 1
-        check_invariants(engine, findings, f"{name}@seed{seed}")
+    with tempfile.TemporaryDirectory() as temp_dir:
+        for step in range(actions):
+            name, action = choose_action(engine, rng)
+            findings.actions += 1
+            try:
+                result = action()
+            except Exception as exc:  # noqa: BLE001 - the fuzz must capture everything
+                findings.crash(name, seed, step, exc)
+                if len(findings.crashes) >= 5:
+                    return
+                continue
+            ok = bool(result[0]) if isinstance(result, tuple) else True
+            if ok:
+                findings.successes += 1
+            else:
+                findings.refusals += 1
+            check_invariants(engine, findings, f"{name}@seed{seed}")
+            if save_every and (step + 1) % save_every == 0:
+                try:
+                    engine = round_trip(engine, temp_dir, findings, f"{name}@seed{seed}")
+                except Exception as exc:  # noqa: BLE001 - a save crash is a finding
+                    findings.crash(f"round_trip:{name}", seed, step, exc)
+                    return
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -194,6 +236,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--actions", type=int, default=2000,
                         help="Random actions per seed (default: 2000)")
     parser.add_argument("--json", action="store_true", help="Print the raw report as JSON")
+    parser.add_argument("--save-every", type=int, default=0,
+                        help="Save and reload the engine every N actions (default: off)")
     args = parser.parse_args(argv)
     if args.actions < 1:
         parser.error("--actions must be >= 1")
@@ -201,13 +245,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     findings = Findings()
     for seed in seeds:
-        run_seed(seed, args.actions, findings)
+        run_seed(seed, args.actions, findings, save_every=args.save_every)
 
     report = {
         "seeds": seeds,
         "actions": findings.actions,
         "successes": findings.successes,
         "refusals": findings.refusals,
+        "reloads": findings.reloads,
         "crashes": findings.crashes,
         "violations": findings.violations,
         "ok": not findings.crashes and not findings.violations,
@@ -217,7 +262,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     else:
         print(
             f"Chaos fuzz: {report['actions']} actions across {len(seeds)} seed(s), "
-            f"{report['successes']} succeeded, {report['refusals']} refused"
+            f"{report['successes']} succeeded, {report['refusals']} refused, "
+            f"{report['reloads']} save/load round trips"
         )
         print(f"Crashes: {len(findings.crashes)}  Invariant breaches: {len(findings.violations)}")
         for crash in findings.crashes[:5]:

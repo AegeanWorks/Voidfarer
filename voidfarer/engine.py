@@ -561,24 +561,29 @@ class SimulationEngine:
     def _bootstrap_frontier(self) -> None:
         """Backfill frontier systems for legacy saves without changing the save schema."""
         updates: dict[str, Any] = {}
+        # A pre-ADR-405 save has no RNG checkpoint; only those may be missing content
+        # that was added later. A modern save can legitimately hold an empty crew,
+        # weapon rack or inbox after the player empties it, and resurrecting the
+        # starter loadout on every load would undo that choice (ADR-415).
+        legacy_save = self.state.rng_state is None
         if not self.state.ai_captains:
             updates["ai_captains"] = generate_ai_captains(self.state.systems, self.state.galaxy_seed)
         if not self.state.depots:
             updates["depots"] = generate_depots(self.state.systems)
-        if not self.state.messages:
+        if legacy_save and not self.state.messages:
             updates["messages"] = generate_welcome_messages(self.state.time.tick)
-        if not any(m.tree_id for m in self.state.messages):
+        if self.state.messages and not any(m.tree_id for m in self.state.messages):
             root = tree_root_message("precursor_signal", self.state.time.tick)
             if root:
                 updates["messages"] = tuple(updates.get("messages", self.state.messages)) + (root,)
         if not self.state.faction_leaders:
             updates["faction_leaders"] = generate_faction_leaders(self.state.galaxy_seed)
-        if not self.state.ship.crew:
+        if legacy_save and not self.state.ship.crew:
             updates["ship"] = self._clone_ship(crew=(
                 CrewMember(id="crew_engineer_1", name="Imani Vale", role="engineer", skill=3, morale=82.0, wage=35, portrait="crew_02", specialty="engineering"),
                 CrewMember(id="crew_pilot_2", name="Rook Calder", role="pilot", skill=2, morale=78.0, wage=30, portrait="crew_05", specialty="evasion"),
             ))
-        if not self.state.ship.weapons:
+        if legacy_save and not self.state.ship.weapons:
             updates["ship"] = self._clone_ship(weapons=("pulse_laser",), primary_weapon="pulse_laser")
         gov_map = {
             "Sol Coalition": "Federal Democracy",

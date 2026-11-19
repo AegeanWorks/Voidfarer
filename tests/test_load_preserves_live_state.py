@@ -67,6 +67,55 @@ class LegacyWorldMigrationTest(unittest.TestCase):
         self.assertEqual(body.faction, "Precursor Watch")
 
 
+class EmptyCollectionsStayEmptyTest(unittest.TestCase):
+    """A modern save keeps a deliberately empty crew, weapons or inbox (ADR-415)."""
+
+    def _save_and_reload(self, engine: SimulationEngine) -> SimulationEngine:
+        with TemporaryDirectory() as temp_dir:
+            StorageManager(temp_dir).save(engine.state)
+            return SimulationEngine(state=StorageManager(temp_dir).load())
+
+    def test_an_empty_crew_stays_empty(self):
+        engine = SimulationEngine(seed=5)
+        engine.state = engine._clone_state(ship=engine._clone_ship(crew=()))
+        self.assertTrue(engine.state.rng_state)
+        reloaded = self._save_and_reload(engine)
+        self.assertEqual(reloaded.state.ship.crew, ())
+
+    def test_an_empty_weapon_loadout_stays_empty(self):
+        engine = SimulationEngine(seed=5)
+        engine.state = engine._clone_state(
+            ship=engine._clone_ship(weapons=(), primary_weapon="")
+        )
+        reloaded = self._save_and_reload(engine)
+        self.assertEqual(reloaded.state.ship.weapons, ())
+        self.assertEqual(reloaded.state.ship.primary_weapon, "")
+
+    def test_an_empty_inbox_stays_empty(self):
+        engine = SimulationEngine(seed=5)
+        engine.state = engine._clone_state(messages=())
+        reloaded = self._save_and_reload(engine)
+        self.assertEqual(reloaded.state.messages, ())
+
+    def test_a_legacy_save_still_receives_the_starter_crew(self):
+        engine = SimulationEngine(seed=5)
+        payload = engine.state.to_dict()
+        payload["rng_state"] = None
+        payload["ship"]["crew"] = []
+        legacy = type(engine.state).from_dict(payload)
+        reloaded = SimulationEngine(state=legacy)
+        roles = [member.role for member in reloaded.state.ship.crew]
+        self.assertEqual(roles, ["engineer", "pilot"])
+
+    def test_a_legacy_save_with_messages_still_gets_a_tree_root(self):
+        engine = SimulationEngine(seed=5)
+        payload = engine.state.to_dict()
+        payload["rng_state"] = None
+        legacy = type(engine.state).from_dict(payload)
+        reloaded = SimulationEngine(state=legacy)
+        self.assertTrue(any(message.tree_id for message in reloaded.state.messages))
+
+
 class LoadPreservesLiveStateTest(unittest.TestCase):
     def test_loading_keeps_the_live_trade_link_volumes(self):
         engine = SimulationEngine(seed=11)

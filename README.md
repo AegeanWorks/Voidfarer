@@ -396,7 +396,9 @@ enumerates every cockpit control with a stable `data-testid`, and the bundled ca
 plays a full campaign through the same HTTP API the UI uses. `tools/chaos_fuzz.py`
 does the opposite: it fires random legal actions (jumps, orbits, trades, salvos,
 encounter resolutions, crew changes) and checks every state against its declared
-bounds. 10,000 actions across five seeds produced zero crashes and zero breaches.
+bounds. With `--save-every` it also saves and reloads mid-stream: 40,000 random
+actions across twenty seeds with 400 round trips produced zero crashes, zero
+breaches and zero save drift.
 
 ```bash
 python tools/ai_play.py --steps 180           # human-readable mechanic coverage

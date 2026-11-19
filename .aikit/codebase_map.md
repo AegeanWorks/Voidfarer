@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `246`
-- **Total Classes**: `612`
-- **Total Top-Level Functions**: `554`
-- **Total Class Methods**: `3176`
-- **Total Source Lines**: `70564`
+- **Total Classes**: `613`
+- **Total Top-Level Functions**: `556`
+- **Total Class Methods**: `3184`
+- **Total Source Lines**: `70684`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`246` module(s))
@@ -825,7 +825,7 @@
 ### [`tests/test_chaos_fuzz.py`](tests/test_chaos_fuzz.py)
 > *The chaos fuzz tool must catch every rule class it claims to check (ADR-414).*
 
-**Size**: `113` lines
+**Size**: `133` lines
 
 **Classes:**
 - `class ChaosInvariantTest`
@@ -835,6 +835,8 @@
 - `class ChaosRunTest`
   - Method `.test_a_blocking_combat_is_always_answered_first()`
   - Method `.test_a_short_seeded_run_is_clean_and_repeatable()`
+  - Method `.test_save_interleaving_round_trips_without_drift()`
+  - Method `.test_round_trip_returns_an_engine_at_the_same_tick()`
 
 **Functions:**
 - `def _bad_engine()`
@@ -3086,13 +3088,20 @@
 ### [`tests/test_load_preserves_live_state.py`](tests/test_load_preserves_live_state.py)
 > *Loading a save must not rewrite live universe state (ADR-406).*
 
-**Size**: `108` lines
+**Size**: `157` lines
 
 **Classes:**
 - `class LegacyWorldMigrationTest` - *Only a genuinely pre-demographics world is backfilled on load (ADR-407).*
   - Method `._system_with(body_kwargs, faction)`
   - Method `.test_a_conquered_gas_giant_keeps_its_unclaimed_flag_on_load()`
   - Method `.test_a_real_legacy_world_is_still_seeded()`
+- `class EmptyCollectionsStayEmptyTest` - *A modern save keeps a deliberately empty crew, weapons or inbox (ADR-415).*
+  - Method `._save_and_reload(engine)`
+  - Method `.test_an_empty_crew_stays_empty()`
+  - Method `.test_an_empty_weapon_loadout_stays_empty()`
+  - Method `.test_an_empty_inbox_stays_empty()`
+  - Method `.test_a_legacy_save_still_receives_the_starter_crew()`
+  - Method `.test_a_legacy_save_with_messages_still_gets_a_tree_root()`
 - `class LoadPreservesLiveStateTest`
   - Method `.test_loading_keeps_the_live_trade_link_volumes()`
   - Method `.test_a_legacy_save_without_trade_links_still_gets_them()`
@@ -5036,7 +5045,7 @@
 ### [`tools/chaos_fuzz.py`](tools/chaos_fuzz.py)
 > *Chaos-fuzz the engine with random valid actions and check state invariants.*
 
-**Size**: `235` lines
+**Size**: `281` lines
 
 **Classes:**
 - `class Findings` - *Collect crashes and invariant breaches once per distinct signature.*
@@ -5045,10 +5054,12 @@
   - Method `.crash(action, seed, step, exc)`
 
 **Functions:**
+- `def _strip_clock(value, key)`
 - `def check_invariants(engine, findings, action)` - *Every campaign state must stay inside its declared bounds.*
 - `def dock_somewhere(engine)`
 - `def choose_action(engine, rng)` - *Pick one random action that is legal in the current blocking state.*
-- `def run_seed(seed, actions, findings)`
+- `def round_trip(engine, temp_dir, findings, action)` - *Save, reload and verify the universe is unchanged; return the resumed engine.*
+- `def run_seed(seed, actions, findings, save_every)`
 - `def main(argv)`
 
 ---
@@ -5606,7 +5617,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11333` lines
+**Size**: `11338` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

@@ -108,6 +108,26 @@ class ChaosRunTest(unittest.TestCase):
         # Successes and refusals must partition the actions that did not crash.
         self.assertEqual(findings.successes + findings.refusals, 20)
 
+    def test_save_interleaving_round_trips_without_drift(self):
+        findings = Findings()
+        run_seed(seed=3, actions=20, findings=findings, save_every=5)
+        self.assertEqual(findings.crashes, [])
+        self.assertEqual(findings.violations, [])
+        self.assertEqual(findings.reloads, 4)
+
+    def test_round_trip_returns_an_engine_at_the_same_tick(self):
+        from tempfile import TemporaryDirectory
+        from tools.chaos_fuzz import round_trip
+        engine = SimulationEngine(seed=3)
+        engine.tick(3)
+        tick = engine.state.time.tick
+        with TemporaryDirectory() as temp_dir:
+            findings = Findings()
+            resumed = round_trip(engine, temp_dir, findings, "tick@test")
+        self.assertEqual(findings.reloads, 1)
+        self.assertEqual(findings.violations, [])
+        self.assertEqual(resumed.state.time.tick, tick)
+
 
 if __name__ == "__main__":
     unittest.main()
