@@ -3,32 +3,18 @@
   "active_task": {
     "task_id": "readme-docs-sync",
     "last_phase": "in_progress",
-    "active_phase": 4,
-    "status": "in_progress",
+    "active_phase": 5,
+    "status": "completed",
     "updated_at": 1795117607.843955,
     "owner": "kilo:goal",
     "lease_until": 1795124807.843955,
     "started_by": "kilo:goal",
-    "continuations": []
+    "continuations": [],
+    "completed_at": 1795117716.0290158,
+    "completed_head": "f9c1d34ab52e539c2d341349fd0e8d12c368ee15",
+    "completed_tree": "4435410639346b7c2d7ca7cd6989df709d8340da"
   },
   "checkpoints": [
-    {
-      "task_id": "reactor-heat-chain",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'reactor-heat-chain' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795097084.2958536,
-      "timestamp_str": "2026-11-19 17:04:44",
-      "agent": "kilo:goal",
-      "head": "b4994ca36eb07fb0015ffa8e5a89c4c5b458f7a5",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
     {
       "task_id": "deterministic-resume",
       "phase": "in_progress",
@@ -321,6 +307,23 @@
       "timestamp": 1795117607.843955,
       "timestamp_str": "2026-11-19 22:46:47",
       "agent": "kilo:goal"
+    },
+    {
+      "task_id": "readme-docs-sync",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'readme-docs-sync' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795117716.263284,
+      "timestamp_str": "2026-11-19 22:48:36",
+      "agent": "kilo:goal",
+      "head": "f9c1d34ab52e539c2d341349fd0e8d12c368ee15",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
     }
   ]
 }
