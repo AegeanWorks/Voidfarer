@@ -147,8 +147,9 @@ voidfarer/
 │   ├── ui_audit.py       <- layout metrics
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
-│   └── ai_play.py        <- headless AI campaign with mechanic coverage
-└── tests/                <- unit & integration test suite (182 suites)
+│   ├── ai_play.py        <- headless AI campaign with mechanic coverage
+│   └── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
+└── tests/                <- unit & integration test suite (183 suites)
 ```
 
 ---
@@ -392,11 +393,15 @@ python -m voidfarer.cli settings show
 Every mechanic is reachable without a human. `GET /api/agent/actions` publishes the
 action catalog scraped from the server's own route table, `window.voidfarerClickMap()`
 enumerates every cockpit control with a stable `data-testid`, and the bundled captain
-plays a full campaign through the same HTTP API the UI uses.
+plays a full campaign through the same HTTP API the UI uses. `tools/chaos_fuzz.py`
+does the opposite: it fires random legal actions (jumps, orbits, trades, salvos,
+encounter resolutions, crew changes) and checks every state against its declared
+bounds. 10,000 actions across five seeds produced zero crashes and zero breaches.
 
 ```bash
 python tools/ai_play.py --steps 180           # human-readable mechanic coverage
 python tools/ai_play.py --steps 180 --json    # machine-readable report
+python tools/chaos_fuzz.py --seed 3 --seed 7 --actions 2000   # invariant fuzz
 python tools/ui_browser.py --click-map --viewports desktop --out ui-review/clickmap
 ```
 

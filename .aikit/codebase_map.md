@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `244`
-- **Total Classes**: `609`
-- **Total Top-Level Functions**: `548`
-- **Total Class Methods**: `3168`
-- **Total Source Lines**: `70216`
+- **Total Python Modules**: `246`
+- **Total Classes**: `612`
+- **Total Top-Level Functions**: `554`
+- **Total Class Methods**: `3176`
+- **Total Source Lines**: `70564`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`244` module(s))
+- **Indexed**: python (`246` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -819,6 +819,25 @@
   - Method `.test_index_declares_the_captains_log_tab()`
   - Method `.test_javascript_renders_and_claims_codex_entries()`
   - Method `.test_styles_cover_codex_cards()`
+
+---
+
+### [`tests/test_chaos_fuzz.py`](tests/test_chaos_fuzz.py)
+> *The chaos fuzz tool must catch every rule class it claims to check (ADR-414).*
+
+**Size**: `113` lines
+
+**Classes:**
+- `class ChaosInvariantTest`
+  - Method `.test_the_checker_catches_every_rule_class()`
+  - Method `.test_a_clean_engine_reports_nothing()`
+  - Method `.test_the_same_breach_is_recorded_once()`
+- `class ChaosRunTest`
+  - Method `.test_a_blocking_combat_is_always_answered_first()`
+  - Method `.test_a_short_seeded_run_is_clean_and_repeatable()`
+
+**Functions:**
+- `def _bad_engine()`
 
 ---
 
@@ -5010,6 +5029,26 @@
 **Size**: `83` lines
 
 **Functions:**
+- `def main(argv)`
+
+---
+
+### [`tools/chaos_fuzz.py`](tools/chaos_fuzz.py)
+> *Chaos-fuzz the engine with random valid actions and check state invariants.*
+
+**Size**: `235` lines
+
+**Classes:**
+- `class Findings` - *Collect crashes and invariant breaches once per distinct signature.*
+  - Method `.__init__()`
+  - Method `.violation(kind, detail, action)`
+  - Method `.crash(action, seed, step, exc)`
+
+**Functions:**
+- `def check_invariants(engine, findings, action)` - *Every campaign state must stay inside its declared bounds.*
+- `def dock_somewhere(engine)`
+- `def choose_action(engine, rng)` - *Pick one random action that is legal in the current blocking state.*
+- `def run_seed(seed, actions, findings)`
 - `def main(argv)`
 
 ---
