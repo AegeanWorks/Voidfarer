@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `261`
-- **Total Classes**: `629`
-- **Total Top-Level Functions**: `578`
-- **Total Class Methods**: `3291`
-- **Total Source Lines**: `72553`
+- **Total Python Modules**: `262`
+- **Total Classes**: `630`
+- **Total Top-Level Functions**: `579`
+- **Total Class Methods**: `3298`
+- **Total Source Lines**: `72632`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`261` module(s))
+- **Indexed**: python (`262` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3777,6 +3777,25 @@
 
 ---
 
+### [`tests/test_pirate_fight.py`](tests/test_pirate_fight.py)
+> *The captain fights a pirate once when it is clearly stronger (ADR-431).*
+
+**Size**: `57` lines
+
+**Classes:**
+- `class PirateFightPolicyTest`
+  - Method `.test_a_strong_post_story_ship_fights()`
+  - Method `.test_a_damaged_ship_still_evades()`
+  - Method `.test_the_short_gate_always_evades()`
+  - Method `.test_only_one_pirate_is_fought_per_campaign()`
+  - Method `.test_the_threshold_is_half_the_hull()`
+  - Method `.test_no_pirate_resolves_nothing()`
+
+**Functions:**
+- `def _captain(hull, max_hull, completed, fought)`
+
+---
+
 ### [`tests/test_population_economy.py`](tests/test_population_economy.py)
 > *Population capacity, technology limits, wartime devastation and faction treasuries.*
 
@@ -5443,7 +5462,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3165` lines
+**Size**: `3187` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5461,6 +5480,7 @@
   - Method `._anomaly_threshold(choice)`
   - Method `._combat_choice()` - *Pick a combat action from the live state: survival first, then the tactical surface.*
   - Method `._smuggle_action()` - *Buy one contraband lot and run it at the quoted high-security cordon (ADR-400).*
+  - Method `._pirate_resolution()` - *Fight one post-story pirate when clearly stronger, else evade (ADR-431).*
   - Method `._gambit_action()` - *Recall an armed escort and spend its captain's once-per-battle gambit (ADR-397).*
   - Method `._note_refusal(signature, message)` - *Schedule a fast retry, then a slow one, then drop a gate that never opens.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*

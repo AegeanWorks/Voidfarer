@@ -314,6 +314,8 @@ class AiCaptain:
         self.survey_scans = 0
         # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
         self.pact_tried: set[tuple[str, str]] = set()
+        # One pirate may be fought per campaign when the hull is healthy (ADR-431).
+        self.pirate_fought = False
         # Quantum freight run state: finished, idle steps, last seen order count (ADR-429).
         self.quantum_done = False
         self.quantum_idle = 0
@@ -421,9 +423,8 @@ class AiCaptain:
                 choice_id = first.get("id", "") if isinstance(first, dict) else str(first)
             if choice_id:
                 return "/api/decision/resolve", {"choice_id": choice_id}, "decision"
-        pirate = state.get("active_pirate")
-        if pirate:
-            return "/api/pirate/resolve", {"action": "evade"}, "pirate"
+        if state.get("active_pirate"):
+            return self._pirate_resolution()
 
         customs = state.get("active_customs")
         if customs:
@@ -915,6 +916,27 @@ class AiCaptain:
             return None
         self.smuggling_jumps += 1
         return "/api/jump", {"target": target}, "jump"
+
+    def _pirate_resolution(self):
+        """Fight one post-story pirate when clearly stronger, else evade (ADR-431).
+
+        The captain has always evaded, so the engine's fight branch (toll refused,
+        combat starts, bounty on victory) had no AI proof. Half hull is the safety
+        floor, and one fight per campaign bounds the detour.
+        """
+        if not (self.state.get("active_pirate") or {}):
+            return None
+        ship = self.state.get("ship") or {}
+        hull = int(ship.get("hull") or 0)
+        max_hull = max(1, int(ship.get("max_hull") or 0))
+        if (
+            (self.state.get("story_status") or {}).get("completed")
+            and not self.pirate_fought
+            and hull * 2 >= max_hull
+        ):
+            self.pirate_fought = True
+            return "/api/pirate/resolve", {"action": "fight"}, "pirate"
+        return "/api/pirate/resolve", {"action": "evade"}, "pirate"
 
     def _gambit_action(self):
         """Recall an armed escort and spend its captain's once-per-battle gambit (ADR-397).
