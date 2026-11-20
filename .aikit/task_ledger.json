@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "endurance-10k",
+    "task_id": "atomic-backup-perf",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795156946.796672,
+    "updated_at": 1795158785.0886612,
     "owner": "kilo:goal",
-    "lease_until": 1795164146.796672,
+    "lease_until": 1795165985.0886612,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795156977.5506315,
-    "completed_head": "c178db5acb4b4d8e5d2065956d42c77a67a775b8",
-    "completed_tree": "6a646c06efbdf376c5f663988bf9d6d7566c30d3"
+    "completed_at": 1795158827.0811665,
+    "completed_head": "6a78262f03b671a7a089bcbbc9a8e1422e733dcb",
+    "completed_tree": "34a67f6e837479d9d4ba6cde4da7acbbaf1833c3"
   },
   "checkpoints": [
-    {
-      "task_id": "combat-save-parity",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'combat-save-parity' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795115944.8777604,
-      "timestamp_str": "2026-11-19 22:19:04",
-      "agent": "kilo:goal",
-      "head": "899256ca844abf94d576e22b494c970edc6449d3",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "readme-docs-sync",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Document the post-story captain and deterministic saves",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795117385.8653388,
-      "timestamp_str": "2026-11-19 22:43:05",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ADR-395..411 changed shipped captain and save behavior while README section 14c still described only story-phase actions; user-visible changes must update the live document",
-        "benefits": "players can read what the headless captain does after Act VI and that reloads resume exactly",
-        "risks": "contract: docs only, no behavior change; dependency: none; concurrency: none; state: none",
-        "mitigation": "README stays inside its 37,500-character budget and the suite re-runs in the project gate"
-      },
-      "plan_digest": "db4bb3b87c902b6c428a5daf0aae1270fdeb4eef5d5edd36da70ef67d1c19cb4"
-    },
-    {
-      "task_id": "readme-docs-sync",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Section 14c now documents the post-story errands and the deterministic save guarantees with the tests that pin them; README 36,975 chars (under 37,500); 6/6 project gates incl. full suite and the 180-step mechanics gate (ADR-412); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795117607.843955,
-      "timestamp_str": "2026-11-19 22:46:47",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "readme-docs-sync",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 09:42:57",
       "agent": "kilo:goal",
       "head": "c178db5acb4b4d8e5d2065956d42c77a67a775b8",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "atomic-backup-perf",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Make the shadow backup an atomic rename instead of a second copy",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795158784.8952188,
+      "timestamp_str": "2026-11-20 10:13:04",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the server saves after every mutation; a 485 KB save cost 36.9 ms and the .bak copy+fsync alone cost 17.6 ms, more than writing the new payload (6.6 ms), because the previous file is already durable",
+        "benefits": "save latency halves without weakening crash safety: the renamed backup is the previous durable state and load already falls back to it",
+        "risks": "contract: save format and load fallback unchanged; dependency: none; concurrency: the existing write lock still serializes saves; state: a power loss between rename and install recovers the previous save from .bak",
+        "mitigation": "failing-first tests for the no-copy path, backup content, first-save absence, failed-install recovery and named slots, plus the save-interleaved fuzz and benchmark campaigns"
+      },
+      "plan_digest": "9fa81c7bc2aada6aab938d587222d6c3d8dd5ed9206b3fab631a3836e7df6f7a"
+    },
+    {
+      "task_id": "atomic-backup-perf",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] save 36.9 to 17.3 ms (-53%), /api/time/step 57.4 to 34.2 ms (-40%), campaign 68.2 to 35.1 ms/step (-49%); coverage unchanged: 180 gate 58/59/69 with 0 gaps/0 errors/10 refusals, seed 1 104/101/101 refusals 21, seed 42 102/99/100 refusals 20, both 0 errors; 20,000-action save-interleaved fuzz 0 crashes/0 breaches/0 drift; 5 tests pass; suite Ran 2179 OK with README tree at 186 suites (ADR-419); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795158785.0886612,
+      "timestamp_str": "2026-11-20 10:13:05",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "atomic-backup-perf",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'atomic-backup-perf' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795158827.1382093,
+      "timestamp_str": "2026-11-20 10:13:47",
+      "agent": "kilo:goal",
+      "head": "6a78262f03b671a7a089bcbbc9a8e1422e733dcb",
       "delivery": {
         "roots": [
           "."
