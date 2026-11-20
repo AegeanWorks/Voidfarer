@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `252`
-- **Total Classes**: `620`
-- **Total Top-Level Functions**: `567`
-- **Total Class Methods**: `3226`
-- **Total Source Lines**: `71489`
+- **Total Python Modules**: `254`
+- **Total Classes**: `622`
+- **Total Top-Level Functions**: `569`
+- **Total Class Methods**: `3233`
+- **Total Source Lines**: `71657`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`252` module(s))
+- **Indexed**: python (`254` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3289,6 +3289,24 @@
 
 ---
 
+### [`tests/test_mechanics_gate.py`](tests/test_mechanics_gate.py)
+> *The mechanics gate must run both proofs and fail if either does (ADR-422).*
+
+**Size**: `78` lines
+
+**Classes:**
+- `class _Completed`
+  - Method `.__init__(returncode, stdout, stderr)`
+- `class MechanicsGateTest`
+  - Method `.test_both_proofs_run_and_pass()`
+  - Method `.test_a_failing_campaign_fails_the_gate()`
+  - Method `.test_a_failing_fuzz_fails_the_gate()`
+  - Method `.test_a_timeout_is_a_failure_with_a_reason()`
+  - Method `.test_the_fuzz_seed_and_action_count_are_forwarded()`
+  - Method `.test_misuse_is_refused()`
+
+---
+
 ### [`tests/test_megastructure_restoration.py`](tests/test_megastructure_restoration.py)
 > *Megastructure restoration: orbit/cost gates, bonuses and persistence.*
 
@@ -5176,6 +5194,17 @@
 - `def serve(engine, data_dir)`
 - `def stop(server, thread)`
 - `def run(seed, segment, segments)` - *Play ``segments`` chunks of ``segment`` steps, reloading a save between each.*
+- `def main(argv)`
+
+---
+
+### [`tools/mechanics_gate.py`](tools/mechanics_gate.py)
+> *The project's Phase 4 mechanics proof: campaign coverage plus invariant fuzz.*
+
+**Size**: `90` lines
+
+**Functions:**
+- `def run_step(label, command, timeout)` - *Run one proof command and return whether it passed plus a one-line summary.*
 - `def main(argv)`
 
 ---

@@ -149,8 +149,9 @@ voidfarer/
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   ├── ai_play.py        <- headless AI campaign with mechanic coverage
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
-│   └── endurance_check.py<- segmented long-run campaign with reload checks
-└── tests/                <- unit & integration test suite (188 suites)
+│   ├── endurance_check.py<- segmented long-run campaign with reload checks
+│   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
+└── tests/                <- unit & integration test suite (189 suites)
 ```
 
 ---

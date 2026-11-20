@@ -56,8 +56,10 @@
       "voidfarer/agent_api.py",
       "voidfarer/agent_play.py",
       "voidfarer/server.py",
-      "tools/ai_play.py"
+      "tools/ai_play.py",
+      "tools/chaos_fuzz.py",
+      "tools/mechanics_gate.py"
     ],
-    "test": "python tools/ai_play.py --steps 180"
+    "test": "python tools/mechanics_gate.py"
   }
 }
