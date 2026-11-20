@@ -216,6 +216,11 @@ class AiCaptain:
     # captain falls back to the credit rebuild rather than hunting forever.
     RELIEF_STOCK_LIMIT = 6
 
+    # A full-system survey pays 300 cr + 120 XP and unlocks two milestones, but the
+    # tour only ever scans the body it happens to orbit; the post-story captain sweeps
+    # one system, bounded so a hostile anomaly chain cannot eat the errands (ADR-427).
+    SURVEY_SCAN_LIMIT = 24
+
     # A body hosts a derelict about 40% of the time, so three probes are enough to
     # find one while a derelict-free system cannot eat the post-story errands.
     SALVAGE_PROBE_LIMIT = 3
@@ -296,6 +301,9 @@ class AiCaptain:
         self.gambit_recalled = False
         # The post-campaign reactor doctrine change is attempted once (ADR-398).
         self.reactor_switched = False
+        # One full-system survey per campaign, and the scan/orbit steps it spent (ADR-427).
+        self.survey_done = False
+        self.survey_scans = 0
         # Relief stocking: how many purchase actions have tried to fill the bags (ADR-425).
         self.relief_stock_attempts = 0
         # One smuggling run per campaign: the contraband lot bought and the jumps
@@ -548,6 +556,12 @@ class AiCaptain:
         smuggle = self._smuggle_action()
         if smuggle is not None:
             return smuggle
+
+        # A full-system survey pays a completion bonus the rotating tour can never
+        # collect; it runs last so no established errand is displaced (ADR-427).
+        survey = self._survey_action()
+        if survey is not None:
+            return survey
 
         # Station services live at a dock; reach one before touring menu mechanics.
         if not self._is_docked():
@@ -1701,6 +1715,32 @@ class AiCaptain:
             return None
         return ("/api/reconstruct", {"body_id": body_id, "mode": "credits"},
                 "reconstruct")
+
+    def _survey_action(self):
+        """Finish one full-system survey after the campaign (ADR-427).
+
+        A survey bonus is only paid when every body in the system has been scanned, and
+        the rotating tour never completes one. The sweep orbits and scans any unscanned
+        body in order, bounded by ``SURVEY_SCAN_LIMIT`` steps; hostile bodies that refuse
+        an orbit are skipped so a single anomaly cannot stall the sweep.
+        """
+        if self.survey_done or self.survey_scans >= self.SURVEY_SCAN_LIMIT:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        system = self.state.get("current_system") or {}
+        bodies = [body for body in system.get("bodies") or [] if isinstance(body, dict)]
+        pending = [body for body in bodies if body.get("id") and not body.get("scan_completed")]
+        if not pending:
+            self.survey_done = True
+            return None
+        orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        target = next((body for body in pending if str(body.get("id")) == orbiting), None)
+        if target is None:
+            self.survey_scans += 1
+            return "/api/orbit", {"target": str(pending[0]["id"])}, "orbit"
+        self.survey_scans += 1
+        return "/api/scan", {}, "scan"
 
     def _scoop_action(self):
         """Orbit a scoopable body when the post-story tank is running low (ADR-396).

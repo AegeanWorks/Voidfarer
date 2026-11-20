@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `258`
-- **Total Classes**: `626`
-- **Total Top-Level Functions**: `574`
-- **Total Class Methods**: `3261`
-- **Total Source Lines**: `72109`
+- **Total Python Modules**: `259`
+- **Total Classes**: `627`
+- **Total Top-Level Functions**: `575`
+- **Total Class Methods**: `3269`
+- **Total Source Lines**: `72218`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`258` module(s))
+- **Indexed**: python (`259` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4730,6 +4730,26 @@
 
 ---
 
+### [`tests/test_survey_sweep.py`](tests/test_survey_sweep.py)
+> *The post-story captain finishes one full system survey (ADR-427).*
+
+**Size**: `69` lines
+
+**Classes:**
+- `class SurveySweepTest`
+  - Method `.test_an_unscanned_body_is_orbited_first()`
+  - Method `.test_an_orbited_unscanned_body_is_scanned()`
+  - Method `.test_a_fully_scanned_system_marks_the_survey_done()`
+  - Method `.test_the_sweep_runs_once()`
+  - Method `.test_the_sweep_is_capped()`
+  - Method `.test_nothing_surveys_before_the_campaign()`
+  - Method `.test_the_sweep_counts_each_step()`
+
+**Functions:**
+- `def _captain(bodies, orbiting, completed, done, scans)`
+
+---
+
 ### [`tests/test_system_target_hotkeys.py`](tests/test_system_target_hotkeys.py)
 > *On the galaxy map, comma and period cycle the star systems linked to the current one.*
 
@@ -5377,7 +5397,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2989` lines
+**Size**: `3029` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5425,6 +5445,7 @@
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
+  - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
