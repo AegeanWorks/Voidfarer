@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "research-bench",
+    "task_id": "away-team-rotation",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795210278.1090312,
+    "updated_at": 1795213901.7109666,
     "owner": "kilo:goal",
-    "lease_until": 1795217478.1090312,
+    "lease_until": 1795221101.7109666,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,57 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795210313.3758147,
-    "completed_head": "e42f1adb6535eb094fc12ae3c012f32f82120e3d",
-    "completed_tree": "c3013e7d3ea1a5d4adec92ede21e53dd9c7ca7bc"
+    "completed_at": 1795213916.8810198,
+    "completed_head": "d301aa7b2cd9cd906e428cebe377dc2116eac215",
+    "completed_tree": "585e03f1c959cf0d959063d426a61a1f2781128b"
   },
   "checkpoints": [
-    {
-      "task_id": "codex-claim-repeat",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Claims rise from 1 to 36-39 per campaign with 0 errors on 9 seeds; seeds 1/42/2 at 103/101/99 families with reconstruct+customs+megastructure; prize sale proven on 1/4/6/8/11 and gambit+sell together on 6/8/11 (104 families, 101 succeeded); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2230 OK with README tree at 193 suites (ADR-426); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795186537.680403,
-      "timestamp_str": "2026-11-20 17:55:37",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "codex-claim-repeat",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'codex-claim-repeat' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795186696.7966714,
-      "timestamp_str": "2026-11-20 17:58:16",
-      "agent": "kilo:goal",
-      "head": "b845a2c895f6986c82f06cd6498100fa320c89ef",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "full-system-survey",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Finish one full system survey after the campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795190614.4593098,
-      "timestamp_str": "2026-11-20 19:03:34",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "scan pays a 300 cr / 120 XP completion bonus and two codex milestones once every body is scanned, but the tour only scans the body it orbits, so systems_surveyed stayed zero in every benchmark campaign",
-        "benefits": "each campaign completes a survey, collects the bonus and banks system_surveyor while progressing sector_cartographer, without touching the 180 gate",
-        "risks": "contract: one additive post-story action and two flags; dependency: none; concurrency: none; state: none",
-        "mitigation": "seven failing-first tests for orbit-first, scan, done, once-only, the 24-step cap, the pre-campaign gate and step accounting, plus four campaign seeds"
-      },
-      "plan_digest": "57b1d4ffffc8416917d0801322f84a109ba3b492f1165d30ecf62b149deb3646"
-    },
     {
       "task_id": "full-system-survey",
       "phase": "in_progress",
@@ -331,6 +285,65 @@
       "timestamp_str": "2026-11-21 00:31:53",
       "agent": "kilo:goal",
       "head": "e42f1adb6535eb094fc12ae3c012f32f82120e3d",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "away-team-rotation",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Keep away teams deployed after the campaign (field team target)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795211718.3922207,
+      "timestamp_str": "2026-11-21 00:55:18",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the rotating tour launches one expedition and the first team is then protected while later ones are recalled, so away_missions ends at 1 in every campaign and the field_team milestone (five completions) plus the Deep Explorer medal are unreachable, even though missions pay credits, research and XP",
+        "benefits": "the post-story captain deploys a fresh team whenever the current orbit offers an unworked, staffable mission, collecting five completions and the medal while sites pay their rewards",
+        "risks": "contract: one additive post-story action, a tried set and a recall guard; dependency: none; concurrency: none; state: two run flags, no schema change",
+        "mitigation": "nine failing-first tests for the launch, pre-campaign, active-mission, target, worked/unavailable, refused-pair, recall-protection, second-recall and codex-mirror cases, plus the 180-step gate and campaigns"
+      },
+      "plan_digest": "dcdedc1f69b3377166994db18f327b200376c2e26f6e4fcd93aa08dc727eec23",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "away-team-rotation",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All six benchmark campaigns reach away_missions 5 and bank field_team with 0 errors; codex rises to 43-46 of 62 (seed 1 46, seed 6/8/11 45, seed 42 44, seed 2 43); headline proofs retained (reconstruct+survey+megastructure+both pact types+quantum freight on all six, customs on 42/2/6/11, prize capture+sale on 42 and 6, pirate fight on every seed); decorated_crew stays out of reach (two medals need five missions for two crew); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2281 OK with README tree at 199 suites (ADR-433); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795213901.7109666,
+      "timestamp_str": "2026-11-21 01:31:41",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "away-team-rotation",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'away-team-rotation' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795213916.9605813,
+      "timestamp_str": "2026-11-21 01:31:56",
+      "agent": "kilo:goal",
+      "head": "d301aa7b2cd9cd906e428cebe377dc2116eac215",
       "delivery": {
         "roots": [
           "."
