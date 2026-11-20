@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `255`
-- **Total Classes**: `623`
-- **Total Top-Level Functions**: `572`
-- **Total Class Methods**: `3241`
-- **Total Source Lines**: `71818`
+- **Total Python Modules**: `257`
+- **Total Classes**: `625`
+- **Total Top-Level Functions**: `573`
+- **Total Class Methods**: `3256`
+- **Total Source Lines**: `72037`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`255` module(s))
+- **Indexed**: python (`257` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4057,6 +4057,26 @@
 
 ---
 
+### [`tests/test_relief_reconstruction.py`](tests/test_relief_reconstruction.py)
+> *Rebuilds prefer relief supplies, then fall back to credits (ADR-425).*
+
+**Size**: `103` lines
+
+**Classes:**
+- `class ReliefReconstructionTest`
+  - Method `._captain(cargo, credits, docked, orbiting, attempted, stock_attempts, quotes)`
+  - Method `.test_a_supplied_hold_rebuilds_with_relief()`
+  - Method `.test_a_missing_bag_is_bought_at_a_dock_first()`
+  - Method `.test_the_next_missing_bag_is_bought_in_turn()`
+  - Method `.test_an_undocked_captain_takes_the_credit_rebuild()`
+  - Method `.test_exhausted_stocking_falls_back_to_credits()`
+  - Method `.test_no_stock_and_no_credits_stays_quiet()`
+  - Method `.test_an_already_attempted_rebuild_stays_quiet()`
+  - Method `.test_an_intact_system_has_no_target()`
+  - Method `.test_the_stocking_limit_mirrors_the_engine_recipe()`
+
+---
+
 ### [`tests/test_repair_all_outposts.py`](tests/test_repair_all_outposts.py)
 > *REPAIR ALL OUTPOSTS restores every damaged outpost, worst first, as far as credits stretch.*
 
@@ -5027,6 +5047,24 @@
 
 ---
 
+### [`tests/test_vent_cooldown.py`](tests/test_vent_cooldown.py)
+> *The vent policy must honour the coolant recharge it can read (ADR-425).*
+
+**Size**: `57` lines
+
+**Classes:**
+- `class VentCooldownTest`
+  - Method `.test_the_snapshot_exposes_the_vent_tick()`
+  - Method `.test_a_hot_core_with_a_fresh_vent_is_not_posted()`
+  - Method `.test_a_hot_core_with_a_recharged_loop_is_posted()`
+  - Method `.test_a_core_never_vented_is_posted_once()`
+  - Method `.test_the_engine_reports_the_cooldown_after_a_real_vent()`
+
+**Functions:**
+- `def _captain(heat, last_vent, tick)`
+
+---
+
 ### [`tests/test_vital_card_keyboard.py`](tests/test_vital_card_keyboard.py)
 > *Actionable vital cards (burn cell, patch hull) are real keyboard controls, not mouse-only divs.*
 
@@ -5148,7 +5186,7 @@
 ### [`tests/test_world_relief.py`](tests/test_world_relief.py)
 > *Post-war reconstruction, relief cargo and the market premium for bombed worlds.*
 
-**Size**: `155` lines
+**Size**: `156` lines
 
 **Classes:**
 - `class WorldReliefEngineTest`
@@ -5321,7 +5359,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2936` lines
+**Size**: `2981` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5605,7 +5643,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `772` lines
+**Size**: `776` lines
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -5786,7 +5824,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11379` lines
+**Size**: `11388` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

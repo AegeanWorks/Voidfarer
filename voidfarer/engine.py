@@ -8678,6 +8678,15 @@ class SimulationEngine:
                     "mode_name": get_reactor_mode(self.state.ship.reactor.mode)["name"],
                     "surge_ticks": int(self.state.ship.reactor.surge_ticks),
                     "surge_bonus": round(float(self.state.ship.reactor.surge_bonus), 3),
+                    # The agent gates its purge on this tick; without it a hot core is
+                    # posted every step and the cooling loop refuses most of them
+                    # (ADR-425).
+                    "last_vent_tick": int(self.state.ship.reactor.last_vent_tick),
+                    "can_vent": self.state.ship.reactor.heat > 5.0
+                    and (
+                        self.state.ship.reactor.last_vent_tick < 0
+                        or self.state.time.tick - self.state.ship.reactor.last_vent_tick >= 5
+                    ),
                     "efficiency": round(reactor_output_efficiency(self.state.ship.reactor, float(equipment_snapshot.get("reactor_output", 0.0))), 3),
                     "cooling": round(reactor_cooling_rate(self.state.ship.reactor, equipment_snapshot, float(self._map_effects(cur_sys)["cooling_bonus"])), 2),
                     "modes": {mid: dict(profile) for mid, profile in REACTOR_MODES.items()},

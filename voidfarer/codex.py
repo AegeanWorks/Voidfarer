@@ -607,7 +607,11 @@ def metric_value(state: GameState, metric: str) -> int:
     if metric == "surface_ops":
         return int(state.stats.get("surface_ops", 0))
     if metric == "worlds_rebuilt":
-        return int(state.stats.get("worlds_rebuilt", 0))
+        # A relief landing rebuilds a world too; the achievement counts both modes
+        # rather than only the credit-funded one (ADR-425).
+        return int(state.stats.get("worlds_rebuilt", 0)) + int(
+            state.stats.get("relief_deliveries", 0)
+        )
     if metric == "relief_deliveries":
         return int(state.stats.get("relief_deliveries", 0))
     if metric == "trades":

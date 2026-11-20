@@ -209,6 +209,13 @@ class AiCaptain:
         "star", "orbital_station", "research_outpost", "black_hole",
         "wormhole", "quantum_relay", "solar_collector",
     })
+    # Mirrors SimulationEngine.RELIEF_CARGO: landing medicines, hydroponics and a
+    # fuel cell rebuilds 40 devastation for 5 standing instead of 20 for 2 (ADR-425).
+    RELIEF_CARGO = (("medicines", 2), ("hydroponics", 2), ("fuel_cells", 1))
+    # Six purchase actions are enough for three bags at any dock; after that the
+    # captain falls back to the credit rebuild rather than hunting forever.
+    RELIEF_STOCK_LIMIT = 6
+
     # A body hosts a derelict about 40% of the time, so three probes are enough to
     # find one while a derelict-free system cannot eat the post-story errands.
     SALVAGE_PROBE_LIMIT = 3
@@ -289,6 +296,8 @@ class AiCaptain:
         self.gambit_recalled = False
         # The post-campaign reactor doctrine change is attempted once (ADR-398).
         self.reactor_switched = False
+        # Relief stocking: how many purchase actions have tried to fill the bags (ADR-425).
+        self.relief_stock_attempts = 0
         # One smuggling run per campaign: the contraband lot bought and the jumps
         # spent carrying it toward a cordon (ADR-400).
         self.smuggling_item = ""
@@ -1645,10 +1654,46 @@ class AiCaptain:
         target = max(targets, key=lambda body: float(body.get("devastation") or 0.0))
         body_id = str(target["id"])
         ship = self.state.get("ship") or {}
+        cargo = ship.get("cargo") or {}
+        missing = [
+            (item_id, max(0, quantity - int(cargo.get(item_id, 0))))
+            for item_id, quantity in self.RELIEF_CARGO
+            if int(cargo.get(item_id, 0)) < quantity
+        ]
+        stocked_here = (
+            missing
+            and self._is_docked()
+            and self.relief_stock_attempts < self.RELIEF_STOCK_LIMIT
+        )
+        if stocked_here:
+            # Stock the relief bags while already at a dock; away from one the captain
+            # takes the credit rebuild rather than detouring for supplies (ADR-425).
+            quotes = {
+                str(quote.get("commodity_id")): quote
+                for quote in self.state.get("market_quotes") or []
+                if isinstance(quote, dict)
+            }
+            credits = int(ship.get("credits") or 0)
+            for item_id, need in missing:
+                quote = quotes.get(item_id)
+                if not quote:
+                    continue
+                if int(quote.get("max_buy") or 0) < need:
+                    continue
+                if credits < int(quote.get("buy_price") or 0) * need:
+                    continue
+                self.relief_stock_attempts += 1
+                return ("/api/trade",
+                        {"commodity_id": item_id, "quantity": need, "is_buy": True},
+                        "trade")
+            # No bag is buyable here: fall through to the credit rebuild below.
         orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
         landed = str(ship.get("landed_body_id") or "")
         if body_id not in (orbiting, landed):
             return "/api/orbit", {"target": body_id}, "orbit"
+        if not missing:
+            return ("/api/reconstruct", {"body_id": body_id, "mode": "relief"},
+                    "reconstruct")
         if int(ship.get("credits") or 0) < self.RECONSTRUCTION_COST:
             return None
         return ("/api/reconstruct", {"body_id": body_id, "mode": "credits"},

@@ -70,6 +70,7 @@ class WorldReliefEngineTest(unittest.TestCase):
         after_morale = sum(member.morale for member in self.engine.state.ship.crew) / len(self.engine.state.ship.crew)
         self.assertGreater(after_morale, before_morale)
         self.assertEqual(self.engine.state.stats.get("relief_deliveries"), 1)
+        self.assertEqual(metric_value(self.engine.state, "worlds_rebuilt"), 1)
         self.assertTrue(any(event.kind == "relief" for event in self.engine.state.events))
 
     def test_reconstruction_requires_orbit_and_damage(self):
