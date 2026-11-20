@@ -1,77 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "lifetime-escort-credit",
+    "task_id": "relief-rebuild-vent-gate",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795169855.5822308,
+    "updated_at": 1795174024.8386931,
     "owner": "kilo:goal",
-    "lease_until": 1795177055.5822308,
+    "lease_until": 1795181224.8386931,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795169998.2578657,
-    "completed_head": "0f8bac01c64f9ede20f8116256fc3c6688fcd122",
-    "completed_tree": "28d0206c1677c815cae7408281497d2bb6a5be3b"
+    "completed_at": 1795174532.202728,
+    "completed_head": "a085ed75f74735e8c1e237eed532a8ad74e3ab16",
+    "completed_tree": "8a0a85d4b6f43eecac52e99b0cba70c15d74ea0c"
   },
   "checkpoints": [
-    {
-      "task_id": "endurance-10k",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Shipped 10,000-step run (seed 3, 20 x 500 steps, 19 reloads): 0 errors, 0 drift, 101 families, 98 succeeded/99 attempted, 18 refusals; 20,000-action fuzz on seeds 21-30 with 200 round trips clean; 7 helper tests pass; suite Ran 2174 OK with README tree at 185 suites and 36,592 chars; 6/6 project gates (mechanics 180-step passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-418); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795156946.796672,
-      "timestamp_str": "2026-11-20 09:42:26",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "endurance-10k",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'endurance-10k' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795156977.6129513,
-      "timestamp_str": "2026-11-20 09:42:57",
-      "agent": "kilo:goal",
-      "head": "c178db5acb4b4d8e5d2065956d42c77a67a775b8",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "atomic-backup-perf",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Make the shadow backup an atomic rename instead of a second copy",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795158784.8952188,
-      "timestamp_str": "2026-11-20 10:13:04",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the server saves after every mutation; a 485 KB save cost 36.9 ms and the .bak copy+fsync alone cost 17.6 ms, more than writing the new payload (6.6 ms), because the previous file is already durable",
-        "benefits": "save latency halves without weakening crash safety: the renamed backup is the previous durable state and load already falls back to it",
-        "risks": "contract: save format and load fallback unchanged; dependency: none; concurrency: the existing write lock still serializes saves; state: a power loss between rename and install recovers the previous save from .bak",
-        "mitigation": "failing-first tests for the no-copy path, backup content, first-save absence, failed-install recovery and named slots, plus the save-interleaved fuzz and benchmark campaigns"
-      },
-      "plan_digest": "9fa81c7bc2aada6aab938d587222d6c3d8dd5ed9206b3fab631a3836e7df6f7a"
-    },
-    {
-      "task_id": "atomic-backup-perf",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] save 36.9 to 17.3 ms (-53%), /api/time/step 57.4 to 34.2 ms (-40%), campaign 68.2 to 35.1 ms/step (-49%); coverage unchanged: 180 gate 58/59/69 with 0 gaps/0 errors/10 refusals, seed 1 104/101/101 refusals 21, seed 42 102/99/100 refusals 20, both 0 errors; 20,000-action save-interleaved fuzz 0 crashes/0 breaches/0 drift; 5 tests pass; suite Ran 2179 OK with README tree at 186 suites (ADR-419); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795158785.0886612,
-      "timestamp_str": "2026-11-20 10:13:05",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "atomic-backup-perf",
       "phase": "completed",
@@ -312,6 +255,69 @@
       "timestamp_str": "2026-11-20 13:19:58",
       "agent": "kilo:goal",
       "head": "0f8bac01c64f9ede20f8116256fc3c6688fcd122",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "relief-rebuild-vent-gate",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Rebuild devastated worlds with relief supplies",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795173915.388559,
+      "timestamp_str": "2026-11-20 14:25:15",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the AI only used credit reconstruction, so the relief branch (medicines/hydroponics/fuel cell, 40 devastation, +5 standing) had no campaign proof and relief_deliveries never moved; worlds_rebuilt also ignored relief landings",
+        "benefits": "the captain lands relief when already docked with stockable bags, rebuilding twice as much devastation for more standing, then falls back to credits away from a dock",
+        "risks": "contract: _reconstruct_action gains a bounded stocking step and the worlds_rebuilt metric adds relief landings; dependency: none; concurrency: none; state: no schema change",
+        "mitigation": "nine failing-first tests for supply preference, stocking order and bound, undocked credit fallback, intact systems and the shared recipe; all three benchmark campaigns re-measured"
+      },
+      "plan_digest": "c9602a25bdc664471e958e78e019cab35691c38e81587809d753c53f6f8ffbb0"
+    },
+    {
+      "task_id": "relief-rebuild-vent-gate",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[2/2] The vent policy honours the coolant it can read",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795173915.6235745,
+      "timestamp_str": "2026-11-20 14:25:15",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the top-level reactor snapshot never exposed last_vent_tick or can_vent, so the vent policy read -1 and posted the purge every step while a core stayed hot: 1,636 of 1,654 campaign refusals were the recharging refusal",
+        "benefits": "the cooldown gate works, refusals return to 20 on seed 1, and the purge stays the deliberate emergency action",
+        "risks": "contract: the snapshot gains two additive fields; dependency: none; concurrency: none; state: none",
+        "mitigation": "five failing-first tests for the snapshot fields, fresh/recharged cooldown, first vent and a real engine vent"
+      }
+    },
+    {
+      "task_id": "relief-rebuild-vent-gate",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] 14 tests pass; relief lands on all three benchmark seeds (seed 1 105/101/101 refusals 20, seed 42 103/99/100 refusals 21, seed 2 101/98/99 refusals 21, all 0 errors); seed-1 codex relief_runner 1/3 + rebuilder 1/5; refusals drop 1654 -> 20 on seed 1; 180 gate unchanged 58/69/59 with 0 gaps/0 errors/10 refusals; suite Ran 2225 OK with README tree at 192 suites (ADR-425); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795174024.8386931,
+      "timestamp_str": "2026-11-20 14:27:04",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "relief-rebuild-vent-gate",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'relief-rebuild-vent-gate' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795174532.275239,
+      "timestamp_str": "2026-11-20 14:35:32",
+      "agent": "kilo:goal",
+      "head": "a085ed75f74735e8c1e237eed532a8ad74e3ab16",
       "delivery": {
         "roots": [
           "."
