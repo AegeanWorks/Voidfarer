@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (195 suites)
+└── tests/                <- unit & integration test suite (196 suites)
 ```
 
 ---

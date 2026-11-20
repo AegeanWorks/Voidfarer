@@ -216,6 +216,14 @@ class AiCaptain:
     # captain falls back to the credit rebuild rather than hunting forever.
     RELIEF_STOCK_LIMIT = 6
 
+    # The codex's quantum broker target: five automated freight orders (ADR-429).
+    QUANTUM_ORDER_TARGET = 5
+    # Four freight slots exist; buying four units gives every order a full lot.
+    QUANTUM_BUY_QUANTITY = 4
+    # Six cooldown ticks per order plus transit waits; eight idle steps means the
+    # current hold has no profitable lane and the run should stop.
+    QUANTUM_IDLE_LIMIT = 8
+
     # A full-system survey pays 300 cr + 120 XP and unlocks two milestones, but the
     # tour only ever scans the body it happens to orbit; the post-story captain sweeps
     # one system, bounded so a hostile anomaly chain cannot eat the errands (ADR-427).
@@ -306,6 +314,10 @@ class AiCaptain:
         self.survey_scans = 0
         # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
         self.pact_tried: set[tuple[str, str]] = set()
+        # Quantum freight run state: finished, idle steps, last seen order count (ADR-429).
+        self.quantum_done = False
+        self.quantum_idle = 0
+        self.quantum_last_orders = 0
         # Relief stocking: how many purchase actions have tried to fill the bags (ADR-425).
         self.relief_stock_attempts = 0
         # One smuggling run per campaign: the contraband lot bought and the jumps
@@ -564,6 +576,11 @@ class AiCaptain:
         if pact is not None:
             return pact
 
+        # Automated quantum freight needs a dock, a lot and cooldown ticks (ADR-429).
+        freight = self._quantum_freight_action()
+        if freight is not None:
+            return freight
+
         # A full-system survey pays a completion bonus the rotating tour can never
         # collect; it runs last so no established errand is displaced (ADR-427).
         survey = self._survey_action()
@@ -590,7 +607,7 @@ class AiCaptain:
 
         # Quantum freight follows the same post-campaign pattern on the engine's own
         # route report: one order, one armed auto-freight window (ADR-381).
-        quantum = self._quantum_freight_action()
+        quantum = self._quantum_manual_action()
         if quantum is not None:
             return quantum
 
@@ -1510,7 +1527,7 @@ class AiCaptain:
             return None
         return payload.get("quantum") or payload.get("report") or {}
 
-    def _quantum_freight_action(self):
+    def _quantum_manual_action(self):
         """Place one quantum order, then arm and stand down auto-freight (ADR-381).
 
         The engine's route report already prices every held commodity against every
@@ -1773,6 +1790,67 @@ class AiCaptain:
             self._note_pact_attempt("research_pact", pick[1])
             return "/api/diplomacy", {"faction_id": pick[1], "action": "research_pact"}, "diplomacy"
         return None
+
+    def _quantum_freight_action(self):
+        """Run the automated quantum freight lane until the broker milestone (ADR-429).
+
+        The rotating tour arms and disarms the broker, so the automation never ships a
+        load and the engine's ``_run_quantum_automation`` path stays unexercised. This
+        run arms it for good, buys a full lot when the hold is empty, and advances the
+        clock so the cooldown places one order per call; eight idle steps without a new
+        order means the hold has no profitable lane and the run stops.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if self.quantum_done:
+            return None
+        automation = self.state.get("quantum_automation") or {}
+        orders = int(automation.get("orders") or 0)
+        if orders >= self.QUANTUM_ORDER_TARGET:
+            self.quantum_done = True
+            if automation.get("enabled"):
+                return (
+                    "/api/trade/quantum/automation",
+                    {"enabled": False},
+                    "trade_quantum_automation",
+                )
+            return None
+        if orders != self.quantum_last_orders:
+            self.quantum_last_orders = orders
+            self.quantum_idle = 0
+        if not self._is_docked():
+            return None
+        if not automation.get("enabled"):
+            return (
+                "/api/trade/quantum/automation",
+                {"enabled": True, "min_net": 0},
+                "trade_quantum_automation",
+            )
+        ship = self.state.get("ship") or {}
+        trade_orders = ship.get("trade_orders") or []
+        cargo = ship.get("cargo") or {}
+        if not trade_orders and not any(int(quantity) > 0 for quantity in cargo.values()):
+            credits = int(ship.get("credits") or 0)
+            quotes = [
+                quote
+                for quote in self.state.get("market_quotes") or []
+                if isinstance(quote, dict)
+                and int(quote.get("max_buy") or 0) >= self.QUANTUM_BUY_QUANTITY
+                and credits >= int(quote.get("buy_price") or 0) * self.QUANTUM_BUY_QUANTITY
+            ]
+            if quotes:
+                row = min(quotes, key=lambda quote: int(quote.get("buy_price") or 0))
+                return (
+                    "/api/trade",
+                    {"commodity_id": str(row["commodity_id"]),
+                     "quantity": self.QUANTUM_BUY_QUANTITY, "is_buy": True},
+                    "trade",
+                )
+        self.quantum_idle += 1
+        if self.quantum_idle >= self.QUANTUM_IDLE_LIMIT:
+            self.quantum_done = True
+            return None
+        return "/api/time/step", {"ticks": 6}, "time"
 
     def _survey_action(self):
         """Finish one full-system survey after the campaign (ADR-427).

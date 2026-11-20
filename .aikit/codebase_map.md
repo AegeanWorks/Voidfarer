@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `260`
-- **Total Classes**: `628`
-- **Total Top-Level Functions**: `577`
-- **Total Class Methods**: `3280`
-- **Total Source Lines**: `72372`
+- **Total Python Modules**: `261`
+- **Total Classes**: `629`
+- **Total Top-Level Functions**: `578`
+- **Total Class Methods**: `3291`
+- **Total Source Lines**: `72553`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`260` module(s))
+- **Indexed**: python (`261` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3900,6 +3900,29 @@
 
 ---
 
+### [`tests/test_quantum_freight.py`](tests/test_quantum_freight.py)
+> *The post-story captain runs automated quantum freight (ADR-429).*
+
+**Size**: `103` lines
+
+**Classes:**
+- `class QuantumFreightPolicyTest`
+  - Method `.test_a_dormant_broker_is_armed()`
+  - Method `.test_an_empty_hold_buys_the_cheapest_lot()`
+  - Method `.test_a_loaded_hold_advances_the_freight_clock()`
+  - Method `.test_a_full_slot_queue_waits()`
+  - Method `.test_the_target_is_met_disarms_and_the_policy_stops()`
+  - Method `.test_nothing_runs_before_the_campaign()`
+  - Method `.test_a_landed_captain_does_not_run_freight()`
+  - Method `.test_an_unprofitable_hold_gives_up_after_the_idle_limit()`
+  - Method `.test_a_delivered_order_resets_the_idle_count()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _captain(orders, enabled, cargo, trade_orders, docked, completed, credits, done, idle, last_orders)`
+
+---
+
 ### [`tests/test_radar_hover.py`](tests/test_radar_hover.py)
 > *System radar: the hovered body gets a ring and a forced name, even with labels switched off.*
 
@@ -5420,7 +5443,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3087` lines
+**Size**: `3165` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5462,7 +5485,7 @@
   - Method `._automation_action()` - *Arm the docked broker on the cheapest quote, then stand it down (ADR-380).*
   - Method `._quote_price(quotes, commodity_id, field)` - *Read one price from the quote list or its id-keyed form.*
   - Method `._quantum_report()` - *Read the docked quantum-freight report so routes come from the engine.*
-  - Method `._quantum_freight_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
+  - Method `._quantum_manual_action()` - *Place one quantum order, then arm and stand down auto-freight (ADR-381).*
   - Method `._fabricate_action()` - *Field-fabricate one patch kit or fuel cell after the campaign (ADR-394).*
   - Method `._overhaul_action()` - *Scrub hyperlane frame wear once after the campaign at a drydock (ADR-393).*
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
@@ -5470,6 +5493,7 @@
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
   - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
+  - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until the broker milestone (ADR-429).*
   - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*

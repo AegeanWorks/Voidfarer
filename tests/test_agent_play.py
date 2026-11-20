@@ -2256,7 +2256,7 @@ class QuantumFreightTourTest(unittest.TestCase):
             {"commodity_id": "titanium", "quantity": 20,
              "destination_system_id": "sol", "fee": 10, "net": 900},
         ])
-        action = self._captain(report)._quantum_freight_action()
+        action = self._captain(report)._quantum_manual_action()
         self.assertEqual(action[0], "/api/trade/quantum/place")
         self.assertEqual(action[1], {"commodity_id": "titanium", "quantity": 1,
                                      "destination_system_id": "sol"})
@@ -2267,14 +2267,14 @@ class QuantumFreightTourTest(unittest.TestCase):
             {"commodity_id": "titanium", "quantity": 20,
              "destination_system_id": "vega", "fee": 500, "net": -20},
         ])
-        self.assertIsNone(self._captain(report)._quantum_freight_action())
+        self.assertIsNone(self._captain(report)._quantum_manual_action())
         good = self._report([
             {"commodity_id": "titanium", "quantity": 20,
              "destination_system_id": "vega", "fee": 10, "net": 500},
         ])
-        self.assertIsNone(self._captain(good, orbiting_body=None)._quantum_freight_action())
+        self.assertIsNone(self._captain(good, orbiting_body=None)._quantum_manual_action())
         self.assertIsNone(self._captain(
-            good, story_status={"completed": False})._quantum_freight_action())
+            good, story_status={"completed": False})._quantum_manual_action())
 
     def test_a_refused_or_unaffordable_fee_is_skipped(self):
         report = self._report([
@@ -2282,7 +2282,7 @@ class QuantumFreightTourTest(unittest.TestCase):
              "destination_system_id": "vega", "fee": 900, "net": 500},
         ])
         self.assertIsNone(self._captain(
-            report, ship={"credits": 500, "cargo": {"titanium": 20}})._quantum_freight_action())
+            report, ship={"credits": 500, "cargo": {"titanium": 20}})._quantum_manual_action())
 
     def test_the_automation_is_armed_after_the_manual_order(self):
         report = self._report([
@@ -2291,7 +2291,7 @@ class QuantumFreightTourTest(unittest.TestCase):
         ])
         captain = self._captain(report)
         captain.attempted_signatures.add(("/api/trade/quantum/place", "titanium"))
-        action = captain._quantum_freight_action()
+        action = captain._quantum_manual_action()
         self.assertEqual(action[0], "/api/trade/quantum/automation")
         self.assertEqual(action[1], {"enabled": True, "min_net": 0})
         self.assertEqual(action[2], "quantum_automation")
@@ -2301,14 +2301,14 @@ class QuantumFreightTourTest(unittest.TestCase):
         traded = self._captain(report, quantum_automation={
             "enabled": True, "min_net": 0, "orders": 1})
         self.assertEqual(
-            traded._quantum_freight_action(),
+            traded._quantum_manual_action(),
             ("/api/trade/quantum/automation", {"enabled": False}, "quantum_automation"),
         )
         idle = self._captain(report, quantum_automation={
             "enabled": True, "min_net": 0, "orders": 0})
         idle.quantum_armed_at = 1
         idle.total_steps = 99
-        self.assertEqual(idle._quantum_freight_action()[1], {"enabled": False})
+        self.assertEqual(idle._quantum_manual_action()[1], {"enabled": False})
 
     def test_both_quantum_routes_are_keyed(self):
         captain = self._captain(self._report([]))
