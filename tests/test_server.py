@@ -401,6 +401,42 @@ class TestServer(unittest.TestCase):
         self.assertIn("current_system", slim["state"])
         self.assertLess(len(slim_data), len(full_data))
 
+    def test_concurrent_requests_never_return_server_errors(self):
+        import threading
+        errors = []
+        lock = threading.Lock()
+
+        def worker(index):
+            paths = [("/api/time/step", {"ticks": 1}), ("/api/status", {}), ("/api/scan", {})]
+            for step in range(3):
+                path, body = paths[(index + step) % len(paths)]
+                try:
+                    status, data = self._post(path, body)
+                    json.loads(data.decode("utf-8"))
+                    if status >= 500:
+                        with lock:
+                            errors.append((path, status))
+                except Exception as exc:  # noqa: BLE001 - collected and asserted below
+                    with lock:
+                        errors.append((path, f"{type(exc).__name__}: {exc}"))
+
+        threads = [threading.Thread(target=worker, args=(index,)) for index in range(2)]
+        for item in threads:
+            item.start()
+        for item in threads:
+            item.join(timeout=30)
+
+        self.assertEqual(errors, [])
+        engine = VoidFarerHandler.engine
+        self.assertGreater(engine.state.time.tick, 0)
+        self.assertGreaterEqual(engine.state.ship.hull, 0)
+        self.assertGreaterEqual(engine.state.ship.credits, 0)
+        self.assertEqual(
+            len([member.id for member in engine.state.ship.crew]),
+            len({member.id for member in engine.state.ship.crew}),
+        )
+        self.assertEqual(self._post("/api/time/step", {"ticks": 1})[0], 200)
+
     def test_get_api_shipyard_excludes_current_chassis(self):
         status, data = self._get("/api/shipyard")
         self.assertEqual(status, 200)

@@ -9,8 +9,8 @@
 - **Total Python Modules**: `254`
 - **Total Classes**: `622`
 - **Total Top-Level Functions**: `569`
-- **Total Class Methods**: `3233`
-- **Total Source Lines**: `71657`
+- **Total Class Methods**: `3234`
+- **Total Source Lines**: `71693`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`254` module(s))
@@ -4232,7 +4232,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `1041` lines
+**Size**: `1077` lines
 
 **Classes:**
 - `class TestServer`
@@ -4273,6 +4273,7 @@
   - Method `.test_a_tick_request_beyond_the_cap_is_refused_without_advancing()`
   - Method `.test_a_normal_tick_request_still_advances()`
   - Method `.test_a_cached_catalog_request_omits_the_static_keys()`
+  - Method `.test_concurrent_requests_never_return_server_errors()`
   - Method `.test_get_api_shipyard_excludes_current_chassis()`
   - Method `.test_post_inventory_buy_rejects_non_numeric_quantity()`
   - Method `.test_frontier_endpoints()`
