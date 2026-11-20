@@ -234,6 +234,11 @@ class AiCaptain:
     # busy until the milestone is banked (ADR-432).
     RESEARCH_TARGET = 4
 
+    # The codex's field-team milestone: five completed expeditions. The tour launches
+    # one team and protects it, so the post-story captain keeps deploying fresh teams
+    # until the milestone is banked (ADR-433).
+    AWAY_MISSION_TARGET = 5
+
     # A body hosts a derelict about 40% of the time, so three probes are enough to
     # find one while a derelict-free system cannot eat the post-story errands.
     SALVAGE_PROBE_LIMIT = 3
@@ -321,6 +326,10 @@ class AiCaptain:
         # so a refused start cannot repeat forever (ADR-432).
         self.research_done = False
         self.research_tried: set[str] = set()
+        # Away rotation state: the target is reached and the (mission_type, body)
+        # pairs already tried, so a refused launch cannot repeat (ADR-433).
+        self.away_rotation_done = False
+        self.away_launch_tried: set[tuple[str, str]] = set()
         # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
         self.pact_tried: set[tuple[str, str]] = set()
         # One pirate may be fought per campaign when the hull is healthy (ADR-431).
@@ -728,6 +737,12 @@ class AiCaptain:
         research = self._research_action()
         if research is not None:
             return research
+
+        # A fresh body orbit is where an expedition can be deployed; a free step
+        # launches the next available mission and waits for it to resolve (ADR-433).
+        away = self._away_rotation_action()
+        if away is not None:
+            return away
 
         return "/api/time/step", {"ticks": 1}, "time"
 
@@ -1916,6 +1931,45 @@ class AiCaptain:
                 return "/api/research/start", {"project_id": project_id}, "research"
         return None
 
+    def _away_rotation_action(self):
+        """Keep away teams deployed after the campaign (ADR-433).
+
+        The tour launches one expedition, the first team is protected and every later
+        one is recalled, so ``away_missions`` ends at one in every campaign and the
+        field-team milestone (five completions) plus the Deep Explorer medal stay
+        unreachable. The rotation launches the first unworked, fully staffable mission
+        the current orbit offers whenever no team is deployed, and waits for that team
+        to resolve. Each ``(mission_type, body)`` pair is tried once, so a refused
+        launch cannot repeat.
+        """
+        if self.away_rotation_done:
+            return None
+        ship = self.state.get("ship") or {}
+        if ship.get("away_missions"):
+            return None
+        stat = int((self.state.get("stats") or {}).get("away_missions") or 0)
+        if stat >= self.AWAY_MISSION_TARGET:
+            self.away_rotation_done = True
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        report = self.state.get("away_report") or {}
+        body = report.get("body") or self.state.get("orbiting_body") or {}
+        body_id = str(body.get("id") or "")
+        for mission in report.get("available") or []:
+            if not isinstance(mission, dict) or not mission.get("id"):
+                continue
+            if not mission.get("available", True) or mission.get("worked"):
+                continue
+            mission_type = str(
+                mission.get("mission_type") or mission.get("type") or mission["id"]
+            )
+            if (mission_type, body_id) in self.away_launch_tried:
+                continue
+            self.away_launch_tried.add((mission_type, body_id))
+            return "/api/away/launch", {"mission_type": mission_type}, "away"
+        return None
+
     def _survey_action(self):
         """Finish one full-system survey after the campaign (ADR-427).
 
@@ -2414,6 +2468,13 @@ class AiCaptain:
         if not self.away_protected_mission:
             self.away_protected_mission = str(missions[0]["id"])
             return None
+        if not self.away_rotation_done and (self.state.get("story_status") or {}).get("completed"):
+            # The post-story rotation wants every expedition to resolve; it launches
+            # only when none is active, so a lone mission is its own team and is
+            # adopted as protected instead of being recalled (ADR-433).
+            if len(missions) == 1:
+                self.away_protected_mission = str(missions[0]["id"])
+                return None
         for mission in missions:
             mission_id = str(mission["id"])
             if mission_id == self.away_protected_mission:

@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (198 suites)
+└── tests/                <- unit & integration test suite (199 suites)
 ```
 
 ---
@@ -434,9 +434,12 @@ a relic set. It decommissions a destroyed escort so the officer is released, sel
 captured prize at a drydock, recalls an armed escort into a fight to spend its captain's
 gambit, and switches the reactor to economy once the story is over. It also keeps the
 research bench busy: whenever no project is running it starts the next available one,
-finishing four projects and banking the Technologist milestone. A smuggling run buys
-one contraband lot, ferries the high-security cordon the snapshot quotes and dumps it when
-the scan lands; a live heat spike is vented and the purge damage serviced at the next dock.
+finishing four projects and banking the Technologist milestone. At a fresh orbit it keeps
+away teams deployed as well, launching the first unworked, staffable expedition and
+waiting for it to resolve until five missions complete the Field Team milestone. A
+smuggling run buys one contraband lot, ferries the high-security cordon the snapshot
+quotes and dumps it when the scan lands; a live heat spike is vented and the purge
+damage serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a

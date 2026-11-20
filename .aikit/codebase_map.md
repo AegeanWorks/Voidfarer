@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `263`
-- **Total Classes**: `631`
-- **Total Top-Level Functions**: `580`
-- **Total Class Methods**: `3308`
-- **Total Source Lines**: `72767`
+- **Total Python Modules**: `264`
+- **Total Classes**: `633`
+- **Total Top-Level Functions**: `582`
+- **Total Class Methods**: `3319`
+- **Total Source Lines**: `72951`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`263` module(s))
+- **Indexed**: python (`264` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -665,6 +665,31 @@
 
 **Functions:**
 - `def _crew(member_id, role, skill, specialty, injury)`
+
+---
+
+### [`tests/test_away_rotation.py`](tests/test_away_rotation.py)
+> *The post-story captain keeps away teams deployed (ADR-433).*
+
+**Size**: `123` lines
+
+**Classes:**
+- `class AwayRotationPolicyTest`
+  - Method `.test_an_available_mission_is_launched_after_the_campaign()`
+  - Method `.test_the_first_available_mission_wins()`
+  - Method `.test_nothing_launches_before_the_campaign()`
+  - Method `.test_an_active_mission_is_waited_on()`
+  - Method `.test_the_target_stops_the_rotation()`
+  - Method `.test_a_worked_or_unstaffable_mission_is_skipped()`
+  - Method `.test_a_refused_pair_is_not_retried()`
+  - Method `.test_the_target_matches_the_codex_milestone()`
+- `class AwayRecallGuardTest`
+  - Method `.test_the_rotation_protects_its_single_mission_from_recall()`
+  - Method `.test_a_second_mission_is_still_recalled()`
+
+**Functions:**
+- `def _captain(available, missions, stat, story, done, body)`
+- `def _mission(mission_id, **fields)`
 
 ---
 
@@ -5484,7 +5509,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3229` lines
+**Size**: `3290` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5537,6 +5562,7 @@
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
   - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until the broker milestone (ADR-429).*
   - Method `._research_action()` - *Start the next available research project after the campaign (ADR-432).*
+  - Method `._away_rotation_action()` - *Keep away teams deployed after the campaign (ADR-433).*
   - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*
