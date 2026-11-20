@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "slim-action-payloads",
+    "task_id": "bounded-time-step",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795161004.080869,
+    "updated_at": 1795163774.427172,
     "owner": "kilo:goal",
-    "lease_until": 1795168204.080869,
+    "lease_until": 1795170974.427172,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795161030.4090793,
-    "completed_head": "55ba41e1c3090ded970636f1b5127a7513a45a57",
-    "completed_tree": "e402d53c8f51ef9b05df7c5e4fc7e45c0b1e7224"
+    "completed_at": 1795163801.6162064,
+    "completed_head": "3d1499afce97eedb784cc327339baf49263d33a9",
+    "completed_tree": "6874bffe8897510e2d1b8b3f7304082646949590"
   },
   "checkpoints": [
-    {
-      "task_id": "autosave-follows-active-slot",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'autosave-follows-active-slot' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795120602.3626847,
-      "timestamp_str": "2026-11-19 23:36:42",
-      "agent": "kilo:goal",
-      "head": "ab56c6d9e42d705688ed27b3837bf8c548db5767",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "chaos-fuzz-harness",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Ship a chaos fuzz harness and prove the engine survives random play",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795123537.0374446,
-      "timestamp_str": "2026-11-20 00:25:37",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "all recent verification followed the AI captain's deliberate route; random legal action sequences (blocking encounters, odd trades, dismissals) had never been exercised, so unhandled state combinations were untested",
-        "benefits": "a reusable tool turns random play into a repeatable invariant check with reproducible seed/step reporting and Why/Fix exit guidance",
-        "risks": "contract: none, a new developer tool plus fast unit tests; dependency: stdlib only; concurrency: none; state: none",
-        "mitigation": "five fast tests pin the checker against a synthetic bad state covering all twelve rule classes, plus the clean case, dedup, priority and a small seeded run"
-      },
-      "plan_digest": "ebaac0cffc173a2d95b001f35e4ae54a1602d21414ba32a0752b16fcda36fff1"
-    },
-    {
-      "task_id": "chaos-fuzz-harness",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] tools/chaos_fuzz.py ran 10,000 random actions across seeds 3/7/11/23/42 in 12s with 0 crashes and 0 invariant breaches; five unit tests pass; suite Ran 2154 OK with README tree at 183 suites; 6/6 project gates (mechanics gate passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-414); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795123538.0465941,
-      "timestamp_str": "2026-11-20 00:25:38",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "chaos-fuzz-harness",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 10:50:30",
       "agent": "kilo:goal",
       "head": "55ba41e1c3090ded970636f1b5127a7513a45a57",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "bounded-time-step",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Bound a time step and make the calendar overflow-proof",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795163774.1499705,
+      "timestamp_str": "2026-11-20 11:36:14",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "POST /api/time/step accepted any positive integer; a billion ticks raised OverflowError in TimeState.current_date (timedelta overflow), escaping the handler and poisoning any save built from that state; the CLI time step had the same exposure",
+        "benefits": "the clock cannot be crashed by a malformed or hostile request, and extreme ticks complete with a clamped calendar and finite populations",
+        "risks": "contract: engine gains MAX_TICKS_PER_STEP and the server parser a maximum bound; dependency: none; concurrency: none; state: no save-schema change",
+        "mitigation": "failing-first engine tests for the five date clamps and four cap behaviours plus two server tests"
+      },
+      "plan_digest": "33ffd273b4c2532d30f428afde8293c18420ff4adc09043235a5a48e5d831fac"
+    },
+    {
+      "task_id": "bounded-time-step",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] 9 tick-limit tests and 2 server tests pass; tick(1e9) now completes with date 31.12.9999 and finite populations, save payload free of Infinity/NaN; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; campaigns seed 1 104/101/101 refusals 21 and seed 42 102/99/100 refusals 20, both 0 errors; chaos fuzz seeds 3/7 clean; suite Ran 2197 OK with README tree at 188 suites (ADR-421); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795163774.427172,
+      "timestamp_str": "2026-11-20 11:36:14",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "bounded-time-step",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'bounded-time-step' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795163801.6947978,
+      "timestamp_str": "2026-11-20 11:36:41",
+      "agent": "kilo:goal",
+      "head": "3d1499afce97eedb784cc327339baf49263d33a9",
       "delivery": {
         "roots": [
           "."
