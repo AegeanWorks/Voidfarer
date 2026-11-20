@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "structural-fuzz-thermal-save",
+    "task_id": "endurance-10k",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795130079.6646006,
+    "updated_at": 1795156946.796672,
     "owner": "kilo:goal",
-    "lease_until": 1795137279.6646006,
+    "lease_until": 1795164146.796672,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795130101.3561351,
-    "completed_head": "9c34db5d6ce4d30a375448233536f9c850a9938d",
-    "completed_tree": "f09d6bc981544609562b43c8fb1d97e284862ffc"
+    "completed_at": 1795156977.5506315,
+    "completed_head": "c178db5acb4b4d8e5d2065956d42c77a67a775b8",
+    "completed_tree": "6a646c06efbdf376c5f663988bf9d6d7566c30d3"
   },
   "checkpoints": [
-    {
-      "task_id": "checkpoint-replay-proof",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'checkpoint-replay-proof' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795115066.7841136,
-      "timestamp_str": "2026-11-19 22:04:26",
-      "agent": "kilo:goal",
-      "head": "acb475f84c236efe4fb8474550525a4c2590c2ee",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "combat-save-parity",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] A fight saved mid-battle resumes the exact exchange",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795115875.1839015,
-      "timestamp_str": "2026-11-19 22:17:55",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "an active combat is the most stateful save moment (enemy hull, intent, cooldowns, spent gambit, evasion bonus) and nothing pinned that a reloaded fight rolls the same exchange instead of a re-roll",
-        "benefits": "mid-fight saves are proven exact over the real storage path",
-        "risks": "contract: none, test-only; dependency: none; concurrency: none; state: none",
-        "mitigation": "three tests covering a single exchange, three further rounds and the gambit-used fields"
-      },
-      "plan_digest": "5b99e6440fa73b374bb866bc9a72fc9da847aef535f1b114602cfddc9c2a8b36"
-    },
-    {
-      "task_id": "combat-save-parity",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Three combat parity tests pass; suite Ran 2142 OK with README tree at 181 suites; 6/6 project gates (mechanics 180-step passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-411); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795115875.5322073,
-      "timestamp_str": "2026-11-19 22:17:55",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "combat-save-parity",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 02:15:01",
       "agent": "kilo:goal",
       "head": "9c34db5d6ce4d30a375448233536f9c850a9938d",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "endurance-10k",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Ship a segmented endurance check and prove a 10,000-step campaign",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795156946.503446,
+      "timestamp_str": "2026-11-20 09:42:26",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "every prior campaign capped at 2,000 steps in one play() call and resume parity was sampled only to 1,000 steps; nothing proved repeated save/load hand-offs over a long campaign stay error-free and drift-free",
+        "benefits": "the tool reproduces a long segmented run for any seed and segment size and reports the exact field that drifted",
+        "risks": "contract: tool plus fast helper tests, no production change; dependency: stdlib; concurrency: none; state: none",
+        "mitigation": "seven pure-helper tests plus the shipped 10,000-step run and the ten-seed save-interleaved fuzz"
+      },
+      "plan_digest": "34ef83c3e55298d6fe54f21c6c152fe8537120f2c0437b429ec79c31b1f5eda5"
+    },
+    {
+      "task_id": "endurance-10k",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] Shipped 10,000-step run (seed 3, 20 x 500 steps, 19 reloads): 0 errors, 0 drift, 101 families, 98 succeeded/99 attempted, 18 refusals; 20,000-action fuzz on seeds 21-30 with 200 round trips clean; 7 helper tests pass; suite Ran 2174 OK with README tree at 185 suites and 36,592 chars; 6/6 project gates (mechanics 180-step passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-418); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795156946.796672,
+      "timestamp_str": "2026-11-20 09:42:26",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "endurance-10k",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'endurance-10k' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795156977.6129513,
+      "timestamp_str": "2026-11-20 09:42:57",
+      "agent": "kilo:goal",
+      "head": "c178db5acb4b4d8e5d2065956d42c77a67a775b8",
       "delivery": {
         "roots": [
           "."
