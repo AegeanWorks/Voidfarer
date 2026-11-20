@@ -641,7 +641,15 @@ def metric_value(state: GameState, metric: str) -> int:
     if metric == "crew_medals":
         return sum(len(member.medals) for member in ship.crew)
     if metric == "escorts":
-        return len(ship.fleet_ships)
+        # Ships can be sold, dismissed or lost in battle, but a commission is forever:
+        # credit the lifetime count so an achievement is never revoked by a later sale
+        # (ADR-424). Older saves only have a live roster, which is the floor.
+        commissioned = sum(
+            int(value)
+            for key, value in state.stats.items()
+            if key.startswith("escort_commissions_")
+        )
+        return max(len(ship.fleet_ships), commissioned)
     if metric == "drones":
         return len(ship.fleet_drones)
     if metric == "outposts":
@@ -655,7 +663,10 @@ def metric_value(state: GameState, metric: str) -> int:
     if metric == "research_pacts":
         return len(ship.research_pacts)
     if metric == "escort_captains":
-        return sum(1 for escort in ship.fleet_ships if escort.captain_id)
+        # A recalled captain leaves the roster empty, so the assignment is also counted
+        # as a lifetime event (ADR-424).
+        assigned = int(state.stats.get("escort_captains_assigned", 0))
+        return max(sum(1 for escort in ship.fleet_ships if escort.captain_id), assigned)
     if metric == "outposts_specialized":
         return sum(1 for outpost in state.outposts if outpost.specialization)
     if metric == "outposts_repaired":

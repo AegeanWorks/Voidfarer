@@ -3612,7 +3612,11 @@ class SimulationEngine:
                 fleet_ships=fleet_ships,
                 flight_log=tuple(list(self.state.ship.flight_log[-19:]) + [line]),
             )
-            self.state = self._clone_state(ship=new_ship)
+            stats = dict(self.state.stats)
+            # A recall empties the roster entry, so the assignment is also a lifetime
+            # event for the codex (ADR-424).
+            stats["escort_captains_assigned"] = int(stats.get("escort_captains_assigned", 0)) + 1
+            self.state = self._clone_state(ship=new_ship, stats=stats)
             return True, line
 
     def recall_fleet_captain(self, ship_id: str) -> tuple[bool, str]:

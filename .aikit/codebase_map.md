@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `254`
-- **Total Classes**: `622`
-- **Total Top-Level Functions**: `569`
-- **Total Class Methods**: `3234`
-- **Total Source Lines**: `71693`
+- **Total Python Modules**: `255`
+- **Total Classes**: `623`
+- **Total Top-Level Functions**: `572`
+- **Total Class Methods**: `3241`
+- **Total Source Lines**: `71818`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`254` module(s))
+- **Indexed**: python (`255` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1580,6 +1580,28 @@
   - Method `.test_the_control_is_wired_to_the_inventory_route()`
   - Method `.test_the_button_state_reads_the_hold_and_explains_the_gate()`
   - Method `.test_the_low_fuel_flee_names_the_decoy_alternative()`
+
+---
+
+### [`tests/test_codex_escort_credit.py`](tests/test_codex_escort_credit.py)
+> *Escort achievements credit the commission, not the current roster (ADR-424).*
+
+**Size**: `110` lines
+
+**Classes:**
+- `class EscortLifetimeCreditTest`
+  - Method `.test_commissioning_an_escort_credits_the_achievement()`
+  - Method `.test_selling_the_only_escort_keeps_the_achievement()`
+  - Method `.test_dismissing_the_only_escort_keeps_the_achievement()`
+  - Method `.test_giving_a_captain_keeps_the_credit_after_a_recall()`
+  - Method `.test_three_commissions_count_even_one_at_a_time()`
+  - Method `.test_a_legacy_save_still_counts_the_current_roster()`
+  - Method `.test_the_higher_of_roster_and_commissions_wins()`
+
+**Functions:**
+- `def _engine()`
+- `def _member_id(engine)`
+- `def _dock(engine)`
 
 ---
 
@@ -5583,7 +5605,7 @@
 ### [`voidfarer/codex.py`](voidfarer/codex.py)
 > *Captain's log and discovery codex: milestones, statistics, and rewards.*
 
-**Size**: `761` lines
+**Size**: `772` lines
 
 **Classes:**
 - `class CodexCategory` - *A thematic grouping of codex milestones.*
@@ -5764,7 +5786,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11375` lines
+**Size**: `11379` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
