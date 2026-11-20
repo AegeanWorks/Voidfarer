@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "bounded-time-step",
+    "task_id": "mechanics-gate-fuzz",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795163774.427172,
+    "updated_at": 1795166175.3305893,
     "owner": "kilo:goal",
-    "lease_until": 1795170974.427172,
+    "lease_until": 1795173375.3305893,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795163801.6162064,
-    "completed_head": "3d1499afce97eedb784cc327339baf49263d33a9",
-    "completed_tree": "6874bffe8897510e2d1b8b3f7304082646949590"
+    "completed_at": 1795166299.9892232,
+    "completed_head": "444e28f74d82010202ace41d3293b72c7a3b297e",
+    "completed_tree": "c8f0f4298e63f5300b3285bde97631e3e8173821"
   },
   "checkpoints": [
-    {
-      "task_id": "chaos-fuzz-harness",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'chaos-fuzz-harness' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795123626.7073987,
-      "timestamp_str": "2026-11-20 00:27:06",
-      "agent": "kilo:goal",
-      "head": "923bb8f75a785856ce7cabf2f631126021dfaea9",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "empty-loadout-stays-empty",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Loading keeps an emptied crew, weapon rack or inbox empty",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795125750.4287412,
-      "timestamp_str": "2026-11-20 01:02:30",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the chaos harness's save/load interleaving found that a ship which dismissed every officer came back from a reload with the starter engineer and pilot restored: _bootstrap_frontier treated empty collections as legacy and backfilled them",
-        "benefits": "deliberate player choices survive a reload, and the fuzz now field-compares 400 arbitrary save/load round trips",
-        "risks": "contract: legacy backfill is gated on the pre-RNG-checkpoint marker; dependency: none; concurrency: none; state: none",
-        "mitigation": "failing-first tests for empty crew/weapons/inbox plus legacy crew and tree-root backfill, and the extended --save-every fuzz across twenty seeds"
-      },
-      "plan_digest": "d22d46c805081c5b3630349d9e7d6c2d860a875791cc855524ae9be65ae9ebd6"
-    },
-    {
-      "task_id": "empty-loadout-stays-empty",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Five resurrection tests pass; extended fuzz ran 40,000 actions across 20 seeds with 400 save/load round trips: 0 crashes, 0 breaches, 0 drift (110s); suite Ran 2161 OK; README tree still 183 suites, 36,124 chars; 6/6 project gates (mechanics gate passed; last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-415); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795125751.4952114,
-      "timestamp_str": "2026-11-20 01:02:31",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "empty-loadout-stays-empty",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 11:36:41",
       "agent": "kilo:goal",
       "head": "3d1499afce97eedb784cc327339baf49263d33a9",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "mechanics-gate-fuzz",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Make the mechanics gate run coverage plus an invariant fuzz",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795166175.050635,
+      "timestamp_str": "2026-11-20 12:16:15",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the mechanics gate only ran ai_play 180, so random legal action sequences and save interleaving were never part of Phase 4 even though the chaos harness caught two real defects the deliberate route missed",
+        "benefits": "every project check now proves route coverage and random-play invariants with save interleaving in about 8s",
+        "risks": "contract: mechanics.test becomes a wrapper and mechanics.core lists the two tools; dependency: stdlib only; concurrency: the steps run sequentially inside the gate; state: none",
+        "mitigation": "six fast wrapper tests pin success, either-step failure, timeout, forwarding and misuse, and the full gate was re-run"
+      },
+      "plan_digest": "4e4dce7117d086818706931f04860b1b6d1564ca0f4989ae1e48e1c465bd8ae0"
+    },
+    {
+      "task_id": "mechanics-gate-fuzz",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] aikit check voidfarer passes 6/6 with mechanics now covering 180-step coverage (58/59/69, 0 gaps/0 errors) and a 400-action save-interleaved fuzz (4 round trips, clean) in 8s; wrapper suite 6 tests green; suite passes with README tree at 189 suites and 36,742 chars (ADR-422); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795166175.3305893,
+      "timestamp_str": "2026-11-20 12:16:15",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "mechanics-gate-fuzz",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'mechanics-gate-fuzz' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795166300.0869725,
+      "timestamp_str": "2026-11-20 12:18:20",
+      "agent": "kilo:goal",
+      "head": "444e28f74d82010202ace41d3293b72c7a3b297e",
       "delivery": {
         "roots": [
           "."
