@@ -52,12 +52,20 @@ class StorageManager:
                 os.fsync(f.fileno())
 
             if target_path.exists():
+                # Keep the last known good save as the backup by renaming it instead of
+                # copying it: a rename is metadata-only, while copying the 470 KB save
+                # and fsyncing the copy cost more than writing the new save itself (ADR-419).
+                # If the process dies before the install below, the primary is missing and
+                # load() falls back to this backup, which is the previous state.
                 backup_temp = self.data_dir / f".tmp_{backup_path.name}_{token}"
                 try:
-                    shutil.copy2(target_path, backup_temp)
-                    with open(backup_temp, "rb+") as bf:
-                        os.fsync(bf.fileno())
-                    os.replace(backup_temp, backup_path)
+                    try:
+                        os.replace(target_path, backup_path)
+                    except OSError:
+                        shutil.copy2(target_path, backup_temp)
+                        with open(backup_temp, "rb+") as bf:
+                            os.fsync(bf.fileno())
+                        os.replace(backup_temp, backup_path)
                 except OSError:
                     backup_temp.unlink(missing_ok=True)
 

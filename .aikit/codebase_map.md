@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `249`
-- **Total Classes**: `615`
-- **Total Top-Level Functions**: `566`
-- **Total Class Methods**: `3198`
-- **Total Source Lines**: `71127`
+- **Total Python Modules**: `250`
+- **Total Classes**: `616`
+- **Total Top-Level Functions**: `567`
+- **Total Class Methods**: `3203`
+- **Total Source Lines**: `71225`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`249` module(s))
+- **Indexed**: python (`250` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -586,6 +586,24 @@
 
 **Functions:**
 - `def _in_transit()`
+
+---
+
+### [`tests/test_atomic_backup.py`](tests/test_atomic_backup.py)
+> *The shadow backup is an atomic rename, not a second file copy (ADR-419).*
+
+**Size**: `90` lines
+
+**Classes:**
+- `class AtomicBackupTest`
+  - Method `.test_save_does_not_copy_the_previous_file()`
+  - Method `.test_the_backup_holds_the_previous_save()`
+  - Method `.test_a_first_save_writes_no_backup()`
+  - Method `.test_a_failed_install_leaves_the_previous_state_recoverable()`
+  - Method `.test_the_save_round_trips_named_slots()`
+
+**Functions:**
+- `def _engine(seed, credits)`
 
 ---
 
@@ -6710,7 +6728,7 @@
 ### [`voidfarer/storage.py`](voidfarer/storage.py)
 > *Crash-resilient storage engine and atomic persistence for VoidFarer.*
 
-**Size**: `234` lines
+**Size**: `242` lines
 
 **Classes:**
 - `class StorageManager` - *Manages power-loss safe atomic persistence and shadow backups.*
