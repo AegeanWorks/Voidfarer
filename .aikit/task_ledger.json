@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "away-team-rotation",
+    "task_id": "freight-milestone",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795213901.7109666,
+    "updated_at": 1795217105.4341002,
     "owner": "kilo:goal",
-    "lease_until": 1795221101.7109666,
+    "lease_until": 1795224305.4341002,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,57 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795213916.8810198,
-    "completed_head": "d301aa7b2cd9cd906e428cebe377dc2116eac215",
-    "completed_tree": "585e03f1c959cf0d959063d426a61a1f2781128b"
+    "completed_at": 1795217112.8441203,
+    "completed_head": "561b6948aa10700be1ae3f04a21d34fee2da242a",
+    "completed_tree": "c4e45fafc8b8862a99919a29c871ba46c7a43090"
   },
   "checkpoints": [
-    {
-      "task_id": "full-system-survey",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] survey completes on seeds 1/6/8/11 with sector_cartographer 1/3 and system_surveyor banked; codex 38-41 of 62 completed and claimed; coverage retains every headline mechanic (seed 11: 105/101/101 with sell+gambit+reconstruct+customs+megastructure; seed 6: 102/99/99 with sell+gambit); 0 errors, refusals 19/19/18/15; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2237 OK with README tree at 194 suites (ADR-427); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795190614.7698588,
-      "timestamp_str": "2026-11-20 19:03:34",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "full-system-survey",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'full-system-survey' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795190740.014459,
-      "timestamp_str": "2026-11-20 19:05:40",
-      "agent": "kilo:goal",
-      "head": "693c80c87a57636cc25c4d32a4f625a1f2c2f9fc",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "diplomacy-pacts",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Sign a trade and a research pact after the campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795193242.5180404,
-      "timestamp_str": "2026-11-20 19:47:22",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "trade_pacts/research_pacts pay a trade margin and passive research and two milestones key on them, but the tour only ever improves standing; a campaign reached +100 standing with both thresholds met and signed nothing",
-        "benefits": "campaigns sign both pacts with friendly factions, banking two more codex entries and their economic bonuses",
-        "risks": "contract: one additive post-story action and a one-attempt set; dependency: none; concurrency: none; state: no schema change",
-        "mitigation": "nine failing-first tests mirroring the engine gates (standing 40/60, war-with-player, war-between-others, order, refusal guard) plus four campaign seeds"
-      },
-      "plan_digest": "62b393a6d4a2dd77eb9d8579724f973304cb0515f690914f3920ef79e08d8094"
-    },
     {
       "task_id": "diplomacy-pacts",
       "phase": "in_progress",
@@ -344,6 +298,65 @@
       "timestamp_str": "2026-11-21 01:31:56",
       "agent": "kilo:goal",
       "head": "d301aa7b2cd9cd906e428cebe377dc2116eac215",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "freight-milestone",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Run quantum freight to the freight-baron milestone (ten deliveries)",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795214636.8072572,
+      "timestamp_str": "2026-11-21 01:43:56",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the automated run disarms at the broker target of five automated orders, so deliveries end at 5-7 and the freight_baron milestone (ten deliveries) stays unreachable while the lane and its credits are available",
+        "benefits": "one longer run banks both quantum_broker and freight_baron, earning the extra freight payouts instead of idling the lane",
+        "risks": "contract: the run stop becomes deliveries>=10 and orders>=5 with a hard order cap; dependency: none; concurrency: none; state: one additive constant",
+        "mitigation": "failing-first tests for the mid-run continuation, the dual stop, the hard cap, the legacy-save completion and both codex mirrors, plus six benchmark campaigns and the 180-step gate"
+      },
+      "plan_digest": "679caff70db2585f0231c9d3e7e712990634c413b0337cf0f72d440b3ebe5585",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "freight-milestone",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All six campaigns finish 10 automated orders with 11-12 deliveries and 0 errors, banking Freight Baron and Quantum Broker; Merchant also banked (48-94 trades); codex 45-48 of 62 (seed 1 48, seed 8 48, seed 6/11/42 47, seed 2 45); headline proofs retained (reconstruct+survey+megastructure+both pacts on all six, customs on 42/2/6/11, prize capture+sale on 6, pirate fight on 1/42/2/8/11); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2286 OK with README tree at 199 suites (ADR-434); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795217105.4341002,
+      "timestamp_str": "2026-11-21 02:25:05",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "freight-milestone",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'freight-milestone' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795217112.9174342,
+      "timestamp_str": "2026-11-21 02:25:12",
+      "agent": "kilo:goal",
+      "head": "561b6948aa10700be1ae3f04a21d34fee2da242a",
       "delivery": {
         "roots": [
           "."
