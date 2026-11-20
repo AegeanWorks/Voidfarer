@@ -148,8 +148,9 @@ voidfarer/
 │   ├── ui_browser.py     <- real browser review and click-map proof
 │   ├── ui_inventory.py   <- cockpit inventory proof
 │   ├── ai_play.py        <- headless AI campaign with mechanic coverage
-│   └── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
-└── tests/                <- unit & integration test suite (184 suites)
+│   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
+│   └── endurance_check.py<- segmented long-run campaign with reload checks
+└── tests/                <- unit & integration test suite (185 suites)
 ```
 
 ---
@@ -401,10 +402,15 @@ ship mods and research) and checks every state against its declared bounds. With
 twenty seeds with 400 round trips produced zero crashes, zero breaches and zero
 save drift.
 
+A 10,000-step endurance run plays twenty 500-step segments and saves, reloads and
+field-compares the universe between every one: 0 errors, 0 save drift, 101 mechanic
+families. `tools/endurance_check.py` reproduces it with any seed and segment size.
+
 ```bash
 python tools/ai_play.py --steps 180           # human-readable mechanic coverage
 python tools/ai_play.py --steps 180 --json    # machine-readable report
 python tools/chaos_fuzz.py --seed 3 --seed 7 --actions 2000   # invariant fuzz
+python tools/endurance_check.py --seed 3 --segment 500 --segments 20
 python tools/ui_browser.py --click-map --viewports desktop --out ui-review/clickmap
 ```
 

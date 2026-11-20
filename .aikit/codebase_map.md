@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `247`
-- **Total Classes**: `614`
-- **Total Top-Level Functions**: `560`
-- **Total Class Methods**: `3191`
-- **Total Source Lines**: `70924`
+- **Total Python Modules**: `249`
+- **Total Classes**: `615`
+- **Total Top-Level Functions**: `566`
+- **Total Class Methods**: `3198`
+- **Total Source Lines**: `71127`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`247` module(s))
+- **Indexed**: python (`249` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -2153,6 +2153,23 @@
 - `def _customs()`
 - `def _anomaly()`
 - `def _decision()`
+
+---
+
+### [`tests/test_endurance_check.py`](tests/test_endurance_check.py)
+> *The endurance checker's comparison helpers must catch every drift shape (ADR-418).*
+
+**Size**: `48` lines
+
+**Classes:**
+- `class EnduranceDiffTest`
+  - Method `.test_identical_states_have_no_diff()`
+  - Method `.test_a_changed_leaf_is_reported_with_its_path()`
+  - Method `.test_a_missing_key_is_reported()`
+  - Method `.test_list_length_changes_are_reported()`
+  - Method `.test_a_type_change_is_reported()`
+  - Method `.test_wall_clock_fields_are_ignored_at_any_depth()`
+  - Method `.test_strip_clock_keeps_play_clock_fields()`
 
 ---
 
@@ -5082,6 +5099,21 @@
 - `def choose_structural(engine, rng)` - *Pick one structural action (fleet, outposts, mods, research) (ADR-416).*
 - `def round_trip(engine, temp_dir, findings, action)` - *Save, reload and verify the universe is unchanged; return the resumed engine.*
 - `def run_seed(seed, actions, findings, save_every)`
+- `def main(argv)`
+
+---
+
+### [`tools/endurance_check.py`](tools/endurance_check.py)
+> *Long-run endurance check: play many segments, reload between each, verify no drift.*
+
+**Size**: `155` lines
+
+**Functions:**
+- `def strip_clock(value, key)` - *Drop real-time timestamps so two runs can be compared meaningfully.*
+- `def diff(a, b, path)` - *Return every differing leaf between two serialized states.*
+- `def serve(engine, data_dir)`
+- `def stop(server, thread)`
+- `def run(seed, segment, segments)` - *Play ``segments`` chunks of ``segment`` steps, reloading a save between each.*
 - `def main(argv)`
 
 ---
