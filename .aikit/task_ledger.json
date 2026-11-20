@@ -1,72 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "mechanics-gate-fuzz",
+    "task_id": "concurrent-requests",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795166175.3305893,
+    "updated_at": 1795167235.1707444,
     "owner": "kilo:goal",
-    "lease_until": 1795173375.3305893,
+    "lease_until": 1795174435.1707444,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795166299.9892232,
-    "completed_head": "444e28f74d82010202ace41d3293b72c7a3b297e",
-    "completed_tree": "c8f0f4298e63f5300b3285bde97631e3e8173821"
+    "completed_at": 1795167292.5938118,
+    "completed_head": "95d8a37f83b69b07873d0ec32f317e0ac6c67f8f",
+    "completed_tree": "2fbc6e03489a0f4c8358e5bc14dbf03b1eeef77b"
   },
   "checkpoints": [
-    {
-      "task_id": "empty-loadout-stays-empty",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'empty-loadout-stays-empty' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795125844.87912,
-      "timestamp_str": "2026-11-20 01:04:04",
-      "agent": "kilo:goal",
-      "head": "03c0dcf016f671704dd319422f29780d23f71596",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "structural-fuzz-thermal-save",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Press the structural systems with the chaos fuzz",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795130039.7665453,
-      "timestamp_str": "2026-11-20 02:13:59",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the harness only sampled flight, trade, encounters and crew, leaving power routing, reactor modes, outposts, escorts, ship mods, upgrades, research, contracts and depots untouched by random play",
-        "benefits": "every stateful ship-building system now sees random input and its refusals, and reactor bounds join the invariant checks",
-        "risks": "contract: tool-only, no production route changes; dependency: none; concurrency: none; state: none",
-        "mitigation": "prerequisites are left to the engine's refusals, and refusal/success counts partition the actions"
-      },
-      "plan_digest": "8ce357a2041e4cce480e0372a5d1abd09b2478f2c3f8a61d76de231561aceb2f"
-    },
-    {
-      "task_id": "structural-fuzz-thermal-save",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[2/2] Core heat follows the fitted capacity and survives a save exactly",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795130040.0214827,
-      "timestamp_str": "2026-11-20 02:14:00",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the save interleaving found heat rounded on save (0.005 drift) and clamped to the base max_heat on load, silently cooling a core that legitimately sat above the base cap, while removing a thermal mod left the core above its new capacity",
-        "benefits": "thermal capacity is respected everywhere, saves are lossless, and a reload no longer rewrites the reactor",
-        "risks": "contract: ReactorState serialization now keeps exact floats and load-time clamping is removed; dependency: none; concurrency: none; state: live states obey the fitted capacity because every equipment change clamps",
-        "mitigation": "failing-first tests for capacity change, 120-heat save round trip, clamp after removal, negative-heat repair and integrity clamp, plus the 20-seed save-interleaved fuzz"
-      }
-    },
     {
       "task_id": "structural-fuzz-thermal-save",
       "phase": "in_progress",
@@ -318,6 +266,52 @@
       "timestamp_str": "2026-11-20 12:18:20",
       "agent": "kilo:goal",
       "head": "444e28f74d82010202ace41d3293b72c7a3b297e",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "concurrent-requests",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Pin concurrent requests to stay clean",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795167234.8630772,
+      "timestamp_str": "2026-11-20 12:33:54",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the cockpit runs on a threaded HTTP server while a ticker thread ticks and autosaves, so parallel requests are a real path, yet no test had ever issued them; a race would surface as a 500, a corrupt save or a half-applied mutation",
+        "benefits": "the threaded path gains a regression test inside the normal suite and a wide probe gives confidence beyond it",
+        "risks": "contract: test-only; dependency: none; concurrency: the test itself issues parallel requests and joins with a timeout; state: none",
+        "mitigation": "two-thread server test asserting no 5xx, valid JSON, sane state and a successful step afterwards, plus a 480-request eight-thread probe"
+      },
+      "plan_digest": "8da470f50d2f4f7ddb86352c936aacd9963c5a5dd55b3bf31c0e6a1809e44a37"
+    },
+    {
+      "task_id": "concurrent-requests",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Concurrency test passes in 0.66s inside the 60-test server suite; 480-request probe: 0 server errors, 0 transport errors, 0 bad state, finite payload, no negative populations; suite Ran 2204 OK; 6/6 project gates (ADR-423); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795167235.1707444,
+      "timestamp_str": "2026-11-20 12:33:55",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "concurrent-requests",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'concurrent-requests' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795167292.6961148,
+      "timestamp_str": "2026-11-20 12:34:52",
+      "agent": "kilo:goal",
+      "head": "95d8a37f83b69b07873d0ec32f317e0ac6c67f8f",
       "delivery": {
         "roots": [
           "."
