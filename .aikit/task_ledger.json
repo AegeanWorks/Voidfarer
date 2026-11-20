@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "relief-rebuild-vent-gate",
+    "task_id": "codex-claim-repeat",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795174024.8386931,
+    "updated_at": 1795186537.680403,
     "owner": "kilo:goal",
-    "lease_until": 1795181224.8386931,
+    "lease_until": 1795193737.680403,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795174532.202728,
-    "completed_head": "a085ed75f74735e8c1e237eed532a8ad74e3ab16",
-    "completed_tree": "8a0a85d4b6f43eecac52e99b0cba70c15d74ea0c"
+    "completed_at": 1795186696.698207,
+    "completed_head": "b845a2c895f6986c82f06cd6498100fa320c89ef",
+    "completed_tree": "c35d727f24702f82240aed1d548e703906e5b06f"
   },
   "checkpoints": [
-    {
-      "task_id": "atomic-backup-perf",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'atomic-backup-perf' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795158827.1382093,
-      "timestamp_str": "2026-11-20 10:13:47",
-      "agent": "kilo:goal",
-      "head": "6a78262f03b671a7a089bcbbc9a8e1422e733dcb",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "slim-action-payloads",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Action responses omit the static catalogs",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795161003.8807447,
-      "timestamp_str": "2026-11-20 10:50:03",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "every action response carried 193 KB, 57 KB of it code-constant catalogs the headless captain re-downloaded and rebuilt on ~1000 steps, although the server already supports stripping them behind X-VoidFarer-Catalogs",
-        "benefits": "each step moves 56 KB less JSON and skips the static snapshot build, while the five policies that read catalogs keep working through a one-time cache",
-        "risks": "contract: the header constant moves to engine.py as the single definition; dependency: none; concurrency: none; state: the captain caches immutable build constants, so staleness is impossible within a session",
-        "mitigation": "six new tests pin the cache seeding, header on every action, full initial fetch, rehydration, fresh-value precedence and empty-snapshot guard; gate and both benchmark campaigns re-measured"
-      },
-      "plan_digest": "8944f3cf9ce0dd6215f9280afffdf4c1c371749604703d8fd068c67c7d94f5a5"
-    },
-    {
-      "task_id": "slim-action-payloads",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] payload 193 to 137 KB, snapshot build 7.2 to 2.3 ms, campaign step 35.1 to 26.8 ms (-24%; -61% since ADR-419); coverage unchanged: 180 gate 58/59/69 with 0 gaps/0 errors/10 refusals, seed 1 104/101/101 refusals 21, seed 42 102/99/100 refusals 20, both 0 errors; 6 tests pass; suite Ran 2186 OK with README tree at 187 suites (ADR-420); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795161004.080869,
-      "timestamp_str": "2026-11-20 10:50:04",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "slim-action-payloads",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 14:35:32",
       "agent": "kilo:goal",
       "head": "a085ed75f74735e8c1e237eed532a8ad74e3ab16",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "codex-claim-repeat",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Make every ready codex milestone claimable",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795186537.4153812,
+      "timestamp_str": "2026-11-20 17:55:37",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the tour keys one-shots on SIGNATURE_ROUTES and /api/codex/claim was absent, so after the first claim every later claim shared the empty signature and was skipped; campaigns ended with ~36 ready entries and 1 claimed, leaving most reward bundles uncollected",
+        "benefits": "the logbook can be banked repeatedly, collecting hundreds of credits and XP per campaign that were previously stranded",
+        "risks": "contract: one additive SIGNATURE_ROUTES entry; dependency: none; concurrency: none; state: none",
+        "mitigation": "five failing-first tests for the first claim, second claim after the first, same-entry guard, unready inbox and entry-keyed signature, plus nine campaign seeds measured for coverage and errors"
+      },
+      "plan_digest": "96870619bc80aaea0928c846cd14ae3f557e4c50b4d75844be8771eb31f83b42"
+    },
+    {
+      "task_id": "codex-claim-repeat",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Claims rise from 1 to 36-39 per campaign with 0 errors on 9 seeds; seeds 1/42/2 at 103/101/99 families with reconstruct+customs+megastructure; prize sale proven on 1/4/6/8/11 and gambit+sell together on 6/8/11 (104 families, 101 succeeded); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2230 OK with README tree at 193 suites (ADR-426); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795186537.680403,
+      "timestamp_str": "2026-11-20 17:55:37",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "codex-claim-repeat",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'codex-claim-repeat' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795186696.7966714,
+      "timestamp_str": "2026-11-20 17:58:16",
+      "agent": "kilo:goal",
+      "head": "b845a2c895f6986c82f06cd6498100fa320c89ef",
       "delivery": {
         "roots": [
           "."
