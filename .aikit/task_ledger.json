@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "diplomacy-pacts",
+    "task_id": "quantum-freight-run",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795193242.8660738,
+    "updated_at": 1795198505.8843753,
     "owner": "kilo:goal",
-    "lease_until": 1795200442.8660738,
+    "lease_until": 1795205705.8843753,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795193318.4330184,
-    "completed_head": "e7408c842660ae835abf0ae746252936ea139cc9",
-    "completed_tree": "a1b96f8082cf77ddcbfd54ccca7232f8de61f2db"
+    "completed_at": 1795198543.3880734,
+    "completed_head": "145cb3a574143872d07be34bed03d630c01cf0cc",
+    "completed_tree": "1ce4d6df795538a72cde207cdd2d5ac812ecced3"
   },
   "checkpoints": [
-    {
-      "task_id": "mechanics-gate-fuzz",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'mechanics-gate-fuzz' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795166300.0869725,
-      "timestamp_str": "2026-11-20 12:18:20",
-      "agent": "kilo:goal",
-      "head": "444e28f74d82010202ace41d3293b72c7a3b297e",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "concurrent-requests",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Pin concurrent requests to stay clean",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795167234.8630772,
-      "timestamp_str": "2026-11-20 12:33:54",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the cockpit runs on a threaded HTTP server while a ticker thread ticks and autosaves, so parallel requests are a real path, yet no test had ever issued them; a race would surface as a 500, a corrupt save or a half-applied mutation",
-        "benefits": "the threaded path gains a regression test inside the normal suite and a wide probe gives confidence beyond it",
-        "risks": "contract: test-only; dependency: none; concurrency: the test itself issues parallel requests and joins with a timeout; state: none",
-        "mitigation": "two-thread server test asserting no 5xx, valid JSON, sane state and a successful step afterwards, plus a 480-request eight-thread probe"
-      },
-      "plan_digest": "8da470f50d2f4f7ddb86352c936aacd9963c5a5dd55b3bf31c0e6a1809e44a37"
-    },
-    {
-      "task_id": "concurrent-requests",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Concurrency test passes in 0.66s inside the 60-test server suite; 480-request probe: 0 server errors, 0 transport errors, 0 bad state, finite payload, no negative populations; suite Ran 2204 OK; 6/6 project gates (ADR-423); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795167235.1707444,
-      "timestamp_str": "2026-11-20 12:33:55",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "concurrent-requests",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 19:48:38",
       "agent": "kilo:goal",
       "head": "e7408c842660ae835abf0ae746252936ea139cc9",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "quantum-freight-run",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Run automated quantum freight until the broker milestone",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795198505.5301197,
+      "timestamp_str": "2026-11-20 21:15:05",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-381's policy places one manual order and stands the broker down after a single automated order or its window, and the captain usually has no cargo, so _run_quantum_automation never shipped a load and quantum_broker (five automated orders) was unreachable",
+        "benefits": "the automation path is exercised for real, the broker milestone completes, and the captain earns freight profits instead of leaving the lane idle",
+        "risks": "contract: the ADR-381 policy is renamed _quantum_manual_action and a new automated policy runs first; dependency: none; concurrency: none; state: three run flags",
+        "mitigation": "ten failing-first tests for arming, cheapest-lot buying, cooldown ticks, busy-slot waits, target disarm, gates, idle guard, reset and target mirror, plus five campaign seeds"
+      },
+      "plan_digest": "15be68173f8127ce36a615908fdfbfff80e7bd9a9f4380fd2be652d3d2c8bec9"
+    },
+    {
+      "task_id": "quantum-freight-run",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] seed 11 reaches automation orders 5 and trade-order counter 6 with both pacts, survey and 42 codex entries; five seeds 0 errors with codex 40-43; reconstruct+megastructure on all five, customs on 42/2/6, gambit on 1/6/8, prize sale on 6; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2256 OK with README tree at 196 suites (ADR-429); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795198505.8843753,
+      "timestamp_str": "2026-11-20 21:15:05",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "quantum-freight-run",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'quantum-freight-run' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795198543.5038579,
+      "timestamp_str": "2026-11-20 21:15:43",
+      "agent": "kilo:goal",
+      "head": "145cb3a574143872d07be34bed03d630c01cf0cc",
       "delivery": {
         "roots": [
           "."
