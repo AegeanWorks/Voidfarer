@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "concurrent-requests",
+    "task_id": "lifetime-escort-credit",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795167235.1707444,
+    "updated_at": 1795169855.5822308,
     "owner": "kilo:goal",
-    "lease_until": 1795174435.1707444,
+    "lease_until": 1795177055.5822308,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795167292.5938118,
-    "completed_head": "95d8a37f83b69b07873d0ec32f317e0ac6c67f8f",
-    "completed_tree": "2fbc6e03489a0f4c8358e5bc14dbf03b1eeef77b"
+    "completed_at": 1795169998.2578657,
+    "completed_head": "0f8bac01c64f9ede20f8116256fc3c6688fcd122",
+    "completed_tree": "28d0206c1677c815cae7408281497d2bb6a5be3b"
   },
   "checkpoints": [
-    {
-      "task_id": "structural-fuzz-thermal-save",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] 20-seed structural fuzz (40,000 actions, 400 save/reload round trips) clean: 0 crashes, 0 breaches, 0 drift; 5 reactor tests and 8 chaos tests pass; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; campaigns seed 1 104/101/101 and seed 42 102/99/100 with 0 errors (ADR-416, ADR-417); suite Ran 2167 OK with README tree at 184 suites; 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795130079.6646006,
-      "timestamp_str": "2026-11-20 02:14:39",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "structural-fuzz-thermal-save",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'structural-fuzz-thermal-save' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795130101.5725796,
-      "timestamp_str": "2026-11-20 02:15:01",
-      "agent": "kilo:goal",
-      "head": "9c34db5d6ce4d30a375448233536f9c850a9938d",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "endurance-10k",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Ship a segmented endurance check and prove a 10,000-step campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795156946.503446,
-      "timestamp_str": "2026-11-20 09:42:26",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "every prior campaign capped at 2,000 steps in one play() call and resume parity was sampled only to 1,000 steps; nothing proved repeated save/load hand-offs over a long campaign stay error-free and drift-free",
-        "benefits": "the tool reproduces a long segmented run for any seed and segment size and reports the exact field that drifted",
-        "risks": "contract: tool plus fast helper tests, no production change; dependency: stdlib; concurrency: none; state: none",
-        "mitigation": "seven pure-helper tests plus the shipped 10,000-step run and the ten-seed save-interleaved fuzz"
-      },
-      "plan_digest": "34ef83c3e55298d6fe54f21c6c152fe8537120f2c0437b429ec79c31b1f5eda5"
-    },
     {
       "task_id": "endurance-10k",
       "phase": "in_progress",
@@ -312,6 +266,52 @@
       "timestamp_str": "2026-11-20 12:34:52",
       "agent": "kilo:goal",
       "head": "95d8a37f83b69b07873d0ec32f317e0ac6c67f8f",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "lifetime-escort-credit",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Credit escort achievements by commission, not current roster",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795169855.237576,
+      "timestamp_str": "2026-11-20 13:17:35",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "a full campaign left escort/squadron/fleet_captain/captain_corps at zero after commissioning, captaining and fighting a corvette, because the metrics read the live roster and the post-story decommission (ADR-402) emptied it; any player who sells or loses an escort would lose the achievement",
+        "benefits": "fleet achievements become monotonic lifetime events, with the live roster kept as a floor so old saves still read correctly",
+        "risks": "contract: codex metric semantics change additively, metrics keep live-roster floor; dependency: none; concurrency: none; state: one new stats counter for captain assignments",
+        "mitigation": "seven failing-first tests for commission, sale, dismissal, recall, repeated commissions, legacy floor and higher-of, plus the 180 gate and seed-42 campaign"
+      },
+      "plan_digest": "98590fb2b511d43f886194e39231f5b2cd7e86a6c997946d9620c3996145a0c8"
+    },
+    {
+      "task_id": "lifetime-escort-credit",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] 7 tests pass; seed-1 campaign codex completed rises 36 -> 38 (escort, fleet_captain) with squadron/captain_corps progressing, no regression; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; seed 42 102/99/100 0 errors; suite Ran 2211 OK with README tree at 190 suites; 6/6 project gates (ADR-424); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795169855.5822308,
+      "timestamp_str": "2026-11-20 13:17:35",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "lifetime-escort-credit",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'lifetime-escort-credit' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795169998.5852985,
+      "timestamp_str": "2026-11-20 13:19:58",
+      "agent": "kilo:goal",
+      "head": "0f8bac01c64f9ede20f8116256fc3c6688fcd122",
       "delivery": {
         "roots": [
           "."
