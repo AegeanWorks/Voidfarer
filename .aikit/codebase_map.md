@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `262`
-- **Total Classes**: `630`
-- **Total Top-Level Functions**: `579`
-- **Total Class Methods**: `3298`
-- **Total Source Lines**: `72632`
+- **Total Python Modules**: `263`
+- **Total Classes**: `631`
+- **Total Top-Level Functions**: `580`
+- **Total Class Methods**: `3308`
+- **Total Source Lines**: `72767`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`262` module(s))
+- **Indexed**: python (`263` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4196,6 +4196,28 @@
 
 ---
 
+### [`tests/test_research_policy.py`](tests/test_research_policy.py)
+> *The post-story captain keeps the research bench busy (ADR-432).*
+
+**Size**: `93` lines
+
+**Classes:**
+- `class ResearchPolicyTest`
+  - Method `.test_the_next_available_project_starts()`
+  - Method `.test_the_first_available_project_wins()`
+  - Method `.test_a_running_project_is_left_alone()`
+  - Method `.test_a_queued_project_is_left_alone()`
+  - Method `.test_nothing_starts_before_the_campaign()`
+  - Method `.test_the_target_stops_the_policy()`
+  - Method `.test_a_refused_project_is_not_retried()`
+  - Method `.test_an_empty_catalog_starts_nothing()`
+  - Method `.test_the_target_matches_the_codex_milestone()`
+
+**Functions:**
+- `def _captain(completed, active, queue, available, story, done)`
+
+---
+
 ### [`tests/test_research_queue.py`](tests/test_research_queue.py)
 > *Research queue: validation, ordering, auto-start and persistence.*
 
@@ -5462,7 +5484,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3187` lines
+**Size**: `3229` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5514,6 +5536,7 @@
   - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
   - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until the broker milestone (ADR-429).*
+  - Method `._research_action()` - *Start the next available research project after the campaign (ADR-432).*
   - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*

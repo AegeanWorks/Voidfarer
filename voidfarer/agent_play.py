@@ -229,6 +229,11 @@ class AiCaptain:
     # one system, bounded so a hostile anomaly chain cannot eat the errands (ADR-427).
     SURVEY_SCAN_LIMIT = 24
 
+    # The codex's technologist milestone: four completed research projects. The bench
+    # is otherwise idle after the first project, so the post-story captain keeps it
+    # busy until the milestone is banked (ADR-432).
+    RESEARCH_TARGET = 4
+
     # A body hosts a derelict about 40% of the time, so three probes are enough to
     # find one while a derelict-free system cannot eat the post-story errands.
     SALVAGE_PROBE_LIMIT = 3
@@ -312,6 +317,10 @@ class AiCaptain:
         # One full-system survey per campaign, and the scan/orbit steps it spent (ADR-427).
         self.survey_done = False
         self.survey_scans = 0
+        # Research bench state: the target is reached and the projects already tried,
+        # so a refused start cannot repeat forever (ADR-432).
+        self.research_done = False
+        self.research_tried: set[str] = set()
         # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
         self.pact_tried: set[tuple[str, str]] = set()
         # One pirate may be fought per campaign when the hull is healthy (ADR-431).
@@ -713,6 +722,12 @@ class AiCaptain:
                 self.travelled += 1
                 self.visited_bodies.add(str(target_body["id"]))
                 return "/api/travel", {"body_id": target_body["id"], "mode": "sublight"}, "travel"
+
+        # The bench is idle after the first project, so a free step starts the next
+        # available one; it needs no dock or travel (ADR-432).
+        research = self._research_action()
+        if research is not None:
+            return research
 
         return "/api/time/step", {"ticks": 1}, "time"
 
@@ -1873,6 +1888,33 @@ class AiCaptain:
             self.quantum_done = True
             return None
         return "/api/time/step", {"ticks": 6}, "time"
+
+    def _research_action(self):
+        """Start the next available research project after the campaign (ADR-432).
+
+        The captain starts one project at step 1 and the bench then sits idle for the
+        rest of the save: research points keep accruing from outposts, pacts and
+        salvage, but no later project ever starts, so prerequisites and the
+        technologist milestone (four completions) stay unreachable. Starting the first
+        available project whenever the bench is idle keeps the tech tree advancing; it
+        needs no dock or travel, so it runs after every established errand.
+        """
+        if self.research_done:
+            return None
+        research = self.state.get("research") or {}
+        if len(research.get("completed") or []) >= self.RESEARCH_TARGET:
+            self.research_done = True
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if research.get("active_project_id") or research.get("queue"):
+            return None
+        for project in research.get("available") or []:
+            project_id = str(project.get("id") or "") if isinstance(project, dict) else ""
+            if project_id and project_id not in self.research_tried:
+                self.research_tried.add(project_id)
+                return "/api/research/start", {"project_id": project_id}, "research"
+        return None
 
     def _survey_action(self):
         """Finish one full-system survey after the campaign (ADR-427).

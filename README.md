@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (197 suites)
+└── tests/                <- unit & integration test suite (198 suites)
 ```
 
 ---
@@ -432,7 +432,9 @@ fabricated materials), probes up to three bodies for a derelict and orbits a sco
 body when the tank is low, develops and links outposts, restores a megastructure and fuses
 a relic set. It decommissions a destroyed escort so the officer is released, sells a
 captured prize at a drydock, recalls an armed escort into a fight to spend its captain's
-gambit, and switches the reactor to economy once the story is over. A smuggling run buys
+gambit, and switches the reactor to economy once the story is over. It also keeps the
+research bench busy: whenever no project is running it starts the next available one,
+finishing four projects and banking the Technologist milestone. A smuggling run buys
 one contraband lot, ferries the high-security cordon the snapshot quotes and dumps it when
 the scan lands; a live heat spike is vented and the purge damage serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
