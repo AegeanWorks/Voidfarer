@@ -28,6 +28,7 @@ from voidfarer.flight import flight_action, flight_report
 from voidfarer.surface_ops import surface_action, surface_report
 from voidfarer.engine import (
     CATALOG_CACHE_HEADER,
+    MAX_TICKS_PER_STEP,
     STATIC_SNAPSHOT_KEYS,
     SimulationEngine,
     static_catalogs,
@@ -62,7 +63,13 @@ MAX_BODY_BYTES = 1024 * 1024
 
 
 
-def _int_field(body: dict[str, Any], key: str, default: int, minimum: int | None = None) -> int:
+def _int_field(
+    body: dict[str, Any],
+    key: str,
+    default: int,
+    minimum: int | None = None,
+    maximum: int | None = None,
+) -> int:
     value = body.get(key, default)
     if isinstance(value, bool):
         raise ValueError(f"'{key}' must be an integer")
@@ -74,6 +81,8 @@ def _int_field(body: dict[str, Any], key: str, default: int, minimum: int | None
         raise ValueError(f"'{key}' must be an integer")
     if minimum is not None and parsed < minimum:
         raise ValueError(f"'{key}' must be at least {minimum}")
+    if maximum is not None and parsed > maximum:
+        raise ValueError(f"'{key}' must be at most {maximum}")
     return parsed
 
 
@@ -1467,7 +1476,7 @@ class VoidFarerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/time/step":
-            ticks = _int_field(body, "ticks", 1, minimum=1)
+            ticks = _int_field(body, "ticks", 1, minimum=1, maximum=MAX_TICKS_PER_STEP)
             ok, msg, summary = self.engine.step_time(ticks)
             self.storage.save(self.engine.state)
             self._send_json({"ok": ok, "message": msg, "summary": summary, "state": self.engine.get_status_snapshot()})

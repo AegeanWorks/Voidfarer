@@ -366,6 +366,11 @@ from voidfarer.upgrades import (
 )
 
 
+# One REST/CLI request may not fast-forward the clock past this many ticks. A tick is
+# a quarter in-game day, so the cap is roughly 6,800 years: far beyond any plausible
+# campaign and still inside the calendar's range (ADR-421).
+MAX_TICKS_PER_STEP = 10_000_000
+
 # Request header telling the server the caller already cached the static catalogs, so
 # responses may omit them. Shared by the cockpit client and the headless captain (ADR-420).
 CATALOG_CACHE_HEADER = "X-VoidFarer-Catalogs"
@@ -11355,7 +11360,16 @@ class SimulationEngine:
             return True, f"Simulation clock speed set to {time_scale}."
 
     def step_time(self, num_ticks: int = 1) -> tuple[bool, str, dict[str, Any]]:
-        """Advance simulation by a discrete number of ticks."""
-        summary = self.tick(max(1, int(num_ticks)))
+        """Advance simulation by a discrete number of ticks, bounded per request."""
+        requested = max(1, int(num_ticks))
+        if requested > MAX_TICKS_PER_STEP:
+            return (
+                False,
+                f"Refused {requested} ticks. Why: one request may advance at most "
+                f"{MAX_TICKS_PER_STEP} ticks ({MAX_TICKS_PER_STEP // 4:,} in-game days). "
+                f"Fix: step in chunks of {MAX_TICKS_PER_STEP:,} ticks or fewer.",
+                {"ticks_advanced": 0, "tick": self.state.time.tick},
+            )
+        summary = self.tick(requested)
         return True, f"Advanced {summary['ticks_advanced']} tick(s). Date: {summary['date']} (Tick #{summary['tick']}).", summary
 

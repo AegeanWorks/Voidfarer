@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
+import math
 from typing import Any
 
 
@@ -2146,9 +2147,22 @@ class TimeState:
 
     @property
     def current_date(self) -> str:
-        """In-game calendar date (DD.MM.YYYY), starting 01.01.3042 at tick zero."""
+        """In-game calendar date (DD.MM.YYYY), starting 01.01.3042 at tick zero.
+
+        The calendar is clamped to the representable range: an extreme or corrupt
+        elapsed-day count (a legacy save, a raw internal tick jump) must never make the
+        whole snapshot raise ``OverflowError`` (ADR-421).
+        """
         start = date(3042, 1, 1)
-        return (start + timedelta(days=int(self.elapsed_days))).strftime("%d.%m.%Y")
+        limit = (date.max - start).days
+        days = float(self.elapsed_days)
+        if math.isnan(days):
+            offset = 0
+        elif not math.isfinite(days):
+            offset = limit
+        else:
+            offset = max(0, min(int(days), limit))
+        return (start + timedelta(days=offset)).strftime("%d.%m.%Y")
 
     def to_dict(self) -> dict[str, Any]:
         return {

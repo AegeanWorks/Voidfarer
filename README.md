@@ -150,7 +150,7 @@ voidfarer/
 │   ├── ai_play.py        <- headless AI campaign with mechanic coverage
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   └── endurance_check.py<- segmented long-run campaign with reload checks
-└── tests/                <- unit & integration test suite (187 suites)
+└── tests/                <- unit & integration test suite (188 suites)
 ```
 
 ---
@@ -472,6 +472,7 @@ python -m voidfarer.cli time resume
 python -m voidfarer.cli time speed 5
 
 # Advance cosmic simulation by a discrete number of ticks (+1, +4, +10)
+# One command may advance at most 10,000,000 ticks (about 6,800 in-game years).
 python -m voidfarer.cli time step 4
 ```
 

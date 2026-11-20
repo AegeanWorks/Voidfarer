@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `251`
-- **Total Classes**: `618`
+- **Total Python Modules**: `252`
+- **Total Classes**: `620`
 - **Total Top-Level Functions**: `567`
-- **Total Class Methods**: `3215`
-- **Total Source Lines**: `71370`
+- **Total Class Methods**: `3226`
+- **Total Source Lines**: `71489`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`251` module(s))
+- **Indexed**: python (`252` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4214,7 +4214,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `1024` lines
+**Size**: `1041` lines
 
 **Classes:**
 - `class TestServer`
@@ -4252,6 +4252,8 @@
   - Method `.test_a_save_load_cycle_restores_the_live_state_and_rng()`
   - Method `.test_an_autosave_follows_the_loaded_slot()`
   - Method `._post_with_headers(path, body, headers)`
+  - Method `.test_a_tick_request_beyond_the_cap_is_refused_without_advancing()`
+  - Method `.test_a_normal_tick_request_still_advances()`
   - Method `.test_a_cached_catalog_request_omits_the_static_keys()`
   - Method `.test_get_api_shipyard_excludes_current_chassis()`
   - Method `.test_post_inventory_buy_rejects_non_numeric_quantity()`
@@ -4685,6 +4687,26 @@
   - Method `.test_the_helper_never_bypasses_a_disabled_or_hidden_button()`
   - Method `.test_refusals_are_explained_not_silent()`
   - Method `.test_the_controls_reference_lists_both_keys()`
+
+---
+
+### [`tests/test_tick_limits.py`](tests/test_tick_limits.py)
+> *Uncontrolled tick counts cannot crash the clock (ADR-421).*
+
+**Size**: `65` lines
+
+**Classes:**
+- `class DateClampTest`
+  - Method `.test_a_huge_elapsed_day_count_renders_a_valid_date()`
+  - Method `.test_an_infinite_elapsed_day_count_renders_the_ceiling()`
+  - Method `.test_a_nan_elapsed_day_count_renders_the_start()`
+  - Method `.test_a_negative_elapsed_day_count_renders_the_start()`
+  - Method `.test_an_ordinary_day_count_is_unchanged()`
+- `class TickCapTest`
+  - Method `.test_a_step_beyond_the_cap_is_refused()`
+  - Method `.test_a_step_at_the_cap_is_allowed()`
+  - Method `.test_a_billion_ticks_no_longer_raises()`
+  - Method `.test_a_normal_step_still_advances()`
 
 ---
 
@@ -5712,7 +5734,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11361` lines
+**Size**: `11375` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -5965,7 +5987,7 @@
   - Method `.pause_time()` - *Pause simulation temporal clock while preserving current playback rate.*
   - Method `.resume_time()` - *Resume simulation temporal clock restoring previous speed multiplier.*
   - Method `.set_time_speed(speed)` - *Set simulation speed multiplier (0.0x to 10.0x).*
-  - Method `.step_time(num_ticks)` - *Advance simulation by a discrete number of ticks.*
+  - Method `.step_time(num_ticks)` - *Advance simulation by a discrete number of ticks, bounded per request.*
 
 **Functions:**
 - `def static_catalogs()` - *Build the code-constant catalogs once per process; callers must treat them as read-only.*
@@ -6313,7 +6335,7 @@
 ### [`voidfarer/models.py`](voidfarer/models.py)
 > *Domain state models and frozen data transfer objects for VoidFarer.*
 
-**Size**: `2505` lines
+**Size**: `2519` lines
 
 **Classes:**
 - `class Moon` - *Natural satellite orbiting a planet.*
@@ -6644,7 +6666,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1780` lines
+**Size**: `1789` lines
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*
@@ -6665,7 +6687,7 @@
   - Method `.stop()`
 
 **Functions:**
-- `def _int_field(body, key, default, minimum)`
+- `def _int_field(body, key, default, minimum, maximum)`
 - `def _float_field(body, key, default, minimum)`
 - `def _bool_field(body, key, default)`
 - `def tick_interval(speed)` - *Wall-clock seconds between simulation ticks for a chrono speed multiplier.*

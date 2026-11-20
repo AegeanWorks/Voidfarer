@@ -368,6 +368,23 @@ class TestServer(unittest.TestCase):
         conn.close()
         return res.status, data
 
+    def test_a_tick_request_beyond_the_cap_is_refused_without_advancing(self):
+        from voidfarer.engine import MAX_TICKS_PER_STEP
+        engine = VoidFarerHandler.engine
+        before = engine.state.time.tick
+        status, data = self._post("/api/time/step", {"ticks": MAX_TICKS_PER_STEP + 1})
+        self.assertEqual(status, 400)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertIn("at most", payload["message"])
+        self.assertEqual(engine.state.time.tick, before)
+
+    def test_a_normal_tick_request_still_advances(self):
+        engine = VoidFarerHandler.engine
+        before = engine.state.time.tick
+        status, _ = self._post("/api/time/step", {"ticks": 5})
+        self.assertEqual(status, 200)
+        self.assertEqual(engine.state.time.tick, before + 5)
+
     def test_a_cached_catalog_request_omits_the_static_keys(self):
         status, full_data = self._post("/api/time/step", {"ticks": 1})
         self.assertEqual(status, 200)
