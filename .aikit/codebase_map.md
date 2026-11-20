@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `259`
-- **Total Classes**: `627`
-- **Total Top-Level Functions**: `575`
-- **Total Class Methods**: `3269`
-- **Total Source Lines**: `72218`
+- **Total Python Modules**: `260`
+- **Total Classes**: `628`
+- **Total Top-Level Functions**: `577`
+- **Total Class Methods**: `3280`
+- **Total Source Lines**: `72372`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`259` module(s))
+- **Indexed**: python (`260` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3699,6 +3699,29 @@
 
 ---
 
+### [`tests/test_pact_policy.py`](tests/test_pact_policy.py)
+> *The post-story captain signs a trade and a research pact (ADR-428).*
+
+**Size**: `96` lines
+
+**Classes:**
+- `class PactPolicyTest`
+  - Method `.test_a_trade_pact_goes_to_the_highest_standing_friend()`
+  - Method `.test_a_faction_at_war_with_the_player_is_skipped()`
+  - Method `.test_a_war_between_other_factions_does_not_block()`
+  - Method `.test_a_research_pact_follows_the_trade_pact()`
+  - Method `.test_low_standing_signs_nothing()`
+  - Method `.test_research_still_signs_when_trade_is_held_elsewhere()`
+  - Method `.test_nothing_signs_before_the_campaign()`
+  - Method `.test_a_refused_pact_is_not_retried()`
+  - Method `.test_both_pacts_held_signs_nothing()`
+
+**Functions:**
+- `def _captain(standings, trade, research, wars, completed)`
+- `def _war(attacker, defender)`
+
+---
+
 ### [`tests/test_payroll_runway.py`](tests/test_payroll_runway.py)
 > *CREW cash-flow strip: a payroll runway warns before wages go unpaid.*
 
@@ -5397,7 +5420,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3029` lines
+**Size**: `3087` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5445,6 +5468,8 @@
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
+  - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
+  - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
   - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*

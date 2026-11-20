@@ -304,6 +304,8 @@ class AiCaptain:
         # One full-system survey per campaign, and the scan/orbit steps it spent (ADR-427).
         self.survey_done = False
         self.survey_scans = 0
+        # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
+        self.pact_tried: set[tuple[str, str]] = set()
         # Relief stocking: how many purchase actions have tried to fill the bags (ADR-425).
         self.relief_stock_attempts = 0
         # One smuggling run per campaign: the contraband lot bought and the jumps
@@ -556,6 +558,11 @@ class AiCaptain:
         smuggle = self._smuggle_action()
         if smuggle is not None:
             return smuggle
+
+        # A friendly faction at standing 40 or 60 will sign a trade or research pact.
+        pact = self._pact_action()
+        if pact is not None:
+            return pact
 
         # A full-system survey pays a completion bonus the rotating tour can never
         # collect; it runs last so no established errand is displaced (ADR-427).
@@ -1715,6 +1722,57 @@ class AiCaptain:
             return None
         return ("/api/reconstruct", {"body_id": body_id, "mode": "credits"},
                 "reconstruct")
+
+    def _note_pact_attempt(self, action: str, faction_id: str) -> None:
+        """Remember a signature attempt so a refusal is not retried forever (ADR-428)."""
+        self.pact_tried.add((action, faction_id))
+
+    def _pact_action(self):
+        """Sign a trade pact, then a research pact, with a friendly faction (ADR-428).
+
+        Both pacts pay off in credits or research, and two milestones key on them, but
+        the tour only ever improves standing and never signs. The engine's gates are
+        mirrored exactly: standing 40 for trade, 60 for research, no belligerent in a
+        war that involves the player's polity, and each pact once per faction.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        ship = self.state.get("ship") or {}
+        standings = ship.get("faction_standings") or {}
+        trade = {str(faction) for faction in ship.get("trade_pacts") or []}
+        research = {str(faction) for faction in ship.get("research_pacts") or []}
+        wars = [
+            war for war in self.state.get("wars") or []
+            if isinstance(war, dict) and war.get("active")
+        ]
+
+        def at_war_with_player(faction_id: str) -> bool:
+            return any(
+                "sol_coalition" in (war.get("attacker_id"), war.get("defender_id"))
+                and faction_id in (war.get("attacker_id"), war.get("defender_id"))
+                for war in wars
+            )
+
+        def best(threshold: int, held: set[str], action: str) -> tuple[int, str] | None:
+            rows = [
+                (int(standing), str(faction))
+                for faction, standing in standings.items()
+                if int(standing) >= threshold
+                and str(faction) not in held
+                and not at_war_with_player(str(faction))
+                and (action, str(faction)) not in self.pact_tried
+            ]
+            return max(rows) if rows else None
+
+        pick = best(40, trade, "trade_pact")
+        if pick is not None:
+            self._note_pact_attempt("trade_pact", pick[1])
+            return "/api/diplomacy", {"faction_id": pick[1], "action": "trade_pact"}, "diplomacy"
+        pick = best(60, research, "research_pact")
+        if pick is not None:
+            self._note_pact_attempt("research_pact", pick[1])
+            return "/api/diplomacy", {"faction_id": pick[1], "action": "research_pact"}, "diplomacy"
+        return None
 
     def _survey_action(self):
         """Finish one full-system survey after the campaign (ADR-427).
