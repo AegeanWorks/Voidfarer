@@ -1,72 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "post-story-endurance",
+    "task_id": "pirate-fight-proof",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795199654.4414108,
+    "updated_at": 1795202120.905782,
     "owner": "kilo:goal",
-    "lease_until": 1795206854.4414108,
+    "lease_until": 1795209320.905782,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795199786.625106,
-    "completed_head": "3b3aa3c746fa0cab60913d09a64a40158ea6e3ec",
-    "completed_tree": "22180b2a8a94e3f3bc7c719247fdc26507cce2d6"
+    "completed_at": 1795202162.2879562,
+    "completed_head": "4f2b75b2ffb96603569b2e03048cb785fa07b314",
+    "completed_tree": "71b3ba40a605dc141027d0dcf586b4ff038ac4f1"
   },
   "checkpoints": [
-    {
-      "task_id": "lifetime-escort-credit",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'lifetime-escort-credit' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795169998.5852985,
-      "timestamp_str": "2026-11-20 13:19:58",
-      "agent": "kilo:goal",
-      "head": "0f8bac01c64f9ede20f8116256fc3c6688fcd122",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "relief-rebuild-vent-gate",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Rebuild devastated worlds with relief supplies",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795173915.388559,
-      "timestamp_str": "2026-11-20 14:25:15",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the AI only used credit reconstruction, so the relief branch (medicines/hydroponics/fuel cell, 40 devastation, +5 standing) had no campaign proof and relief_deliveries never moved; worlds_rebuilt also ignored relief landings",
-        "benefits": "the captain lands relief when already docked with stockable bags, rebuilding twice as much devastation for more standing, then falls back to credits away from a dock",
-        "risks": "contract: _reconstruct_action gains a bounded stocking step and the worlds_rebuilt metric adds relief landings; dependency: none; concurrency: none; state: no schema change",
-        "mitigation": "nine failing-first tests for supply preference, stocking order and bound, undocked credit fallback, intact systems and the shared recipe; all three benchmark campaigns re-measured"
-      },
-      "plan_digest": "c9602a25bdc664471e958e78e019cab35691c38e81587809d753c53f6f8ffbb0"
-    },
-    {
-      "task_id": "relief-rebuild-vent-gate",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[2/2] The vent policy honours the coolant it can read",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795173915.6235745,
-      "timestamp_str": "2026-11-20 14:25:15",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the top-level reactor snapshot never exposed last_vent_tick or can_vent, so the vent policy read -1 and posted the purge every step while a core stayed hot: 1,636 of 1,654 campaign refusals were the recharging refusal",
-        "benefits": "the cooldown gate works, refusals return to 20 on seed 1, and the purge stays the deliberate emergency action",
-        "risks": "contract: the snapshot gains two additive fields; dependency: none; concurrency: none; state: none",
-        "mitigation": "five failing-first tests for the snapshot fields, fresh/recharged cooldown, first vent and a real engine vent"
-      }
-    },
     {
       "task_id": "relief-rebuild-vent-gate",
       "phase": "in_progress",
@@ -318,6 +266,52 @@
       "timestamp_str": "2026-11-20 21:36:26",
       "agent": "kilo:goal",
       "head": "3b3aa3c746fa0cab60913d09a64a40158ea6e3ec",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "pirate-fight-proof",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Fight one post-story pirate when clearly stronger",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795202120.5493965,
+      "timestamp_str": "2026-11-20 22:15:20",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the pirate branch always evaded, so the engine fight path (refuse toll, generate enemy, start combat, bounty, pirates_fought) and the first step of corsair_bane had no AI proof",
+        "benefits": "seed 8 now fights a pirate end to end while the damaged and pre-story cases still evade, and one fight per campaign bounds the detour",
+        "risks": "contract: one additive action helper and a one-fight flag; dependency: none; concurrency: none; state: no schema change",
+        "mitigation": "six failing-first tests for the strong fight, half-hull threshold, damaged evade, pre-story evade, one-fight guard and no-encounter case, plus three campaign seeds"
+      },
+      "plan_digest": "b2d764b3f62f7e34e20ac9addb0c6e7155f41cf273b4c1014b89d5bf18a5721c"
+    },
+    {
+      "task_id": "pirate-fight-proof",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] seed 8 refuses the toll, fights and records pirates_fought 1 (fight branch proven; combat_item lost on that seed only); seeds 11/6/8 at 103/102/102 families, 0 errors, refusals 14-19; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2262 OK with README tree at 197 suites (ADR-431); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795202120.905782,
+      "timestamp_str": "2026-11-20 22:15:20",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "pirate-fight-proof",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'pirate-fight-proof' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795202162.3663335,
+      "timestamp_str": "2026-11-20 22:16:02",
+      "agent": "kilo:goal",
+      "head": "4f2b75b2ffb96603569b2e03048cb785fa07b314",
       "delivery": {
         "roots": [
           "."
