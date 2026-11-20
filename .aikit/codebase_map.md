@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `257`
-- **Total Classes**: `625`
-- **Total Top-Level Functions**: `573`
-- **Total Class Methods**: `3256`
-- **Total Source Lines**: `72037`
+- **Total Python Modules**: `258`
+- **Total Classes**: `626`
+- **Total Top-Level Functions**: `574`
+- **Total Class Methods**: `3261`
+- **Total Source Lines**: `72109`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`257` module(s))
+- **Indexed**: python (`258` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1580,6 +1580,24 @@
   - Method `.test_the_control_is_wired_to_the_inventory_route()`
   - Method `.test_the_button_state_reads_the_hold_and_explains_the_gate()`
   - Method `.test_the_low_fuel_flee_names_the_decoy_alternative()`
+
+---
+
+### [`tests/test_codex_claim_tour.py`](tests/test_codex_claim_tour.py)
+> *Every ready codex entry stays claimable, not just the first (ADR-426).*
+
+**Size**: `64` lines
+
+**Classes:**
+- `class CodexClaimTourTest`
+  - Method `.test_the_first_ready_entry_is_claimed()`
+  - Method `.test_a_second_ready_entry_is_claimable_after_the_first()`
+  - Method `.test_the_same_entry_is_not_claimed_twice()`
+  - Method `.test_nothing_ready_claims_nothing()`
+  - Method `.test_the_signature_is_keyed_on_the_entry()`
+
+**Functions:**
+- `def _captain(entries)`
 
 ---
 
@@ -5359,7 +5377,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2981` lines
+**Size**: `2989` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5448,7 +5466,7 @@
   - Method `._tour_surface()`
   - Method `._tour_away()`
   - Method `._tour_ai()`
-  - Method `._tour_codex()`
+  - Method `._tour_codex()` - *Claim any completed milestone that has not been banked yet (ADR-426).*
   - Method `._tour_mastery()`
   - Method `._tour_training()`
   - Method `._tour_depot()`

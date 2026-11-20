@@ -1145,6 +1145,9 @@ class AiCaptain:
         "/api/megastructure/restore": "body_id",
         # A rebuilt world is keyed by its body id (ADR-395).
         "/api/reconstruct": "body_id",
+        # Every completed milestone is a separate claim; keying on the path let the
+        # first claim lock all remaining rewards out for the whole campaign (ADR-426).
+        "/api/codex/claim": "entry_id",
     }
 
     def _tour_signature(self, path: str, body: dict[str, Any]) -> tuple[str, str]:
@@ -2453,6 +2456,11 @@ class AiCaptain:
         return None
 
     def _tour_codex(self):
+        """Claim any completed milestone that has not been banked yet (ADR-426).
+
+        The signature is keyed on the entry id, so repeated claims stay reachable; keying
+        it on the path allowed exactly one claim per campaign while dozens stayed ready.
+        """
         codex = self.state.get("codex") or {}
         for entry in codex.get("entries") or []:
             if isinstance(entry, dict) and entry.get("ready") and not entry.get("claimed") and entry.get("id"):
