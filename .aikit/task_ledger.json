@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "full-system-survey",
+    "task_id": "diplomacy-pacts",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795190614.7698588,
+    "updated_at": 1795193242.8660738,
     "owner": "kilo:goal",
-    "lease_until": 1795197814.7698588,
+    "lease_until": 1795200442.8660738,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795190739.921054,
-    "completed_head": "693c80c87a57636cc25c4d32a4f625a1f2c2f9fc",
-    "completed_tree": "42fd6e4db84cbb9c4cbb02ab85f31555719dee65"
+    "completed_at": 1795193318.4330184,
+    "completed_head": "e7408c842660ae835abf0ae746252936ea139cc9",
+    "completed_tree": "a1b96f8082cf77ddcbfd54ccca7232f8de61f2db"
   },
   "checkpoints": [
-    {
-      "task_id": "bounded-time-step",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'bounded-time-step' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795163801.6947978,
-      "timestamp_str": "2026-11-20 11:36:41",
-      "agent": "kilo:goal",
-      "head": "3d1499afce97eedb784cc327339baf49263d33a9",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "mechanics-gate-fuzz",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] Make the mechanics gate run coverage plus an invariant fuzz",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795166175.050635,
-      "timestamp_str": "2026-11-20 12:16:15",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the mechanics gate only ran ai_play 180, so random legal action sequences and save interleaving were never part of Phase 4 even though the chaos harness caught two real defects the deliberate route missed",
-        "benefits": "every project check now proves route coverage and random-play invariants with save interleaving in about 8s",
-        "risks": "contract: mechanics.test becomes a wrapper and mechanics.core lists the two tools; dependency: stdlib only; concurrency: the steps run sequentially inside the gate; state: none",
-        "mitigation": "six fast wrapper tests pin success, either-step failure, timeout, forwarding and misuse, and the full gate was re-run"
-      },
-      "plan_digest": "4e4dce7117d086818706931f04860b1b6d1564ca0f4989ae1e48e1c465bd8ae0"
-    },
-    {
-      "task_id": "mechanics-gate-fuzz",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] aikit check voidfarer passes 6/6 with mechanics now covering 180-step coverage (58/59/69, 0 gaps/0 errors) and a 400-action save-interleaved fuzz (4 round trips, clean) in 8s; wrapper suite 6 tests green; suite passes with README tree at 189 suites and 36,742 chars (ADR-422); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795166175.3305893,
-      "timestamp_str": "2026-11-20 12:16:15",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "mechanics-gate-fuzz",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 19:05:40",
       "agent": "kilo:goal",
       "head": "693c80c87a57636cc25c4d32a4f625a1f2c2f9fc",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "diplomacy-pacts",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Sign a trade and a research pact after the campaign",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795193242.5180404,
+      "timestamp_str": "2026-11-20 19:47:22",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "trade_pacts/research_pacts pay a trade margin and passive research and two milestones key on them, but the tour only ever improves standing; a campaign reached +100 standing with both thresholds met and signed nothing",
+        "benefits": "campaigns sign both pacts with friendly factions, banking two more codex entries and their economic bonuses",
+        "risks": "contract: one additive post-story action and a one-attempt set; dependency: none; concurrency: none; state: no schema change",
+        "mitigation": "nine failing-first tests mirroring the engine gates (standing 40/60, war-with-player, war-between-others, order, refusal guard) plus four campaign seeds"
+      },
+      "plan_digest": "62b393a6d4a2dd77eb9d8579724f973304cb0515f690914f3920ef79e08d8094"
+    },
+    {
+      "task_id": "diplomacy-pacts",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] Both pacts signed on seed 11 (Precursor Watch + Sol Coalition after their wars close), codex 40-44 of 62 completed and claimed across seeds 1/6/8/11; seed 11 keeps 105/101/101 with sell+gambit+reconstruct+customs+megastructure, seed 6 keeps sell+gambit, 0 errors, refusals 15-19; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2246 OK with README tree at 195 suites (ADR-428); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795193242.8660738,
+      "timestamp_str": "2026-11-20 19:47:22",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "diplomacy-pacts",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'diplomacy-pacts' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795193318.5489147,
+      "timestamp_str": "2026-11-20 19:48:38",
+      "agent": "kilo:goal",
+      "head": "e7408c842660ae835abf0ae746252936ea139cc9",
       "delivery": {
         "roots": [
           "."
