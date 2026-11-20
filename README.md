@@ -404,7 +404,7 @@ twenty seeds with 400 round trips produced zero crashes, zero breaches and zero
 save drift.
 
 A 10,000-step endurance run plays twenty 500-step segments and saves, reloads and
-field-compares the universe between every one: 0 errors, 0 save drift, 101 mechanic
+field-compares the universe between every one: 0 errors, 0 save drift, 104 mechanic
 families. `tools/endurance_check.py` reproduces it with any seed and segment size.
 
 ```bash
