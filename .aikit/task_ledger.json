@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "quantum-freight-run",
+    "task_id": "post-story-endurance",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795198505.8843753,
+    "updated_at": 1795199654.4414108,
     "owner": "kilo:goal",
-    "lease_until": 1795205705.8843753,
+    "lease_until": 1795206854.4414108,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795198543.3880734,
-    "completed_head": "145cb3a574143872d07be34bed03d630c01cf0cc",
-    "completed_tree": "1ce4d6df795538a72cde207cdd2d5ac812ecced3"
+    "completed_at": 1795199786.625106,
+    "completed_head": "3b3aa3c746fa0cab60913d09a64a40158ea6e3ec",
+    "completed_tree": "22180b2a8a94e3f3bc7c719247fdc26507cce2d6"
   },
   "checkpoints": [
-    {
-      "task_id": "concurrent-requests",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'concurrent-requests' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795167292.6961148,
-      "timestamp_str": "2026-11-20 12:34:52",
-      "agent": "kilo:goal",
-      "head": "95d8a37f83b69b07873d0ec32f317e0ac6c67f8f",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "lifetime-escort-credit",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Credit escort achievements by commission, not current roster",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795169855.237576,
-      "timestamp_str": "2026-11-20 13:17:35",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "a full campaign left escort/squadron/fleet_captain/captain_corps at zero after commissioning, captaining and fighting a corvette, because the metrics read the live roster and the post-story decommission (ADR-402) emptied it; any player who sells or loses an escort would lose the achievement",
-        "benefits": "fleet achievements become monotonic lifetime events, with the live roster kept as a floor so old saves still read correctly",
-        "risks": "contract: codex metric semantics change additively, metrics keep live-roster floor; dependency: none; concurrency: none; state: one new stats counter for captain assignments",
-        "mitigation": "seven failing-first tests for commission, sale, dismissal, recall, repeated commissions, legacy floor and higher-of, plus the 180 gate and seed-42 campaign"
-      },
-      "plan_digest": "98590fb2b511d43f886194e39231f5b2cd7e86a6c997946d9620c3996145a0c8"
-    },
-    {
-      "task_id": "lifetime-escort-credit",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] 7 tests pass; seed-1 campaign codex completed rises 36 -> 38 (escort, fleet_captain) with squadron/captain_corps progressing, no regression; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; seed 42 102/99/100 0 errors; suite Ran 2211 OK with README tree at 190 suites; 6/6 project gates (ADR-424); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795169855.5822308,
-      "timestamp_str": "2026-11-20 13:17:35",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "lifetime-escort-credit",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 21:15:43",
       "agent": "kilo:goal",
       "head": "145cb3a574143872d07be34bed03d630c01cf0cc",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "post-story-endurance",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/1] Validate the post-story errand set over a 10,000-step campaign",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795199654.120083,
+      "timestamp_str": "2026-11-20 21:34:14",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "fourteen stateful post-story behaviours were each verified at 2,000 steps but never together past that horizon, where stale flags and exhausted guards would surface",
+        "benefits": "the long-horizon companion to the per-commit gate, with save/reload drift checked at every hand-off",
+        "risks": "contract: documentation only, no code change; dependency: none; concurrency: none; state: none",
+        "mitigation": "run the shipped endurance tool on seed 11 for 10,000 steps and record the result in the README and register"
+      },
+      "plan_digest": "0d6ca0eaa3bca6c151409b5a196e7cc204b6476b7b3f4389833f9cd5c16ae67c"
+    },
+    {
+      "task_id": "post-story-endurance",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[1/1] 10,000 steps in 20 segments: 0 errors, 0 save/reload drifts, 104 mechanics/101 succeeded/101 attempted/16 refusals; README updated to 104 families; 6/6 project gates with the suite green (ADR-430); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795199654.4414108,
+      "timestamp_str": "2026-11-20 21:34:14",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "post-story-endurance",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'post-story-endurance' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795199786.6959524,
+      "timestamp_str": "2026-11-20 21:36:26",
+      "agent": "kilo:goal",
+      "head": "3b3aa3c746fa0cab60913d09a64a40158ea6e3ec",
       "delivery": {
         "roots": [
           "."
