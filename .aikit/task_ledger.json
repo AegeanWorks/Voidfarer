@@ -1,66 +1,20 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "atomic-backup-perf",
+    "task_id": "slim-action-payloads",
     "last_phase": "in_progress",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795158785.0886612,
+    "updated_at": 1795161004.080869,
     "owner": "kilo:goal",
-    "lease_until": 1795165985.0886612,
+    "lease_until": 1795168204.080869,
     "started_by": "kilo:goal",
     "continuations": [],
-    "completed_at": 1795158827.0811665,
-    "completed_head": "6a78262f03b671a7a089bcbbc9a8e1422e733dcb",
-    "completed_tree": "34a67f6e837479d9d4ba6cde4da7acbbaf1833c3"
+    "completed_at": 1795161030.4090793,
+    "completed_head": "55ba41e1c3090ded970636f1b5127a7513a45a57",
+    "completed_tree": "e402d53c8f51ef9b05df7c5e4fc7e45c0b1e7224"
   },
   "checkpoints": [
-    {
-      "task_id": "readme-docs-sync",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'readme-docs-sync' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795117716.263284,
-      "timestamp_str": "2026-11-19 22:48:36",
-      "agent": "kilo:goal",
-      "head": "f9c1d34ab52e539c2d341349fd0e8d12c368ee15",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "autosave-follows-active-slot",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/2] An autosave follows the loaded slot",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795120430.7832386,
-      "timestamp_str": "2026-11-19 23:33:50",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "StorageManager had no active-slot notion, so the ticker and per-step autosaves always wrote the default file; loading alpha and playing silently overwrote the default branch (reproduced: default 111 became 222)",
-        "benefits": "named campaigns autosave into themselves and a second branch is never clobbered; the pre-jump checkpoint slot stays a safety net",
-        "risks": "contract: StorageManager.save gains an activate keyword with a default that preserves explicit-slot saves; dependency: none; concurrency: the existing write lock already serializes saves; state: active_slot lives in memory only and starts at default",
-        "mitigation": "failing-first storage tests for all six transitions plus a server-level new-game/time-step test, full suite and project gates"
-      },
-      "plan_digest": "e16fb383649a0687327e21cdfd5625d89f3fb7fc08012aca3344721ea108b1b1"
-    },
-    {
-      "task_id": "autosave-follows-active-slot",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[2/2] Six storage tests and the server autosave-slot test pass; suite Ran 2149 OK with README tree at 182 suites; 6/6 project gates incl. the 180-step mechanics gate (last measured 58/59/69, 0 gaps/0 errors/10 refusals) (ADR-413); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795120431.5815454,
-      "timestamp_str": "2026-11-19 23:33:51",
-      "agent": "kilo:goal"
-    },
     {
       "task_id": "autosave-follows-active-slot",
       "phase": "completed",
@@ -318,6 +272,52 @@
       "timestamp_str": "2026-11-20 10:13:47",
       "agent": "kilo:goal",
       "head": "6a78262f03b671a7a089bcbbc9a8e1422e733dcb",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "slim-action-payloads",
+      "phase": "in_progress",
+      "phase_num": 2,
+      "description": "[1/2] Action responses omit the static catalogs",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795161003.8807447,
+      "timestamp_str": "2026-11-20 10:50:03",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "every action response carried 193 KB, 57 KB of it code-constant catalogs the headless captain re-downloaded and rebuilt on ~1000 steps, although the server already supports stripping them behind X-VoidFarer-Catalogs",
+        "benefits": "each step moves 56 KB less JSON and skips the static snapshot build, while the five policies that read catalogs keep working through a one-time cache",
+        "risks": "contract: the header constant moves to engine.py as the single definition; dependency: none; concurrency: none; state: the captain caches immutable build constants, so staleness is impossible within a session",
+        "mitigation": "six new tests pin the cache seeding, header on every action, full initial fetch, rehydration, fresh-value precedence and empty-snapshot guard; gate and both benchmark campaigns re-measured"
+      },
+      "plan_digest": "8944f3cf9ce0dd6215f9280afffdf4c1c371749604703d8fd068c67c7d94f5a5"
+    },
+    {
+      "task_id": "slim-action-payloads",
+      "phase": "in_progress",
+      "phase_num": 4,
+      "description": "[2/2] payload 193 to 137 KB, snapshot build 7.2 to 2.3 ms, campaign step 35.1 to 26.8 ms (-24%; -61% since ADR-419); coverage unchanged: 180 gate 58/59/69 with 0 gaps/0 errors/10 refusals, seed 1 104/101/101 refusals 21, seed 42 102/99/100 refusals 20, both 0 errors; 6 tests pass; suite Ran 2186 OK with README tree at 187 suites (ADR-420); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795161004.080869,
+      "timestamp_str": "2026-11-20 10:50:04",
+      "agent": "kilo:goal"
+    },
+    {
+      "task_id": "slim-action-payloads",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'slim-action-payloads' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795161030.472179,
+      "timestamp_str": "2026-11-20 10:50:30",
+      "agent": "kilo:goal",
+      "head": "55ba41e1c3090ded970636f1b5127a7513a45a57",
       "delivery": {
         "roots": [
           "."
