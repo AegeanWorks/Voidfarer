@@ -199,17 +199,17 @@ class _StubClient:
             return 200, {"ok": True, "actions": [{"path": "/api/time/step"}]}
         return 200, {"ok": True, "state": self.state}
 
-    def post(self, path, body):
+    def post(self, path, body, headers=None):
         return 200, {"ok": True, "state": self.state}
 
 
 class _RefusingClient(_StubClient):
-    def post(self, path, body):
+    def post(self, path, body, headers=None):
         return 200, {"ok": False, "message": "nope", "state": self.state}
 
 
 class _FailingClient(_StubClient):
-    def post(self, path, body):
+    def post(self, path, body, headers=None):
         return 500, {"ok": False, "message": "boom", "state": self.state}
 
 

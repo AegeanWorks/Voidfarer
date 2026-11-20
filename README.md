@@ -150,7 +150,7 @@ voidfarer/
 │   ├── ai_play.py        <- headless AI campaign with mechanic coverage
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   └── endurance_check.py<- segmented long-run campaign with reload checks
-└── tests/                <- unit & integration test suite (186 suites)
+└── tests/                <- unit & integration test suite (187 suites)
 ```
 
 ---

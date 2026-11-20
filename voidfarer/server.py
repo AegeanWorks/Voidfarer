@@ -26,7 +26,12 @@ from voidfarer.intel import intel_action, intel_report
 from voidfarer.narrative import narrative_action, narrative_report
 from voidfarer.flight import flight_action, flight_report
 from voidfarer.surface_ops import surface_action, surface_report
-from voidfarer.engine import STATIC_SNAPSHOT_KEYS, SimulationEngine, static_catalogs
+from voidfarer.engine import (
+    CATALOG_CACHE_HEADER,
+    STATIC_SNAPSHOT_KEYS,
+    SimulationEngine,
+    static_catalogs,
+)
 from voidfarer.fitting import (
     fitting_report,
     install as install_fitting,
@@ -54,8 +59,7 @@ from voidfarer.upgrades import (
 )
 
 MAX_BODY_BYTES = 1024 * 1024
-# A client that sends this header has /api/catalogs cached; its state payloads omit them.
-CATALOG_CACHE_HEADER = "X-VoidFarer-Catalogs"
+
 
 
 def _int_field(body: dict[str, Any], key: str, default: int, minimum: int | None = None) -> int:

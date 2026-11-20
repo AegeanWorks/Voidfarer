@@ -359,6 +359,31 @@ class TestServer(unittest.TestCase):
         self.assertEqual(self.storage.load(slot="alpha").time.tick, alpha_before + 3)
         self.assertEqual(self.storage.active_slot, "alpha")
 
+    def _post_with_headers(self, path: str, body: dict, headers: dict):
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+        conn.request("POST", path, body=json.dumps(body),
+                     headers={"Content-Type": "application/json", **headers})
+        res = conn.getresponse()
+        data = res.read()
+        conn.close()
+        return res.status, data
+
+    def test_a_cached_catalog_request_omits_the_static_keys(self):
+        status, full_data = self._post("/api/time/step", {"ticks": 1})
+        self.assertEqual(status, 200)
+        full = json.loads(full_data.decode("utf-8"))
+        self.assertIn("catalog_upgrades", full["state"])
+
+        status, slim_data = self._post_with_headers(
+            "/api/time/step", {"ticks": 1}, {"X-VoidFarer-Catalogs": "1"})
+        self.assertEqual(status, 200)
+        slim = json.loads(slim_data.decode("utf-8"))
+        self.assertNotIn("catalog_upgrades", slim["state"])
+        self.assertNotIn("story_chapters", slim["state"])
+        self.assertIn("ship", slim["state"])
+        self.assertIn("current_system", slim["state"])
+        self.assertLess(len(slim_data), len(full_data))
+
     def test_get_api_shipyard_excludes_current_chassis(self):
         status, data = self._get("/api/shipyard")
         self.assertEqual(status, 200)

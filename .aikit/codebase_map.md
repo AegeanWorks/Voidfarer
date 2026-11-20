@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `250`
-- **Total Classes**: `616`
+- **Total Python Modules**: `251`
+- **Total Classes**: `618`
 - **Total Top-Level Functions**: `567`
-- **Total Class Methods**: `3203`
-- **Total Source Lines**: `71225`
+- **Total Class Methods**: `3215`
+- **Total Source Lines**: `71370`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`250` module(s))
+- **Indexed**: python (`251` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -114,11 +114,11 @@
 - `class _StubClient` - *Minimal API stand-in so play() can be exercised without a server.*
   - Method `.__init__(state)`
   - Method `.get(path)`
-  - Method `.post(path, body)`
+  - Method `.post(path, body, headers)`
 - `class _RefusingClient`
-  - Method `.post(path, body)`
+  - Method `.post(path, body, headers)`
 - `class _FailingClient`
-  - Method `.post(path, body)`
+  - Method `.post(path, body, headers)`
 - `class PlayStepCapTest` - *The CLI honours --steps and says when the runaway guard clamps it (ADR-341).*
   - Method `.test_a_request_beyond_the_guard_is_clamped_and_reported()`
   - Method `.test_a_request_inside_the_guard_runs_in_full_and_is_not_flagged()`
@@ -837,6 +837,26 @@
   - Method `.test_index_declares_the_captains_log_tab()`
   - Method `.test_javascript_renders_and_claims_codex_entries()`
   - Method `.test_styles_cover_codex_cards()`
+
+---
+
+### [`tests/test_catalog_cache.py`](tests/test_catalog_cache.py)
+> *The captain caches static catalogs and asks for slim action payloads (ADR-420).*
+
+**Size**: `84` lines
+
+**Classes:**
+- `class _RecordingClient` - *Stand-in for ApiClient that records headers and returns canned payloads.*
+  - Method `.__init__()`
+  - Method `.get(path, headers)`
+  - Method `.post(path, payload, headers)`
+- `class CatalogCacheTest`
+  - Method `.test_the_first_snapshot_seeds_the_cache()`
+  - Method `.test_every_action_post_requests_the_slim_payload()`
+  - Method `.test_the_initial_snapshot_is_fetched_in_full()`
+  - Method `.test_a_slim_response_is_rehydrated_from_the_cache()`
+  - Method `.test_a_fresh_catalog_value_wins_over_the_cache()`
+  - Method `.test_an_empty_snapshot_is_ignored()`
 
 ---
 
@@ -4194,7 +4214,7 @@
 ### [`tests/test_server.py`](tests/test_server.py)
 > *Unit and integration tests for embedded HTTP server REST endpoints.*
 
-**Size**: `999` lines
+**Size**: `1024` lines
 
 **Classes:**
 - `class TestServer`
@@ -4231,6 +4251,8 @@
   - Method `.test_reset_is_deterministic_for_a_seed()`
   - Method `.test_a_save_load_cycle_restores_the_live_state_and_rng()`
   - Method `.test_an_autosave_follows_the_loaded_slot()`
+  - Method `._post_with_headers(path, body, headers)`
+  - Method `.test_a_cached_catalog_request_omits_the_static_keys()`
   - Method `.test_get_api_shipyard_excludes_current_chassis()`
   - Method `.test_post_inventory_buy_rejects_non_numeric_quantity()`
   - Method `.test_frontier_endpoints()`
@@ -5225,16 +5247,17 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `2908` lines
+**Size**: `2936` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
   - Method `.__init__(host, port, timeout)`
-  - Method `.get(path)`
-  - Method `.post(path, payload)`
+  - Method `.get(path, headers)`
+  - Method `.post(path, payload, headers)`
   - Method `._open(request)`
 - `class AiCaptain` - *A deterministic policy that exercises every mechanic family it can reach.*
   - Method `.__init__(client, seed)`
+  - Method `._adopt_state(snapshot)` - *Adopt a response snapshot, restoring catalogs the server omitted (ADR-420).*
   - Method `.play(steps)`
   - Method `._choose(step)`
   - Method `._fallback_jump(step)` - *Rotate the post-story fallback jump across the affordable lanes (ADR-401).*
@@ -5689,7 +5712,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11357` lines
+**Size**: `11361` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*
@@ -6621,7 +6644,7 @@
 ### [`voidfarer/server.py`](voidfarer/server.py)
 > *Zero-dependency embedded HTTP server and REST API for the VoidFarer Web Cockpit.*
 
-**Size**: `1776` lines
+**Size**: `1780` lines
 
 **Classes:**
 - `class ThreadedHTTPServer` - *Multi-threaded HTTP server handling concurrent HUD telemetry requests.*

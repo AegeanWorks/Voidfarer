@@ -8,6 +8,8 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from voidfarer.engine import CATALOG_CACHE_HEADER, STATIC_SNAPSHOT_KEYS
+
 
 # Actions the policy cannot reach in an ordinary campaign, with the reason. Every other
 # endpoint in the catalog must be attempted by the headless captain, so a new mechanic
@@ -105,15 +107,20 @@ class ApiClient:
         self.base = f"http://{host}:{port}"
         self.timeout = timeout
 
-    def get(self, path: str) -> tuple[int, dict[str, Any]]:
-        request = urllib.request.Request(self.base + path, method="GET")
+    def get(self, path: str, headers: dict[str, str] | None = None) -> tuple[int, dict[str, Any]]:
+        request = urllib.request.Request(self.base + path, method="GET", headers=headers or {})
         return self._open(request)
 
-    def post(self, path: str, payload: dict[str, Any] | None = None) -> tuple[int, dict[str, Any]]:
+    def post(
+        self,
+        path: str,
+        payload: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> tuple[int, dict[str, Any]]:
         data = json.dumps(payload or {}).encode("utf-8")
         request = urllib.request.Request(
             self.base + path, data=data, method="POST",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", **(headers or {})},
         )
         return self._open(request)
 
@@ -288,6 +295,20 @@ class AiCaptain:
         self.smuggling_jumps = 0
         # Fallback-jump rotation; one keeps the historic first slot (ADR-401).
         self.fallback_jumps = 1
+        # Static catalogs are fetched once and re-injected into every slim action
+        # response, so each step moves ~57 KB less JSON (ADR-420).
+        self.catalogs: dict[str, Any] = {}
+
+    def _adopt_state(self, snapshot: Any) -> None:
+        """Adopt a response snapshot, restoring catalogs the server omitted (ADR-420)."""
+        if not isinstance(snapshot, dict):
+            return
+        if self.catalogs:
+            merged = dict(snapshot)
+            for key, value in self.catalogs.items():
+                merged.setdefault(key, value)
+            snapshot = merged
+        self.state = snapshot
 
     def play(self, steps: int = 40) -> dict[str, Any]:
         self.steps_requested = max(1, int(steps))
@@ -300,7 +321,12 @@ class AiCaptain:
         if status != 200:
             self.errors.append(f"GET /api/state -> {status}")
             return self.report()
-        self.state = payload.get("state") or payload.get("data") or payload
+        self._adopt_state(payload.get("state") or payload.get("data") or payload)
+        # The first snapshot is full; keep the code-constant catalogs so later slim
+        # action responses can be rehydrated without a second full fetch (ADR-420).
+        self.catalogs = {
+            key: self.state[key] for key in STATIC_SNAPSHOT_KEYS if key in self.state
+        }
 
         for step in range(min(self.steps_requested, self.MAX_STEPS)):
             self.steps_taken = step + 1
@@ -310,10 +336,12 @@ class AiCaptain:
             path, body, family = self._choose(self.total_steps - 1)
             if path is None:
                 break
-            status, payload = self.client.post(path, body)
+            status, payload = self.client.post(
+                path, body, headers={CATALOG_CACHE_HEADER: "1"}
+            )
             if status == 409 and payload.get("state"):
                 # A blocking prompt appeared mid-step; adopt it and retry this path later.
-                self.state = payload["state"]
+                self._adopt_state(payload["state"])
                 self.refusals.append(f"{family}: blocked by prompt")
                 continue
             signature = self._tour_signature(path, body or {})
@@ -322,14 +350,14 @@ class AiCaptain:
             if status != 200:
                 self.errors.append(f"POST {path} -> {status}: {payload.get('message', '')}")
                 if payload.get("state"):
-                    self.state = payload["state"]
+                    self._adopt_state(payload["state"])
                 continue
             if not payload.get("ok"):
                 message = str(payload.get("message", "refused"))
                 self.refusals.append(f"{family}: {message}")
                 self._note_refusal(signature, message)
                 if payload.get("state"):
-                    self.state = payload["state"]
+                    self._adopt_state(payload["state"])
                 continue
             self.families[family] = self.families.get(family, 0) + 1
             self.succeeded.add(path)
@@ -337,7 +365,7 @@ class AiCaptain:
             self.refusal_attempts.pop(signature, None)
             self.repeat_last[signature] = self.total_steps
             if payload.get("state"):
-                self.state = payload["state"]
+                self._adopt_state(payload["state"])
         return self.report()
 
     def _choose(self, step: int) -> tuple[str | None, dict[str, Any], str]:

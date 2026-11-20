@@ -303,7 +303,7 @@ class AgentTransportTest(unittest.TestCase):
                     return 200, {"ok": True, "actions": [{"path": "/api/settings/decisions"}]}
                 return 200, {"ok": True, "data": {"ship": {}, "time": {"tick": 0}}}
 
-            def post(self, path, payload=None):
+            def post(self, path, payload=None, headers=None):
                 return 409, {"ok": False, "state": {"ship": {}, "time": {"tick": 0}}}
 
         report = AiCaptain(BlockedClient()).play(steps=1)
@@ -317,7 +317,7 @@ class AgentTransportTest(unittest.TestCase):
                     return 500, {"ok": False}
                 return 200, {"ok": True, "data": {"ship": {}, "time": {"tick": 0}}}
 
-            def post(self, path, payload=None):
+            def post(self, path, payload=None, headers=None):
                 return 200, {"ok": True, "state": {"ship": {}, "time": {"tick": 0}}}
 
         report = AiCaptain(FakeClient()).play(steps=2)

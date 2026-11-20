@@ -366,6 +366,10 @@ from voidfarer.upgrades import (
 )
 
 
+# Request header telling the server the caller already cached the static catalogs, so
+# responses may omit them. Shared by the cockpit client and the headless captain (ADR-420).
+CATALOG_CACHE_HEADER = "X-VoidFarer-Catalogs"
+
 # Snapshot keys whose values are code constants: identical for every save, tick and seed.
 STATIC_SNAPSHOT_KEYS = (
     "catalog_chassis",
