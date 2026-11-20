@@ -218,6 +218,11 @@ class AiCaptain:
 
     # The codex's quantum broker target: five automated freight orders (ADR-429).
     QUANTUM_ORDER_TARGET = 5
+    # The codex's freight-baron milestone: ten quantum freight deliveries. One run
+    # passes the broker target on the way, so it keeps shipping until both are banked;
+    # the hard cap stops a lane whose deliveries lag its orders (ADR-434).
+    FREIGHT_DELIVERY_TARGET = 10
+    QUANTUM_ORDER_LIMIT = 16
     # Four freight slots exist; buying four units gives every order a full lot.
     QUANTUM_BUY_QUANTITY = 4
     # Six cooldown ticks per order plus transit waits; eight idle steps means the
@@ -1844,13 +1849,16 @@ class AiCaptain:
         return None
 
     def _quantum_freight_action(self):
-        """Run the automated quantum freight lane until the broker milestone (ADR-429).
+        """Run the automated quantum freight lane until both broker milestones (ADR-434).
 
         The rotating tour arms and disarms the broker, so the automation never ships a
         load and the engine's ``_run_quantum_automation`` path stays unexercised. This
         run arms it for good, buys a full lot when the hold is empty, and advances the
         clock so the cooldown places one order per call; eight idle steps without a new
-        order means the hold has no profitable lane and the run stops.
+        order means the hold has no profitable lane and the run stops. The run passes
+        the broker target (five automated orders) and continues to the freight-baron
+        milestone (ten deliveries), so one run banks both; a hard order cap covers a
+        lane whose deliveries lag its orders.
         """
         if not (self.state.get("story_status") or {}).get("completed"):
             return None
@@ -1858,7 +1866,10 @@ class AiCaptain:
             return None
         automation = self.state.get("quantum_automation") or {}
         orders = int(automation.get("orders") or 0)
-        if orders >= self.QUANTUM_ORDER_TARGET:
+        deliveries = int((self.state.get("stats") or {}).get("deliveries") or 0)
+        broker_banked = orders >= self.QUANTUM_ORDER_TARGET
+        freight_banked = deliveries >= self.FREIGHT_DELIVERY_TARGET
+        if (broker_banked and freight_banked) or orders >= self.QUANTUM_ORDER_LIMIT:
             self.quantum_done = True
             if automation.get("enabled"):
                 return (
@@ -1880,8 +1891,14 @@ class AiCaptain:
             )
         ship = self.state.get("ship") or {}
         trade_orders = ship.get("trade_orders") or []
-        cargo = ship.get("cargo") or {}
-        if not trade_orders and not any(int(quantity) > 0 for quantity in cargo.values()):
+        free = ship.get("cargo_free_volume")
+        free = int(ship.get("cargo_capacity") or 0) if free is None else int(free)
+        # A profitable stack already in the hold ships itself; a fresh lot keeps the
+        # lane working, so buy whenever the hold has room instead of only when empty.
+        # The hold starts full of salvage, and waiting for it to empty stopped the run
+        # at the broker target with no lane left (ADR-434). Buying waits for every
+        # slot to clear, so one lot ships per delivery cycle instead of piling up.
+        if not trade_orders and free >= self.QUANTUM_BUY_QUANTITY:
             credits = int(ship.get("credits") or 0)
             quotes = [
                 quote

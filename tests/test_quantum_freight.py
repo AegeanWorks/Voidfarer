@@ -9,13 +9,15 @@ from voidfarer.codex import CODEX_ENTRIES
 
 
 def _captain(orders=0, enabled=True, cargo=None, trade_orders=(), docked=True,
-             completed=True, credits=50000, done=False, idle=0, last_orders=0):
+             completed=True, credits=50000, done=False, idle=0, last_orders=0,
+             deliveries=0, free=60):
     captain = AiCaptain(ApiClient(port=1), seed=42)
     captain.quantum_done = done
     captain.quantum_idle = idle
     captain.quantum_last_orders = last_orders
     captain.state = {
         "story_status": {"completed": completed},
+        "stats": {"deliveries": deliveries},
         "orbiting_body": {"id": "sol_body_1", "station_dockable": docked},
         "quantum_automation": {
             "enabled": enabled, "orders": orders, "min_net": 0,
@@ -25,6 +27,8 @@ def _captain(orders=0, enabled=True, cargo=None, trade_orders=(), docked=True,
         "ship": {
             "credits": credits,
             "cargo": cargo if cargo is not None else {},
+            "cargo_capacity": 60,
+            "cargo_free_volume": free,
             "trade_orders": list(trade_orders),
         },
         "market_quotes": [
@@ -53,8 +57,17 @@ class QuantumFreightPolicyTest(unittest.TestCase):
              {"commodity_id": "fuel_cells", "quantity": 4, "is_buy": True}, "trade"),
         )
 
-    def test_a_loaded_hold_advances_the_freight_clock(self):
+    def test_a_loaded_hold_with_room_buys_a_fresh_lot(self):
         captain = _captain(cargo={"fuel_cells": 6})
+        self.assertEqual(
+            captain._quantum_freight_action(),
+            ("/api/trade",
+             {"commodity_id": "fuel_cells", "quantity": 4, "is_buy": True}, "trade"),
+            "an unprofitable stack must not block a fresh freight lot",
+        )
+
+    def test_a_full_hold_advances_the_freight_clock(self):
+        captain = _captain(cargo={"fuel_cells": 6}, free=0)
         self.assertEqual(captain._quantum_freight_action(),
                          ("/api/time/step", {"ticks": 6}, "time"))
 
@@ -66,7 +79,10 @@ class QuantumFreightPolicyTest(unittest.TestCase):
         self.assertEqual(captain._quantum_freight_action()[0], "/api/time/step")
 
     def test_the_target_is_met_disarms_and_the_policy_stops(self):
-        captain = _captain(orders=AiCaptain.QUANTUM_ORDER_TARGET)
+        captain = _captain(
+            orders=AiCaptain.QUANTUM_ORDER_TARGET,
+            deliveries=AiCaptain.FREIGHT_DELIVERY_TARGET,
+        )
         self.assertEqual(
             captain._quantum_freight_action(),
             ("/api/trade/quantum/automation",
@@ -74,6 +90,42 @@ class QuantumFreightPolicyTest(unittest.TestCase):
         )
         self.assertTrue(captain.quantum_done)
         self.assertIsNone(captain._quantum_freight_action())
+
+    def test_the_run_continues_past_the_broker_target_for_the_freight_milestone(self):
+        captain = _captain(
+            orders=AiCaptain.QUANTUM_ORDER_TARGET,
+            deliveries=AiCaptain.QUANTUM_ORDER_TARGET - 1,
+            cargo={},
+        )
+        self.assertEqual(
+            captain._quantum_freight_action()[0], "/api/trade",
+            "the lane must keep shipping until ten deliveries are banked",
+        )
+
+    def test_the_hard_order_cap_stops_a_stalled_lane(self):
+        captain = _captain(
+            orders=AiCaptain.QUANTUM_ORDER_LIMIT,
+            deliveries=AiCaptain.QUANTUM_ORDER_TARGET,
+        )
+        self.assertEqual(
+            captain._quantum_freight_action(),
+            ("/api/trade/quantum/automation",
+             {"enabled": False}, "trade_quantum_automation"),
+        )
+        self.assertTrue(captain.quantum_done)
+
+    def test_a_legacy_save_completes_the_missing_broker_target(self):
+        captain = _captain(
+            orders=0,
+            deliveries=AiCaptain.FREIGHT_DELIVERY_TARGET,
+            enabled=False,
+        )
+        self.assertEqual(
+            captain._quantum_freight_action(),
+            ("/api/trade/quantum/automation",
+             {"enabled": True, "min_net": 0}, "trade_quantum_automation"),
+            "ten manual deliveries must not skip the five automated orders",
+        )
 
     def test_nothing_runs_before_the_campaign(self):
         self.assertIsNone(_captain(completed=False)._quantum_freight_action())
@@ -85,18 +137,25 @@ class QuantumFreightPolicyTest(unittest.TestCase):
         captain = _captain(
             cargo={"fuel_cells": 6},
             idle=AiCaptain.QUANTUM_IDLE_LIMIT - 1,
+            free=0,
         )
         self.assertIsNone(captain._quantum_freight_action())
         self.assertTrue(captain.quantum_done)
 
     def test_a_delivered_order_resets_the_idle_count(self):
-        captain = _captain(cargo={"fuel_cells": 6}, orders=2, idle=5, last_orders=1)
+        captain = _captain(
+            cargo={"fuel_cells": 6}, orders=2, idle=5, last_orders=1, free=0,
+        )
         self.assertEqual(captain._quantum_freight_action()[0], "/api/time/step")
         self.assertEqual(captain.quantum_idle, 1)
 
     def test_the_target_mirrors_the_codex_entry(self):
         entry = next(row for row in CODEX_ENTRIES if row.id == "quantum_broker")
         self.assertEqual(AiCaptain.QUANTUM_ORDER_TARGET, entry.target)
+
+    def test_the_freight_target_mirrors_the_codex_entry(self):
+        entry = next(row for row in CODEX_ENTRIES if row.id == "freight_baron")
+        self.assertEqual(AiCaptain.FREIGHT_DELIVERY_TARGET, entry.target)
 
 
 if __name__ == "__main__":

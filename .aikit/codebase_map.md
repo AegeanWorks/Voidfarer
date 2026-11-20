@@ -9,8 +9,8 @@
 - **Total Python Modules**: `264`
 - **Total Classes**: `633`
 - **Total Top-Level Functions**: `582`
-- **Total Class Methods**: `3319`
-- **Total Source Lines**: `72951`
+- **Total Class Methods**: `3324`
+- **Total Source Lines**: `73027`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`264` module(s))
@@ -3947,23 +3947,28 @@
 ### [`tests/test_quantum_freight.py`](tests/test_quantum_freight.py)
 > *The post-story captain runs automated quantum freight (ADR-429).*
 
-**Size**: `103` lines
+**Size**: `162` lines
 
 **Classes:**
 - `class QuantumFreightPolicyTest`
   - Method `.test_a_dormant_broker_is_armed()`
   - Method `.test_an_empty_hold_buys_the_cheapest_lot()`
-  - Method `.test_a_loaded_hold_advances_the_freight_clock()`
+  - Method `.test_a_loaded_hold_with_room_buys_a_fresh_lot()`
+  - Method `.test_a_full_hold_advances_the_freight_clock()`
   - Method `.test_a_full_slot_queue_waits()`
   - Method `.test_the_target_is_met_disarms_and_the_policy_stops()`
+  - Method `.test_the_run_continues_past_the_broker_target_for_the_freight_milestone()`
+  - Method `.test_the_hard_order_cap_stops_a_stalled_lane()`
+  - Method `.test_a_legacy_save_completes_the_missing_broker_target()`
   - Method `.test_nothing_runs_before_the_campaign()`
   - Method `.test_a_landed_captain_does_not_run_freight()`
   - Method `.test_an_unprofitable_hold_gives_up_after_the_idle_limit()`
   - Method `.test_a_delivered_order_resets_the_idle_count()`
   - Method `.test_the_target_mirrors_the_codex_entry()`
+  - Method `.test_the_freight_target_mirrors_the_codex_entry()`
 
 **Functions:**
-- `def _captain(orders, enabled, cargo, trade_orders, docked, completed, credits, done, idle, last_orders)`
+- `def _captain(orders, enabled, cargo, trade_orders, docked, completed, credits, done, idle, last_orders, deliveries, free)`
 
 ---
 
@@ -5509,7 +5514,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3290` lines
+**Size**: `3307` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5560,7 +5565,7 @@
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
   - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
-  - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until the broker milestone (ADR-429).*
+  - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until both broker milestones (ADR-434).*
   - Method `._research_action()` - *Start the next available research project after the campaign (ADR-432).*
   - Method `._away_rotation_action()` - *Keep away teams deployed after the campaign (ADR-433).*
   - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*

@@ -436,10 +436,12 @@ gambit, and switches the reactor to economy once the story is over. It also keep
 research bench busy: whenever no project is running it starts the next available one,
 finishing four projects and banking the Technologist milestone. At a fresh orbit it keeps
 away teams deployed as well, launching the first unworked, staffable expedition and
-waiting for it to resolve until five missions complete the Field Team milestone. A
-smuggling run buys one contraband lot, ferries the high-security cordon the snapshot
-quotes and dumps it when the scan lands; a live heat spike is vented and the purge
-damage serviced at the next dock.
+waiting for it to resolve until five missions complete the Field Team milestone. The
+automated quantum lane keeps buying fresh lots and shipping until ten deliveries bank
+both the Quantum Broker and Freight Baron milestones. A smuggling run buys one
+contraband lot, ferries the high-security cordon the snapshot quotes and dumps it
+when the scan lands; a live heat spike is vented and the purge damage serviced at the
+next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a
