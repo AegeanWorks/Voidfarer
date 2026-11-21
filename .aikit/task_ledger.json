@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "rebuild-sweep",
+    "task_id": "relief-run",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795253702.1432295,
+    "updated_at": 1795258058.848634,
     "owner": "kilo:goal",
-    "lease_until": 1795260902.1432295,
+    "lease_until": 1795265258.848634,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,63 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795253722.75705,
-    "completed_head": "71d3753af49fb75a208cb0807deb591de2274544",
-    "completed_tree": "942285d63c5ae43070c53ae09ef4abb68a77649a"
+    "completed_at": 1795258091.4455948,
+    "completed_head": "b6f3e38f1e431461d12ab774a9251b4c3e366576",
+    "completed_tree": "240e3aa83b35e4d154670ab01c4735f11ce67bd9"
   },
   "checkpoints": [
-    {
-      "task_id": "pirate-fight-proof",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] seed 8 refuses the toll, fights and records pirates_fought 1 (fight branch proven; combat_item lost on that seed only); seeds 11/6/8 at 103/102/102 families, 0 errors, refusals 14-19; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2262 OK with README tree at 197 suites (ADR-431); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795202120.905782,
-      "timestamp_str": "2026-11-20 22:15:20",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "pirate-fight-proof",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'pirate-fight-proof' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795202162.3663335,
-      "timestamp_str": "2026-11-20 22:16:02",
-      "agent": "kilo:goal",
-      "head": "4f2b75b2ffb96603569b2e03048cb785fa07b314",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "research-bench",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Keep the research bench busy after the campaign (technologist target)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795206625.3925931,
-      "timestamp_str": "2026-11-20 23:30:25",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the captain starts exactly one research project at step 1 and never starts another, so the 12-project tech tree, its prerequisites and the technologist milestone (four completions) stay unreachable while research accrues from outposts and pacts",
-        "benefits": "the post-story bench finishes four projects, unlocks their effects and banks the technologist milestone without displacing any travel errand",
-        "risks": "contract: one additive post-story action and a tried set; dependency: none; concurrency: none; state: no schema change",
-        "mitigation": "eight failing-first tests for the next-project start, active/queued/idle guards, the pre-campaign gate, the target stop, the refused-project guard, an empty catalog and the codex mirror, plus 180-step gate and campaign measurements"
-      },
-      "plan_digest": "9e7e6c4ad7bc1d2c8bbb4766fabcc93844d1480a5bb14b7f5a439649ee0118a5",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "research-bench",
       "phase": "phase 4",
@@ -396,6 +344,65 @@
       "timestamp_str": "2026-11-21 12:35:22",
       "agent": "kilo:goal",
       "head": "71d3753af49fb75a208cb0807deb591de2274544",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "relief-run",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Restock relief bags for the relief-runner milestone",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795258042.166594,
+      "timestamp_str": "2026-11-21 13:47:22",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the rebuild sweep rebuilt with credits whenever the hold was empty, so relief_deliveries stayed at 0-1 of 3 and Relief Runner stayed unreachable",
+        "benefits": "every seed banks Relief Runner and Rebuilder; seed 8 also recovers Squadron Command and banks Ace",
+        "risks": "contract: the sweep stocks bags at a dock with its own bounded budget and stops after both targets; the squadron no-crew deadlock needs a narrow guard exception once the corps is banked; dependency: none; concurrency: none; state: one counter, no schema change",
+        "mitigation": "eleven failing-first tests (ten relief + one squadron), six campaigns and the 180-step gate"
+      },
+      "plan_digest": "3b5e63c61e29b604ca6297cbe810a980986c394c2a8c1cfc4054b96a132241bb",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "relief-run",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All six campaigns bank Rebuilder and Relief Runner (relief 3 on every seed, total rebuilt 5-7) with 0 errors; seed 8 recovers 3 commissions (Squadron) and banks Ace; codex 50-54 of 62 (42/6/8 54, 11 52, 1 51, 2 50; was 50-53); headline proofs retained (survey+megastructure+both pacts+10 quantum orders on all six, customs 42/2/6/11, prize capture 42/6/8, pirate fight 1/42/6/8/11); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2327 OK, README tree 203 suites, .aikit/cache git-ignored (ADR-438); 6/6 gates pass individually; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795258058.848634,
+      "timestamp_str": "2026-11-21 13:47:38",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "relief-run",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'relief-run' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795258091.538614,
+      "timestamp_str": "2026-11-21 13:48:11",
+      "agent": "kilo:goal",
+      "head": "b6f3e38f1e431461d12ab774a9251b4c3e366576",
       "delivery": {
         "roots": [
           "."
