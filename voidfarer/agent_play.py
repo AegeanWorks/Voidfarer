@@ -231,8 +231,11 @@ class AiCaptain:
 
     # A full-system survey pays 300 cr + 120 XP and unlocks two milestones, but the
     # tour only ever scans the body it happens to orbit; the post-story captain sweeps
-    # one system, bounded so a hostile anomaly chain cannot eat the errands (ADR-427).
+    # a system, bounded per system so a hostile anomaly chain cannot eat the errands.
+    # Three completed sweeps bank the sector cartographer milestone (ADR-427, ADR-436).
     SURVEY_SCAN_LIMIT = 24
+    SURVEY_SYSTEM_TARGET = 3
+    SURVEY_JUMP_LIMIT = 8
 
     # The codex's technologist milestone: four completed research projects. The bench
     # is otherwise idle after the first project, so the post-story captain keeps it
@@ -332,9 +335,13 @@ class AiCaptain:
         self.gambit_recalled = False
         # The post-campaign reactor doctrine change is attempted once (ADR-398).
         self.reactor_switched = False
-        # One full-system survey per campaign, and the scan/orbit steps it spent (ADR-427).
+        # Survey sweep state: no more work, the per-system scan budget, the systems
+        # already swept or left and the jumps spent, so a refused course is bounded
+        # (ADR-427, ADR-436).
         self.survey_done = False
         self.survey_scans = 0
+        self.survey_jumps = 0
+        self.survey_systems_tried: set[str] = set()
         # Research bench state: the target is reached and the projects already tried,
         # so a refused start cannot repeat forever (ADR-432).
         self.research_done = False
@@ -2096,23 +2103,28 @@ class AiCaptain:
         return None
 
     def _survey_action(self):
-        """Finish one full-system survey after the campaign (ADR-427).
+        """Finish a three-system survey sweep after the campaign (ADR-436).
 
         A survey bonus is only paid when every body in the system has been scanned, and
         the rotating tour never completes one. The sweep orbits and scans any unscanned
-        body in order, bounded by ``SURVEY_SCAN_LIMIT`` steps; hostile bodies that refuse
-        an orbit are skipped so a single anomaly cannot stall the sweep.
+        body in order, bounded by ``SURVEY_SCAN_LIMIT`` steps per system; hostile bodies
+        that refuse an orbit are skipped so a single anomaly cannot stall the sweep. A
+        swept or stalled system is left along a fresh hyperlane, bounded by
+        ``SURVEY_JUMP_LIMIT`` jumps, until three surveys bank the sector milestone.
         """
-        if self.survey_done or self.survey_scans >= self.SURVEY_SCAN_LIMIT:
+        if self.survey_done:
             return None
         if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        surveyed = int((self.state.get("stats") or {}).get("systems_surveyed") or 0)
+        if surveyed >= self.SURVEY_SYSTEM_TARGET:
+            self.survey_done = True
             return None
         system = self.state.get("current_system") or {}
         bodies = [body for body in system.get("bodies") or [] if isinstance(body, dict)]
         pending = [body for body in bodies if body.get("id") and not body.get("scan_completed")]
-        if not pending:
-            self.survey_done = True
-            return None
+        if not pending or self.survey_scans >= self.SURVEY_SCAN_LIMIT:
+            return self._survey_next_system(system)
         orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
         target = next((body for body in pending if str(body.get("id")) == orbiting), None)
         if target is None:
@@ -2120,6 +2132,30 @@ class AiCaptain:
             return "/api/orbit", {"target": str(pending[0]["id"])}, "orbit"
         self.survey_scans += 1
         return "/api/scan", {}, "scan"
+
+    def _survey_next_system(self, system):
+        """Leave a swept or stalled system along a fresh hyperlane (ADR-436)."""
+        system_id = str(system.get("id") or "")
+        if system_id:
+            self.survey_systems_tried.add(system_id)
+        if self.survey_jumps >= self.SURVEY_JUMP_LIMIT:
+            self.survey_done = True
+            return None
+        next_system = next(
+            (
+                str(item)
+                for item in system.get("connections") or []
+                if item and str(item) not in self.survey_systems_tried
+            ),
+            "",
+        )
+        if not next_system:
+            self.survey_done = True
+            return None
+        self.survey_systems_tried.add(next_system)
+        self.survey_jumps += 1
+        self.survey_scans = 0
+        return "/api/navigate", {"system_id": next_system}, "navigate"
 
     def _scoop_action(self):
         """Orbit a scoopable body when the post-story tank is running low (ADR-396).

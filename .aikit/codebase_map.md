@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `265`
-- **Total Classes**: `634`
-- **Total Top-Level Functions**: `585`
-- **Total Class Methods**: `3335`
-- **Total Source Lines**: `73277`
+- **Total Python Modules**: `266`
+- **Total Classes**: `635`
+- **Total Top-Level Functions**: `586`
+- **Total Class Methods**: `3346`
+- **Total Source Lines**: `73444`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`265` module(s))
+- **Indexed**: python (`266` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4374,6 +4374,29 @@
 
 ---
 
+### [`tests/test_sector_sweep.py`](tests/test_sector_sweep.py)
+> *The post-story captain sweeps three systems for the sector milestone (ADR-436).*
+
+**Size**: `131` lines
+
+**Classes:**
+- `class SectorSweepTest`
+  - Method `.test_a_fully_scanned_system_jumps_to_the_next_connection()`
+  - Method `.test_a_tried_connection_is_skipped()`
+  - Method `.test_the_jump_marks_the_target_as_tried()`
+  - Method `.test_the_completed_system_is_marked_tried()`
+  - Method `.test_an_exhausted_system_is_abandoned_for_the_next_one()`
+  - Method `.test_no_untried_connection_ends_the_sweep()`
+  - Method `.test_an_isolated_system_ends_the_sweep()`
+  - Method `.test_the_target_stops_the_sweep()`
+  - Method `.test_the_jump_budget_bounds_a_refused_course()`
+  - Method `.test_the_target_matches_the_codex_milestone()`
+
+**Functions:**
+- `def _captain(bodies, connections, orbiting, surveyed, completed, done, scans, tried, jumps)`
+
+---
+
 ### [`tests/test_sell_all_profitable.py`](tests/test_sell_all_profitable.py)
 > *SELL ALL PROFITABLE sells every held commodity that beats its cost basis and keeps the rest.*
 
@@ -5539,7 +5562,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3415` lines
+**Size**: `3451` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5594,7 +5617,8 @@
   - Method `._research_action()` - *Start the next available research project after the campaign (ADR-432).*
   - Method `._away_rotation_action()` - *Keep away teams deployed after the campaign (ADR-433).*
   - Method `._squadron_action()` - *Commission and staff escorts up to the squadron milestones (ADR-435).*
-  - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*
+  - Method `._survey_action()` - *Finish a three-system survey sweep after the campaign (ADR-436).*
+  - Method `._survey_next_system(system)` - *Leave a swept or stalled system along a fresh hyperlane (ADR-436).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
