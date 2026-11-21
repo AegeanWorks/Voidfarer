@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "corsair-milestone",
+    "task_id": "ui-review-record",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795284364.5618818,
+    "updated_at": 1795294166.2287686,
     "owner": "kilo:goal",
-    "lease_until": 1795291564.5618818,
+    "lease_until": 1795301366.2287686,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795284387.153423,
-    "completed_head": "117b8c97831312a499b1428c07088e14144ad7d7",
-    "completed_tree": "0ac1f743bee7b1b568f79feb2917c649edc38dd1"
+    "completed_at": 1795294172.5805178,
+    "completed_head": "4df24348248229e56bc96448887294a554e701d5",
+    "completed_tree": "af9fa74e8a70ab2f4d61f8456596cbfff8255dc7"
   },
   "checkpoints": [
-    {
-      "task_id": "squadron-milestones",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] All six campaigns reach 3 commissions and 3 assigned captains with 0 errors, banking Squadron Command and Captain Corps (neither in any leftover list); codex 48-50 of 62 (seed 1 50, seed 6 50, seed 42 49, seed 8 49, seed 2 48, seed 11 48; was 45-48); headline proofs retained (reconstruct+survey+megastructure+both pacts+10 quantum orders on all six, customs on 42/2/6/11, prize capture+sale on 6, pirate fight on 1/42/2/8/11); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2296 OK with README tree at 200 suites (ADR-435); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795248650.3877952,
-      "timestamp_str": "2026-11-21 11:10:50",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "squadron-milestones",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'squadron-milestones' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795248661.505611,
-      "timestamp_str": "2026-11-21 11:11:01",
-      "agent": "kilo:goal",
-      "head": "db62dca45140193a9372b0e4e7f19efe6a841408",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "sector-sweep",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Sweep three systems for the Sector Cartographer milestone",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795250331.799171,
-      "timestamp_str": "2026-11-21 11:38:51",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the survey sweep stops after one full system, so Sector Cartographer (three surveys) stays at 1 of 3 even though the survey bonus, scans and milestone pay",
-        "benefits": "every seed banks Sector Cartographer and adds two survey bonuses plus their scans",
-        "risks": "contract: the sweep leaves a swept system along a fresh hyperlane; dependency: none; concurrency: none; state: three run fields, no schema change",
-        "mitigation": "ten failing-first tests for the jump, tried-set, budget, abandonment, target, isolation and codex mirror, plus six benchmark campaigns and the 180-step gate"
-      },
-      "plan_digest": "566bc766897ffdc517042acb97834446482d6e4a8028712034616edb1c7a4da2",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "sector-sweep",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-21 21:06:27",
       "agent": "kilo:goal",
       "head": "117b8c97831312a499b1428c07088e14144ad7d7",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "ui-review-record",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Record the cockpit visual review and close the UI contract",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795294123.1174822,
+      "timestamp_str": "2026-11-21 23:48:43",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the cockpit surface digest had no finished UI task, so strict delivery was blocked; the review itself needs a vision model that the main model lacks",
+        "benefits": "the UI contract now matches the running cockpit and strict delivery unblocks",
+        "risks": "contract: ui.json timeout only, no producing code; dependency: a vision provider; concurrency: none; state: ui history adds one reviewed task",
+        "mitigation": "real-browser audits at three viewports, a click map, a vision read with quotes, live-DOM measurements of every claimed defect, and the full suite under the new timeout"
+      },
+      "plan_digest": "b04c5a11cba3ffd311dabbab2f574b9516434191bc0035c163386d6783f041ff",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "ui-review-record",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] G-015 review recorded and the UI task closed: vision subagent (Gemini 3.8 Flash) quoted the real cockpit text from short.png; its three claimed defects were refuted by live measurements (hint 12px, scrollWidth==clientWidth 211; cue 79.9x20 inside panelLeft, 78==78; 9 radar labels, 0 forced, 0 overlaps; 0 sub-12px DOM text). Machine evidence: ui_audit post 1920/1366/1280 all zero findings, click-map 197 controls 0 missing/0 dup, screenshots in ui-review/2026-11-21-*. ui begin/verify/finish all OK after fast_timeout 300->600 (suite 277s, ADR-442); no code change warranted. Suite Ran 2353 OK; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795294166.2287686,
+      "timestamp_str": "2026-11-21 23:49:26",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "ui-review-record",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ui-review-record' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795294172.7072022,
+      "timestamp_str": "2026-11-21 23:49:32",
+      "agent": "kilo:goal",
+      "head": "4df24348248229e56bc96448887294a554e701d5",
       "delivery": {
         "roots": [
           "."

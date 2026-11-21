@@ -3137,5 +3137,35 @@
     "final_snapshot_entries": 1385,
     "surface_digest": "5cde9f73b4873c495870a1b2f12c0a1d97c9e631d46badd205b82cf3d1908a03",
     "baseline_digest": "bd157527849769bdfe5af6edb2fe036c220692a786b59091f80b3f88abd1716f"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [],
+    "no_visual_reason": "",
+    "no_change_reason": "G-015 visual review of the running cockpit at 1280x720: the vision subagent read short.png and quoted the on-screen text (top bar CHRONO/01.01.3042/HULL 100/100, left terminal IMPERIAL OUTLINER + PLAYER tab, center NAV-RADAR SOL SYSTEM with 8 body labels, bottom REACTOR + ABILITIES + SHIFT+1..6 hint, right flight log). Its three claimed defects were measured in the live page and refuted: .skills-quick-hint computes 12px with scrollWidth 211 == clientWidth 211 (not under 12px, not clipped); #deckScrollCue is 79.9x20 at y 650-670 inside panelLeft y 181-685 with scrollWidth 78 == clientWidth 78 (not truncated); one instrumented radar draw placed 9 labels with 0 forced placements and 0 overlapping boxes, and 0 visible DOM elements render below 12px. Machine evidence: ui_audit --post-tutorial at 1920/1366/1280 = 0 errors, 0 hscroll, 0 clipped, 0 offscreen, 0 tiny, 0 contrast, 0 unlabeled, 0 overlaps, radar ok; ui_browser click-map = 197 controls, 0 missing testid, 0 duplicates; screenshots in ui-review/2026-11-21-cockpit, ui-review/2026-11-21-audit, ui-review/2026-11-21-crops. No code change was warranted.",
+    "baseline_commit": "4df24348248229e56bc96448887294a554e701d5",
+    "contract_hash": "05ba6291b0879bb6d140fcf3640b7d8d50d06589b73848947b99dc0b76b49a77",
+    "started_at": 1795293944.7082398,
+    "finished_at": 1795294089.8547816,
+    "strikes": 0,
+    "reviewer": "google/Gemini 3.8 Flash (vision subagent, task ses_e0084a5ceffeqC5H71RZrTCVvq)",
+    "review": {
+      "reviewer": "google/Gemini 3.8 Flash (vision subagent, task ses_e0084a5ceffeqC5H71RZrTCVvq)",
+      "surface": "cockpit",
+      "surface_digest": "c20b4eade65efc7e9c71fc2ae0bb685026471277233dc0c49ad1958c6cbc8ced",
+      "snapshot_digest": "e854b759835b06e71a792b6abf08f7f66f3849d7727639b1bf728943e456b68e",
+      "snapshot_entries": 1385,
+      "visual": true,
+      "reviewed_at": 1795294089.8547838
+    },
+    "allowed_removals": [],
+    "allowed_tests": [],
+    "final_snapshot_digest": "e854b759835b06e71a792b6abf08f7f66f3849d7727639b1bf728943e456b68e",
+    "final_snapshot_entries": 1385,
+    "surface_digest": "c20b4eade65efc7e9c71fc2ae0bb685026471277233dc0c49ad1958c6cbc8ced",
+    "baseline_digest": "c20b4eade65efc7e9c71fc2ae0bb685026471277233dc0c49ad1958c6cbc8ced"
   }
 ]
