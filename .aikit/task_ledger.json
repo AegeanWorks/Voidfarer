@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ui-review-record",
+    "task_id": "ui-review-adr",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795294166.2287686,
+    "updated_at": 1795294612.4028487,
     "owner": "kilo:goal",
-    "lease_until": 1795301366.2287686,
+    "lease_until": 1795301812.4028487,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795294172.5805178,
-    "completed_head": "4df24348248229e56bc96448887294a554e701d5",
-    "completed_tree": "af9fa74e8a70ab2f4d61f8456596cbfff8255dc7"
+    "completed_at": 1795294658.0116942,
+    "completed_head": "5dba1e7875ae9289606929e9d8d13fdc0abc7d3b",
+    "completed_tree": "ddd60101e6708b9732338d12f68ba6e68e20f51f"
   },
   "checkpoints": [
-    {
-      "task_id": "sector-sweep",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] All six campaigns bank Sector Cartographer (systems_surveyed 3, 47-49 scans, 0 errors) and the entry leaves every leftover list; codex 49-52 of 62 (seed 6 52, seed 42 51, seed 1 50, seed 8 50, seed 2 49, seed 11 49; was 48-50); reconstruction still exercised on all six (credits or relief), as are full survey, megastructure, both pacts and 10 quantum orders; customs on 42/2/6/11, prize capture on 6, pirate fight on 1/42/6/8/11; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2306 OK with README tree at 201 suites (ADR-436); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795250493.9293573,
-      "timestamp_str": "2026-11-21 11:41:33",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "sector-sweep",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'sector-sweep' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795250519.298225,
-      "timestamp_str": "2026-11-21 11:41:59",
-      "agent": "kilo:goal",
-      "head": "b0db0e8d4cf1a24ad05b0eac56d83efe1e168689",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "rebuild-sweep",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Keep rebuilding devastated worlds to the Rebuilder milestone",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795251718.614629,
-      "timestamp_str": "2026-11-21 12:01:58",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the post-story reconstruction errand runs once, so worlds_rebuilt plus relief_deliveries ends at 1 of 5 and both Rebuilder and (partly) Relief Runner stay unreachable while dozens of devastated colonies remain",
-        "benefits": "every seed banks Rebuilder and gains the standing, capacity and relief payouts of four more reconstructions",
-        "risks": "contract: a new post-story sweep after the established one-shot errand; the ADR-395/425 action and its tests are untouched; dependency: none; concurrency: none; state: one attempt counter, no schema change",
-        "mitigation": "ten failing-first tests for the credit and relief routes, the target, the orbit step, the pre-campaign and pre-success gates, the attempt bound and the codex mirror, plus six campaigns and the 180-step gate"
-      },
-      "plan_digest": "7a134c9bdaa4af3b6a91132d54349406a6c2c24492ce865a8b388237c9e69fcd",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "rebuild-sweep",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-21 23:49:32",
       "agent": "kilo:goal",
       "head": "4df24348248229e56bc96448887294a554e701d5",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "ui-review-adr",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Pair the cockpit review ADR with its task",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795294568.5844588,
+      "timestamp_str": "2026-11-21 23:56:08",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the ADR recording the review was committed after its task closed, so strict delivery wants a task that covers it",
+        "benefits": "the ledger pairs every non-bookkeeping commit with a task again",
+        "risks": "contract: none, documentation only; dependency: none; concurrency: none; state: ledger only",
+        "mitigation": "the ADR already records the evidence; this task only pairs it and reruns strict"
+      },
+      "plan_digest": "32aae41b1f221893d0fe28f5f2070b42166e4db6fd6dcb56ed7d4a3b79f80d42",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "ui-review-adr",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] ADR-443 records the review quotes, the three refuted defect claims with their measurements, and the ui finish close at digest c20b4eade65e; check voidfarer --strict returned 6/6 gates before this pairing commit; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795294612.4028487,
+      "timestamp_str": "2026-11-21 23:56:52",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "ui-review-adr",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'ui-review-adr' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795294659.224229,
+      "timestamp_str": "2026-11-21 23:57:39",
+      "agent": "kilo:goal",
+      "head": "5dba1e7875ae9289606929e9d8d13fdc0abc7d3b",
       "delivery": {
         "roots": [
           "."
