@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `266`
-- **Total Classes**: `635`
-- **Total Top-Level Functions**: `586`
-- **Total Class Methods**: `3346`
-- **Total Source Lines**: `73444`
+- **Total Python Modules**: `267`
+- **Total Classes**: `636`
+- **Total Top-Level Functions**: `587`
+- **Total Class Methods**: `3357`
+- **Total Source Lines**: `73619`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`266` module(s))
+- **Indexed**: python (`267` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4106,6 +4106,29 @@
 
 ---
 
+### [`tests/test_rebuild_sweep.py`](tests/test_rebuild_sweep.py)
+> *The post-story captain keeps rebuilding devastated worlds (ADR-437).*
+
+**Size**: `105` lines
+
+**Classes:**
+- `class RebuildSweepTest`
+  - Method `.test_the_worst_world_is_rebuilt_with_credits()`
+  - Method `.test_a_stocked_hold_still_prefers_relief()`
+  - Method `.test_a_distant_world_is_orbited_first()`
+  - Method `.test_the_target_counts_both_modes()`
+  - Method `.test_nothing_runs_before_the_campaign()`
+  - Method `.test_nothing_continues_before_the_first_rebuild_succeeded()`
+  - Method `.test_the_attempt_bound_stops_a_refused_route()`
+  - Method `.test_a_broke_captain_without_supplies_stays_quiet()`
+  - Method `.test_an_intact_system_has_no_target()`
+  - Method `.test_the_target_mirrors_the_codex_milestone()`
+
+**Functions:**
+- `def _captain(bodies, orbiting, credits, cargo, rebuilt, relief, succeeded, completed, attempts)`
+
+---
+
 ### [`tests/test_reduced_motion.py`](tests/test_reduced_motion.py)
 > *Particle FX honor the OS reduce-motion preference: continuous decoration stops, event feedback stays.*
 
@@ -5562,7 +5585,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3451` lines
+**Size**: `3521` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5611,6 +5634,7 @@
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
+  - Method `._rebuild_sweep_action()` - *Keep rebuilding devastated worlds to the rebuilder milestone (ADR-437).*
   - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
   - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until both broker milestones (ADR-434).*

@@ -242,6 +242,12 @@ class AiCaptain:
     # busy until the milestone is banked (ADR-432).
     RESEARCH_TARGET = 4
 
+    # The codex's rebuilder milestone: five rebuilt worlds, counting both the credit
+    # and relief modes. One errand runs in the tour, so the post-story captain keeps
+    # rebuilding while devastated inhabited worlds remain (ADR-437).
+    REBUILD_TARGET = 5
+    REBUILD_ATTEMPT_LIMIT = 8
+
     # The codex's field-team milestone: five completed expeditions. The tour launches
     # one team and protects it, so the post-story captain keeps deploying fresh teams
     # until the milestone is banked (ADR-433).
@@ -342,6 +348,9 @@ class AiCaptain:
         self.survey_scans = 0
         self.survey_jumps = 0
         self.survey_systems_tried: set[str] = set()
+        # Rebuild sweep state: the credit/relief reconstructions issued after the
+        # one-shot errand, so a refused route is bounded (ADR-437).
+        self.rebuild_attempts = 0
         # Research bench state: the target is reached and the projects already tried,
         # so a refused start cannot repeat forever (ADR-432).
         self.research_done = False
@@ -549,6 +558,12 @@ class AiCaptain:
         reconstruct = self._reconstruct_action()
         if reconstruct is not None:
             return reconstruct
+
+        # One rebuild is the tour's errand, but the rebuilder milestone wants five;
+        # keep rebuilding while devastated colonies remain (ADR-437).
+        rebuild = self._rebuild_sweep_action()
+        if rebuild is not None:
+            return rebuild
 
         # A half-empty tank is a real errand: orbit a scoopable body instead of
         # waiting for a station that may be a jump away (ADR-396).
@@ -1821,6 +1836,61 @@ class AiCaptain:
         if int(ship.get("credits") or 0) < self.RECONSTRUCTION_COST:
             return None
         return ("/api/reconstruct", {"body_id": body_id, "mode": "credits"},
+                "reconstruct")
+
+    def _rebuild_sweep_action(self):
+        """Keep rebuilding devastated worlds to the rebuilder milestone (ADR-437).
+
+        The one-shot errand from ADR-395/425 rebuilds a single world, so the codex's
+        rebuilder milestone (five rebuilt worlds, counting both modes) stays at 1 of 5
+        while dozens of devastated colonies remain. The sweep continues after that
+        first success: the worst devastated inhabited world in the current system is
+        orbited and rebuilt with stocked relief supplies when the hold has them, else
+        with credits while the treasury can pay. A bounded attempt counter keeps a
+        refused route from looping, and the sweep stops at the milestone.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        stats = self.state.get("stats") or {}
+        rebuilt = int(stats.get("worlds_rebuilt") or 0) + int(
+            stats.get("relief_deliveries") or 0
+        )
+        if rebuilt >= self.REBUILD_TARGET:
+            return None
+        if "/api/reconstruct" not in self.succeeded:
+            return None
+        if self.rebuild_attempts >= self.REBUILD_ATTEMPT_LIMIT:
+            return None
+        system = self.state.get("current_system") or {}
+        targets = [
+            body for body in system.get("bodies") or []
+            if isinstance(body, dict) and body.get("id")
+            and int(body.get("population") or 0) > 0
+            and float(body.get("devastation") or 0.0) > 0.0
+        ]
+        if not targets:
+            return None
+        target = max(targets, key=lambda body: float(body.get("devastation") or 0.0))
+        body_id = str(target["id"])
+        ship = self.state.get("ship") or {}
+        orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        landed = str(ship.get("landed_body_id") or "")
+        if body_id not in (orbiting, landed):
+            return "/api/orbit", {"target": body_id}, "orbit"
+        cargo = ship.get("cargo") or {}
+        stocked = all(
+            int(cargo.get(item_id, 0)) >= quantity
+            for item_id, quantity in self.RELIEF_CARGO
+        )
+        mode = ""
+        if stocked:
+            mode = "relief"
+        elif int(ship.get("credits") or 0) >= self.RECONSTRUCTION_COST:
+            mode = "credits"
+        if not mode:
+            return None
+        self.rebuild_attempts += 1
+        return ("/api/reconstruct", {"body_id": body_id, "mode": mode},
                 "reconstruct")
 
     def _note_pact_attempt(self, action: str, faction_id: str) -> None:

@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (201 suites)
+└── tests/                <- unit & integration test suite (202 suites)
 ```
 
 ---
@@ -440,9 +440,11 @@ waiting for it to resolve until five missions complete the Field Team milestone.
 automated quantum lane keeps buying fresh lots and shipping until ten deliveries bank
 both the Quantum Broker and Freight Baron milestones. It also commissions and staffs a
 three-escort squadron for the Squadron Command and Captain Corps milestones and sweeps
-three systems for the Sector Cartographer milestone. A smuggling run buys one contraband
-lot, ferries the high-security cordon the snapshot quotes and dumps it when the scan
-lands; a live heat spike is vented and the purge damage serviced at the next dock.
+three systems for the Sector Cartographer milestone. Rebuilding does not stop at one
+world: it keeps restoring devastated colonies until five rebuilt worlds bank the
+Rebuilder milestone. A smuggling run buys one contraband lot, ferries the
+high-security cordon the snapshot quotes and dumps it when the scan lands; a live
+heat spike is vented and the purge damage serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a
