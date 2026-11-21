@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `267`
-- **Total Classes**: `636`
-- **Total Top-Level Functions**: `587`
-- **Total Class Methods**: `3357`
-- **Total Source Lines**: `73619`
+- **Total Python Modules**: `268`
+- **Total Classes**: `637`
+- **Total Top-Level Functions**: `588`
+- **Total Class Methods**: `3368`
+- **Total Source Lines**: `73815`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`267` module(s))
+- **Indexed**: python (`268` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4106,6 +4106,29 @@
 
 ---
 
+### [`tests/test_rebuild_relief_run.py`](tests/test_rebuild_relief_run.py)
+> *The rebuild sweep stocks relief to bank the Relief Runner milestone (ADR-438).*
+
+**Size**: `148` lines
+
+**Classes:**
+- `class ReliefRunTest`
+  - Method `.test_a_docked_empty_hold_buys_the_first_missing_bag()`
+  - Method `.test_the_next_missing_bag_is_bought_in_turn()`
+  - Method `.test_a_fully_stocked_hold_delivers_relief()`
+  - Method `.test_no_stocking_once_the_relief_target_is_banked()`
+  - Method `.test_an_exhausted_stock_budget_falls_back_to_credits()`
+  - Method `.test_an_unbuyable_bag_does_not_burn_the_budget()`
+  - Method `.test_after_five_rebuilds_only_relief_continues()`
+  - Method `.test_both_targets_stop_the_sweep()`
+  - Method `.test_the_stock_budget_is_bounded()`
+  - Method `.test_the_relief_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _captain(cargo, orbiting, docked, credits, rebuilt, relief, succeeded, completed, attempts, stock_attempts, quotes, bodies)`
+
+---
+
 ### [`tests/test_rebuild_sweep.py`](tests/test_rebuild_sweep.py)
 > *The post-story captain keeps rebuilding devastated worlds (ADR-437).*
 
@@ -4712,7 +4735,7 @@
 ### [`tests/test_squadron_policy.py`](tests/test_squadron_policy.py)
 > *The post-story captain builds and staffs a squadron (ADR-435).*
 
-**Size**: `142` lines
+**Size**: `156` lines
 
 **Classes:**
 - `class SquadronPolicyTest`
@@ -4725,6 +4748,7 @@
   - Method `.test_a_refused_pair_falls_through_to_the_next_crew()`
   - Method `.test_a_stationed_or_injured_member_is_not_a_captain()`
   - Method `.test_a_destroyed_hull_is_not_staffed()`
+  - Method `.test_the_last_commission_proceeds_without_free_crew_once_the_corps_is_banked()`
   - Method `.test_the_targets_match_the_codex_milestones()`
 
 **Functions:**
@@ -5585,7 +5609,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3521` lines
+**Size**: `3555` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5634,7 +5658,7 @@
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
-  - Method `._rebuild_sweep_action()` - *Keep rebuilding devastated worlds to the rebuilder milestone (ADR-437).*
+  - Method `._rebuild_sweep_action()` - *Keep rebuilding devastated worlds to both relief milestones (ADR-437, ADR-438).*
   - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
   - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until both broker milestones (ADR-434).*

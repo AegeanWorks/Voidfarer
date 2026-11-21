@@ -244,9 +244,13 @@ class AiCaptain:
 
     # The codex's rebuilder milestone: five rebuilt worlds, counting both the credit
     # and relief modes. One errand runs in the tour, so the post-story captain keeps
-    # rebuilding while devastated inhabited worlds remain (ADR-437).
+    # rebuilding while devastated inhabited worlds remain (ADR-437). The relief-runner
+    # milestone wants three relief deliveries, so the sweep also restocks bags at a
+    # dock while relief is short, bounded by its own purchase budget (ADR-438).
     REBUILD_TARGET = 5
     REBUILD_ATTEMPT_LIMIT = 8
+    RELIEF_RUNNER_TARGET = 3
+    REBUILD_STOCK_LIMIT = 6
 
     # The codex's field-team milestone: five completed expeditions. The tour launches
     # one team and protects it, so the post-story captain keeps deploying fresh teams
@@ -349,8 +353,10 @@ class AiCaptain:
         self.survey_jumps = 0
         self.survey_systems_tried: set[str] = set()
         # Rebuild sweep state: the credit/relief reconstructions issued after the
-        # one-shot errand, so a refused route is bounded (ADR-437).
+        # one-shot errand, so a refused route is bounded (ADR-437), and the relief
+        # bags bought at dock for the sweep's own deliveries (ADR-438).
         self.rebuild_attempts = 0
+        self.rebuild_stock_attempts = 0
         # Research bench state: the target is reached and the projects already tried,
         # so a refused start cannot repeat forever (ADR-432).
         self.research_done = False
@@ -1839,23 +1845,27 @@ class AiCaptain:
                 "reconstruct")
 
     def _rebuild_sweep_action(self):
-        """Keep rebuilding devastated worlds to the rebuilder milestone (ADR-437).
+        """Keep rebuilding devastated worlds to both relief milestones (ADR-437, ADR-438).
 
         The one-shot errand from ADR-395/425 rebuilds a single world, so the codex's
         rebuilder milestone (five rebuilt worlds, counting both modes) stays at 1 of 5
         while dozens of devastated colonies remain. The sweep continues after that
         first success: the worst devastated inhabited world in the current system is
         orbited and rebuilt with stocked relief supplies when the hold has them, else
-        with credits while the treasury can pay. A bounded attempt counter keeps a
-        refused route from looping, and the sweep stops at the milestone.
+        with credits while the treasury can pay. Because the relief-runner milestone
+        wants three relief deliveries, a docked captain restocks a missing bag first
+        while relief is short, bounded by its own purchase budget. A bounded attempt
+        counter keeps a refused route from looping; the sweep stops when both
+        milestones are banked, and once the rebuild target is met only relief runs.
         """
         if not (self.state.get("story_status") or {}).get("completed"):
             return None
         stats = self.state.get("stats") or {}
-        rebuilt = int(stats.get("worlds_rebuilt") or 0) + int(
-            stats.get("relief_deliveries") or 0
-        )
-        if rebuilt >= self.REBUILD_TARGET:
+        relief = int(stats.get("relief_deliveries") or 0)
+        rebuilt = int(stats.get("worlds_rebuilt") or 0) + relief
+        need_rebuild = rebuilt < self.REBUILD_TARGET
+        need_relief = relief < self.RELIEF_RUNNER_TARGET
+        if not need_rebuild and not need_relief:
             return None
         if "/api/reconstruct" not in self.succeeded:
             return None
@@ -1873,19 +1883,41 @@ class AiCaptain:
         target = max(targets, key=lambda body: float(body.get("devastation") or 0.0))
         body_id = str(target["id"])
         ship = self.state.get("ship") or {}
+        cargo = ship.get("cargo") or {}
+        missing = [
+            (item_id, max(0, quantity - int(cargo.get(item_id, 0))))
+            for item_id, quantity in self.RELIEF_CARGO
+            if int(cargo.get(item_id, 0)) < quantity
+        ]
+        credits = int(ship.get("credits") or 0)
+        if (need_relief and missing and self._is_docked()
+                and self.rebuild_stock_attempts < self.REBUILD_STOCK_LIMIT):
+            quotes = {
+                str(quote.get("commodity_id")): quote
+                for quote in self.state.get("market_quotes") or []
+                if isinstance(quote, dict)
+            }
+            for item_id, need in missing:
+                quote = quotes.get(item_id)
+                if not quote:
+                    continue
+                if int(quote.get("max_buy") or 0) < need:
+                    continue
+                if credits < int(quote.get("buy_price") or 0) * need:
+                    continue
+                self.rebuild_stock_attempts += 1
+                return ("/api/trade",
+                        {"commodity_id": item_id, "quantity": need, "is_buy": True},
+                        "trade")
         orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
         landed = str(ship.get("landed_body_id") or "")
         if body_id not in (orbiting, landed):
             return "/api/orbit", {"target": body_id}, "orbit"
-        cargo = ship.get("cargo") or {}
-        stocked = all(
-            int(cargo.get(item_id, 0)) >= quantity
-            for item_id, quantity in self.RELIEF_CARGO
-        )
+        stocked = not missing
         mode = ""
-        if stocked:
+        if stocked and need_relief:
             mode = "relief"
-        elif int(ship.get("credits") or 0) >= self.RECONSTRUCTION_COST:
+        elif need_rebuild and credits >= self.RECONSTRUCTION_COST:
             mode = "credits"
         if not mode:
             return None
@@ -2142,14 +2174,16 @@ class AiCaptain:
                     )
         if commissioned < self.SQUADRON_TARGET:
             # Never buy a hull that would sit unstaffed: a living escort without a
-            # captain is the next assignment, so the purchase waits for it (and only
-            # a crew member who could command the new hull opens another slot).
+            # captain is the next assignment, so the purchase waits for it. When no
+            # free crew is left, only a captain corps already banked opens the last
+            # commission, because the squadron milestone counts lifetime commissions
+            # and the hull can never find a captain (ADR-438).
             unstaffed = any(
                 int(ship.get("hull") or 0) > 0
                 and not str(ship.get("captain_id") or "")
                 for ship in rows
             )
-            if not crew or unstaffed:
+            if unstaffed and (crew or assigned < self.CAPTAIN_CORPS_TARGET):
                 return None
             catalog = (self.state.get("fleet_manager") or {}).get("catalog") or {}
             options = [

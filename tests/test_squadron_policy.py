@@ -129,6 +129,20 @@ class SquadronPolicyTest(unittest.TestCase):
         )
         self.assertIsNone(captain._squadron_action())
 
+    def test_the_last_commission_proceeds_without_free_crew_once_the_corps_is_banked(self):
+        captain = _captain(
+            commissions=2,
+            assigned=3,
+            ships=[_ship(captain_id="crew_engineer_1")],
+            crew=[_crew("crew_engineer_1", station="bridge")],
+        )
+        self.assertEqual(
+            captain._squadron_action(),
+            ("/api/fleet/escort/buy",
+             {"escort_type": "corvette", "system_id": "sol"}, "fleet"),
+            "the squadron milestone counts commissions, so the hull is still bought",
+        )
+
     def test_the_targets_match_the_codex_milestones(self):
         self.assertEqual(
             AiCaptain.SQUADRON_TARGET, CODEX_MAP["squadron"].target

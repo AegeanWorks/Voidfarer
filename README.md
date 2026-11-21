@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (202 suites)
+└── tests/                <- unit & integration test suite (203 suites)
 ```
 
 ---
@@ -441,8 +441,9 @@ automated quantum lane keeps buying fresh lots and shipping until ten deliveries
 both the Quantum Broker and Freight Baron milestones. It also commissions and staffs a
 three-escort squadron for the Squadron Command and Captain Corps milestones and sweeps
 three systems for the Sector Cartographer milestone. Rebuilding does not stop at one
-world: it keeps restoring devastated colonies until five rebuilt worlds bank the
-Rebuilder milestone. A smuggling run buys one contraband lot, ferries the
+world: it restocks relief bags at a dock and keeps restoring devastated colonies until
+five rebuilt worlds and three relief deliveries bank Rebuilder and Relief Runner. A
+smuggling run buys one contraband lot, ferries the
 high-security cordon the snapshot quotes and dumps it when the scan lands; a live
 heat spike is vented and the purge damage serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.

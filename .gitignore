@@ -19,3 +19,4 @@ node_modules/
 ui-review/
 # AIKit transient state
 .aikit/*.log
+.aikit/cache/
