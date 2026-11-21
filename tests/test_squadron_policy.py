@@ -17,6 +17,7 @@ def _captain(
     docked=True,
     story=True,
     done=False,
+    roles=None,
 ):
     captain = AiCaptain(ApiClient(port=1), seed=42)
     captain.squadron_done = done
@@ -30,6 +31,7 @@ def _captain(
         },
         "ship": {"credits": credits, "away_missions": []},
         "crew": list(crew),
+        "crew_roles": list(roles or []),
         "outposts": [],
         "fleet_manager": {
             "ships": list(ships),
@@ -142,6 +144,61 @@ class SquadronPolicyTest(unittest.TestCase):
              {"escort_type": "corvette", "system_id": "sol"}, "fleet"),
             "the squadron milestone counts commissions, so the hull is still bought",
         )
+
+    def test_a_dead_hull_releases_its_officer_when_no_crew_is_free(self):
+        captain = _captain(
+            commissions=3,
+            assigned=2,
+            ships=[
+                _ship("escort_corvette_1", hull=0, captain_id="crew_engineer_1"),
+                _ship("escort_corvette_3", hull=90),
+            ],
+            crew=[_crew("crew_engineer_1", station="")],
+        )
+        self.assertEqual(
+            captain._squadron_action(),
+            ("/api/fleet/escort/dismiss", {"ship_id": "escort_corvette_1"},
+             "fleet_dismiss"),
+            "the officer in a dead hull is the only free captain left",
+        )
+        self.assertIn("escort_corvette_1", captain.squadron_dismissed)
+
+    def test_a_released_hull_is_not_dismissed_twice(self):
+        captain = _captain(
+            commissions=3,
+            assigned=2,
+            ships=[_ship("escort_corvette_1", hull=0, captain_id="crew_engineer_1")],
+            crew=[_crew("crew_engineer_1")],
+        )
+        captain.squadron_dismissed.add("escort_corvette_1")
+        self.assertIsNone(captain._squadron_action())
+
+    def test_an_officer_is_recruited_when_no_crew_is_free(self):
+        captain = _captain(
+            commissions=3,
+            assigned=2,
+            ships=[_ship("escort_corvette_3", hull=90)],
+            crew=[_crew("crew_engineer_1", station="engineering")],
+            roles=[{"id": "engineer", "cost": 400},
+                   {"id": "marine", "cost": 900}],
+        )
+        self.assertEqual(
+            captain._squadron_action(),
+            ("/api/crew/recruit", {"role_id": "engineer"}, "crew"),
+            "a short corps needs one more officer from the docks",
+        )
+        self.assertEqual(captain.squadron_recruits, 1)
+
+    def test_an_unaffordable_recruit_stays_quiet(self):
+        captain = _captain(
+            commissions=3,
+            assigned=2,
+            ships=[_ship("escort_corvette_3", hull=90)],
+            crew=[_crew("crew_engineer_1", station="engineering")],
+            credits=100,
+            roles=[{"id": "engineer", "cost": 400}],
+        )
+        self.assertIsNone(captain._squadron_action())
 
     def test_the_targets_match_the_codex_milestones(self):
         self.assertEqual(

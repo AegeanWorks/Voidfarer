@@ -2834,6 +2834,43 @@ class MegastructureRestorePolicyTest(unittest.TestCase):
             ("/api/orbit", {"target": "sol_ring_world"}, "orbit"),
         )
 
+    def test_a_probed_body_is_not_orbited_twice(self):
+        captain = self._captain(current_system={
+            "id": "sol", "name": "Sol System",
+            "bodies": [
+                {"id": "sol_body_7", "body_type": "research_outpost"},
+                {"id": "sol_ring_world", "body_type": "ring_world"},
+            ],
+        })
+        self.assertEqual(
+            captain._megastructure_action(),
+            ("/api/orbit", {"target": "sol_ring_world"}, "orbit"),
+        )
+        self.assertIsNone(
+            captain._megastructure_action(),
+            "a body whose structure is not restorable must not be orbited again",
+        )
+
+    def test_the_probe_budget_bounds_an_exhausted_system(self):
+        captain = self._captain(current_system={
+            "id": "sol", "name": "Sol System",
+            "bodies": [
+                {"id": "sol_body_7", "body_type": "research_outpost"},
+                {"id": "sol_ring_world", "body_type": "ring_world"},
+                {"id": "sol_dyson_sphere", "body_type": "dyson_sphere"},
+            ],
+        })
+        self.assertEqual(
+            captain._megastructure_action()[1]["target"], "sol_ring_world"
+        )
+        self.assertEqual(
+            captain._megastructure_action()[1]["target"], "sol_dyson_sphere"
+        )
+        self.assertIsNone(
+            captain._megastructure_action(),
+            "every candidate probed once, then the errand ends",
+        )
+
     def test_an_unaffordable_restore_waits(self):
         captain = self._captain(
             ship={"credits": 500},

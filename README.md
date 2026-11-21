@@ -443,10 +443,11 @@ three-escort squadron for the Squadron Command and Captain Corps milestones and 
 three systems for the Sector Cartographer milestone. Rebuilding does not stop at one
 world: it restocks relief bags at a dock and keeps restoring devastated colonies until
 five rebuilt worlds and three relief deliveries bank Rebuilder and Relief Runner. It also
-boards every derelict it finds (cautiously) until five hulks bank Wreck Diver. A
-smuggling run buys one contraband lot, ferries the
-high-security cordon the snapshot quotes and dumps it when the scan lands; a live
-heat spike is vented and the purge damage serviced at the next dock.
+boards every derelict it finds (cautiously) until five hulks bank Wreck Diver, and it
+keeps the escort corps staffed — releasing officers from dead hulls and recruiting at a
+dock when every crew member is already committed. A smuggling run buys one contraband
+lot, ferries the high-security cordon the snapshot quotes and dumps it when the scan
+lands; a live heat spike is vented and the purge damage serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a

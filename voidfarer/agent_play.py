@@ -256,7 +256,9 @@ class AiCaptain:
     REBUILD_TARGET = 5
     REBUILD_ATTEMPT_LIMIT = 8
     RELIEF_RUNNER_TARGET = 3
-    REBUILD_STOCK_LIMIT = 6
+    # Three bags can need one purchase per commodity each, so six purchases only ever
+    # funded two deliveries (ADR-440).
+    REBUILD_STOCK_LIMIT = 9
 
     # The codex's field-team milestone: five completed expeditions. The tour launches
     # one team and protects it, so the post-story captain keeps deploying fresh teams
@@ -379,6 +381,10 @@ class AiCaptain:
         self.squadron_done = False
         self.squadron_tried: set[tuple[str, str]] = set()
         self.squadron_buys = 0
+        # Dead hulls the corps milestone released an officer from (ADR-440).
+        self.squadron_dismissed: set[str] = set()
+        # Officers recruited at a dock for the corps milestone, bounded by its target.
+        self.squadron_recruits = 0
         # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
         self.pact_tried: set[tuple[str, str]] = set()
         # One pirate may be fought per campaign when the hull is healthy (ADR-431).
@@ -1779,7 +1785,11 @@ class AiCaptain:
                 return None
         system = self.state.get("current_system") or {}
         orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
-        if report.get("restorable") and orbiting:
+        # A body whose structure was just reported is known; whether or not the report
+        # says restorable, orbiting it again would only repeat the same answer. Only a
+        # restorable report used to mark the body, so a system without a restorable
+        # structure re-orbited its first candidate forever (ADR-440).
+        if orbiting:
             self.megastructure_probed.add(orbiting)
         for body in system.get("bodies") or []:
             if not isinstance(body, dict):
@@ -1791,6 +1801,7 @@ class AiCaptain:
                 continue
             if body_id in self.megastructure_probed:
                 continue
+            self.megastructure_probed.add(body_id)
             return "/api/orbit", {"target": body_id}, "orbit"
         return None
 
@@ -2187,6 +2198,35 @@ class AiCaptain:
                          "action": "assign"},
                         "escort_captain",
                     )
+            # No free officer: every crew member is stationed or already a captain.
+            # A dead bought hull keeps its officer out of the pool forever, so release
+            # that officer here, once per hull, while the corps is still short; the
+            # ADR-402 one-shot dismissal stays untouched. When even that pool is empty,
+            # recruit one officer at the docks, bounded by the corps target (ADR-440).
+            if not crew:
+                wrecks = [
+                    str(ship["id"]) for ship in rows
+                    if int(ship.get("hull") or 0) <= 0
+                    and str(ship.get("role") or "") != "prize"
+                    and str(ship.get("captain_id") or "")
+                    and str(ship["id"]) not in self.squadron_dismissed
+                ]
+                if wrecks:
+                    self.squadron_dismissed.add(wrecks[0])
+                    return ("/api/fleet/escort/dismiss", {"ship_id": wrecks[0]},
+                            "fleet_dismiss")
+                credits = int((self.state.get("ship") or {}).get("credits") or 0)
+                roles = sorted(
+                    (int(role.get("cost") or 0), str(role.get("id") or ""))
+                    for role in self.state.get("crew_roles") or []
+                    if isinstance(role, dict) and role.get("id")
+                )
+                if self.squadron_recruits < self.CAPTAIN_CORPS_TARGET:
+                    for cost, role_id in roles:
+                        if credits < cost:
+                            continue
+                        self.squadron_recruits += 1
+                        return ("/api/crew/recruit", {"role_id": role_id}, "crew")
         if commissioned < self.SQUADRON_TARGET:
             # Never buy a hull that would sit unstaffed: a living escort without a
             # captain is the next assignment, so the purchase waits for it. When no

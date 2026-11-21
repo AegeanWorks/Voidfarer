@@ -137,6 +137,13 @@ class ReliefRunTest(unittest.TestCase):
         self.assertGreater(AiCaptain.REBUILD_STOCK_LIMIT, 0)
         self.assertLess(AiCaptain.REBUILD_STOCK_LIMIT, 20)
 
+    def test_the_stock_budget_covers_three_full_bags(self):
+        self.assertGreaterEqual(
+            AiCaptain.REBUILD_STOCK_LIMIT,
+            AiCaptain.RELIEF_RUNNER_TARGET * len(AiCaptain.RELIEF_CARGO),
+            "each delivery can need one purchase per commodity",
+        )
+
     def test_the_relief_target_mirrors_the_codex_entry(self):
         self.assertEqual(
             AiCaptain.RELIEF_RUNNER_TARGET,

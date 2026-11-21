@@ -9,8 +9,8 @@
 - **Total Python Modules**: `269`
 - **Total Classes**: `638`
 - **Total Top-Level Functions**: `589`
-- **Total Class Methods**: `3380`
-- **Total Source Lines**: `73984`
+- **Total Class Methods**: `3387`
+- **Total Source Lines**: `74125`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`269` module(s))
@@ -87,7 +87,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `3315` lines
+**Size**: `3352` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -433,6 +433,8 @@
   - Method `.test_a_restorable_orbited_structure_is_restored()`
   - Method `.test_a_completed_structure_is_skipped_for_the_next_candidate()`
   - Method `.test_a_plain_body_orbits_the_first_restorable_type()`
+  - Method `.test_a_probed_body_is_not_orbited_twice()`
+  - Method `.test_the_probe_budget_bounds_an_exhausted_system()`
   - Method `.test_an_unaffordable_restore_waits()`
   - Method `.test_it_needs_the_campaign_and_a_candidate()`
   - Method `.test_the_restore_is_one_shot()`
@@ -4111,7 +4113,7 @@
 ### [`tests/test_rebuild_relief_run.py`](tests/test_rebuild_relief_run.py)
 > *The rebuild sweep stocks relief to bank the Relief Runner milestone (ADR-438).*
 
-**Size**: `148` lines
+**Size**: `155` lines
 
 **Classes:**
 - `class ReliefRunTest`
@@ -4124,6 +4126,7 @@
   - Method `.test_after_five_rebuilds_only_relief_continues()`
   - Method `.test_both_targets_stop_the_sweep()`
   - Method `.test_the_stock_budget_is_bounded()`
+  - Method `.test_the_stock_budget_covers_three_full_bags()`
   - Method `.test_the_relief_target_mirrors_the_codex_entry()`
 
 **Functions:**
@@ -4737,7 +4740,7 @@
 ### [`tests/test_squadron_policy.py`](tests/test_squadron_policy.py)
 > *The post-story captain builds and staffs a squadron (ADR-435).*
 
-**Size**: `156` lines
+**Size**: `213` lines
 
 **Classes:**
 - `class SquadronPolicyTest`
@@ -4751,10 +4754,14 @@
   - Method `.test_a_stationed_or_injured_member_is_not_a_captain()`
   - Method `.test_a_destroyed_hull_is_not_staffed()`
   - Method `.test_the_last_commission_proceeds_without_free_crew_once_the_corps_is_banked()`
+  - Method `.test_a_dead_hull_releases_its_officer_when_no_crew_is_free()`
+  - Method `.test_a_released_hull_is_not_dismissed_twice()`
+  - Method `.test_an_officer_is_recruited_when_no_crew_is_free()`
+  - Method `.test_an_unaffordable_recruit_stays_quiet()`
   - Method `.test_the_targets_match_the_codex_milestones()`
 
 **Functions:**
-- `def _captain(commissions, assigned, ships, crew, credits, docked, story, done)`
+- `def _captain(commissions, assigned, ships, crew, credits, docked, story, done, roles)`
 - `def _ship(ship_id, hull, captain_id)`
 - `def _crew(member_id, role, station)`
 
@@ -5633,7 +5640,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3614` lines
+**Size**: `3654` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
