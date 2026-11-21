@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `264`
-- **Total Classes**: `633`
-- **Total Top-Level Functions**: `582`
-- **Total Class Methods**: `3324`
-- **Total Source Lines**: `73027`
+- **Total Python Modules**: `265`
+- **Total Classes**: `634`
+- **Total Top-Level Functions**: `585`
+- **Total Class Methods**: `3335`
+- **Total Source Lines**: `73277`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`264` module(s))
+- **Indexed**: python (`265` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4663,6 +4663,31 @@
 
 ---
 
+### [`tests/test_squadron_policy.py`](tests/test_squadron_policy.py)
+> *The post-story captain builds and staffs a squadron (ADR-435).*
+
+**Size**: `142` lines
+
+**Classes:**
+- `class SquadronPolicyTest`
+  - Method `.test_an_unstaffed_escort_gets_a_captain_first()`
+  - Method `.test_a_second_escort_is_commissioned_once_every_hull_is_staffed()`
+  - Method `.test_nothing_runs_before_the_campaign()`
+  - Method `.test_nothing_is_bought_away_from_a_dock()`
+  - Method `.test_the_credit_reserve_blocks_a_purchase()`
+  - Method `.test_both_targets_stop_the_policy()`
+  - Method `.test_a_refused_pair_falls_through_to_the_next_crew()`
+  - Method `.test_a_stationed_or_injured_member_is_not_a_captain()`
+  - Method `.test_a_destroyed_hull_is_not_staffed()`
+  - Method `.test_the_targets_match_the_codex_milestones()`
+
+**Functions:**
+- `def _captain(commissions, assigned, ships, crew, credits, docked, story, done)`
+- `def _ship(ship_id, hull, captain_id)`
+- `def _crew(member_id, role, station)`
+
+---
+
 ### [`tests/test_state_machines.py`](tests/test_state_machines.py)
 > *Canonical state-machine registry, inspector, gate and surface tests.*
 
@@ -5514,7 +5539,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3307` lines
+**Size**: `3415` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5568,6 +5593,7 @@
   - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until both broker milestones (ADR-434).*
   - Method `._research_action()` - *Start the next available research project after the campaign (ADR-432).*
   - Method `._away_rotation_action()` - *Keep away teams deployed after the campaign (ADR-433).*
+  - Method `._squadron_action()` - *Commission and staff escorts up to the squadron milestones (ADR-435).*
   - Method `._survey_action()` - *Finish one full-system survey after the campaign (ADR-427).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*

@@ -244,6 +244,14 @@ class AiCaptain:
     # until the milestone is banked (ADR-433).
     AWAY_MISSION_TARGET = 5
 
+    # The codex's squadron milestone: three commissioned escorts, and Captain Corps:
+    # three assigned escort captains. The tour commissions one and staffs it, so the
+    # post-story captain buys and staffs the rest (ADR-435).
+    SQUADRON_TARGET = 3
+    CAPTAIN_CORPS_TARGET = 3
+    # Keep enough credits for repairs and fuel after a hull purchase.
+    SQUADRON_CREDIT_RESERVE = 1000
+
     # A body hosts a derelict about 40% of the time, so three probes are enough to
     # find one while a derelict-free system cannot eat the post-story errands.
     SALVAGE_PROBE_LIMIT = 3
@@ -335,6 +343,11 @@ class AiCaptain:
         # pairs already tried, so a refused launch cannot repeat (ADR-433).
         self.away_rotation_done = False
         self.away_launch_tried: set[tuple[str, str]] = set()
+        # Squadron state: the target is reached, the (ship, crew) pairs tried and the
+        # purchase attempts, so a refused action cannot repeat (ADR-435).
+        self.squadron_done = False
+        self.squadron_tried: set[tuple[str, str]] = set()
+        self.squadron_buys = 0
         # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
         self.pact_tried: set[tuple[str, str]] = set()
         # One pirate may be fought per campaign when the hull is healthy (ADR-431).
@@ -622,6 +635,12 @@ class AiCaptain:
         chassis = self._chassis_action()
         if chassis is not None:
             return chassis
+
+        # A squadron of three staffed escorts is the fleet's lifetime milestone pair;
+        # the tour commissions one, so the rest are bought and staffed here (ADR-435).
+        squadron = self._squadron_action()
+        if squadron is not None:
+            return squadron
 
         # The docked broker is armed on a live quote after the campaign, proves one
         # automated trade, and is stood down before its loop can fill the hold (ADR-380).
@@ -1985,6 +2004,95 @@ class AiCaptain:
                 continue
             self.away_launch_tried.add((mission_type, body_id))
             return "/api/away/launch", {"mission_type": mission_type}, "away"
+        return None
+
+    def _squadron_action(self):
+        """Commission and staff escorts up to the squadron milestones (ADR-435).
+
+        A campaign ends with one commissioned corvette and one captain: the tour buys
+        a single escort and the Act battles destroy it, so Squadron Command (three
+        escorts) and Captain Corps (three captains) stay unreachable even though the
+        milestones count lifetime commissions and assignments. The policy staffs every
+        living escort without a captain first, then commissions the cheapest hull
+        until three exist; each (ship, crew) pair is tried once and purchases are
+        bounded, so a refusal cannot loop.
+        """
+        if self.squadron_done:
+            return None
+        stats = self.state.get("stats") or {}
+        commissioned = sum(
+            int(value)
+            for key, value in stats.items()
+            if key.startswith("escort_commissions_")
+        )
+        assigned = int(stats.get("escort_captains_assigned") or 0)
+        if (commissioned >= self.SQUADRON_TARGET
+                and assigned >= self.CAPTAIN_CORPS_TARGET):
+            self.squadron_done = True
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if not self._is_docked():
+            return None
+        rows = self._escort_rows()
+        commanded = {str(ship.get("captain_id") or "") for ship in rows}
+        crew = [
+            member for member in self.state.get("crew") or []
+            if isinstance(member, dict)
+            and member.get("id")
+            and str(member.get("status")) == "active"
+            and int(member.get("injury_ticks") or 0) == 0
+            and not str(member.get("station") or "").strip()
+            and str(member.get("id")) not in commanded
+        ]
+        if assigned < self.CAPTAIN_CORPS_TARGET:
+            for ship in rows:
+                hull = int(ship.get("hull") or 0)
+                if hull <= 0 or str(ship.get("captain_id") or ""):
+                    continue
+                ship_id = str(ship["id"])
+                for member in crew:
+                    crew_id = str(member["id"])
+                    pair = (ship_id, crew_id)
+                    if pair in self.squadron_tried:
+                        continue
+                    self.squadron_tried.add(pair)
+                    return (
+                        "/api/fleet/escort/captain",
+                        {"ship_id": ship_id, "crew_id": crew_id,
+                         "action": "assign"},
+                        "escort_captain",
+                    )
+        if commissioned < self.SQUADRON_TARGET:
+            # Never buy a hull that would sit unstaffed: a living escort without a
+            # captain is the next assignment, so the purchase waits for it (and only
+            # a crew member who could command the new hull opens another slot).
+            unstaffed = any(
+                int(ship.get("hull") or 0) > 0
+                and not str(ship.get("captain_id") or "")
+                for ship in rows
+            )
+            if not crew or unstaffed:
+                return None
+            catalog = (self.state.get("fleet_manager") or {}).get("catalog") or {}
+            options = [
+                (int(row.get("cost") or 0), str(key))
+                for key, row in catalog.items()
+                if isinstance(row, dict) and int(row.get("cost") or 0) > 0
+            ]
+            if not options or self.squadron_buys >= self.SQUADRON_TARGET:
+                return None
+            cost, escort_type = min(options)
+            credits = int((self.state.get("ship") or {}).get("credits") or 0)
+            if credits < cost + self.SQUADRON_CREDIT_RESERVE:
+                return None
+            self.squadron_buys += 1
+            return (
+                "/api/fleet/escort/buy",
+                {"escort_type": escort_type,
+                 "system_id": (self.state.get("current_system") or {}).get("id", "")},
+                "fleet",
+            )
         return None
 
     def _survey_action(self):
