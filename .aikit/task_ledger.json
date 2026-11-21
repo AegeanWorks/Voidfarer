@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "sector-sweep",
+    "task_id": "rebuild-sweep",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795250493.9293573,
+    "updated_at": 1795253702.1432295,
     "owner": "kilo:goal",
-    "lease_until": 1795257693.9293573,
+    "lease_until": 1795260902.1432295,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,57 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795250519.157587,
-    "completed_head": "b0db0e8d4cf1a24ad05b0eac56d83efe1e168689",
-    "completed_tree": "6bbfd3f77f7d4975149401f1c84599f00778125a"
+    "completed_at": 1795253722.75705,
+    "completed_head": "71d3753af49fb75a208cb0807deb591de2274544",
+    "completed_tree": "942285d63c5ae43070c53ae09ef4abb68a77649a"
   },
   "checkpoints": [
-    {
-      "task_id": "post-story-endurance",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] 10,000 steps in 20 segments: 0 errors, 0 save/reload drifts, 104 mechanics/101 succeeded/101 attempted/16 refusals; README updated to 104 families; 6/6 project gates with the suite green (ADR-430); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795199654.4414108,
-      "timestamp_str": "2026-11-20 21:34:14",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "post-story-endurance",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'post-story-endurance' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795199786.6959524,
-      "timestamp_str": "2026-11-20 21:36:26",
-      "agent": "kilo:goal",
-      "head": "3b3aa3c746fa0cab60913d09a64a40158ea6e3ec",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "pirate-fight-proof",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Fight one post-story pirate when clearly stronger",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795202120.5493965,
-      "timestamp_str": "2026-11-20 22:15:20",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the pirate branch always evaded, so the engine fight path (refuse toll, generate enemy, start combat, bounty, pirates_fought) and the first step of corsair_bane had no AI proof",
-        "benefits": "seed 8 now fights a pirate end to end while the damaged and pre-story cases still evade, and one fight per campaign bounds the detour",
-        "risks": "contract: one additive action helper and a one-fight flag; dependency: none; concurrency: none; state: no schema change",
-        "mitigation": "six failing-first tests for the strong fight, half-hull threshold, damaged evade, pre-story evade, one-fight guard and no-encounter case, plus three campaign seeds"
-      },
-      "plan_digest": "b2d764b3f62f7e34e20ac9addb0c6e7155f41cf273b4c1014b89d5bf18a5721c"
-    },
     {
       "task_id": "pirate-fight-proof",
       "phase": "in_progress",
@@ -383,6 +337,65 @@
       "timestamp_str": "2026-11-21 11:41:59",
       "agent": "kilo:goal",
       "head": "b0db0e8d4cf1a24ad05b0eac56d83efe1e168689",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "rebuild-sweep",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Keep rebuilding devastated worlds to the Rebuilder milestone",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795251718.614629,
+      "timestamp_str": "2026-11-21 12:01:58",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the post-story reconstruction errand runs once, so worlds_rebuilt plus relief_deliveries ends at 1 of 5 and both Rebuilder and (partly) Relief Runner stay unreachable while dozens of devastated colonies remain",
+        "benefits": "every seed banks Rebuilder and gains the standing, capacity and relief payouts of four more reconstructions",
+        "risks": "contract: a new post-story sweep after the established one-shot errand; the ADR-395/425 action and its tests are untouched; dependency: none; concurrency: none; state: one attempt counter, no schema change",
+        "mitigation": "ten failing-first tests for the credit and relief routes, the target, the orbit step, the pre-campaign and pre-success gates, the attempt bound and the codex mirror, plus six campaigns and the 180-step gate"
+      },
+      "plan_digest": "7a134c9bdaa4af3b6a91132d54349406a6c2c24492ce865a8b388237c9e69fcd",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "rebuild-sweep",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All six campaigns bank Rebuilder (5 rebuilt worlds: 4 credit + 1 relief on seeds 1/42/2/6/11, 5 credit on seed 8) with 0 errors and the entry leaves every leftover list; codex 50-53 of 62 (seed 8 53, seeds 42/6 52, seeds 1/2/11 50; was 49-52); headline proofs retained (full survey+megastructure+both pacts+10 quantum orders on all six, customs on 42/2/6/11, prize capture on 42/6/8, pirate fight on 1/11); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2316 OK with README tree at 202 suites (ADR-437); 6/6 gates passed individually (hygiene, guidelines, secrets, dependencies, test, mechanics); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795253702.1432295,
+      "timestamp_str": "2026-11-21 12:35:02",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "rebuild-sweep",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'rebuild-sweep' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795253722.8444812,
+      "timestamp_str": "2026-11-21 12:35:22",
+      "agent": "kilo:goal",
+      "head": "71d3753af49fb75a208cb0807deb591de2274544",
       "delivery": {
         "roots": [
           "."
