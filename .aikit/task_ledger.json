@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "squadron-milestones",
+    "task_id": "sector-sweep",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795248650.3877952,
+    "updated_at": 1795250493.9293573,
     "owner": "kilo:goal",
-    "lease_until": 1795255850.3877952,
+    "lease_until": 1795257693.9293573,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,57 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795248661.441638,
-    "completed_head": "db62dca45140193a9372b0e4e7f19efe6a841408",
-    "completed_tree": "efc7e7108258303b8f2efb82246efbd8a7e75a7d"
+    "completed_at": 1795250519.157587,
+    "completed_head": "b0db0e8d4cf1a24ad05b0eac56d83efe1e168689",
+    "completed_tree": "6bbfd3f77f7d4975149401f1c84599f00778125a"
   },
   "checkpoints": [
-    {
-      "task_id": "quantum-freight-run",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] seed 11 reaches automation orders 5 and trade-order counter 6 with both pacts, survey and 42 codex entries; five seeds 0 errors with codex 40-43; reconstruct+megastructure on all five, customs on 42/2/6, gambit on 1/6/8, prize sale on 6; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2256 OK with README tree at 196 suites (ADR-429); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795198505.8843753,
-      "timestamp_str": "2026-11-20 21:15:05",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "quantum-freight-run",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'quantum-freight-run' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795198543.5038579,
-      "timestamp_str": "2026-11-20 21:15:43",
-      "agent": "kilo:goal",
-      "head": "145cb3a574143872d07be34bed03d630c01cf0cc",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "post-story-endurance",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Validate the post-story errand set over a 10,000-step campaign",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795199654.120083,
-      "timestamp_str": "2026-11-20 21:34:14",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "fourteen stateful post-story behaviours were each verified at 2,000 steps but never together past that horizon, where stale flags and exhausted guards would surface",
-        "benefits": "the long-horizon companion to the per-commit gate, with save/reload drift checked at every hand-off",
-        "risks": "contract: documentation only, no code change; dependency: none; concurrency: none; state: none",
-        "mitigation": "run the shipped endurance tool on seed 11 for 10,000 steps and record the result in the README and register"
-      },
-      "plan_digest": "0d6ca0eaa3bca6c151409b5a196e7cc204b6476b7b3f4389833f9cd5c16ae67c"
-    },
     {
       "task_id": "post-story-endurance",
       "phase": "in_progress",
@@ -370,6 +324,65 @@
       "timestamp_str": "2026-11-21 11:11:01",
       "agent": "kilo:goal",
       "head": "db62dca45140193a9372b0e4e7f19efe6a841408",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "sector-sweep",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Sweep three systems for the Sector Cartographer milestone",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795250331.799171,
+      "timestamp_str": "2026-11-21 11:38:51",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the survey sweep stops after one full system, so Sector Cartographer (three surveys) stays at 1 of 3 even though the survey bonus, scans and milestone pay",
+        "benefits": "every seed banks Sector Cartographer and adds two survey bonuses plus their scans",
+        "risks": "contract: the sweep leaves a swept system along a fresh hyperlane; dependency: none; concurrency: none; state: three run fields, no schema change",
+        "mitigation": "ten failing-first tests for the jump, tried-set, budget, abandonment, target, isolation and codex mirror, plus six benchmark campaigns and the 180-step gate"
+      },
+      "plan_digest": "566bc766897ffdc517042acb97834446482d6e4a8028712034616edb1c7a4da2",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "sector-sweep",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All six campaigns bank Sector Cartographer (systems_surveyed 3, 47-49 scans, 0 errors) and the entry leaves every leftover list; codex 49-52 of 62 (seed 6 52, seed 42 51, seed 1 50, seed 8 50, seed 2 49, seed 11 49; was 48-50); reconstruction still exercised on all six (credits or relief), as are full survey, megastructure, both pacts and 10 quantum orders; customs on 42/2/6/11, prize capture on 6, pirate fight on 1/42/6/8/11; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2306 OK with README tree at 201 suites (ADR-436); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795250493.9293573,
+      "timestamp_str": "2026-11-21 11:41:33",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "sector-sweep",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'sector-sweep' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795250519.298225,
+      "timestamp_str": "2026-11-21 11:41:59",
+      "agent": "kilo:goal",
+      "head": "b0db0e8d4cf1a24ad05b0eac56d83efe1e168689",
       "delivery": {
         "roots": [
           "."
