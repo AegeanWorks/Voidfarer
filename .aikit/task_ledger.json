@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "wreck-sweep",
+    "task_id": "bounded-errands",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795264066.9118395,
+    "updated_at": 1795270373.0846438,
     "owner": "kilo:goal",
-    "lease_until": 1795271266.9118395,
+    "lease_until": 1795277573.0846438,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795264094.2842212,
-    "completed_head": "ffe33ca0f1f2b885a4b55d41c9ae0dbc4cd0b88f",
-    "completed_tree": "65f782c27ef8d900c76b4942c109adf97a85a514"
+    "completed_at": 1795270401.6583283,
+    "completed_head": "53a85d761959b7b0bcd9892fe4ec1ef5ebedd014",
+    "completed_tree": "a9beda099b3ba4757e20c66ea08b45b50f2f539d"
   },
   "checkpoints": [
-    {
-      "task_id": "away-team-rotation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] All six benchmark campaigns reach away_missions 5 and bank field_team with 0 errors; codex rises to 43-46 of 62 (seed 1 46, seed 6/8/11 45, seed 42 44, seed 2 43); headline proofs retained (reconstruct+survey+megastructure+both pact types+quantum freight on all six, customs on 42/2/6/11, prize capture+sale on 42 and 6, pirate fight on every seed); decorated_crew stays out of reach (two medals need five missions for two crew); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2281 OK with README tree at 199 suites (ADR-433); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795213901.7109666,
-      "timestamp_str": "2026-11-21 01:31:41",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "away-team-rotation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'away-team-rotation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795213916.9605813,
-      "timestamp_str": "2026-11-21 01:31:56",
-      "agent": "kilo:goal",
-      "head": "d301aa7b2cd9cd906e428cebe377dc2116eac215",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "freight-milestone",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Run quantum freight to the freight-baron milestone (ten deliveries)",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795214636.8072572,
-      "timestamp_str": "2026-11-21 01:43:56",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the automated run disarms at the broker target of five automated orders, so deliveries end at 5-7 and the freight_baron milestone (ten deliveries) stays unreachable while the lane and its credits are available",
-        "benefits": "one longer run banks both quantum_broker and freight_baron, earning the extra freight payouts instead of idling the lane",
-        "risks": "contract: the run stop becomes deliveries>=10 and orders>=5 with a hard order cap; dependency: none; concurrency: none; state: one additive constant",
-        "mitigation": "failing-first tests for the mid-run continuation, the dual stop, the hard cap, the legacy-save completion and both codex mirrors, plus six benchmark campaigns and the 180-step gate"
-      },
-      "plan_digest": "679caff70db2585f0231c9d3e7e712990634c413b0337cf0f72d440b3ebe5585",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "freight-milestone",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-21 15:28:14",
       "agent": "kilo:goal",
       "head": "ffe33ca0f1f2b885a4b55d41c9ae0dbc4cd0b88f",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "bounded-errands",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Bound the megastructure probe, fund three relief bags and pool corps officers",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795270327.1511798,
+      "timestamp_str": "2026-11-21 17:12:07",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "ADR-439's boardings exposed a re-orbit loop (417 wasted orbits on seed 2), a six-purchase relief budget that funded only two bags, and a corps short of its third officer with every crew member committed",
+        "benefits": "seed 2 recovers Relief Runner and its megastructure, seed 11 banks Captain Corps and Ace, and no errand can spin on the same body",
+        "risks": "contract: the megastructure probe marks bodies on issue and on arrival, the stock budget rises to nine and the corps releases dead-hull officers and recruits at a dock, all bounded; dependency: none; concurrency: none; state: three run fields, no schema change",
+        "mitigation": "six failing-first tests (two probe, one stock, three corps) plus six campaigns, the 180-step gate and the full suite"
+      },
+      "plan_digest": "050b556d9ea18b47cfa95d0599bcddd182c648d97afe48e90350021caf72243d",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "bounded-errands",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All six campaigns finish 53-55 of 62 codex entries (seed 8 55, seeds 42/2/6/11 54, seed 1 53; was 50-54) with 0 errors; ADR-439 losses recovered (seed 2 Relief Runner + megastructure, seed 11 Captain Corps + Ace); every milestone banks on every seed and all headline mechanics hold on all six; megastructure probe no longer loops (marks on issue and arrival); stock budget 9 funds three bags; corps releases dead-hull officers once per hull then recruits at dock, bounded; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2345 OK with README tree at 204 suites (ADR-440); hygiene/secrets/deps/guidelines/mechanics pass; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795270373.0846438,
+      "timestamp_str": "2026-11-21 17:12:53",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "bounded-errands",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'bounded-errands' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795270401.7220356,
+      "timestamp_str": "2026-11-21 17:13:21",
+      "agent": "kilo:goal",
+      "head": "53a85d761959b7b0bcd9892fe4ec1ef5ebedd014",
       "delivery": {
         "roots": [
           "."
