@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `268`
-- **Total Classes**: `637`
-- **Total Top-Level Functions**: `588`
-- **Total Class Methods**: `3368`
-- **Total Source Lines**: `73815`
+- **Total Python Modules**: `269`
+- **Total Classes**: `638`
+- **Total Top-Level Functions**: `589`
+- **Total Class Methods**: `3380`
+- **Total Source Lines**: `73984`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`268` module(s))
+- **Indexed**: python (`269` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -87,7 +87,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `3299` lines
+**Size**: `3315` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -474,6 +474,8 @@
   - Method `.test_a_probed_derelict_moves_to_the_next_candidate()`
   - Method `.test_the_probe_is_capped()`
   - Method `.test_a_claimed_derelict_is_not_probed_again()`
+  - Method `.test_a_detected_site_is_claimed_even_after_a_salvage()`
+  - Method `.test_a_detected_site_is_left_alone_once_the_milestone_is_banked()`
   - Method `.test_a_low_tank_orbits_a_scoopable_body()`
   - Method `.test_a_healthy_tank_does_not_scoop()`
   - Method `.test_an_available_scoop_here_is_claimed_directly()`
@@ -5454,6 +5456,28 @@
 
 ---
 
+### [`tests/test_wreck_sweep.py`](tests/test_wreck_sweep.py)
+> *The post-story captain boards every derelict it can find (ADR-439).*
+
+**Size**: `94` lines
+
+**Classes:**
+- `class WreckSweepTest`
+  - Method `.test_a_detected_hulk_is_claimed_cautiously()`
+  - Method `.test_the_next_body_is_probed_when_no_hulk_is_detected()`
+  - Method `.test_an_already_probed_or_claimed_body_is_skipped()`
+  - Method `.test_the_target_stops_the_sweep()`
+  - Method `.test_nothing_runs_before_the_campaign()`
+  - Method `.test_the_probe_budget_bounds_the_sweep()`
+  - Method `.test_a_probe_spends_one_budget_step()`
+  - Method `.test_an_exhausted_system_stays_quiet_for_the_next_one()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _captain(bodies, orbiting, site, salvage, completed, probes, probed)`
+
+---
+
 ### [`tools/__init__.py`](tools/__init__.py)
 > *Developer proofs for VoidFarer.*
 
@@ -5609,7 +5633,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3555` lines
+**Size**: `3614` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5669,6 +5693,7 @@
   - Method `._survey_next_system(system)` - *Leave a swept or stalled system along a fresh hyperlane (ADR-436).*
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*
+  - Method `._wreck_sweep_action()` - *Board every derelict the captain can find (ADR-439).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
   - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*

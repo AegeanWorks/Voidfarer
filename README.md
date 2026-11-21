@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (203 suites)
+└── tests/                <- unit & integration test suite (204 suites)
 ```
 
 ---
@@ -442,7 +442,8 @@ both the Quantum Broker and Freight Baron milestones. It also commissions and st
 three-escort squadron for the Squadron Command and Captain Corps milestones and sweeps
 three systems for the Sector Cartographer milestone. Rebuilding does not stop at one
 world: it restocks relief bags at a dock and keeps restoring devastated colonies until
-five rebuilt worlds and three relief deliveries bank Rebuilder and Relief Runner. A
+five rebuilt worlds and three relief deliveries bank Rebuilder and Relief Runner. It also
+boards every derelict it finds (cautiously) until five hulks bank Wreck Diver. A
 smuggling run buys one contraband lot, ferries the
 high-security cordon the snapshot quotes and dumps it when the scan lands; a live
 heat spike is vented and the purge damage serviced at the next dock.

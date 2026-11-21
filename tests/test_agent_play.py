@@ -3142,6 +3142,22 @@ class SalvageScoopProspectingTest(unittest.TestCase):
         captain.succeeded.add("/api/salvage")
         self.assertIsNone(captain._salvage_action())
 
+    def test_a_detected_site_is_claimed_even_after_a_salvage(self):
+        captain = self._captain(
+            orbiting_body={"id": "kepler_ice", "body_type": "ice_world"},
+            salvage_site={"body_id": "kepler_ice", "name": "Freighter Wreck"})
+        captain.succeeded.add("/api/salvage")
+        self.assertEqual(captain._salvage_action(),
+                         ("/api/salvage", {}, "salvage"))
+
+    def test_a_detected_site_is_left_alone_once_the_milestone_is_banked(self):
+        captain = self._captain(
+            orbiting_body={"id": "kepler_ice", "body_type": "ice_world"},
+            salvage_site={"body_id": "kepler_ice", "name": "Freighter Wreck"})
+        captain.succeeded.add("/api/salvage")
+        captain.state["stats"] = {"salvage": AiCaptain.WRECK_TARGET}
+        self.assertIsNone(captain._salvage_action())
+
     def test_a_low_tank_orbits_a_scoopable_body(self):
         captain = self._captain(
             ship={"credits": 5000, "fuel": 20, "max_fuel": 80,

@@ -216,6 +216,12 @@ class AiCaptain:
     # captain falls back to the credit rebuild rather than hunting forever.
     RELIEF_STOCK_LIMIT = 6
 
+    # The codex's wreck-diver milestone: five boarded derelicts. The tour boards one,
+    # and the one-shot probe is capped at three bodies, so the post-story captain
+    # keeps boarding every hulk it finds, under its own probe budget (ADR-439).
+    WRECK_TARGET = 5
+    WRECK_PROBE_LIMIT = 24
+
     # The codex's quantum broker target: five automated freight orders (ADR-429).
     QUANTUM_ORDER_TARGET = 5
     # The codex's freight-baron milestone: ten quantum freight deliveries. One run
@@ -339,6 +345,9 @@ class AiCaptain:
         # search orbits the same body twice (ADR-396).
         self.salvage_probed: set[str] = set()
         self.salvage_probes = 0
+        # Wreck sweep state: the post-story boarding probes spent, so a hulk-free
+        # system cannot eat the errands (ADR-439).
+        self.wreck_probes = 0
         self.scoop_probed: set[str] = set()
         # One gambit recall per campaign; a refused recall must not repeat each fight
         # (ADR-397).
@@ -795,6 +804,12 @@ class AiCaptain:
         away = self._away_rotation_action()
         if away is not None:
             return away
+
+        # Derelicts are deterministic and every boarding counts, so a free step probes
+        # and boards the next hulk until the wreck-diver milestone is banked (ADR-439).
+        wreck_sweep = self._wreck_sweep_action()
+        if wreck_sweep is not None:
+            return wreck_sweep
 
         return "/api/time/step", {"ticks": 1}, "time"
 
@@ -2298,16 +2313,22 @@ class AiCaptain:
         """Probe a plausible derelict body after the campaign (ADR-396).
 
         Derelicts are deterministic per body but invisible until the captain orbits
-        one, so the probe is capped instead of scanning the whole system.
+        one, so the probe is capped instead of scanning the whole system. A detected
+        site is claimed immediately, even after the first success, because another
+        errand can orbit the ship away (ADR-439).
         """
         if not (self.state.get("story_status") or {}).get("completed"):
             return None
+        # Claim the derelict under the ship before another errand orbits away; this
+        # also covers the body that reached the probe limit (ADR-396). The claim keeps
+        # firing after the first success while the wreck-diver milestone needs hulks,
+        # so an incidentally discovered site is never lost to an errand's orbit
+        # (ADR-439).
+        salvage = int((self.state.get("stats") or {}).get("salvage") or 0)
+        if self.state.get("salvage_site") and salvage < self.WRECK_TARGET:
+            return "/api/salvage", {}, "salvage"
         if "/api/salvage" in self.succeeded:
             return None
-        # Claim the derelict under the ship before another errand orbits away; this
-        # also covers the body that reached the probe limit (ADR-396).
-        if self.state.get("salvage_site"):
-            return "/api/salvage", {}, "salvage"
         if self.salvage_probes >= self.SALVAGE_PROBE_LIMIT:
             return None
         current = str((self.state.get("orbiting_body") or {}).get("id") or "")
@@ -2324,6 +2345,44 @@ class AiCaptain:
                 continue
             self.salvage_probed.add(body_id)
             self.salvage_probes += 1
+            return "/api/orbit", {"target": body_id}, "orbit"
+        return None
+
+    def _wreck_sweep_action(self):
+        """Board every derelict the captain can find (ADR-439).
+
+        Derelicts are deterministic per body: roughly three in five eligible bodies
+        hide one, they are invisible until orbited, and any boarding attempt (success
+        or failure) counts as a salvage and claims the hull. The tour boards one, so
+        the codex's wreck-diver milestone (five boarded derelicts) stays at 1 of 5.
+        The sweep orbits unprobed, eligible bodies in the current system and boards a
+        detected hulk cautiously (half the danger, no hull damage on success), under
+        its own probe budget. It does not navigate: fresh systems arrive through the
+        other errands, and an exhausted system simply waits for the next orbit.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        salvage = int((self.state.get("stats") or {}).get("salvage") or 0)
+        if salvage >= self.WRECK_TARGET:
+            return None
+        if self.wreck_probes >= self.WRECK_PROBE_LIMIT:
+            return None
+        if self.state.get("salvage_site"):
+            return "/api/salvage", {"strategy": "cautious"}, "salvage"
+        current = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        system = self.state.get("current_system") or {}
+        for body in system.get("bodies") or []:
+            if not isinstance(body, dict):
+                continue
+            body_id = str(body.get("id") or "")
+            if (not body_id or body_id == current
+                    or body_id in self.salvage_probed
+                    or body.get("station_dockable")
+                    or body.get("salvage_claimed")
+                    or str(body.get("body_type") or "") in self.DERELICT_EXCLUDED_TYPES):
+                continue
+            self.salvage_probed.add(body_id)
+            self.wreck_probes += 1
             return "/api/orbit", {"target": body_id}, "orbit"
         return None
 
