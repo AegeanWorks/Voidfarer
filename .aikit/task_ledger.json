@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "freight-milestone",
+    "task_id": "squadron-milestones",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795217105.4341002,
+    "updated_at": 1795248650.3877952,
     "owner": "kilo:goal",
-    "lease_until": 1795224305.4341002,
+    "lease_until": 1795255850.3877952,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,57 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795217112.8441203,
-    "completed_head": "561b6948aa10700be1ae3f04a21d34fee2da242a",
-    "completed_tree": "c4e45fafc8b8862a99919a29c871ba46c7a43090"
+    "completed_at": 1795248661.441638,
+    "completed_head": "db62dca45140193a9372b0e4e7f19efe6a841408",
+    "completed_tree": "efc7e7108258303b8f2efb82246efbd8a7e75a7d"
   },
   "checkpoints": [
-    {
-      "task_id": "diplomacy-pacts",
-      "phase": "in_progress",
-      "phase_num": 4,
-      "description": "[1/1] Both pacts signed on seed 11 (Precursor Watch + Sol Coalition after their wars close), codex 40-44 of 62 completed and claimed across seeds 1/6/8/11; seed 11 keeps 105/101/101 with sell+gambit+reconstruct+customs+megastructure, seed 6 keeps sell+gambit, 0 errors, refusals 15-19; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2246 OK with README tree at 195 suites (ADR-428); 6/6 project gates; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795193242.8660738,
-      "timestamp_str": "2026-11-20 19:47:22",
-      "agent": "kilo:goal"
-    },
-    {
-      "task_id": "diplomacy-pacts",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'diplomacy-pacts' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795193318.5489147,
-      "timestamp_str": "2026-11-20 19:48:38",
-      "agent": "kilo:goal",
-      "head": "e7408c842660ae835abf0ae746252936ea139cc9",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "quantum-freight-run",
-      "phase": "in_progress",
-      "phase_num": 2,
-      "description": "[1/1] Run automated quantum freight until the broker milestone",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795198505.5301197,
-      "timestamp_str": "2026-11-20 21:15:05",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "ADR-381's policy places one manual order and stands the broker down after a single automated order or its window, and the captain usually has no cargo, so _run_quantum_automation never shipped a load and quantum_broker (five automated orders) was unreachable",
-        "benefits": "the automation path is exercised for real, the broker milestone completes, and the captain earns freight profits instead of leaving the lane idle",
-        "risks": "contract: the ADR-381 policy is renamed _quantum_manual_action and a new automated policy runs first; dependency: none; concurrency: none; state: three run flags",
-        "mitigation": "ten failing-first tests for arming, cheapest-lot buying, cooldown ticks, busy-slot waits, target disarm, gates, idle guard, reset and target mirror, plus five campaign seeds"
-      },
-      "plan_digest": "15be68173f8127ce36a615908fdfbfff80e7bd9a9f4380fd2be652d3d2c8bec9"
-    },
     {
       "task_id": "quantum-freight-run",
       "phase": "in_progress",
@@ -357,6 +311,65 @@
       "timestamp_str": "2026-11-21 02:25:12",
       "agent": "kilo:goal",
       "head": "561b6948aa10700be1ae3f04a21d34fee2da242a",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "squadron-milestones",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Staff and commission escorts to three captains and three hulls",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795248639.099638,
+      "timestamp_str": "2026-11-21 11:10:39",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the tour commissions one corvette and staffs one captain, so Squadron Command and Captain Corps stay at 1 of 3 while the treasury ends rich",
+        "benefits": "both milestones bank on every seed and the fleet gains two staffed hulls for patrol payouts",
+        "risks": "contract: one additive post-story action; dependency: none; concurrency: none; state: two run fields, no schema change",
+        "mitigation": "ten failing-first tests plus six benchmark campaigns and the 180-step gate"
+      },
+      "plan_digest": "ebe2d6f2c709700d347de7826ac343d4849925f9c87d12a0b0c239be50129741",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "squadron-milestones",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] All six campaigns reach 3 commissions and 3 assigned captains with 0 errors, banking Squadron Command and Captain Corps (neither in any leftover list); codex 48-50 of 62 (seed 1 50, seed 6 50, seed 42 49, seed 8 49, seed 2 48, seed 11 48; was 45-48); headline proofs retained (reconstruct+survey+megastructure+both pacts+10 quantum orders on all six, customs on 42/2/6/11, prize capture+sale on 6, pirate fight on 1/42/2/8/11); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2296 OK with README tree at 200 suites (ADR-435); 6/6 project gates; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795248650.3877952,
+      "timestamp_str": "2026-11-21 11:10:50",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "squadron-milestones",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'squadron-milestones' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795248661.505611,
+      "timestamp_str": "2026-11-21 11:11:01",
+      "agent": "kilo:goal",
+      "head": "db62dca45140193a9372b0e4e7f19efe6a841408",
       "delivery": {
         "roots": [
           "."
