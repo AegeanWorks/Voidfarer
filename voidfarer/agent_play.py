@@ -222,6 +222,11 @@ class AiCaptain:
     WRECK_TARGET = 5
     WRECK_PROBE_LIMIT = 24
 
+    # The codex's corsair milestone: five pirate fights. The captain fought one per
+    # campaign through a session flag; the persisted stat now bounds the engagement
+    # so a resumed save cannot keep fighting beyond the target (ADR-441).
+    CORSAIR_TARGET = 5
+
     # The codex's quantum broker target: five automated freight orders (ADR-429).
     QUANTUM_ORDER_TARGET = 5
     # The codex's freight-baron milestone: ten quantum freight deliveries. One run
@@ -387,8 +392,6 @@ class AiCaptain:
         self.squadron_recruits = 0
         # One attempt per (pact action, faction) so a refused signature cannot loop (ADR-428).
         self.pact_tried: set[tuple[str, str]] = set()
-        # One pirate may be fought per campaign when the hull is healthy (ADR-431).
-        self.pirate_fought = False
         # Quantum freight run state: finished, idle steps, last seen order count (ADR-429).
         self.quantum_done = False
         self.quantum_idle = 0
@@ -1021,23 +1024,25 @@ class AiCaptain:
         return "/api/jump", {"target": target}, "jump"
 
     def _pirate_resolution(self):
-        """Fight one post-story pirate when clearly stronger, else evade (ADR-431).
+        """Fight post-story pirates while the hull is healthy, up to the milestone (ADR-441).
 
         The captain has always evaded, so the engine's fight branch (toll refused,
         combat starts, bounty on victory) had no AI proof. Half hull is the safety
-        floor, and one fight per campaign bounds the detour.
+        floor, and the corsair milestone (five fights) bounds the engagement: the
+        policy keeps fighting below that target because the codex counts fights, not
+        kills.
         """
         if not (self.state.get("active_pirate") or {}):
             return None
         ship = self.state.get("ship") or {}
         hull = int(ship.get("hull") or 0)
         max_hull = max(1, int(ship.get("max_hull") or 0))
+        fought = int((self.state.get("stats") or {}).get("pirates_fought") or 0)
         if (
             (self.state.get("story_status") or {}).get("completed")
-            and not self.pirate_fought
+            and fought < self.CORSAIR_TARGET
             and hull * 2 >= max_hull
         ):
-            self.pirate_fought = True
             return "/api/pirate/resolve", {"action": "fight"}, "pirate"
         return "/api/pirate/resolve", {"action": "evade"}, "pirate"
 

@@ -1,4 +1,4 @@
-"""The captain fights a pirate once when it is clearly stronger (ADR-431)."""
+"""The captain fights pirates while the hull is healthy, up to the milestone (ADR-441)."""
 
 from __future__ import annotations
 
@@ -7,12 +7,12 @@ import unittest
 from voidfarer.agent_play import AiCaptain, ApiClient
 
 
-def _captain(hull=400, max_hull=400, completed=True, fought=False):
+def _captain(hull=400, max_hull=400, completed=True, fought=0):
     captain = AiCaptain(ApiClient(port=1), seed=42)
-    captain.pirate_fought = fought
     captain.state = {
         "story_status": {"completed": completed},
         "active_pirate": {"name": "Corsair", "demand": 120},
+        "stats": {"pirates_fought": fought},
         "ship": {"hull": hull, "max_hull": max_hull, "credits": 50000},
     }
     return captain
@@ -36,9 +36,10 @@ class PirateFightPolicyTest(unittest.TestCase):
             _captain(completed=False)._pirate_resolution()[1], {"action": "evade"}
         )
 
-    def test_only_one_pirate_is_fought_per_campaign(self):
+    def test_the_milestone_ends_the_fights(self):
         self.assertEqual(
-            _captain(fought=True)._pirate_resolution()[1], {"action": "evade"}
+            _captain(fought=AiCaptain.CORSAIR_TARGET)._pirate_resolution()[1],
+            {"action": "evade"},
         )
 
     def test_the_threshold_is_half_the_hull(self):

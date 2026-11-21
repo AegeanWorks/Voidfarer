@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `269`
-- **Total Classes**: `638`
-- **Total Top-Level Functions**: `589`
-- **Total Class Methods**: `3387`
-- **Total Source Lines**: `74125`
+- **Total Python Modules**: `270`
+- **Total Classes**: `639`
+- **Total Top-Level Functions**: `590`
+- **Total Class Methods**: `3395`
+- **Total Source Lines**: `74200`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`269` module(s))
+- **Indexed**: python (`270` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1812,6 +1812,27 @@
 **Classes:**
 - `class ContractCardsKeepSizeTests`
   - Method `.test_cards_do_not_shrink_in_the_fixed_height_list()`
+
+---
+
+### [`tests/test_corsair_policy.py`](tests/test_corsair_policy.py)
+> *The post-story captain fights pirates up to the corsair milestone (ADR-441).*
+
+**Size**: `69` lines
+
+**Classes:**
+- `class CorsairPolicyTest`
+  - Method `.test_a_strong_post_story_ship_fights()`
+  - Method `.test_a_damaged_ship_still_evades()`
+  - Method `.test_the_short_gate_always_evades()`
+  - Method `.test_the_milestone_ends_the_fights()`
+  - Method `.test_the_next_pirate_is_fought_below_the_target()`
+  - Method `.test_the_threshold_is_half_the_hull()`
+  - Method `.test_no_pirate_resolves_nothing()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _captain(hull, max_hull, completed, fought)`
 
 ---
 
@@ -3807,16 +3828,16 @@
 ---
 
 ### [`tests/test_pirate_fight.py`](tests/test_pirate_fight.py)
-> *The captain fights a pirate once when it is clearly stronger (ADR-431).*
+> *The captain fights pirates while the hull is healthy, up to the milestone (ADR-441).*
 
-**Size**: `57` lines
+**Size**: `58` lines
 
 **Classes:**
 - `class PirateFightPolicyTest`
   - Method `.test_a_strong_post_story_ship_fights()`
   - Method `.test_a_damaged_ship_still_evades()`
   - Method `.test_the_short_gate_always_evades()`
-  - Method `.test_only_one_pirate_is_fought_per_campaign()`
+  - Method `.test_the_milestone_ends_the_fights()`
   - Method `.test_the_threshold_is_half_the_hull()`
   - Method `.test_no_pirate_resolves_nothing()`
 
@@ -5640,7 +5661,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3654` lines
+**Size**: `3659` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5658,7 +5679,7 @@
   - Method `._anomaly_threshold(choice)`
   - Method `._combat_choice()` - *Pick a combat action from the live state: survival first, then the tactical surface.*
   - Method `._smuggle_action()` - *Buy one contraband lot and run it at the quoted high-security cordon (ADR-400).*
-  - Method `._pirate_resolution()` - *Fight one post-story pirate when clearly stronger, else evade (ADR-431).*
+  - Method `._pirate_resolution()` - *Fight post-story pirates while the hull is healthy, up to the milestone (ADR-441).*
   - Method `._gambit_action()` - *Recall an armed escort and spend its captain's once-per-battle gambit (ADR-397).*
   - Method `._note_refusal(signature, message)` - *Schedule a fast retry, then a slow one, then drop a gate that never opens.*
   - Method `._refusal_may_pass(message)` - *True when the refusal is a resource gate that later play can satisfy.*

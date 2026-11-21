@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (204 suites)
+└── tests/                <- unit & integration test suite (205 suites)
 ```
 
 ---
@@ -445,9 +445,11 @@ world: it restocks relief bags at a dock and keeps restoring devastated colonies
 five rebuilt worlds and three relief deliveries bank Rebuilder and Relief Runner. It also
 boards every derelict it finds (cautiously) until five hulks bank Wreck Diver, and it
 keeps the escort corps staffed — releasing officers from dead hulls and recruiting at a
-dock when every crew member is already committed. A smuggling run buys one contraband
-lot, ferries the high-security cordon the snapshot quotes and dumps it when the scan
-lands; a live heat spike is vented and the purge damage serviced at the next dock.
+dock when every crew member is already committed. It fights every pirate it meets while
+the hull is above half, up to the five fights the Corsair's Bane milestone counts. A
+smuggling run buys one contraband lot, ferries the high-security cordon the snapshot
+quotes and dumps it when the scan lands; a live heat spike is vented and the purge damage
+serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a
