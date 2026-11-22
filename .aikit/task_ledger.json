@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "helium-milestone",
+    "task_id": "decision-cadence",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795306766.1626747,
+    "updated_at": 1795312324.4136472,
     "owner": "kilo:goal",
-    "lease_until": 1795313966.1626747,
+    "lease_until": 1795319524.4136472,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795306798.1888514,
-    "completed_head": "86b3e21234054ac49393c6714b86406c21153e3b",
-    "completed_tree": "142085bf0f1054daef9a867e7787f4ffe6560f5d"
+    "completed_at": 1795312376.860561,
+    "completed_head": "b5182ae96fa5544b7dc670ec8a86556f634bc64f",
+    "completed_tree": "dac48f8d8bf5f098f7fc75a82e6da731c129e2a6"
   },
   "checkpoints": [
-    {
-      "task_id": "relief-run",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] All six campaigns bank Rebuilder and Relief Runner (relief 3 on every seed, total rebuilt 5-7) with 0 errors; seed 8 recovers 3 commissions (Squadron) and banks Ace; codex 50-54 of 62 (42/6/8 54, 11 52, 1 51, 2 50; was 50-53); headline proofs retained (survey+megastructure+both pacts+10 quantum orders on all six, customs 42/2/6/11, prize capture 42/6/8, pirate fight 1/42/6/8/11); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2327 OK, README tree 203 suites, .aikit/cache git-ignored (ADR-438); 6/6 gates pass individually; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795258058.848634,
-      "timestamp_str": "2026-11-21 13:47:38",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "relief-run",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'relief-run' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795258091.538614,
-      "timestamp_str": "2026-11-21 13:48:11",
-      "agent": "kilo:goal",
-      "head": "b6f3e38f1e431461d12ab774a9251b4c3e366576",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "wreck-sweep",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Board every derelict for the wreck-diver milestone",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795264026.8074949,
-      "timestamp_str": "2026-11-21 15:27:06",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the tour boards one hulk and the ADR-396 probe is capped and disabled after its first success, so Wreck Diver stayed at 1 of 5 although two in five eligible bodies hide a deterministic derelict and any boarding counts",
-        "benefits": "Wreck Diver banks on all six seeds; net +3 codex entries with headroom for the rest",
-        "risks": "contract: the post-success claim is now bounded by the milestone; dependency: none; concurrency: none; state: one probe counter, no schema change; schedule churn trades one milestone on two seeds",
-        "mitigation": "eleven failing-first tests (nine sweep + two claim), six campaigns and the unchanged 180-step gate"
-      },
-      "plan_digest": "326752afb72b4c255e85fc35e9ad4dd29afc898527e88de8945f25800d5404bd",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "wreck-sweep",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-22 03:19:58",
       "agent": "kilo:goal",
       "head": "86b3e21234054ac49393c6714b86406c21153e3b",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "decision-cadence",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Run decisions at the frequent cadence for Decision Maker",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795312285.2005632,
+      "timestamp_str": "2026-11-22 04:51:25",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the relaxed cadence resolved only 2-6 decisions per campaign, so the ten-decision milestone was unreachable",
+        "benefits": "Decision Maker banks on all six seeds (24-26 decisions) at a net +4 codex entries across the seeds, and Ace banks on two more",
+        "risks": "contract: the step-0 settings action changes; decision rewards now arrive far more often, which churns the deterministic schedule; dependency: none; concurrency: none; state: none, a constant and one action value",
+        "mitigation": "four failing-first tests, six campaigns, repeated sequential runs to separate transport flakiness from the change, and the unchanged 180-step gate"
+      },
+      "plan_digest": "ae0c5f2b79fbfd4c63196d12b77d9f718d2c85562a6b6f588c3cdb6e5eeeb071",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "decision-cadence",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Decision Maker banks on all six seeds (24-26 resolved); codex 54-56 of 62, net 329 across six seeds vs 325 (seed 2 56 +3, 42/6 56 +1 each, 1/11 level at 54 after trades, 8 54 -1); Ace also banks on seeds 2 and 6; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2375 OK with README tree at 207 suites (ADR-445); transport timeouts were machine contention (sequential reruns 0 errors, no call over 2s); hygiene/secrets/deps/mechanics pass; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795312324.4136472,
+      "timestamp_str": "2026-11-22 04:52:04",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "decision-cadence",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'decision-cadence' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795312377.4780543,
+      "timestamp_str": "2026-11-22 04:52:57",
+      "agent": "kilo:goal",
+      "head": "b5182ae96fa5544b7dc670ec8a86556f634bc64f",
       "delivery": {
         "roots": [
           "."
