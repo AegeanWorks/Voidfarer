@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "capture-window",
+    "task_id": "warlord-hunt",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795354183.8571482,
+    "updated_at": 1795358173.1085339,
     "owner": "kilo:goal",
-    "lease_until": 1795361383.8571482,
+    "lease_until": 1795365373.1085339,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795354211.991124,
-    "completed_head": "8e971694550db4a848dad007cb3ee0bfd4412858",
-    "completed_tree": "b835fdb0a427903c1a72ecd68f59cb6a1836c231"
+    "completed_at": 1795358188.6958818,
+    "completed_head": "198029521dbd9645f65d9dbc1adff8c14c6e6430",
+    "completed_tree": "d548a55a5a8e00f75d9bdf47a971f783c07287bf"
   },
   "checkpoints": [
-    {
-      "task_id": "helium-milestone",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Helium Harvester banks on all six seeds (scoops 10 each) with a net 325 vs 324 codex entries; seed 1 54 (+1), seed 6 55 (+1), seed 2 53 (-1, outpost_warden), seeds 8/11/42 level after one-entry churn each; two rejected variants documented (early orbit without gating: seed 42 fell to 45; no tap cap: seed 8 lost Relief Runner); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2371 OK with README tree at 206 suites (ADR-444); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795306766.1626747,
-      "timestamp_str": "2026-11-22 03:19:26",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "helium-milestone",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'helium-milestone' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795306798.8313053,
-      "timestamp_str": "2026-11-22 03:19:58",
-      "agent": "kilo:goal",
-      "head": "86b3e21234054ac49393c6714b86406c21153e3b",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "decision-cadence",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Run decisions at the frequent cadence for Decision Maker",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795312285.2005632,
-      "timestamp_str": "2026-11-22 04:51:25",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the relaxed cadence resolved only 2-6 decisions per campaign, so the ten-decision milestone was unreachable",
-        "benefits": "Decision Maker banks on all six seeds (24-26 decisions) at a net +4 codex entries across the seeds, and Ace banks on two more",
-        "risks": "contract: the step-0 settings action changes; decision rewards now arrive far more often, which churns the deterministic schedule; dependency: none; concurrency: none; state: none, a constant and one action value",
-        "mitigation": "four failing-first tests, six campaigns, repeated sequential runs to separate transport flakiness from the change, and the unchanged 180-step gate"
-      },
-      "plan_digest": "ae0c5f2b79fbfd4c63196d12b77d9f718d2c85562a6b6f588c3cdb6e5eeeb071",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "decision-cadence",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-22 16:30:12",
       "agent": "kilo:goal",
       "head": "8e971694550db4a848dad007cb3ee0bfd4412858",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "warlord-hunt",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Hunt the riskiest lane for Warlord",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795358154.8416462,
+      "timestamp_str": "2026-11-22 17:35:54",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "every victory comes from a fight the engine rolls per jump, and a peaceful tour met only 8-15 of them, so Warlord's fifteen never banked",
+        "benefits": "three seeds now reach a complete 62/62 codex and the aggregate rises to 366 vs 363",
+        "risks": "contract: constant jumps late in the campaign churn encounter rolls, which cost captains corps spins on early attempts; dependency: /api/galaxy plus StarSystem.from_dict and pirate_risk, all existing; concurrency: none; state: two fields",
+        "mitigation": "thirteen failing-first cases in test_warlord_hunt.py, the corsair-first gate added after the first attempt starved Corsair's Bane to 4/5 on seed 11, and six measured campaigns"
+      },
+      "plan_digest": "067f598b7704bb906e26c692f9cbc2128383f01cc35db35e7a62de0b33c9ed26",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "warlord-hunt",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Warlord banks on 3 of 6 seeds and seeds 2/8/11 reach a complete 62/62 codex (first complete codex in the campaign); aggregate 366 vs 363; seed 6 61, seed 1 60, seed 42 59; remaining gaps are fuel- and encounter-bound, not budget-bound (seed 6 spent 8 of 30 jumps, seed 42 ended at 0/80 fuel); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2439 OK with README tree at 212 suites (ADR-451); hygiene/secrets/deps/mechanics pass; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795358173.1085339,
+      "timestamp_str": "2026-11-22 17:36:13",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "warlord-hunt",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'warlord-hunt' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795358189.1116526,
+      "timestamp_str": "2026-11-22 17:36:29",
+      "agent": "kilo:goal",
+      "head": "198029521dbd9645f65d9dbc1adff8c14c6e6430",
       "delivery": {
         "roots": [
           "."
