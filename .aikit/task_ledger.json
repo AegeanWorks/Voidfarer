@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "warlord-hunt",
+    "task_id": "hunt-refuel",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795358173.1085339,
+    "updated_at": 1795365367.672422,
     "owner": "kilo:goal",
-    "lease_until": 1795365373.1085339,
+    "lease_until": 1795372567.672422,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795358188.6958818,
-    "completed_head": "198029521dbd9645f65d9dbc1adff8c14c6e6430",
-    "completed_tree": "d548a55a5a8e00f75d9bdf47a971f783c07287bf"
+    "completed_at": 1795365388.2835333,
+    "completed_head": "bff003651242f6526ce9b07133317ceb7c3f8f46",
+    "completed_tree": "1341a0592f21ae4a6f7145a4f5f6773527a14e50"
   },
   "checkpoints": [
-    {
-      "task_id": "decision-cadence",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Decision Maker banks on all six seeds (24-26 resolved); codex 54-56 of 62, net 329 across six seeds vs 325 (seed 2 56 +3, 42/6 56 +1 each, 1/11 level at 54 after trades, 8 54 -1); Ace also banks on seeds 2 and 6; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2375 OK with README tree at 207 suites (ADR-445); transport timeouts were machine contention (sequential reruns 0 errors, no call over 2s); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795312324.4136472,
-      "timestamp_str": "2026-11-22 04:52:04",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "decision-cadence",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'decision-cadence' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795312377.4780543,
-      "timestamp_str": "2026-11-22 04:52:57",
-      "agent": "kilo:goal",
-      "head": "b5182ae96fa5544b7dc670ec8a86556f634bc64f",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "fleet-decommission",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Sell every prize and scrap a banked squadron",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795314093.5364888,
-      "timestamp_str": "2026-11-22 05:21:33",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the sale policy allowed exactly one prize and then refused every later sale, stranding captures, and the damaged squadron was never sold even though the codex counts escort sales and the hulls are pure upkeep",
-        "benefits": "Shipbreaker and Privateer bank on all six seeds; codex net 344 vs 329 (+15)",
-        "risks": "contract: the prize sale gate is gone and escorts are sold after the milestones; dependency: none; concurrency: none; state: none; schedule churn costs Relief Runner on seed 1 and Veteran Crew on seed 8",
-        "mitigation": "six failing-first cases in PrizeSalePolicyTest (every-prize-sold, prize-first order, banked decommission, short-corps guard, plus the kept docked/travel/pre-campaign cases), six campaigns, and the unchanged 180-step gate"
-      },
-      "plan_digest": "73f1e1b0f504c543b929e282c1ef09b2fd8d1028a22423bad955c41c2ca42f8a",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "fleet-decommission",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-22 17:36:29",
       "agent": "kilo:goal",
       "head": "198029521dbd9645f65d9dbc1adff8c14c6e6430",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "hunt-refuel",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Refuel the hunt and keep a fuel reserve",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795365349.5775156,
+      "timestamp_str": "2026-11-22 19:35:49",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the hunt drained tanks the helium track had stopped refilling, and one seed stranded itself at 0 fuel in a system with no volatile body or dock",
+        "benefits": "the stranding dead-end closes and victories rise on four seeds; the half-tank variant was measured and rejected for reordering the campaign without a net entry",
+        "risks": "contract: the hunt refuses hops that would leave under 8 fuel; dependency: existing scoop and galaxy endpoints; concurrency: none; state: one counter",
+        "mitigation": "ten failing-first cases in test_hunt_refuel.py, both refuel thresholds measured (half-tank vs blocked-only), and six campaigns"
+      },
+      "plan_digest": "b250f2fd9d8cd273171887296e4fa5f67102e579d9a834980f75fb6817cd8abb",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "hunt-refuel",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Hunt no longer strands: blocked-only refuel plus an 8-fuel reserve; victories rise on 4 seeds (42 10->14, 2 13->17, 8 12->16, 1 12->13) and the jump budget is fully spent where lanes exist (seed 8 30/30); codex holds at 366 aggregate with seeds 2/8/11 complete at 62/62, seed 6 61, seed 1 60, seed 42 59; the residual Warlord gap is step-bound (seed 6) and relief-bound (1, 42); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2449 OK with README tree at 213 suites (ADR-452); hygiene/secrets/deps/mechanics pass with the documented stale-native override (peer session editing host rust/); checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795365367.672422,
+      "timestamp_str": "2026-11-22 19:36:07",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "hunt-refuel",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'hunt-refuel' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795365388.3497622,
+      "timestamp_str": "2026-11-22 19:36:28",
+      "agent": "kilo:goal",
+      "head": "bff003651242f6526ce9b07133317ceb7c3f8f46",
       "delivery": {
         "roots": [
           "."
