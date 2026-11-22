@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "ui-review-adr",
+    "task_id": "helium-milestone",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795294612.4028487,
+    "updated_at": 1795306766.1626747,
     "owner": "kilo:goal",
-    "lease_until": 1795301812.4028487,
+    "lease_until": 1795313966.1626747,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795294658.0116942,
-    "completed_head": "5dba1e7875ae9289606929e9d8d13fdc0abc7d3b",
-    "completed_tree": "ddd60101e6708b9732338d12f68ba6e68e20f51f"
+    "completed_at": 1795306798.1888514,
+    "completed_head": "86b3e21234054ac49393c6714b86406c21153e3b",
+    "completed_tree": "142085bf0f1054daef9a867e7787f4ffe6560f5d"
   },
   "checkpoints": [
-    {
-      "task_id": "rebuild-sweep",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] All six campaigns bank Rebuilder (5 rebuilt worlds: 4 credit + 1 relief on seeds 1/42/2/6/11, 5 credit on seed 8) with 0 errors and the entry leaves every leftover list; codex 50-53 of 62 (seed 8 53, seeds 42/6 52, seeds 1/2/11 50; was 49-52); headline proofs retained (full survey+megastructure+both pacts+10 quantum orders on all six, customs on 42/2/6/11, prize capture on 42/6/8, pirate fight on 1/11); 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2316 OK with README tree at 202 suites (ADR-437); 6/6 gates passed individually (hygiene, guidelines, secrets, dependencies, test, mechanics); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795253702.1432295,
-      "timestamp_str": "2026-11-21 12:35:02",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "rebuild-sweep",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'rebuild-sweep' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795253722.8444812,
-      "timestamp_str": "2026-11-21 12:35:22",
-      "agent": "kilo:goal",
-      "head": "71d3753af49fb75a208cb0807deb591de2274544",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "relief-run",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Restock relief bags for the relief-runner milestone",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795258042.166594,
-      "timestamp_str": "2026-11-21 13:47:22",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the rebuild sweep rebuilt with credits whenever the hold was empty, so relief_deliveries stayed at 0-1 of 3 and Relief Runner stayed unreachable",
-        "benefits": "every seed banks Relief Runner and Rebuilder; seed 8 also recovers Squadron Command and banks Ace",
-        "risks": "contract: the sweep stocks bags at a dock with its own bounded budget and stops after both targets; the squadron no-crew deadlock needs a narrow guard exception once the corps is banked; dependency: none; concurrency: none; state: one counter, no schema change",
-        "mitigation": "eleven failing-first tests (ten relief + one squadron), six campaigns and the 180-step gate"
-      },
-      "plan_digest": "3b5e63c61e29b604ca6297cbe810a980986c394c2a8c1cfc4054b96a132241bb",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "relief-run",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-21 23:57:39",
       "agent": "kilo:goal",
       "head": "5dba1e7875ae9289606929e9d8d13fdc0abc7d3b",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "helium-milestone",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Scoop fuel to the helium-harvester milestone",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795306715.1053216,
+      "timestamp_str": "2026-11-22 03:18:35",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the one-shot scoop fires only below half a tank and is disabled after its first success, so a campaign ended at one scoop while the codex milestone counts ten",
+        "benefits": "every seed banks Helium Harvester at near-neutral aggregate cost (325 vs 324 codex entries across six seeds)",
+        "risks": "contract: an early tap may take an orbit before the dock branch; a full tank needs a burn jump; dependency: none; concurrency: none; state: four run fields, no schema change; schedule churn of one entry on three seeds",
+        "mitigation": "eighteen failing-first tests, six campaigns measured with a trace-driven split (the naive early orbit measured 45 on seed 42 and was rejected), the tap cap that recovered seed 8, and the unchanged 180-step gate"
+      },
+      "plan_digest": "2746e9025f1448e5a8faa4cd934b4d288bb81d46a152d7debbda430f6db06765",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "helium-milestone",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Helium Harvester banks on all six seeds (scoops 10 each) with a net 325 vs 324 codex entries; seed 1 54 (+1), seed 6 55 (+1), seed 2 53 (-1, outpost_warden), seeds 8/11/42 level after one-entry churn each; two rejected variants documented (early orbit without gating: seed 42 fell to 45; no tap cap: seed 8 lost Relief Runner); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2371 OK with README tree at 206 suites (ADR-444); hygiene/secrets/deps/mechanics pass; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795306766.1626747,
+      "timestamp_str": "2026-11-22 03:19:26",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "helium-milestone",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'helium-milestone' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795306798.8313053,
+      "timestamp_str": "2026-11-22 03:19:58",
+      "agent": "kilo:goal",
+      "head": "86b3e21234054ac49393c6714b86406c21153e3b",
       "delivery": {
         "roots": [
           "."
