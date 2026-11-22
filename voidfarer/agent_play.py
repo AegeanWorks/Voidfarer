@@ -290,6 +290,12 @@ class AiCaptain:
     # until the milestone is banked (ADR-433).
     AWAY_MISSION_TARGET = 5
 
+    # The codex's veteran-crew milestone: one specialist trained to rank five. The
+    # rotating tour drills whoever comes first in the roster and rarely the same crew
+    # twice, so the post-story captain keeps drilling the best specialist (ADR-448).
+    VETERAN_TARGET = 5
+    VETERAN_TRAIN_LIMIT = 12
+
     # The codex's decorated-crew milestone: two medals across the crew. Deep Explorer
     # lands at five expeditions for one member, so the rotation pins a candidate in
     # every team until the crew is decorated (ADR-447).
@@ -419,6 +425,10 @@ class AiCaptain:
         self.away_launch_tried: set[tuple[str, str]] = set()
         # Medal-track missions launched after the field target, so the track ends (ADR-447).
         self.medal_missions = 0
+        # Veteran-crew drills bought after the campaign, so a refused drill is bounded
+        # (ADR-448).
+        self.veteran_done = False
+        self.veteran_attempts = 0
         # Squadron state: the target is reached, the (ship, crew) pairs tried and the
         # purchase attempts, so a refused action cannot repeat (ADR-435).
         self.squadron_done = False
@@ -719,6 +729,12 @@ class AiCaptain:
             dock = self._dockable_body()
             if dock and dock.get("id") != ship.get("orbiting_body_id"):
                 return "/api/travel", {"body_id": dock["id"], "mode": "sublight"}, "dock"
+
+        # A paid drill at the dock is the cheapest way to a rank-five specialist; it
+        # costs a fraction of a hull, so it runs before the shipyard (ADR-448).
+        veteran = self._veteran_crew_action()
+        if veteran is not None:
+            return veteran
 
         # A capital hull is the shipyard's headline purchase; take it once the treasury
         # can cover the hull, a repair reserve and the current hold (ADR-379).
@@ -2156,6 +2172,45 @@ class AiCaptain:
                 self.research_tried.add(project_id)
                 return "/api/research/start", {"project_id": project_id}, "research"
         return None
+
+    def _veteran_crew_action(self):
+        """Drill the best specialist to rank five (ADR-448).
+
+        Training is a paid dock drill that raises one member's skill by one rank, and
+        the codex's veteran-crew milestone wants a single specialist at rank five. The
+        rotating tour drills whichever active member comes first in the roster, so no
+        one reached five. The policy drills the highest-skill active member (ties by
+        id) whenever that rank is below the target, bounded by ``VETERAN_TRAIN_LIMIT``
+        so a refused drill cannot loop; the engine's own gates (cost, rank ten) still
+        apply.
+        """
+        if self.veteran_done:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        members = [
+            member for member in self.state.get("crew") or []
+            if isinstance(member, dict) and member.get("id")
+            and str(member.get("status")) == "active"
+        ]
+        if not members:
+            return None
+        best = max(members, key=lambda member: (
+            int(member.get("skill") or 0), str(member["id"])
+        ))
+        skill = int(best.get("skill") or 0)
+        if skill >= self.VETERAN_TARGET:
+            self.veteran_done = True
+            return None
+        if not self._is_docked():
+            return None
+        if self.veteran_attempts >= self.VETERAN_TRAIN_LIMIT:
+            return None
+        cost = 160 + max(1, skill) * 120
+        if int((self.state.get("ship") or {}).get("credits") or 0) < cost:
+            return None
+        self.veteran_attempts += 1
+        return "/api/crew/train", {"crew_id": str(best["id"])}, "crew_train"
 
     def _medal_candidates(self):
         """Crew who can deploy, ordered so the next medal lands soonest (ADR-447)."""

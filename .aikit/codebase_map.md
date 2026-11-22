@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `273`
-- **Total Classes**: `643`
-- **Total Top-Level Functions**: `595`
-- **Total Class Methods**: `3438`
-- **Total Source Lines**: `74902`
+- **Total Python Modules**: `274`
+- **Total Classes**: `644`
+- **Total Top-Level Functions**: `597`
+- **Total Class Methods**: `3449`
+- **Total Source Lines**: `75043`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`273` module(s))
+- **Indexed**: python (`274` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -5426,6 +5426,30 @@
 
 ---
 
+### [`tests/test_veteran_crew.py`](tests/test_veteran_crew.py)
+> *The post-story captain trains one specialist to rank five (ADR-448).*
+
+**Size**: `86` lines
+
+**Classes:**
+- `class VeteranCrewTest`
+  - Method `.test_the_best_specialist_is_trained()`
+  - Method `.test_a_rank_five_specialist_ends_the_training()`
+  - Method `.test_higher_ranks_beyond_the_milestone_are_left_alone()`
+  - Method `.test_nothing_trains_before_the_campaign()`
+  - Method `.test_a_dock_is_required()`
+  - Method `.test_the_attempt_budget_bounds_a_refused_drill()`
+  - Method `.test_a_broke_captain_skips_the_drill()`
+  - Method `.test_an_injured_specialist_still_trains()`
+  - Method `.test_no_crew_means_no_drill()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _member(member_id, skill, **fields)`
+- `def _captain(crew, docked, credits, completed, done, attempts)`
+
+---
+
 ### [`tests/test_vital_card_keyboard.py`](tests/test_vital_card_keyboard.py)
 > *Actionable vital cards (burn cell, patch hull) are real keyboard controls, not mouse-only divs.*
 
@@ -5742,7 +5766,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3889` lines
+**Size**: `3944` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5796,6 +5820,7 @@
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
   - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until both broker milestones (ADR-434).*
   - Method `._research_action()` - *Start the next available research project after the campaign (ADR-432).*
+  - Method `._veteran_crew_action()` - *Drill the best specialist to rank five (ADR-448).*
   - Method `._medal_candidates()` - *Crew who can deploy, ordered so the next medal lands soonest (ADR-447).*
   - Method `._away_rotation_action()` - *Keep away teams deployed after the campaign (ADR-433, ADR-447).*
   - Method `._squadron_action()` - *Commission and staff escorts up to the squadron milestones (ADR-435).*
