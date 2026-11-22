@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (209 suites)
+└── tests/                <- unit & integration test suite (210 suites)
 ```
 
 ---
@@ -450,12 +450,13 @@ keeps the escort corps staffed — releasing officers from dead hulls and recrui
 dock when every crew member is already committed. It scoops volatiles at every body it
 passes and, when the tank is full, burns room on jumps until ten scoops bank Helium
 Harvester. At a dock it drills its best specialist to rank five for the Veteran Crew
-milestone. It sets the frequent decision cadence on its first step and resolves every
-prompt with its first choice, banking Decision Maker. It fights every pirate it meets
-while the hull is above half, up to the five fights the Corsair's Bane milestone counts.
-A smuggling run buys one contraband lot,
-ferries the high-security cordon the snapshot quotes and dumps it when the scan lands; a
-live heat spike is vented and the purge damage serviced at the next dock.
+milestone, and it stakes a decisive war bond on the side ahead in any live war so a
+single settlement banks Bondholder. It sets the frequent decision cadence on its first
+step and resolves every prompt with its first choice, banking Decision Maker. It fights
+every pirate it meets while the hull is above half, up to the five fights the Corsair's
+Bane milestone counts. A smuggling run buys one contraband lot, ferries the
+high-security cordon the snapshot quotes and dumps it when the scan lands; a live heat
+spike is vented and the purge damage serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a

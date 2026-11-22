@@ -290,6 +290,15 @@ class AiCaptain:
     # until the milestone is banked (ADR-433).
     AWAY_MISSION_TARGET = 5
 
+    # The codex's bondholder milestone: two thousand credits of war-bond payouts. One
+    # stake sized for a stalemate settlement banks it, so a single decisive pledge is
+    # worth more than the tour's 100-credit token (ADR-449).
+    BONDHOLDER_TARGET = 2000
+    WAR_BOND_MIN_PLEDGE = 100
+    WAR_BOND_MAX_STAKE = 6000
+    WAR_BOND_RESERVE = 5000
+    WAR_BOND_MARGIN = 1.25
+
     # The codex's veteran-crew milestone: one specialist trained to rank five. The
     # rotating tour drills whoever comes first in the roster and rarely the same crew
     # twice, so the post-story captain keeps drilling the best specialist (ADR-448).
@@ -429,6 +438,9 @@ class AiCaptain:
         # (ADR-448).
         self.veteran_done = False
         self.veteran_attempts = 0
+        # War-bond pledges already spent, one decisive stake per war (ADR-449).
+        self.war_bond_done = False
+        self.war_bond_pledged: set[str] = set()
         # Squadron state: the target is reached, the (ship, crew) pairs tried and the
         # purchase attempts, so a refused action cannot repeat (ADR-435).
         self.squadron_done = False
@@ -612,6 +624,12 @@ class AiCaptain:
         war = self._tour_war()
         if war is not None and not self._tour_action_attempted(war[0], war[1]):
             return war
+
+        # The tour pledges a token 100 cr; a decisive pledge on one war is what banks
+        # the Bondholder milestone, so size it before the revolving errands (ADR-449).
+        bond = self._war_bond_action()
+        if bond is not None:
+            return bond
 
         # The station terminal's consumable is bought once and used when hurt, so the
         # item terminal and its use are exercised (ADR-367).
@@ -3777,6 +3795,60 @@ class AiCaptain:
         if not connections:
             return None
         return "/api/navigate", {"system_id": connections[0]}, "navigate"
+
+    def _war_bond_action(self):
+        """Stake one decisive war bond for the Bondholder milestone (ADR-449).
+
+        The tour pledges a token 100 cr to the defender, which pays at most 150 cr on
+        settlement, so a campaign recorded 80 cr of payouts against a 2,000 cr
+        milestone. The engine settles a pledge at 1.5x when the supported side wins
+        and 0.8x on a stalemate, caps subscriptions at 6,000 cr per commander per war,
+        and pays nothing if the supported side loses. The policy therefore backs the
+        side currently ahead on the war score (the defender on a tie), stakes enough
+        that an 0.8x stalemate still banks the remaining shortfall, keeps the per-war
+        cap and a repair reserve, and never re-stakes a war it has already pledged.
+        """
+        if self.war_bond_done:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        payouts = int((self.state.get("stats") or {}).get("war_bond_payouts") or 0)
+        if payouts >= self.BONDHOLDER_TARGET:
+            self.war_bond_done = True
+            return None
+        credits = int((self.state.get("ship") or {}).get("credits") or 0)
+        affordable = credits - self.WAR_BOND_RESERVE
+        if affordable < self.WAR_BOND_MIN_PLEDGE:
+            return None
+        # A stalemate pays 0.8x, so that is the conservative stake for the shortfall;
+        # a small margin covers settlements that land just under the estimate and the
+        # token pledges that resolve alongside it (ADR-449).
+        needed = self.BONDHOLDER_TARGET - payouts
+        stake = math.ceil(needed * self.WAR_BOND_MARGIN / 0.8)
+        for war in self.state.get("wars") or []:
+            if not isinstance(war, dict) or not war.get("active"):
+                continue
+            war_id = str(war.get("id") or "")
+            if not war_id or war_id in self.war_bond_pledged:
+                continue
+            attacker = str(war.get("attacker_id") or "")
+            defender = str(war.get("defender_id") or "")
+            if not attacker or not defender:
+                continue
+            score = float(war.get("war_score") or 0.0)
+            side = attacker if score > 0 else defender
+            already = int((war.get("support") or {}).get(side) or 0)
+            room = self.WAR_BOND_MAX_STAKE - already
+            pledge = min(stake, room, affordable)
+            if pledge < self.WAR_BOND_MIN_PLEDGE:
+                continue
+            self.war_bond_pledged.add(war_id)
+            return (
+                "/api/war/support",
+                {"war_id": war_id, "faction_id": side, "credits": int(pledge)},
+                "war",
+            )
+        return None
 
     def _tour_war(self):
         for war in self.state.get("wars") or []:

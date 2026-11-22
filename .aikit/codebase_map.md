@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `274`
-- **Total Classes**: `644`
-- **Total Top-Level Functions**: `597`
-- **Total Class Methods**: `3449`
-- **Total Source Lines**: `75043`
+- **Total Python Modules**: `275`
+- **Total Classes**: `645`
+- **Total Top-Level Functions**: `599`
+- **Total Class Methods**: `3464`
+- **Total Source Lines**: `75239`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`274` module(s))
+- **Indexed**: python (`275` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -5513,6 +5513,34 @@
 
 ---
 
+### [`tests/test_war_bond.py`](tests/test_war_bond.py)
+> *The post-story captain pledges a decisive war bond for Bondholder (ADR-449).*
+
+**Size**: `124` lines
+
+**Classes:**
+- `class WarBondTest`
+  - Method `.test_a_leading_attacker_gets_the_pledge()`
+  - Method `.test_a_leading_defender_gets_the_pledge()`
+  - Method `.test_a_tied_front_pledges_the_defender()`
+  - Method `.test_the_pledge_covers_a_stalemate_payout()`
+  - Method `.test_the_pledge_respects_the_per_war_cap()`
+  - Method `.test_a_fully_pledged_side_is_skipped()`
+  - Method `.test_a_pledged_war_is_not_pledged_again()`
+  - Method `.test_the_next_war_is_pledged_after_one_is_spent()`
+  - Method `.test_the_milestone_ends_the_pledging()`
+  - Method `.test_a_thin_treasury_keeps_the_repair_reserve()`
+  - Method `.test_nothing_is_pledged_before_the_campaign()`
+  - Method `.test_a_concluded_war_is_ignored()`
+  - Method `.test_an_early_payout_asks_for_a_smaller_pledge()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _war(war_id, score, support, active, **fields)`
+- `def _captain(wars, payouts, credits, completed, done, pledged, reserve)`
+
+---
+
 ### [`tests/test_war_bonds.py`](tests/test_war_bonds.py)
 > *War bonds: pledges pay out on victory, partially on stalemate, never twice.*
 
@@ -5766,7 +5794,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3944` lines
+**Size**: `4016` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5906,6 +5934,7 @@
   - Method `._tour_escort_repair()`
   - Method `._tour_time_speed()`
   - Method `._tour_navigate()`
+  - Method `._war_bond_action()` - *Stake one decisive war bond for the Bondholder milestone (ADR-449).*
   - Method `._tour_war()`
   - Method `._tour_dock()`
   - Method `._tour_point()`
