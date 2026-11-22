@@ -9,8 +9,8 @@
 - **Total Python Modules**: `272`
 - **Total Classes**: `642`
 - **Total Top-Level Functions**: `592`
-- **Total Class Methods**: `3420`
-- **Total Source Lines**: `74561`
+- **Total Class Methods**: `3423`
+- **Total Source Lines**: `74615`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`272` module(s))
@@ -87,7 +87,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `3352` lines
+**Size**: `3390` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -280,7 +280,10 @@
   - Method `.test_a_docked_prize_is_sold()`
   - Method `.test_an_undocked_captain_reaches_a_station_first()`
   - Method `.test_the_bought_escort_is_never_sold()`
-  - Method `.test_the_sale_happens_once()`
+  - Method `.test_every_prize_is_sold()`
+  - Method `.test_prizes_are_sold_before_the_squadron_is_decommissioned()`
+  - Method `.test_a_banked_squadron_is_decommissioned_for_scrap()`
+  - Method `.test_a_short_corps_keeps_its_hulls()`
   - Method `.test_nothing_sells_before_the_campaign()`
 - `class SmuggleCordonPolicyTest` - *The post-story captain runs one real contraband cordon (ADR-400).*
   - Method `._captain(cargo, docked, completed, **state)`
@@ -5710,7 +5713,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3796` lines
+**Size**: `3812` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5778,7 +5781,7 @@
   - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*
   - Method `._shipyard_sell_action()` - *Trade in one safe equipped upgrade at a dock after the campaign (ADR-387).*
-  - Method `._prize_sale_action()` - *Sell one captured prize at a drydock after the campaign (ADR-399).*
+  - Method `._fleet_sale_action()` - *Sell prizes, then decommission a banked squadron for scrap (ADR-446).*
   - Method `._wreck_dismiss_action()` - *Decommission a destroyed escort so its officer is released (ADR-402).*
   - Method `._send_action()` - *Send one quantum report to a real correspondent after the campaign (ADR-386).*
   - Method `._ally_action()` - *Hail the most trusted non-ally to 50 trust, then ally (ADR-385).*

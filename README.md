@@ -430,8 +430,9 @@ It also hires a marine, so a crippled, shieldless enemy can be boarded and taken
 After Act VI the same captain keeps playing: it rebuilds a devastated world (credits or
 fabricated materials), probes up to three bodies for a derelict and orbits a scoopable
 body when the tank is low, develops and links outposts, restores a megastructure and fuses
-a relic set. It decommissions a destroyed escort so the officer is released, sells a
-captured prize at a drydock, recalls an armed escort into a fight to spend its captain's
+a relic set. It decommissions a destroyed escort so the officer is released, sells every
+captured prize at a drydock and, once both fleet milestones are banked, sells the whole
+damaged squadron for scrap, recalls an armed escort into a fight to spend its captain's
 gambit, and switches the reactor to economy once the story is over. It also keeps the
 research bench busy: whenever no project is running it starts the next available one,
 finishing four projects and banking the Technologist milestone. At a fresh orbit it keeps

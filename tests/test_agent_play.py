@@ -1412,7 +1412,7 @@ class PrizeSalePolicyTest(unittest.TestCase):
             {"id": "prize_134_1", "role": "prize", "hull": 0},
         ])
         self.assertEqual(
-            captain._prize_sale_action(),
+            captain._fleet_sale_action(),
             ("/api/fleet/escort/sell", {"ship_id": "prize_134_1"}, "fleet_sell"),
         )
 
@@ -1420,7 +1420,7 @@ class PrizeSalePolicyTest(unittest.TestCase):
         captain = self._captain(
             [{"id": "prize_134_1", "role": "prize", "hull": 0}], docked=False)
         self.assertEqual(
-            captain._prize_sale_action(),
+            captain._fleet_sale_action(),
             ("/api/travel", {"body_id": "ashen_station", "mode": "sublight"}, "dock"),
         )
 
@@ -1428,19 +1428,57 @@ class PrizeSalePolicyTest(unittest.TestCase):
         captain = self._captain([
             {"id": "escort_corvette_1", "role": "escort", "hull": 90},
         ])
-        self.assertIsNone(captain._prize_sale_action())
+        self.assertIsNone(captain._fleet_sale_action())
 
-    def test_the_sale_happens_once(self):
+    def test_every_prize_is_sold(self):
         captain = self._captain([
             {"id": "prize_134_1", "role": "prize", "hull": 0},
         ])
         captain.succeeded.add("/api/fleet/escort/sell")
-        self.assertIsNone(captain._prize_sale_action())
+        self.assertEqual(
+            captain._fleet_sale_action(),
+            ("/api/fleet/escort/sell", {"ship_id": "prize_134_1"}, "fleet_sell"),
+            "a second captured prize must not be stranded by the first sale",
+        )
+
+    def test_prizes_are_sold_before_the_squadron_is_decommissioned(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 40},
+            {"id": "prize_134_1", "role": "prize", "hull": 0},
+        ])
+        self.assertEqual(
+            captain._fleet_sale_action()[1]["ship_id"], "prize_134_1"
+        )
+
+    def test_a_banked_squadron_is_decommissioned_for_scrap(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 40},
+        ])
+        captain.state["stats"] = {
+            "escort_commissions_corvette": AiCaptain.SQUADRON_TARGET,
+            "escort_captains_assigned": AiCaptain.CAPTAIN_CORPS_TARGET,
+        }
+        self.assertEqual(
+            captain._fleet_sale_action(),
+            ("/api/fleet/escort/sell", {"ship_id": "escort_corvette_1"},
+             "fleet_sell"),
+            "the decommissioned hull is scrap value and saves its upkeep",
+        )
+
+    def test_a_short_corps_keeps_its_hulls(self):
+        captain = self._captain([
+            {"id": "escort_corvette_1", "role": "escort", "hull": 40},
+        ])
+        captain.state["stats"] = {
+            "escort_commissions_corvette": AiCaptain.SQUADRON_TARGET,
+            "escort_captains_assigned": AiCaptain.CAPTAIN_CORPS_TARGET - 1,
+        }
+        self.assertIsNone(captain._fleet_sale_action())
 
     def test_nothing_sells_before_the_campaign(self):
         captain = self._captain(
             [{"id": "prize_134_1", "role": "prize", "hull": 0}], completed=False)
-        self.assertIsNone(captain._prize_sale_action())
+        self.assertIsNone(captain._fleet_sale_action())
 
 
 class SmuggleCordonPolicyTest(unittest.TestCase):
