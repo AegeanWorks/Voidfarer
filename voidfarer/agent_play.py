@@ -299,6 +299,13 @@ class AiCaptain:
     WAR_BOND_RESERVE = 5000
     WAR_BOND_MARGIN = 1.25
 
+    # The codex's privateer milestone: one captured prize, and Warlord at fifteen
+    # victories. Boarding is the only capture path, so a marine aboard holds fire and
+    # chips the hull into the 30% boarding window (ADR-450).
+    CAPTURE_TARGET = 1
+    WARLORD_TARGET = 15
+    CAPTURE_CHIP_LIMIT = 6
+
     # The codex's veteran-crew milestone: one specialist trained to rank five. The
     # rotating tour drills whoever comes first in the roster and rarely the same crew
     # twice, so the post-story captain keeps drilling the best specialist (ADR-448).
@@ -372,6 +379,8 @@ class AiCaptain:
         # One-shot combat tricks are remembered per encounter so a spent action is not
         # chosen again while the snapshot is one call behind (ADR-362).
         self.combat_used: dict[str, set[str]] = {}
+        # Subsystem chips spent holding a boarding window open, per encounter (ADR-450).
+        self.capture_chips: dict[str, int] = {}
         # The Hollow Between is entered and surfaced once per campaign (ADR-366).
         self.void_attempted = False
         self.void_emerged = False
@@ -1020,15 +1029,28 @@ class AiCaptain:
                 return "/api/inventory/use", {"item_id": self.SUPPLY_DECOY_ID}, "combat_item"
         if heat_pct >= 85.0 and "vent_heat" not in used:
             return pick("vent_heat")
+        marines = [
+            member for member in self.state.get("crew") or []
+            if isinstance(member, dict) and str(member.get("role")) == "marine"
+            and str(member.get("status")) == "active"
+            and int(member.get("injury_ticks") or 0) == 0
+        ]
         if enemy_shield <= 0 and enemy_hull * 10 <= enemy_max_hull * 3 and "board_enemy" not in used:
-            marines = [
-                member for member in self.state.get("crew") or []
-                if isinstance(member, dict) and str(member.get("role")) == "marine"
-                and str(member.get("status")) == "active"
-                and int(member.get("injury_ticks") or 0) == 0
-            ]
             if marines:
                 return pick("board_enemy")
+        # A capture needs the hull intact below 30%, and a laser aimed from any hull
+        # above that can kill the prize outright: measured fights ended the moment the
+        # shields fell, with no hull damage ever recorded (ADR-450). With a marine
+        # aboard, hold fire and chip the hull with low-damage strikes instead, bounded
+        # by CAPTURE_CHIP_LIMIT; the first chip also cuts enemy firepower 40%.
+        if marines and enemy_shield <= 0 and enemy_hull * 10 > enemy_max_hull * 3:
+            combat_id = str(combat.get("id") or "combat")
+            chips = self.capture_chips.get(combat_id, 0)
+            if chips < self.CAPTURE_CHIP_LIMIT:
+                self.capture_chips[combat_id] = chips + 1
+                if "target_weapons" not in used:
+                    return pick("target_weapons")
+                return "/api/combat", {"action": "target_subsystem"}, "combat"
         if (shield * 3 <= max_shield and hull * 4 <= max_hull * 3
                 and enemy_damage >= 5 and "shield_absorb" not in used):
             # Absorbing every turn can outlast the enemy indefinitely (it damages neither

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `275`
-- **Total Classes**: `645`
-- **Total Top-Level Functions**: `599`
-- **Total Class Methods**: `3464`
-- **Total Source Lines**: `75239`
+- **Total Python Modules**: `276`
+- **Total Classes**: `646`
+- **Total Top-Level Functions**: `601`
+- **Total Class Methods**: `3474`
+- **Total Source Lines**: `75361`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`275` module(s))
+- **Indexed**: python (`276` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -869,6 +869,30 @@
   - Method `.test_index_declares_the_captains_log_tab()`
   - Method `.test_javascript_renders_and_claims_codex_entries()`
   - Method `.test_styles_cover_codex_cards()`
+
+---
+
+### [`tests/test_capture_window.py`](tests/test_capture_window.py)
+> *A healthy marine holds fire to open a boarding window (ADR-450).*
+
+**Size**: `100` lines
+
+**Classes:**
+- `class CaptureWindowTest`
+  - Method `.test_a_marine_chips_instead_of_risking_a_kill_shot()`
+  - Method `.test_the_chip_is_repeatable_after_the_weapon_cut()`
+  - Method `.test_a_full_health_enemy_is_chipped_too()`
+  - Method `.test_no_marine_means_no_holding_fire()`
+  - Method `.test_an_injured_marine_means_no_holding_fire()`
+  - Method `.test_live_shields_still_get_the_ion_pulse()`
+  - Method `.test_the_chip_budget_runs_out()`
+  - Method `.test_a_crippled_enemy_is_boarded_not_chipped()`
+  - Method `.test_survival_outranks_capture()`
+  - Method `.test_the_capture_milestones_are_unchanged()`
+
+**Functions:**
+- `def _marine(**fields)`
+- `def _captain(enemy_hull, enemy_max_hull, enemy_shield, crew, enemy_damage, enemy_intent, hull)`
 
 ---
 
@@ -5794,7 +5818,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4016` lines
+**Size**: `4038` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
