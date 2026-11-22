@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `277`
-- **Total Classes**: `647`
-- **Total Top-Level Functions**: `603`
-- **Total Class Methods**: `3490`
-- **Total Source Lines**: `75596`
+- **Total Python Modules**: `278`
+- **Total Classes**: `648`
+- **Total Top-Level Functions**: `604`
+- **Total Class Methods**: `3501`
+- **Total Source Lines**: `75776`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`277` module(s))
+- **Indexed**: python (`278` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3192,6 +3192,29 @@
 
 ---
 
+### [`tests/test_hunt_refuel.py`](tests/test_hunt_refuel.py)
+> *The hunt refuels its own tank once the helium track is spent (ADR-452).*
+
+**Size**: `112` lines
+
+**Classes:**
+- `class HuntRefuelTest`
+  - Method `.test_a_live_tap_is_scooped_during_the_hunt()`
+  - Method `.test_a_dry_hunt_orbits_the_next_volatile_body()`
+  - Method `.test_an_affordable_hop_needs_no_refuel()`
+  - Method `.test_the_refuel_stops_once_warlord_is_banked()`
+  - Method `.test_the_refuel_waits_for_the_corsair_milestone()`
+  - Method `.test_a_damaged_hull_does_not_refuel()`
+  - Method `.test_nothing_refuels_before_the_campaign()`
+  - Method `.test_a_system_without_volatiles_cannot_refuel()`
+  - Method `.test_the_refuel_budget_bounds_a_refused_orbit()`
+  - Method `.test_a_spent_hunt_budget_stops_refuelling()`
+
+**Functions:**
+- `def _captain(fuel, max_fuel, victories, pirates, hull, max_hull, scoop, orbiting, bodies, completed, refuels)`
+
+---
+
 ### [`tests/test_input_names.py`](tests/test_input_names.py)
 > *Every form input has an accessible name, not just a nearby visual label.*
 
@@ -5845,7 +5868,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4136` lines
+**Size**: `4204` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5987,6 +6010,7 @@
   - Method `._tour_navigate()`
   - Method `._galaxy_systems()` - *The galaxy catalogue the risk formula needs, fetched once (ADR-451).*
   - Method `._system_risk(system_id)` - *Pirate risk for one system, using the engine's own formula (ADR-451).*
+  - Method `._hunt_fuel_action()` - *Refuel only when the hunt cannot afford another hop (ADR-452).*
   - Method `._warlord_hunt_action()` - *Hunt the riskiest adjacent lane while Warlord needs victories (ADR-451).*
   - Method `._war_bond_action()` - *Stake one decisive war bond for the Bondholder milestone (ADR-449).*
   - Method `._tour_war()`

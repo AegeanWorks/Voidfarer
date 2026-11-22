@@ -314,6 +314,12 @@ class AiCaptain:
     WARLORD_TARGET = 15
     CAPTURE_CHIP_LIMIT = 6
     WARLORD_JUMP_LIMIT = 30
+    # A hop that empties the tank can strand the hunt in a system with no volatile body
+    # and no dock, where it can never refuel or leave (measured on seed 42) (ADR-452).
+    HUNT_FUEL_RESERVE = 8
+    # The hunt drains a tank faster than the helium track refilled it: measured runs
+    # ended at 0 of 80 fuel with only 8 of 30 jumps spent (ADR-452).
+    HUNT_REFUEL_LIMIT = 24
 
     # The codex's veteran-crew milestone: one specialist trained to rank five. The
     # rotating tour drills whoever comes first in the roster and rarely the same crew
@@ -393,6 +399,7 @@ class AiCaptain:
         # Warlord hunt state: the jumps spent seeking fights and the cached galaxy
         # map the risk formula needs (ADR-451).
         self.warlord_jumps = 0
+        self.warlord_refuels = 0
         self.galaxy_cache: dict[str, Any] | None = None
         # The Hollow Between is entered and surfaced once per campaign (ADR-366).
         self.void_attempted = False
@@ -928,7 +935,11 @@ class AiCaptain:
 
         # Warlord needs more fights than a peaceful tour meets, so once every errand is
         # spent the captain jumps along the riskiest lane the galaxy map offers; those
-        # hops also burn tank room for the scoop track (ADR-451).
+        # hops also burn tank room for the scoop track (ADR-451). A starved tank refuels
+        # first, because the helium track stopped scooping at its own milestone (ADR-452).
+        hunt_fuel = self._hunt_fuel_action()
+        if hunt_fuel is not None:
+            return hunt_fuel
         hunt = self._warlord_hunt_action()
         if hunt is not None:
             return hunt
@@ -3861,6 +3872,60 @@ class AiCaptain:
         standing = int((ship.get("faction_standings") or {}).get(faction_id) or 0)
         return pirate_risk(system, standing).chance
 
+    def _hunt_fuel_action(self):
+        """Refuel only when the hunt cannot afford another hop (ADR-452).
+
+        The hunt jumps far more than the tour ever did, and the helium track stops
+        scooping at its ten-scoop milestone, so a measured hunt starved outright: seed
+        42 ended at 0 of 80 fuel with 18 of its 30 jumps unspent. Refuelling at half a
+        tank was tried first and reordered the whole late campaign without gaining a
+        net entry, so this fires only when the tank is below every affordable lane's
+        published cost, which makes it a rescue rather than a scheduler. It takes a
+        live volatile tap or orbits the richest volatile body in the system, bounded by
+        ``HUNT_REFUEL_LIMIT`` so a refused orbit cannot loop, and it stops the moment
+        Warlord banks or the jump budget is spent.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        stats = self.state.get("stats") or {}
+        if int(stats.get("combat_victories") or 0) >= self.WARLORD_TARGET:
+            return None
+        if int(stats.get("pirates_fought") or 0) < self.CORSAIR_TARGET:
+            return None
+        if self.warlord_jumps >= self.WARLORD_JUMP_LIMIT:
+            return None
+        ship = self.state.get("ship") or {}
+        hull = int(ship.get("hull") or 0)
+        max_hull = max(1, int(ship.get("max_hull") or 0))
+        if hull * 2 < max_hull:
+            return None
+        fuel = int(ship.get("fuel") or 0)
+        costs = self.state.get("jump_fuel_costs") or {}
+        connections = [
+            str(item)
+            for item in (self.state.get("current_system") or {}).get("connections") or []
+            if item
+        ]
+        affordable = [
+            int(costs[system_id] or 0)
+            for system_id in connections
+            if system_id in costs and int(costs[system_id] or 0) > 0
+        ]
+        if not affordable:
+            return None
+        if fuel >= max(1, min(affordable)) + self.HUNT_FUEL_RESERVE:
+            return None
+        if (self.state.get("scoop") or {}).get("available"):
+            self.warlord_refuels += 1
+            return "/api/scoop", {}, "scoop"
+        if self.warlord_refuels >= self.HUNT_REFUEL_LIMIT:
+            return None
+        body = self._scoopable_body()
+        if body is None:
+            return None
+        self.warlord_refuels += 1
+        return "/api/orbit", {"target": str(body["id"])}, "orbit"
+
     def _warlord_hunt_action(self):
         """Hunt the riskiest adjacent lane while Warlord needs victories (ADR-451).
 
@@ -3904,7 +3969,10 @@ class AiCaptain:
             if system_id not in costs:
                 continue
             cost = int(costs[system_id] or 0)
-            if cost <= 0 or fuel < cost:
+            # Keep a reserve so the far side can always afford its own way out: a hop
+            # that empties the tank can strand the ship where nothing refuels it
+            # (measured on seed 42) (ADR-452).
+            if cost <= 0 or fuel < cost + self.HUNT_FUEL_RESERVE:
                 continue
             lanes.append((self._system_risk(system_id), -cost, system_id))
         if not lanes:
