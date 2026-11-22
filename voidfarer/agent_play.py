@@ -290,6 +290,13 @@ class AiCaptain:
     # until the milestone is banked (ADR-433).
     AWAY_MISSION_TARGET = 5
 
+    # The codex's decorated-crew milestone: two medals across the crew. Deep Explorer
+    # lands at five expeditions for one member, so the rotation pins a candidate in
+    # every team until the crew is decorated (ADR-447).
+    DECORATED_TARGET = 2
+    DEEP_EXPLORER_MEDAL = "Deep Explorer"
+    MEDAL_MISSION_LIMIT = 14
+
     # The codex's squadron milestone: three commissioned escorts, and Captain Corps:
     # three assigned escort captains. The tour commissions one and staffs it, so the
     # post-story captain buys and staffs the rest (ADR-435).
@@ -410,6 +417,8 @@ class AiCaptain:
         # pairs already tried, so a refused launch cannot repeat (ADR-433).
         self.away_rotation_done = False
         self.away_launch_tried: set[tuple[str, str]] = set()
+        # Medal-track missions launched after the field target, so the track ends (ADR-447).
+        self.medal_missions = 0
         # Squadron state: the target is reached, the (ship, crew) pairs tried and the
         # purchase attempts, so a refused action cannot repeat (ADR-435).
         self.squadron_done = False
@@ -2148,8 +2157,54 @@ class AiCaptain:
                 return "/api/research/start", {"project_id": project_id}, "research"
         return None
 
+    def _medal_candidates(self):
+        """Crew who can deploy, ordered so the next medal lands soonest (ADR-447)."""
+        commanded = {
+            str(ship.get("captain_id") or "") for ship in self._escort_rows()
+        }
+        stationed = {
+            str(crew_id)
+            for outpost in self.state.get("outposts") or []
+            if isinstance(outpost, dict)
+            for crew_id in outpost.get("assigned_crew") or []
+        }
+        deployed = {
+            str(crew_id)
+            for mission in (self.state.get("away_report") or {}).get("active") or []
+            if isinstance(mission, dict)
+            for crew_id in mission.get("crew_ids") or []
+        }
+        for mission in (self.state.get("ship") or {}).get("away_missions") or []:
+            if isinstance(mission, dict):
+                deployed.update(
+                    str(crew_id) for crew_id in mission.get("crew_ids") or []
+                )
+        rows = []
+        for member in self.state.get("crew") or []:
+            if not isinstance(member, dict) or not member.get("id"):
+                continue
+            if str(member.get("status")) != "active":
+                continue
+            if int(member.get("injury_ticks") or 0) > 0:
+                continue
+            if member.get("assigned_mission_id"):
+                continue
+            if str(member["id"]) in commanded:
+                continue
+            if str(member["id"]) in stationed or str(member["id"]) in deployed:
+                continue
+            rows.append(member)
+        medals = [str(medal) for member in rows for medal in member.get("medals") or []]
+        rows.sort(key=lambda member: (
+            self.DEEP_EXPLORER_MEDAL in [str(m) for m in member.get("medals") or []],
+            len(member.get("medals") or []),
+            -int(member.get("away_missions") or 0),
+            str(member["id"]),
+        ))
+        return rows, len(medals)
+
     def _away_rotation_action(self):
-        """Keep away teams deployed after the campaign (ADR-433).
+        """Keep away teams deployed after the campaign (ADR-433, ADR-447).
 
         The tour launches one expedition, the first team is protected and every later
         one is recalled, so ``away_missions`` ends at one in every campaign and the
@@ -2158,6 +2213,12 @@ class AiCaptain:
         the current orbit offers whenever no team is deployed, and waits for that team
         to resolve. Each ``(mission_type, body)`` pair is tried once, so a refused
         launch cannot repeat.
+
+        Every team is passed explicitly, drawn from the medal candidates: the member
+        with the fewest medals (and no Deep Explorer yet) but the most expeditions
+        leads, so the same crew keep deploying until they earn the medal. Once the
+        field-team milestone is banked the rotation continues only while the crew is
+        undecorated, under ``MEDAL_MISSION_LIMIT``, so it cannot run forever.
         """
         if self.away_rotation_done:
             return None
@@ -2165,9 +2226,16 @@ class AiCaptain:
         if ship.get("away_missions"):
             return None
         stat = int((self.state.get("stats") or {}).get("away_missions") or 0)
-        if stat >= self.AWAY_MISSION_TARGET:
+        candidates, medals = self._medal_candidates()
+        if medals >= self.DECORATED_TARGET:
             self.away_rotation_done = True
             return None
+        if stat >= self.AWAY_MISSION_TARGET:
+            if not candidates or self.medal_missions >= self.MEDAL_MISSION_LIMIT:
+                # With nobody to train (an older snapshot shape) the field target is
+                # the end of the rotation, as ADR-433 had it.
+                self.away_rotation_done = True
+                return None
         if not (self.state.get("story_status") or {}).get("completed"):
             return None
         report = self.state.get("away_report") or {}
@@ -2178,13 +2246,22 @@ class AiCaptain:
                 continue
             if not mission.get("available", True) or mission.get("worked"):
                 continue
+            team_size = max(1, int(mission.get("team_size") or 1))
+            team = [str(member["id"]) for member in candidates[:team_size]]
+            if candidates and len(team) < team_size:
+                continue
             mission_type = str(
                 mission.get("mission_type") or mission.get("type") or mission["id"]
             )
             if (mission_type, body_id) in self.away_launch_tried:
                 continue
             self.away_launch_tried.add((mission_type, body_id))
-            return "/api/away/launch", {"mission_type": mission_type}, "away"
+            if stat >= self.AWAY_MISSION_TARGET:
+                self.medal_missions += 1
+            body_payload: dict[str, Any] = {"mission_type": mission_type}
+            if team:
+                body_payload["crew_ids"] = team
+            return ("/api/away/launch", body_payload, "away")
         return None
 
     def _squadron_action(self):

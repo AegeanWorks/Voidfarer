@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `272`
-- **Total Classes**: `642`
-- **Total Top-Level Functions**: `592`
-- **Total Class Methods**: `3423`
-- **Total Source Lines**: `74615`
+- **Total Python Modules**: `273`
+- **Total Classes**: `643`
+- **Total Top-Level Functions**: `595`
+- **Total Class Methods**: `3438`
+- **Total Source Lines**: `74902`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`272` module(s))
+- **Indexed**: python (`273` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3449,6 +3449,35 @@
 
 ---
 
+### [`tests/test_medal_rotation.py`](tests/test_medal_rotation.py)
+> *The away rotation pins a medal candidate so two medals bank (ADR-447).*
+
+**Size**: `210` lines
+
+**Classes:**
+- `class MedalCandidateTest`
+  - Method `.test_a_mission_candidate_with_a_medal_is_passed()`
+  - Method `.test_the_most_experienced_unmedalled_member_leads()`
+  - Method `.test_a_member_who_already_has_the_explorer_medal_steps_back()`
+  - Method `.test_an_escort_commander_is_not_deployed()`
+  - Method `.test_an_injured_or_deployed_member_is_skipped()`
+  - Method `.test_a_bridge_station_does_not_block_deployment()`
+  - Method `.test_an_outpost_crew_member_is_not_deployed()`
+  - Method `.test_a_member_on_an_active_mission_is_not_deployed()`
+  - Method `.test_a_mission_that_needs_more_crew_than_are_free_is_skipped()`
+  - Method `.test_the_track_stops_at_two_medals()`
+  - Method `.test_the_track_stops_at_the_mission_budget()`
+  - Method `.test_a_medal_mission_after_the_field_target_is_counted()`
+  - Method `.test_the_field_target_still_drives_the_first_missions()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _member(member_id, medals, missions, battles, **fields)`
+- `def _mission(mission_id, team_size, **fields)`
+- `def _captain(crew, available, ships, medals, stat, completed, medal_missions, tried)`
+
+---
+
 ### [`tests/test_megastructure_restoration.py`](tests/test_megastructure_restoration.py)
 > *Megastructure restoration: orbit/cost gates, bonuses and persistence.*
 
@@ -5713,7 +5742,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3812` lines
+**Size**: `3889` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5767,7 +5796,8 @@
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
   - Method `._quantum_freight_action()` - *Run the automated quantum freight lane until both broker milestones (ADR-434).*
   - Method `._research_action()` - *Start the next available research project after the campaign (ADR-432).*
-  - Method `._away_rotation_action()` - *Keep away teams deployed after the campaign (ADR-433).*
+  - Method `._medal_candidates()` - *Crew who can deploy, ordered so the next medal lands soonest (ADR-447).*
+  - Method `._away_rotation_action()` - *Keep away teams deployed after the campaign (ADR-433, ADR-447).*
   - Method `._squadron_action()` - *Commission and staff escorts up to the squadron milestones (ADR-435).*
   - Method `._survey_action()` - *Finish a three-system survey sweep after the campaign (ADR-436).*
   - Method `._survey_next_system(system)` - *Leave a swept or stalled system along a fresh hyperlane (ADR-436).*

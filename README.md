@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (207 suites)
+└── tests/                <- unit & integration test suite (208 suites)
 ```
 
 ---
@@ -436,10 +436,11 @@ damaged squadron for scrap, recalls an armed escort into a fight to spend its ca
 gambit, and switches the reactor to economy once the story is over. It also keeps the
 research bench busy: whenever no project is running it starts the next available one,
 finishing four projects and banking the Technologist milestone. At a fresh orbit it keeps
-away teams deployed as well, launching the first unworked, staffable expedition and
-waiting for it to resolve until five missions complete the Field Team milestone. The
-automated quantum lane keeps buying fresh lots and shipping until ten deliveries bank
-both the Quantum Broker and Freight Baron milestones. It also commissions and staffs a
+away teams deployed as well, launching the first unworked, staffable expedition with the
+least-medalled crew in the lead and waiting for it to resolve until five missions complete
+the Field Team milestone and two service medals decorate the crew. The automated quantum
+lane keeps buying fresh lots and shipping until ten deliveries bank both the Quantum
+Broker and Freight Baron milestones. It also commissions and staffs a
 three-escort squadron for the Squadron Command and Captain Corps milestones and sweeps
 three systems for the Sector Cartographer milestone. Rebuilding does not stop at one
 world: it restocks relief bags at a dock and keeps restoring devastated colonies until
