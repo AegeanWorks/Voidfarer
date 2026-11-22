@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "medal-rotation",
+    "task_id": "veteran-crew",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795338816.6261523,
+    "updated_at": 1795347025.4266262,
     "owner": "kilo:goal",
-    "lease_until": 1795346016.6261523,
+    "lease_until": 1795354225.4266262,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795338825.251338,
-    "completed_head": "b76c28f6f185d0a5f6ca6e071cd9b6744a5630aa",
-    "completed_tree": "d063cc41492609ad6f74280df31b8df485c7a71e"
+    "completed_at": 1795347038.4233606,
+    "completed_head": "1a1e6223293c95d4ede11ad26890185c6ad597bb",
+    "completed_tree": "b6838f4e7286f1b81a869a45bc6b218ef38fccd5"
   },
   "checkpoints": [
-    {
-      "task_id": "corsair-milestone",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Six campaigns 53-55 of 62 with 0 errors (8 55, 42/2/6/11 54, 1 53), identical totals to ADR-440 because encounters bound the milestone; seed 11 now 4 fights / 8 victories (was 1/5); seed 1 and 42 meet 0-1 pirates; a forced repair variant measured 50-55 (seed 1 lost 3 entries) and was reverted; every other milestone still banks on every seed; 180 gate unchanged 58/59/69 with 0 gaps/0 errors/10 refusals; suite Ran 2353 OK with README tree at 205 suites (ADR-441); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795284364.5618818,
-      "timestamp_str": "2026-11-21 21:06:04",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "corsair-milestone",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'corsair-milestone' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795284387.8428638,
-      "timestamp_str": "2026-11-21 21:06:27",
-      "agent": "kilo:goal",
-      "head": "117b8c97831312a499b1428c07088e14144ad7d7",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "ui-review-record",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Record the cockpit visual review and close the UI contract",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795294123.1174822,
-      "timestamp_str": "2026-11-21 23:48:43",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the cockpit surface digest had no finished UI task, so strict delivery was blocked; the review itself needs a vision model that the main model lacks",
-        "benefits": "the UI contract now matches the running cockpit and strict delivery unblocks",
-        "risks": "contract: ui.json timeout only, no producing code; dependency: a vision provider; concurrency: none; state: ui history adds one reviewed task",
-        "mitigation": "real-browser audits at three viewports, a click map, a vision read with quotes, live-DOM measurements of every claimed defect, and the full suite under the new timeout"
-      },
-      "plan_digest": "b04c5a11cba3ffd311dabbab2f574b9516434191bc0035c163386d6783f041ff",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "ui-review-record",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-22 12:13:45",
       "agent": "kilo:goal",
       "head": "b76c28f6f185d0a5f6ca6e071cd9b6744a5630aa",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "veteran-crew",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Drill a specialist to rank five",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795347002.1263492,
+      "timestamp_str": "2026-11-22 14:30:02",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the tour trained whichever member came first, so ranks spread and crew_max_skill ended at 3-4 of 5 on every seed while the treasury could pay for three drills many times over",
+        "benefits": "Veteran Crew banks on all six seeds; codex net 356 vs 352 (+4), seed 6 now 61/62",
+        "risks": "contract: three dock drills run before the shipyard; dependency: none; concurrency: none; state: two run fields; step-clock shift moves encounter-bound entries by 1-4",
+        "mitigation": "ten failing-first cases in test_veteran_crew.py, six measured campaigns, sequential reruns to separate contention from the change, and the unchanged 180-step gate"
+      },
+      "plan_digest": "2e284dbdef82af75846fd8cc93138e5d1d49b4c0e43b5d4937049e9c7b93c838",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "veteran-crew",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Veteran Crew banks on all six seeds with 0 logic errors; codex 356 across six seeds vs 352 (seed 6 61 +4, 8 61 +1, 1 60 +2; 2/11/42 at 58 after one-entry encounter churn); seed 6 sits at 61/62 with only Bondholder left; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2402 OK with README tree at 209 suites, catalog test green alone in 10.5s (contention caused the parallel failure) (ADR-448); hygiene/secrets/deps/mechanics pass; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795347025.4266262,
+      "timestamp_str": "2026-11-22 14:30:25",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "veteran-crew",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'veteran-crew' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795347038.5045238,
+      "timestamp_str": "2026-11-22 14:30:38",
+      "agent": "kilo:goal",
+      "head": "1a1e6223293c95d4ede11ad26890185c6ad597bb",
       "delivery": {
         "roots": [
           "."
