@@ -8,7 +8,13 @@ import urllib.error
 import urllib.request
 from typing import Any
 
-from voidfarer.engine import CATALOG_CACHE_HEADER, STATIC_SNAPSHOT_KEYS
+from voidfarer.engine import (
+    CATALOG_CACHE_HEADER,
+    STATIC_SNAPSHOT_KEYS,
+    get_faction_id_from_name,
+)
+from voidfarer.models import StarSystem
+from voidfarer.pirates import pirate_risk
 
 
 # Actions the policy cannot reach in an ordinary campaign, with the reason. Every other
@@ -301,10 +307,13 @@ class AiCaptain:
 
     # The codex's privateer milestone: one captured prize, and Warlord at fifteen
     # victories. Boarding is the only capture path, so a marine aboard holds fire and
-    # chips the hull into the 30% boarding window (ADR-450).
+    # chips the hull into the 30% boarding window (ADR-450). Warlord needs more fights
+    # than a peaceful tour ever meets, so the post-story captain hunts the riskiest
+    # lane (ADR-451).
     CAPTURE_TARGET = 1
     WARLORD_TARGET = 15
     CAPTURE_CHIP_LIMIT = 6
+    WARLORD_JUMP_LIMIT = 30
 
     # The codex's veteran-crew milestone: one specialist trained to rank five. The
     # rotating tour drills whoever comes first in the roster and rarely the same crew
@@ -381,6 +390,10 @@ class AiCaptain:
         self.combat_used: dict[str, set[str]] = {}
         # Subsystem chips spent holding a boarding window open, per encounter (ADR-450).
         self.capture_chips: dict[str, int] = {}
+        # Warlord hunt state: the jumps spent seeking fights and the cached galaxy
+        # map the risk formula needs (ADR-451).
+        self.warlord_jumps = 0
+        self.galaxy_cache: dict[str, Any] | None = None
         # The Hollow Between is entered and surfaced once per campaign (ADR-366).
         self.void_attempted = False
         self.void_emerged = False
@@ -912,6 +925,13 @@ class AiCaptain:
         helium = self._helium_sweep_action()
         if helium is not None:
             return helium
+
+        # Warlord needs more fights than a peaceful tour meets, so once every errand is
+        # spent the captain jumps along the riskiest lane the galaxy map offers; those
+        # hops also burn tank room for the scoop track (ADR-451).
+        hunt = self._warlord_hunt_action()
+        if hunt is not None:
+            return hunt
 
         return "/api/time/step", {"ticks": 1}, "time"
 
@@ -3817,6 +3837,84 @@ class AiCaptain:
         if not connections:
             return None
         return "/api/navigate", {"system_id": connections[0]}, "navigate"
+
+    def _galaxy_systems(self) -> dict[str, Any]:
+        """The galaxy catalogue the risk formula needs, fetched once (ADR-451)."""
+        if self.galaxy_cache is not None:
+            return self.galaxy_cache
+        status, payload = self.client.get("/api/galaxy")
+        systems = payload.get("systems") if status == 200 else None
+        self.galaxy_cache = systems if isinstance(systems, dict) else {}
+        return self.galaxy_cache
+
+    def _system_risk(self, system_id: str) -> float:
+        """Pirate risk for one system, using the engine's own formula (ADR-451)."""
+        row = self._galaxy_systems().get(system_id)
+        if not isinstance(row, dict):
+            return 0.0
+        try:
+            system = StarSystem.from_dict(row)
+        except (KeyError, TypeError, ValueError):
+            return 0.0
+        ship = self.state.get("ship") or {}
+        faction_id = get_faction_id_from_name(system.faction)
+        standing = int((ship.get("faction_standings") or {}).get(faction_id) or 0)
+        return pirate_risk(system, standing).chance
+
+    def _warlord_hunt_action(self):
+        """Hunt the riskiest adjacent lane while Warlord needs victories (ADR-451).
+
+        Combat victories only come from pirate fights, and a peaceful tour meets 8-15
+        of them in 2,000 steps because the engine rolls one encounter per jump at a
+        risk that starts from four percent. The engine's own ``pirate_risk`` adds a
+        pirate-haven bonus, corsair territory, low security and hostile standing, so
+        the post-story captain jumps along the connection with the highest computed
+        risk until the Warlord milestone is banked, bounded by ``WARLORD_JUMP_LIMIT``
+        jumps. It only hunts on a hull above half (the pirate policy would otherwise
+        evade) and with fuel for the published hop, so it never strands the ship.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        stats = self.state.get("stats") or {}
+        victories = int(stats.get("combat_victories") or 0)
+        if victories >= self.WARLORD_TARGET:
+            return None
+        # The corsair milestone counts pirate toll fights, which the hunt's own jumps
+        # can starve by shifting the per-tick encounter rolls, so it waits until that
+        # milestone is banked (ADR-451).
+        if int(stats.get("pirates_fought") or 0) < self.CORSAIR_TARGET:
+            return None
+        if self.warlord_jumps >= self.WARLORD_JUMP_LIMIT:
+            return None
+        ship = self.state.get("ship") or {}
+        hull = int(ship.get("hull") or 0)
+        max_hull = max(1, int(ship.get("max_hull") or 0))
+        if hull * 2 < max_hull:
+            return None
+        current = self.state.get("current_system") or {}
+        connections = [
+            str(item) for item in current.get("connections") or [] if item
+        ]
+        if not connections:
+            return None
+        costs = self.state.get("jump_fuel_costs") or {}
+        fuel = int(ship.get("fuel") or 0)
+        lanes = []
+        for system_id in connections:
+            if system_id not in costs:
+                continue
+            cost = int(costs[system_id] or 0)
+            if cost <= 0 or fuel < cost:
+                continue
+            lanes.append((self._system_risk(system_id), -cost, system_id))
+        if not lanes:
+            return None
+        lanes.sort(reverse=True)
+        risk, _, target = lanes[0]
+        if risk <= 0.0:
+            return None
+        self.warlord_jumps += 1
+        return "/api/jump", {"target": target}, "jump"
 
     def _war_bond_action(self):
         """Stake one decisive war bond for the Bondholder milestone (ADR-449).

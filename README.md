@@ -151,7 +151,7 @@ voidfarer/
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
-└── tests/                <- unit & integration test suite (211 suites)
+└── tests/                <- unit & integration test suite (212 suites)
 ```
 
 ---
@@ -456,9 +456,11 @@ step and resolves every prompt with its first choice, banking Decision Maker. It
 every pirate it meets while the hull is above half, up to the five fights the Corsair's
 Bane milestone counts. With a marine aboard it holds fire and chips the enemy hull with
 subsystem strikes instead of lasers, so a boarding window opens and prizes are taken
-rather than destroyed. A smuggling run buys one contraband lot, ferries the high-security
-cordon the snapshot quotes and dumps it when the scan lands; a live heat spike is vented
-and the purge damage serviced at the next dock.
+rather than destroyed. Once every errand is spent it hunts the riskiest adjacent lane
+the galaxy map offers, jumping into pirate havens and low-security space to bank
+Warlord. A smuggling run buys one contraband lot, ferries the high-security cordon the
+snapshot quotes and dumps it when the scan lands; a live heat spike is vented and the
+purge damage serviced at the next dock.
 If any of these routes falls outside the 180-step gate, `CONTEXT_ACTIONS` says why.
 
 Saves resume deterministically. `GameState` carries the live `random.Random` stream, so a

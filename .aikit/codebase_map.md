@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `276`
-- **Total Classes**: `646`
-- **Total Top-Level Functions**: `601`
-- **Total Class Methods**: `3474`
-- **Total Source Lines**: `75361`
+- **Total Python Modules**: `277`
+- **Total Classes**: `647`
+- **Total Top-Level Functions**: `603`
+- **Total Class Methods**: `3490`
+- **Total Source Lines**: `75596`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`276` module(s))
+- **Indexed**: python (`277` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -5601,6 +5601,33 @@
 
 ---
 
+### [`tests/test_warlord_hunt.py`](tests/test_warlord_hunt.py)
+> *The post-story captain hunts pirates in the riskiest lane for Warlord (ADR-451).*
+
+**Size**: `137` lines
+
+**Classes:**
+- `class WarlordHuntTest`
+  - Method `.test_the_riskiest_neighbour_is_chosen()`
+  - Method `.test_a_pirate_haven_outranks_a_calm_system()`
+  - Method `.test_the_jump_marks_progress()`
+  - Method `.test_the_target_ends_the_hunt()`
+  - Method `.test_the_corsair_milestone_is_banked_first()`
+  - Method `.test_nothing_hunts_before_the_campaign()`
+  - Method `.test_a_damaged_hull_stops_the_hunt()`
+  - Method `.test_a_dry_tank_stops_the_hunt()`
+  - Method `.test_the_jump_budget_bounds_the_hunt()`
+  - Method `.test_an_isolated_system_has_no_lane()`
+  - Method `.test_a_lane_without_a_published_cost_is_not_taken()`
+  - Method `.test_an_unreachable_galaxy_map_hunts_nothing()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _system(system_id, security, faction, connections, **extra)`
+- `def _captain(victories, pirates, current, connections, galaxy, fuel, hull, completed, jumps, budget)`
+
+---
+
 ### [`tests/test_wave8_fixbatch.py`](tests/test_wave8_fixbatch.py)
 > *Wave 8 fix-batch: failing-first regressions for swarm-verified defects.*
 
@@ -5818,7 +5845,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4038` lines
+**Size**: `4136` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5958,6 +5985,9 @@
   - Method `._tour_escort_repair()`
   - Method `._tour_time_speed()`
   - Method `._tour_navigate()`
+  - Method `._galaxy_systems()` - *The galaxy catalogue the risk formula needs, fetched once (ADR-451).*
+  - Method `._system_risk(system_id)` - *Pirate risk for one system, using the engine's own formula (ADR-451).*
+  - Method `._warlord_hunt_action()` - *Hunt the riskiest adjacent lane while Warlord needs victories (ADR-451).*
   - Method `._war_bond_action()` - *Stake one decisive war bond for the Bondholder milestone (ADR-449).*
   - Method `._tour_war()`
   - Method `._tour_dock()`
