@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "veteran-crew",
+    "task_id": "war-bond",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795347025.4266262,
+    "updated_at": 1795350128.5902312,
     "owner": "kilo:goal",
-    "lease_until": 1795354225.4266262,
+    "lease_until": 1795357328.5902312,
     "started_by": "kilo:goal",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795347038.4233606,
-    "completed_head": "1a1e6223293c95d4ede11ad26890185c6ad597bb",
-    "completed_tree": "b6838f4e7286f1b81a869a45bc6b218ef38fccd5"
+    "completed_at": 1795350158.6629317,
+    "completed_head": "b307b150f37508d4c3919f3c9291013f5b5c3e80",
+    "completed_tree": "4886a08d6f46737ab6260dbd91b3f14cf6361356"
   },
   "checkpoints": [
-    {
-      "task_id": "ui-review-record",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] G-015 review recorded and the UI task closed: vision subagent (Gemini 3.8 Flash) quoted the real cockpit text from short.png; its three claimed defects were refuted by live measurements (hint 12px, scrollWidth==clientWidth 211; cue 79.9x20 inside panelLeft, 78==78; 9 radar labels, 0 forced, 0 overlaps; 0 sub-12px DOM text). Machine evidence: ui_audit post 1920/1366/1280 all zero findings, click-map 197 controls 0 missing/0 dup, screenshots in ui-review/2026-11-21-*. ui begin/verify/finish all OK after fast_timeout 300->600 (suite 277s, ADR-442); no code change warranted. Suite Ran 2353 OK; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795294166.2287686,
-      "timestamp_str": "2026-11-21 23:49:26",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "ui-review-record",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'ui-review-record' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795294172.7072022,
-      "timestamp_str": "2026-11-21 23:49:32",
-      "agent": "kilo:goal",
-      "head": "4df24348248229e56bc96448887294a554e701d5",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "ui-review-adr",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Pair the cockpit review ADR with its task",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795294568.5844588,
-      "timestamp_str": "2026-11-21 23:56:08",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the ADR recording the review was committed after its task closed, so strict delivery wants a task that covers it",
-        "benefits": "the ledger pairs every non-bookkeeping commit with a task again",
-        "risks": "contract: none, documentation only; dependency: none; concurrency: none; state: ledger only",
-        "mitigation": "the ADR already records the evidence; this task only pairs it and reruns strict"
-      },
-      "plan_digest": "32aae41b1f221893d0fe28f5f2070b42166e4db6fd6dcb56ed7d4a3b79f80d42",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "task_id": "ui-review-adr",
       "phase": "phase 4",
@@ -403,6 +344,65 @@
       "timestamp_str": "2026-11-22 14:30:38",
       "agent": "kilo:goal",
       "head": "1a1e6223293c95d4ede11ad26890185c6ad597bb",
+      "delivery": {
+        "roots": [
+          "."
+        ],
+        "forced": false
+      }
+    },
+    {
+      "task_id": "war-bond",
+      "phase": "phase 2",
+      "phase_num": 2,
+      "description": "[1/2] Stake a decisive war bond for Bondholder",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795350093.264026,
+      "timestamp_str": "2026-11-22 15:21:33",
+      "agent": "kilo:goal",
+      "impact_assessment": {
+        "why": "the tour pledged a token 100 cr to the defender, so settlement paid at most 150 cr against a 2,000 cr milestone; the 6,000 cr per-war cap, not the treasury, was the real ceiling",
+        "benefits": "Bondholder banks on all six seeds; codex net 360 vs 356 (+4)",
+        "risks": "contract: a 2,500-3,300 cr pledge is spent per war from a post-story treasury of 70-200k, behind a 5,000 cr reserve; a losing side pays nothing; dependency: none; concurrency: none; state: one set plus a flag",
+        "mitigation": "fourteen failing-first cases in test_war_bond.py, six measured campaigns, a margin added after an early 2,400 cr stake settled at 0.8x for 1,933 of 2,000 on seed 1, and the unchanged 180-step gate"
+      },
+      "plan_digest": "41bc8cd7af9a20ec97214bf5cdbc7db5f6e01dde0223aea50dfce668668d5357",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "war-bond",
+      "phase": "phase 4",
+      "phase_num": 4,
+      "description": "[1/1] Bondholder banks on all six seeds (payouts 2.0-4.7k cr each, vs 80 before); codex 360 across six seeds vs 356 (seed 1 61 of 62, seeds 2/6/8/42 60, seed 11 59); each remaining gap is a live-state roll (privateer 0 captures, warlord 10-14/15, corsair 4/5 on three seeds, merchant 24/25 on 11, relic sets 3/4 on 42, relief on 1); the 1.25 stake margin came from a measured 2,400 cr stake settling at 0.8x for 1,933/2,000 on seed 1; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2416 OK with README tree at 210 suites (ADR-449); hygiene/secrets/deps/mechanics pass; checklists: passed",
+      "files_affected": [],
+      "status": "in_progress",
+      "timestamp": 1795350128.5902312,
+      "timestamp_str": "2026-11-22 15:22:08",
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "task_id": "war-bond",
+      "phase": "completed",
+      "phase_num": 5,
+      "description": "Task 'war-bond' completed successfully.",
+      "status": "completed",
+      "timestamp": 1795350158.7595508,
+      "timestamp_str": "2026-11-22 15:22:38",
+      "agent": "kilo:goal",
+      "head": "b307b150f37508d4c3919f3c9291013f5b5c3e80",
       "delivery": {
         "roots": [
           "."
