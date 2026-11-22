@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `270`
-- **Total Classes**: `639`
-- **Total Top-Level Functions**: `590`
-- **Total Class Methods**: `3395`
-- **Total Source Lines**: `74200`
+- **Total Python Modules**: `271`
+- **Total Classes**: `641`
+- **Total Top-Level Functions**: `591`
+- **Total Class Methods**: `3416`
+- **Total Source Lines**: `74502`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`270` module(s))
+- **Indexed**: python (`271` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3116,6 +3116,38 @@
 
 ---
 
+### [`tests/test_helium_sweep.py`](tests/test_helium_sweep.py)
+> *The post-story captain sweeps fuel to the helium-harvester milestone (ADR-444).*
+
+**Size**: `171` lines
+
+**Classes:**
+- `class HeliumTapTest`
+  - Method `.test_an_available_tap_is_scooped()`
+  - Method `.test_a_low_tank_orbits_the_next_scoopable_body()`
+  - Method `.test_a_dedicated_burn_jump_lets_the_tap_orbit_above_half()`
+  - Method `.test_above_half_without_a_burn_jump_the_tap_stays_quiet()`
+  - Method `.test_a_star_beats_an_ice_world()`
+  - Method `.test_a_full_tank_taps_nothing()`
+  - Method `.test_the_target_ends_the_taps()`
+  - Method `.test_nothing_runs_before_the_campaign()`
+  - Method `.test_a_system_without_volatiles_taps_nothing()`
+- `class HeliumBurnTest`
+  - Method `.test_a_full_tank_burns_fuel_on_a_jump()`
+  - Method `.test_an_untried_connection_is_preferred()`
+  - Method `.test_a_spent_map_falls_back_to_a_known_lane()`
+  - Method `.test_a_tank_with_room_needs_no_jump()`
+  - Method `.test_the_jump_budget_ends_the_sweep()`
+  - Method `.test_the_target_ends_the_sweep()`
+  - Method `.test_nothing_runs_before_the_campaign()`
+  - Method `.test_an_isolated_full_tank_stays_quiet()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _captain(fuel, max_fuel, scoops, completed, done, orbiting, scoop, bodies, connections, tried, jumps)`
+
+---
+
 ### [`tests/test_input_names.py`](tests/test_input_names.py)
 > *Every form input has an accessible name, not just a nearby visual label.*
 
@@ -5661,7 +5693,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3659` lines
+**Size**: `3790` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5722,6 +5754,9 @@
   - Method `._scoop_action()` - *Orbit a scoopable body when the post-story tank is running low (ADR-396).*
   - Method `._salvage_action()` - *Probe a plausible derelict body after the campaign (ADR-396).*
   - Method `._wreck_sweep_action()` - *Board every derelict the captain can find (ADR-439).*
+  - Method `._scoopable_body()` - *The richest volatile body in the current system, or None (ADR-444).*
+  - Method `._helium_tap_action()` - *Take a volatile tap while the tank has room (ADR-444).*
+  - Method `._helium_sweep_action()` - *Burn tank room so the next volatile tap can land (ADR-444).*
   - Method `._outpost_link_action()` - *Build two same-system outposts, then link their supply (ADR-390).*
   - Method `._outpost_link_pair(local)` - *Route the newest unlinked outpost through the oldest unlinked hub.*
   - Method `._crew_dismiss_action()` - *Trim redundant unassigned crew after the campaign, weakest first (ADR-388).*

@@ -204,6 +204,11 @@ class AiCaptain:
     SCOOP_BODY_TYPES = frozenset({
         "star", "gas_giant", "ringed_giant", "ice_world", "ice_giant",
     })
+    # Richest volatile reservoirs first, mirroring exploration.SCOOP_RESERVE_BASE
+    # (star 6, gas giant 5, ringed and ice giants 4, ice worlds 3) (ADR-444).
+    SCOOP_BODY_PRIORITY = (
+        "star", "gas_giant", "ringed_giant", "ice_giant", "ice_world",
+    )
     # Mirrors exploration.DERELICT_EXCLUDED_TYPES (ADR-396).
     DERELICT_EXCLUDED_TYPES = frozenset({
         "star", "orbital_station", "research_outpost", "black_hole",
@@ -221,6 +226,15 @@ class AiCaptain:
     # keeps boarding every hulk it finds, under its own probe budget (ADR-439).
     WRECK_TARGET = 5
     WRECK_PROBE_LIMIT = 24
+
+    # The codex's helium-harvester milestone: ten fuel scoops. The one-shot scoop only
+    # fires on a half tank and is disabled after its first success, so the post-story
+    # captain keeps sweeping volatiles and burns tank room on jumps (ADR-444).
+    HELIUM_TARGET = 10
+    HELIUM_JUMP_LIMIT = 16
+    # Orbit detours are the part that moves the ship away from an errand's body, so
+    # they are capped; a tap at the current orbit is free and stays available (ADR-444).
+    HELIUM_TAP_LIMIT = 18
 
     # The codex's corsair milestone: five pirate fights. The captain fought one per
     # campaign through a session flag; the persisted stat now bounds the engagement
@@ -355,6 +369,15 @@ class AiCaptain:
         # Wreck sweep state: the post-story boarding probes spent, so a hulk-free
         # system cannot eat the errands (ADR-439).
         self.wreck_probes = 0
+        # Helium sweep state: finished, the fuel-burn jumps spent, the systems
+        # already jumped to, so a full tank cannot ping-pong forever, and the room a
+        # dedicated burn jump just opened, which the tap may use above half a tank
+        # without hijacking an errand's orbit (ADR-444).
+        self.helium_done = False
+        self.helium_jumps = 0
+        self.helium_systems_tried: set[str] = set()
+        self.helium_room_pending = False
+        self.helium_taps = 0
         self.scoop_probed: set[str] = set()
         # One gambit recall per campaign; a refused recall must not repeat each fight
         # (ADR-397).
@@ -595,6 +618,12 @@ class AiCaptain:
         if scoop is not None:
             return scoop
 
+        # Every tap counts, but the dock branch refuels the tank, so the tap must be
+        # taken before the ship is pulled back to a station (ADR-444).
+        helium_tap = self._helium_tap_action()
+        if helium_tap is not None:
+            return helium_tap
+
         # The wars left derelicts across the galaxy; probe a plausible body so the
         # salvage mechanic succeeds instead of refusing at a station (ADR-396).
         salvage = self._salvage_action()
@@ -819,6 +848,12 @@ class AiCaptain:
         wreck_sweep = self._wreck_sweep_action()
         if wreck_sweep is not None:
             return wreck_sweep
+
+        # Every scoop counts, but the tank needs room, so the last free step keeps
+        # sweeping volatiles and burns tank room on jumps (ADR-444).
+        helium = self._helium_sweep_action()
+        if helium is not None:
+            return helium
 
         return "/api/time/step", {"ticks": 1}, "time"
 
@@ -2430,6 +2465,102 @@ class AiCaptain:
             self.wreck_probes += 1
             return "/api/orbit", {"target": body_id}, "orbit"
         return None
+
+    def _scoopable_body(self):
+        """The richest volatile body in the current system, or None (ADR-444)."""
+        system = self.state.get("current_system") or {}
+        orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
+        bodies = [
+            body for body in system.get("bodies") or []
+            if isinstance(body, dict) and body.get("id")
+            and str(body.get("id")) != orbiting
+            and str(body.get("body_type") or "") in self.SCOOP_BODY_TYPES
+        ]
+        if not bodies:
+            return None
+        rank = {body_type: index
+                for index, body_type in enumerate(self.SCOOP_BODY_PRIORITY)}
+        bodies.sort(key=lambda body: rank.get(str(body["body_type"]), len(rank)))
+        return bodies[0]
+
+    def _helium_tap_action(self):
+        """Take a volatile tap while the tank has room (ADR-444).
+
+        Every successful scoop counts, even one that tops off a nearly full tank, and
+        a scoop only lands while the tank has room. This runs early in the chain:
+        the dock branch re-docks whenever the ship is not at a station, and a
+        station refuels the tank, so an end-of-chain orbit would be pulled away
+        before the tap landed. Orbiting a volatile body is a single instant action.
+        """
+        if self.helium_done:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        scoops = int((self.state.get("stats") or {}).get("scoops") or 0)
+        if scoops >= self.HELIUM_TARGET:
+            self.helium_done = True
+            return None
+        ship = self.state.get("ship") or {}
+        fuel = int(ship.get("fuel") or 0)
+        max_fuel = max(1, int(ship.get("max_fuel") or 0))
+        if fuel >= max_fuel:
+            return None
+        if (self.state.get("scoop") or {}).get("available"):
+            self.helium_room_pending = False
+            return "/api/scoop", {}, "scoop"
+        # A dedicated burn jump just opened room; use it before the dock branch can
+        # move the ship. Above half a tank a detour only happens for that reason, so
+        # the tap cannot hijack an errand's orbit (ADR-444).
+        if not self.helium_room_pending and fuel * 2 >= max_fuel:
+            return None
+        if self.helium_taps >= self.HELIUM_TAP_LIMIT:
+            return None
+        body = self._scoopable_body()
+        if body is None:
+            return None
+        self.helium_taps += 1
+        self.helium_room_pending = False
+        return "/api/orbit", {"target": str(body["id"])}, "orbit"
+
+    def _helium_sweep_action(self):
+        """Burn tank room so the next volatile tap can land (ADR-444).
+
+        A scoop needs room in the tank, and only a jump reliably burns fuel
+        (sublight hops are free), so a full tank is burned down along a connection,
+        bounded by ``HELIUM_JUMP_LIMIT`` so a full tank cannot ping-pong forever.
+        This runs last on the idle fallback, so no established errand is displaced;
+        the tap itself is taken early by ``_helium_tap_action``.
+        """
+        if self.helium_done:
+            return None
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        scoops = int((self.state.get("stats") or {}).get("scoops") or 0)
+        if scoops >= self.HELIUM_TARGET:
+            self.helium_done = True
+            return None
+        ship = self.state.get("ship") or {}
+        fuel = int(ship.get("fuel") or 0)
+        max_fuel = max(1, int(ship.get("max_fuel") or 0))
+        if fuel < max_fuel:
+            return None
+        if self.helium_jumps >= self.HELIUM_JUMP_LIMIT:
+            self.helium_done = True
+            return None
+        system = self.state.get("current_system") or {}
+        connections = [
+            str(item) for item in system.get("connections") or [] if item
+        ]
+        next_system = next(
+            (item for item in connections if item not in self.helium_systems_tried),
+            connections[0] if connections else "",
+        )
+        if not next_system:
+            return None
+        self.helium_systems_tried.add(next_system)
+        self.helium_jumps += 1
+        self.helium_room_pending = True
+        return "/api/navigate", {"system_id": next_system}, "navigate"
 
     def _outpost_link_action(self):
         """Build two same-system outposts, then link their supply (ADR-390).
