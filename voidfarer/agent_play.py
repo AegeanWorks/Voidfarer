@@ -227,6 +227,12 @@ class AiCaptain:
     WRECK_TARGET = 5
     WRECK_PROBE_LIMIT = 24
 
+    # The codex's decision-maker milestone: ten resolved decisions. The captain
+    # resolves every prompt with its first choice, but the relaxed cadence it used to
+    # set (one window per 36 ticks at 0.55x) reached only 2-6 per campaign, so the
+    # frequent cadence (one per 6 ticks at 1.6x) runs from the first step (ADR-445).
+    DECISION_TARGET = 10
+
     # The codex's helium-harvester milestone: ten fuel scoops. The one-shot scoop only
     # fires on a half tank and is disabled after its first success, so the post-story
     # captain keeps sweeping volatiles and burns tank room on jumps (ADR-444).
@@ -558,7 +564,7 @@ class AiCaptain:
             return "/api/time/step", {"ticks": 1}, "time"
 
         if step == 0:
-            return "/api/settings/decisions", {"cadence": "relaxed"}, "settings"
+            return "/api/settings/decisions", {"cadence": "frequent"}, "settings"
 
         if step == 1:
             project = self._first_research_project()

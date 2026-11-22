@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `271`
-- **Total Classes**: `641`
-- **Total Top-Level Functions**: `591`
-- **Total Class Methods**: `3416`
-- **Total Source Lines**: `74502`
+- **Total Python Modules**: `272`
+- **Total Classes**: `642`
+- **Total Top-Level Functions**: `592`
+- **Total Class Methods**: `3420`
+- **Total Source Lines**: `74561`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`271` module(s))
+- **Indexed**: python (`272` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -1942,6 +1942,23 @@
 
 **Functions:**
 - `def _engine(cargo)`
+
+---
+
+### [`tests/test_decision_cadence.py`](tests/test_decision_cadence.py)
+> *The captain runs decisions at the frequent cadence for the decision milestone (ADR-445).*
+
+**Size**: `53` lines
+
+**Classes:**
+- `class DecisionCadenceTest`
+  - Method `.test_the_first_step_sets_the_frequent_cadence()`
+  - Method `.test_a_pending_decision_resolves_with_the_first_choice()`
+  - Method `.test_the_frequent_cadence_widens_the_decision_windows()`
+  - Method `.test_the_target_mirrors_the_codex_entry()`
+
+**Functions:**
+- `def _captain()`
 
 ---
 
@@ -5693,7 +5710,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `3790` lines
+**Size**: `3796` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
