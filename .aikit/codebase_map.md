@@ -9,8 +9,8 @@
 - **Total Python Modules**: `278`
 - **Total Classes**: `648`
 - **Total Top-Level Functions**: `604`
-- **Total Class Methods**: `3501`
-- **Total Source Lines**: `75776`
+- **Total Class Methods**: `3502`
+- **Total Source Lines**: `75788`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`278` module(s))
@@ -87,7 +87,7 @@
 ### [`tests/test_agent_play.py`](tests/test_agent_play.py)
 > *The headless AI captain must be able to reach and exercise the game without a human.*
 
-**Size**: `3390` lines
+**Size**: `3400` lines
 
 **Classes:**
 - `class AgentApiCatalogTest`
@@ -122,6 +122,7 @@
 - `class PlayStepCapTest` - *The CLI honours --steps and says when the runaway guard clamps it (ADR-341).*
   - Method `.test_a_request_beyond_the_guard_is_clamped_and_reported()`
   - Method `.test_a_request_inside_the_guard_runs_in_full_and_is_not_flagged()`
+  - Method `.test_the_guard_clears_the_campaign_length_the_last_entries_need()`
   - Method `.test_refusal_count_is_not_truncated_by_the_sample()`
   - Method `.test_total_steps_accumulate_across_play_calls()`
   - Method `.test_error_count_is_not_truncated_by_the_sample()`
@@ -5868,7 +5869,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4204` lines
+**Size**: `4206` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

@@ -231,6 +231,16 @@ class PlayStepCapTest(unittest.TestCase):
         self.assertEqual(report["steps_requested"], 3)
         self.assertFalse(report["steps_capped"])
 
+    def test_the_guard_clears_the_campaign_length_the_last_entries_need(self):
+        self.assertGreaterEqual(
+            AiCaptain.MAX_STEPS, 5000,
+            "the remaining codex entries are step-bound, so the ceiling must clear them",
+        )
+        self.assertLess(
+            AiCaptain.MAX_STEPS, 100000,
+            "the guard must still bound a runaway campaign",
+        )
+
     def test_refusal_count_is_not_truncated_by_the_sample(self):
         report = AiCaptain(_RefusingClient(), seed=42).play(steps=20)
         self.assertEqual(report["refusal_count"], 20)

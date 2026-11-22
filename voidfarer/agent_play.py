@@ -152,8 +152,10 @@ class AiCaptain:
     """A deterministic policy that exercises every mechanic family it can reach."""
 
     # A runaway guard, not a comfort limit: the CLI honours any request up to this bound
-    # and reports when it has to clamp (ADR-341).
-    MAX_STEPS = 2000
+    # and reports when it has to clamp (ADR-341). The last codex entries are step-bound,
+    # so the ceiling sits above the campaign length they need rather than at it
+    # (ADR-453).
+    MAX_STEPS = 5000
     # Affordability gates can pass later (contracts pay out), so a refused action is
     # retried after a cooldown instead of being written off for the whole run (ADR-345).
     REFUSAL_RETRY_STEPS = 40
