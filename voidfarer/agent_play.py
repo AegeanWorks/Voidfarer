@@ -290,8 +290,13 @@ class AiCaptain:
     REBUILD_ATTEMPT_LIMIT = 8
     RELIEF_RUNNER_TARGET = 3
     # Three bags can need one purchase per commodity each, so six purchases only ever
-    # funded two deliveries (ADR-440).
-    REBUILD_STOCK_LIMIT = 9
+    # funded two deliveries (ADR-440). A dock with only part of a bag in stock spends
+    # one purchase per partial top-up, so the budget must cover three full bags made
+    # from partial docks (ADR-454).
+    REBUILD_STOCK_LIMIT = 18
+    # A stocked hold is only useful over a devastated world, so relief travels to the
+    # nearest one; the search is bounded so it cannot roam the galaxy (ADR-454).
+    RELIEF_JUMP_LIMIT = 18
 
     # The codex's field-team milestone: five completed expeditions. The tour launches
     # one team and protects it, so the post-story captain keeps deploying fresh teams
@@ -455,6 +460,9 @@ class AiCaptain:
         # bags bought at dock for the sweep's own deliveries (ADR-438).
         self.rebuild_attempts = 0
         self.rebuild_stock_attempts = 0
+        # Relief travel: jumps spent carrying a stocked hold toward a devastated world,
+        # so the search is bounded (ADR-454).
+        self.relief_jumps = 0
         # Research bench state: the target is reached and the projects already tried,
         # so a refused start cannot repeat forever (ADR-432).
         self.research_done = False
@@ -2014,6 +2022,113 @@ class AiCaptain:
         return ("/api/reconstruct", {"body_id": body_id, "mode": "credits"},
                 "reconstruct")
 
+    def _relief_destination(self):
+        """The nearest system with a devastated inhabited world, as a first hop (ADR-454).
+
+        A stocked hold is worthless unless the ship is over a devastated colony, and a
+        measured campaign drifted for a thousand steps holding a full bag while no
+        target was in the current system. This walks the cached galaxy catalogue
+        breadth-first from the current system and returns the first hop toward the
+        nearest system that has a body with population and devastation.
+        """
+        systems = self._galaxy_systems()
+        current = str((self.state.get("current_system") or {}).get("id") or "")
+        if not current or not systems:
+            return None
+
+        def devastated(system_id: str) -> bool:
+            row = systems.get(system_id)
+            if not isinstance(row, dict):
+                return False
+            for body in row.get("bodies") or []:
+                if not isinstance(body, dict):
+                    continue
+                if (int(body.get("population") or 0) > 0
+                        and float(body.get("devastation") or 0.0) > 0.0):
+                    return True
+            return False
+
+        if devastated(current):
+            return None
+        seen = {current}
+        queue: list[tuple[str, str]] = [(current, "")]
+        while queue:
+            system_id, first_hop = queue.pop(0)
+            row = systems.get(system_id) or {}
+            for neighbour in row.get("connections") or []:
+                neighbour = str(neighbour)
+                if not neighbour or neighbour in seen:
+                    continue
+                hop = first_hop or neighbour
+                if devastated(neighbour):
+                    return hop
+                seen.add(neighbour)
+                queue.append((neighbour, hop))
+        return None
+
+    def _relief_travel_action(self):
+        """Jump one hop toward the nearest devastated world, bounded (ADR-454)."""
+        if self.relief_jumps >= self.RELIEF_JUMP_LIMIT:
+            return None
+        hop = self._relief_destination()
+        if not hop:
+            return None
+        costs = self.state.get("jump_fuel_costs") or {}
+        fuel = int((self.state.get("ship") or {}).get("fuel") or 0)
+        if hop not in costs:
+            return None
+        cost = int(costs[hop] or 0)
+        if cost <= 0 or fuel < cost:
+            return None
+        self.relief_jumps += 1
+        return "/api/jump", {"target": hop}, "jump"
+
+    def _relief_stock_action(self):
+        """Buy the next missing relief bag at whatever dock the ship reaches (ADR-454).
+
+        The sweep that delivers relief is gated on the one-shot reconstruction having
+        succeeded, so buying bags inside it meant an unstocked hold was never restocked
+        while the trek to a devastated world was still ahead of it; a measured campaign
+        reached 160 dock visits with stock on sale and bought nothing. This runs early,
+        like the volatile tap from ADR-444, and buys whichever missing ingredient the
+        dock can actually sell, in the quantity it has, so partial docks still help.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        relief = int((self.state.get("stats") or {}).get("relief_deliveries") or 0)
+        if relief >= self.RELIEF_RUNNER_TARGET:
+            return None
+        if self.rebuild_stock_attempts >= self.REBUILD_STOCK_LIMIT:
+            return None
+        if not self._is_docked():
+            return None
+        ship = self.state.get("ship") or {}
+        cargo = ship.get("cargo") or {}
+        credits = int(ship.get("credits") or 0)
+        quotes = {
+            str(quote.get("commodity_id")): quote
+            for quote in self.state.get("market_quotes") or []
+            if isinstance(quote, dict)
+        }
+        for item_id, quantity in self.RELIEF_CARGO:
+            need = max(0, quantity - int(cargo.get(item_id, 0)))
+            if need <= 0:
+                continue
+            quote = quotes.get(item_id)
+            if not quote:
+                continue
+            available = min(need, int(quote.get("max_buy") or 0))
+            if available <= 0:
+                continue
+            if credits < int(quote.get("buy_price") or 0) * available:
+                continue
+            self.rebuild_stock_attempts += 1
+            return ("/api/trade",
+                    {"commodity_id": item_id, "quantity": available,
+                     "is_buy": True},
+                    "trade")
+        return None
+
     def _rebuild_sweep_action(self):
         """Keep rebuilding devastated worlds to both relief milestones (ADR-437, ADR-438).
 
@@ -2048,10 +2163,6 @@ class AiCaptain:
             and int(body.get("population") or 0) > 0
             and float(body.get("devastation") or 0.0) > 0.0
         ]
-        if not targets:
-            return None
-        target = max(targets, key=lambda body: float(body.get("devastation") or 0.0))
-        body_id = str(target["id"])
         ship = self.state.get("ship") or {}
         cargo = ship.get("cargo") or {}
         missing = [
@@ -2060,34 +2171,45 @@ class AiCaptain:
             if int(cargo.get(item_id, 0)) < quantity
         ]
         credits = int(ship.get("credits") or 0)
-        if (need_relief and missing and self._is_docked()
-                and self.rebuild_stock_attempts < self.REBUILD_STOCK_LIMIT):
-            quotes = {
-                str(quote.get("commodity_id")): quote
-                for quote in self.state.get("market_quotes") or []
-                if isinstance(quote, dict)
-            }
-            for item_id, need in missing:
-                quote = quotes.get(item_id)
-                if not quote:
-                    continue
-                if int(quote.get("max_buy") or 0) < need:
-                    continue
-                if credits < int(quote.get("buy_price") or 0) * need:
-                    continue
-                self.rebuild_stock_attempts += 1
-                return ("/api/trade",
-                        {"commodity_id": item_id, "quantity": need, "is_buy": True},
-                        "trade")
+        if targets and need_relief and missing:
+            # A local devastated world makes the delivery the plan, so restock
+            # at this dock before spending credits on a rebuild (ADR-438, ADR-454).
+            stock = self._relief_stock_action()
+            if stock is not None:
+                return stock
+        if not targets:
+            # Nothing local to rebuild: a stocked hold travels to the nearest
+            # devastated world, and an empty one buys what this dock can sell
+            # (ADR-454). A docked ship with a sold-out market waits for the quote
+            # to refresh; an undocked one keeps travelling, because waiting for a
+            # full bag deadlocked seed 42 in systems where no dock sold all three
+            # items at once.
+            if need_relief:
+                if not missing:
+                    return self._relief_travel_action()
+                stock = self._relief_stock_action()
+                if stock is not None:
+                    return stock
+                if not self._is_docked():
+                    return self._relief_travel_action()
+            return None
+        target = max(targets, key=lambda body: float(body.get("devastation") or 0.0))
+        body_id = str(target["id"])
         orbiting = str((self.state.get("orbiting_body") or {}).get("id") or "")
         landed = str(ship.get("landed_body_id") or "")
+        stocked = not missing
+        # An unstocked hold that cannot pay for a credit rebuild has nothing to do
+        # here, so it stops rather than orbiting a target it could never reconstruct
+        # (ADR-454).
+        can_credit = need_rebuild and credits >= self.RECONSTRUCTION_COST
+        if not stocked and not can_credit:
+            return None
         if body_id not in (orbiting, landed):
             return "/api/orbit", {"target": body_id}, "orbit"
-        stocked = not missing
         mode = ""
         if stocked and need_relief:
             mode = "relief"
-        elif need_rebuild and credits >= self.RECONSTRUCTION_COST:
+        elif can_credit:
             mode = "credits"
         if not mode:
             return None

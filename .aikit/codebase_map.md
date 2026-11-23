@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `278`
-- **Total Classes**: `648`
-- **Total Top-Level Functions**: `604`
-- **Total Class Methods**: `3502`
-- **Total Source Lines**: `75788`
+- **Total Python Modules**: `279`
+- **Total Classes**: `651`
+- **Total Top-Level Functions**: `607`
+- **Total Class Methods**: `3527`
+- **Total Source Lines**: `76179`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`278` module(s))
+- **Indexed**: python (`279` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4391,6 +4391,45 @@
 
 ---
 
+### [`tests/test_relief_travel.py`](tests/test_relief_travel.py)
+> *The relief sweep travels to a devastated world instead of loitering (ADR-454).*
+
+**Size**: `269` lines
+
+**Classes:**
+- `class ReliefStockTest`
+  - Method `._captain(relief, docked, cargo, quotes, stock_attempts, completed)`
+  - Method `.test_a_dock_restocks_the_first_missing_bag()`
+  - Method `.test_stocking_runs_before_the_one_shot_rebuild_succeeds()`
+  - Method `.test_a_partial_dock_sells_what_it_has()`
+  - Method `.test_an_out_of_stock_dock_buys_nothing()`
+  - Method `.test_a_stocked_hold_does_not_buy()`
+  - Method `.test_an_undocked_ship_does_not_buy()`
+  - Method `.test_the_banked_target_stops_the_stocking()`
+  - Method `.test_the_purchase_budget_bounds_the_stocking()`
+  - Method `.test_nothing_stocks_before_the_campaign()`
+- `class ReliefTravelTest`
+  - Method `.test_a_stocked_hold_jumps_toward_a_devastated_world()`
+  - Method `.test_a_multi_hop_destination_takes_the_first_hop()`
+  - Method `.test_the_nearest_destination_wins()`
+  - Method `.test_an_empty_hold_still_travels_toward_a_devastated_world()`
+  - Method `.test_the_travel_budget_bounds_the_search()`
+  - Method `.test_a_banked_relief_target_stops_the_travel()`
+  - Method `.test_a_docked_sold_out_market_waits_for_refresh()`
+  - Method `.test_no_destination_means_no_travel()`
+- `class NoThrashTest`
+  - Method `.test_an_unstocked_hold_does_not_orbit_a_target_it_cannot_rebuild()`
+  - Method `.test_a_needed_credit_rebuild_still_orbits()`
+  - Method `.test_the_one_shot_gate_still_applies()`
+  - Method `.test_a_dock_restocks_for_a_local_target_it_cannot_rebuild()`
+
+**Functions:**
+- `def _body(body_id, population, devastation, **extra)`
+- `def _system(system_id, bodies, connections, **extra)`
+- `def _captain(galaxy, current, orbiting, cargo, credits, rebuilt, relief, completed, attempts, jumps)`
+
+---
+
 ### [`tests/test_repair_all_outposts.py`](tests/test_repair_all_outposts.py)
 > *REPAIR ALL OUTPOSTS restores every damaged outpost, worst first, as far as credits stretch.*
 
@@ -5869,7 +5908,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4206` lines
+**Size**: `4328` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5918,6 +5957,9 @@
   - Method `._relic_fuse_action()` - *Fuse the lowest complete relic set once after the campaign (ADR-392).*
   - Method `._megastructure_action()` - *Restore the first affordable restorable structure after the campaign (ADR-391).*
   - Method `._reconstruct_action()` - *Orbit and rebuild the worst devastated inhabited world in this system (ADR-395).*
+  - Method `._relief_destination()` - *The nearest system with a devastated inhabited world, as a first hop (ADR-454).*
+  - Method `._relief_travel_action()` - *Jump one hop toward the nearest devastated world, bounded (ADR-454).*
+  - Method `._relief_stock_action()` - *Buy the next missing relief bag at whatever dock the ship reaches (ADR-454).*
   - Method `._rebuild_sweep_action()` - *Keep rebuilding devastated worlds to both relief milestones (ADR-437, ADR-438).*
   - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*
