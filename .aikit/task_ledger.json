@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "relief-fuel",
+    "task_id": "sector-survey",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795471057.2115412,
+    "updated_at": 1795473589.4420004,
     "owner": "opencode:hy4-flash-free",
-    "lease_until": 1795478257.2115412,
+    "lease_until": 1795480789.4420004,
     "started_by": "opencode:hy4-flash-free",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795471076.4381852,
-    "completed_head": "b78322a1842e84ae315f15227a1b253164c82266",
-    "completed_tree": "9e5e9ae1089ff4659ce9c2c9253193ad0e829e05"
+    "completed_at": 1795473622.3875496,
+    "completed_head": "f20a6fd46ca968bb121b854c490e04ff9af2c5b3",
+    "completed_tree": "1c6024301a5b1e14eea9f5920e51247cb7bf0590"
   },
   "checkpoints": [
-    {
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "description": "[1/1] Bondholder banks on all six seeds (payouts 2.0-4.7k cr each, vs 80 before); codex 360 across six seeds vs 356 (seed 1 61 of 62, seeds 2/6/8/42 60, seed 11 59); each remaining gap is a live-state roll (privateer 0 captures, warlord 10-14/15, corsair 4/5 on three seeds, merchant 24/25 on 11, relic sets 3/4 on 42, relief on 1); the 1.25 stake margin came from a measured 2,400 cr stake settling at 0.8x for 1,933/2,000 on seed 1; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2416 OK with README tree at 210 suites (ADR-449); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "phase": "phase 4",
-      "phase_num": 4,
-      "status": "in_progress",
-      "task_id": "war-bond",
-      "timestamp": 1795350128.5902312,
-      "timestamp_str": "2026-11-22 15:22:08",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "agent": "kilo:goal",
-      "delivery": {
-        "forced": false,
-        "roots": [
-          "."
-        ]
-      },
-      "description": "Task 'war-bond' completed successfully.",
-      "head": "b307b150f37508d4c3919f3c9291013f5b5c3e80",
-      "phase": "completed",
-      "phase_num": 5,
-      "status": "completed",
-      "task_id": "war-bond",
-      "timestamp": 1795350158.7595508,
-      "timestamp_str": "2026-11-22 15:22:38"
-    },
-    {
-      "agent": "kilo:goal",
-      "description": "[1/2] Hold fire to capture pirate prizes",
-      "files_affected": [],
-      "impact_assessment": {
-        "benefits": "prizes captured on 5 of 6 seeds; codex net 363 vs 360; seed 11 returns to 61/62 after the earlier trade",
-        "mitigation": "ten failing-first cases in test_capture_window.py, a combat trace that showed the full-hull kill pattern, six measured campaigns, and the unchanged 180-step gate",
-        "risks": "contract: holding fire raises fight length by up to 6 subsystem strikes; the survival ladder still outranks capture; dependency: none; concurrency: none; state: one per-encounter counter",
-        "why": "the laser branch always fired first, so every enemy sat at full hull until its shields fell and died in that same volley; the engine only allows boarding below 30 percent hull, so no prize was ever taken"
-      },
-      "phase": "phase 2",
-      "phase_num": 2,
-      "plan_digest": "90fb602d22cd06da316b0418cfb6ee7a18d299a198799be1dd7908d70a229177",
-      "status": "in_progress",
-      "task_id": "capture-window",
-      "timestamp": 1795354159.605407,
-      "timestamp_str": "2026-11-22 16:29:19",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "agent": "kilo:goal",
       "checklists": "passed",
@@ -409,6 +350,65 @@
       "task_id": "relief-fuel",
       "timestamp": 1795471076.5159886,
       "timestamp_str": "2026-11-24 00:57:56"
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "description": "[1/2] Recover sector cartographer on seed 1 without regressing the completed seed 42 codex",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "Seed 1 reaches 62 of 62 while seed 42 stays complete; the survey track keeps its deterministic bounded policy",
+        "mitigation": "failing-first tests for the survey bound and completion, both 5000-step seeds measured against the ADR-455 baselines (seed 1 61 of 62, seed 42 62 of 62), the unchanged 180-step gate, and a Phase 4 aikit check",
+        "risks": "contract: bounded survey scans and jumps in the existing policy; dependency: /api/scan and the published survey snapshot already used; concurrency: none; state: in-memory counters only; extra scans and hops shift the step clock and may churn encounter-bound entries on either seed",
+        "why": "After ADR-455 seed 42 reaches a complete 62 of 62 codex, but seed 1 ends at 61 of 62 with only sector_cartographer (three full system surveys) unmet, so the last verified codex gap remains on that seed"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "ee9a787c89d3d6cad2e5563fab55725036ee5b1474c60c2f243b13a2bee74492",
+      "status": "in_progress",
+      "task_id": "sector-survey",
+      "timestamp": 1795471452.2085097,
+      "timestamp_str": "2026-11-24 01:04:12",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "checklists": "passed",
+      "description": "[1/1] The survey sweep no longer quits when fresh hyperlanes run out: it revisits the connected neighbour with the most unscanned bodies from the cached galaxy, bounded by a separate revisit counter, with a larger jump budget. Both benchmark seeds reach a complete 62 of 62 codex with 0 errors at 5000 steps; seed 1 rises from 1 to 3 system surveys (11 jumps, 12 scans in the last system) and seed 42 stays complete. Seven failing-first cases in tests/test_survey_revisit.py; 180-step gate unchanged at 58 families / 59 succeeded / 69 attempted with 0 gaps; suite Ran 2493 OK with README tree at 216 suites; all 6 delivery gates pass; ADR-456 recorded; checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "sector-survey",
+      "timestamp": 1795473589.4420004,
+      "timestamp_str": "2026-11-24 01:39:49",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'sector-survey' completed successfully.",
+      "head": "f20a6fd46ca968bb121b854c490e04ff9af2c5b3",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "sector-survey",
+      "timestamp": 1795473622.644457,
+      "timestamp_str": "2026-11-24 01:40:22"
     }
   ]
 }
