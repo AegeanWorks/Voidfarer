@@ -1,14 +1,14 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "step-guard",
+    "task_id": "relief-runner",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795370056.2468889,
-    "owner": "kilo:goal",
-    "lease_until": 1795377256.2468889,
-    "started_by": "kilo:goal",
+    "updated_at": 1795468096.1075766,
+    "owner": "opencode:hy4-flash-free",
+    "lease_until": 1795475296.1075766,
+    "started_by": "opencode:hy4-flash-free",
     "continuations": [],
     "workspaces": [
       {
@@ -16,81 +16,22 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795370204.2336931,
-    "completed_head": "d3fd69e6402593bfd391b50dfaa121b008ac94fe",
-    "completed_tree": "532a2f48b4a4e2f710f41d19de797e629c42ef70"
+    "completed_at": 1795468107.299896,
+    "completed_head": "09de3f102d2c75eca9bbe6c1dd7429889e2826db",
+    "completed_tree": "ec19735324af566b865709ecb2df8565f14826ac"
   },
   "checkpoints": [
     {
-      "task_id": "medal-rotation",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Decorated Crew banks on all six seeds with 0 errors; codex 57-60 of 62, net 352 vs 344 (seed 8 60 +4, 2/11/42 59 +2/+3/+2, 1 58 level, 6 57 -1 from veteran+warlord churn); both medals land inside the field-team five on most seeds; remaining gaps are Bondholder 80/2000, Privateer on 3 seeds, Warlord 9-13/15, Corsair 3-4/5, Veteran/Merchant by one; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2392 OK with README tree at 208 suites (ADR-447); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795338816.6261523,
-      "timestamp_str": "2026-11-22 12:13:36",
       "agent": "kilo:goal",
       "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "medal-rotation",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'medal-rotation' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795338825.3149798,
-      "timestamp_str": "2026-11-22 12:13:45",
-      "agent": "kilo:goal",
-      "head": "b76c28f6f185d0a5f6ca6e071cd9b6744a5630aa",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "veteran-crew",
-      "phase": "phase 2",
-      "phase_num": 2,
-      "description": "[1/2] Drill a specialist to rank five",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795347002.1263492,
-      "timestamp_str": "2026-11-22 14:30:02",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the tour trained whichever member came first, so ranks spread and crew_max_skill ended at 3-4 of 5 on every seed while the treasury could pay for three drills many times over",
-        "benefits": "Veteran Crew banks on all six seeds; codex net 356 vs 352 (+4), seed 6 now 61/62",
-        "risks": "contract: three dock drills run before the shipyard; dependency: none; concurrency: none; state: two run fields; step-clock shift moves encounter-bound entries by 1-4",
-        "mitigation": "ten failing-first cases in test_veteran_crew.py, six measured campaigns, sequential reruns to separate contention from the change, and the unchanged 180-step gate"
-      },
-      "plan_digest": "2e284dbdef82af75846fd8cc93138e5d1d49b4c0e43b5d4937049e9c7b93c838",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "veteran-crew",
-      "phase": "phase 4",
-      "phase_num": 4,
       "description": "[1/1] Veteran Crew banks on all six seeds with 0 logic errors; codex 356 across six seeds vs 352 (seed 6 61 +4, 8 61 +1, 1 60 +2; 2/11/42 at 58 after one-entry encounter churn); seed 6 sits at 61/62 with only Bondholder left; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2402 OK with README tree at 209 suites, catalog test green alone in 10.5s (contention caused the parallel failure) (ADR-448); hygiene/secrets/deps/mechanics pass; checklists: passed",
       "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
       "status": "in_progress",
+      "task_id": "veteran-crew",
       "timestamp": 1795347025.4266262,
       "timestamp_str": "2026-11-22 14:30:25",
-      "agent": "kilo:goal",
-      "checklists": "passed",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -99,39 +40,39 @@
       ]
     },
     {
-      "task_id": "veteran-crew",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'veteran-crew' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795347038.5045238,
-      "timestamp_str": "2026-11-22 14:30:38",
       "agent": "kilo:goal",
-      "head": "1a1e6223293c95d4ede11ad26890185c6ad597bb",
       "delivery": {
+        "forced": false,
         "roots": [
           "."
-        ],
-        "forced": false
-      }
+        ]
+      },
+      "description": "Task 'veteran-crew' completed successfully.",
+      "head": "1a1e6223293c95d4ede11ad26890185c6ad597bb",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "veteran-crew",
+      "timestamp": 1795347038.5045238,
+      "timestamp_str": "2026-11-22 14:30:38"
     },
     {
-      "task_id": "war-bond",
-      "phase": "phase 2",
-      "phase_num": 2,
+      "agent": "kilo:goal",
       "description": "[1/2] Stake a decisive war bond for Bondholder",
       "files_affected": [],
+      "impact_assessment": {
+        "benefits": "Bondholder banks on all six seeds; codex net 360 vs 356 (+4)",
+        "mitigation": "fourteen failing-first cases in test_war_bond.py, six measured campaigns, a margin added after an early 2,400 cr stake settled at 0.8x for 1,933 of 2,000 on seed 1, and the unchanged 180-step gate",
+        "risks": "contract: a 2,500-3,300 cr pledge is spent per war from a post-story treasury of 70-200k, behind a 5,000 cr reserve; a losing side pays nothing; dependency: none; concurrency: none; state: one set plus a flag",
+        "why": "the tour pledged a token 100 cr to the defender, so settlement paid at most 150 cr against a 2,000 cr milestone; the 6,000 cr per-war cap, not the treasury, was the real ceiling"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "41bc8cd7af9a20ec97214bf5cdbc7db5f6e01dde0223aea50dfce668668d5357",
       "status": "in_progress",
+      "task_id": "war-bond",
       "timestamp": 1795350093.264026,
       "timestamp_str": "2026-11-22 15:21:33",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the tour pledged a token 100 cr to the defender, so settlement paid at most 150 cr against a 2,000 cr milestone; the 6,000 cr per-war cap, not the treasury, was the real ceiling",
-        "benefits": "Bondholder banks on all six seeds; codex net 360 vs 356 (+4)",
-        "risks": "contract: a 2,500-3,300 cr pledge is spent per war from a post-story treasury of 70-200k, behind a 5,000 cr reserve; a losing side pays nothing; dependency: none; concurrency: none; state: one set plus a flag",
-        "mitigation": "fourteen failing-first cases in test_war_bond.py, six measured campaigns, a margin added after an early 2,400 cr stake settled at 0.8x for 1,933 of 2,000 on seed 1, and the unchanged 180-step gate"
-      },
-      "plan_digest": "41bc8cd7af9a20ec97214bf5cdbc7db5f6e01dde0223aea50dfce668668d5357",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -140,16 +81,16 @@
       ]
     },
     {
-      "task_id": "war-bond",
-      "phase": "phase 4",
-      "phase_num": 4,
+      "agent": "kilo:goal",
+      "checklists": "passed",
       "description": "[1/1] Bondholder banks on all six seeds (payouts 2.0-4.7k cr each, vs 80 before); codex 360 across six seeds vs 356 (seed 1 61 of 62, seeds 2/6/8/42 60, seed 11 59); each remaining gap is a live-state roll (privateer 0 captures, warlord 10-14/15, corsair 4/5 on three seeds, merchant 24/25 on 11, relic sets 3/4 on 42, relief on 1); the 1.25 stake margin came from a measured 2,400 cr stake settling at 0.8x for 1,933/2,000 on seed 1; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2416 OK with README tree at 210 suites (ADR-449); hygiene/secrets/deps/mechanics pass; checklists: passed",
       "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
       "status": "in_progress",
+      "task_id": "war-bond",
       "timestamp": 1795350128.5902312,
       "timestamp_str": "2026-11-22 15:22:08",
-      "agent": "kilo:goal",
-      "checklists": "passed",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -158,39 +99,39 @@
       ]
     },
     {
-      "task_id": "war-bond",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'war-bond' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795350158.7595508,
-      "timestamp_str": "2026-11-22 15:22:38",
       "agent": "kilo:goal",
-      "head": "b307b150f37508d4c3919f3c9291013f5b5c3e80",
       "delivery": {
+        "forced": false,
         "roots": [
           "."
-        ],
-        "forced": false
-      }
+        ]
+      },
+      "description": "Task 'war-bond' completed successfully.",
+      "head": "b307b150f37508d4c3919f3c9291013f5b5c3e80",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "war-bond",
+      "timestamp": 1795350158.7595508,
+      "timestamp_str": "2026-11-22 15:22:38"
     },
     {
-      "task_id": "capture-window",
-      "phase": "phase 2",
-      "phase_num": 2,
+      "agent": "kilo:goal",
       "description": "[1/2] Hold fire to capture pirate prizes",
       "files_affected": [],
+      "impact_assessment": {
+        "benefits": "prizes captured on 5 of 6 seeds; codex net 363 vs 360; seed 11 returns to 61/62 after the earlier trade",
+        "mitigation": "ten failing-first cases in test_capture_window.py, a combat trace that showed the full-hull kill pattern, six measured campaigns, and the unchanged 180-step gate",
+        "risks": "contract: holding fire raises fight length by up to 6 subsystem strikes; the survival ladder still outranks capture; dependency: none; concurrency: none; state: one per-encounter counter",
+        "why": "the laser branch always fired first, so every enemy sat at full hull until its shields fell and died in that same volley; the engine only allows boarding below 30 percent hull, so no prize was ever taken"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "90fb602d22cd06da316b0418cfb6ee7a18d299a198799be1dd7908d70a229177",
       "status": "in_progress",
+      "task_id": "capture-window",
       "timestamp": 1795354159.605407,
       "timestamp_str": "2026-11-22 16:29:19",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the laser branch always fired first, so every enemy sat at full hull until its shields fell and died in that same volley; the engine only allows boarding below 30 percent hull, so no prize was ever taken",
-        "benefits": "prizes captured on 5 of 6 seeds; codex net 363 vs 360; seed 11 returns to 61/62 after the earlier trade",
-        "risks": "contract: holding fire raises fight length by up to 6 subsystem strikes; the survival ladder still outranks capture; dependency: none; concurrency: none; state: one per-encounter counter",
-        "mitigation": "ten failing-first cases in test_capture_window.py, a combat trace that showed the full-hull kill pattern, six measured campaigns, and the unchanged 180-step gate"
-      },
-      "plan_digest": "90fb602d22cd06da316b0418cfb6ee7a18d299a198799be1dd7908d70a229177",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -199,16 +140,16 @@
       ]
     },
     {
-      "task_id": "capture-window",
-      "phase": "phase 4",
-      "phase_num": 4,
+      "agent": "kilo:goal",
+      "checklists": "passed",
       "description": "[1/1] Prizes captured on 5 of 6 seeds (2 on 11, 1 on 1/2/6/8; 42 met no boardable enemy) with 0 errors; codex 363 across six seeds vs 360 (11 and 2/6/8 at 61 of 62, 1 at 60, 42 at 59); only Warlord (8-11/15) plus two seed-level rolls remain, and Warlord is encounter-bound (8-15 fights per 2,000 steps); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2426 OK with README tree at 211 suites (ADR-450); hygiene/secrets/deps/mechanics pass; checklists: passed",
       "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
       "status": "in_progress",
+      "task_id": "capture-window",
       "timestamp": 1795354183.8571482,
       "timestamp_str": "2026-11-22 16:29:43",
-      "agent": "kilo:goal",
-      "checklists": "passed",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -217,39 +158,39 @@
       ]
     },
     {
-      "task_id": "capture-window",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'capture-window' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795354212.0585861,
-      "timestamp_str": "2026-11-22 16:30:12",
       "agent": "kilo:goal",
-      "head": "8e971694550db4a848dad007cb3ee0bfd4412858",
       "delivery": {
+        "forced": false,
         "roots": [
           "."
-        ],
-        "forced": false
-      }
+        ]
+      },
+      "description": "Task 'capture-window' completed successfully.",
+      "head": "8e971694550db4a848dad007cb3ee0bfd4412858",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "capture-window",
+      "timestamp": 1795354212.058586,
+      "timestamp_str": "2026-11-22 16:30:12"
     },
     {
-      "task_id": "warlord-hunt",
-      "phase": "phase 2",
-      "phase_num": 2,
+      "agent": "kilo:goal",
       "description": "[1/2] Hunt the riskiest lane for Warlord",
       "files_affected": [],
+      "impact_assessment": {
+        "benefits": "three seeds now reach a complete 62/62 codex and the aggregate rises to 366 vs 363",
+        "mitigation": "thirteen failing-first cases in test_warlord_hunt.py, the corsair-first gate added after the first attempt starved Corsair's Bane to 4/5 on seed 11, and six measured campaigns",
+        "risks": "contract: constant jumps late in the campaign churn encounter rolls, which cost captains corps spins on early attempts; dependency: /api/galaxy plus StarSystem.from_dict and pirate_risk, all existing; concurrency: none; state: two fields",
+        "why": "every victory comes from a fight the engine rolls per jump, and a peaceful tour met only 8-15 of them, so Warlord's fifteen never banked"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "067f598b7704bb906e26c692f9cbc2128383f01cc35db35e7a62de0b33c9ed26",
       "status": "in_progress",
+      "task_id": "warlord-hunt",
       "timestamp": 1795358154.8416462,
       "timestamp_str": "2026-11-22 17:35:54",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "every victory comes from a fight the engine rolls per jump, and a peaceful tour met only 8-15 of them, so Warlord's fifteen never banked",
-        "benefits": "three seeds now reach a complete 62/62 codex and the aggregate rises to 366 vs 363",
-        "risks": "contract: constant jumps late in the campaign churn encounter rolls, which cost captains corps spins on early attempts; dependency: /api/galaxy plus StarSystem.from_dict and pirate_risk, all existing; concurrency: none; state: two fields",
-        "mitigation": "thirteen failing-first cases in test_warlord_hunt.py, the corsair-first gate added after the first attempt starved Corsair's Bane to 4/5 on seed 11, and six measured campaigns"
-      },
-      "plan_digest": "067f598b7704bb906e26c692f9cbc2128383f01cc35db35e7a62de0b33c9ed26",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -258,16 +199,16 @@
       ]
     },
     {
-      "task_id": "warlord-hunt",
-      "phase": "phase 4",
-      "phase_num": 4,
+      "agent": "kilo:goal",
+      "checklists": "passed",
       "description": "[1/1] Warlord banks on 3 of 6 seeds and seeds 2/8/11 reach a complete 62/62 codex (first complete codex in the campaign); aggregate 366 vs 363; seed 6 61, seed 1 60, seed 42 59; remaining gaps are fuel- and encounter-bound, not budget-bound (seed 6 spent 8 of 30 jumps, seed 42 ended at 0/80 fuel); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2439 OK with README tree at 212 suites (ADR-451); hygiene/secrets/deps/mechanics pass; checklists: passed",
       "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
       "status": "in_progress",
-      "timestamp": 1795358173.1085339,
+      "task_id": "warlord-hunt",
+      "timestamp": 1795358173.108534,
       "timestamp_str": "2026-11-22 17:36:13",
-      "agent": "kilo:goal",
-      "checklists": "passed",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -276,98 +217,39 @@
       ]
     },
     {
-      "task_id": "warlord-hunt",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'warlord-hunt' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795358189.1116526,
-      "timestamp_str": "2026-11-22 17:36:29",
       "agent": "kilo:goal",
-      "head": "198029521dbd9645f65d9dbc1adff8c14c6e6430",
       "delivery": {
+        "forced": false,
         "roots": [
           "."
-        ],
-        "forced": false
-      }
+        ]
+      },
+      "description": "Task 'warlord-hunt' completed successfully.",
+      "head": "198029521dbd9645f65d9dbc1adff8c14c6e6430",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "warlord-hunt",
+      "timestamp": 1795358189.1116526,
+      "timestamp_str": "2026-11-22 17:36:29"
     },
     {
-      "task_id": "hunt-refuel",
-      "phase": "phase 2",
-      "phase_num": 2,
+      "agent": "kilo:goal",
       "description": "[1/2] Refuel the hunt and keep a fuel reserve",
       "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795365349.5775156,
-      "timestamp_str": "2026-11-22 19:35:49",
-      "agent": "kilo:goal",
       "impact_assessment": {
-        "why": "the hunt drained tanks the helium track had stopped refilling, and one seed stranded itself at 0 fuel in a system with no volatile body or dock",
         "benefits": "the stranding dead-end closes and victories rise on four seeds; the half-tank variant was measured and rejected for reordering the campaign without a net entry",
+        "mitigation": "ten failing-first cases in test_hunt_refuel.py, both refuel thresholds measured (half-tank vs blocked-only), and six campaigns",
         "risks": "contract: the hunt refuses hops that would leave under 8 fuel; dependency: existing scoop and galaxy endpoints; concurrency: none; state: one counter",
-        "mitigation": "ten failing-first cases in test_hunt_refuel.py, both refuel thresholds measured (half-tank vs blocked-only), and six campaigns"
+        "why": "the hunt drained tanks the helium track had stopped refilling, and one seed stranded itself at 0 fuel in a system with no volatile body or dock"
       },
-      "plan_digest": "b250f2fd9d8cd273171887296e4fa5f67102e579d9a834980f75fb6817cd8abb",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "hunt-refuel",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] Hunt no longer strands: blocked-only refuel plus an 8-fuel reserve; victories rise on 4 seeds (42 10->14, 2 13->17, 8 12->16, 1 12->13) and the jump budget is fully spent where lanes exist (seed 8 30/30); codex holds at 366 aggregate with seeds 2/8/11 complete at 62/62, seed 6 61, seed 1 60, seed 42 59; the residual Warlord gap is step-bound (seed 6) and relief-bound (1, 42); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2449 OK with README tree at 213 suites (ADR-452); hygiene/secrets/deps/mechanics pass with the documented stale-native override (peer session editing host rust/); checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795365367.672422,
-      "timestamp_str": "2026-11-22 19:36:07",
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "task_id": "hunt-refuel",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'hunt-refuel' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795365388.3497622,
-      "timestamp_str": "2026-11-22 19:36:28",
-      "agent": "kilo:goal",
-      "head": "bff003651242f6526ce9b07133317ceb7c3f8f46",
-      "delivery": {
-        "roots": [
-          "."
-        ],
-        "forced": false
-      }
-    },
-    {
-      "task_id": "step-guard",
       "phase": "phase 2",
       "phase_num": 2,
-      "description": "[1/2] Raise the campaign step guard for completionist runs",
-      "files_affected": [],
+      "plan_digest": "b250f2fd9d8cd273171887296e4fa5f67102e579d9a834980f75fb6817cd8abb",
       "status": "in_progress",
-      "timestamp": 1795369950.2138135,
-      "timestamp_str": "2026-11-22 20:52:30",
-      "agent": "kilo:goal",
-      "impact_assessment": {
-        "why": "the last codex gaps looked encounter-bound, but a longer run showed seed 6 completes at 62/62 by 5,000 steps while the guard clamped every request at 2,000",
-        "benefits": "a completionist campaign is now possible with no change to any default: seed 6 reaches 62/62, and seeds 1/42 close Warlord and Privateer",
-        "risks": "contract: MAX_STEPS rises 2000 to 5000 as a ceiling only, so default and gate runs are untouched; dependency: none; concurrency: none; state: none",
-        "mitigation": "a test pins both edges of the guard (at least 5000, still under 100000), the clamp test sets its own value so it stays valid, and all six seeds were measured at both lengths"
-      },
-      "plan_digest": "a3f169833d1978da3ba3038429eb659f84e84b0a99393f7a87b3d47045f09040",
+      "task_id": "hunt-refuel",
+      "timestamp": 1795365349.5775156,
+      "timestamp_str": "2026-11-22 19:35:49",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -376,16 +258,16 @@
       ]
     },
     {
-      "task_id": "step-guard",
-      "phase": "phase 4",
-      "phase_num": 4,
-      "description": "[1/1] MAX_STEPS 2000 -> 5000 as a ceiling only; seed 6 reaches 62/62 at 5,000 steps through the real path (0 errors, no clamp), seeds 1/42 reach 61/62 with Warlord and Privateer closed; the single residual entry on both is Relief Runner (1/3 and 0/3 deliveries), a genuine relief-sweep defect recorded as the next task; no default or gate behaviour changed; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2450 OK with README tree at 213 suites (ADR-453); hygiene/secrets/deps/README/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "status": "in_progress",
-      "timestamp": 1795370056.2468889,
-      "timestamp_str": "2026-11-22 20:54:16",
       "agent": "kilo:goal",
       "checklists": "passed",
+      "description": "[1/1] Hunt no longer strands: blocked-only refuel plus an 8-fuel reserve; victories rise on 4 seeds (42 10->14, 2 13->17, 8 12->16, 1 12->13) and the jump budget is fully spent where lanes exist (seed 8 30/30); codex holds at 366 aggregate with seeds 2/8/11 complete at 62/62, seed 6 61, seed 1 60, seed 42 59; the residual Warlord gap is step-bound (seed 6) and relief-bound (1, 42); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2449 OK with README tree at 213 suites (ADR-452); hygiene/secrets/deps/mechanics pass with the documented stale-native override (peer session editing host rust/); checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "hunt-refuel",
+      "timestamp": 1795365367.672422,
+      "timestamp_str": "2026-11-22 19:36:07",
       "workspaces": [
         {
           "name": "voidfarer",
@@ -394,21 +276,139 @@
       ]
     },
     {
-      "task_id": "step-guard",
-      "phase": "completed",
-      "phase_num": 5,
-      "description": "Task 'step-guard' completed successfully.",
-      "status": "completed",
-      "timestamp": 1795370204.7660043,
-      "timestamp_str": "2026-11-22 20:56:44",
       "agent": "kilo:goal",
-      "head": "d3fd69e6402593bfd391b50dfaa121b008ac94fe",
       "delivery": {
+        "forced": false,
         "roots": [
           "."
-        ],
-        "forced": false
-      }
+        ]
+      },
+      "description": "Task 'hunt-refuel' completed successfully.",
+      "head": "bff003651242f6526ce9b07133317ceb7c3f8f46",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "hunt-refuel",
+      "timestamp": 1795365388.3497622,
+      "timestamp_str": "2026-11-22 19:36:28"
+    },
+    {
+      "agent": "kilo:goal",
+      "description": "[1/2] Raise the campaign step guard for completionist runs",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "a completionist campaign is now possible with no change to any default: seed 6 reaches 62/62, and seeds 1/42 close Warlord and Privateer",
+        "mitigation": "a test pins both edges of the guard (at least 5000, still under 100000), the clamp test sets its own value so it stays valid, and all six seeds were measured at both lengths",
+        "risks": "contract: MAX_STEPS rises 2000 to 5000 as a ceiling only, so default and gate runs are untouched; dependency: none; concurrency: none; state: none",
+        "why": "the last codex gaps looked encounter-bound, but a longer run showed seed 6 completes at 62/62 by 5,000 steps while the guard clamped every request at 2,000"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "a3f169833d1978da3ba3038429eb659f84e84b0a99393f7a87b3d47045f09040",
+      "status": "in_progress",
+      "task_id": "step-guard",
+      "timestamp": 1795369950.2138135,
+      "timestamp_str": "2026-11-22 20:52:30",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "kilo:goal",
+      "checklists": "passed",
+      "description": "[1/1] MAX_STEPS 2000 -> 5000 as a ceiling only; seed 6 reaches 62/62 at 5,000 steps through the real path (0 errors, no clamp), seeds 1/42 reach 61/62 with Warlord and Privateer closed; the single residual entry on both is Relief Runner (1/3 and 0/3 deliveries), a genuine relief-sweep defect recorded as the next task; no default or gate behaviour changed; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2450 OK with README tree at 213 suites (ADR-453); hygiene/secrets/deps/README/mechanics pass; checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "step-guard",
+      "timestamp": 1795370056.2468889,
+      "timestamp_str": "2026-11-22 20:54:16",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "kilo:goal",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'step-guard' completed successfully.",
+      "head": "d3fd69e6402593bfd391b50dfaa121b008ac94fe",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "step-guard",
+      "timestamp": 1795370204.7660043,
+      "timestamp_str": "2026-11-22 20:56:44"
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "description": "[1/2] Make the relief sweep travel to a devastated world and restock on the way",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "Relief Runner banks on both flagged seeds; the remaining codex gap closes without raising the step guard again; deterministic and stdlib-only",
+        "mitigation": "19 failing-first unit tests in tests/test_relief_travel.py, two 5,000-step benchmark campaigns on seeds 1 and 42, the unchanged 180-step gate, and a Phase 4 aikit check",
+        "risks": "contract: three new bounded helper actions inside the existing sweep; dependency: /api/galaxy catalogue and published jump costs already used by the hunt; concurrency: none; state: one in-memory jump counter, no save-field change; step-clock shifts may churn encounter-bound entries",
+        "why": "ADR-453 left Relief Runner at 1/3 and 0/3 on seeds 1 and 42: a stocked hold drifted for a thousand steps because the sweep returned early when the current system held no devastated target, and an empty hold never restocked on the trek"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "e0396e6d9b0b083d971a0d58b0596c3dbc42b760ee10ef2748d07c621e3edfb2",
+      "status": "in_progress",
+      "task_id": "relief-runner",
+      "timestamp": 1795460120.670742,
+      "timestamp_str": "2026-11-23 21:55:20",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "checklists": "passed",
+      "description": "[1/1] Relief sweep no longer returns early when no local target: it routes toward the nearest devastated system, restocks at every dock and waits only when a docked market is sold out. Seed 1 banks Relief Runner at 3 of 3 with 0 errors (18 hops, 13 purchases, codex 60 of 62 after route churn); seed 42 closes the deadlock (18 hops, 2 purchases, medicines 2 and hydroponics 2 held) but ends 0 of 3 because fuel cells were never in stock, codex 61 of 62 with 0 errors, so its residual gap is market availability. 180-step gate unchanged at 58 families / 59 succeeded / 69 attempted with 0 gaps; suite Ran 2471 OK with README tree at 214 suites; all 6 delivery gates pass (stale-native override while a peer edits host rust/); ADR-454 recorded; checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "relief-runner",
+      "timestamp": 1795468096.1075766,
+      "timestamp_str": "2026-11-24 00:08:16",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'relief-runner' completed successfully.",
+      "head": "09de3f102d2c75eca9bbe6c1dd7429889e2826db",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "relief-runner",
+      "timestamp": 1795468107.379812,
+      "timestamp_str": "2026-11-24 00:08:27"
     }
   ]
 }
