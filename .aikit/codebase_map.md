@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `279`
-- **Total Classes**: `651`
-- **Total Top-Level Functions**: `607`
-- **Total Class Methods**: `3527`
-- **Total Source Lines**: `76179`
+- **Total Python Modules**: `280`
+- **Total Classes**: `653`
+- **Total Top-Level Functions**: `609`
+- **Total Class Methods**: `3545`
+- **Total Source Lines**: `76416`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`279` module(s))
+- **Indexed**: python (`280` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -4371,6 +4371,37 @@
 
 ---
 
+### [`tests/test_relief_fuel.py`](tests/test_relief_fuel.py)
+> *A relief bag short of fuel cells harvests them from a surface site (ADR-455).*
+
+**Size**: `154` lines
+
+**Classes:**
+- `class ReliefFuelTest`
+  - Method `.test_a_landed_site_runs_the_fuel_operation_not_the_first_one()`
+  - Method `.test_a_used_fuel_operation_is_skipped()`
+  - Method `.test_an_unavailable_fuel_operation_is_skipped()`
+  - Method `.test_a_held_fuel_cell_stops_the_harvest()`
+  - Method `.test_nothing_harvests_before_the_campaign()`
+  - Method `.test_a_banked_relief_target_stops_the_harvest()`
+  - Method `.test_the_attempt_budget_stops_the_harvest()`
+  - Method `.test_a_worked_operation_increments_the_attempt_budget()`
+  - Method `.test_an_orbiting_ship_keeps_its_route()`
+  - Method `.test_a_ship_away_from_a_site_keeps_its_route()`
+  - Method `.test_a_ship_in_transit_does_not_land()`
+- `class FullHoldSaleTest`
+  - Method `._captain(cargo, quotes, relief, completed, free_volume)`
+  - Method `.test_a_full_hold_sells_ore_not_the_relief_bag()`
+  - Method `.test_the_sale_also_works_for_map_shaped_quotes()`
+  - Method `.test_relief_ingredients_are_sellable_once_the_milestone_is_banked()`
+  - Method `.test_a_hold_with_space_does_not_dump_cargo()`
+
+**Functions:**
+- `def _operations(fuel_used, fuel_available)`
+- `def _captain(cargo, landed, relief, completed, attempts, operations, orbiting, orbiting_id, travel)`
+
+---
+
 ### [`tests/test_relief_reconstruction.py`](tests/test_relief_reconstruction.py)
 > *Rebuilds prefer relief supplies, then fall back to credits (ADR-425).*
 
@@ -5908,7 +5939,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4328` lines
+**Size**: `4411` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*
@@ -5960,6 +5991,8 @@
   - Method `._relief_destination()` - *The nearest system with a devastated inhabited world, as a first hop (ADR-454).*
   - Method `._relief_travel_action()` - *Jump one hop toward the nearest devastated world, bounded (ADR-454).*
   - Method `._relief_stock_action()` - *Buy the next missing relief bag at whatever dock the ship reaches (ADR-454).*
+  - Method `._relief_reserved(item_id)` - *Keep an unfinished relief bag out of the generic full-hold sale (ADR-455).*
+  - Method `._relief_fuel_action()` - *Work a fuel-yielding surface site when a relief bag is short cells (ADR-455).*
   - Method `._rebuild_sweep_action()` - *Keep rebuilding devastated worlds to both relief milestones (ADR-437, ADR-438).*
   - Method `._note_pact_attempt(action, faction_id)` - *Remember a signature attempt so a refusal is not retried forever (ADR-428).*
   - Method `._pact_action()` - *Sign a trade pact, then a research pact, with a friendly faction (ADR-428).*

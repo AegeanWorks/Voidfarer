@@ -297,6 +297,10 @@ class AiCaptain:
     # A stocked hold is only useful over a devastated world, so relief travels to the
     # nearest one; the search is bounded so it cannot roam the galaxy (ADR-454).
     RELIEF_JUMP_LIMIT = 18
+    # Fuel cells are the bag ingredient markets run out of first; the surface
+    # harvest that completes a bag is bounded so a worked-out site cannot loop
+    # (ADR-455).
+    RELIEF_FUEL_LIMIT = 8
 
     # The codex's field-team milestone: five completed expeditions. The tour launches
     # one team and protects it, so the post-story captain keeps deploying fresh teams
@@ -463,6 +467,8 @@ class AiCaptain:
         # Relief travel: jumps spent carrying a stocked hold toward a devastated world,
         # so the search is bounded (ADR-454).
         self.relief_jumps = 0
+        # Fuel-cell harvests worked for an incomplete relief bag (ADR-455).
+        self.relief_fuel_attempts = 0
         # Research bench state: the target is reached and the projects already tried,
         # so a refused start cannot repeat forever (ADR-432).
         self.research_done = False
@@ -878,6 +884,13 @@ class AiCaptain:
         if trade is not None:
             return trade
 
+        # A relief bag short of fuel cells has a deterministic surface source;
+        # the generic fallback works the first operation, which rarely yields one
+        # (ADR-455).
+        relief_fuel = self._relief_fuel_action()
+        if relief_fuel is not None:
+            return relief_fuel
+
         if body and body.get("landable") and not ship.get("landed_body_id") and step % 3 == 0:
             return "/api/land", {"target": body["id"]}, "land"
 
@@ -1276,9 +1289,21 @@ class AiCaptain:
         """
         ship = self.state.get("ship") or {}
         quotes = self.state.get("market_quotes") or {}
+        # The live snapshot publishes quotes as a list, not a map keyed by id;
+        # checking cargo keys against the list directly made the full-hold sale
+        # dead code and let ore jam the hold until relief cargo overflowed
+        # (ADR-343, ADR-350, ADR-455).
+        if isinstance(quotes, dict):
+            quote_ids = {str(key) for key in quotes}
+        else:
+            quote_ids = {
+                str(row.get("commodity_id") or row.get("id") or "")
+                for row in quotes
+                if isinstance(row, dict)
+            }
         # The cap guards speculative buying; selling to keep the hold from jamming
         # drone collection must always work (ADR-350).
-        if not quotes:
+        if not quote_ids:
             return None
         cargo = ship.get("cargo") or {}
         capacity = int(ship.get("cargo_capacity") or 0)
@@ -1286,10 +1311,16 @@ class AiCaptain:
         if free_volume is None:
             free_volume = capacity - sum(int(v) for v in cargo.values())
         free_volume = int(free_volume)
-        if cargo and free_volume < self.TITANIUM_VOLUME:
+        story = self.state.get("story_status")
+        story_done = story is None or bool(story.get("completed"))
+        if cargo and free_volume < self.TITANIUM_VOLUME and story_done:
             # Only market commodities trade here; station consumables share the cargo
             # hold but have no quote, and selling one retried forever (ADR-371).
-            item = next((k for k, v in cargo.items() if int(v) > 0 and k in quotes), None)
+            item = next(
+                (k for k, v in cargo.items()
+                 if int(v) > 0 and k in quote_ids and not self._relief_reserved(k)),
+                None,
+            )
             if item:
                 self.fallback_trades += 1
                 return "/api/trade", {"commodity_id": item, "quantity": 1, "is_buy": False}, "trade"
@@ -2127,6 +2158,58 @@ class AiCaptain:
                     {"commodity_id": item_id, "quantity": available,
                      "is_buy": True},
                     "trade")
+        return None
+
+    def _relief_reserved(self, item_id: str) -> bool:
+        """Keep an unfinished relief bag out of the generic full-hold sale (ADR-455).
+
+        Seed 42 lost harvested fuel cells and bought medicines to the volume-full
+        fallback sale, which takes the first quoted cargo item regardless of what
+        the bag still needs. Once the milestone is banked the ingredients trade
+        freely again.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return False
+        if int((self.state.get("stats") or {}).get("relief_deliveries") or 0) >= self.RELIEF_RUNNER_TARGET:
+            return False
+        return any(item_id == needed for needed, _ in self.RELIEF_CARGO)
+
+    def _relief_fuel_action(self):
+        """Work a fuel-yielding surface site when a relief bag is short cells (ADR-455).
+
+        Seed 42 reached two of the three relief ingredients and then stalled: the
+        docks it visited never stocked fuel cells, so the third bag was never
+        completed. The engine already offers geothermal taps, ice drills, magma
+        taps and cloud scoops; the generic fallback works only the first available
+        operation, which is rarely one of them. This picks a fuel operation by the
+        cargo its own report advertises, so no operation catalog is duplicated.
+        """
+        if not (self.state.get("story_status") or {}).get("completed"):
+            return None
+        if int((self.state.get("stats") or {}).get("relief_deliveries") or 0) >= self.RELIEF_RUNNER_TARGET:
+            return None
+        ship = self.state.get("ship") or {}
+        if int((ship.get("cargo") or {}).get("fuel_cells") or 0) >= 1:
+            return None
+        if self.relief_fuel_attempts >= self.RELIEF_FUEL_LIMIT:
+            return None
+
+        # Opportunistic only: a ship that is not already landed keeps its route.
+        # Landing here for fuel starved the other late-game errands in a measured
+        # campaign, even though the surface harvest itself was correct (ADR-455).
+        report = self.state.get("surface_report") or {}
+        if not report.get("landed"):
+            return None
+        for operation in report.get("operations") or []:
+            if not isinstance(operation, dict) or not operation.get("id"):
+                continue
+            if operation.get("used") or not operation.get("available", True):
+                continue
+            cargo = operation.get("cargo") or []
+            if any(isinstance(row, dict) and str(row.get("id")) == "fuel_cells"
+                   and int(row.get("quantity") or 0) > 0 for row in cargo):
+                self.relief_fuel_attempts += 1
+                return "/api/surface/op", {"operation_id": operation["id"]}, "surface"
         return None
 
     def _rebuild_sweep_action(self):
