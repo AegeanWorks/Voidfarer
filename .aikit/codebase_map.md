@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `280`
-- **Total Classes**: `653`
-- **Total Top-Level Functions**: `609`
-- **Total Class Methods**: `3545`
-- **Total Source Lines**: `76416`
+- **Total Python Modules**: `281`
+- **Total Classes**: `654`
+- **Total Top-Level Functions**: `611`
+- **Total Class Methods**: `3553`
+- **Total Source Lines**: `76530`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`280` module(s))
+- **Indexed**: python (`281` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -5171,6 +5171,28 @@
 
 ---
 
+### [`tests/test_survey_revisit.py`](tests/test_survey_revisit.py)
+> *A survey sweep revisits unfinished neighbours instead of quitting (ADR-456).*
+
+**Size**: `89` lines
+
+**Classes:**
+- `class SurveyRevisitTest`
+  - Method `._captains(**kwargs)`
+  - Method `.test_a_fresh_lane_is_still_preferred()`
+  - Method `.test_an_exhausted_lane_revisits_the_most_unscanned_neighbour()`
+  - Method `.test_a_revisit_increments_the_bounded_counter()`
+  - Method `.test_the_revisit_budget_stops_the_sweep()`
+  - Method `.test_a_fully_scanned_neighbour_is_not_revisited()`
+  - Method `.test_the_jump_budget_still_bounds_the_sweep()`
+  - Method `.test_the_survey_target_still_stops_the_sweep()`
+
+**Functions:**
+- `def _system(system_id, bodies, connections)`
+- `def _captain(current, galaxy, tried, jumps, revisits, surveyed)`
+
+---
+
 ### [`tests/test_survey_sweep.py`](tests/test_survey_sweep.py)
 > *The post-story captain finishes one full system survey (ADR-427).*
 
@@ -5939,7 +5961,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4411` lines
+**Size**: `4436` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

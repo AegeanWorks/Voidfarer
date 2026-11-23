@@ -274,7 +274,10 @@ class AiCaptain:
     # Three completed sweeps bank the sector cartographer milestone (ADR-427, ADR-436).
     SURVEY_SCAN_LIMIT = 24
     SURVEY_SYSTEM_TARGET = 3
-    SURVEY_JUMP_LIMIT = 8
+    SURVEY_JUMP_LIMIT = 16
+    # A sweep can exhaust its fresh hyperlanes before three systems are complete;
+    # bounded revisits let it finish a partially scanned neighbour (ADR-456).
+    SURVEY_REVISIT_LIMIT = 8
 
     # The codex's technologist milestone: four completed research projects. The bench
     # is otherwise idle after the first project, so the post-story captain keeps it
@@ -459,6 +462,7 @@ class AiCaptain:
         self.survey_scans = 0
         self.survey_jumps = 0
         self.survey_systems_tried: set[str] = set()
+        self.survey_revisits = 0
         # Rebuild sweep state: the credit/relief reconstructions issued after the
         # one-shot errand, so a refused route is bounded (ADR-437), and the relief
         # bags bought at dock for the sweep's own deliveries (ADR-438).
@@ -2764,6 +2768,27 @@ class AiCaptain:
             ),
             "",
         )
+        if not next_system and self.survey_revisits < self.SURVEY_REVISIT_LIMIT:
+            # Fresh lanes ran out with surveys still short. The cached catalogue
+            # carries each body's scan flag, so return to the neighbour with the
+            # most unscanned bodies instead of ending the sweep (ADR-456).
+            systems = self._galaxy_systems()
+            candidates = []
+            for item in system.get("connections") or []:
+                neighbour = str(item)
+                if not neighbour:
+                    continue
+                row = systems.get(neighbour) or {}
+                pending = sum(
+                    1 for body in row.get("bodies") or []
+                    if isinstance(body, dict) and body.get("id")
+                    and not body.get("scan_completed")
+                )
+                if pending:
+                    candidates.append((pending, neighbour))
+            if candidates:
+                _, next_system = max(candidates)
+                self.survey_revisits += 1
         if not next_system:
             self.survey_done = True
             return None
