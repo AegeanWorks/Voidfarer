@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "relief-runner",
+    "task_id": "relief-fuel",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795468096.1075766,
+    "updated_at": 1795471057.2115412,
     "owner": "opencode:hy4-flash-free",
-    "lease_until": 1795475296.1075766,
+    "lease_until": 1795478257.2115412,
     "started_by": "opencode:hy4-flash-free",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795468107.299896,
-    "completed_head": "09de3f102d2c75eca9bbe6c1dd7429889e2826db",
-    "completed_tree": "ec19735324af566b865709ecb2df8565f14826ac"
+    "completed_at": 1795471076.4381852,
+    "completed_head": "b78322a1842e84ae315f15227a1b253164c82266",
+    "completed_tree": "9e5e9ae1089ff4659ce9c2c9253193ad0e829e05"
   },
   "checkpoints": [
-    {
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "description": "[1/1] Veteran Crew banks on all six seeds with 0 logic errors; codex 356 across six seeds vs 352 (seed 6 61 +4, 8 61 +1, 1 60 +2; 2/11/42 at 58 after one-entry encounter churn); seed 6 sits at 61/62 with only Bondholder left; 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2402 OK with README tree at 209 suites, catalog test green alone in 10.5s (contention caused the parallel failure) (ADR-448); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "phase": "phase 4",
-      "phase_num": 4,
-      "status": "in_progress",
-      "task_id": "veteran-crew",
-      "timestamp": 1795347025.4266262,
-      "timestamp_str": "2026-11-22 14:30:25",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "agent": "kilo:goal",
-      "delivery": {
-        "forced": false,
-        "roots": [
-          "."
-        ]
-      },
-      "description": "Task 'veteran-crew' completed successfully.",
-      "head": "1a1e6223293c95d4ede11ad26890185c6ad597bb",
-      "phase": "completed",
-      "phase_num": 5,
-      "status": "completed",
-      "task_id": "veteran-crew",
-      "timestamp": 1795347038.5045238,
-      "timestamp_str": "2026-11-22 14:30:38"
-    },
-    {
-      "agent": "kilo:goal",
-      "description": "[1/2] Stake a decisive war bond for Bondholder",
-      "files_affected": [],
-      "impact_assessment": {
-        "benefits": "Bondholder banks on all six seeds; codex net 360 vs 356 (+4)",
-        "mitigation": "fourteen failing-first cases in test_war_bond.py, six measured campaigns, a margin added after an early 2,400 cr stake settled at 0.8x for 1,933 of 2,000 on seed 1, and the unchanged 180-step gate",
-        "risks": "contract: a 2,500-3,300 cr pledge is spent per war from a post-story treasury of 70-200k, behind a 5,000 cr reserve; a losing side pays nothing; dependency: none; concurrency: none; state: one set plus a flag",
-        "why": "the tour pledged a token 100 cr to the defender, so settlement paid at most 150 cr against a 2,000 cr milestone; the 6,000 cr per-war cap, not the treasury, was the real ceiling"
-      },
-      "phase": "phase 2",
-      "phase_num": 2,
-      "plan_digest": "41bc8cd7af9a20ec97214bf5cdbc7db5f6e01dde0223aea50dfce668668d5357",
-      "status": "in_progress",
-      "task_id": "war-bond",
-      "timestamp": 1795350093.264026,
-      "timestamp_str": "2026-11-22 15:21:33",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "agent": "kilo:goal",
       "checklists": "passed",
@@ -409,6 +350,65 @@
       "task_id": "relief-runner",
       "timestamp": 1795468107.379812,
       "timestamp_str": "2026-11-24 00:08:27"
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "description": "[1/2] Make fuel cells obtainable so Relief Runner banks on seed 42",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "Relief Runner banks on seed 42; the third relief bag has a deterministic non-market source; codex reaches 62 of 62 on the last flagged seed",
+        "mitigation": "failing-first tests in a new test module, a 5000-step seed 42 campaign compared with the measured ADR-454 baseline, the unchanged 180-step gate, and a Phase 4 aikit check",
+        "risks": "contract: a new bounded agent action using existing surface operations and landing; dependency: /api/land and /api/surface/op already exercised by the fallback; concurrency: none; state: one in-memory attempt counter, no save-field change; landing changes the step clock and may churn encounter-bound entries",
+        "why": "ADR-454 closed the sweep deadlock but seed 42 still ends at 0 of 3 relief deliveries: its hold reaches medicines 2 and hydroponics 2 while fuel cells are never in stock at the docks it visits, so the codex gap survives"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "96788b2bd1991bcfeb41ff73d2f1b471b46adf53241e71a18f9b8e1e3b729a89",
+      "status": "in_progress",
+      "task_id": "relief-fuel",
+      "timestamp": 1795468506.3279326,
+      "timestamp_str": "2026-11-24 00:15:06",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "checklists": "passed",
+      "description": "[1/1] A full hold now sheds ore post-story instead of jamming until relief cargo overflows: list-shaped market quotes are normalized to ids, relief ingredients are reserved until the milestone banks, and a bounded opportunistic surface harvest supplies fuel cells when already landed. Seed 42 reaches a complete 62 of 62 codex with Relief Runner 3 of 3 and 0 errors; seed 1 banks Relief Runner 3 of 3 with 0 errors and codex 61 of 62 (sector cartographer lost to route churn). 180-step gate unchanged at 58 families / 59 succeeded / 69 attempted with 0 gaps; suite Ran 2486 OK with README tree at 215 suites; all 6 delivery gates pass; ADR-455 recorded; checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "relief-fuel",
+      "timestamp": 1795471057.2115412,
+      "timestamp_str": "2026-11-24 00:57:37",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'relief-fuel' completed successfully.",
+      "head": "b78322a1842e84ae315f15227a1b253164c82266",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "relief-fuel",
+      "timestamp": 1795471076.5159886,
+      "timestamp_str": "2026-11-24 00:57:56"
     }
   ]
 }
