@@ -260,6 +260,7 @@
 
             <!-- Quick Action & Audio Controls -->
             <div class="hud-top-actions">
+                <button class="btn-hud comms-pill" id="btnCommsPill" data-testid="comms-pill" title="Open the campaign comms log" hidden>COMMS <strong id="commsPillCount">0</strong></button>
                 <button class="btn-hud" id="audioToggleBtn" aria-pressed="true" title="Toggle Synthesized Audio">
                     <span class="icon" id="audioIcon">◉</span> SOUND FX
                 </button>
@@ -374,6 +375,14 @@
                 <button class="btn-cadet-guide" id="btnCadetGuide" title="Position ship and open the active milestone control">GUIDE ME</button>
                 <button class="btn-cadet-skip" id="btnSkipCadet" title="Dismiss flight academy tutorial">SKIP TUTORIAL</button>
             </div>
+        </div>
+
+        <!-- Post-graduation objective hand-off: the next campaign beat stays visible
+             without unhiding the condensed advanced rail (fun F1 / story F6). -->
+        <div class="objective-strip" id="objectiveStrip" data-testid="objective-strip" hidden>
+            <span class="objective-tag">NEXT OBJECTIVE</span>
+            <span class="objective-text" id="objectiveText"></span>
+            <button class="text-btn objective-plot" id="btnObjectivePlot" data-testid="objective-plot" hidden>PLOT TARGET ON MAP</button>
         </div>
 
         <!-- Main Workspace Deck Grid (command strip is placed on the bottom row by G-013) -->

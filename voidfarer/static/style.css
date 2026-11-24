@@ -11216,3 +11216,28 @@ body.cockpit-theme .nav-panel > .panel-header {
 .btn-trade, #btnHarvestFleet, .trade-tip { min-height: 24px; }
 .surface-op-side .btn-hud, .fleet-ship-card > .ship-actions .btn-hud, .target-disclosure-toggle,
 .surface-site-chip, .surface-disclosure-toggle, .skill-row .skill-train-btn, .skills-card-toggle { min-height: 24px; }
+
+/* Post-graduation objective hand-off: one compact line, never a second hidden tab (fun F1 / story F6). */
+.objective-strip {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 28px;
+    margin: 0.25rem 1.2rem 0 1.2rem;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid rgba(127, 183, 201, 0.35);
+    border-left: 3px solid var(--console-gold);
+    border-radius: 3px;
+    background: rgba(10, 18, 38, 0.86);
+    font-size: 0.75rem;
+    color: var(--console-text, #dce6f2);
+    position: relative;
+    z-index: 10;
+}
+.objective-strip[hidden] { display: none; }
+.objective-tag { color: var(--console-gold); font-weight: 700; white-space: nowrap; }
+.objective-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.objective-plot { margin-left: auto; white-space: nowrap; min-height: 24px; }
+.comms-pill { min-height: 24px; }
+.comms-pill[hidden] { display: none; }

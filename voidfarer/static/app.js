@@ -818,6 +818,11 @@ class CockpitApp {
         this.contractsBadge = document.getElementById("contractsBadge");
         this.storyBadge = document.getElementById("storyBadge");
         this.messagesBadge = document.getElementById("messagesBadge");
+        this.commsPill = document.getElementById("btnCommsPill");
+        this.commsPillCount = document.getElementById("commsPillCount");
+        this.objectiveStrip = document.getElementById("objectiveStrip");
+        this.objectiveText = document.getElementById("objectiveText");
+        this.objectivePlot = document.getElementById("btnObjectivePlot");
         this.marketBadge = document.getElementById("marketBadge");
         this.aiBadge = document.getElementById("aiBadge");
         this.skillsBadge = document.getElementById("skillsBadge");
@@ -1238,6 +1243,11 @@ class CockpitApp {
         if (this.tabBtnEmpire) this.tabBtnEmpire.addEventListener("click", () => this.switchRightTab("empire"));
         if (this.tabBtnCodex) this.tabBtnCodex.addEventListener("click", () => this.switchRightTab("codex"));
         this.tabBtnStory.addEventListener("click", () => this.switchRightTab("story"));
+        this.commsPill?.addEventListener("click", () => {
+            this.switchRightTab("story");
+            this.tabBtnStory?.click();
+        });
+        this.objectivePlot?.addEventListener("click", () => this.plotSystemOnMap(this.objectivePlot.dataset.system || ""));
         if (this.tabBtnFactions) {
             this.tabBtnFactions.addEventListener("click", () => this.switchRightTab("factions"));
         }
@@ -3000,6 +3010,12 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             const unread = (this.state.messages || []).filter(m => !m.read).length;
             this.messagesBadge.textContent = String(unread);
             this.messagesBadge.style.display = unread > 0 ? "inline-block" : "none";
+            if (this.commsPill && this.commsPillCount) {
+                const storyPending = this.storyBadge && this.storyBadge.style.display !== "none" ? 1 : 0;
+                const pending = storyPending + unread;
+                this.commsPillCount.textContent = String(pending);
+                this.commsPill.hidden = pending === 0;
+            }
         }
 
         // Render Active Tab Content
@@ -3607,6 +3623,7 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
                 this.appendLog(json.message, "system");
                 this.state = json.state;
                 this.renderHUD();
+                this.renderMissionPins();
             }
         } catch (e) {
             console.error("Error skipping tutorial:", e);
@@ -10432,6 +10449,10 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
         if (this.messagesBadge) {
             this.messagesBadge.textContent = String(unread);
             this.messagesBadge.style.display = unread > 0 ? "inline-block" : "none";
+            if (this.commsPill && this.commsPillCount) {
+                this.commsPillCount.textContent = String(unread);
+                this.commsPill.hidden = unread === 0;
+            }
         }
     }
 
@@ -10811,6 +10832,21 @@ if (this.tabBtnMessages) this.tabBtnMessages.addEventListener("click", () => thi
             ? `<button class="text-btn mission-pin-plot" id="btnPinPlot" data-system="${this.escapeHtml(plotId)}">PLOT CAMPAIGN TARGET ON MAP</button>` : "");
         const plot = document.getElementById("btnPinPlot");
         if (plot) plot.addEventListener("click", () => this.plotSystemOnMap(plot.dataset.system));
+
+        // Keep the next campaign beat on screen after graduation; the academy
+        // ribbon owns onboarding until it is finished (fun F1 / story F6).
+        const inAcademy = Boolean(tut.steps && !tut.completed && !tut.skipped && tut.steps.length);
+        const showObjective = !inAcademy && Boolean(chapter && !story.completed && !chapter.completed);
+        if (this.objectiveStrip && this.objectiveText) {
+            this.objectiveStrip.hidden = !showObjective;
+            if (showObjective) {
+                this.objectiveText.textContent = `${chapter.title}: ${chapter.objective || ""}`.trim();
+                if (this.objectivePlot) {
+                    this.objectivePlot.hidden = !plotId;
+                    this.objectivePlot.dataset.system = plotId || "";
+                }
+            }
+        }
     }
 
     plotSystemOnMap(systemId) {
