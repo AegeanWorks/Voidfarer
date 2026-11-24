@@ -274,7 +274,7 @@ class AiCaptain:
     # Three completed sweeps bank the sector cartographer milestone (ADR-427, ADR-436).
     SURVEY_SCAN_LIMIT = 24
     SURVEY_SYSTEM_TARGET = 3
-    SURVEY_JUMP_LIMIT = 16
+    SURVEY_JUMP_LIMIT = 8
     # A sweep can exhaust its fresh hyperlanes before three systems are complete;
     # bounded revisits let it finish a partially scanned neighbour (ADR-456).
     SURVEY_REVISIT_LIMIT = 8
@@ -2739,6 +2739,13 @@ class AiCaptain:
         if surveyed >= self.SURVEY_SYSTEM_TARGET:
             self.survey_done = True
             return None
+        ship = self.state.get("ship") or {}
+        # Orbit and scan are both refused while landed or in transit. Retrying
+        # them only burns the per-system scan budget, so wait for the ship to
+        # fly again rather than spending the whole sweep on refused actions
+        # (ADR-457).
+        if ship.get("landed_body_id") or ship.get("travel") or ship.get("void_traversal"):
+            return None
         system = self.state.get("current_system") or {}
         bodies = [body for body in system.get("bodies") or [] if isinstance(body, dict)]
         pending = [body for body in bodies if body.get("id") and not body.get("scan_completed")]
@@ -2769,9 +2776,16 @@ class AiCaptain:
             "",
         )
         if not next_system and self.survey_revisits < self.SURVEY_REVISIT_LIMIT:
-            # Fresh lanes ran out with surveys still short. The cached catalogue
-            # carries each body's scan flag, so return to the neighbour with the
-            # most unscanned bodies instead of ending the sweep (ADR-456).
+            # Fresh lanes ran out with surveys still short. The once-fetched
+            # catalogue has stale scan flags: revisiting on those sends the ship
+            # straight back out from systems it already finished, which burned
+            # the whole jump budget on seed 11 without completing a survey.
+            # Re-read the catalogue so the revisit targets a body still pending
+            # (ADR-457).
+            status, payload = self.client.get("/api/galaxy")
+            fresh = payload.get("systems") if status == 200 else None
+            if isinstance(fresh, dict) and fresh:
+                self.galaxy_cache = fresh
             systems = self._galaxy_systems()
             candidates = []
             for item in system.get("connections") or []:

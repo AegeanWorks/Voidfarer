@@ -9,8 +9,8 @@
 - **Total Python Modules**: `282`
 - **Total Classes**: `654`
 - **Total Top-Level Functions**: `612`
-- **Total Class Methods**: `3553`
-- **Total Source Lines**: `76569`
+- **Total Class Methods**: `3556`
+- **Total Source Lines**: `76612`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`282` module(s))
@@ -5174,7 +5174,7 @@
 ### [`tests/test_survey_revisit.py`](tests/test_survey_revisit.py)
 > *A survey sweep revisits unfinished neighbours instead of quitting (ADR-456).*
 
-**Size**: `89` lines
+**Size**: `118` lines
 
 **Classes:**
 - `class SurveyRevisitTest`
@@ -5186,6 +5186,9 @@
   - Method `.test_a_fully_scanned_neighbour_is_not_revisited()`
   - Method `.test_the_jump_budget_still_bounds_the_sweep()`
   - Method `.test_the_survey_target_still_stops_the_sweep()`
+  - Method `.test_a_landed_ship_does_not_burn_the_scan_budget()`
+  - Method `.test_a_ship_in_transit_does_not_burn_the_scan_budget()`
+  - Method `.test_a_stale_revisit_is_replaced_by_fresh_scan_state()`
 
 **Functions:**
 - `def _system(system_id, bodies, connections)`
@@ -5971,7 +5974,7 @@
 ### [`voidfarer/agent_play.py`](voidfarer/agent_play.py)
 > *Headless AI captain: plays the game through the same HTTP API the cockpit uses.*
 
-**Size**: `4436` lines
+**Size**: `4450` lines
 
 **Classes:**
 - `class ApiClient` - *Minimal JSON HTTP client for the cockpit server.*

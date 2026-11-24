@@ -84,6 +84,35 @@ class SurveyRevisitTest(unittest.TestCase):
     def test_the_survey_target_still_stops_the_sweep(self):
         self.assertIsNone(self._captains(surveyed=3)._survey_action())
 
+    def test_a_landed_ship_does_not_burn_the_scan_budget(self):
+        captain = self._captains()
+        captain.state["ship"] = {"landed_body_id": "sol_body_1"}
+        self.assertIsNone(captain._survey_action(), "orbit is refused while landed")
+        self.assertEqual(captain.survey_scans, 0)
+
+    def test_a_ship_in_transit_does_not_burn_the_scan_budget(self):
+        captain = self._captains()
+        captain.state["ship"] = {"travel": {"arrival_tick": 9}}
+        self.assertIsNone(captain._survey_action(), "scan is refused in transit")
+        self.assertEqual(captain.survey_scans, 0)
+
+    def test_a_stale_revisit_is_replaced_by_fresh_scan_state(self):
+        class FreshClient:
+            def get(self, path):
+                return 200, {"systems": {
+                    "sol": _system("sol", connections=["a", "b"]),
+                    "a": _system("a", [("a1", False), ("a2", False)]),
+                    "b": _system("b", [("b1", True)]),
+                }}
+
+        captain = self._captains(tried=["sol", "a", "b"])
+        captain.client = FreshClient()
+        self.assertEqual(
+            captain._survey_action(),
+            ("/api/navigate", {"system_id": "a"}, "navigate"),
+            "the revisit must target a body still pending in the refreshed catalogue",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
