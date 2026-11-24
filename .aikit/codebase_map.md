@@ -7,10 +7,10 @@
 
 ## 📊 Codebase Metrics
 - **Total Python Modules**: `282`
-- **Total Classes**: `654`
+- **Total Classes**: `657`
 - **Total Top-Level Functions**: `612`
-- **Total Class Methods**: `3556`
-- **Total Source Lines**: `76612`
+- **Total Class Methods**: `3560`
+- **Total Source Lines**: `76667`
 
 ## 🧭 Map Coverage
 - **Indexed**: python (`282` module(s))
@@ -920,9 +920,11 @@
 ### [`tests/test_chaos_fuzz.py`](tests/test_chaos_fuzz.py)
 > *The chaos fuzz tool must catch every rule class it claims to check (ADR-414).*
 
-**Size**: `149` lines
+**Size**: `162` lines
 
 **Classes:**
+- `class FuzzActionCatalogTest`
+  - Method `.test_every_fuzz_combat_action_is_a_real_engine_verb()`
 - `class ChaosInvariantTest`
   - Method `.test_the_checker_catches_every_rule_class()`
   - Method `.test_the_checker_catches_negative_heat()`
@@ -2102,11 +2104,12 @@
 ### [`tests/test_drone_partial_collection.py`](tests/test_drone_partial_collection.py)
 > *Drone haul collection fills the hold in part instead of refusing an oversized harvest.*
 
-**Size**: `70` lines
+**Size**: `81` lines
 
 **Classes:**
 - `class PartialDroneCollectionTest`
   - Method `.test_an_oversized_haul_fills_the_free_volume_and_keeps_the_rest()`
+  - Method `.test_xp_scales_with_the_units_actually_hauled()`
   - Method `.test_a_haul_that_fits_is_collected_whole()`
   - Method `.test_a_full_hold_still_banks_credits()`
   - Method `.test_no_room_and_no_credits_is_refused()`
@@ -3570,9 +3573,11 @@
 ### [`tests/test_messaging_crew_quantum.py`](tests/test_messaging_crew_quantum.py)
 > *Regression tests for message trees, crew, portraits, weapons, quantum tech, and megastructures.*
 
-**Size**: `301` lines
+**Size**: `315` lines
 
 **Classes:**
+- `class QuantumCompactNegotiationTest`
+  - Method `.test_negotiating_pays_more_research_than_accepting()`
 - `class MessageTreeTest`
   - Method `.setUp()`
   - Method `.test_tree_root_is_seeded_and_has_branches()`
@@ -5079,7 +5084,7 @@
 ### [`tests/test_story.py`](tests/test_story.py)
 > *Unit and integration tests for Cadet Flight Academy and The Precursor Cipher story campaign.*
 
-**Size**: `883` lines
+**Size**: `893` lines
 
 **Classes:**
 - `class TestStoryAndTutorial`
@@ -5128,6 +5133,8 @@
   - Method `.test_engine_load_state_migrates_legacy_campaign()`
   - Method `.test_serialization_roundtrip_preserves_flags_and_ending()`
   - Method `.test_migrate_empty_chapters_rebuilds_campaign()`
+- `class CampaignDocumentationTest`
+  - Method `.test_readme_advertises_the_implemented_act_count()`
 
 ---
 
@@ -5829,7 +5836,7 @@
 ### [`tools/chaos_fuzz.py`](tools/chaos_fuzz.py)
 > *Chaos-fuzz the engine with random valid actions and check state invariants.*
 
-**Size**: `400` lines
+**Size**: `404` lines
 
 **Classes:**
 - `class Findings` - *Collect crashes and invariant breaches once per distinct signature.*
@@ -6465,7 +6472,7 @@
 ### [`voidfarer/engine.py`](voidfarer/engine.py)
 > *Deterministic state machine and simulation engine for VoidFarer.*
 
-**Size**: `11388` lines
+**Size**: `11391` lines
 
 **Classes:**
 - `class SimulationEngine` - *Coordinates space flight, star navigation, fleet drones, upgrades, and tactical combat.*

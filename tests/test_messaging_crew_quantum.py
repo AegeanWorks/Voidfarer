@@ -18,6 +18,20 @@ from voidfarer.research import RESEARCH_MAP
 from voidfarer.weapons import WEAPON_CATALOG, get_weapon
 
 
+class QuantumCompactNegotiationTest(unittest.TestCase):
+    def test_negotiating_pays_more_research_than_accepting(self):
+        choices = TREE_MAP["quantum_offer"].nodes["root"].choices
+        by_id = {choice.id: choice for choice in choices}
+        accept = by_id["accept"]
+        negotiate = by_id["negotiate"]
+        self.assertGreater(
+            int(negotiate.outcome.get("research", 0)),
+            int(accept.outcome.get("research", 0)),
+            "a branch labelled 'Negotiate harder' must actually pay more research",
+        )
+        self.assertIn("quantum_key", accept.outcome, "accepting keeps its quantum key trade-off")
+
+
 class MessageTreeTest(unittest.TestCase):
     def setUp(self):
         self.engine = SimulationEngine(seed=42)

@@ -145,8 +145,8 @@ TREES: dict[str, MessageTree] = {
                     MessageChoice(
                         id="negotiate",
                         label="Negotiate harder",
-                        description="More research if your diplomacy skill is sufficient.",
-                        outcome={"research": 80, "standing_faction": "nebula_collective", "standing_delta": 4},
+                        description="More research, less standing and no quantum key - press the Collective hard.",
+                        outcome={"research": 160, "standing_faction": "nebula_collective", "standing_delta": 2},
                         next_node_id="accepted",
                     ),
                     MessageChoice(

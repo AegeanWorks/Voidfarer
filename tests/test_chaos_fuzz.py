@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 from dataclasses import replace
 
-from tools.chaos_fuzz import Findings, choose_action, check_invariants, run_seed
+from tools.chaos_fuzz import COMBAT_ACTIONS, Findings, choose_action, check_invariants, run_seed
 from voidfarer.engine import SimulationEngine
 from voidfarer.models import Depot, Outpost
 
@@ -48,6 +48,19 @@ def _bad_engine() -> SimulationEngine:
                       cargo={"water": -4}),),
     )
     return engine
+
+
+class FuzzActionCatalogTest(unittest.TestCase):
+    def test_every_fuzz_combat_action_is_a_real_engine_verb(self):
+        engine = SimulationEngine(seed=42)
+        from tests.test_combat_save_parity import _combat_engine
+        combat = _combat_engine()
+        for action in COMBAT_ACTIONS:
+            ok, message = combat.combat_action(action)
+            self.assertFalse(
+                str(message).startswith("Unknown combat action"),
+                f"fuzz action '{action}' never reaches combat logic: {message}",
+            )
 
 
 class ChaosInvariantTest(unittest.TestCase):

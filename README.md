@@ -337,7 +337,7 @@ python -m voidfarer.cli story
 # Resolve an episodic narrative dilemma
 python -m voidfarer.cli story choose choice_vance_telemetry
 ```
-The five-act campaign keeps persistent flags: later choices can need earlier decisions, locked choices show why, and the finale resolves First VoidFarer, Sentinel or Shadow Broker.
+The six-act campaign (Ghost Transmission through the First Charter) keeps persistent flags: later choices can need earlier decisions, locked choices show why, and the finale resolves First VoidFarer, Sentinel or Shadow Broker.
 
 ### 13b. The Hollow Between (Void Lane Traversal)
 ```bash

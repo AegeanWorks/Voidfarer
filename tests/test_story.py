@@ -879,5 +879,15 @@ class TestStoryBranchingMechanics(unittest.TestCase):
         self.assertFalse(rebuilt.completed)
 
 
+class CampaignDocumentationTest(unittest.TestCase):
+    def test_readme_advertises_the_implemented_act_count(self):
+        from pathlib import Path
+        from voidfarer.story import CAMPAIGN_CHAPTERS
+
+        readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
+        self.assertIn("six-act", readme, "README must not advertise the old five-act campaign")
+        self.assertEqual(len(CAMPAIGN_CHAPTERS), 6)
+
+
 if __name__ == "__main__":
     unittest.main()

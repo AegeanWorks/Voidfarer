@@ -59,7 +59,7 @@ class CombatSaveParityTest(unittest.TestCase):
             StorageManager(temp_dir).save(engine.state)
             resumed = SimulationEngine(state=StorageManager(temp_dir).load())
 
-        for action in ("fire_lasers", "brace_for_impact", "fire_lasers"):
+        for action in ("fire_lasers", "shield_absorb", "fire_lasers"):
             live = engine.combat_action(action)
             saved = resumed.combat_action(action)
             self.assertEqual(live, saved)

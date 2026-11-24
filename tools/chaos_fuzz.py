@@ -25,6 +25,13 @@ from voidfarer.storage import StorageManager  # noqa: E402
 
 WALL_CLOCK = {"completed_at", "created_at", "started_at", "saved_at", "timestamp", "recorded_at"}
 
+# Every entry must be a real `SimulationEngine.combat_action` verb; a dead name
+# silently consumes a fuzz slot without ever exercising combat (report F2).
+COMBAT_ACTIONS = (
+    "fire_lasers", "shield_absorb", "target_shields", "target_engines",
+    "vent_heat", "flee", "board_enemy", "point_defense",
+)
+
 
 def _strip_clock(value: Any, key: Optional[str] = None) -> Any:
     if key in WALL_CLOCK:
@@ -133,10 +140,7 @@ def choose_action(
     system = engine.current_system
 
     if state.active_combat is not None:
-        return "combat", lambda: engine.combat_action(rng.choice([
-            "fire_lasers", "brace_for_impact", "target_shields", "target_engines",
-            "vent_heat", "flee", "board_enemy", "combat_gambit",
-        ]))
+        return "combat", lambda: engine.combat_action(rng.choice(COMBAT_ACTIONS))
     if state.active_anomaly is not None:
         choices = [choice.choice_id for choice in state.active_anomaly.choices]
         if not choices:

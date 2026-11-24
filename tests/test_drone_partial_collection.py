@@ -35,6 +35,17 @@ class PartialDroneCollectionTest(unittest.TestCase):
         self.assertEqual(ship.cargo["titanium"], 5)
         self.assertEqual(ship.fleet_drones[0].cargo_accumulated, 95)
 
+    def test_xp_scales_with_the_units_actually_hauled(self):
+        engine = _engine({"titanium": 0}, capacity=10, accumulated=100)
+        before = engine.state.ship.mastery.xp
+        ok, _message, info = engine.collect_drone_yield()
+        self.assertTrue(ok)
+        gained = engine.state.ship.mastery.xp - before
+        self.assertLessEqual(
+            gained, info["cargo"],
+            "a five-unit partial haul must not pay the same XP as a full hold",
+        )
+
     def test_a_haul_that_fits_is_collected_whole(self):
         engine = _engine({}, capacity=40, accumulated=3)
         ok, _message, info = engine.collect_drone_yield()

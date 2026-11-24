@@ -6172,7 +6172,10 @@ class SimulationEngine:
             # Progress mining contracts and award fleet commander pilot XP
             updated_contracts, contract_logs = self._progress_contracts("mining", collected)
             new_log.extend(contract_logs)
-            new_mastery, xp_logs = self._award_pilot_xp(40, self.state.ship.mastery)
+            # XP follows the units actually hauled, capped at the old flat rate:
+            # a five-unit partial collection is not a full-hold payout (report F3).
+            harvest_xp = min(40, max(1, collected))
+            new_mastery, xp_logs = self._award_pilot_xp(harvest_xp, self.state.ship.mastery)
             new_log.extend(xp_logs)
 
             new_ship = self._clone_ship(
