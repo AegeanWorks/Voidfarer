@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "sector-survey",
+    "task_id": "perf-rust-shards",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795473589.4420004,
+    "updated_at": 1795479030.8872175,
     "owner": "opencode:hy4-flash-free",
-    "lease_until": 1795480789.4420004,
+    "lease_until": 1795486230.8872175,
     "started_by": "opencode:hy4-flash-free",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795473622.3875496,
-    "completed_head": "f20a6fd46ca968bb121b854c490e04ff9af2c5b3",
-    "completed_tree": "1c6024301a5b1e14eea9f5920e51247cb7bf0590"
+    "completed_at": 1795479031.519945,
+    "completed_head": "de29d1186ece74f6de27d0ec25334fdb1f164d77",
+    "completed_tree": "d75e3bb43766a88490b2ce1a097927e808803fcd"
   },
   "checkpoints": [
-    {
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "description": "[1/1] Prizes captured on 5 of 6 seeds (2 on 11, 1 on 1/2/6/8; 42 met no boardable enemy) with 0 errors; codex 363 across six seeds vs 360 (11 and 2/6/8 at 61 of 62, 1 at 60, 42 at 59); only Warlord (8-11/15) plus two seed-level rolls remain, and Warlord is encounter-bound (8-15 fights per 2,000 steps); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2426 OK with README tree at 211 suites (ADR-450); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "phase": "phase 4",
-      "phase_num": 4,
-      "status": "in_progress",
-      "task_id": "capture-window",
-      "timestamp": 1795354183.8571482,
-      "timestamp_str": "2026-11-22 16:29:43",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "agent": "kilo:goal",
-      "delivery": {
-        "forced": false,
-        "roots": [
-          "."
-        ]
-      },
-      "description": "Task 'capture-window' completed successfully.",
-      "head": "8e971694550db4a848dad007cb3ee0bfd4412858",
-      "phase": "completed",
-      "phase_num": 5,
-      "status": "completed",
-      "task_id": "capture-window",
-      "timestamp": 1795354212.058586,
-      "timestamp_str": "2026-11-22 16:30:12"
-    },
-    {
-      "agent": "kilo:goal",
-      "description": "[1/2] Hunt the riskiest lane for Warlord",
-      "files_affected": [],
-      "impact_assessment": {
-        "benefits": "three seeds now reach a complete 62/62 codex and the aggregate rises to 366 vs 363",
-        "mitigation": "thirteen failing-first cases in test_warlord_hunt.py, the corsair-first gate added after the first attempt starved Corsair's Bane to 4/5 on seed 11, and six measured campaigns",
-        "risks": "contract: constant jumps late in the campaign churn encounter rolls, which cost captains corps spins on early attempts; dependency: /api/galaxy plus StarSystem.from_dict and pirate_risk, all existing; concurrency: none; state: two fields",
-        "why": "every victory comes from a fight the engine rolls per jump, and a peaceful tour met only 8-15 of them, so Warlord's fifteen never banked"
-      },
-      "phase": "phase 2",
-      "phase_num": 2,
-      "plan_digest": "067f598b7704bb906e26c692f9cbc2128383f01cc35db35e7a62de0b33c9ed26",
-      "status": "in_progress",
-      "task_id": "warlord-hunt",
-      "timestamp": 1795358154.8416462,
-      "timestamp_str": "2026-11-22 17:35:54",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "agent": "kilo:goal",
       "checklists": "passed",
@@ -409,6 +350,65 @@
       "task_id": "sector-survey",
       "timestamp": 1795473622.644457,
       "timestamp_str": "2026-11-24 01:40:22"
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "description": "[1/2] Run the project unit suite through the Rust shard runner",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "Test gate falls to about 50 s with the same tests and assertions; threefold faster feedback",
+        "mitigation": "verified all 216 modules pass in 8 shards with exit 0, kept the original unittest path as fallback, added three Rust unit tests, and ran aikit check with 6/6 gates",
+        "risks": "contract: a new test_command and shim with automatic fallback; dependency: the Rust binary is optional and absent on machines without a build; concurrency: eight interpreter processes share the host and temp paths; state: none",
+        "why": "A 2,493-test sequential unittest discover takes about 145 s and dominated every Phase 4 check"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "16402a6ac871c680fd7eaa627133f915f1e3348db102a0c85a363f796c418e26",
+      "status": "in_progress",
+      "task_id": "perf-rust-shards",
+      "timestamp": 1795479029.925281,
+      "timestamp_str": "2026-11-24 03:10:29",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "checklists": "passed",
+      "description": "[1/1] Rust test_shard runner shards 216 modules across 8 processes: 40,491 ms versus 144,900 ms sequential (3.6x) and the aikit test gate 50,500 ms versus about 150,000 ms. All shards passed with exit 0, 3 Rust unit tests pass, 6/6 project gates pass, fallback preserved. checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "perf-rust-shards",
+      "timestamp": 1795479030.8872175,
+      "timestamp_str": "2026-11-24 03:10:30",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'perf-rust-shards' completed successfully.",
+      "head": "de29d1186ece74f6de27d0ec25334fdb1f164d77",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "perf-rust-shards",
+      "timestamp": 1795479031.7607546,
+      "timestamp_str": "2026-11-24 03:10:31"
     }
   ]
 }
