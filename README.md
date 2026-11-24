@@ -152,7 +152,7 @@ voidfarer/
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
 │   ├── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
 │   └── fast_tests.py     <- parallel test runner (Rust shards, Python fallback)
-└── tests/                <- unit & integration test suite (216 suites)
+└── tests/                <- unit & integration test suite (217 suites)
 ```
 
 ---

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `282`
-- **Total Classes**: `657`
+- **Total Python Modules**: `283`
+- **Total Classes**: `658`
 - **Total Top-Level Functions**: `612`
-- **Total Class Methods**: `3560`
-- **Total Source Lines**: `76667`
+- **Total Class Methods**: `3566`
+- **Total Source Lines**: `76716`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`282` module(s))
+- **Indexed**: python (`283` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -3752,6 +3752,22 @@
 - `class NonAggressionWarTest`
   - Method `._systems_and_leaders()`
   - Method `.test_active_pact_blocks_a_new_sol_coalition_war()`
+
+---
+
+### [`tests/test_objective_handoff.py`](tests/test_objective_handoff.py)
+> *The post-graduation objective hand-off stays on the HUD, not in a hidden tab.*
+
+**Size**: `49` lines
+
+**Classes:**
+- `class ObjectiveHandoffContractTest`
+  - Method `.setUpClass()`
+  - Method `.test_objective_strip_is_outside_the_contracts_tab()`
+  - Method `.test_comms_pill_lives_in_top_actions()`
+  - Method `.test_render_mission_pins_populates_the_strip()`
+  - Method `.test_comms_pill_tracks_unread_messages()`
+  - Method `.test_strip_has_a_compact_css_contract()`
 
 ---
 
