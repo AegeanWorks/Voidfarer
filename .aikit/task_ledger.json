@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "perf-rust-shards",
+    "task_id": "survey-revisit-fix",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795479030.8872175,
+    "updated_at": 1795489720.7373571,
     "owner": "opencode:hy4-flash-free",
-    "lease_until": 1795486230.8872175,
+    "lease_until": 1795496920.7373571,
     "started_by": "opencode:hy4-flash-free",
     "continuations": [],
     "workspaces": [
@@ -16,129 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795479031.519945,
-    "completed_head": "de29d1186ece74f6de27d0ec25334fdb1f164d77",
-    "completed_tree": "d75e3bb43766a88490b2ce1a097927e808803fcd"
+    "completed_at": 1795489777.1557856,
+    "completed_head": "8e3ffb2a61bd87a8af813a9d023051516aee90b5",
+    "completed_tree": "c9510f38f515262435a75317a395f4a332106525"
   },
   "checkpoints": [
-    {
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "description": "[1/1] Warlord banks on 3 of 6 seeds and seeds 2/8/11 reach a complete 62/62 codex (first complete codex in the campaign); aggregate 366 vs 363; seed 6 61, seed 1 60, seed 42 59; remaining gaps are fuel- and encounter-bound, not budget-bound (seed 6 spent 8 of 30 jumps, seed 42 ended at 0/80 fuel); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2439 OK with README tree at 212 suites (ADR-451); hygiene/secrets/deps/mechanics pass; checklists: passed",
-      "files_affected": [],
-      "phase": "phase 4",
-      "phase_num": 4,
-      "status": "in_progress",
-      "task_id": "warlord-hunt",
-      "timestamp": 1795358173.108534,
-      "timestamp_str": "2026-11-22 17:36:13",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "agent": "kilo:goal",
-      "delivery": {
-        "forced": false,
-        "roots": [
-          "."
-        ]
-      },
-      "description": "Task 'warlord-hunt' completed successfully.",
-      "head": "198029521dbd9645f65d9dbc1adff8c14c6e6430",
-      "phase": "completed",
-      "phase_num": 5,
-      "status": "completed",
-      "task_id": "warlord-hunt",
-      "timestamp": 1795358189.1116526,
-      "timestamp_str": "2026-11-22 17:36:29"
-    },
-    {
-      "agent": "kilo:goal",
-      "description": "[1/2] Refuel the hunt and keep a fuel reserve",
-      "files_affected": [],
-      "impact_assessment": {
-        "benefits": "the stranding dead-end closes and victories rise on four seeds; the half-tank variant was measured and rejected for reordering the campaign without a net entry",
-        "mitigation": "ten failing-first cases in test_hunt_refuel.py, both refuel thresholds measured (half-tank vs blocked-only), and six campaigns",
-        "risks": "contract: the hunt refuses hops that would leave under 8 fuel; dependency: existing scoop and galaxy endpoints; concurrency: none; state: one counter",
-        "why": "the hunt drained tanks the helium track had stopped refilling, and one seed stranded itself at 0 fuel in a system with no volatile body or dock"
-      },
-      "phase": "phase 2",
-      "phase_num": 2,
-      "plan_digest": "b250f2fd9d8cd273171887296e4fa5f67102e579d9a834980f75fb6817cd8abb",
-      "status": "in_progress",
-      "task_id": "hunt-refuel",
-      "timestamp": 1795365349.5775156,
-      "timestamp_str": "2026-11-22 19:35:49",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "agent": "kilo:goal",
-      "checklists": "passed",
-      "description": "[1/1] Hunt no longer strands: blocked-only refuel plus an 8-fuel reserve; victories rise on 4 seeds (42 10->14, 2 13->17, 8 12->16, 1 12->13) and the jump budget is fully spent where lanes exist (seed 8 30/30); codex holds at 366 aggregate with seeds 2/8/11 complete at 62/62, seed 6 61, seed 1 60, seed 42 59; the residual Warlord gap is step-bound (seed 6) and relief-bound (1, 42); 180 gate unchanged 58/59/69 with 0 gaps/0 errors; suite Ran 2449 OK with README tree at 213 suites (ADR-452); hygiene/secrets/deps/mechanics pass with the documented stale-native override (peer session editing host rust/); checklists: passed",
-      "files_affected": [],
-      "phase": "phase 4",
-      "phase_num": 4,
-      "status": "in_progress",
-      "task_id": "hunt-refuel",
-      "timestamp": 1795365367.672422,
-      "timestamp_str": "2026-11-22 19:36:07",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "agent": "kilo:goal",
-      "delivery": {
-        "forced": false,
-        "roots": [
-          "."
-        ]
-      },
-      "description": "Task 'hunt-refuel' completed successfully.",
-      "head": "bff003651242f6526ce9b07133317ceb7c3f8f46",
-      "phase": "completed",
-      "phase_num": 5,
-      "status": "completed",
-      "task_id": "hunt-refuel",
-      "timestamp": 1795365388.3497622,
-      "timestamp_str": "2026-11-22 19:36:28"
-    },
-    {
-      "agent": "kilo:goal",
-      "description": "[1/2] Raise the campaign step guard for completionist runs",
-      "files_affected": [],
-      "impact_assessment": {
-        "benefits": "a completionist campaign is now possible with no change to any default: seed 6 reaches 62/62, and seeds 1/42 close Warlord and Privateer",
-        "mitigation": "a test pins both edges of the guard (at least 5000, still under 100000), the clamp test sets its own value so it stays valid, and all six seeds were measured at both lengths",
-        "risks": "contract: MAX_STEPS rises 2000 to 5000 as a ceiling only, so default and gate runs are untouched; dependency: none; concurrency: none; state: none",
-        "why": "the last codex gaps looked encounter-bound, but a longer run showed seed 6 completes at 62/62 by 5,000 steps while the guard clamped every request at 2,000"
-      },
-      "phase": "phase 2",
-      "phase_num": 2,
-      "plan_digest": "a3f169833d1978da3ba3038429eb659f84e84b0a99393f7a87b3d47045f09040",
-      "status": "in_progress",
-      "task_id": "step-guard",
-      "timestamp": 1795369950.2138135,
-      "timestamp_str": "2026-11-22 20:52:30",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "agent": "kilo:goal",
       "checklists": "passed",
@@ -409,6 +291,124 @@
       "task_id": "perf-rust-shards",
       "timestamp": 1795479031.7607546,
       "timestamp_str": "2026-11-24 03:10:31"
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "description": "[1/2] Verify all six benchmark seeds still reach a complete codex",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "Confirms the campaign-wide codex completion the project's ADRs claim, or finds the next concrete gap",
+        "mitigation": "six 5,000-step runs through the same engine-state probe, 0-error assertion per seed, and the unchanged 180-step gate",
+        "risks": "contract: read-only measurement through the existing probe; dependency: none; concurrency: six sequential campaigns share the host; state: none",
+        "why": "ADR-454..456 were measured on seeds 1 and 42 only; the survey revisit and full-hold sale changes shift the step clock and could regress the other four benchmark seeds"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "c7dc1e4349d443ff55bdf717ea82f95203fd3eb57c1cc0f7d54bfe581a6b1198",
+      "status": "in_progress",
+      "task_id": "six-seed-verify",
+      "timestamp": 1795479409.7773938,
+      "timestamp_str": "2026-11-24 03:16:49",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "checklists": "passed",
+      "description": "[1/1] Six 5,000-step seeds measured with the engine-state probe: 1/2/6/11? seeds 1, 2, 6, 11 measured before the new ADR-456 change: 1=62, 2=62, 6=62, 42=62; after ADR-456 seeds 2/6=62, 8=61 (privateer), 11=57 (survey, freight, relic lost). Diagnosis: seed 11's sweep burned 16 jumps across 17 systems with 0 surveys because revisits used a stale galaxy cache and immediately re-jumped from already-scanned systems. Verification found a real regression; the fix task follows. checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "six-seed-verify",
+      "timestamp": 1795483025.5900257,
+      "timestamp_str": "2026-11-24 04:17:05",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'six-seed-verify' completed successfully.",
+      "head": "eba018b53a6a8e4c53540ba9ce64339d10e1ed0c",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "six-seed-verify",
+      "timestamp": 1795483029.901006,
+      "timestamp_str": "2026-11-24 04:17:09"
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "description": "[1/2] Make survey revisits use fresh scan state and stop the seed 11 churn",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "Restores seed 8 and 11 codex completion while keeping the seed 1 survey recovery",
+        "mitigation": "failing-first tests for stale-cache revisits, re-measure seeds 1, 8 and 11 at 5,000 steps against the regression baselines, and the unchanged 180-step gate",
+        "risks": "contract: the existing survey action and galaxy endpoint; dependency: /api/galaxy refresh on revisit only; concurrency: none; state: in-memory counters only; extra HTTP reads are bounded by the revisit budget",
+        "why": "ADR-456 revisited neighbours using the once-fetched galaxy cache, whose scan flags were stale, so seed 11 jumped through 17 systems completing no survey and displaced freight, relic and capture milestones"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "39a5952ae5620f778f0059c64f6be1eccefa3126273214b22833a03dcb27f2fa",
+      "status": "in_progress",
+      "task_id": "survey-revisit-fix",
+      "timestamp": 1795483050.5889163,
+      "timestamp_str": "2026-11-24 04:17:30",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "checklists": "passed",
+      "description": "[1/1] Survey revisits refresh the galaxy catalogue before choosing a target, keep the eight-jump budget and skip while landed or in transit. Seed 1 stays 62 of 62 with surveys done in seven jumps; seed 11 rises 57 to 58 but its survey and freight milestones remain open; seed 8 unchanged at 61 with privateer. Five failing-first tests, 180-step gate unchanged, all six delivery gates pass, ADR-457 recorded. checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "survey-revisit-fix",
+      "timestamp": 1795489720.7373571,
+      "timestamp_str": "2026-11-24 06:08:40",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'survey-revisit-fix' completed successfully.",
+      "head": "8e3ffb2a61bd87a8af813a9d023051516aee90b5",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "survey-revisit-fix",
+      "timestamp": 1795489777.292026,
+      "timestamp_str": "2026-11-24 06:09:37"
     }
   ]
 }
