@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "voidfarer",
-  "test_command": null,
+  "test_command": "python tools/fast_tests.py",
   "gates": {},
   "ui_required": true,
   "created": "2026-10-18",

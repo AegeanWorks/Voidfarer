@@ -150,7 +150,8 @@ voidfarer/
 │   ├── ai_play.py        <- headless AI campaign with mechanic coverage
 │   ├── chaos_fuzz.py     <- random-action engine fuzz with invariant checks
 │   ├── endurance_check.py<- segmented long-run campaign with reload checks
-│   └── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
+│   ├── mechanics_gate.py <- Phase 4 proof: coverage + invariant fuzz
+│   └── fast_tests.py     <- parallel test runner (Rust shards, Python fallback)
 └── tests/                <- unit & integration test suite (216 suites)
 ```
 

@@ -6,14 +6,14 @@
 ---
 
 ## 📊 Codebase Metrics
-- **Total Python Modules**: `281`
+- **Total Python Modules**: `282`
 - **Total Classes**: `654`
-- **Total Top-Level Functions**: `611`
+- **Total Top-Level Functions**: `612`
 - **Total Class Methods**: `3553`
-- **Total Source Lines**: `76530`
+- **Total Source Lines**: `76569`
 
 ## 🧭 Map Coverage
-- **Indexed**: python (`281` module(s))
+- **Indexed**: python (`282` module(s))
 - **Not indexed by this map**: javascript (`4` file(s))
 
 > Only Python symbols are catalogued. A language above is reported as not indexed, never as verified by this map.
@@ -5858,6 +5858,16 @@
 - `def stop(server, thread)`
 - `def run(seed, segment, segments)` - *Play ``segments`` chunks of ``segment`` steps, reloading a save between each.*
 - `def main(argv)`
+
+---
+
+### [`tools/fast_tests.py`](tools/fast_tests.py)
+> *Run the project's unit suite in parallel when the Rust shard runner is built.*
+
+**Size**: `39` lines
+
+**Functions:**
+- `def main()`
 
 ---
 
