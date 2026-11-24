@@ -3167,5 +3167,51 @@
     "final_snapshot_entries": 1385,
     "surface_digest": "c20b4eade65efc7e9c71fc2ae0bb685026471277233dc0c49ad1958c6cbc8ced",
     "baseline_digest": "c20b4eade65efc7e9c71fc2ae0bb685026471277233dc0c49ad1958c6cbc8ced"
+  },
+  {
+    "schema": 1,
+    "surface": "cockpit",
+    "mode": "visual",
+    "visual_change": true,
+    "changed_paths": [
+      "tests/test_objective_handoff.py",
+      "voidfarer/static/app.js",
+      "voidfarer/static/index.html",
+      "voidfarer/static/style.css"
+    ],
+    "no_visual_reason": "",
+    "baseline_commit": "HEAD",
+    "contract_hash": "ee8f2d3b45a0ded1d6ced207bb29c8782264b997bca6cdae4930c318dec202cc",
+    "started_at": 1795517047.6153255,
+    "finished_at": 1795518121.7153497,
+    "strikes": 1,
+    "reviewer": "opencode:hy4-flash-free (main multimodal fallback; G-015)",
+    "review": {
+      "reviewer": "opencode:hy4-flash-free (main multimodal fallback; G-015)",
+      "surface": "cockpit",
+      "surface_digest": "0ff060069cfd6798edae0e4bbad192395c2ebb39fefc74725a28c2278b34d2f8",
+      "snapshot_digest": "e8bd7aaa590c9b86adc1eb72e465f672a28f187e98695af4dd8eaa5b1fa1e486",
+      "snapshot_entries": 1392,
+      "visual": true,
+      "reviewed_at": 1795518121.7153533,
+      "scoped_paths": [
+        "tests/test_objective_handoff.py",
+        "voidfarer/static/app.js",
+        "voidfarer/static/index.html",
+        "voidfarer/static/style.css"
+      ],
+      "scoped_digest": "e2d6d36f80d56f2f216b1dfb6daefc3af8f7312c881f78aacbdda0c754dd41f1"
+    },
+    "allowed_removals": [],
+    "allowed_tests": [
+      {
+        "path": "tests/test_objective_handoff.py",
+        "reason": "DOM contract test for the objective strip and comms pill added in this UI task"
+      }
+    ],
+    "final_snapshot_digest": "e8bd7aaa590c9b86adc1eb72e465f672a28f187e98695af4dd8eaa5b1fa1e486",
+    "final_snapshot_entries": 1392,
+    "surface_digest": "0ff060069cfd6798edae0e4bbad192395c2ebb39fefc74725a28c2278b34d2f8",
+    "baseline_digest": "c20b4eade65efc7e9c71fc2ae0bb685026471277233dc0c49ad1958c6cbc8ced"
   }
 ]
