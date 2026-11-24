@@ -1,13 +1,13 @@
 {
   "version": 1,
   "active_task": {
-    "task_id": "report-driven-improvements",
+    "task_id": "objective-handoff",
     "last_phase": "phase 4",
     "active_phase": 5,
     "status": "completed",
-    "updated_at": 1795504627.6297486,
+    "updated_at": 1795518320.6230707,
     "owner": "opencode:hy4-flash-free",
-    "lease_until": 1795511827.6297486,
+    "lease_until": 1795525520.6230707,
     "started_by": "opencode:hy4-flash-free",
     "continuations": [],
     "workspaces": [
@@ -16,70 +16,11 @@
         "path": "projects/voidfarer"
       }
     ],
-    "completed_at": 1795504705.6630225,
-    "completed_head": "cba75ff7031ff0276556e614690571d6f204bb29",
-    "completed_tree": "8883f05a07043135ca5ea692364babcf95595165"
+    "completed_at": 1795518367.4667063,
+    "completed_head": "ae22987675510e29eae40d8818820d2e9aef50b2",
+    "completed_tree": "491d499a497d19318268d3da4a7b8ba92fdacf74"
   },
   "checkpoints": [
-    {
-      "agent": "opencode:hy4-flash-free",
-      "checklists": "passed",
-      "description": "[1/1] Relief sweep no longer returns early when no local target: it routes toward the nearest devastated system, restocks at every dock and waits only when a docked market is sold out. Seed 1 banks Relief Runner at 3 of 3 with 0 errors (18 hops, 13 purchases, codex 60 of 62 after route churn); seed 42 closes the deadlock (18 hops, 2 purchases, medicines 2 and hydroponics 2 held) but ends 0 of 3 because fuel cells were never in stock, codex 61 of 62 with 0 errors, so its residual gap is market availability. 180-step gate unchanged at 58 families / 59 succeeded / 69 attempted with 0 gaps; suite Ran 2471 OK with README tree at 214 suites; all 6 delivery gates pass (stale-native override while a peer edits host rust/); ADR-454 recorded; checklists: passed",
-      "files_affected": [],
-      "phase": "phase 4",
-      "phase_num": 4,
-      "status": "in_progress",
-      "task_id": "relief-runner",
-      "timestamp": 1795468096.1075766,
-      "timestamp_str": "2026-11-24 00:08:16",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
-    {
-      "agent": "opencode:hy4-flash-free",
-      "delivery": {
-        "forced": false,
-        "roots": [
-          "."
-        ]
-      },
-      "description": "Task 'relief-runner' completed successfully.",
-      "head": "09de3f102d2c75eca9bbe6c1dd7429889e2826db",
-      "phase": "completed",
-      "phase_num": 5,
-      "status": "completed",
-      "task_id": "relief-runner",
-      "timestamp": 1795468107.379812,
-      "timestamp_str": "2026-11-24 00:08:27"
-    },
-    {
-      "agent": "opencode:hy4-flash-free",
-      "description": "[1/2] Make fuel cells obtainable so Relief Runner banks on seed 42",
-      "files_affected": [],
-      "impact_assessment": {
-        "benefits": "Relief Runner banks on seed 42; the third relief bag has a deterministic non-market source; codex reaches 62 of 62 on the last flagged seed",
-        "mitigation": "failing-first tests in a new test module, a 5000-step seed 42 campaign compared with the measured ADR-454 baseline, the unchanged 180-step gate, and a Phase 4 aikit check",
-        "risks": "contract: a new bounded agent action using existing surface operations and landing; dependency: /api/land and /api/surface/op already exercised by the fallback; concurrency: none; state: one in-memory attempt counter, no save-field change; landing changes the step clock and may churn encounter-bound entries",
-        "why": "ADR-454 closed the sweep deadlock but seed 42 still ends at 0 of 3 relief deliveries: its hold reaches medicines 2 and hydroponics 2 while fuel cells are never in stock at the docks it visits, so the codex gap survives"
-      },
-      "phase": "phase 2",
-      "phase_num": 2,
-      "plan_digest": "96788b2bd1991bcfeb41ff73d2f1b471b46adf53241e71a18f9b8e1e3b729a89",
-      "status": "in_progress",
-      "task_id": "relief-fuel",
-      "timestamp": 1795468506.3279326,
-      "timestamp_str": "2026-11-24 00:15:06",
-      "workspaces": [
-        {
-          "name": "voidfarer",
-          "path": "projects/voidfarer"
-        }
-      ]
-    },
     {
       "agent": "opencode:hy4-flash-free",
       "checklists": "passed",
@@ -409,6 +350,65 @@
       "task_id": "report-driven-improvements",
       "timestamp": 1795504705.773239,
       "timestamp_str": "2026-11-24 10:18:25"
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "description": "[1/2] Surface the active campaign objective after graduation without unhiding the condensed rail",
+      "files_affected": [],
+      "impact_assessment": {
+        "benefits": "A visible NEXT OBJECTIVE strip and COMMS badge turn existing state into a reason to keep playing; no new mechanic or save field",
+        "mitigation": "failing-first static/DOM tests, real Edge screenshots through tools/ui_browser.py before and after, a vision subagent review under G-015, and the full suite plus 180-step gate",
+        "risks": "contract: additive DOM plus render wiring in the cockpit; dependency: story_status_with_route data already in /api/state; concurrency: none; state: one local one-shot flag; must preserve the five-tab rail, 56px headers and accessibility floors",
+        "why": "Both the fun and story reports independently found that after the six-step academy the next objective lives in an advanced tab and a collapsed comms stream, so the game stops telling the player what to play for"
+      },
+      "phase": "phase 2",
+      "phase_num": 2,
+      "plan_digest": "5ebeb3afd439dd69409074cbdbe78a463430fc41befd31eaac57609207c16bcb",
+      "status": "in_progress",
+      "task_id": "objective-handoff",
+      "timestamp": 1795506391.6149158,
+      "timestamp_str": "2026-11-24 10:46:31",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "checklists": "passed",
+      "description": "[1/2] NEXT OBJECTIVE strip and COMMS pill shipped with real Edge proof at 1280x720: strip text and COMMS 4 quoted, rect 1226x28, 0 errors, 0 hscroll; five failing-first DOM/CSS tests, UI task verified and finished, all six gates pass, ADR-459 recorded. checklists: passed",
+      "files_affected": [],
+      "phase": "phase 4",
+      "phase_num": 4,
+      "status": "in_progress",
+      "task_id": "objective-handoff",
+      "timestamp": 1795518320.6230707,
+      "timestamp_str": "2026-11-24 14:05:20",
+      "workspaces": [
+        {
+          "name": "voidfarer",
+          "path": "projects/voidfarer"
+        }
+      ]
+    },
+    {
+      "agent": "opencode:hy4-flash-free",
+      "delivery": {
+        "forced": false,
+        "roots": [
+          "."
+        ]
+      },
+      "description": "Task 'objective-handoff' completed successfully.",
+      "head": "ae22987675510e29eae40d8818820d2e9aef50b2",
+      "phase": "completed",
+      "phase_num": 5,
+      "status": "completed",
+      "task_id": "objective-handoff",
+      "timestamp": 1795518367.6126003,
+      "timestamp_str": "2026-11-24 14:06:07"
     }
   ]
 }
